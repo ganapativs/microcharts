@@ -12,7 +12,6 @@ import type { Value } from "../../core/types.js";
 import { rugGeometry, type RugTick } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual distribution summary — shared with the interactive entry. */
 export function rugSummary(
   ticks: readonly RugTick[],
   fmt: (n: number) => string,

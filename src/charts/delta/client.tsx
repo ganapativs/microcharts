@@ -40,7 +40,7 @@ export function Delta({
 }: InteractiveDeltaProps): React.ReactNode {
   const [pulse, setPulse] = useState(false);
   const prev = useRef(props.value);
-  const { summary, shown } = deltaModel(props);
+  const { summary, shown, display } = deltaModel(props);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
@@ -67,7 +67,7 @@ export function Delta({
   // nothing to focus or activate either.
   const pick =
     onSelect && props.summary !== false
-      ? (): void => onSelect({ index: 0, value: shown })
+      ? (): void => onSelect({ index: 0, value: shown, formatted: display })
       : undefined;
 
   return (

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { HistogramStrip } from "@microcharts/react/histogram-strip";
 import { HistogramStrip as HistogramStripInteractive } from "@microcharts/react/histogram-strip/interactive";
 import staticModule, { playground as staticPlayground, TIMES } from "./histogram-strip";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: HistogramStrip,
+  ChartLive: HistogramStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

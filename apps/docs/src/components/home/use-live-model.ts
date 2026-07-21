@@ -3,41 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { LIVE_FEW_SHOTS, LIVE_SYSTEM_PROMPT } from "@/lib/live-grammar";
 
 /**
- * HERO LIVE MODE — Chrome's built-in Prompt API (Gemini Nano, on-device).
+ * Chrome Prompt API (on-device) for the hero composer. Offered only when
+ * `LanguageModel.availability()` is `"available"` — never triggers a download.
+ * Grammar lives in `@/lib/live-grammar`; invalid tags render as literal code.
  *
- * What it is: when the visitor's Chrome already has its on-device model
- * installed, the hero's "assistant reply" panel gains a composer (sample
- * chips + free input). The question is answered locally by Gemini Nano —
- * nothing leaves the machine, no API key, no server. The model is taught the
- * tiny chart notation in `@/lib/live-grammar` (system prompt + few-shots
- * live there too), and its streamed reply runs through the same raw-grammar →
- * morph pipeline as the scripted tour. Invalid grammar renders as literal
- * code, never a broken chart. Everyone else sees the scripted tour, unchanged.
- *
- * How to enable it in your own Chrome (to see the composer):
- * 1. Chrome 138+ on desktop (Win 10/11, macOS 13+, Linux, Chromebook Plus).
- *    No mobile support. Hardware floor: ~22 GB free disk and 16 GB RAM with
- *    4+ cores, or a GPU with more than 4 GB VRAM.
- * 2. The model downloads once (~2–4 GB), browser-wide, after a user gesture
- *    on a page that calls the API. Quickest manual path: open DevTools on
- *    any page and run  `await LanguageModel.create()`  — Chrome starts the
- *    download. On older builds, first flip
- *    chrome://flags/#prompt-api-for-gemini-nano and
- *    chrome://flags/#optimization-guide-on-device-model to Enabled.
- *    Progress/status is visible at chrome://on-device-internals.
- * 3. When  `await LanguageModel.availability()`  returns `"available"`,
- *    reload the homepage — the composer appears under the reply panel.
- *
- * Why the gate is strict: live is offered ONLY when availability() reports
- * `available` — the model is already on disk. `downloadable` is deliberately
- * ignored: a homepage never triggers a multi-GB download. Everyone else keeps
- * the scripted tour; this hook then costs one settled promise.
+ * Enable locally: Chrome 138+ desktop, ~22 GB free / 16 GB RAM (or >4 GB VRAM).
+ * DevTools: `await LanguageModel.create()` (or enable the Prompt API flags on
+ * older builds). When availability is `"available"`, reload — composer appears.
  * Docs: https://developer.chrome.com/docs/ai/prompt-api
  *
- * Session strategy: one pristine base session holds the system prompt +
- * few-shot examples (created lazily on first intent — input focus / chip
- * hover); each ask clones it so replies never pollute the teaching context or
- * each other.
+ * One base session (system + few-shots); each ask clones it.
  */
 
 interface LMSession {

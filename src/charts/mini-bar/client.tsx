@@ -49,6 +49,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -110,13 +111,15 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = sorted[i];
+      const v = isFiniteValue(d?.value) ? (d!.value as number) : null;
       return {
         index: i,
-        value: isFiniteValue(d?.value) ? (d!.value as number) : null,
+        value: v,
         label: d?.label,
+        formatted: v === null ? `${d?.label}: ${strings.noData}` : `${d?.label}: ${fmt(v)}`,
       };
     },
-    [sorted],
+    [sorted, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -139,7 +142,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         : miniBarSummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // focus ring hugs the bar's category band, full value extent
+  const shown = active ?? selected;
   const outline = (i: number, pinned: boolean) => {
     const b = geo.bars[i];
     if (!b || b.empty) return null;
@@ -158,7 +161,6 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     );
   };
 
-  const shown = active ?? selected;
   const shownBar = shown !== null ? geo.bars[shown] : undefined;
   const shownDatum = shown !== null ? sorted[shown] : undefined;
   const announced =
@@ -189,13 +191,12 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticMiniBar>
       <LiveRegion>{announced}</LiveRegion>
-      {shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {readout && shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{

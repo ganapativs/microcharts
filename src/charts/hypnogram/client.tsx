@@ -47,6 +47,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -81,8 +82,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     for (const s of rowStates) max = Math.max(max, s.length);
     return max;
   }, [rowStates]);
-  // Shared with the static entry, drop rule included: at small sizes it hands
-  // the gutter back to the runs, and a copy that didn't would offset every x.
+  // Same drop rule as static — a mismatch would offset every run x.
   const { gutter } = hypnogramLabels({
     labels: labelsProp ?? width >= 96,
     width,
@@ -115,9 +115,10 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         index: i,
         value: run ? run.t1 - run.t0 : null,
         label: run?.state,
+        formatted: run ? `${run.state} ${fmt(run.t0)}–${fmt(run.t1)}` : undefined,
       };
     },
-    [geo],
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -176,13 +177,12 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticHypnogram>
       <LiveRegion>{announced}</LiveRegion>
-      {run ? (
+      {readout && run ? (
         <span
           className="mc-spark-readout"
           style={{

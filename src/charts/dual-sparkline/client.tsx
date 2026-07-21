@@ -5,6 +5,7 @@
 // touches both lines. Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -52,6 +53,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -65,7 +67,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
   useEntrance(hostRef, "draw", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 8));
+  const fontSize = labelFont(height, 0.4);
   // Last finite primary value — scanned backwards in place (a `[...data]
   // .reverse()` copies the whole series) and memoised: the interactive entry
   // re-renders on every unit crossed during a scrub, and this feeds `geo`.
@@ -112,9 +114,14 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
   const datum = useCallback(
     (i: number) => {
       const v = data[i];
-      return { index: i, value: isFiniteValue(v) ? v : null };
+      const c = compare[i];
+      return {
+        index: i,
+        value: isFiniteValue(v) ? v : null,
+        formatted: `${isFiniteValue(v) ? fmt(v) : "—"} / ${isFiniteValue(c) ? fmt(c) : "—"}`,
+      };
     },
-    [data],
+    [data, compare, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -175,7 +182,6 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         seriesStrings={seriesStrings}
         summary={false}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {selPoint ? (
           <circle
             cx={selPoint[0]}
@@ -219,7 +225,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         {rest.children}
       </StaticDualSparkline>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null && crossX !== undefined ? (
+      {readout && shown !== null && crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{

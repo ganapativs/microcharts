@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Sparkline } from "@microcharts/react/sparkline";
 import { Sparkline as SparklineInteractive } from "@microcharts/react/sparkline/interactive";
 import staticModule, { entry, playground as staticPlayground } from "./sparkline";
 
@@ -56,6 +57,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Sparkline,
+  ChartLive: SparklineInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

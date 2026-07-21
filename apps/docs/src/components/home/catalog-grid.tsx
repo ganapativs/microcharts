@@ -3,22 +3,11 @@ import "@microcharts/react/motion"; // tiles draw with the library's own entranc
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { ChartModule } from "@/lib/charts/types";
+import { useClickableCard } from "@/lib/use-clickable-card";
 
-/**
- * 02 · the catalog, live — a grid of real chart Previews (the same
- * components `/charts` renders). Shuffles per reload, one tile cross-fades
- * to a new type every couple of seconds (paused on hover/focus and in hidden
- * tabs). Hover reveals the tagline (space reserved — nothing shifts); the
- * final cell is the "+N more" door to the Charts index. Reduced motion: a
- * still, shuffled board.
- *
- * PERF: the homepage pays ZERO chart JS up front. The first board renders on the
- * SERVER and arrives as `children`; the pool's chart modules (~99 kB gzip — each
- * module carries its chart's interactive twin as well as the static one) are
- * imported only AFTER mount, off the critical path, at which point the client
- * board takes over and starts dealing. `tiles` carries just the name/tagline/tier
- * the board needs, so the 44 kB-gzip catalog metadata stays off the client too.
- */
+/** Live catalog board. SSR first paint; interactive modules load after mount.
+ *  Shuffles; one tile rotates (paused on hover/hidden). `tiles` = name/tagline
+ *  only so the full catalog stays off the client. */
 
 // 11 charts + the "+N more" tile = a 12-cell board — fills 2/3/4
 // columns exactly and keeps the section to three rows on desktop (breadth
@@ -51,7 +40,6 @@ export function CatalogGrid({
 }) {
   const [modules, setModules] = useState<Record<string, ChartModule> | null>(null);
   const [board, setBoard] = useState<Cell[] | null>(null);
-  const [live, setLive] = useState(false);
   const nonce = useRef(COUNT);
   const paused = useRef(false);
 
@@ -62,9 +50,11 @@ export function CatalogGrid({
 
     // Deferred to after mount: the server already painted a full board, so this
     // chunk only has to land before the first deal — never before first paint.
-    void import("@/components/home/hero-modules").then(({ HERO_MODULES }) => {
+    // Live modules carry PreviewLive (interactive entries); static hero-modules
+    // stay on the SSR path so first paint ships zero interactive chart JS.
+    void import("@/components/home/hero-modules-live").then(({ HERO_MODULES_LIVE }) => {
       if (cancelled) return;
-      setModules(HERO_MODULES);
+      setModules(HERO_MODULES_LIVE);
       setBoard(() => {
         const used = new Set<string>();
         return Array.from({ length: COUNT }, () => {
@@ -75,7 +65,6 @@ export function CatalogGrid({
       });
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      setLive(true);
 
       const tick = () => {
         if (document.visibilityState === "visible" && !paused.current) {
@@ -115,14 +104,15 @@ export function CatalogGrid({
       onFocusCapture={hold}
       onBlurCapture={release}
     >
-      {/* The server's board holds the space until the pool's modules land —
-          identical markup and box, so the handover shifts nothing. */}
+      {/* SSR board keeps layout until client modules hydrate (same box). */}
       {board && modules
         ? board.map((cell, i) => {
             const mod = modules[cell.slug];
             const entry = tiles.find((t) => t.slug === cell.slug);
             if (!mod || !entry) return <li key={cell.nonce} aria-hidden />;
-            const Preview = live && mod.PreviewLive ? mod.PreviewLive : mod.Preview;
+            // Interactive twin whenever it exists — pointer reaches the chart
+            // (tile link lives on the name row, not around the mark).
+            const Preview = mod.PreviewLive ?? mod.Preview;
             return (
               <CatalogTile key={cell.nonce} i={i} entry={entry}>
                 <Preview />
@@ -154,8 +144,15 @@ export function CatalogGrid({
 }
 
 /**
- * One board cell. Shared by the server's first board and the client's dealt
- * board so the two are identical and the handover is invisible.
+ * One board cell. Fully clickable (opens the chart docs) and interactive
+ * (hover/scrub on the mark).
+ *
+ * The link is a real `<a>` overlay (`.hx-tile-link`) — crawlable, shows its URL
+ * in the status bar, and supports right-click "Open in new tab" / "Copy link".
+ * It covers the name row + dead tile but sits BELOW the raised chart slot
+ * (`z-index`), so the interactive mark keeps hover/scrub and the focusable chart
+ * is never nested inside the `<a>`. Clicks on the raised slot are handled by
+ * `useClickableCard`: a short click navigates, a pointer scrub does not.
  */
 export function CatalogTile({
   i,
@@ -166,20 +163,24 @@ export function CatalogTile({
   entry: TileMeta;
   children: ReactNode;
 }) {
+  const href = `/docs/charts/${entry.slug}`;
+  const nav = useClickableCard(href);
+
   return (
     <li className="hx-stagger" style={{ "--i": i % 12 } as React.CSSProperties}>
-      <Link
-        prefetch={false}
-        href={`/docs/charts/${entry.slug}`}
-        aria-label={`${entry.name}: ${entry.tagline}`}
-        className="hx-tile group flex h-full flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4 no-underline"
+      <div
+        className="hx-tile group relative flex h-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4"
+        {...nav}
       >
-        <span
-          inert
-          className="hx-slot hx-swap flex min-h-[4.25rem] w-full items-center justify-center"
-        >
+        <Link
+          prefetch={false}
+          href={href}
+          className="hx-tile-link"
+          aria-label={`${entry.name}: ${entry.tagline}`}
+        />
+        <div className="hx-slot hx-swap flex min-h-[4.25rem] w-full items-center justify-center">
           {children}
-        </span>
+        </div>
         <span className="flex max-w-full items-center gap-1.5">
           <span
             aria-hidden
@@ -190,11 +191,10 @@ export function CatalogTile({
             {entry.name}
           </span>
         </span>
-        {/* tagline — one reserved line, fades in on hover, never shifts */}
         <span className="hv-tile-tag" aria-hidden>
           {entry.tagline}
         </span>
-      </Link>
+      </div>
     </li>
   );
 }

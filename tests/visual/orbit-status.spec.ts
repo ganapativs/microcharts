@@ -18,7 +18,7 @@ function gallery(): string {
   const cell = `<table><tbody>
     <tr><td>auth</td><td>${svg({ latency: 90, rate: 18, ...D, size: 18, summary: false })}</td></tr>
     <tr><td>payments</td><td>${svg({ latency: 240, rate: 12, ...D, size: 18, summary: false })}</td></tr>
-    <tr><td>search</td><td>${svg({ latency: 350, rate: 5, ...D, alert: 300, size: 18, summary: false })}</td></tr>
+    <tr><td>search</td><td>${svg({ latency: 350, rate: 5, ...D, threshold: 300, size: 18, summary: false })}</td></tr>
   </tbody></table>`;
 
   const kpi = `<div class="card">
@@ -30,7 +30,7 @@ function gallery(): string {
 
   const variants = [
     svg({ latency: 240, rate: 12, ...D, title: "healthy", size: 44 }),
-    svg({ latency: 350, rate: 5, ...D, alert: 300, title: "alerting", size: 44 }),
+    svg({ latency: 350, rate: 5, ...D, threshold: 300, title: "alerting", size: 44 }),
     svg({ latency: 100, rate: 0, ...D, title: "idle", size: 44 }),
     svg({ latency: NaN, rate: 5, title: "unknown", size: 44 }),
   ]

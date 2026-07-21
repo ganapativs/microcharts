@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TallyMarks } from "@microcharts/react/tally-marks";
 import { TallyMarks as TallyMarksInteractive } from "@microcharts/react/tally-marks/interactive";
 import staticModule, { playground as staticPlayground } from "./tally-marks";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TallyMarks,
+  ChartLive: TallyMarksInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

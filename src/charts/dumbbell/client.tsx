@@ -45,6 +45,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -133,9 +134,17 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
-      return { index: i, value: d && Number.isFinite(d.to) ? d.to : null, label: d?.label };
+      const c = d ? pairChange(d.from, d.to) : null;
+      return {
+        index: i,
+        value: d && Number.isFinite(d.to) ? d.to : null,
+        label: d?.label,
+        formatted: d
+          ? `${Number.isFinite(d.from) ? fmt(d.from) : "—"} → ${Number.isFinite(d.to) ? fmt(d.to) : "—"}${c ? ` (${c.dir} ${c.pct})` : ""}`
+          : undefined,
+      };
     },
-    [data],
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -228,13 +237,12 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? marks(selected, true) : null}
         {active !== null ? marks(active, false) : null}
         {rest.children}
       </StaticDumbbell>
       <LiveRegion>{announced}</LiveRegion>
-      {shownRow && shownDatum ? (
+      {readout && shownRow && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{

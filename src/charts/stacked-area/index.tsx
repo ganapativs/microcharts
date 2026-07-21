@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
@@ -108,7 +109,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     );
   }
 
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
+  const fontSize = labelFont(height, 0.3);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   // ridge forces smooth silhouettes (documented)
   const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
@@ -150,7 +151,6 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
       className={className ? `mc-stacked ${className}` : "mc-stacked"}
       style={rootStyle}
     >
-      {/* back-to-front for ridge (opaque fills), bottom-up for stacked */}
       {(mode === "ridge" ? [...geo.layers].reverse() : geo.layers).map((layer) => (
         <g key={layer.index}>
           {layer.dArea ? (
@@ -210,7 +210,10 @@ function round2Y(
   height: number,
   fontSize: number,
 ): number {
-  // stagger endpoint labels down the right edge in layer order
+  // stagger endpoint labels down the right edge in layer order. Alphabetic
+  // baseline: keep the em-box (≈0.78 above / 0.22 below) inside the viewBox.
   const y = fontSize + layer.index * fontSize * 1.15;
-  return Math.round(Math.min(y, height - 1) * 100) / 100;
+  const lo = fontSize * 0.78;
+  const hi = height - fontSize * 0.22;
+  return Math.round(Math.min(Math.max(y, lo), hi) * 100) / 100;
 }

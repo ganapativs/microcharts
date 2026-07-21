@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Hypnogram } from "@microcharts/react/hypnogram";
 import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
 import staticModule, { playground as staticPlayground, SLEEP, STATES, DOM } from "./hypnogram";
 
@@ -55,6 +56,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Hypnogram,
+  ChartLive: HypnogramInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

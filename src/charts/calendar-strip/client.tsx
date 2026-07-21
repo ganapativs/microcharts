@@ -70,6 +70,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -157,8 +158,16 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
   // index = day index in reading order over the weeks × 7 grid (0 = the
   // window's first cell); only past-or-present days are navigable.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: cells?.[i]?.value ?? null, label: dayLabelAt(i) }),
-    [cells, dayLabelAt],
+    (i: number) => {
+      const v = cells?.[i]?.value ?? null;
+      return {
+        index: i,
+        value: v,
+        label: dayLabelAt(i),
+        formatted: v === null ? `${dayLabelAt(i)}: —` : `${dayLabelAt(i)}: ${fmt(v)}`,
+      };
+    },
+    [cells, dayLabelAt, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -230,13 +239,12 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticCalendarStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell && shown !== null ? (
+      {readout && shownCell && shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{

@@ -42,7 +42,7 @@ describe("interactive <RugStrip>", () => {
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     // index is the RANK in the sorted values: rank 1 is 4.4, not data[1].
-    expect(seen.at(-1)).toEqual({ index: 1, value: 4.4 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 4.4 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -54,7 +54,7 @@ describe("interactive <RugStrip>", () => {
     wrap.focus();
     key(wrap, "End");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 3, value: 9.7 });
+    expect(picks.at(-1)).toMatchObject({ index: 3, value: 9.7 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

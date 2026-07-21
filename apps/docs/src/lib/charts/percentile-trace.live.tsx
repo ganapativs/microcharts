@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { PercentileTrace as PercentileTraceInteractive } from "@microcharts/react/percentile-trace/interactive";
 import staticModule, { playground as staticPlayground, DEMO } from "./percentile-trace";
 
@@ -17,7 +18,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <PercentileTraceInteractive
       data={DEMO}
-      bands={s.bands as boolean}
+      showBands={s.showBands as boolean}
       positive={s.positive as "up" | "down"}
       unit="week"
       animate={ui.animate}
@@ -30,7 +31,7 @@ export const playground: PlaygroundSpec = {
     [
       "<PercentileTrace",
       "  data={ranks}",
-      s.bands === false && "  bands={false}",
+      s.showBands === false && "  showBands={false}",
       s.positive !== "up" && `  positive="${s.positive}"`,
       ui.animate && " animate",
       "/>",
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PercentileTrace,
+  ChartLive: PercentileTraceInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -16,7 +16,7 @@ const OPACITY_STEPS = [0.15, 0.35, 0.55, 0.75, 1] as const;
 
 interface PolarSegment {
   index: number;
-  /** Cycle position (0 = 12 o'clock slot), after `start` rotation. */
+  /** Cycle position (0 = 12 o'clock slot), after `origin` rotation. */
   pos: number;
   a0: number;
   a1: number;
@@ -49,21 +49,21 @@ export interface PolarClockGeometry {
 }
 
 /**
- * `start` normalized to a slot index in `[0, n)`: floored, wrapped, and 0 for
+ * `origin` normalized to a slot index in `[0, n)`: floored, wrapped, and 0 for
  * anything non-finite. Exported because the interactive entry must invert the
  * SAME rotation the paint applied — normalizing there separately (or not at
- * all) turned `start={1.5}` into a fractional index that matches no segment,
+ * all) turned `origin={1.5}` into a fractional index that matches no segment,
  * and the dial stopped answering the pointer.
  */
-export function polarStart(start: number, n: number): number {
-  return n > 0 && Number.isFinite(start) ? ((Math.floor(start) % n) + n) % n : 0;
+export function polarStart(origin: number, n: number): number {
+  return n > 0 && Number.isFinite(origin) ? ((Math.floor(origin) % n) + n) % n : 0;
 }
 
 export function polarClockGeometry(opts: {
   values: readonly Value[];
   size: number;
   inner: number;
-  start: number;
+  origin: number;
   pad: number;
   mode: "length" | "opacity";
   now?: number | undefined;
@@ -75,7 +75,7 @@ export function polarClockGeometry(opts: {
   const rMax = size / 2 - pad;
   const inner = Number.isFinite(opts.inner) ? Math.min(0.9, Math.max(0, opts.inner)) : 0.35;
   const r0 = rMax * inner;
-  const start = polarStart(opts.start, n);
+  const start = polarStart(opts.origin, n);
 
   const guide = { cx, cy, r: round2(r0) };
   const empty: PolarClockGeometry = {

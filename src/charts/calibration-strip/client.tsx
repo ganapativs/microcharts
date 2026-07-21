@@ -58,6 +58,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -105,9 +106,21 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
   const datum = useCallback(
     (i: number) => {
       const p = geo.points[i];
-      return { index: i, value: p?.observed ?? null, label: p ? fmt(p.predicted) : undefined };
+      return {
+        index: i,
+        value: p?.observed ?? null,
+        label: p ? fmt(p.predicted) : undefined,
+        formatted: p
+          ? strings.calibrationChip(
+              fmt(p.predicted),
+              fmt(p.observed),
+              String(p.count),
+              p.lowSupport ? strings.calibrationLow : "",
+            )
+          : undefined,
+      };
     },
-    [geo, fmt],
+    [geo, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -158,7 +171,6 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {pinned ? (
           <circle
             cx={pinned.x}
@@ -195,12 +207,17 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         {rest.children}
       </StaticCalibrationStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {pt ? (
+      {readout && pt ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(pt.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(pt.predicted)} → ${fmt(pt.observed)} (n=${pt.count}${pt.lowSupport ? ", low support" : ""})`}
+          {strings.calibrationChip(
+            fmt(pt.predicted),
+            fmt(pt.observed),
+            String(pt.count),
+            pt.lowSupport ? strings.calibrationLow : "",
+          )}
         </span>
       ) : null}
     </span>

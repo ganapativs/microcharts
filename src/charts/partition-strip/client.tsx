@@ -41,6 +41,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -81,9 +82,19 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   const datum = useCallback(
     (i: number) => {
       const s = segs[i];
-      return { index: i, value: s ? s.share : null, label: s?.label };
+      if (!s) return { index: i, value: null };
+      const parent =
+        s.parent && s.parentShare != null
+          ? strings.partitionParent(`${Math.round(s.parentShare * 100)}%`, s.parent)
+          : "";
+      return {
+        index: i,
+        value: s.share,
+        label: s.label,
+        formatted: `${s.label} ${Math.round(s.share * 100)}%${parent}`,
+      };
     },
-    [segs],
+    [segs, strings],
   );
   // 2-D nav: ←/→ stay inside the current row (the comparison channel is
   // alignment, so crossing rows sideways would be a lie); ↑/↓ walk the
@@ -180,13 +191,12 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticPartitionStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {seg ? (
+      {readout && seg ? (
         <span
           className="mc-spark-readout"
           style={{

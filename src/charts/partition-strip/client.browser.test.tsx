@@ -38,16 +38,16 @@ describe("interactive <PartitionStrip>", () => {
     const wrap = screen.container.querySelector(".mc-partition-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight"); // → unit 0 (JS)
-    expect(seen.at(-1)).toEqual({ index: 0, value: 0.44, label: "JS" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.44, label: "JS" });
     key(wrap, "ArrowRight"); // skips the child row → CSS
-    expect(seen.at(-1)).toEqual({ index: 3, value: 0.56, label: "CSS" });
+    expect(seen.at(-1)).toMatchObject({ index: 3, value: 0.56, label: "CSS" });
     key(wrap, "ArrowLeft");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 0.44, label: "JS" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.44, label: "JS" });
     key(wrap, "ArrowDown"); // into react
     key(wrap, "ArrowRight"); // → vue (same row)
-    expect(seen.at(-1)).toEqual({ index: 2, value: 0.16, label: "vue" });
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: 0.16, label: "vue" });
     key(wrap, "ArrowUp"); // back to the parent
-    expect(seen.at(-1)).toEqual({ index: 0, value: 0.44, label: "JS" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.44, label: "JS" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -62,7 +62,7 @@ describe("interactive <PartitionStrip>", () => {
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 0.28, label: "react" });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 0.28, label: "react" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

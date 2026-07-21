@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
-import { labelFitsBand } from "../../core/labels.js";
+import { labelFont, labelFitsBand } from "../../core/labels.js";
 import { abStripsGeometry, abTagsFit } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, abDelta, type ABStripsProps } from "./index.js";
 
@@ -45,6 +45,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -61,7 +62,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   // that drops takes its gutter with it, so a copy that kept reserving would
   // stretch `totalWidth` past the composed static's viewBox and slide the
   // pointer map off the marks.
-  const FONT = Math.min(8, Math.max(6, Math.round(height * 0.3)));
+  const FONT = labelFont(height, 0.3);
   const labelChars = abTagsFit(height, FONT)
     ? Math.max(seriesLabels[0].length, seriesLabels[1].length)
     : 0;
@@ -156,9 +157,12 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         index: i,
         value: e?.edge.value ?? null,
         label: e ? `${seriesLabels[Math.floor(i / EDGES)]!} p${e.edge.p}` : undefined,
+        formatted: e
+          ? `${seriesLabels[Math.floor(i / EDGES)]!} p${e.edge.p} ${fmt(e.edge.value)}`
+          : undefined,
       };
     },
-    [edgeAt, seriesLabels],
+    [edgeAt, seriesLabels, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -235,12 +239,11 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus dot is transient. */}
         {selected !== null && selected !== active ? dot(selected, true) : null}
         {active !== null ? dot(active, false) : null}
         {rest.children}
       </StaticABStrips>
-      {at && geo ? (
+      {readout && at && geo ? (
         <span
           className="mc-ab-strips-readout mc-spark-readout"
           style={{

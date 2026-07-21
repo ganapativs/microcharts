@@ -10,8 +10,7 @@ import { isFiniteValue, type Value } from "../../core/types.js";
 import { seismogramGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual event summary from RAW values (pre-downsample) — shared with the
- *  interactive entry. Count = non-zero finite slots; peak = |max| magnitude. */
+/** From raw values (pre-downsample). Count = non-zero finite slots; peak = |max|. */
 export function seismogramSummary(
   data: readonly Value[],
   fmt: (n: number) => string,
@@ -118,7 +117,6 @@ export function Seismogram(props: SeismogramProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* tick width inherits --mc-stroke-width (theme-tunable, matches peers) */}
       {geo.dData !== "" ? (
         <path
           d={geo.dData}

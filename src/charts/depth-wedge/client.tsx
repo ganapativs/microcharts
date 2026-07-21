@@ -44,6 +44,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -103,8 +104,17 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
     [combined],
   );
   const datum = useCallback(
-    (i: number) => ({ index: i, value: combined[i]?.cum ?? null }),
-    [combined],
+    (i: number) => {
+      const s = combined[i];
+      return {
+        index: i,
+        value: s?.cum ?? null,
+        formatted: s
+          ? `${strings.depthWedgeSides[s.side].toLowerCase()} ${fmt(s.cum)} (± ${fmt(s.dist)})`
+          : "",
+      };
+    },
+    [combined, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -163,13 +173,12 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; probe is transient. */}
         {selected !== null && selected !== active ? probe(selected, true) : null}
         {active !== null ? probe(active, false) : null}
         {rest.children}
       </StaticDepthWedge>
       <LiveRegion>{announced}</LiveRegion>
-      {step ? (
+      {readout && step ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(step.x / width) * 100}%`, transform: "translateX(-50%)" }}

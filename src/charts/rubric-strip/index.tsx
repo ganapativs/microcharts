@@ -20,7 +20,7 @@ export interface RubricStripDatum {
 
 export interface RubricStripProps {
   data: readonly RubricStripDatum[];
-  /** Pass-threshold tick across all rows — one honest line, never a total. */
+  /** Pass target tick across all rows — one honest line, never a total. */
   target?: number | undefined;
   /** Criterion names in the left gutter; off for cell embedding. */
   labels?: boolean | undefined;

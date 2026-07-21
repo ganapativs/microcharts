@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { RateVolume } from "@microcharts/react/rate-volume";
 import { RateVolume as RateVolumeInteractive } from "@microcharts/react/rate-volume/interactive";
 import staticModule, { playground as staticPlayground, FRAC, PCT } from "./rate-volume";
 
@@ -52,6 +53,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: RateVolume,
+  ChartLive: RateVolumeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

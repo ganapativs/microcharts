@@ -56,6 +56,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -107,8 +108,15 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     [geo],
   );
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.segments[i]?.grade ?? null }),
-    [geo],
+    (i: number) => {
+      const s = geo.segments[i];
+      return {
+        index: i,
+        value: s?.grade ?? null,
+        formatted: s ? `${fmt(s.dEnd)}: ${pct(s.grade)}, ${fmt(s.cumGain)} gained` : undefined,
+      };
+    },
+    [geo, fmt, pct],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -177,13 +185,12 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus chord is transient. */}
         {selected !== null && selected !== active ? chord(selected, true) : null}
         {active !== null ? chord(active, false) : null}
         {rest.children}
       </StaticGradeProfile>
       <LiveRegion>{announced}</LiveRegion>
-      {seg ? (
+      {readout && seg ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(midX / width) * 100}%`, transform: "translateX(-50%)" }}

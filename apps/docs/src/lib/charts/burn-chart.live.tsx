@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BurnChart } from "@microcharts/react/burn-chart";
 import { BurnChart as BurnChartInteractive } from "@microcharts/react/burn-chart/interactive";
 import staticModule, { playground as staticPlayground, PLAN, ACTUAL } from "./burn-chart";
 
@@ -55,6 +56,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BurnChart,
+  ChartLive: BurnChartInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

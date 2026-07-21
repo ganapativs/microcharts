@@ -17,7 +17,7 @@ export interface TrendArrowModel {
   valence: "pos" | "neg" | "flat";
   /** Formatted magnitude (`12%`), or `—` for non-finite input. */
   display: string;
-  /** Factual summary — direction + magnitude, never valence. */
+  /** Direction + magnitude, never valence. */
   summary: string;
 }
 

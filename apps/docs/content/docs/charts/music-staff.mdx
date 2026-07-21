@@ -1,8 +1,8 @@
 ---
 title: MusicStaff
-description:
-  A music-staff chart for React — the shape of a short series read as a melody, pitch on a five-line staff, with no
-  clefs, stems, or bars.
+description: >-
+  React music staff chart — ordered values as notes on a miniature staff. Tiny accessible SVG microchart; RSC-safe
+  static or /interactive.
 ---
 
 MusicStaff answers "what's the shape of this short series?" by reading it as a melody: each value is a note, its
@@ -42,12 +42,12 @@ in steps (nine to thirteen positions), so exact values steer to `Sparkline` with
 ## Variants
 
 <LiveDemo
-  label="staff range + a rest"
-  code={`<MusicStaff data={[3, 5, 4, 8, 6, 9]} range="staff" />
+  label="staff mode + a rest"
+  code={`<MusicStaff data={[3, 5, 4, 8, 6, 9]} mode="staff" />
 <MusicStaff data={[3, 5, null, 8, 6]} />`}
 >
   <span className="inline-flex gap-6 items-center">
-    <MusicStaff data={[3, 5, 4, 8, 6, 9]} range="staff" width={100} height={24} />
+    <MusicStaff data={[3, 5, 4, 8, 6, 9]} mode="staff" width={100} height={24} />
     <MusicStaff data={[3, 5, null, 8, 6]} width={90} height={24} />
   </span>
 </LiveDemo>
@@ -87,8 +87,8 @@ phrasing. With a `locale`, the trailing `label="last"` value follows that locale
 
 ## Why this default
 
-The ledger range is the default because clipping pitch silently is worse than two extra hairline ledger ticks — a note
-above or below the staff still reads truly. `range="staff"` exists for dense cells where ledger lines would collide with
+The ledger mode is the default because clipping pitch silently is worse than two extra hairline ledger ticks — a note
+above or below the staff still reads truly. `mode="staff"` exists for dense cells where ledger lines would collide with
 a neighbour; there, out-of-range pitches clamp to the nearest staff line or space instead, trading visual precision for
 a collision-free cell — the accessible summary is unaffected either way, since it describes the raw values, not the
 clamped pixel positions. Two adjacent equal values are spaced by the time axis, never dodged vertically, because moving

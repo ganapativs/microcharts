@@ -1,8 +1,8 @@
 ---
 title: SegmentedBar
-description:
-  A composition bar for React — parts of a whole as segment lengths, with a labeled Other rollup and largest-remainder
-  percents.
+description: >-
+  React segmented bar chart — part-to-whole as adjacent segments in one bar. Tiny accessible SVG microchart; RSC-safe
+  static or /interactive.
 ---
 
 SegmentedBar answers "what is this made of, and in what proportions?". Segments always sum to the full bar; past
@@ -44,14 +44,14 @@ data at every size we ship.
 ## Variants
 
 <LiveDemo
-  label="percents"
-  code={`<SegmentedBar
+  label="percents (default)"
+  code={`// label="percent" is the default — segment shares when they fit.
+<SegmentedBar
   data={[
     { label: "Chrome", value: 620 },
     { label: "Safari", value: 240 },
     { label: "Firefox", value: 140 },
   ]}
-  label="percent"
 />`}
 >
   <SegmentedBar
@@ -60,7 +60,6 @@ data at every size we ship.
       { label: "Safari", value: 240 },
       { label: "Firefox", value: 140 },
     ]}
-    label="percent"
     title="With percents"
     width={220}
     height={20}

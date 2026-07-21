@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { MicroScatter as MicroScatterInteractive } from "@microcharts/react/micro-scatter/interactive";
 import staticModule, { playground as staticPlayground, CLOUD } from "./micro-scatter";
 
@@ -46,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MicroScatter,
+  ChartLive: MicroScatterInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

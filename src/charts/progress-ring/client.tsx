@@ -32,6 +32,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     animate = false,
     strings = EN_SCALAR,
     title,
+    summary,
     onSelect,
     className,
     style,
@@ -67,11 +68,17 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       ? strings.remaining(pctFmt(Math.max(0, 1 - fraction)))
       : strings.progress(pctFmt(fraction))
     : strings.noData;
-  const label = [title, summaryText].filter(Boolean).join(". ") || undefined;
+  const accName =
+    summary === false ? undefined : typeof summary === "string" ? summary : summaryText;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // One arc, one selectable unit (index 0): the fraction it sweeps.
   const pick = (): void =>
-    onSelect?.({ index: 0, value: Number.isFinite(fraction) ? fraction : null });
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(fraction) ? fraction : null,
+      formatted: Number.isFinite(fraction) ? pctFmt(fraction) : undefined,
+    });
 
   return (
     <span

@@ -53,6 +53,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Fade past the outer band — 'this is approximate'.",
     },
+    {
+      name: "label",
+      type: '"median" | "none"',
+      required: false,
+      description: "States the median in a right gutter (default none).",
+    },
   ],
   demo: [12, 17, 21, 21, 26, 38],
   example: {
@@ -143,12 +149,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Forecast estimate{" "}
         <span className="mc-inline">
-          <GradedBand data={DRAWS} label="median" height={16} summary={false} />
+          <GradedBand data={DRAWS} label="none" height={16} summary={false} />
         </span>{" "}
         — 50% band spans 17–21, point at 19.
       </p>
     ),
-    code: "<p>\n  Forecast estimate <GradedBand data={posterior} /> — 50% band spans 17–21, point at 19.\n</p>",
+    code: '<p>\n  Forecast estimate{" "}\n  <span className="mc-inline">\n    <GradedBand data={posterior} summary={false} />\n  </span>{" "}\n  — 50% band spans 17–21, point at 19.\n</p>',
   },
   cell: {
     render: () => (
@@ -158,7 +164,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <GradedBand data={row.data} label="median" height={18} summary={false} />
+                <GradedBand data={row.data} label="none" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -192,7 +198,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <GradedBand data={row.data} label="median" height={14} summary={false} />
+            <GradedBand data={row.data} label="none" height={14} summary={false} />
           </span>
         ))}
       </div>

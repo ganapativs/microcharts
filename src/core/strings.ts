@@ -4,6 +4,8 @@
 // module so a 12-px glyph never bundles series templates.
 import { EN_SERIES, type SummaryStrings } from "./summary.js";
 import { EN_SCALAR } from "./strings-scalar.js";
+import { EN_BULLET } from "./strings-bullet.js";
+import { EN_ACTIVITY } from "./strings-activity.js";
 import { EN_PICTOGRAM } from "./strings-pictogram.js";
 import { EN_TALLY } from "./strings-tally.js";
 import { EN_DICE } from "./strings-dice.js";
@@ -90,6 +92,8 @@ import { EN_PERCENTILE_TRACE } from "./strings-percentile-trace.js";
 export const EN: SummaryStrings = {
   ...EN_SERIES,
   ...EN_SCALAR,
+  ...EN_BULLET,
+  ...EN_ACTIVITY,
   ...EN_PICTOGRAM,
   ...EN_TALLY,
   ...EN_DICE,

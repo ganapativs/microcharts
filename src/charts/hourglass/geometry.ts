@@ -4,6 +4,7 @@
 // to 2×). Closed forms: top bulb is apex-down, remaining r=1−value fills from the
 // apex to height h=H·√r; bottom bulb apex-up, elapsed e=value fills from the base
 // to h=H·(1−√(1−e)). All coords 2-dp.
+import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
 export interface HourglassGeometry {
@@ -24,10 +25,6 @@ export interface HourglassGeometry {
   y1: number;
 }
 
-function clamp01(n: number): number {
-  return n < 0 ? 0 : n > 1 ? 1 : n;
-}
-
 export function hourglassGeometry(opts: {
   value: number;
   width: number;
@@ -35,7 +32,7 @@ export function hourglassGeometry(opts: {
   pad: number;
 }): HourglassGeometry {
   const { width, height, pad } = opts;
-  const e = clamp01(Number.isFinite(opts.value) ? opts.value : 0); // elapsed
+  const e = clamp(Number.isFinite(opts.value) ? opts.value : 0, 0, 1); // elapsed
   const r = 1 - e; // remaining
   const cx = round2(width / 2);
   const L = pad;

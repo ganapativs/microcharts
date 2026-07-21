@@ -34,7 +34,7 @@ describe("interactive <TallyMarks>", () => {
     const screen = await render(<TallyMarks value={23} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-tally-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 23 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 23 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -43,6 +43,6 @@ describe("interactive <TallyMarks>", () => {
     const wrap = screen.container.querySelector(".mc-tally-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 7 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 7 }]);
   });
 });

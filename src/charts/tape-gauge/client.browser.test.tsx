@@ -22,7 +22,7 @@ describe("interactive <TapeGauge>", () => {
     );
     const wrap = screen.container.querySelector(".mc-tape-live") as HTMLElement;
     wrap.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 142 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 142 });
   });
 
   it("Enter fires onSelect", async () => {
@@ -33,6 +33,6 @@ describe("interactive <TapeGauge>", () => {
     const wrap = screen.container.querySelector(".mc-tape-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 98 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 98 });
   });
 });

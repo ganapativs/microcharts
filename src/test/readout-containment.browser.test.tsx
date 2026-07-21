@@ -65,8 +65,7 @@ const CASES: Record<string, () => ReactElement> = {
       title="Phase"
     />
   ),
-  // `field` is required for a readout: the navigable units are the PEER ghosts,
-  // not the focal dot, so a bare `data` gives nothing to hover.
+  // `field` optional: focal is always navigable (index 0); peers follow.
   "quadrant-dot": () => (
     <QuadrantDot
       data={{ x: 62, y: 78 }}

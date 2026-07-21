@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { RugStrip } from "@microcharts/react/rug-strip";
 import { RugStrip as RugStripInteractive } from "@microcharts/react/rug-strip/interactive";
 import staticModule, { playground as staticPlayground, FIELD } from "./rug-strip";
 
@@ -50,6 +51,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: RugStrip,
+  ChartLive: RugStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -46,6 +46,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -102,9 +103,16 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
   const datum = useCallback(
     (i: number) => {
       const row = geo.rows[i];
-      return { index: i, value: row?.score ?? null, label: row?.label };
+      return {
+        index: i,
+        value: row?.score ?? null,
+        label: row?.label,
+        formatted: row
+          ? `${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${Math.round(row.weightShare * 100)}%)`
+          : "",
+      };
     },
-    [geo],
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -168,13 +176,12 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== null && selected !== active ? box(selected, true) : null}
         {active !== null ? box(active, false) : null}
         {rest.children}
       </StaticRubricStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {row ? (
+      {readout && row ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${weightPct})`}
         </span>

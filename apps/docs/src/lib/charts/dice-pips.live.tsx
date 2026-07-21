@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DicePips } from "@microcharts/react/dice-pips";
 import { DicePips as DicePipsInteractive } from "@microcharts/react/dice-pips/interactive";
 import staticModule, { playground as staticPlayground } from "./dice-pips";
 
@@ -36,6 +37,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DicePips,
+  ChartLive: DicePipsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -28,12 +28,12 @@ export function musicStaffGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   width: number;
   height: number;
-  range: "staff" | "ledger";
+  mode: "staff" | "ledger";
   pad: number;
 }): MusicStaffGeometry {
-  const { values, width, height, range, pad } = opts;
-  const T = range === "staff" ? 9 : 13; // total positions (5 lines + 4 spaces, ±2 ledger)
-  const staffOffset = range === "staff" ? 0 : 2; // ledger positions above the top line
+  const { values, width, height, mode, pad } = opts;
+  const T = mode === "staff" ? 9 : 13; // total positions (5 lines + 4 spaces, ±2 ledger)
+  const staffOffset = mode === "staff" ? 0 : 2; // ledger positions above the top line
   // note head sized from the nominal spacing, then the band is inset by ry so the
   // top/bottom notes never overflow the box
   const half0 = (height - 2 * pad) / (T - 1);

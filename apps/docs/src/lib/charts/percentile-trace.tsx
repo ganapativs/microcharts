@@ -38,7 +38,7 @@ export const entry: ChartEntry = {
       description: "Percentile ranks 0–100, one per reading; out-of-range values are clamped.",
     },
     {
-      name: "bands",
+      name: "showBands",
       type: "boolean",
       required: false,
       description: "Draw the fixed p25–75 and p5–95 population fields (default true).",
@@ -82,13 +82,13 @@ export function Preview() {
 }
 export const playground: PlaygroundSpec = {
   knobs: [
-    { kind: "toggle", key: "bands", label: "bands", init: true },
+    { kind: "toggle", key: "showBands", label: "show bands", init: true },
     { kind: "segmented", key: "positive", label: "good is", options: ["up", "down"], init: "up" },
   ],
   render: (s) => (
     <PercentileTrace
       data={DEMO}
-      bands={s.bands as boolean}
+      showBands={s.showBands as boolean}
       positive={s.positive as "up" | "down"}
       summary={false}
       width={280}
@@ -99,7 +99,7 @@ export const playground: PlaygroundSpec = {
     [
       "<PercentileTrace",
       "  data={ranks}",
-      s.bands === false && "  bands={false}",
+      s.showBands === false && "  showBands={false}",
       s.positive !== "up" && `  positive="${s.positive}"`,
       "/>",
     ]
@@ -112,8 +112,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "without population bands",
-    code: `<PercentileTrace data={ranks} bands={false} />`,
-    node: <PercentileTrace data={DEMO} bands={false} summary={false} width={170} height={26} />,
+    code: `<PercentileTrace data={ranks} showBands={false} />`,
+    node: <PercentileTrace data={DEMO} showBands={false} summary={false} width={170} height={26} />,
   },
   {
     label: "a slipping standing (down is good)",
@@ -139,7 +139,7 @@ export const contexts: ChartContexts = {
         — climbed from 40th to 81st percentile.
       </p>
     ),
-    code: "<p>\n  Standing over the season <PercentileTrace data={ranks} /> — climbed from 40th to 81st percentile.\n</p>",
+    code: '<p>\n  Standing over the season{" "}\n  <span className="mc-inline">\n    <PercentileTrace data={ranks} summary={false} />\n  </span>{" "}\n  — climbed from 40th to 81st percentile.\n</p>',
   },
   cell: {
     render: () => (

@@ -58,6 +58,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -105,8 +106,15 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
 
   // `value` = the percentile rank at that reading (this chart's only channel).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: pointAt(i)?.value ?? null }),
-    [pointAt],
+    (i: number) => {
+      const pt = pointAt(i);
+      return {
+        index: i,
+        value: pt?.value ?? null,
+        formatted: pt ? `${unit} ${pt.index}: ${pStr(pt.value)}` : undefined,
+      };
+    },
+    [pointAt, unit, pStr],
   );
 
   // The static reserves a right gutter for the `label="last"` readout and
@@ -163,7 +171,6 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the ring is transient. */}
         {pinned ? (
           <circle
             cx={pinned.x}
@@ -200,7 +207,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
         ) : null}
         {rest.children}
       </StaticPercentileTrace>
-      {p ? (
+      {readout && p ? (
         <span
           className="mc-percentile-readout mc-spark-readout"
           style={{ left: `${(p.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}

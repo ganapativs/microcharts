@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PercentileLadder } from "@microcharts/react/percentile-ladder";
 import { PercentileLadder as PercentileLadderInteractive } from "@microcharts/react/percentile-ladder/interactive";
 import staticModule, { playground as staticPlayground, LATENCY } from "./percentile-ladder";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PercentileLadder,
+  ChartLive: PercentileLadderInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

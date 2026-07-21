@@ -75,21 +75,21 @@ describe("<ActivityGrid> shape + calendar alignment", () => {
     expect(r.getAttribute("shape-rendering")).toBeNull();
   });
 
-  it("start pads the first column to the real weekday (1970-01-01 = Thursday)", () => {
-    // Monday start → Thursday = 3 leading empty slots
+  it("anchor pads the first column to the real weekday (1970-01-01 = Thursday)", () => {
+    // Monday weekStart → Thursday = 3 leading empty slots
     expect(calendarOffset("1970-01-01", 1)).toBe(3);
     expect(calendarOffset("1970-01-01", 0)).toBe(4);
     expect(calendarOffset(undefined, 1)).toBe(0);
     expect(calendarOffset("not-a-date", 1)).toBe(0);
-    const { container } = draw(<ActivityGrid data={[1, 2, 3, 4, 5]} start="1970-01-01" />);
+    const { container } = draw(<ActivityGrid data={[1, 2, 3, 4, 5]} anchor="1970-01-01" />);
     const first = container.querySelector('rect[data-mc-ink="cell"]')!;
     // slot 3 of column 0 → y = 3 * (10 + 2)
     expect(first.getAttribute("y")).toBe("36");
     expect(first.getAttribute("x")).toBe("0");
   });
 
-  it("strip layout ignores start (single row has no weekday)", () => {
-    const { container } = draw(<ActivityGrid data={[1, 2]} layout="strip" start="1970-01-01" />);
+  it("strip layout ignores anchor (single row has no weekday)", () => {
+    const { container } = draw(<ActivityGrid data={[1, 2]} layout="strip" anchor="1970-01-01" />);
     expect(container.querySelector('rect[data-mc-ink="cell"]')!.getAttribute("x")).toBe("0");
   });
 });

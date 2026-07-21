@@ -51,6 +51,12 @@ export const entry: ChartEntry = {
       description: "Direct endpoint value label.",
     },
     {
+      name: "positive",
+      type: '"up" | "down"',
+      required: false,
+      description: '"up" (default); "down" flips which sign is good.',
+    },
+    {
       name: "title",
       type: "string",
       required: false,
@@ -88,6 +94,13 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "segmented", key: "mode", options: ["bar", "winloss"], init: "bar" },
     { kind: "toggle", key: "label", init: false },
+    {
+      kind: "segmented",
+      key: "positive",
+      label: "positive",
+      options: ["up", "down"],
+      init: "up",
+    },
     { kind: "range", key: "gap", label: "gap", min: 0, max: 0.6, step: 0.05, init: 0.25 },
     {
       kind: "segmented",
@@ -112,6 +125,7 @@ export const playground: PlaygroundSpec = {
         mode={s.mode as "bar" | "winloss"}
         gap={gap}
         label={s.label ? "last" : "none"}
+        positive={s.positive as "up" | "down"}
         locale={s.locale as string}
         className="w-full max-w-md"
         style={{ height: "auto" }}
@@ -128,6 +142,7 @@ export const playground: PlaygroundSpec = {
       `  mode="${s.mode}"`,
       gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
+      s.positive !== "up" && `  positive="${s.positive}"`,
       s.locale !== "en-US" && `  locale="${s.locale}"`,
       "/>",
     ]
@@ -173,7 +188,7 @@ export const contexts: ChartContexts = {
         — quieter since.
       </p>
     ),
-    code: `<p>\n  Deploys peaked at nine mid-week{" "}\n  <SparkBar data={deploys} width={70} height={16} /> — quieter since.\n</p>`,
+    code: `<p>\n  Deploys peaked at nine mid-week{" "}\n  <span className="mc-inline">\n    <SparkBar data={deploys} width={70} height={16} summary={false} />\n  </span>{" "}\n  — quieter since.\n</p>`,
   },
   cell: {
     render: () => (

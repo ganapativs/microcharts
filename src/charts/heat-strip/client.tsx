@@ -49,6 +49,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -87,8 +88,15 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
   // index = cell index along the strip. 1:1 with `data` until the series
   // exceeds HEAT_STRIP_MAX_CELLS, when cells are max-per-bucket rollups.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const c = geo.cells[i];
+      return {
+        index: i,
+        value: c?.value ?? null,
+        formatted: c ? (c.value === null ? "—" : fmt(c.value)) : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -159,13 +167,12 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticHeatStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell ? (
+      {readout && shownCell ? (
         <span
           className="mc-spark-readout"
           style={{

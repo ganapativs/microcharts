@@ -4,29 +4,22 @@ import { SectionMark } from "@/components/home/section-mark";
 import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
 import { SIZE } from "@/lib/docs-facts";
+import { RECHARTS } from "@/lib/competitor-facts";
 
-/**
- * 05 · The cost — the size argument, placed AFTER the product has sold
- * itself (grammar → catalog → surfaces → models): by now the reader wants
- * the thing; this section tells them it's nearly free. The weight comparison
- * is drawn by the library itself, to linear scale: honesty is the argument,
- * and the microchart bar being nearly invisible is the point. The receipts
- * strip below is the page's ONE home for the measured numbers (size
- * distribution, dependencies, client JS) — each stat illustrated by a
- * microchart of itself, all derived from docs-facts.ts.
- */
+/** 05 · Size. Weight bar is linear (library vs one Recharts chart). Receipts
+ *  below are the measured numbers from docs-facts.ts. */
 
-// External reference point, pinned + dated (never hand-wave a competitor):
-// recharts 3.9.2, 145 kB min+gzip, 11 dependencies — bundlephobia, 2026-07-15.
-const RECHARTS_KB = 145;
-const RECHARTS_VERSION = "3.9.2";
+const RECHARTS_ONE_CHART_KB = RECHARTS.oneChartGzipKb;
+const RECHARTS_PACKAGE_KB = RECHARTS.packageGzipKb;
+const RECHARTS_DEPS = RECHARTS.runtimeDeps;
+const RECHARTS_VERSION = RECHARTS.version;
 
 export function HomeCostSection() {
   const receipts = [
     {
-      big: `${SIZE.min}–${SIZE.max} kB`,
-      label: "gzip per chart",
-      note: `median ${SIZE.median} kB across all ${SIZE.count} static entries`,
+      big: `${SIZE.interactiveMin}–${SIZE.interactiveMax} kB`,
+      label: "gzip per interactive chart",
+      note: `median ${SIZE.interactiveMedian} kB · static ${SIZE.min}–${SIZE.max} kB (median ${SIZE.median})`,
       source: ".size-limit.json · CI-enforced",
       chart: <ReceiptsSizeHistogram />,
     },
@@ -69,13 +62,15 @@ export function HomeCostSection() {
             Word-sized on screen. Word-sized on the wire.
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            Chart libraries were built for pages that were mostly chart, so the bill never mattered:{" "}
-            {RECHARTS_KB} kB and 11 dependencies before the first mark renders. Inside a sentence or
-            a table cell, it does.
+            Not a head-to-head. Recharts is a full charting toolkit — axes, legends, tooltips, every
+            chart type — and it costs about {RECHARTS_ONE_CHART_KB} kB gzip and {RECHARTS_DEPS}{" "}
+            dependencies for one tree-shaken LineChart. That bill is fine on a page that&nbsp;is
+            mostly chart. Inside a sentence or a table cell, it isn&rsquo;t.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
-            Here, every chart&rsquo;s gzip size is a CI gate: a chart that outgrows its budget fails
-            the build. The numbers on this page are the enforced ones, measured on every commit.
+            microcharts is for the other job: when you already know the shape of the answer and just
+            need the mark — minimal, honest, small enough to live in the interface. Every
+            chart&rsquo;s gzip size is a CI gate; the numbers on this page are the enforced ones.
           </p>
         </Reveal>
 
@@ -87,54 +82,57 @@ export function HomeCostSection() {
                 shrink below it and the panel overflows the mobile viewport. */}
             <div className="space-y-3">
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
-                <span className="text-sm text-fd-muted-foreground">recharts, whole package</span>
+                <span className="text-sm text-fd-muted-foreground">recharts, one LineChart</span>
                 <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
-                    value={RECHARTS_KB}
-                    max={RECHARTS_KB}
+                    value={RECHARTS_ONE_CHART_KB}
+                    max={RECHARTS_ONE_CHART_KB}
                     label="none"
                     color="var(--mc-neutral)"
                     width={280}
                     height={10}
-                    summary={`recharts, the whole package: ${RECHARTS_KB} kB gzip: the full bar.`}
+                    summary={`recharts, one tree-shaken LineChart: ${RECHARTS_ONE_CHART_KB} kB gzip: the full bar.`}
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  {RECHARTS_KB} kB
+                  {RECHARTS_ONE_CHART_KB} kB
                 </span>
               </div>
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
-                <span className="text-sm text-fd-muted-foreground">microcharts, one chart</span>
+                <span className="text-sm text-fd-muted-foreground">
+                  microcharts, one interactive
+                </span>
                 <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
-                    value={SIZE.median}
-                    max={RECHARTS_KB}
+                    value={SIZE.interactiveMedian}
+                    max={RECHARTS_ONE_CHART_KB}
                     label="none"
                     width={280}
                     height={10}
-                    summary={`microcharts, one chart's subpath: ${SIZE.median} kB gzip on the same scale, ${Math.round(RECHARTS_KB / SIZE.median)} times smaller.`}
+                    summary={`microcharts, one interactive subpath: ${SIZE.interactiveMedian} kB gzip on the same scale, ${Math.round(RECHARTS_ONE_CHART_KB / SIZE.interactiveMedian)} times smaller.`}
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  {SIZE.median} kB
+                  {SIZE.interactiveMedian} kB
                 </span>
               </div>
             </div>
             <p className="mt-3 text-[0.8rem] text-fd-muted-foreground">
-              Not like for like, and that is the point: recharts is one package you install whole,
-              microcharts is one subpath you import. Same scale, so the second bar being hard to see
-              is the argument.
+              Same scale, different jobs. Recharts keeps the dashboard surface; tree-shaking drops
+              unused chart types, but one LineChart still ships the shared Redux/d3 kernel (~
+              {RECHARTS_ONE_CHART_KB} kB with axes + tooltip; LineChart alone ~69 kB; package{" "}
+              {RECHARTS_PACKAGE_KB} kB / {RECHARTS_DEPS} deps). microcharts is one subpath for the
+              inlined mark — static from {SIZE.min} kB.
             </p>
             <p className="mono-label mt-4 opacity-60">
-              recharts {RECHARTS_VERSION} via bundlephobia, 2026-07 · microcharts median from
+              recharts {RECHARTS_VERSION} one-chart: esbuild tree-shake, 2026-07 · package{" "}
+              {RECHARTS_PACKAGE_KB} kB via bundlephobia · microcharts interactive median from
               .size-limit.json, CI-enforced
             </p>
           </div>
         </Reveal>
       </div>
 
-      {/* The receipts — every figure measured by the build, every stat drawn
-          by a microchart of itself. */}
       <Reveal delay={140} className="mt-10 border-t border-hairline pt-8">
         <div className="grid gap-x-8 gap-y-6 sm:grid-cols-3">
           {receipts.map((s) => (

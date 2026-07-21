@@ -49,6 +49,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     summary,
     strings = EN_TREE,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -107,8 +108,16 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
 
   // Rings are 1:1 with data; index = ring/period index, value = its number.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.rings[i]?.value ?? null, label: periodLabel(i) }),
-    [geo, periodLabel],
+    (i: number) => {
+      const rg = geo.rings[i];
+      return {
+        index: i,
+        value: rg?.value ?? null,
+        label: periodLabel(i),
+        formatted: rg ? strings.treeRingAt(periodLabel(rg.index), fmt(rg.value)) : undefined,
+      };
+    },
+    [geo, periodLabel, fmt, strings],
   );
 
   // `label="last"` widens the static's viewBox by a right gutter; the pointer
@@ -179,13 +188,12 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus halo is transient. */}
         {selected !== null && selected !== active ? halo(selected, true) : null}
         {active !== null ? halo(active, false) : null}
         {rest.children}
       </StaticTreeRings>
       <LiveRegion>{announced}</LiveRegion>
-      {shownRing ? (
+      {readout && shownRing ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {announced}
         </span>

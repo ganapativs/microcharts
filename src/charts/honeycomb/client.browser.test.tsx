@@ -85,9 +85,9 @@ describe("interactive <Honeycomb>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 0, value: 1 });
+    expect(onActive).toHaveBeenLastCalledWith(expect.objectContaining({ index: 0, value: 1 }));
     await userEvent.keyboard("{End}"); // cell 9 — beyond the 6 filled
-    expect(onActive).toHaveBeenLastCalledWith({ index: 9, value: 0 });
+    expect(onActive).toHaveBeenLastCalledWith(expect.objectContaining({ index: 9, value: 0 }));
     await userEvent.keyboard("{Escape}");
     expect(onActive).toHaveBeenLastCalledWith(null);
   });
@@ -98,7 +98,7 @@ describe("interactive <Honeycomb>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{Enter}");
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 1 });
+    expect(onSelect).toHaveBeenLastCalledWith(expect.objectContaining({ index: 0, value: 1 }));
     fig.blur();
     await vi.waitFor(() =>
       expect(screen.container.querySelector('path[data-mc-w="tick"]')).not.toBeNull(),

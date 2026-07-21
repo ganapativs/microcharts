@@ -23,6 +23,8 @@ export interface PairedBarsGeometry {
   baseline: number;
   /** Pair pitch on the category axis (interactive band lookup). */
   pitch: number;
+  /** Shared zero-anchored domain (annotations / interactive). */
+  domain: readonly [number, number];
 }
 
 export function pairedBarsGeometry(opts: {
@@ -36,7 +38,7 @@ export function pairedBarsGeometry(opts: {
 }): PairedBarsGeometry {
   const { width, height, pairs, gap = 1.5, mode, orientation } = opts;
   const n = pairs.length;
-  if (n === 0) return { pairs: [], baseline: 0, pitch: 0 };
+  if (n === 0) return { pairs: [], baseline: 0, pitch: 0, domain: [0, 1] };
 
   const catLen = orientation === "vertical" ? width : height;
   const valLen = orientation === "vertical" ? height : width;
@@ -95,5 +97,5 @@ export function pairedBarsGeometry(opts: {
     };
   });
 
-  return { pairs: out, baseline: zero, pitch };
+  return { pairs: out, baseline: zero, pitch, domain };
 }

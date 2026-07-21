@@ -1,7 +1,8 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useState, type ComponentType, type ReactNode } from "react";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { buildMarkContexts, inferMarkContextSpec, markInput } from "@/lib/charts/contexts-factory";
+import { swapChartTree } from "@/lib/charts/swap-chart-tree";
 import type { ChartContexts, ChartModule } from "@/lib/charts/types";
 
 // Registry-FREE presentational core for the four-homes view. Kept in its own
@@ -17,16 +18,45 @@ const HOMES = [
   { key: "tab", label: "In a tab header" },
 ] as const;
 
+type MarkProps = { data: number[]; width?: number; height?: number };
+
 /** Fallback when a chart hasn't authored `contexts` yet. */
 function genericContexts(mod: ChartModule): ChartContexts {
   const data = markInput(mod.entry);
-  return buildMarkContexts(mod.Mark, mod.markCode, inferMarkContextSpec(mod.entry), data);
+  const Mark = (mod.ChartLive ?? mod.Mark) as ComponentType<MarkProps>;
+  return buildMarkContexts(Mark, mod.markCode, inferMarkContextSpec(mod.entry), data);
+}
+
+/** Prefer interactive twin inside authored homes; code samples stay static. */
+function liveContexts(mod: ChartModule): ChartContexts {
+  const base = mod.contexts ?? genericContexts(mod);
+  if (!mod.Chart || !mod.ChartLive || !mod.contexts) return base;
+  const { Chart, ChartLive } = mod;
+  return {
+    ...base,
+    sentence: {
+      ...base.sentence,
+      render: () => swapChartTree(base.sentence.render(), Chart, ChartLive) as ReactNode,
+    },
+    cell: {
+      ...base.cell,
+      render: () => swapChartTree(base.cell.render(), Chart, ChartLive) as ReactNode,
+    },
+    kpi: {
+      ...base.kpi,
+      render: () => swapChartTree(base.kpi.render(), Chart, ChartLive) as ReactNode,
+    },
+    tab: {
+      ...base.tab,
+      render: () => swapChartTree(base.tab.render(), Chart, ChartLive) as ReactNode,
+    },
+  };
 }
 
 /** Chart in four placements: sentence, cell, KPI, tab — for one resolved module. */
 export function FourContextsView({ mod }: { mod: ChartModule }) {
   const [tab, setTab] = useState<"preview" | "code">("preview");
-  const ctx = mod.contexts ?? genericContexts(mod);
+  const ctx = liveContexts(mod);
 
   return (
     <div className="not-prose my-6">
@@ -69,6 +99,22 @@ export function FourContextsView({ mod }: { mod: ChartModule }) {
           );
         })}
       </div>
+      {ctx.note ? (
+        <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">{ctx.note}</p>
+      ) : null}
+      <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">
+        Preview uses the public chart API only. When an interactive twin exists, it swaps in with
+        the same props and no entrance motion — code samples stay on the static import. Placement
+        recipes:{" "}
+        <a href="/docs/composition" className="underline underline-offset-2">
+          Composition
+        </a>
+        ,{" "}
+        <a href="/docs/sizing" className="underline underline-offset-2">
+          Sizing
+        </a>
+        .
+      </p>
     </div>
   );
 }

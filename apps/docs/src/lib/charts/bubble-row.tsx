@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
         — EMEA leads at 1.24B.
       </p>
     ),
-    code: "<p>\n  Market size by region <BubbleRow data={regions} /> — EMEA leads at 1.24B.\n</p>",
+    code: '<p>\n  Market size by region{" "}\n  <span className="mc-inline">\n    <BubbleRow data={regions} summary={false} />\n  </span>{" "}\n  — EMEA leads at 1.24B.\n</p>',
   },
   cell: {
     render: () => (

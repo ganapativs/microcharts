@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { FoldedDayBand } from "@microcharts/react/folded-day-band";
 import { FoldedDayBand as FoldedDayBandInteractive } from "@microcharts/react/folded-day-band/interactive";
 import staticModule, { playground as staticPlayground, DATA, TODAY } from "./folded-day-band";
 
@@ -18,7 +19,7 @@ export const playground: PlaygroundSpec = {
     <FoldedDayBandInteractive
       data={DATA}
       today={s.today ? TODAY : undefined}
-      bands={
+      percentiles={
         s.single
           ? [[25, 75]]
           : [
@@ -38,7 +39,7 @@ export const playground: PlaygroundSpec = {
       "<FoldedDayBand",
       "  data={observations}",
       s.today === true && "  today={today}",
-      s.single === true && "  bands={[[25, 75]]}",
+      s.single === true && "  percentiles={[[25, 75]]}",
       s.bins !== 24 && `  bins={${s.bins}}`,
       ui.animate && " animate",
       "/>",
@@ -49,6 +50,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: FoldedDayBand,
+  ChartLive: FoldedDayBandInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

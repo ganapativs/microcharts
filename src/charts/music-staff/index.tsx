@@ -14,7 +14,7 @@ import { musicStaffGeometry } from "./geometry.js";
 export interface MusicStaffProps {
   data: readonly Value[];
   /** `ledger` (default, ±2 ledger positions) or `staff` (clamp on-staff). */
-  range?: "staff" | "ledger" | undefined;
+  mode?: "staff" | "ledger" | undefined;
   /** `last` prints the final value after the last note. */
   label?: "none" | "last" | undefined;
   domain?: readonly [number, number] | undefined;
@@ -37,7 +37,7 @@ const PAD = 2;
 export function MusicStaff(props: MusicStaffProps): ReactNode {
   const {
     data,
-    range = "ledger",
+    mode = "ledger",
     label = "none",
     domain,
     color,
@@ -63,7 +63,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     domain,
     width: width - gutter,
     height,
-    range,
+    mode,
     pad: PAD,
   });
   const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
@@ -78,12 +78,12 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
       id={id}
       // A staff is a band, not a column: nothing rests on its lowest line, so it
       // centres on the cap band. The note band is inset by an equal pad top and
-      // bottom and the five lines are symmetric about its middle in both `range`
+      // bottom and the five lines are symmetric about its middle in both `mode`
       // settings, so the frame's midpoint IS the staff's — no need to carry the
       // band out of geometry.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-staff ${className}` : "mc-staff"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <path
         d={geo.staffYs.map((y) => `M${PAD} ${y}L${width - gutter - PAD} ${y}`).join("")}
@@ -97,9 +97,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
           style={{ strokeOpacity: 0.7 }}
         />
       ) : null}
-      {/* melodic contour — a whisper of a line through the notes in time order, so
-          the SHAPE of the tune (rise/fall) reads at a glance; the noteheads stay
-          the precise marks, this is only the second-read guide */}
+      {/* Contour line — shape only; noteheads carry the values. */}
       {geo.notes.length >= 2 ? (
         <path
           d={geo.notes

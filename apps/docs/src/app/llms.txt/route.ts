@@ -62,7 +62,9 @@ Use \`${SITE.pkg}\` for React. Import individual charts from subpaths, for examp
 Interactive entries live under \`/interactive\` and share one interaction contract: hover or
 arrow keys make a unit active, click/tap/Enter/Space selects and pins it, Escape clears,
 Home/End jump to the ends. Read it with \`onActive(datum)\` and \`onSelect(datum)\`, payload
-\`{ index, value, label? }\`; control the pin with \`selectedIndex\` / \`defaultSelectedIndex\`.
+\`{ index, value, label?, formatted? }\` where \`value\` is the raw number and \`formatted\` is the
+chart's ready-to-display string; control the pin with \`selectedIndex\` / \`defaultSelectedIndex\`.
+Set \`readout={false}\` to hide the in-chart value chip and render \`datum.formatted\` yourself.
 Single-unit scalar charts (Delta, Progress, StatusDot, Bullet, …) take \`onSelect\` only.
 Theme with \`--mc-*\` CSS variables, or build a palette from one accent with \`defineTheme\` from
 \`${SITE.pkg}/theme\`.

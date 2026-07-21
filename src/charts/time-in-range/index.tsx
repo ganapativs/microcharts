@@ -157,8 +157,8 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={fontSize}
-              fontWeight={600}
               fill={ON_FILL_INK}
+              style={{ fontWeight: 600 }}
             >
               {text}
             </text>,

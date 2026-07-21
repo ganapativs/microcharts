@@ -53,7 +53,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     data,
     now,
     inner = 0.35,
-    start = 0,
+    origin = 0,
     mode = "length",
     segmentFormat,
     size = 24,
@@ -63,6 +63,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -76,8 +77,8 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   useEntrance(hostRef, "grow", animate);
 
   const geo = useMemo(
-    () => polarClockGeometry({ values: data, size, inner, start, pad: 1, mode, now }),
-    [data, size, inner, start, mode, now],
+    () => polarClockGeometry({ values: data, size, inner, origin, pad: 1, mode, now }),
+    [data, size, inner, origin, mode, now],
   );
   // The Chart viewBox gains a bottom gutter when the peak numeral is shown; the
   // clock still sits in the top square, so the pointer must map over the full height.
@@ -93,7 +94,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   // top square; the peak-label gutter (if any) lives below it. Both the hit
   // origin and the rotation come from geometry, so the inverse lands on the
   // segment the reader is actually pointing at.
-  const start0 = polarStart(start, n);
+  const start0 = polarStart(origin, n);
   const locate = useCallback(
     (x: number, y: number) => {
       if (n === 0) return null;
@@ -134,9 +135,10 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         index: i,
         value: typeof v === "number" && Number.isFinite(v) ? v : null,
         label: seg(i),
+        formatted: `${seg(i)}: ${typeof v === "number" && Number.isFinite(v) ? fmt(v) : "—"}`,
       };
     },
-    [data, seg],
+    [data, seg, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -175,7 +177,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         ? strings.polarClockAt(seg(shown!), fmt(shownVal))
         : strings.polarClockAt(seg(shown!), "—")
       : "";
-  const readout =
+  const chip =
     shownSeg !== undefined
       ? `${seg(shown!)}: ${typeof shownVal === "number" && Number.isFinite(shownVal) ? fmt(shownVal) : "—"}`
       : "";
@@ -190,7 +192,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         data={data}
         now={now}
         inner={inner}
-        start={start}
+        origin={origin}
         mode={mode}
         segmentFormat={segmentFormat}
         size={size}
@@ -199,15 +201,14 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus sector is transient. */}
         {pinPath ? <path d={pinPath} data-mc-ink="accent" data-mc-w="tick" /> : null}
         {activePath ? <path d={activePath} data-mc-ink="accent" /> : null}
         {rest.children}
       </StaticPolarClock>
       <LiveRegion>{announced}</LiveRegion>
-      {shownSeg !== undefined ? (
+      {readout && shownSeg !== undefined ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {readout}
+          {chip}
         </span>
       ) : null}
     </span>

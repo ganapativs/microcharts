@@ -18,6 +18,9 @@ describe("<DualWindowMeter>", () => {
   it("renders both traces + target summary leads with the slow read", () => {
     const { container } = draw(<DualWindowMeter data={NOISE} target={75} />);
     expect(container.querySelectorAll("path").length).toBe(2);
+    // Both traces are open polylines — each must carry fill="none" or the ink
+    // rule fills the M…L… path into a blob (see styles.css accent/data rules).
+    for (const p of container.querySelectorAll("path")) expect(p.getAttribute("fill")).toBe("none");
     expect(dualWindowSummary(20.4, 23.1, 23, EN_DUAL_WINDOW, fmt)).toBe(
       "Slow window 23.1 vs target 23; fast 20.4.",
     );

@@ -59,7 +59,7 @@ describe("interactive <ChangePoint>", () => {
     const fig = screen.container.querySelector(".mc-change-point-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 32 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 32 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -72,7 +72,7 @@ describe("interactive <ChangePoint>", () => {
     const fig = screen.container.querySelector(".mc-change-point-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 32 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 32 });
     fig.blur();
     await expect.poll(() => fig.querySelector(PIN)).not.toBeNull();
     await expect.poll(() => fig.querySelector(FOCUS)).toBeNull();

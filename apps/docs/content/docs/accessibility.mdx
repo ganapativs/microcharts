@@ -1,9 +1,8 @@
 ---
 title: Accessibility
 description:
-  Accessible by default — every chart is an img with a natural-language summary generated from your data, and one
-  keyboard, pointer, and touch contract across every interactive entry. Localizable, correct under forced-colors,
-  reduced-motion, and high-contrast. Meaning is never carried by color alone.
+  Accessible React charts by default — every microchart is role="img" with a generated natural-language summary,
+  keyboard-ready interactive entries, CVD-safe tokens, and forced-colors / reduced-motion support. No extra a11y work.
 ---
 
 Accessibility isn't a setting in microcharts. Every chart is accessible the moment you render it, because the accessible
@@ -98,9 +97,12 @@ changes, not on every pointer move, so sweeping across a chart announces once pe
 pixel.
 
 The callbacks mirror the states exactly. `onActive` fires as the active unit changes; `onSelect` fires on selection.
-Both receive a `MicroDatum` — `{ index, value, label? }`, where `index` identifies the unit and `value` is that unit's
-primary encoded number (`null` when the unit encodes nothing) — or `null` when the chart clears. Selection is
-controllable with `selectedIndex`, or seeded once with `defaultSelectedIndex`.
+Both receive a `MicroDatum` — `{ index, value, label?, formatted? }`, where `index` identifies the unit, `value` is that
+unit's primary encoded number (`null` when the unit encodes nothing), and `formatted` is the exact string the chart's
+own readout chip would show — or `null` when the chart clears. Selection is controllable with `selectedIndex`, or seeded
+once with `defaultSelectedIndex`. To move the value out of the chart entirely — a KPI number, a sentence, a cell that
+updates as you hover — set `readout={false}` to keep the crosshair but drop the in-chart chip, and render
+`datum.formatted` from `onActive` yourself.
 
 Charts with only **one** unit — Delta, Progress, StatusDot, Bullet, and the rest of the scalar set — have nothing to
 rove between, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state.

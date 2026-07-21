@@ -48,6 +48,24 @@ describe("minimapGeometry", () => {
     expect(geo.unknownShare).toBe(0);
   });
 
+  it("the annotation lane scales with height (legible ticks on tall strips)", () => {
+    const at = (height: number) =>
+      minimapGeometry({
+        content: CONTENT,
+        window: [0, 1200],
+        marks: [600],
+        known: [[0, 1200]],
+        domain: [0, 1200],
+        width: 120,
+        height,
+      }).contentTop;
+    // taller strip → deeper lane (was a fixed 2u sliver), clamped so it never
+    // eats the content band, and content always sits below it.
+    expect(at(40)).toBeGreaterThan(at(12));
+    expect(at(12)).toBeGreaterThanOrEqual(3);
+    expect(at(200)).toBeLessThanOrEqual(7);
+  });
+
   it("default domain spans content + window + marks + known", () => {
     expect(minimapDomain({ content: CONTENT, window: [520, 660] })).toEqual([0, 1200]);
   });

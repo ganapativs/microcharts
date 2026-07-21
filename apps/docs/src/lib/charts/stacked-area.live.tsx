@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { StackedArea } from "@microcharts/react/stacked-area";
 import { StackedArea as StackedAreaInteractive } from "@microcharts/react/stacked-area/interactive";
 import staticModule, { playground as staticPlayground, MIX } from "./stacked-area";
 
@@ -46,6 +47,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: StackedArea,
+  ChartLive: StackedAreaInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

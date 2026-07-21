@@ -57,6 +57,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     summary,
     strings = EN_SKYLINE,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -102,8 +103,24 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
   // `value` = the building's height value (the primary, zero-anchored channel);
   // `lit` is the secondary channel and rides in the announcement, not the datum.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
-    [data],
+    (i: number) => {
+      const d = data[i];
+      const b = geo.buildings[i];
+      return {
+        index: i,
+        value: d?.value ?? null,
+        label: d?.label,
+        formatted:
+          d && b
+            ? !isFiniteValue(d.value)
+              ? strings.citySkylineEmpty(d.label)
+              : b.lit === null
+                ? strings.citySkylineAt(d.label, fmt(d.value))
+                : strings.citySkylineAtLit(d.label, fmt(d.value), `${Math.round(b.lit * 100)}%`)
+            : "",
+      };
+    },
+    [data, geo, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -183,13 +200,12 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticCitySkyline>
       <LiveRegion>{announced}</LiveRegion>
-      {b && announced ? (
+      {readout && b && announced ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${((b.x + b.w / 2) / geo.width) * 100}%`, transform: "translateX(-50%)" }}

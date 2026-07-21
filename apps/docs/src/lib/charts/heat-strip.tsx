@@ -148,7 +148,7 @@ export const contexts: ChartContexts = {
         — peaked at 90% by minute 8, dipped to 28%, spiked again, then closed at 35%.
       </p>
     ),
-    code: `<p>\n  API load over the last 20 minutes{" "}\n  <HeatStrip data={hourlyLoad} domain={[0, 100]} height={14} /> — peaked at 90%, closed at 35%.\n</p>`,
+    code: `<p>\n  API load over the last 20 minutes{" "}\n  <span className="mc-inline">\n    <HeatStrip data={hourlyLoad} domain={[0, 100]} height={14} summary={false} />\n  </span>{" "}\n  — peaked at 90%, closed at 35%.\n</p>`,
   },
   cell: {
     render: () => (

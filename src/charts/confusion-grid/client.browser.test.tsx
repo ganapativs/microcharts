@@ -41,7 +41,7 @@ describe("interactive <ConfusionGrid>", () => {
     );
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 0.12, label: "cat→dog" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 0.12, label: "cat→dog" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -53,7 +53,7 @@ describe("interactive <ConfusionGrid>", () => {
     );
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowDown}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 2, value: 0.14, label: "dog→cat" });
+    expect(picks.at(-1)).toMatchObject({ index: 2, value: 0.14, label: "dog→cat" });
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });

@@ -6,6 +6,7 @@
 // the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import {
   named,
@@ -53,6 +54,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -98,7 +100,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
       mode,
       domain: props.domain,
       gutterCh,
-      fontSize: Math.min(9, Math.max(6, Math.round(height * 0.42))),
+      fontSize: labelFont(height, 0.42),
     });
   }, [width, height, data.before, data.after, bins, mode, props.domain, props.label, fmt]);
 
@@ -145,6 +147,9 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
             ? round2(b.afterShare - b.beforeShare)
             : null,
         label: b ? `${fmt(b.x0)}–${fmt(b.x1)}` : undefined,
+        formatted: b
+          ? `${fmt(b.x0)}–${fmt(b.x1)}: ${pct(b.beforeShare)} / ${pct(b.afterShare)}`
+          : undefined,
       };
     },
     [geo, fmt],
@@ -229,12 +234,11 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticShiftHistogram>
-      {b && geo ? (
+      {readout && b && geo ? (
         <span
           className="mc-shift-readout mc-spark-readout"
           style={{

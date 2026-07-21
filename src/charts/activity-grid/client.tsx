@@ -9,6 +9,7 @@ import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
+import { EN_ACTIVITY, type ActivityStrings } from "../../core/strings-activity.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import {
   named,
@@ -28,8 +29,8 @@ import {
 } from "./index.js";
 
 export interface InteractiveActivityGridProps extends ActivityGridProps, PickerProps {
-  /** Swappable announcement strings (defaults to EN). */
-  strings?: SeriesStrings & SlotStrings;
+  /** Swappable announcement strings (defaults to EN). Interactive adds series/slot templates. */
+  strings?: ActivityStrings & Partial<SeriesStrings & SlotStrings>;
   /**
    * Opt-in entrance motion (default `false`): cells fade in on first
    * client-side mount. Inert on the server and on hydrated server HTML;
@@ -38,14 +39,12 @@ export interface InteractiveActivityGridProps extends ActivityGridProps, PickerP
   animate?: boolean;
 }
 
-const DEFAULT_STRINGS = { ...EN_SERIES, ...EN_SLOTS };
-
 export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNode {
   const {
     data,
     layout = "grid",
     shape = "square",
-    start,
+    anchor,
     weekStart = 1,
     cell = 10,
     gap = 2,
@@ -54,8 +53,9 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     locale,
     title,
     summary,
-    strings = DEFAULT_STRINGS,
+    strings = EN_ACTIVITY,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -65,11 +65,13 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     ...rest
   } = props;
 
+  const announce = { ...EN_SERIES, ...EN_SLOTS, ...strings };
+
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "reveal", animate);
 
   const rows = layout === "strip" ? 1 : 7;
-  const offset = layout === "grid" ? calendarOffset(start, weekStart) : 0;
+  const offset = layout === "grid" ? calendarOffset(anchor, weekStart) : 0;
   const geo = useMemo(
     () => activityGridGeometry(data, { rows, cell, gap, levels: LEVELS, domain, offset }),
     [data, rows, cell, gap, domain, offset],
@@ -129,8 +131,11 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   );
 
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const v = geo.cells[i]?.value ?? null;
+      return { index: i, value: v, formatted: v === null ? "—" : fmt(v) };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -151,7 +156,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
       ? undefined
       : typeof summary === "string"
         ? summary
-        : activitySummary(data, fmt);
+        : activitySummary(data, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const ring = (i: number, pinned: boolean) => {
@@ -181,8 +186,8 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     shownCell === undefined
       ? ""
       : shownCell.value === null
-        ? strings.pointEmpty(shownCell.index + 1, geo.cells.length)
-        : strings.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value));
+        ? announce.pointEmpty(shownCell.index + 1, geo.cells.length)
+        : announce.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value));
 
   return (
     <span
@@ -197,22 +202,22 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         data={data}
         layout={layout}
         shape={shape}
-        start={start}
+        anchor={anchor}
         weekStart={weekStart}
         cell={cell}
         gap={gap}
         domain={domain}
         format={format}
         locale={locale}
+        strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticActivityGrid>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell ? (
+      {readout && shownCell ? (
         <span
           className="mc-spark-readout"
           style={{

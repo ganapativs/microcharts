@@ -17,16 +17,16 @@ pre-commit:
       run: pnpm oxlint --no-error-on-unmatched-pattern {staged_files}
 
 pre-push:
-  # Sequential (piped), not parallel: typecheck, then the node (jsdom) project,
-  # then the browser (Playwright) project. The node project runs in one process
-  # at default parallelism and peaks ~0.7 GB — well under a worker's 4 GB V8 heap.
-  # (It used to OOM, but the cause was a single chart emitting unbounded geometry
-  # on a non-physical input, not the suite size — fixed in wind-barb/geometry.ts.)
+  # Sequential (piped), not parallel: typecheck, then the node-env + jsdom
+  # projects, then the browser (Playwright) project. The jsdom project peaks
+  # ~0.7 GB — well under a worker's 4 GB V8 heap. (It used to OOM, but the cause
+  # was a single chart emitting unbounded geometry on a non-physical input, not
+  # the suite size — fixed in wind-barb/geometry.ts.)
   piped: true
   commands:
     1_typecheck:
       run: pnpm typecheck
     2_test_node:
-      run: pnpm vitest run --project node
+      run: pnpm vitest run --project core --project dom
     3_test_browser:
       run: pnpm vitest run --project browser

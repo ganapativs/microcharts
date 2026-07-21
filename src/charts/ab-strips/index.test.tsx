@@ -80,25 +80,24 @@ describe("<ABStrips> degrades at small sizes", () => {
     draw(<ABStrips data={{ a: A, b: B }} width={160} height={height} {...props} />).container;
   const texts = (c: Element) => [...c.querySelectorAll("text")].map((t) => t.textContent);
 
-  // The two arms split the box into two rows and each tag is centred on its
-  // row, so under a one-em pitch "A" lands on "B" (and "Ctrl" on "Test").
-  it("keeps the row tags while the row pitch holds one em (height 16 → pitch 6)", () => {
-    expect(texts(at(16))).toEqual(["A", "B", "+15%"]);
+  // labelFont floors at 7, so tags need band ≥ 7 → height ≥ 18
+  // ((h − 2pad) / 2). Below that the tags drop; strips + delta survive.
+  it("keeps the row tags while the row pitch holds one em (height 18 → pitch 7)", () => {
+    expect(texts(at(18))).toEqual(["A", "B", "+15%"]);
   });
 
   it("drops the row tags below one em — the strips and the delta survive", () => {
-    const c = at(15);
+    const c = at(17);
     expect(texts(c)).toEqual(["+15%"]);
-    // the marks still read: two median dots, still on the shared scale
     expect(c.querySelectorAll("circle").length).toBe(2);
   });
 
   it("longer row identities drop at the same pitch, never overlap", () => {
-    expect(texts(at(15, { seriesLabels: ["Ctrl", "Test"] }))).toEqual(["+15%"]);
+    expect(texts(at(17, { seriesLabels: ["Ctrl", "Test"] }))).toEqual(["+15%"]);
   });
 
   it("the tags' lead gutter goes with them — the strips reclaim the width", () => {
     const outerX = (h: number) => Number([...at(h).querySelectorAll("rect")][0]!.getAttribute("x"));
-    expect(outerX(15)).toBeLessThan(outerX(16));
+    expect(outerX(17)).toBeLessThan(outerX(18));
   });
 });

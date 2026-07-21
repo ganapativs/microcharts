@@ -86,6 +86,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
         title={title}
         summary={accName}
         id={id}
+        seat={{ mode: "center", top: PAD, bottom: height - PAD }}
         className={cls}
         style={style}
       >
@@ -126,7 +127,6 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* 50% midline — the decision boundary */}
       <line
         x1={PAD}
         y1={geo!.midY}
@@ -138,7 +138,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
       />
-      {/* trailing (<50) neutral + leading (>50) accent stretches — one worm, split at 50 */}
+      {/* Split at 50: below muted, above accent. */}
       {[
         { d: geo!.belowD, ink: "muted", st: undefined as CSSProperties | undefined },
         { d: geo!.aboveD, ink: "accent", st: { stroke: accent } },
@@ -183,7 +183,6 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
           </text>
         </g>
       ) : null}
-      {/* endpoint "now" dot — coloured by the current leader */}
       <circle
         cx={end.x}
         cy={end.y}

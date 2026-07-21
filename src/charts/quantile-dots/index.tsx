@@ -12,7 +12,6 @@ import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-q
 import { quantileDotsGeometry, type QuantileDotsGeometry, type ThresholdSide } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual quantile-dots summary. Shared with the interactive entry. */
 export function quantileDotsSummary(
   geo: QuantileDotsGeometry,
   fmt: (n: number) => string,
@@ -110,6 +109,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={{ mode: "floor", bottom: height - 2 }}
         className={cls}
         style={style}
       >
@@ -139,8 +139,6 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* base dots — filled muted (each ≈ a 1-in-count chance) */}
-      {/* keyed by index — coincident dots (all-equal input) share coordinates */}
       {geo.dots.map((d, i) =>
         d.past ? null : <circle key={i} cx={d.x} cy={d.y} r={d.r} data-mc-ink="neutral" />,
       )}
@@ -156,7 +154,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* past-threshold dots — re-inked accent AND ringed (never color-alone) */}
+      {/* Past threshold: accent + ring (not color alone). */}
       {geo.dots.map((d, i) =>
         d.past ? (
           <circle

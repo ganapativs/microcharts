@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { CHART_GZIP } from "@/lib/stats";
 import { getChart } from "@/lib/catalog";
+import { ExpectWarn } from "@/components/ui/expect-warn";
 import { LiveDemoView } from "@/components/ui/live-demo-view";
+import { EntryDemoDual } from "@/components/ui/entry-demo-dual";
 import type { SampleData } from "@/lib/charts/types";
 
 /**
@@ -12,6 +14,11 @@ import type { SampleData } from "@/lib/charts/types";
  * {@link LiveDemoView}. That keeps the 106-chart catalog out of every page's
  * client bundle — a text page that renders a `<LiveDemo>` ships only the tiny
  * view island, not the registry.
+ *
+ * When `sizeOf` is set (chart-page entry demo before Install), the preview is
+ * the interactive twin from the chart module. Variant demos render `children` —
+ * on chart-doc pages those tags are already the `/interactive` entries (see
+ * `mdx-chart-tags-live`). Size meta still lists interactive · static gzip.
  */
 export function LiveDemo({
   children,
@@ -23,8 +30,9 @@ export function LiveDemo({
   dataOf,
   sampleData,
   grid = false,
+  expectWarn = false,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   code?: string;
   lang?: string;
   label?: string;
@@ -36,10 +44,26 @@ export function LiveDemo({
   /** Explicit sample-data for pages not in the chart registry (e.g. annotations). */
   sampleData?: SampleData[];
   grid?: boolean;
+  /** Quiet intentional edge-case `devWarn` mounts (docs only). */
+  expectWarn?: boolean;
 }) {
-  const size = sizeOf ? CHART_GZIP[sizeOf]?.static : undefined;
-  const metaText = meta ?? (size !== undefined ? `static · ${size} kB` : undefined);
+  const sizes = sizeOf ? CHART_GZIP[sizeOf] : undefined;
+  const metaText =
+    meta ??
+    (sizes
+      ? sizes.interactive !== undefined
+        ? `interactive · ${sizes.interactive} kB · static · ${sizes.static} kB`
+        : `static · ${sizes.static} kB`
+      : undefined);
   const data = sampleData ?? getChart(dataOf ?? sizeOf ?? "")?.sampleData;
+
+  const preview = sizeOf ? (
+    <EntryDemoDual slug={sizeOf} />
+  ) : expectWarn ? (
+    <ExpectWarn>{children}</ExpectWarn>
+  ) : (
+    children
+  );
 
   return (
     <LiveDemoView
@@ -50,7 +74,7 @@ export function LiveDemo({
       sampleData={data}
       grid={grid}
     >
-      {children}
+      {preview}
     </LiveDemoView>
   );
 }

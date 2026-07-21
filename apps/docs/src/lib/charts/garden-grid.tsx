@@ -127,13 +127,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  {
-    name: "microcharts",
-    meta: "34 peak",
-    data: [24480, 25840, 27200, 28560, 29920, 31280, 32640, 34000],
-  },
-  { name: "docs", meta: "22 peak", data: [15840, 16720, 17600, 18480, 19360, 20240, 21120, 22000] },
-  { name: "api", meta: "18 peak", data: [12960, 13680, 14400, 15120, 15840, 16560, 17280, 18000] },
+  { name: "microcharts", meta: "34 peak", data: [12, 20, 8, 0, 15, 28, 34, 5, 0, 22, 18, 9] },
+  { name: "docs", meta: "22 peak", data: [22, 18, 14, 10, 8, 6, 4, 2, 0, 0, 3, 5] },
+  { name: "api", meta: "18 peak", data: [2, 0, 4, 0, 8, 18, 12, 0, 6, 0, 1, 0] },
 ];
 
 export const contexts: ChartContexts = {
@@ -142,12 +138,19 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Contributions this quarter{" "}
         <span className="mc-inline">
-          <GardenGrid data={WEEKS} unit="weeks" cell={8} summary={false} />
+          <GardenGrid
+            data={WEEKS.slice(0, 12)}
+            unit="weeks"
+            rows={1}
+            steps={3}
+            cell={8}
+            summary={false}
+          />
         </span>{" "}
         — busy mid-month, quiet weeks 4 and 10.
       </p>
     ),
-    code: "<p>\n  Contributions this quarter <GardenGrid data={weeks} /> — busy mid-month, quiet weeks 4 and 10.\n</p>",
+    code: '<p>\n  Contributions this quarter{" "}\n  <span className="mc-inline">\n    <GardenGrid data={weeks} rows={1} summary={false} />\n  </span>{" "}\n  — busy mid-month, quiet weeks 4 and 10.\n</p>',
   },
   cell: {
     render: () => (
@@ -157,7 +160,14 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <GardenGrid data={row.data} unit="weeks" cell={9} summary={false} />
+                <GardenGrid
+                  data={row.data}
+                  unit="weeks"
+                  rows={1}
+                  steps={3}
+                  cell={8}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -165,7 +175,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <GardenGrid data={weeks} />\n</td>",
+    code: "<td>\n  <GardenGrid data={weeks} rows={1} />\n</td>",
   },
   kpi: {
     render: () => (
@@ -177,7 +187,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">peak week</span>
           </div>
         </div>
-        <GardenGrid data={CTX_ROWS[0]!.data} unit="weeks" cell={12} summary={false} />
+        <GardenGrid data={CTX_ROWS[0]!.data} unit="weeks" rows={3} cell={10} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">34</span>\n  <span className="unit">peak week</span>\n  <GardenGrid data={weeks} />\n</div>',
@@ -191,13 +201,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <GardenGrid data={row.data} unit="weeks" cell={7} summary={false} />
+            <GardenGrid data={row.data} unit="weeks" rows={1} steps={3} cell={7} summary={false} />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  microcharts <GardenGrid data={weeks} />\n</button>',
+    code: '<button className="tab">\n  microcharts <GardenGrid data={weeks} rows={1} />\n</button>',
   },
+  note: "Best at KPI/card scale — activity grids need room for cell area.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

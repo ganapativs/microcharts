@@ -39,7 +39,7 @@ export function calendarEntries(data: readonly CalendarStripDatum[]): Map<string
   return entries;
 }
 
-/** Factual calendar summary — active days over the window. Shared. */
+/** Active days over the window. */
 export function calendarStripSummary(
   activeDays: number,
   totalDays: number,

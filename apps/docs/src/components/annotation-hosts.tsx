@@ -23,6 +23,11 @@ import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { WinProbWorm } from "@microcharts/react/win-prob-worm";
 import { ErrorBudget } from "@microcharts/react/error-budget";
+import { NetFlow } from "@microcharts/react/net-flow";
+import { Horizon } from "@microcharts/react/horizon";
+import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
+import { PairedBars } from "@microcharts/react/paired-bars";
+import { Slope } from "@microcharts/react/slope";
 
 const W = 220;
 const H = 84;
@@ -77,6 +82,32 @@ const PCT = [40, 46, 52, 58, 63, 68, 72, 76, 79, 81];
 const RET = [1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38, 0.379, 0.378];
 const GAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
 const BUDGET = [1, 0.96, 0.93, 0.9, 0.86, 0.83, 0.79, 0.75, 0.71, 0.67, 0.64, 0.62];
+const FLOW = [
+  { in: 12, out: 8 },
+  { in: 14, out: 9 },
+  { in: 11, out: 10 },
+  { in: 16, out: 7 },
+  { in: 13, out: 11 },
+  { in: 15, out: 8 },
+];
+const HORIZON = [2, 4, 3, -1, -3, -2, 1, 5, 4, 2, -2, -4, -1, 3, 6, 5];
+const ENSEMBLE = [
+  [10, 12, 11, 14, 13, 16, 15, 18],
+  [10, 11, 13, 12, 15, 14, 17, 16],
+  [10, 13, 12, 15, 14, 18, 16, 19],
+  [10, 12, 14, 13, 16, 15, 14, 17],
+];
+const PAIRED = [
+  { label: "A", value: 42, ref: 38 },
+  { label: "B", value: 31, ref: 35 },
+  { label: "C", value: 28, ref: 22 },
+  { label: "D", value: 19, ref: 24 },
+];
+const SLOPE = [
+  { label: "East", from: 40, to: 47 },
+  { label: "West", from: 55, to: 41 },
+  { label: "South", from: 30, to: 33 },
+];
 
 function Cell({ name, mark, children }: { name: string; mark: string; children: ReactNode }) {
   return (
@@ -205,6 +236,36 @@ export function AnnotationHostGallery() {
           <Callout x={5} y={0.82} label="deploy dip" />
         </ErrorBudget>
       </Cell>
+
+      <Cell name="NetFlow" mark="Threshold">
+        <NetFlow data={FLOW} label="none" width={W} height={H}>
+          <Threshold y={4} label="net+" />
+        </NetFlow>
+      </Cell>
+
+      <Cell name="Horizon" mark="Threshold">
+        <Horizon data={HORIZON} width={W} height={H}>
+          <Threshold y={0} label="zero" />
+        </Horizon>
+      </Cell>
+
+      <Cell name="EnsembleGhosts" mark="Threshold">
+        <EnsembleGhosts data={ENSEMBLE} label="none" width={W} height={H}>
+          <Threshold y={16} label="cap" />
+        </EnsembleGhosts>
+      </Cell>
+
+      <Cell name="PairedBars" mark="Threshold">
+        <PairedBars data={PAIRED} width={W} height={H}>
+          <Threshold y={30} label="bar" />
+        </PairedBars>
+      </Cell>
+
+      <Cell name="Slope" mark="Threshold">
+        <Slope data={SLOPE} width={W} height={H}>
+          <Threshold y={45} label="mid" />
+        </Slope>
+      </Cell>
     </div>
   );
 }
@@ -265,7 +326,7 @@ import {
  *  sourced from {@link HOSTS_SNIPPET} so its indentation survives. */
 export function AnnotationHostShowcase(): ReactNode {
   return (
-    <LiveDemo label="All 17 hosts" code={HOSTS_SNIPPET}>
+    <LiveDemo label="All 22 hosts" code={HOSTS_SNIPPET}>
       <AnnotationHostGallery />
     </LiveDemo>
   );

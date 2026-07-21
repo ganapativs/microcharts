@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { Slope } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { mappedEdgeSuite } from "../../test/edge-cases.js";
+import { expectHostsAnnotations } from "../../test/annotation-host.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
@@ -80,3 +81,17 @@ mappedEdgeSuite(
   (v, i) => ({ label: `c${i}`, from: i, to: v as number }),
   slopeCase,
 );
+
+describe("<Slope> annotations", () => {
+  it("hosts annotations, clamped to the frame", () => {
+    expectHostsAnnotations(
+      (children) => (
+        <Slope data={DATA} width={80} height={40} summary={false}>
+          {children}
+        </Slope>
+      ),
+      80,
+      40,
+    );
+  });
+});

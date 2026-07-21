@@ -50,6 +50,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -95,12 +96,16 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       const d = data[i];
       const a = d?.a;
       const b = d?.b;
+      const g = isFiniteValue(a) && isFiniteValue(b) ? a - b : null;
+      // Mirror the readout chip exactly ("—", "level", or "organic +11").
+      const [la, lb] = seriesPair(seriesLabels);
       return {
         index: i,
-        value: isFiniteValue(a) && isFiniteValue(b) ? a - b : null,
+        value: g,
+        formatted: g === null ? "—" : g === 0 ? "level" : `${g > 0 ? la : lb} +${fmt(Math.abs(g))}`,
       };
     },
-    [data],
+    [data, seriesLabels, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -174,7 +179,6 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinX !== undefined ? (
           <line
             x1={pinX}
@@ -218,7 +222,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         {rest.children}
       </StaticSpreadBand>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null && crossX !== undefined ? (
+      {readout && shown !== null && crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(crossX / width) * 100}%`, transform: "translateX(-50%)" }}

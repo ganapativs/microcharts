@@ -1,5 +1,5 @@
 "use client";
-import sparkline from "@/lib/charts/sparkline";
+import sparkline from "@/lib/charts/sparkline.live";
 import type { ChartModule } from "@/lib/charts/types";
 import { FourContextsView } from "./contexts-view";
 

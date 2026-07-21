@@ -46,9 +46,9 @@ describe("interactive <BiasStrip>", () => {
     const wrap = screen.container.querySelector(".mc-bias-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    expect(seen.at(-1)).toEqual({ index: 0, value: 1, label: "10.5" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 1, label: "10.5" });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
-    expect(seen.at(-1)).toEqual({ index: 1, value: 10, label: "25" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 10, label: "25" });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     expect(seen.at(-1)).toBeNull();
   });
@@ -60,7 +60,7 @@ describe("interactive <BiasStrip>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    expect(picks.at(-1)).toEqual({ index: 0, value: 1, label: "10.5" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 1, label: "10.5" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))

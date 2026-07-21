@@ -32,7 +32,7 @@ export interface InteractiveWaterfallProps extends WaterfallProps, PickerProps {
 export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   const {
     data,
-    start = 0,
+    open = 0,
     totalBar = true,
     domain,
     width = 70,
@@ -43,6 +43,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -68,16 +69,16 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         width,
         height,
         deltas: data.map((d) => d.value),
-        start,
+        open,
         total: totalBar,
         domain,
       }),
-    [width, height, data, start, totalBar, domain],
+    [width, height, data, open, totalBar, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   /** Navigable units = COLUMNS: 0..n-1 = steps (1:1 with `data`), n = the total bar. */
   const cols = data.length + (totalBar ? 1 : 0);
-  const endLevel = geo.levels.length > 0 ? geo.levels[geo.levels.length - 1]! : start;
+  const endLevel = geo.levels.length > 0 ? geo.levels[geo.levels.length - 1]! : open;
 
   // Pointer (viewBox space) → column by x band. `y` is ignored: with
   // `label="delta"` the static viewBox grows a label band below the plot, so
@@ -98,10 +99,19 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     (i: number) => {
       const d = data[i];
       // The total column has no i18n-able name, so it carries no `label`.
-      if (!d) return { index: i, value: endLevel };
-      return { index: i, value: isFiniteValue(d.value) ? d.value : null, label: d.label };
+      if (!d) return { index: i, value: endLevel, formatted: fmt(endLevel) };
+      return {
+        index: i,
+        value: isFiniteValue(d.value) ? d.value : null,
+        label: d.label,
+        formatted: `${d.label}: ${
+          isFiniteValue(d.value)
+            ? `${d.value < 0 ? "−" : "+"}${fmt(Math.abs(d.value))}`
+            : strings.noData
+        } → ${fmt(geo.levels[i] ?? open)}`,
+      };
     },
-    [data, endLevel],
+    [data, endLevel, fmt, geo, strings, open],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -121,7 +131,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : waterfallSummary(data, start, fmt, strings);
+        : waterfallSummary(data, open, fmt, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Built from the column this box names — its own painted rect — never from the
@@ -156,7 +166,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
           isFiniteValue(step.value)
             ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
             : strings.noData,
-          fmt(geo.levels[shown!] ?? start),
+          fmt(geo.levels[shown!] ?? open),
         )
       : "";
 
@@ -170,7 +180,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       <StaticWaterfall
         {...rest}
         data={data}
-        start={start}
+        open={open}
         totalBar={totalBar}
         domain={domain}
         width={width}
@@ -181,13 +191,12 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== null && selected !== active ? box(selected, true) : null}
         {active !== null ? box(active, false) : null}
         {rest.children}
       </StaticWaterfall>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null ? (
+      {readout && shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -202,8 +211,8 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
                   isFiniteValue(step.value)
                     ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
                     : strings.noData
-                } → ${fmt(geo.levels[shown] ?? start)}`
-              : fmt(geo.levels[shown] ?? start)}
+                } → ${fmt(geo.levels[shown] ?? open)}`
+              : fmt(geo.levels[shown] ?? open)}
         </span>
       ) : null}
     </span>

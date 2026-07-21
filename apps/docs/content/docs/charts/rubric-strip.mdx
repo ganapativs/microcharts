@@ -1,8 +1,8 @@
 ---
 title: RubricStrip
-description:
-  A weighted scorecard for React — bar length is the score, bar thickness is the criterion's weight, and there is
-  deliberately no composite total.
+description: >-
+  React rubric strip chart — weighted criteria against a shared pass target. Tiny accessible SVG microchart; RSC-safe
+  static or /interactive.
 ---
 
 RubricStrip answers "how did this thing score per criterion — with each criterion's importance visible — without a fake
@@ -90,6 +90,7 @@ quality into one number.
   code={`// a score of 2 on a [0, 1] domain draws a full-length bar instead of
 // overflowing the track
 <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} />`}
+  expectWarn
 >
   <RubricStrip data={[{ label: "Bonus", score: 2, weight: 1 }]} title="Clamped" width={200} height={16} />
 </LiveDemo>

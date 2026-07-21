@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Dumbbell } from "@microcharts/react/dumbbell";
 import { Dumbbell as DumbbellInteractive } from "@microcharts/react/dumbbell/interactive";
 import staticModule, { playground as staticPlayground, BANDS } from "./dumbbell";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Dumbbell,
+  ChartLive: DumbbellInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

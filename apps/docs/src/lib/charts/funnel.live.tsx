@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Funnel } from "@microcharts/react/funnel";
 import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
 import staticModule, { playground as staticPlayground, PIPE } from "./funnel";
 
@@ -33,7 +34,7 @@ export const playground: PlaygroundSpec = {
       "  data={stages}",
       s.mode !== "absolute" && `  mode="${s.mode}"`,
       !(s.connectors as boolean) && "  connectors={false}",
-      s.label !== "none" && `  label="${s.label}"`,
+      s.label !== "percent" && `  label="${s.label}"`,
       (s.highlight as boolean) && '  highlight="Activated"',
       ui.animate && " animate",
       "/>",
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Funnel,
+  ChartLive: FunnelInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

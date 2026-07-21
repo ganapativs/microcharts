@@ -5,6 +5,8 @@
 // over-shoots (documented).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
+import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -18,7 +20,6 @@ export interface PairedBarsDatum {
   ref: number | null;
 }
 
-/** Factual referenced summary — count + the largest gap. Shared with client. */
 export function pairedBarsSummary(
   data: readonly PairedBarsDatum[],
   fmt: (n: number) => string,
@@ -100,6 +101,18 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
 
   const goodOver = positive !== "down";
 
+  // annotations: vertical only (value on y). Horizontal flips axes — pass through.
+  const ann =
+    orientation === "vertical" && children
+      ? resolveAnnotations(children, {
+          x: (i) => geo.pitch * Math.round(i) + geo.pitch / 2,
+          y: scaleLinear(geo.domain, [height, 0]),
+          width,
+          height,
+          fontSize: annotationFontSize(height),
+        })
+      : { under: null, over: null, rest: children };
+
   return (
     <Chart
       width={width}
@@ -119,6 +132,7 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
       className={className ? `mc-paired ${className}` : "mc-paired"}
       style={style}
     >
+      {ann.under}
       {geo.pairs.map((p) => {
         const d = data[p.index]!;
         const over = isFiniteValue(d.value) && isFiniteValue(d.ref) ? d.value >= d.ref : null;
@@ -155,7 +169,8 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
           </g>
         );
       })}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

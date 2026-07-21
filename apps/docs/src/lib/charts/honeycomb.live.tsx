@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Honeycomb } from "@microcharts/react/honeycomb";
 import { Honeycomb as HoneycombInteractive } from "@microcharts/react/honeycomb/interactive";
 import staticModule, { playground as staticPlayground } from "./honeycomb";
 
@@ -21,6 +22,7 @@ export const playground: PlaygroundSpec = {
       value={s.value as number}
       total={s.total as number}
       empty={s.empty as "outline" | "blank"}
+      label={s.label as "none" | "count" | "percent"}
       unit="seats"
       summary={false}
       animate={ui.animate}
@@ -33,6 +35,7 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       `  total={${s.total}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
+      s.label !== "none" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",
     ]
@@ -42,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Honeycomb,
+  ChartLive: HoneycombInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

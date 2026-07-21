@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
 import staticModule, { playground as staticPlayground, FOCAL, FIELD, AXES } from "./quadrant-dot";
 
@@ -15,8 +16,8 @@ export function PreviewLive() {
       field={FIELD}
       {...AXES}
       summary={false}
-      width={48}
-      height={48}
+      width={72}
+      height={72}
       animate
     />
   );
@@ -57,6 +58,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: QuadrantDot,
+  ChartLive: QuadrantDotInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

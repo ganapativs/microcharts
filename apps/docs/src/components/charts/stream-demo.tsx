@@ -4,7 +4,7 @@
 // index is the correct key. Content-derived keys would remount — and re-animate —
 // already-rendered charts on every token tick.
 /**
- * Scripted assistant stream: inline `chart …` and fenced ```chart blocks
+ * Scripted assistant stream: inline `microchart …` and fenced ```microchart blocks
  * parse into real shipped components. Ghost copy reserves height (no CLS).
  */
 import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -33,8 +33,8 @@ import { DotPlot } from "@microcharts/react/dot-plot";
 import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-// Each reply the model "types". Grammar: inline `chart <type> <data>` for a
-// word-sized chart in a sentence; a fenced ```chart <type> <title> block for a
+// Each reply the model "types". Grammar: inline `microchart <type> <data>` for a
+// word-sized chart in a sentence; a fenced ```microchart <type> <title> block for a
 // standalone one (body is whitespace/comma numbers, or key=value for composites).
 interface Stream {
   id: string;
@@ -48,15 +48,15 @@ const STREAMS: Stream[] = [
     id: "revenue",
     label: "Revenue",
     hint: "business recap",
-    script: `Q3 closed **12% ahead of plan**. Revenue built week over week \`chart sparkline 132 148 141 165 159 182 176 203\` — up \`chart delta +0.184\` on Q2 — and the growth was broad, not one big deal carrying the quarter:
+    script: `Q3 closed **12% ahead of plan**. Revenue built week over week \`microchart sparkline 132 148 141 165 159 182 176 203\` — up \`microchart delta +0.184\` on Q2 — and the growth was broad, not one big deal carrying the quarter:
 
-\`\`\`chart mini-bar Net-new revenue by region ($k)
+\`\`\`microchart mini-bar Net-new revenue by region ($k)
 48 39 27 22 18
 \`\`\`
 
 The funnel held up end to end. Lead → demo → trial → paid converted at **19%** overall, with the trial→paid step the one to watch:
 
-\`\`\`chart funnel Q3 pipeline
+\`\`\`microchart funnel Q3 pipeline
 1000 540 320 190
 \`\`\`
 
@@ -67,28 +67,28 @@ Expansion pulled its weight too — net revenue retention landed at **114%**. Fo
     id: "incident",
     label: "Incident",
     hint: "SRE / on-call",
-    script: `Postmortem for INC-2231. The 14:02 deploy regressed the write path — request volume held steady \`chart sparkbar 120 118 122 90 60 95 128 130\`, but 5xx errors spiked hard for six minutes:
+    script: `Postmortem for INC-2231. The 14:02 deploy regressed the write path — request volume held steady \`microchart sparkbar 120 118 122 90 60 95 128 130\`, but 5xx errors spiked hard for six minutes:
 
-\`\`\`chart seismogram Errors per minute
+\`\`\`microchart seismogram Errors per minute
 2 1 3 2 18 24 9 4 2 1 2 3
 \`\`\`
 
-We caught it fast: alert at 14:03, status \`chart status-dot warn\`, rollback at 14:08, green by 14:11. Deploys resumed once the canary cleared \`chart activity 1 0 2 3 1 0 2 4 3 2\`. Net customer impact was **~40s of elevated latency** — inside the error budget, no SLO breach. Action item: add a write-path smoke test to the canary.
+We caught it fast: alert at 14:03, status \`microchart status-dot warn\`, rollback at 14:08, green by 14:11. Deploys resumed once the canary cleared \`microchart activity 1 0 2 3 1 0 2 4 3 2\`. Net customer impact was **~40s of elevated latency** — inside the error budget, no SLO breach. Action item: add a write-path smoke test to the canary.
 `,
   },
   {
     id: "markets",
     label: "Markets",
     hint: "finance / trading",
-    script: `NVDA closed **+3.8%** \`chart trend-arrow +0.038\` on the session — a steady grind higher into the bell. Intraday returns stayed tight around the mean, no fat tails:
+    script: `NVDA closed **+3.8%** \`microchart trend-arrow +0.038\` on the session — a steady grind higher into the bell. Intraday returns stayed tight around the mean, no fat tails:
 
-\`\`\`chart histogram 1-min returns (bps)
+\`\`\`microchart histogram 1-min returns (bps)
 -2 -1 0 1 -1 2 1 0 3 1 -1 0 2 1 4 -2 1 0
 \`\`\`
 
-Fills clustered mid-book \`chart rug-strip 3 5 5 6 8 8 9 11 12 12 14\`, so slippage was minimal. P&L attribution across the desk's five names was clean — one detractor, four contributors:
+Fills clustered mid-book \`microchart rug-strip 3 5 5 6 8 8 9 11 12 12 14\`, so slippage was minimal. P&L attribution across the desk's five names was clean — one detractor, four contributors:
 
-\`\`\`chart waterfall P&L attribution ($k)
+\`\`\`microchart waterfall P&L attribution ($k)
 40 -12 28 -8 15
 \`\`\`
 
@@ -101,13 +101,13 @@ The book now sits **14% over** its benchmark weight; trimming into strength on M
     hint: "consumer wellness",
     script: `Strong week overall. Your overnight heart rate stayed low and even — a solid recovery signal, and down from last week:
 
-\`\`\`chart horizon Resting HR, 7 nights (bpm)
+\`\`\`microchart horizon Resting HR, 7 nights (bpm)
 62 60 58 61 59 57 60 58 56 59 57 55
 \`\`\`
 
-You logged \`chart tally-marks 5\` workouts and closed \`chart progress value=0.9\` of the monthly move goal — one good push this weekend clears it. Recovery held strong across every system, HRV out in front:
+You logged \`microchart tally-marks 5\` workouts and closed \`microchart progress value=0.9\` of the monthly move goal — one good push this weekend clears it. Recovery held strong across every system, HRV out in front:
 
-\`\`\`chart dot-plot Recovery by system (0–100)
+\`\`\`microchart dot-plot Recovery by system (0–100)
 82 74 91 68 79
 \`\`\`
 `,
@@ -116,21 +116,21 @@ You logged \`chart tally-marks 5\` workouts and closed \`chart progress value=0.
     id: "ml",
     label: "ML training",
     hint: "advanced / dense",
-    script: `Run 47 promoted. Training loss fell cleanly \`chart sparkline 2.9 2.1 1.6 1.2 0.9 0.7 0.6 0.55\` over eight epochs — no divergence, no plateau — and eval cleared the promotion gate with room to spare:
+    script: `Run 47 promoted. Training loss fell cleanly \`microchart sparkline 2.9 2.1 1.6 1.2 0.9 0.7 0.6 0.55\` over eight epochs — no divergence, no plateau — and eval cleared the promotion gate with room to spare:
 
-\`\`\`chart bullet Eval accuracy vs gate (%)
+\`\`\`microchart bullet Eval accuracy vs gate (%)
 value=94 target=90 bands=70,95
 \`\`\`
 
 Inference latency held tight under load, with a couple of tail spikes worth watching before we raise QPS:
 
-\`\`\`chart micro-box p99 latency (ms)
+\`\`\`microchart micro-box p99 latency (ms)
 18 20 19 21 22 24 26 30 38 55 90
 \`\`\`
 
-Accelerators ran near saturation the whole run \`chart progress-ring value=0.96\`, and attention density concentrated in the mid layers, exactly as this architecture predicts:
+Accelerators ran near saturation the whole run \`microchart progress-ring value=0.96\`, and attention density concentrated in the mid layers, exactly as this architecture predicts:
 
-\`\`\`chart heat-strip Attention weight by layer
+\`\`\`microchart heat-strip Attention weight by layer
 12 20 34 58 92 140 96 44 22 14
 \`\`\`
 
@@ -141,13 +141,15 @@ Shipping to staging now; canary at 5% traffic.
 
 type Node = { t: "text"; v: string } | { t: "code"; type: string; body: string; closed: boolean };
 
+const FENCE_OPEN = "```microchart";
+
 // Split partially-revealed markdown into text + fenced-chart nodes. Handles a
 // fence still streaming (closed:false) so it can render raw first, then morph.
 function parse(src: string): Node[] {
   const nodes: Node[] = [];
   let i = 0;
   while (i < src.length) {
-    const open = src.indexOf("```chart", i);
+    const open = src.indexOf(FENCE_OPEN, i);
     if (open === -1) {
       nodes.push({ t: "text", v: src.slice(i) });
       break;
@@ -155,10 +157,15 @@ function parse(src: string): Node[] {
     if (open > i) nodes.push({ t: "text", v: src.slice(i, open) });
     const headerEnd = src.indexOf("\n", open);
     if (headerEnd === -1) {
-      nodes.push({ t: "code", type: src.slice(open + 8).trim(), body: "", closed: false });
+      nodes.push({
+        t: "code",
+        type: src.slice(open + FENCE_OPEN.length).trim(),
+        body: "",
+        closed: false,
+      });
       break;
     }
-    const type = src.slice(open + 8, headerEnd).trim();
+    const type = src.slice(open + FENCE_OPEN.length, headerEnd).trim();
     const close = src.indexOf("```", headerEnd + 1);
     if (close === -1) {
       nodes.push({ t: "code", type, body: src.slice(headerEnd + 1), closed: false });
@@ -441,7 +448,7 @@ const InlineChart = memo(function InlineChart({ spec }: { spec: string }) {
   return <span className="mc-inline mc-morph">{node}</span>;
 });
 
-// Inline markdown — **bold**, an inline `chart …` span, or plain `code`.
+// Inline markdown — **bold**, an inline `microchart …` span, or plain `code`.
 function Inline({ text }: { text: string }) {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean);
   return (
@@ -455,8 +462,8 @@ function Inline({ text }: { text: string }) {
           );
         if (part.startsWith("`") && part.endsWith("`")) {
           const inner = part.slice(1, -1);
-          if (inner.startsWith("chart "))
-            return <InlineChart key={`chart:${inner}`} spec={inner.slice(6)} />;
+          if (inner.startsWith("microchart "))
+            return <InlineChart key={`mc:${inner}`} spec={inner.slice(11)} />;
           return (
             <code key={`code:${inner}`} className="font-mono text-[0.9em] text-fd-primary">
               {inner}
@@ -497,7 +504,7 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
             key={i}
             className="code-inset my-3 block whitespace-pre px-4 py-3 font-mono text-[0.8rem] text-fd-muted-foreground"
           >
-            {"```chart " + n.type + "\n" + n.body}
+            {"```microchart " + n.type + "\n" + n.body}
           </code>
         ),
       )}
@@ -603,7 +610,6 @@ export function StreamDemo() {
 
   return (
     <div ref={rootRef} className="panel not-prose overflow-hidden">
-      {/* sector picker */}
       <div className="flex flex-wrap items-center gap-1.5 border-b border-hairline px-3 py-2.5">
         {STREAMS.map((s) => (
           <button
@@ -624,7 +630,6 @@ export function StreamDemo() {
         ))}
       </div>
 
-      {/* chat header */}
       <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="size-2 rounded-full" style={{ background: "var(--accent)" }} />

@@ -39,12 +39,14 @@ describe("defineTheme — basics", () => {
       surface: "#fff",
       surfaceInk: "#000",
       surfaceEdge: "#ccc",
+      onFill: "rgba(255,255,255,0.9)",
       dark: false,
     });
     expect(t.vars["--mc-font-numeric"]).toBe("IBM Plex Mono");
     expect(t.vars["--mc-label-size"]).toBe("0.8em");
     expect(t.vars["--mc-stroke-width"]).toBe("2"); // number stringified, not twinned
     expect(t.vars["--mc-duration"]).toBe("200ms");
+    expect(t.vars["--mc-on-fill"]).toBe("rgba(255,255,255,0.9)");
     expect(t.darkVars).toEqual({});
   });
 });

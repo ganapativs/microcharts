@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import { funnelGeometry } from "./geometry.js";
@@ -14,7 +15,7 @@ import { resolveSummary } from "../../core/summary.js";
 
 export type FunnelDatum = MiniBarDatum;
 
-/** Factual funnel summary — stages + overall conversion (+ inversion notes). */
+/** Stages + overall conversion. */
 export function funnelSummary(
   data: readonly FunnelDatum[],
   fmt: (n: number) => string,
@@ -45,7 +46,8 @@ export interface FunnelProps {
   mode?: "absolute" | "rate" | undefined;
   /** Connector slats between stages (off for the tightest cells). */
   connectors?: boolean | undefined;
-  /** `"percent"` | `"value"` above each column (deterministic drop-out). */
+  /** `"percent"` (share of the first stage, default) | `"value"` | `"none"`
+   *  above each column (deterministic drop-out). */
   label?: "none" | "percent" | "value" | undefined;
   /** Accent one stage — "the leak". */
   highlight?: number | string | undefined;
@@ -68,7 +70,7 @@ export function Funnel(props: FunnelProps): ReactNode {
     data,
     mode = "absolute",
     connectors = true,
-    label = "none",
+    label = "percent",
     highlight,
     width = 60,
     height = 18,
@@ -88,7 +90,7 @@ export function Funnel(props: FunnelProps): ReactNode {
     devWarn(`<Funnel> ${data.length} stages — past 6 the drops blur (documented cap).`);
   }
 
-  const fontSize = label === "none" ? 0 : 5;
+  const fontSize = label === "none" ? 0 : labelFont(height, 0.35);
   const geo = funnelGeometry({
     width,
     height,

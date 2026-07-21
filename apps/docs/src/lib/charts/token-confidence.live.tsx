@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { TokenConfidence as TokenConfidenceInteractive } from "@microcharts/react/token-confidence/interactive";
 import staticModule, { playground as staticPlayground, ANSWER } from "./token-confidence";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TokenConfidence,
+  ChartLive: TokenConfidenceInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

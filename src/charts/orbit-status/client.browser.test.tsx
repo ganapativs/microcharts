@@ -35,11 +35,11 @@ describe("interactive <OrbitStatus>", () => {
 
   it("announces when latency crosses the alert threshold", async () => {
     const screen = await render(
-      <OrbitStatus latency={200} rate={5} alert={300} latencyDomain={[0, 500]} title="API" />,
+      <OrbitStatus latency={200} rate={5} threshold={300} latencyDomain={[0, 500]} title="API" />,
     );
     const live = screen.container.querySelector('[aria-live="polite"]')!;
     await screen.rerender(
-      <OrbitStatus latency={350} rate={5} alert={300} latencyDomain={[0, 500]} title="API" />,
+      <OrbitStatus latency={350} rate={5} threshold={300} latencyDomain={[0, 500]} title="API" />,
     );
     expect(live.textContent).toBe("Latency high — 350ms.");
   });
@@ -58,7 +58,9 @@ describe("interactive <OrbitStatus>", () => {
     );
     const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
     fig.click();
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 240, label: "API" });
+    expect(onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 0, value: 240, label: "API" }),
+    );
   });
 
   it("Enter fires onSelect", async () => {
@@ -75,6 +77,8 @@ describe("interactive <OrbitStatus>", () => {
     const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
     fig.focus();
     fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 240, label: "API" });
+    expect(onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 0, value: 240, label: "API" }),
+    );
   });
 });

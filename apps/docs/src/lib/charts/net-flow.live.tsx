@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { NetFlow } from "@microcharts/react/net-flow";
 import { NetFlow as NetFlowInteractive } from "@microcharts/react/net-flow/interactive";
 import staticModule, { playground as staticPlayground, DEMO, KFMT } from "./net-flow";
 
@@ -45,6 +46,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: NetFlow,
+  ChartLive: NetFlowInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

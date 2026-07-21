@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { SpiralYear } from "@microcharts/react/spiral-year";
 import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
 import staticModule, { playground as staticPlayground, YEAR } from "./spiral-year";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: SpiralYear,
+  ChartLive: SpiralYearInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

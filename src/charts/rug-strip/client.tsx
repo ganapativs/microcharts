@@ -53,6 +53,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -107,8 +108,11 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
   // (and announces) observations in sorted order, and non-finite entries are
   // dropped, so rank is the only stable identity the chart itself exposes.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.ticks[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const t = geo.ticks[i];
+      return { index: i, value: t?.value ?? null, formatted: t ? fmt(t.value) : undefined };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -176,13 +180,12 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         height={height}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus tick is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticRugStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {shownTick ? (
+      {readout && shownTick ? (
         <span
           className="mc-spark-readout"
           style={

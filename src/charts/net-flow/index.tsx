@@ -15,13 +15,13 @@ import {
   type NetFlowMode,
   type NetFlowPeriod,
 } from "./geometry.js";
+import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 
 /** Signed value string — direction lives in the text, not the color. */
 export function signedNet(net: number, fmt: (n: number) => string): string {
   return net > 0 ? `+${fmt(net)}` : fmt(net);
 }
 
-/** Factual net-flow summary. Shared with the interactive entry. */
 export function netFlowSummary(
   geo: NetFlowGeometry,
   fmt: (n: number) => string,
@@ -86,28 +86,9 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
-  const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-net-flow ${className}` : "mc-net-flow";
-
-  // probe to size the signed-net gutter
-  const probe = netFlowGeometry({ width, height, data, mode, domain });
-  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
-  // box a line of text cannot be seated inside the plot at all. The readout
-  // DROPS rather than spilling past the viewBox, and because the gutter is
-  // derived from it the reserved space goes with it — the plot keeps its own
-  // width and simply stops paying for text it no longer draws. Pure arithmetic:
-  // the static path may never measure text.
-  const showLabel =
-    label === "last" &&
-    probe != null &&
-    !probe.degenerate &&
-    probe.last != null &&
-    labelFitsY(height / 2, FONT, height);
-  const labelText = showLabel ? signedNet(probe!.last!.net, fmt) : "";
-  const gutterCh = showLabel ? labelText.length : 0;
-
-  const geo = netFlowGeometry({ width, height, data, mode, domain, gutterCh, fontSize: FONT });
+  // Paths ignore the label gutter — one geometry pass, then widen the box.
+  const geo = netFlowGeometry({ width, height, data, mode, domain });
 
   if (geo === null) {
     return (
@@ -117,6 +98,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
+        seat={{ mode: "center", top: 2, bottom: height - 2 }}
         className={cls}
         style={style}
       >
@@ -125,17 +107,37 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     );
   }
 
+  const fmt = makeFormatter(format, locale);
+  const FONT = label === "last" ? labelFont(height) : 0;
+  const showLabel =
+    FONT > 0 && !geo.degenerate && geo.last != null && labelFitsY(height / 2, FONT, height);
+  const labelText = showLabel ? signedNet(geo.last!.net, fmt) : "";
+  const totalWidth = showLabel ? width + Math.ceil(labelText.length * FONT * 0.72) + 4 : width;
+  const labelX = width + 3;
+
   const accName = resolveSummary(summary, () => netFlowSummary(geo, fmt, strings));
   // color encodes valence (which direction is good), position encodes identity
   // (in always above, out always below) — the two channels are independent
   const inRole = positive === "down" ? "negative" : "positive";
   const outRole = positive === "down" ? "positive" : "negative";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+    : style;
   const bars = geo.mode === "bars";
+
+  const ann = children
+    ? resolveAnnotations(children, {
+        x: (i) => geo.points[Math.round(i)]?.x ?? Number.NaN,
+        y: geo.yFor,
+        width,
+        height,
+        fontSize: annotationFontSize(height),
+      })
+    : { under: null, over: null, rest: null };
 
   return (
     <Chart
-      width={geo.totalWidth}
+      width={totalWidth}
       height={height}
       title={title}
       summary={accName}
@@ -147,8 +149,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* mirrored flow surfaces — pos/neg ink-role earns the forced-colors
-          distinction; opacity dialed inline */}
+      {ann.under}
       {geo.degenerate ? null : bars ? (
         <>
           {geo.inBars.map((b) =>
@@ -186,7 +187,6 @@ export function NetFlow(props: NetFlowProps): ReactNode {
           <path d={geo.outArea.d} data-mc-ink={outRole} style={{ fillOpacity: AREA_OPACITY }} />
         </>
       )}
-      {/* zero baseline — the axis both directions read against */}
       <line
         x1={0}
         y1={geo.zeroY}
@@ -206,7 +206,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       ) : null}
       {showLabel ? (
         <text
-          x={geo.labelX}
+          x={labelX}
           y={geo.labelY}
           textAnchor="start"
           dominantBaseline="central"
@@ -217,7 +217,8 @@ export function NetFlow(props: NetFlowProps): ReactNode {
           {labelText}
         </text>
       ) : null}
-      {children}
+      {ann.over}
+      {ann.rest}
     </Chart>
   );
 }

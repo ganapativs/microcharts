@@ -185,7 +185,7 @@ export const contexts: ChartContexts = {
         — latency distribution shifted left after deploy.
       </p>
     ),
-    code: "<p>\n  The fix, proven <ShiftHistogram data={{ before, after }} /> — latency distribution shifted left after deploy.\n</p>",
+    code: '<p>\n  The fix, proven{" "}\n  <span className="mc-inline">\n    <ShiftHistogram data={{ before, after }} summary={false} />\n  </span>{" "}\n  — latency distribution shifted left after deploy.\n</p>',
   },
   cell: {
     render: () => (

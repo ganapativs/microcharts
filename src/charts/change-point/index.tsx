@@ -10,6 +10,7 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 import { scaleLinear, extent } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
 import { CHANGE_POINT_PAD, changePointGeometry, type ChangePointGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -18,7 +19,6 @@ import { resolveSummary } from "../../core/summary.js";
 const pct = (frac: number, signed = true): string =>
   `${signed && frac > 0 ? "+" : signed && frac < 0 ? "−" : ""}${Math.round(Math.abs(frac) * 100)}%`;
 
-/** Factual change-point summary. Shared with the interactive entry. */
 export function changePointSummary(
   geo: ChangePointGeometry,
   fmt: (v: number) => string,
@@ -87,7 +87,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
     children,
   } = props;
 
-  const FONT = Math.min(10, Math.max(6, Math.round(height * 0.55)));
+  const FONT = labelFont(height, 0.55);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-change-point ${className}` : "mc-change-point";
 
@@ -150,9 +150,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* regime shading — only the ODD regimes are tinted (identity, not valence);
-          adjacent regimes therefore always contrast (bare vs tinted) at ONE
-          opacity that reads on light and dark. Tiles gap-free break→break. */}
+      {/* Odd regimes tinted so adjacent ones contrast (bare vs tint). */}
       {geo.segments.map((sg, i) =>
         i % 2 === 1 ? (
           <rect
@@ -171,7 +169,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           />
         ) : null,
       )}
-      {/* per-regime mean hairlines */}
       {means
         ? geo.segments.map((sg) =>
             Number.isFinite(sg.mean) ? (
@@ -191,7 +188,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
             ) : null,
           )
         : null}
-      {/* the series line */}
       {geo.line.d ? (
         <path
           d={geo.line.d}
@@ -203,7 +199,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* break markers — vertical hairline + small top triangle */}
       {geo.breaks.map((b) => (
         <g key={`b${b.index}`}>
           <line

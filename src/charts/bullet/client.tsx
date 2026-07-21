@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
+import { EN_BULLET } from "../../core/strings-bullet.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
@@ -23,6 +24,8 @@ export interface InteractiveBulletProps extends BulletProps {
    * on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** The bullet was activated (click, tap, Enter or Space): `{ index: 0, value }` — the measure (never the target or a band). */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -33,9 +36,11 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     target,
     format,
     locale,
+    strings = EN_BULLET,
     title,
     summary,
     animate = false,
+    readout = true,
     onSelect,
     className,
     style,
@@ -49,22 +54,29 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
-  const auto = bulletSummary(fmt(value), target === undefined ? null : fmt(target));
+  const hasTarget = target !== undefined && Number.isFinite(target);
+  const auto = Number.isFinite(value)
+    ? bulletSummary(fmt(value), hasTarget ? fmt(target) : null, strings)
+    : strings.noData;
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : auto;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const readout =
-    target === undefined
-      ? fmt(value)
-      : `${fmt(value)} / ${fmt(target)}${
-          Number.isFinite(value - target)
-            ? ` · ${value - target >= 0 ? "+" : "−"}${fmt(Math.abs(value - target))}`
-            : ""
-        }`;
+  const readoutText = hasTarget
+    ? `${fmt(value)} / ${fmt(target)}${
+        Number.isFinite(value - target)
+          ? ` · ${value - target >= 0 ? "+" : "−"}${fmt(Math.abs(value - target))}`
+          : ""
+      }`
+    : fmt(value);
 
   // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
   // qualitative bands are context, not the datum.
-  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? value : null,
+      formatted: readoutText,
+    });
 
   return (
     <span
@@ -89,12 +101,13 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         target={target}
         format={format}
         locale={locale}
+        strings={strings}
         summary={false}
         style={fillFor(style)}
       />
-      {open ? (
+      {readout && open ? (
         <span className="mc-spark-readout" style={{ right: 0 }}>
-          {readout}
+          {readoutText}
         </span>
       ) : null}
     </span>

@@ -118,8 +118,8 @@ export function GrammarExplorer() {
 
   const emitted =
     mode === "fenced"
-      ? "```chart " + spec.type + "\n" + spec.body + "\n```"
-      : "`chart " + spec.type + " " + spec.body + "`";
+      ? "```microchart " + spec.type + "\n" + spec.body + "\n```"
+      : "`microchart " + spec.type + " " + spec.body + "`";
 
   const [before, after] = spec.sentence.split("{}");
 
@@ -228,11 +228,11 @@ function InlineCode({ text }: { text: string }) {
 
 /** A plain-text version of the whole contract — paste straight into a system prompt. */
 function promptText(): string {
-  const rows = GRAMMAR.map((g) => `  chart ${g.type}  ${g.body}   # ${g.blurb}`).join("\n");
+  const rows = GRAMMAR.map((g) => `  microchart ${g.type}  ${g.body}   # ${g.blurb}`).join("\n");
   const rules = AGENT_RULES.map((r) => `- ${r.replace(/`/g, "")}`).join("\n");
   return [
     "microcharts — emit a chart block instead of describing numbers.",
-    "Fenced ```chart <type> for a standalone chart; inline `chart <type> <data>` inside a sentence.",
+    "Fenced ```microchart <type> for a standalone chart; inline `microchart <type> <data>` inside a sentence.",
     "Body: whitespace/comma numbers, or key=value for composites.",
     "",
     rows,
@@ -261,7 +261,7 @@ export function AgentCheatSheet() {
         <div className="grid gap-x-4 gap-y-1 font-mono text-[0.8rem] leading-relaxed sm:grid-cols-[max-content_1fr]">
           {GRAMMAR.map((g) => (
             <Fragment key={g.type}>
-              <span className="whitespace-nowrap text-fd-primary">chart {g.type}</span>
+              <span className="whitespace-nowrap text-fd-primary">microchart {g.type}</span>
               <span className="text-fd-muted-foreground">
                 {g.body} <span className="text-fd-muted-foreground/60">— {g.blurb}</span>
               </span>

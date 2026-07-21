@@ -19,7 +19,7 @@ export interface PolarClockProps {
   /** Inner radius fraction r0 (the zero baseline all bars grow from). Default 0.35. */
   inner?: number | undefined;
   /** Index rendered at 12 o'clock (week-start / midnight rotation). Default 0. */
-  start?: number | undefined;
+  origin?: number | undefined;
   /** `length` (radial bars, default) or `opacity` (fixed-length, 5-step fill). */
   mode?: "length" | "opacity" | undefined;
   /** Hairline cardinal ticks at 0/¼/½/¾ of the cycle — the at-rest orientation
@@ -88,7 +88,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     data,
     now,
     inner = 0.35,
-    start = 0,
+    origin = 0,
     mode = "length",
     labels = true,
     label = "none",
@@ -107,7 +107,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
   } = props;
   const fontSize = props.fontSize ?? labelFont(size);
 
-  const geo = polarClockGeometry({ values: data, size, inner, start, pad: PAD, mode, now });
+  const geo = polarClockGeometry({ values: data, size, inner, origin, pad: PAD, mode, now });
   const accName =
     summary === false
       ? false
@@ -132,9 +132,8 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       // appends a text band below, which would otherwise drag the dial upward.
       seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-polar ${className}` : "mc-polar"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* zero baseline all bars grow from */}
       <circle
         cx={geo.guide.cx}
         cy={geo.guide.cy}
@@ -163,9 +162,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       ) : geo.segmentsPath ? (
         <path d={geo.segmentsPath} data-mc-ink="bar" style={color ? { fill: color } : undefined} />
       ) : null}
-      {/* now-segment: a FILLED sector. The accent-path CSS rule strokes (not
-          fills) accent paths, so an inline fill is needed for it to read solid;
-          the role is kept for the forced-colors Highlight mapping. */}
+      {/* Now sector: inline fill (accent-path CSS only strokes); role for FC. */}
       {geo.accentPath ? (
         <path d={geo.accentPath} data-mc-ink="accent" style={{ fill: "var(--mc-accent)" }} />
       ) : null}

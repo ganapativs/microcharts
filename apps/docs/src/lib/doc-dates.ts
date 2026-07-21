@@ -60,3 +60,31 @@ export function docLastModified(pagePath: string): string {
   cache ??= buildMap();
   return cache.get(pagePath) ?? FALLBACK;
 }
+
+const fileCache = new Map<string, string>();
+
+/**
+ * Last git-commit date of any repo file (repo-root-relative), for routes that
+ * aren't docs pages (home, gallery, brand). Using the source file's real commit
+ * date instead of a build-time `new Date()` keeps `<lastmod>` from churning on
+ * every unchanged rebuild — a frozen build date trains crawlers to distrust it.
+ */
+export function fileLastModified(repoRelPath: string): string {
+  const hit = fileCache.get(repoRelPath);
+  if (hit) return hit;
+  let date = FALLBACK;
+  try {
+    const out = execSync(`git log -1 --format=%cI -- ${repoRelPath}`, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+      // Route source paths contain `[...]` (Next dynamic segments) which git
+      // would treat as pathspec glob magic; force literal matching.
+      env: { ...process.env, GIT_LITERAL_PATHSPECS: "1" },
+    }).trim();
+    if (/^\d{4}-\d{2}-\d{2}T/.test(out)) date = out;
+  } catch {
+    // Leave FALLBACK.
+  }
+  fileCache.set(repoRelPath, date);
+  return date;
+}

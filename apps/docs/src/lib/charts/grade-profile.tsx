@@ -40,7 +40,15 @@ export const entry: ChartEntry = {
       name: "bins",
       type: "[number, number, number]",
       required: false,
-      description: "Ascending grade % thresholds that quantize the four difficulty bins.",
+      description:
+        "Ascending grade-% thresholds (always percent) that quantize the four difficulty bins.",
+    },
+    {
+      name: "format",
+      type: "Intl.NumberFormatOptions | (n) => string",
+      required: false,
+      description:
+        "Formats distance and elevation in the summary and readout; grades always render as percent.",
     },
     {
       name: "label",
@@ -159,7 +167,7 @@ export const contexts: ChartContexts = {
         — 865 m gain over 800 km.
       </p>
     ),
-    code: "<p>\n  Queen stage elevation <GradeProfile data={trail} /> — 865 m gain over 800 km.\n</p>",
+    code: '<p>\n  Queen stage elevation{" "}\n  <span className="mc-inline">\n    <GradeProfile data={trail} summary={false} />\n  </span>{" "}\n  — 865 m gain over 800 km.\n</p>',
   },
   cell: {
     render: () => (

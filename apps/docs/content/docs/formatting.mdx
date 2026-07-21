@@ -120,6 +120,26 @@ Its prose comes from `strings`, like every other word the library renders, so a 
 too. Its colors come from `--mc-surface`, `--mc-surface-ink` and `--mc-surface-edge`; see
 [Theming](/docs/theming#the-readout-surface).
 
+**Put the value somewhere else.** That same terse string is handed to you: every `onActive` / `onSelect` callback
+receives it as `datum.formatted`, formatted with the chart's own `format` and `locale`. So you can suppress the chip and
+render the value in your own layout — the pattern behind a KPI card whose big number tracks a sparkline you hover:
+
+```tsx
+const [reading, setReading] = useState("$1,600");
+
+// readout={false} keeps the crosshair, drops the chip; the value lands in your <output>
+<output>{reading}</output>;
+<Sparkline
+  data={revenue}
+  format={{ style: "currency", currency: "USD" }}
+  readout={false}
+  onActive={(d) => d && setReading(d.formatted!)}
+/>;
+```
+
+`readout={false}` hides only the chip — hover, keyboard roving, touch scrub, the live-region announcements, and both
+callbacks all keep working. Leave `readout` at its default (`true`) and you get the chip and the callback both.
+
 ## Locale: separators, not language
 
 `locale` is a BCP-47 tag (`"de-DE"`, `"ja-JP"`, or an array of fallbacks). It controls how numbers and dates are

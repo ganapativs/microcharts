@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { IconArray } from "@microcharts/react/icon-array";
 import { IconArray as IconArrayInteractive } from "@microcharts/react/icon-array/interactive";
 import staticModule, { playground as staticPlayground } from "./icon-array";
 
@@ -48,6 +49,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: IconArray,
+  ChartLive: IconArrayInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

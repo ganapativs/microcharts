@@ -20,8 +20,9 @@ that's yours: give it a container with real contrast.
   on the built-in light and dark themes. (`--mc-neutral`, the muted context ink for baselines and ghost marks, sits at
   3.5:1 — comfortably past the 3:1 bar for non-text, and deliberately quieter than the data.)
 - Don't wrap it in a low-contrast tint and expect the chart to compensate; it won't, by design.
-- Need the ink to differ from the page (charts on a colored panel)? Set `--mc-stroke` on the container. See
-  [Theming](/docs/theming).
+- Need the ink to differ from the page (charts on a colored panel, frosted glass)? Set `--mc-stroke` (and valence tokens
+  if needed) on the container — see [Theming](/docs/theming#frosted-or-translucent-surfaces). Don't override `.mc-root`
+  paint rules.
 
 <Callout type="info">
   The gallery renders each demo inside a panel with a normal card background and a hairline border. Nothing about that

@@ -38,7 +38,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     data,
     mode = "absolute",
     connectors = true,
-    label = "none",
+    label = "percent",
     width = 60,
     height = 18,
     format,
@@ -47,6 +47,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -97,9 +98,13 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         index: i,
         value: d && isFiniteValue(d.value) ? d.value : null,
         label: d?.label,
+        formatted:
+          d && isFiniteValue(d.value)
+            ? `${d.label} ${pctFmt(geo.stages[i]!.share)} (${fmt(d.value)})`
+            : undefined,
       };
     },
-    [data, geo],
+    [data, geo, fmt, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -171,13 +176,12 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticFunnel>
       <LiveRegion>{announced}</LiveRegion>
-      {st && stDatum && isFiniteValue(stDatum.value) ? (
+      {readout && st && stDatum && isFiniteValue(stDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{

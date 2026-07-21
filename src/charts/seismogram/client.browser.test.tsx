@@ -38,7 +38,7 @@ describe("interactive <Seismogram>", () => {
     fig.focus();
     // Home jumps to the first event (slot 1, value 3).
     await userEvent.keyboard("{Home}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 3 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 3 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -49,7 +49,7 @@ describe("interactive <Seismogram>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 3 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 3 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('line[stroke="var(--mc-accent)"]')).not.toBeNull();

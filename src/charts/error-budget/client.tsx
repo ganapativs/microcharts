@@ -18,7 +18,13 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { labelFont } from "../../core/labels.js";
 import { errorBudgetGeometry } from "./geometry.js";
-import { ErrorBudget as StaticErrorBudget, RATE_FMT, PCT, type ErrorBudgetProps } from "./index.js";
+import {
+  ErrorBudget as StaticErrorBudget,
+  errorBudgetSummary,
+  RATE_FMT,
+  PCT,
+  type ErrorBudgetProps,
+} from "./index.js";
 
 export interface InteractiveErrorBudgetProps extends ErrorBudgetProps, PickerProps {
   strings?: ErrorBudgetStrings;
@@ -44,6 +50,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -99,8 +106,15 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
 
   // Observed-step index; `value` is the budget remaining fraction (0–1).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo?.points[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const p = geo?.points[i];
+      return {
+        index: i,
+        value: p?.value ?? null,
+        formatted: p ? `${fmt(p.value)} · ${RATE_FMT(p.rate)}×` : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -122,15 +136,13 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         ? summary
         : geo === null
           ? strings.noData
-          : geo.exhausted
-            ? strings.errorBudgetExhausted(unit, geo.exhausted.index + 1, total)
-            : strings.errorBudget(
-                fmt(geo.remaining.value),
-                data.length,
-                total,
-                unit,
-                RATE_FMT(geo.currentRate),
-              );
+          : errorBudgetSummary(
+              geo,
+              fmt,
+              RATE_FMT,
+              { unit, elapsed: data.length, total: window ?? data.length },
+              strings,
+            );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const shown = active ?? selected;
@@ -162,7 +174,6 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
         {sp ? (
           <circle
             cx={sp.x}
@@ -199,7 +210,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticErrorBudget>
-      {rp ? (
+      {readout && rp ? (
         <span
           className="mc-error-budget-readout mc-spark-readout"
           style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}

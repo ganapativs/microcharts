@@ -140,7 +140,7 @@ export const contexts: ChartContexts = {
         — from #5 to #1 in twelve weeks.
       </p>
     ),
-    code: `<p>\n  Our blend's Coffee bestseller rank{" "}\n  <BumpStrip data={weeklyRanks} width={70} height={16} /> — from #5 to #1 in twelve weeks.\n</p>`,
+    code: `<p>\n  Our blend's Coffee bestseller rank{" "}\n  <span className="mc-inline">\n    <BumpStrip data={weeklyRanks} width={70} height={16} summary={false} />\n  </span>{" "}\n  — from #5 to #1 in twelve weeks.\n</p>`,
   },
   cell: {
     render: () => (
@@ -152,7 +152,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5">
                 <BumpStrip
                   data={row.ranks}
-                  label="last"
+                  label="none"
                   dots="none"
                   summary={false}
                   width={70}
@@ -164,7 +164,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: `<td>\n  <BumpStrip data={[3, 3, 4, 4, 3, 3, 2, 3, 4, 4, 5, 5]} label="last" dots="none" width={70} height={16} />\n</td>`,
+    code: `<td>\n  <BumpStrip data={[3, 3, 4, 4, 3, 3, 2, 3, 4, 4, 5, 5]} label="none" dots="none" width={70} height={16} />\n</td>`,
   },
   kpi: {
     render: () => (

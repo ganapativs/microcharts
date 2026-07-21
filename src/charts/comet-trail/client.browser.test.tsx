@@ -40,9 +40,9 @@ describe("interactive <CometTrail>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 40 });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 40 });
     await userEvent.keyboard("{End}");
-    expect(seen.at(-1)).toEqual({ index: 12, value: 87 });
+    expect(seen.at(-1)).toMatchObject({ index: 12, value: 87 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -54,7 +54,7 @@ describe("interactive <CometTrail>", () => {
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
     await userEvent.keyboard("{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 40 });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 40 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();

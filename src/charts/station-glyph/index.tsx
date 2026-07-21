@@ -156,8 +156,6 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     >
       {barb ? (
         <>
-          {/* shaft + feather barbs as one stroked path — width already comes
-              from the "data" ink role, no literal needed */}
           <path
             d={
               `M${barb.shaft.x1} ${barb.shaft.y1}L${barb.shaft.x2} ${barb.shaft.y2}` +
@@ -172,9 +170,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           ))}
         </>
       ) : null}
-      {/* filled disc masks the inner shaft + carries the ring; sky sector on top.
-          Stroke width already comes from the "data" ink role (CSS beats this
-          presentation attribute) — no literal needed. */}
+      {/* Disc masks shaft + carries ring; sky sector on top. */}
       <circle
         cx={geo.disc.cx}
         cy={geo.disc.cy}

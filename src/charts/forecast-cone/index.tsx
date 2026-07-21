@@ -11,11 +11,11 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
 import { forecastConeGeometry, type ForecastConeGeometry, type ForecastInput } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
-import { scaleLinear } from "../../core/scale.js";
+import { scaleLinear, clamp } from "../../core/scale.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
+import { round2 } from "../../core/types.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual forecast summary. Shared with the interactive entry. */
 export function forecastSummary(
   geo: ForecastConeGeometry,
   fmt: (n: number) => string,
@@ -90,32 +90,12 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-forecast-cone ${className}` : "mc-forecast-cone";
   const at = data.length + forecast.mid.length;
 
-  const probe = forecastConeGeometry({ width, height, data, forecast, target, domain });
-  // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
-  // box a line of text cannot be seated inside the plot at all. The readout
-  // DROPS rather than spilling past the viewBox, and because the gutter is
-  // derived from it the reserved space goes with it — the plot keeps its own
-  // width and simply stops paying for text it no longer draws. Pure arithmetic:
-  // the static path may never measure text.
-  const showLabel = label === "landing" && probe != null && labelFitsY(height / 2, FONT, height);
-  const labelText = showLabel ? fmt(probe!.landing.value) : "";
-  const gutterCh = showLabel ? labelText.length : 0;
-
-  const geo = forecastConeGeometry({
-    width,
-    height,
-    data,
-    forecast,
-    target,
-    domain,
-    gutterCh,
-    fontSize: FONT,
-  });
+  // Paths ignore the label gutter — one geometry pass, then widen the box.
+  const geo = forecastConeGeometry({ width, height, data, forecast, target, domain });
 
   if (geo === null) {
     return (
@@ -135,6 +115,15 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     );
   }
 
+  const FONT = label === "landing" ? labelFont(height) : 0;
+  const showLabel = FONT > 0 && labelFitsY(height / 2, FONT, height);
+  const labelText = showLabel ? fmt(geo.landing.value) : "";
+  const totalWidth = showLabel ? width + Math.ceil(labelText.length * FONT * 0.72) + 4 : width;
+  const labelX = width + 3;
+  const labelY = showLabel
+    ? round2(clamp(geo.landing.y, FONT * 0.5, height - FONT * 0.5))
+    : geo.labelY;
+
   if (!geo.widening) {
     devWarn(
       "<ForecastCone> forecast bands don't widen over the horizon — rendered as given, never auto-inflated (an estimate's uncertainty should grow with distance).",
@@ -146,23 +135,27 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       ? false
       : (summary ?? forecastSummary(geo, fmt, { unit, at, target }, strings));
   const accent = color ?? "var(--mc-accent)";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+    : style;
 
   // annotations host contract: Marker x = period INDEX across history+forecast
   // (geo.points span the whole axis), Threshold/TargetZone y = data values on
   // the shared value scale. The frame width is the `width` prop (the plot basis
   // the points use), not the gutter-extended totalWidth.
-  const ann = resolveAnnotations(children, {
-    x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
-    y: scaleLinear(geo.domain, [height - 2, 2]),
-    width,
-    height,
-    fontSize: annotationFontSize(height),
-  });
+  const ann = children
+    ? resolveAnnotations(children, {
+        x: (i) => geo.points[Math.round(i)]?.x ?? NaN,
+        y: scaleLinear(geo.domain, [height - 2, 2]),
+        width,
+        height,
+        fontSize: annotationFontSize(height),
+      })
+    : { under: null, over: null, rest: null };
 
   return (
     <Chart
-      width={geo.totalWidth}
+      width={totalWidth}
       height={height}
       title={title}
       summary={accName}
@@ -176,12 +169,8 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {/* fan bands — faintest (80) first. This is the uncertainty ENCODING, not
-          a neutral reference zone, so it takes an accent tint via inline style
-          rather than `data-mc-ink="band"` (that role means the muted
-          `--mc-band` background token, and — as a side effect — exempts the
-          mark from the craft gate's text-on-mark check; misapplying it here
-          would be borrowing that exemption for a mark it doesn't describe). */}
+      {/* Fan bands (faintest first). Accent fill — not ink="band" (that token
+          is muted background + skips the text-on-mark craft check). */}
       {geo.bands.map((b) => (
         <path
           key={b.p}
@@ -190,7 +179,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           style={{ fill: accent, fillOpacity: BAND_OPACITY[b.p] }}
         />
       ))}
-      {/* history — solid, the record */}
       {geo.history.d ? (
         <path
           d={geo.history.d}
@@ -200,7 +188,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
-      {/* today boundary — a quiet tick + dot at the last actual */}
       <line
         x1={geo.boundary.x}
         y1={1}
@@ -214,7 +201,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       {geo.now !== null ? (
         <circle cx={geo.boundary.x} cy={geo.boundary.y} r={1.6} data-mc-ink="point" />
       ) : null}
-      {/* median — always DASHED; an estimate never renders as fact */}
+      {/* Median dashed — estimate, not fact. */}
       <path
         d={geo.mid.d}
         fill="none"
@@ -222,7 +209,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={{ stroke: accent, strokeWidth: "var(--mc-stroke-width)" }}
       />
-      {/* target reference the cone must clear */}
       {geo.target ? (
         <line
           x1={0}
@@ -238,8 +224,8 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       ) : null}
       {showLabel ? (
         <text
-          x={geo.labelX}
-          y={geo.labelY}
+          x={labelX}
+          y={labelY}
           textAnchor="start"
           dominantBaseline="central"
           data-mc-ink="label"

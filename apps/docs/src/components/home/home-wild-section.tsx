@@ -154,7 +154,7 @@ export function HomeWildSection() {
         <Reveal>
           <WildCard app={featured} wide />
         </Reveal>
-        {/* full-bleed like every other section; 4-up keeps the cards small.
+        {/* Full-bleed; 4-up keeps cards small.
             6 apps leave the last row ragged on lg — the dashed "yours next"
             door closes it on purpose (2 cells wide, the reader's slot). */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

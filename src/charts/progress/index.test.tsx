@@ -85,22 +85,20 @@ describe("<Progress>", () => {
 valueEdgeSuite("Progress", (value) => <Progress value={value} title="Edge" />);
 
 describe("<Progress> degrades at small sizes", () => {
-  // The percent is centred on the track's midline, so a box shorter than one em
-  // of type puts its em-box through the viewBox edge. It drops instead.
-  it("keeps the percent while the box holds one em (height 6, font 6)", () => {
-    const { container } = draw(<Progress value={0.44} width={80} height={6} />);
+  // labelFont floors at 7; the percent sits on the track midline, so below one
+  // em of box height its em-box crosses the viewBox edge and drops.
+  it("keeps the percent while the box holds one em (height 7, font 7)", () => {
+    const { container } = draw(<Progress value={0.44} width={80} height={7} />);
     expect(container.querySelector("text")!.textContent).toBe("44%");
   });
 
   it("drops the percent below one em — and the bar keeps its full length", () => {
-    const { container } = draw(<Progress value={0.44} width={80} height={5} />);
+    const { container } = draw(<Progress value={0.44} width={80} height={6} />);
     expect(container.querySelector("text")).toBeNull();
-    // the mark still reads: track + fill, both untouched by the label leaving
     expect(container.querySelector('[data-mc-ink="band"]')).not.toBeNull();
     const fill = container.querySelector('[data-mc-ink="accent"]')!;
     expect(Number(fill.getAttribute("width"))).toBeCloseTo(80 * 0.44, 1);
-    // and the gutter goes with the label — no dead space widening the viewBox
-    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 80 5");
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 80 6");
   });
 
   it("the bar is byte-identical either side of the drop (no reflow)", () => {
@@ -108,6 +106,6 @@ describe("<Progress> degrades at small sizes", () => {
       draw(<Progress value={0.44} width={80} height={h} />)
         .container.querySelector('[data-mc-ink="accent"]')!
         .getAttribute("width");
-    expect(rect(6)).toBe(rect(5));
+    expect(rect(7)).toBe(rect(6));
   });
 });

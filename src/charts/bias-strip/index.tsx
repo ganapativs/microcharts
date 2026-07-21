@@ -15,7 +15,6 @@ import { resolveSummary } from "../../core/summary.js";
 
 export type { BiasPair };
 
-/** Factual agreement summary. Shared with the interactive entry. */
 export function biasStripSummary(
   geo: BiasGeometry,
   strings: BiasStripStrings,

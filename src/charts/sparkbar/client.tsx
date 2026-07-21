@@ -8,7 +8,8 @@
 // the SVG here used to mis-color win-loss ties and drop annotations/labels.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { describeSeries } from "../../core/summary.js";
+import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
+import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -28,7 +29,14 @@ import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 const BAR_SELECTOR =
   'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]';
 
+// Point announcement uses the shared series template + the slot `pointEmpty`
+// wording (a non-finite bar is an empty slot, not a zero). One default object so
+// the announcement stays byte-identical to `describeSeries` unless overridden.
+const DEFAULT_SERIES_STRINGS: SeriesStrings & SlotStrings = { ...EN_SERIES, ...EN_SLOTS };
+
 export interface InteractiveSparkBarProps extends SparkBarProps, PickerProps {
+  /** Localized announcement templates; defaults to the English series strings. */
+  strings?: SeriesStrings & SlotStrings;
   /**
    * Opt-in entrance motion (default `false`): the bars rise from the baseline
    * when the chart first mounts client-side. Inert on the server and on
@@ -46,12 +54,15 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     mode = "bar",
     gap = 0.25,
     label = "none",
+    positive = "up",
     color,
     title,
     summary,
     format,
     locale,
+    strings = DEFAULT_SERIES_STRINGS,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -120,8 +131,12 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
 
   const datum = useCallback(
-    (i: number) => ({ index: i, value: isFiniteValue(data[i]) ? (data[i] as number) : null }),
-    [data],
+    (i: number) => ({
+      index: i,
+      value: isFiniteValue(data[i]) ? (data[i] as number) : null,
+      formatted: isFiniteValue(data[i]) ? fmt(data[i] as number) : undefined,
+    }),
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -138,7 +153,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   });
 
   const accName =
-    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
+    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale, strings }));
 
   const outline = (i: number, pinned: boolean) => {
     const bar = barAt.get(i);
@@ -163,6 +178,14 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const shown = active ?? selected;
   const shownBar = shown !== null ? barAt.get(shown) : undefined;
   const shownValue = shownBar && isFiniteValue(shownBar.value) ? shownBar.value : null;
+  // `shown` is a DATA index (bars are gap-compacted, so `stops.length` would
+  // undercount) — total is `data.length` and `shown + 1` its 1-based position.
+  const announced =
+    shown === null
+      ? ""
+      : shownValue !== null
+        ? strings.point(shown + 1, data.length, fmt(shownValue))
+        : strings.pointEmpty(shown + 1, data.length);
 
   return (
     <span
@@ -179,6 +202,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         mode={mode}
         gap={gap}
         label={label}
+        positive={positive}
         color={color}
         format={format}
         locale={locale}
@@ -186,12 +210,11 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         style={fillFor(style)}
       >
         {rest.children}
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
       </StaticSparkBar>
-      <LiveRegion>{shownValue !== null ? `Bar ${shown! + 1}: ${fmt(shownValue)}` : ""}</LiveRegion>
-      {shownBar && shownValue !== null ? (
+      <LiveRegion>{announced}</LiveRegion>
+      {readout && shownBar && shownValue !== null ? (
         <span
           className="mc-spark-readout"
           style={{

@@ -212,13 +212,13 @@ export const contexts: ChartContexts = {
             domain={DOM}
             summary={false}
             width={90}
-            height={16}
+            height={20}
           />
         </span>{" "}
         — two deep blocks, REM before wake.
       </p>
     ),
-    code: "<p>\n  Last night&apos;s sleep <Hypnogram data={sleep} states={states} width={90} height={16} /> — two deep blocks.\n</p>",
+    code: '<p>\n  Last night&apos;s sleep{" "}\n  <span className="mc-inline">\n    <Hypnogram data={sleep} states={states} width={90} height={20} summary={false} />\n  </span>{" "}\n  — two deep blocks.\n</p>',
   },
   cell: {
     render: () => (
@@ -234,7 +234,7 @@ export const contexts: ChartContexts = {
                   domain={DOM}
                   summary={false}
                   width={72}
-                  height={16}
+                  height={20}
                 />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{n.meta}</td>
@@ -283,15 +283,16 @@ export const contexts: ChartContexts = {
               states={STATES}
               domain={DOM}
               summary={false}
-              width={54}
-              height={14}
+              width={64}
+              height={18}
             />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">Mon <Hypnogram data={sleep} states={states} width={54} height={14} /></button>',
+    code: '<button className="tab">Mon <Hypnogram data={sleep} states={states} width={64} height={18} /></button>',
   },
+  note: "Best at KPI/card scale — stage steps need height to separate.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

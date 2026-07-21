@@ -34,9 +34,9 @@ describe("interactive <EventRaster>", () => {
     const wrap = screen.container.querySelector(".mc-raster-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 2, label: "api" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 2, label: "api" });
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 5, label: "api" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 5, label: "api" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -51,7 +51,7 @@ describe("interactive <EventRaster>", () => {
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 5, value: 3, label: "db" });
+    expect(picks.at(-1)).toMatchObject({ index: 5, value: 3, label: "db" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

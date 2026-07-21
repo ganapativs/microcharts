@@ -57,7 +57,7 @@ export const entry: ChartEntry = {
       description: "Rate extent (default [0, 2·rate]).",
     },
     {
-      name: "alert",
+      name: "threshold",
       type: "number",
       required: false,
       description: "Latency threshold: at/above it the satellite doubles + the summary flags it.",
@@ -86,7 +86,13 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "latency", label: "latency (ms)", min: 0, max: 500, step: 10, init: 240 },
     { kind: "range", key: "rate", label: "rate (calls/s)", min: 0, max: 20, step: 1, init: 12 },
-    { kind: "segmented", key: "alert", label: "alert 300ms", options: ["off", "on"], init: "off" },
+    {
+      kind: "segmented",
+      key: "threshold",
+      label: "threshold 300ms",
+      options: ["off", "on"],
+      init: "off",
+    },
   ],
   render: (s) => (
     <OrbitStatus
@@ -94,7 +100,7 @@ export const playground: PlaygroundSpec = {
       rate={s.rate as number}
       latencyDomain={LD}
       rateDomain={RD}
-      alert={s.alert === "on" ? 300 : undefined}
+      threshold={s.threshold === "on" ? 300 : undefined}
       summary={false}
       size={120}
     />
@@ -106,7 +112,7 @@ export const playground: PlaygroundSpec = {
       `  rate={${s.rate}}`,
       "  latencyDomain={[0, 500]}",
       "  rateDomain={[0, 20]}",
-      s.alert === "on" && "  alert={300}",
+      s.threshold === "on" && "  threshold={300}",
       "/>",
     ]
       .filter(Boolean)
@@ -118,13 +124,13 @@ export const playground: PlaygroundSpec = {
 
 export const recipes: Recipe[] = [
   {
-    label: "an SLO alert threshold",
-    code: `<OrbitStatus latency={340} rate={8} alert={300} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`,
+    label: "an SLO latency threshold",
+    code: `<OrbitStatus latency={340} rate={8} threshold={300} latencyDomain={[0, 500]} rateDomain={[0, 20]} />`,
     node: (
       <OrbitStatus
         latency={340}
         rate={8}
-        alert={300}
+        threshold={300}
         latencyDomain={LD}
         rateDomain={RD}
         summary={false}
@@ -149,9 +155,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "payments", meta: "240ms", data: [173, 182, 192, 202, 211, 221, 230, 240] },
-  { name: "auth", meta: "48ms", data: [35, 36, 38, 40, 42, 44, 46, 48] },
-  { name: "search", meta: "890ms", data: [641, 676, 712, 748, 783, 819, 854, 890] },
+  { name: "payments", meta: "240ms", latency: 240, rate: 12 },
+  { name: "auth", meta: "48ms", latency: 48, rate: 18 },
+  { name: "search", meta: "420ms", latency: 420, rate: 4, threshold: 300 },
 ];
 
 export const contexts: ChartContexts = {
@@ -165,14 +171,14 @@ export const contexts: ChartContexts = {
             rate={12}
             latencyDomain={LD}
             rateDomain={RD}
-            size={20}
+            size={16}
             summary={false}
           />
         </span>{" "}
         — 240 ms latency, 12 req/s, orbit stable.
       </p>
     ),
-    code: "<p>\n  Payments API health <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} /> — 240 ms latency, 12 req/s, orbit stable.\n</p>",
+    code: `<p>\n  Payments API health{" "}\n  <span className="mc-inline">\n    <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={16} summary={false} />\n  </span>{" "}\n  — 240 ms latency, 12 req/s, orbit stable.\n</p>`,
   },
   cell: {
     render: () => (
@@ -183,11 +189,12 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <OrbitStatus
-                  latency={240}
-                  rate={12}
+                  latency={row.latency}
+                  rate={row.rate}
                   latencyDomain={LD}
                   rateDomain={RD}
-                  size={22}
+                  threshold={row.threshold}
+                  size={18}
                   summary={false}
                 />
               </td>
@@ -197,12 +204,12 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</td>",
+    code: "<td>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={18} summary={false} />\n</td>",
   },
   kpi: {
     render: () => (
-      <>
-        <div>
+      <div className="flex items-center gap-4">
+        <div className="min-w-0 flex-1">
           <div className="text-fd-muted-foreground text-xs">Payments</div>
           <div className="flex items-end gap-2">
             <span className="display text-3xl tabular-nums">240ms</span>
@@ -214,10 +221,10 @@ export const contexts: ChartContexts = {
           rate={12}
           latencyDomain={LD}
           rateDomain={RD}
-          size={48}
+          size={40}
           summary={false}
         />
-      </>
+      </div>
     ),
     code: '<div className="kpi">\n  <span className="figure">240ms</span>\n  <span className="unit">· 12 rps</span>\n  <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} />\n</div>',
   },
@@ -227,15 +234,16 @@ export const contexts: ChartContexts = {
         {CTX_ROWS.map((row, i) => (
           <span
             key={row.name}
-            className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
             <OrbitStatus
-              latency={240}
-              rate={12}
+              latency={row.latency}
+              rate={row.rate}
               latencyDomain={LD}
               rateDomain={RD}
-              size={18}
+              threshold={row.threshold}
+              size={14}
               summary={false}
             />
           </span>

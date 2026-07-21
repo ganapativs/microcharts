@@ -226,7 +226,6 @@ export function swingMark(
   return { text, x, labelY, connectorY: round2(low ? y1 + 1 : y0 - 1), yTo: s.yTo };
 }
 
-/** Factual "per the supplied model" summary — shared with the interactive entry. */
 export function winProbWormSummary(
   geo: WinProbWormGeometry,
   fmt: (v: number) => string,

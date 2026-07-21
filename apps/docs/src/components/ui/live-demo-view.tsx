@@ -2,9 +2,22 @@
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { CodeWithData } from "@/components/ui/code-with-data";
+import { useChartSlug } from "@/components/charts/chart-slug-context";
+import { swapChartTree } from "@/lib/charts/swap-chart-tree";
+import { useChartModule } from "@/lib/charts/use-chart-module";
 import type { SampleData } from "@/lib/charts/types";
 
 type Tab = "preview" | "code";
+
+/** Prefer interactive twin when children were built on the client with the
+ *  static `Chart` identity (Sizing recipes). MDX variants already mount the
+ *  interactive tag — swap is a no-op there (`type` is ChartLive). */
+function LivePreview({ children }: { children: ReactNode }) {
+  const slug = useChartSlug();
+  const mod = useChartModule(slug);
+  if (!mod?.Chart || !mod.ChartLive) return children;
+  return <>{swapChartTree(children, mod.Chart, mod.ChartLive)}</>;
+}
 
 /** Client view for {@link LiveDemo}. All catalog lookups (size meta, sample
  *  data) happen in the server wrapper and arrive here as plain props, so this
@@ -64,7 +77,7 @@ export function LiveDemoView({
             grid && "grid-paper",
           )}
         >
-          {children}
+          <LivePreview>{children}</LivePreview>
         </div>
       ) : (
         <CodeWithData code={code} sampleData={sampleData} lang={lang} />

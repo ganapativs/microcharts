@@ -119,7 +119,6 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       className={className ? `mc-raster ${className}` : "mc-raster"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* zebra lane bands so each row reads as a distinct track */}
       {geo.lanes.map((lane, i) =>
         i % 2 === 1 ? (
           <rect

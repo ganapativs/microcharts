@@ -227,7 +227,7 @@ export const contexts: ChartContexts = {
         — JS is 44% of the payload.
       </p>
     ),
-    code: "<p>\n  Bundle composition <PartitionStrip data={bundle} /> — JS is 44% of the payload.\n</p>",
+    code: '<p>\n  Bundle composition{" "}\n  <span className="mc-inline">\n    <PartitionStrip data={bundle} summary={false} />\n  </span>{" "}\n  — JS is 44% of the payload.\n</p>',
   },
   cell: {
     render: () => (

@@ -27,6 +27,7 @@ export interface ConfusionGridProps {
   label?: "accuracy" | "none" | undefined;
   /** Cell shape (shared vocabulary). */
   shape?: "square" | "round" | undefined;
+  color?: string | undefined;
   size?: number | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
@@ -76,6 +77,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     accent = "diagonal",
     label = "none",
     shape = "square",
+    color,
     format,
     locale,
     strings = EN_CONFUSION,
@@ -162,6 +164,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
             rx={rx}
             data-mc-ink="cell"
             fillOpacity={c.count > 0 ? Math.max(0.08, c.share) : 0}
+            style={color ? { fill: color } : undefined}
           />,
         ];
         if (emphasized)
@@ -188,7 +191,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
         return nodes;
       })}
 
-      {/* first-character axis labels: columns (predicted) on top, rows (actual) left */}
+      {/* Axis initials: predicted on top, actual on left. */}
       {labels.slice(0, kk).flatMap((lab, i) => {
         const cellW = (size - rightGutter - gutterCh - 1) / kk;
         const c = round2(gutterCh + cellW * (i + 0.5));
@@ -234,8 +237,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
   );
 }
 
-/** Overall accuracy (trace / total). Shared with the interactive entry so both
- *  size the accuracy gutter — and therefore the plot — identically. */
+/** Overall accuracy (trace / total). Used by both entries for identical gutters. */
 export function confGeoAccuracy(counts: readonly (readonly number[])[], k: number): number {
   let trace = 0;
   let total = 0;

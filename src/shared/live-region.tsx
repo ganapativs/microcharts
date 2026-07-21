@@ -8,6 +8,23 @@
 // here fixes those charts without threading a ref through each of them. The
 // handful of entries that ship no LiveRegion call `useSeatHoist` themselves.
 //
+// Nesting under role="img" is INTENTIONAL and verified. The interactive wrapper
+// carries role="img" + aria-label (see shared/interactive.ts `named`), and this
+// region renders as its child. ARIA lists role="img" as "Children Presentational:
+// True", which raises the fear that assistive tech prunes the subtree and drops
+// these polite announcements. Empirically it does not: browsers carve live regions
+// (and focusable descendants) out of that pruning. Measured 2026-07-21 via
+// Playwright across all three engines — Chromium's platform accessibility tree
+// (CDP Accessibility.getFullAXTree, the tree NVDA/JAWS/Narrator consume on
+// Windows) keeps this node NON-ignored with live="polite" AND updates its text
+// through mutations; WebKit (VoiceOver's engine) and Gecko keep it un-flattened
+// too. So the announce path survives inside role="img"; no sibling restructure is
+// needed. Caveat: native VoiceOver-on-macOS was not driven directly — the browser
+// AX layer is authoritative for Chromium, strong-but-not-native for WebKit — so if
+// you ever see missing announcements specifically under VoiceOver, revisit by
+// hoisting this region to a SIBLING outside the role="img" element (keeping
+// useSeatHoistFromChild pointed at the new common ancestor).
+//
 // No 'use client' of its own: it's a purely presentational component consumed by
 // the client entries, which carry the directive — the same convention as the other
 // shared client-consumed modules (e.g. shared/motion.ts).

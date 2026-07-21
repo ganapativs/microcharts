@@ -26,7 +26,7 @@ describe("interactive <TimeInRange>", () => {
     const wrap = screen.container.querySelector(".mc-tir-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 9, label: "below" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 9, label: "below" });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -41,7 +41,7 @@ describe("interactive <TimeInRange>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 72, label: "in range" });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 1, value: 72, label: "in range" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

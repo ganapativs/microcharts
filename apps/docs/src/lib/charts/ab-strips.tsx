@@ -157,7 +157,7 @@ export const contexts: ChartContexts = {
         — variant B wins by 12 ms on median.
       </p>
     ),
-    code: "<p>\n  Latency A/B this week <ABStrips data={{ a, b }} /> — variant B wins by 12 ms on median.\n</p>",
+    code: '<p>\n  Latency A/B this week{" "}\n  <span className="mc-inline">\n    <ABStrips data={{ a, b }} summary={false} />\n  </span>{" "}\n  — variant B wins by 12 ms on median.\n</p>',
   },
   cell: {
     render: () => (

@@ -72,7 +72,7 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
       // the cap band, letting the marks set like the glyphs they imitate.
       seat={{ mode: "center", top: PAD, bottom: height - PAD }}
       className={className ? `mc-tally ${className}` : "mc-tally"}
-      style={{ "--mc-label-size": `${FONT}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
     >
       {geo.d ? <path d={geo.d} data-mc-ink="data" /> : null}
       {geo.numeralX !== null ? (

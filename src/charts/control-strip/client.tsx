@@ -47,6 +47,7 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -87,7 +88,23 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
     [geo, count],
   );
   // index = plotted-point index (finite points, in order); value = its measurement.
-  const datum = useCallback((i: number) => ({ index: i, value: finite[i] ?? null }), [finite]);
+  const datum = useCallback(
+    (i: number) => {
+      const v = finite[i];
+      if (v === undefined || !geo) return { index: i, value: null };
+      const s = geo.points[i]?.out ? (v > geo.band.hi ? "upper" : "lower") : null;
+      return {
+        index: i,
+        value: v,
+        formatted: strings.controlChip(
+          fmt(v),
+          s,
+          s ? fmt(s === "upper" ? geo.band.hi : geo.band.lo) : "",
+        ),
+      };
+    },
+    [finite, geo, fmt, strings],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count,
@@ -179,17 +196,20 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus mark is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticControlStrip>
-      {p && value !== undefined ? (
+      {readout && p && value !== undefined ? (
         <span
           className="mc-control-readout mc-spark-readout"
           style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {`${fmt(value)}${side ? ` ${side === "upper" ? "above" : "below"} ${fmt(side === "upper" ? geo!.band.hi : geo!.band.lo)}` : ""}`}
+          {strings.controlChip(
+            fmt(value),
+            side,
+            side ? fmt(side === "upper" ? geo!.band.hi : geo!.band.lo) : "",
+          )}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

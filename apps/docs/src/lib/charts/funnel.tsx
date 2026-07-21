@@ -49,7 +49,7 @@ export const entry: ChartEntry = {
       name: "label",
       type: '"none" | "percent" | "value"',
       required: false,
-      description: "Above each column (deterministic drop-out).",
+      description: "Above each column (deterministic drop-out; default percent).",
     },
     {
       name: "highlight",
@@ -94,7 +94,7 @@ export const playground: PlaygroundSpec = {
       key: "label",
       label: "labels",
       options: ["none", "percent", "value"],
-      init: "none",
+      init: "percent",
     },
     { kind: "toggle", key: "highlight", label: "highlight Activated", init: false },
   ],
@@ -116,7 +116,7 @@ export const playground: PlaygroundSpec = {
       "  data={stages}",
       s.mode !== "absolute" && `  mode="${s.mode}"`,
       !(s.connectors as boolean) && "  connectors={false}",
-      s.label !== "none" && `  label="${s.label}"`,
+      s.label !== "percent" && `  label="${s.label}"`,
       (s.highlight as boolean) && '  highlight="Activated"',
       "/>",
     ]
@@ -150,7 +150,7 @@ export const contexts: ChartContexts = {
         converted 12,400 visitors to 1,116 paid — a 9% overall rate.
       </p>
     ),
-    code: `<p>\n  This week's signup funnel{" "}\n  <Funnel data={stages} width={64} height={20} /> converted 12,400\n  visitors to 1,116 paid — a 9% overall rate.\n</p>`,
+    code: `<p>\n  This week's signup funnel{" "}\n  <span className="mc-inline">\n    <Funnel data={stages} width={64} height={20} summary={false} />\n  </span>{" "}\n  converted 12,400\n  visitors to 1,116 paid — a 9% overall rate.\n</p>`,
   },
   cell: {
     render: () => (
@@ -215,12 +215,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <Funnel data={stages} summary={false} width={40} height={14} />
+            <Funnel data={stages} summary={false} width={64} height={16} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Organic <Funnel data={stages} width={40} height={14} />\n</button>`,
+    code: `<button className="tab">\n  Organic <Funnel data={stages} width={64} height={16} />\n</button>`,
   },
 };
 

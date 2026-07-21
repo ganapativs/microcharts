@@ -55,6 +55,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -121,9 +122,13 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const v = rendered[i];
-      return { index: i, value: isFiniteValue(v) ? v : null };
+      return {
+        index: i,
+        value: isFiniteValue(v) ? v : null,
+        formatted: isFiniteValue(v) && v !== 0 ? fmt(v) : "—",
+      };
     },
-    [rendered],
+    [rendered, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -171,7 +176,6 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; crosshair is transient. */}
         {selected !== null && selected !== active ? (
           <line
             x1={slotW * (selected + 0.5)}
@@ -197,7 +201,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         {rest.children}
       </StaticSeismogram>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null ? (
+      {readout && shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{

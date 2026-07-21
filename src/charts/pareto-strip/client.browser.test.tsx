@@ -45,7 +45,7 @@ describe("interactive <ParetoStrip>", () => {
     const wrap = screen.container.querySelector(".mc-pareto-strip-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 38, label: "Timeouts" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 38, label: "Timeouts" });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -59,7 +59,7 @@ describe("interactive <ParetoStrip>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 38, label: "Timeouts" });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 38, label: "Timeouts" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

@@ -63,6 +63,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Cell shape from the shared vocabulary (default 'square').",
     },
+    {
+      name: "color",
+      type: "string",
+      required: false,
+      description: "Accent fill override.",
+    },
   ],
   demo: [87, 12],
   example: {
@@ -157,12 +163,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Classifier accuracy{" "}
         <span className="mc-inline">
-          <ConfusionGrid data={CATDOG} summary={false} size={20} />
+          <ConfusionGrid data={CATDOG} summary={false} size={28} />
         </span>{" "}
         — 87% cats correct, 12% dogs misclassified.
       </p>
     ),
-    code: "<p>\n  Classifier accuracy <ConfusionGrid data={{ labels, counts }} /> — 87% cats correct, 12% dogs misclassified.\n</p>",
+    code: '<p>\n  Classifier accuracy{" "}\n  <span className="mc-inline">\n    <ConfusionGrid data={{ labels, counts }} summary={false} />\n  </span>{" "}\n  — 87% cats correct, 12% dogs misclassified.\n</p>',
   },
   cell: {
     render: () => (
@@ -172,7 +178,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ConfusionGrid data={row.data} summary={false} size={22} />
+                <ConfusionGrid data={row.data} summary={false} size={36} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -206,13 +212,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ConfusionGrid data={row.data} summary={false} size={18} />
+            <ConfusionGrid data={row.data} summary={false} size={28} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  cats <ConfusionGrid data={{ labels, counts }} />\n</button>',
   },
+  note: "Best at KPI/card scale — the matrix is hard to read below ~36px.",
 };
 
 export function Mark() {

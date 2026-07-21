@@ -137,7 +137,7 @@ export const contexts: ChartContexts = {
         — six events in the last minute, trace still sweeping.
       </p>
     ),
-    code: "<p>\n  Request liveness <HeartbeatBlip events={eventTimestamps} now={serverNow} width={90} height={16} /> — six events in the last minute.\n</p>",
+    code: '<p>\n  Request liveness{" "}\n  <span className="mc-inline">\n    <HeartbeatBlip events={eventTimestamps} now={serverNow} width={90} height={16} summary={false} />\n  </span>{" "}\n  — six events in the last minute.\n</p>',
   },
   cell: {
     render: () => (

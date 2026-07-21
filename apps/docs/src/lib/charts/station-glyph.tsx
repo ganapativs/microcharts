@@ -130,9 +130,39 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "KSFO", meta: "16°C", data: [12, 12, 13, 13, 14, 15, 15, 16] },
-  { name: "KJFK", meta: "22°C", data: [16, 17, 18, 18, 19, 20, 21, 22] },
-  { name: "KORD", meta: "8°C", data: [6, 6, 6, 7, 7, 7, 8, 8] },
+  {
+    name: "KSFO",
+    meta: "16°C",
+    obs: {
+      cloud: 0.75,
+      wind: { direction: 225, magnitude: 15 },
+      temp: 16,
+      dewpoint: 9,
+      pressure: 1013,
+    },
+  },
+  {
+    name: "KJFK",
+    meta: "22°C",
+    obs: {
+      cloud: 0.4,
+      wind: { direction: 180, magnitude: 18 },
+      temp: 22,
+      dewpoint: 14,
+      pressure: 1018,
+    },
+  },
+  {
+    name: "KORD",
+    meta: "8°C",
+    obs: {
+      cloud: 1,
+      wind: { direction: 270, magnitude: 24 },
+      temp: 8,
+      dewpoint: 2,
+      pressure: 1002,
+    },
+  },
 ];
 
 export const contexts: ChartContexts = {
@@ -146,7 +176,7 @@ export const contexts: ChartContexts = {
         — overcast, SW 15 kt, 16°C.
       </p>
     ),
-    code: '<p>\n  KSFO conditions <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} /> — overcast, SW 15 kt, 16°C.\n</p>',
+    code: '<p>\n  KSFO conditions{" "}\n  <span className="mc-inline">\n    <StationGlyph station="KSFO" cloud={0.75} wind={{ direction: 225, magnitude: 15 }} summary={false} />\n  </span>{" "}\n  — overcast, SW 15 kt, 16°C.\n</p>',
   },
   cell: {
     render: () => (
@@ -156,7 +186,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <StationGlyph {...OBS} size={22} summary={false} />
+                <StationGlyph station={row.name} {...row.obs} size={22} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -190,7 +220,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <StationGlyph {...OBS} size={18} summary={false} />
+            <StationGlyph station={row.name} {...row.obs} size={18} summary={false} />
           </span>
         ))}
       </div>

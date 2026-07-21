@@ -6,6 +6,8 @@
 // Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { EN_TALLY, type TallyStrings } from "../../core/strings-tally.js";
 import { TallyMarks as StaticTallyMarks, tallySummary, type TallyMarksProps } from "./index.js";
@@ -14,6 +16,14 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
   /** Announce count changes through a polite region (default true). */
   live?: boolean;
   strings?: TallyStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the whole glyph pops in (fade +
+   * scale) when the chart first mounts client-side — a whole-svg animation, so
+   * it never collides with the per-increment stroke sweep this entry already
+   * drives. Inert on the server and on hydrated server HTML;
+   * `prefers-reduced-motion` always wins.
+   */
+  animate?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -25,6 +35,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     title,
     value,
     pen,
+    animate = false,
     onSelect,
     className,
     style,
@@ -35,6 +46,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
   useSeatHoist(wrap);
+  useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   // length of the path at the previous count — lets a +1 draw ONLY the newly
   // added subpath (static dash prefix = the old marks) instead of re-drawing
@@ -107,21 +119,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

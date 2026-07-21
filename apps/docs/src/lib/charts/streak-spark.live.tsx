@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { StreakSpark } from "@microcharts/react/streak-spark";
 import { StreakSpark as StreakSparkInteractive } from "@microcharts/react/streak-spark/interactive";
 import staticModule, { playground as staticPlayground, STREAK } from "./streak-spark";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: StreakSpark,
+  ChartLive: StreakSparkInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

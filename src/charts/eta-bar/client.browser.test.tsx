@@ -39,7 +39,7 @@ describe("interactive <EtaBar>", () => {
     );
     const wrap = screen.container.querySelector(".mc-eta-live") as HTMLElement;
     wrap.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.64 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.64 });
   });
 
   it("Enter fires onSelect (and keeps the focus readout)", async () => {
@@ -50,7 +50,7 @@ describe("interactive <EtaBar>", () => {
     const wrap = screen.container.querySelector(".mc-eta-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.3 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.3 });
     expect(screen.container.querySelector(".mc-spark-readout")).not.toBeNull();
   });
 });

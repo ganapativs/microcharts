@@ -51,9 +51,9 @@ export const entry: ChartEntry = {
     },
     {
       name: "trend",
-      type: '"line" | "none"',
+      type: "boolean",
       required: false,
-      description: "Within-slot micro-trend, or a spine-only quiet form.",
+      description: "Within-slot micro-trend line (default true); false = spine + ticks only.",
     },
     {
       name: "spine",
@@ -99,7 +99,7 @@ export const playground: PlaygroundSpec = {
       options: ["mean", "median"],
       init: "mean",
     },
-    { kind: "segmented", key: "trend", label: "trend", options: ["line", "none"], init: "line" },
+    { kind: "toggle", key: "trend", label: "within-slot trend", init: true },
     { kind: "toggle", key: "spine", label: "spine", init: true },
   ],
   render: (s) => (
@@ -109,7 +109,7 @@ export const playground: PlaygroundSpec = {
       slots={DAYS}
       cycleUnit="weeks"
       center={s.center as "mean" | "median"}
-      trend={s.trend as "line" | "none"}
+      trend={s.trend as boolean}
       spine={s.spine as boolean}
       summary={false}
       width={280}
@@ -122,7 +122,7 @@ export const playground: PlaygroundSpec = {
       "  data={daily}",
       "  period={7}",
       s.center !== "mean" && `  center="${s.center}"`,
-      s.trend !== "line" && `  trend="${s.trend}"`,
+      s.trend === false && "  trend={false}",
       s.spine === false && "  spine={false}",
       "/>",
     ]
@@ -142,9 +142,9 @@ export const recipes: Recipe[] = [
   },
   {
     label: "spine only (quiet form)",
-    code: `<CyclePlot data={daily} period={7} trend="none" />`,
+    code: `<CyclePlot data={daily} period={7} trend={false} />`,
     node: (
-      <CyclePlot data={WEEKS} period={7} trend="none" summary={false} width={200} height={32} />
+      <CyclePlot data={WEEKS} period={7} trend={false} summary={false} width={200} height={32} />
     ),
   },
 ];
@@ -161,19 +161,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Weekly traffic shape{" "}
         <span className="mc-inline">
-          <CyclePlot
-            data={WEEKS}
-            period={7}
-            slots={DAYS}
-            cycleUnit="weeks"
-            height={16}
-            summary={false}
-          />
+          <CyclePlot data={WEEKS} period={7} cycleUnit="weeks" height={24} summary={false} />
         </span>{" "}
         — weekday peak Wednesday, weekend dip.
       </p>
     ),
-    code: "<p>\n  Weekly traffic shape <CyclePlot data={daily} period={7} /> — weekday peak Wednesday, weekend dip.\n</p>",
+    code: '<p>\n  Weekly traffic shape{" "}\n  <span className="mc-inline">\n    <CyclePlot data={daily} period={7} summary={false} />\n  </span>{" "}\n  — weekday peak Wednesday, weekend dip.\n</p>',
   },
   cell: {
     render: () => (
@@ -186,9 +179,8 @@ export const contexts: ChartContexts = {
                 <CyclePlot
                   data={row.data}
                   period={7}
-                  slots={DAYS}
                   cycleUnit="weeks"
-                  height={18}
+                  height={24}
                   summary={false}
                 />
               </td>
@@ -231,20 +223,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CyclePlot
-              data={row.data}
-              period={7}
-              slots={DAYS}
-              cycleUnit="weeks"
-              height={14}
-              summary={false}
-            />
+            <CyclePlot data={row.data} period={7} cycleUnit="weeks" height={20} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  US <CyclePlot data={daily} period={7} />\n</button>',
   },
+  note: "Best at KPI/card scale — weekly cycles need width for slot groups.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

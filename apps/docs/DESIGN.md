@@ -1,7 +1,7 @@
 # Homepage redesign — direction, rationale, system
 
-_2026-07 · branch `feat/homepage-redesign`. Phase-1 prototypes live at `/lab/hero-a`, `/lab/hero-b`, `/lab/hero-c`
-(noindexed; kept for reference)._
+_2026-07 · branch `feat/homepage-redesign`. Phase-1 prototypes were explored in-session; screenshots at 1440/390,
+light + dark, live in the session archive._
 
 ## Phase 1 — three directions, scored
 
@@ -60,12 +60,12 @@ scenario. Designed, not disabled.
 
 ## Type
 
-| Role          | Face                                            | Why                                                                                                                                                                                                                                                                                  |
-| ------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Display       | **Bricolage Grotesque** (variable, optical)     | The established site voice — expressive grotesque, not the AI-serif pack. Unchanged.                                                                                                                                                                                                 |
-| UI / body     | **Hanken Grotesk**                              | Established; compact humanist. Unchanged.                                                                                                                                                                                                                                            |
-| Reading serif | **Newsreader** (italic + regular, latin subset) | New, one job: the streamed reply and the italic emphasis words (`write`, `trust`). The demo is about _reading_ an AI answer; a serif sells reading. Bricolage has no italic, so emphasis needed a second voice anyway. Subset + `display=swap`; loaded only by the home/lab surface. |
-| Mono          | **JetBrains Mono**                              | Established; grammar, eyebrows, machine surfaces. Unchanged.                                                                                                                                                                                                                         |
+| Role          | Face                                            | Why                                                                                                                                                                                                                                                                              |
+| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display       | **Bricolage Grotesque** (variable, optical)     | The established site voice — expressive grotesque, not the AI-serif pack. Unchanged.                                                                                                                                                                                             |
+| UI / body     | **Hanken Grotesk**                              | Established; compact humanist. Unchanged.                                                                                                                                                                                                                                        |
+| Reading serif | **Newsreader** (italic + regular, latin subset) | New, one job: the streamed reply and the italic emphasis words (`write`, `trust`). The demo is about _reading_ an AI answer; a serif sells reading. Bricolage has no italic, so emphasis needed a second voice anyway. Subset + `display=swap`; loaded only by the home surface. |
+| Mono          | **JetBrains Mono**                              | Established; grammar, eyebrows, machine surfaces. Unchanged.                                                                                                                                                                                                                     |
 
 ## Color
 
@@ -96,10 +96,11 @@ strip — "traded up, on purpose" is the same editorial decision as the catalog)
 it: product UI, report, cell, sentence — no AI required) → 04 made for models (the one dark band, the AI chapter in
 priority order: the provider wall FIRST — "does it work with my stack?" — then the machine-surfaces terminal and a
 deliberately small safe-to-emit card side by side; graceful degradation is table stakes, not a headline) → 05 the cost
-(the size argument lands AFTER the reader wants the thing: recharts 3.9.2 at 145 kB min+gzip + 11 dependencies vs the
-measured median microchart, same linear scale, source cited; closed by the receipts strip — the page's ONE home for
-sizes/deps/client-JS, each stat drawn by a microchart of itself) → 06 the examples → 07 theming (`defineTheme` swatches
-re-theme the section live) → final CTA.
+(the size argument lands AFTER the reader wants the thing: not head-to-head with recharts — different jobs; recharts
+3.9.2 one tree-shaken LineChart ~106 kB gzip (+ 11 deps; package 145 kB via bundlephobia) as a cost reference for a full
+toolkit vs the measured median microchart for the inlined mark; same linear scale, source cited; closed by the receipts
+strip — the page's ONE home for sizes/deps/client-JS, each stat drawn by a microchart of itself) → 06 the examples → 07
+theming (`defineTheme` swatches re-theme the section live) → final CTA.
 
 _2026-07-17 consolidation (two passes): the standalone principles, robustness, and receipts sections were merged away —
 one home per fact. The principles grid restated claims other sections already prove live; its unique line (one encoding
@@ -109,5 +110,6 @@ close 05. The size pitch originally opened the page (old problem→solution arc)
 sells the solution and interrupting the demo context with a bundle-size lecture broke the read._
 
 All numbers flow from `docs-facts.ts` / `stats.ts` (measured, CI-checked) — the page cannot quote a size the build
-didn't measure. The one external figure (recharts) is pinned to a version and dated, fetched from bundlephobia
-2026-07-15.
+didn't measure. The one external figure (recharts) is pinned to a version and dated: package size from bundlephobia
+2026-07-15; one-chart client cost from an esbuild tree-shake measurement 2026-07-21 (recharts ships `sideEffects: false`
+— tree-shaking works, but the shared kernel keeps one chart ~70–106 kB).

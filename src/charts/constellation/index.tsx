@@ -177,12 +177,11 @@ export function Constellation(props: ConstellationProps): ReactNode {
       // padded box, not the stars' extent, which moves with every event.
       seat={{ mode: "center", top: PAD, bottom: geo.height - PAD }}
       className={className ? `mc-constellation ${className}` : "mc-constellation"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {geo.connectorPath ? (
         <path d={geo.connectorPath} data-mc-ink="ghost" data-mc-w="tick" />
       ) : null}
-      {/* faint halo behind the brightest event — a star that stands out */}
       {largest ? (
         <circle
           cx={largest.cx}

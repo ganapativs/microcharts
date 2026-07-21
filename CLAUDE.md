@@ -1,8 +1,9 @@
 # microcharts — contributor & agent guide
 
-Word-sized charts for React: zero runtime dependencies, ~1–3 kB gzip per chart, accessible by default,
-handcrafted-feeling. They're built to sit _inside_ an interface — a sentence, a table cell, a KPI card, a tab header, a
-streamed AI reply — and to be safe for a model to emit and a person to read. Package: **`@microcharts/react`**.
+Word-sized charts for React: zero runtime dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by
+default, handcrafted-feeling. They're built to sit _inside_ an interface — a sentence, a table cell, a KPI card, a tab
+header, a streamed AI reply — and to be safe for a model to emit and a person to read. Package:
+**`@microcharts/react`**.
 
 This file is the working contract for anyone (human or AI) changing the code. The rules below are not style preferences
 — several are enforced in CI, and violating them is a bug.
@@ -31,10 +32,10 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
    JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
    `scripts/size-budgets.json`), never hand-edited. **Two of these ceilings no longer describe the shipped budgets and
-   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 17 statics sit above 3 kB, none by more
-   than 0.9 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 89 of 105 interactive entries are 1.8–2.3
-   kB above their static twin, because size-limit measures each subpath standalone and so charges every one of them the
-   full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
+   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 22 statics sit above 3 kB, none by more
+   than 0.96 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 101 of 105 interactive entries are above
+   that delta (most by ~1.8–2.3 kB), because size-limit measures each subpath standalone and so charges every one of
+   them the full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.

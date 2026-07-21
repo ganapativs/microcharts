@@ -158,7 +158,7 @@ export const contexts: ChartContexts = {
         — 72% in range, 9% below.
       </p>
     ),
-    code: "<p>\n  Glucose time-in-range <TimeInRange data={{ below: 9, in: 72, above: 19 }} /> — 72% in range, 9% below.\n</p>",
+    code: '<p>\n  Glucose time-in-range{" "}\n  <span className="mc-inline">\n    <TimeInRange data={{ below: 9, in: 72, above: 19 }} summary={false} />\n  </span>{" "}\n  — 72% in range, 9% below.\n</p>',
   },
   cell: {
     render: () => (

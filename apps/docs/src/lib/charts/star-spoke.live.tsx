@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { StarSpoke } from "@microcharts/react/star-spoke";
 import { StarSpoke as StarSpokeInteractive } from "@microcharts/react/star-spoke/interactive";
 import staticModule, { playground as staticPlayground, PROFILE } from "./star-spoke";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: StarSpoke,
+  ChartLive: StarSpokeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

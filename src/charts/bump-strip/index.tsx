@@ -5,13 +5,13 @@
 // space (documented). Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { bumpGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual rank-run summary. Shared with the interactive entry. */
 export function bumpSummary(ranks: readonly Value[], strings: FlowStrings): string {
   const clean = ranks.filter((r): r is number => isFiniteValue(r) && r >= 1).map(Math.round);
   if (clean.length === 0) return strings.noData;
@@ -64,7 +64,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     devWarn(`<BumpStrip> rank beyond maxRank=${maxRank} clamped to the bottom band.`);
   }
 
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
+  const fontSize = labelFont(height, 0.4);
   // clamped label center — the glyph box (central baseline) never leaves the frame
   const labelY = (y: number): number =>
     Math.min(Math.max(y, fontSize * 0.5), height - fontSize * 0.5);

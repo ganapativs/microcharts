@@ -162,7 +162,7 @@ export const contexts: ChartContexts = {
         — 29 events, spiking to 11 at minute 28.
       </p>
     ),
-    code: `<p>\n  Checkout errors this hour{" "}\n  <Seismogram data={burstsPerMinute} width={90} height={16} /> — 29 events, spiking to 11 at minute 28.\n</p>`,
+    code: `<p>\n  Checkout errors this hour{" "}\n  <span className="mc-inline">\n    <Seismogram data={burstsPerMinute} width={90} height={16} summary={false} />\n  </span>{" "}\n  — 29 events, spiking to 11 at minute 28.\n</p>`,
   },
   cell: {
     render: () => (

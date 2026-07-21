@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { MicroBox } from "@microcharts/react/micro-box";
 import { MicroBox as MicroBoxInteractive } from "@microcharts/react/micro-box/interactive";
 import staticModule, { playground as staticPlayground, RAW } from "./micro-box";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: MicroBox,
+  ChartLive: MicroBoxInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

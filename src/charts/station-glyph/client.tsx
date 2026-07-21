@@ -66,6 +66,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -189,7 +190,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   const datum = useCallback(
     (i: number) => {
       const f = fields[i];
-      return { index: i, value: f?.value ?? null, label: f?.text };
+      return { index: i, value: f?.value ?? null, label: f?.text, formatted: f?.text };
     },
     [fields],
   );
@@ -249,13 +250,12 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus box is transient. */}
         {selected !== active ? outline(selected, true) : null}
         {outline(active, false)}
         {rest.children}
       </StaticStationGlyph>
       <LiveRegion>{shownField ? shownField.text : ""}</LiveRegion>
-      {shownField ? (
+      {readout && shownField ? (
         <span
           className="mc-spark-readout"
           style={{

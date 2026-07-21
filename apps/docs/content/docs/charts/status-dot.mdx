@@ -1,7 +1,8 @@
 ---
 title: StatusDot
-description:
-  A categorical state mark for React — five paired shape+color states that survive grayscale, print, and forced-colors.
+description: >-
+  React status dot chart — discrete state double-encoded by color and shape. Tiny accessible SVG microchart; RSC-safe
+  static or /interactive.
 ---
 
 StatusDot answers "what state is this thing in right now?". Every state pairs a distinct silhouette with a semantic
@@ -77,6 +78,7 @@ silhouette.
   label="an unknown status key renders 'off' with a dev warning"
   code={`// no "degraded" entry in the built-in map, and none supplied via \`states\`
 <StatusDot status="degraded" />`}
+  expectWarn
 >
   <StatusDot status="degraded" title="Unknown key" style={{ width: 18, height: 18 }} />
 </LiveDemo>

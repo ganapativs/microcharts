@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ControlStrip } from "@microcharts/react/control-strip";
 import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
 import staticModule, { playground as staticPlayground, DEMO } from "./control-strip";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ControlStrip,
+  ChartLive: ControlStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

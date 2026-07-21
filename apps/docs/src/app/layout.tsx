@@ -2,13 +2,14 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
-import { SIZE } from "@/lib/docs-facts";
 import {
   jsonLdScript,
+  organizationJsonLd,
   softwareApplicationJsonLd,
   softwareSourceCodeJsonLd,
   websiteJsonLd,
 } from "@/lib/jsonld";
+import { SEO_KEYWORDS } from "@/lib/seo";
 import "./global.css";
 
 const sans = Hanken_Grotesk({
@@ -49,7 +50,7 @@ const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.get
 // The leading glyph is the hero's own sparkline data ([3,5,4,8,6,9,7,11])
 // rendered in unicode blocks — a chart small enough to sit in a console.log,
 // which is exactly the tagline. Delight that doesn't lie: it's the real series.
-const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ${SIZE.min}–${SIZE.max} kB gzip per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
+const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -62,22 +63,19 @@ export const metadata: Metadata = {
   authors: [{ name: SITE.author, url: SITE.authorUrl }],
   creator: SITE.author,
   publisher: SITE.author,
-  keywords: [
-    "react charts",
-    "sparkline",
-    "microchart",
-    "accessible charts",
-    "zero dependency",
-    "rsc",
-    "svg charts",
-    "tiny chart",
-    "dataviz",
-  ],
+  keywords: [...SEO_KEYWORDS],
+  category: "technology",
   alternates: {
     canonical: "/",
     types: {
       "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }],
+      "text/plain": [{ url: "/llms.txt", title: `${SITE.name} for LLMs` }],
     },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   // Crisp env-aware SVG favicon (app/brand/icon.svg). The apple-touch icon must
   // be listed explicitly — an `icons` object suppresses the app/apple-icon.tsx
@@ -92,6 +90,7 @@ export const metadata: Metadata = {
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     url: SITE.url,
+    locale: "en_US",
     images: [
       {
         url: "/og/default.png",
@@ -107,7 +106,7 @@ export const metadata: Metadata = {
     creator: SITE.authorXHandle,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
-    images: ["/og/default.png"],
+    images: [{ url: "/og/default.png", alt: SITE.ogImageAlt }],
   },
 };
 
@@ -140,6 +139,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LIVE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
+        <script type="application/ld+json">{jsonLdScript(organizationJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareApplicationJsonLd())}</script>

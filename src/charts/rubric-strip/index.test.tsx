@@ -27,7 +27,7 @@ describe("<RubricStrip>", () => {
     );
   });
 
-  it("target renders a threshold tick across all rows", () => {
+  it("target renders a target tick across all rows", () => {
     const { container } = draw(<RubricStrip data={RUBRIC} target={0.7} width={120} height={32} />);
     expect(container.querySelector("line[stroke-dasharray]")).not.toBeNull();
   });
@@ -93,7 +93,7 @@ describe("<RubricStrip>", () => {
 // BOTH at once: with a degenerate weight the row can collapse before the score
 // guard is consulted, so a broken score check reads as passing, and index parity
 // decides which of NaN/±Infinity ever lands on which field. `labels` (default)
-// and `target` are on — the criterion text and the threshold tick are where a
+// and `target` are on — the criterion text and the target tick are where a
 // numeral leak surfaces.
 const rubricCase = (data: readonly RubricStripDatum[]) => (
   <RubricStrip data={data} target={0.7} title="Edge" />

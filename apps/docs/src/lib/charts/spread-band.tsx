@@ -154,7 +154,7 @@ export const contexts: ChartContexts = {
         — organic leads by 18% on median.
       </p>
     ),
-    code: '<p>\n  Organic vs paid <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} /> — organic leads by 18% on median.\n</p>',
+    code: '<p>\n  Organic vs paid{" "}\n  <span className="mc-inline">\n    <SpreadBand data={pairs} seriesLabels={["Organic", "Paid"]} summary={false} />\n  </span>{" "}\n  — organic leads by 18% on median.\n</p>',
   },
   cell: {
     render: () => (

@@ -110,9 +110,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "KSFO", meta: "225° 32", data: [162, 171, 180, 189, 198, 207, 216, 225] },
-  { name: "KJFK", meta: "180° 18", data: [130, 137, 144, 151, 158, 166, 173, 180] },
-  { name: "KORD", meta: "270° 24", data: [194, 205, 216, 227, 238, 248, 259, 270] },
+  { name: "KSFO", meta: "225° 32", direction: 225, magnitude: 32 },
+  { name: "KJFK", meta: "180° 18", direction: 180, magnitude: 18 },
+  { name: "KORD", meta: "270° 24", direction: 270, magnitude: 24 },
 ];
 
 export const contexts: ChartContexts = {
@@ -121,12 +121,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Wind at KSFO{" "}
         <span className="mc-inline">
-          <WindBarb direction={225} magnitude={32} label="value" size={20} summary={false} />
+          <WindBarb direction={225} magnitude={32} size={20} summary={false} />
         </span>{" "}
         — SW 32 kt, three full barbs.
       </p>
     ),
-    code: "<p>\n  Wind at KSFO <WindBarb direction={225} magnitude={32} /> — SW 32 kt, three full barbs.\n</p>",
+    code: '<p>\n  Wind at KSFO{" "}\n  <span className="mc-inline">\n    <WindBarb direction={225} magnitude={32} summary={false} />\n  </span>{" "}\n  — SW 32 kt, three full barbs.\n</p>',
   },
   cell: {
     render: () => (
@@ -136,7 +136,12 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <WindBarb direction={225} magnitude={32} label="value" size={22} summary={false} />
+                <WindBarb
+                  direction={row.direction}
+                  magnitude={row.magnitude}
+                  size={22}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -156,7 +161,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">· 32 kt</span>
           </div>
         </div>
-        <WindBarb direction={225} magnitude={32} label="value" size={48} summary={false} />
+        <WindBarb direction={225} magnitude={32} size={48} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">225°</span>\n  <span className="unit">· 32 kt</span>\n  <WindBarb direction={225} magnitude={32} />\n</div>',
@@ -170,7 +175,12 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <WindBarb direction={225} magnitude={32} label="value" size={18} summary={false} />
+            <WindBarb
+              direction={row.direction}
+              magnitude={row.magnitude}
+              size={18}
+              summary={false}
+            />
           </span>
         ))}
       </div>

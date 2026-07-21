@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { VolumeProfile } from "@microcharts/react/volume-profile";
 import { VolumeProfile as VolumeProfileInteractive } from "@microcharts/react/volume-profile/interactive";
 import staticModule, { playground as staticPlayground, PROFILE } from "./volume-profile";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: VolumeProfile,
+  ChartLive: VolumeProfileInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

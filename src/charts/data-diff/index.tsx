@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry, type DataDiffGeometry } from "./geometry.js";
@@ -15,7 +16,6 @@ import { resolveSummary } from "../../core/summary.js";
 const signed = (n: number, fmt: (v: number) => string): string =>
   `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
 
-/** Factual diff summary. Shared with the interactive entry. */
 export function dataDiffSummary(
   geo: DataDiffGeometry,
   fmt: (v: number) => string,
@@ -86,7 +86,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
       `DataDiff: ${data.length} rows exceeds the 12-row cap; extra rows dropped. Split into a table of DataDiffs (one per group).`,
     );
 
-  const FONT = Math.min(10, Math.max(6, Math.round(height * 0.4)));
+  const FONT = labelFont(height, 0.4);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-data-diff ${className}` : "mc-data-diff";
 
@@ -152,7 +152,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* zero hairline — the axis both directions diverge from */}
       <line
         x1={geo.centerX}
         y1={0}
@@ -165,7 +164,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
       />
       {geo.rows.map((r) => (
         <g key={r.key}>
-          {/* removed leftward */}
           {r.removed.width > 0 ? (
             <rect
               x={r.removed.x}
@@ -176,7 +174,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               shapeRendering="crispEdges"
             />
           ) : null}
-          {/* added rightward */}
           {r.added.width > 0 ? (
             <rect
               x={r.added.x}
@@ -187,7 +184,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               shapeRendering="crispEdges"
             />
           ) : null}
-          {/* 0/0 key — a hairline tick so the key's presence survives */}
           {r.placeholder ? (
             <rect
               x={round2(geo.centerX - 0.5)}
@@ -198,7 +194,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               style={{ fillOpacity: 0.5 }}
             />
           ) : null}
-          {/* net summary tick — opt-in, never a stand-in for the bars */}
+          {/* Opt-in net tick — not a stand-in for the bars. */}
           {net && !r.placeholder ? (
             <rect
               x={round2(r.netX - 0.5)}

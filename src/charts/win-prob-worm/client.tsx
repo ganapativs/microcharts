@@ -48,6 +48,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -100,11 +101,16 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   // index = the DATA index (points are 1:1 with `data`, gaps included);
   // value = the win probability at that point (clamped 0–100), `null` in a gap.
   const datum = useCallback(
-    (i: number) => ({
-      index: i,
-      value: isFiniteValue(data[i]) ? clamp(data[i] as number, 0, 100) : null,
-    }),
-    [data],
+    (i: number) => {
+      const cv = isFiniteValue(data[i]) ? clamp(data[i] as number, 0, 100) : null;
+      return {
+        index: i,
+        value: cv,
+        formatted:
+          cv === null ? undefined : `${cv >= 50 ? sides[0] : sides[1]} ${pct(leaderProb(cv), fmt)}`,
+      };
+    },
+    [data, sides, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -171,12 +177,11 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {selected !== null && selected !== active ? crosshair(selected, true) : null}
         {active !== null ? crosshair(active, false) : null}
         {rest.children}
       </StaticWinProbWorm>
-      {clampedShown !== null ? (
+      {readout && clampedShown !== null ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(px / width) * 100}%`, transform: "translateX(-50%)" }}

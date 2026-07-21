@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ParetoStrip } from "@microcharts/react/pareto-strip";
 import { ParetoStrip as ParetoStripInteractive } from "@microcharts/react/pareto-strip/interactive";
 import staticModule, { playground as staticPlayground, CAUSES } from "./pareto-strip";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ParetoStrip,
+  ChartLive: ParetoStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -6,7 +6,7 @@
 // (canon); the crosshair tick is an overlay child re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -48,6 +48,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -73,7 +74,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         value,
         range,
         domain: props.domain,
-        gutterCh: label !== "none" ? 4 : 0,
+        gutterCh: label !== "none" && labelFitsY(height / 2, font, height) ? 4 : 0,
         fontSize: font,
       }),
     [width, height, data, value, range, props.domain, label, font],
@@ -113,9 +114,14 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
   const datum = useCallback(
     (i: number) => {
       const e = geo?.edges[i];
-      return { index: i, value: e?.value ?? null, label: e?.name };
+      return {
+        index: i,
+        value: e?.value ?? null,
+        label: e?.name,
+        formatted: e ? `${e.name} ${fmt(e.value)}` : undefined,
+      };
     },
-    [geo],
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -171,13 +177,12 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus tick is transient. */}
         {selected !== null && selected !== active ? tick(selected, true) : null}
         {active !== null ? tick(active, false) : null}
         {rest.children}
       </StaticBenchmarkStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {edge ? (
+      {readout && edge ? (
         <span
           className="mc-spark-readout"
           style={{

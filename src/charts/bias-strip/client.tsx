@@ -46,6 +46,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -100,14 +101,20 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
 
   const datum = useCallback(
     (i: number) => {
-      const p = geo.dots[i] ? data[geo.dots[i]!.index] : undefined;
+      const dot = geo.dots[i];
+      const p = dot ? data[dot.index] : undefined;
+      const mean = p ? (p.a + p.b) / 2 : 0;
+      const diff = p ? p.a - p.b : 0;
       return {
         index: i,
-        value: p ? p.a - p.b : null,
-        label: p ? fmt((p.a + p.b) / 2) : undefined,
+        value: p ? diff : null,
+        label: p ? fmt(mean) : undefined,
+        formatted: p
+          ? `${fmt(mean)}, ${fmtSigned(diff)}${dot!.outside ? strings.biasOutside : ""}`
+          : undefined,
       };
     },
-    [geo, data, fmt],
+    [geo, data, fmt, fmtSigned, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -177,13 +184,12 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBiasStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {shownDot && shownPair ? (
+      {readout && shownDot && shownPair ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -191,7 +197,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? " — outside limits" : ""}`}
+          {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? strings.biasOutside : ""}`}
         </span>
       ) : null}
     </span>

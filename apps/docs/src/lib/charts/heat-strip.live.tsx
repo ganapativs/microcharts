@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { HeatStrip } from "@microcharts/react/heat-strip";
 import { HeatStrip as HeatStripInteractive } from "@microcharts/react/heat-strip/interactive";
 import staticModule, { playground as staticPlayground, LOAD, D } from "./heat-strip";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: HeatStrip,
+  ChartLive: HeatStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

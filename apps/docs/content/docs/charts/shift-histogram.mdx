@@ -1,8 +1,8 @@
 ---
 title: ShiftHistogram
-description:
-  A before/after distribution chart for React — mirrored histograms on shared bins with the median shift, so unequal
-  sample sizes can't fake a change.
+description: >-
+  React shift histogram chart — before/after distributions on mirrored shared bins. Tiny accessible SVG microchart;
+  RSC-safe static or /interactive.
 ---
 
 ShiftHistogram answers "did the fix actually change the distribution?". It mirrors two histograms around a center line —
@@ -16,7 +16,7 @@ The mirror carries **identity**, not valence (up isn't "good") — that's the wh
       before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
       after: Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20),
     }}
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="The fix"
     width={260}
     height={30}
@@ -57,7 +57,7 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
         before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
         after: Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20),
       }}
-      format={(n) => `${Math.round(n)} ms`}
+      format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
       mode="overlay"
       title="Overlay"
       width={240}
@@ -68,7 +68,7 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
         before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
         after: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
       }}
-      format={(n) => `${Math.round(n)} ms`}
+      format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
       title="No shift"
       width={240}
       height={26}
@@ -113,7 +113,7 @@ const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
       before: Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20),
       after: [],
     }}
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="Awaiting after sample"
     width={240}
     height={26}

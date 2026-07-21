@@ -126,7 +126,7 @@ export const contexts: ChartContexts = {
         two-thirds through, about 12 minutes left.
       </p>
     ),
-    code: `<p>\n  Nightly backup is{" "}\n  <ProgressRing value={0.68} style={{ width: 18, height: 18 }} /> two-thirds through.\n</p>`,
+    code: `<p>\n  Nightly backup is{" "}\n  <span className="mc-inline">\n    <ProgressRing value={0.68} style={{ width: 18, height: 18 }} summary={false} />\n  </span>{" "}\n  two-thirds through.\n</p>`,
   },
   cell: {
     render: () => (

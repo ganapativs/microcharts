@@ -144,7 +144,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       // text, and seating the box bottom would push the whole skyline up by it.
       seat={{ mode: "floor", bottom: groundY }}
       className={className ? `mc-skyline ${className}` : "mc-skyline"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {ann.under}
       {ground ? (

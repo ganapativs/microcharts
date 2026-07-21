@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { HeartbeatBlip } from "@microcharts/react/heartbeat-blip";
 import { HeartbeatBlip as HeartbeatBlipInteractive } from "@microcharts/react/heartbeat-blip/interactive";
 import staticModule, { playground as staticPlayground, BUSY, NOW } from "./heartbeat-blip";
 
@@ -37,6 +38,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: HeartbeatBlip,
+  ChartLive: HeartbeatBlipInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

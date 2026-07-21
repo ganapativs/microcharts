@@ -49,6 +49,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -126,9 +127,22 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     (i: number) => {
       const d = data[i];
       const ok = !!d && Number.isFinite(d.rate) && Number.isFinite(d.volume) && d.volume > 0;
-      return { index: i, value: ok ? d!.rate : null };
+      return {
+        index: i,
+        value: ok ? d!.rate : null,
+        formatted: !d
+          ? undefined
+          : ok
+            ? strings.rateVolumeChip(
+                fmt(d.rate),
+                fmtVol(d.volume),
+                unit,
+                minVolume !== undefined && d.volume < minVolume,
+              )
+            : strings.rateVolumeChipEmpty,
+      };
     },
-    [data],
+    [data, fmt, fmtVol, unit, minVolume, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -227,12 +241,11 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus mark is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticRateVolume>
-      {sBar && sDatum ? (
+      {readout && sBar && sDatum ? (
         <span
           className="mc-rate-volume-readout mc-spark-readout"
           style={{
@@ -241,10 +254,13 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           }}
         >
           {valid(shown!)
-            ? `${fmt(sDatum.rate)} · ${fmtVol(sDatum.volume)} ${unit}${
-                minVolume !== undefined && sDatum.volume < minVolume ? " (low)" : ""
-              }`
-            : "no events"}
+            ? strings.rateVolumeChip(
+                fmt(sDatum.rate),
+                fmtVol(sDatum.volume),
+                unit,
+                minVolume !== undefined && sDatum.volume < minVolume,
+              )
+            : strings.rateVolumeChipEmpty}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

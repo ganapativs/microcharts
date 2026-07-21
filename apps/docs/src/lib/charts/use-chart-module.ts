@@ -32,10 +32,16 @@ function load(slug: string): Promise<ChartModule | undefined> {
  * this hook fetches that one chunk instead. Returns `undefined` until it lands;
  * callers must reserve the box's height so the swap causes no layout shift.
  */
-export function useChartModule(slug: string): ChartModule | undefined {
-  const [mod, setMod] = useState<ChartModule | undefined>(() => cache.get(slug));
+export function useChartModule(slug: string | undefined): ChartModule | undefined {
+  const [mod, setMod] = useState<ChartModule | undefined>(() =>
+    slug ? cache.get(slug) : undefined,
+  );
 
   useEffect(() => {
+    if (!slug) {
+      setMod(undefined);
+      return;
+    }
     const cached = cache.get(slug);
     if (cached) {
       setMod(cached);

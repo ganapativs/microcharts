@@ -51,6 +51,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     format,
     locale,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -102,8 +103,16 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   // 0 = left, 1 = right. `value` = that pan's weight (the area-true mark).
   const locate = useCallback((x: number) => (x < width / 2 ? 0 : 1), [width]);
   const datum = useCallback(
-    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
-    [data],
+    (i: number) => {
+      const v = data[i]?.value;
+      return {
+        index: i,
+        value: v ?? null,
+        label: data[i]?.label,
+        formatted: isFiniteValue(v) ? `${data[i]?.label} ${fmt(v)}` : undefined,
+      };
+    },
+    [data, fmt],
   );
   // Two pans read as places, not as a sequence: ← always means the LEFT pan and
   // → the RIGHT one (the pre-migration behaviour), so the arrows are absolute
@@ -197,13 +206,12 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBeam>
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {panKnown ? (
+      {readout && panKnown ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${pan!.label} ${fmt(pan!.value)}`}
         </span>

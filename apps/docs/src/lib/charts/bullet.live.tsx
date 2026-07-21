@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Bullet } from "@microcharts/react/bullet";
 import { Bullet as BulletInteractive } from "@microcharts/react/bullet/interactive";
 import staticModule, { playground as staticPlayground } from "./bullet";
 
@@ -30,6 +31,7 @@ export const playground: PlaygroundSpec = {
       target={s.target as number}
       bands={s.bands ? [50, 90] : undefined}
       domain={s.domain ? [0, 60] : undefined}
+      label={s.label as "none" | "value" | "target" | "both"}
       animate={ui.animate}
       width={300}
       height={28}
@@ -44,6 +46,7 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.bands && "  bands={[50, 90]}",
       s.domain && "  domain={[0, 60]}",
+      s.label !== "none" && `  label="${s.label}"`,
       ui.animate && " animate",
       "/>",
     ]
@@ -53,6 +56,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Bullet,
+  ChartLive: BulletInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

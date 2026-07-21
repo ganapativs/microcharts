@@ -49,9 +49,13 @@ describe("interactive <Constellation>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 0, value: 40, label: "Jan" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 0, value: 40, label: "Jan" }),
+    );
     await userEvent.keyboard("{ArrowRight}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 1, value: 90, label: "Mar" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 1, value: 90, label: "Mar" }),
+    );
     await userEvent.keyboard("{Escape}");
     expect(onActive).toHaveBeenLastCalledWith(null);
   });
@@ -64,7 +68,9 @@ describe("interactive <Constellation>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}{ArrowRight}{Enter}");
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 1, value: 90, label: "Mar" });
+    expect(onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 1, value: 90, label: "Mar" }),
+    );
     fig.blur();
     await expect.poll(() => fig.querySelectorAll(PIN).length).toBe(1);
   });

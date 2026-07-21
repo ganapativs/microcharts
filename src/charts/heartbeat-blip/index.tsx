@@ -126,9 +126,8 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       // the baseline lands low in the cap band the way a real trace reads.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-heartbeat ${className}` : "mc-heartbeat"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* baseline — hairline context (role: ⅓ of --mc-stroke-width) */}
       <line
         x1={geo.baseline.x1}
         y1={geo.baseline.y}
@@ -138,9 +137,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
         data-mc-w="hair"
         style={{ strokeOpacity: 0.55 }}
       />
-      {/* spikes — one clean glyph per real event, rounded like a monitor trace.
-          `stroke` is dynamic (color override), so this stays inline; width is
-          the primary-ink token, not a literal, so presets still retune it. */}
+      {/* Spikes: inline stroke (color override); width from primary ink. */}
       {geo.spikesPath ? (
         <path
           className="mc-heartbeat-spikes"
@@ -166,7 +163,6 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           {strings.heartbeatEmpty}
         </text>
       )}
-      {/* now endpoint — the live accent cursor */}
       <circle
         className="mc-heartbeat-now"
         cx={geo.nowDot.cx}

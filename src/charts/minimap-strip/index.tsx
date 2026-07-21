@@ -93,7 +93,7 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
     summary === false
       ? false
       : (summary ?? minimapSummary(data, domain, geo.unknownShare, strings, fmt));
-  const contentBottom = height - 1;
+  const { contentTop, contentBottom } = geo;
 
   return (
     <Chart
@@ -106,12 +106,11 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       // so it centres on the cap band. The band seated is the content lane — the
       // tick lane above it is chrome for annotations, and the geometry reserves
       // it whether or not `markLane` puts anything there.
-      seat={{ mode: "center", top: 3, bottom: contentBottom }}
+      seat={{ mode: "center", top: contentTop, bottom: contentBottom }}
       className={className ? `mc-minimap ${className}` : "mc-minimap"}
       style={style}
     >
-      {/* fog-of-war over unknown regions — flat siblings, ink roles: the fog
-          rects + hatch scale with `known`/domain gaps, so no per-item <g> */}
+      {/* Fog over unknown regions (flat siblings). */}
       {geo.fogRects.flatMap((f, i) => [
         <rect
           key={`fog${i}`}
@@ -132,16 +131,14 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
         />,
       ])}
 
-      {/* content thumbnail — flat siblings, ink role: up to ~60 buckets is
-          this chart's SSR hot path (bench floor 8 charts/ms) */}
       {mode === "heat" ? (
         geo.buckets.map((b, i) => (
           <rect
             key={i}
             x={b.x}
-            y={3}
+            y={contentTop}
             width={b.width}
-            height={contentBottom - 3}
+            height={contentBottom - contentTop}
             fillOpacity={b.norm * 0.7}
             data-mc-ink="bar"
           />
@@ -160,17 +157,18 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
 
       {geo.markX.length > 0 ? (
         <path
-          d={geo.markX.map((x) => `M${round2(x)} 0.5V${markLane ? 3 : height - 1}`).join("")}
+          d={geo.markX
+            .map((x) => `M${round2(x)} 0.5V${markLane ? contentTop : contentBottom}`)
+            .join("")}
           data-mc-ink="accent"
           data-mc-w="support"
+          fill="none"
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
 
-      {/* viewport window — fill+stroke combo, so a literal accent var() ref
-          stays (the "accent" ink role zeroes the stroke on rects). With no
-          measurable window the same rect frames the whole strip, hollow and
-          dashed: the rail is there, the position is unknown — not "all in view". */}
+      {/* Viewport: literal accent stroke (ink role zeroes rect stroke).
+          No window → hollow dashed frame over the whole strip. */}
       <rect
         x={geo.windowRect.x}
         y={geo.windowRect.y}

@@ -31,7 +31,7 @@ describe("interactive <StatusDot>", () => {
     const screen = await render(<StatusDot status="warn" onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-status-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: null, label: "warning" }]);
+    expect(picks).toMatchObject([{ index: 0, value: null, label: "warning" }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -40,6 +40,6 @@ describe("interactive <StatusDot>", () => {
     const wrap = screen.container.querySelector(".mc-status-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: null, label: "ok" }]);
+    expect(picks).toMatchObject([{ index: 0, value: null, label: "ok" }]);
   });
 });

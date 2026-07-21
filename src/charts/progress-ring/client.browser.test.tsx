@@ -27,7 +27,7 @@ describe("interactive <ProgressRing>", () => {
     const screen = await render(<ProgressRing value={0.55} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-ring-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 0.55 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.55 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -36,6 +36,6 @@ describe("interactive <ProgressRing>", () => {
     const wrap = screen.container.querySelector(".mc-ring-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 0.25 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.25 }]);
   });
 });

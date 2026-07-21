@@ -26,6 +26,7 @@ export interface SlopeGeometry {
   labelsFit: boolean;
   colX0: number;
   colX1: number;
+  domain: readonly [number, number];
 }
 
 /** Label font size (viewBox units) — shared by both entries. */
@@ -180,5 +181,6 @@ export function slopeGeometry(opts: {
       (pairs.length === 0 ? true : height / pairs.length >= fontSize * 1.1),
     colX0,
     colX1,
+    domain,
   };
 }

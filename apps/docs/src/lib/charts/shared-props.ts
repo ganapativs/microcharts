@@ -171,7 +171,7 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
     required: false,
     interactive: true,
     description:
-      "The active unit changed — the one under the pointer or the keyboard focus. `null` when the chart is cleared (pointer leaves, focus blurs, Escape). Payload is `MicroDatum` — `{ index, value, label? }`, where `index` identifies the navigable unit and `value` is its primary encoded number (`null` for an empty unit).",
+      "The active unit changed — the one under the pointer or the keyboard focus. `null` when the chart is cleared (pointer leaves, focus blurs, Escape). Payload is `MicroDatum` — `{ index, value, label?, formatted? }`, where `index` identifies the navigable unit, `value` is its primary encoded number (`null` for an empty unit), and `formatted` is the exact string the chart's own readout chip would show. Pair with `readout={false}` to render that value outside the chart.",
   },
   {
     name: "onSelect",
@@ -196,6 +196,14 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
     interactive: true,
     description:
       "Uncontrolled initial selection. Ignored once `selectedIndex` is set. Use it to open a chart with one unit already pinned.",
+  },
+  {
+    name: "readout",
+    type: "boolean",
+    required: false,
+    interactive: true,
+    description:
+      "Show the floating value chip that follows the pointer/focus (default `true`). `false` suppresses only the chip — the hover crosshair, keyboard roving, live-region announcements, and both callbacks keep working — so you can render `datum.formatted` in your own layout instead.",
   },
 ];
 

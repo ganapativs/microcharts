@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { SparkBar } from "@microcharts/react/sparkbar";
 import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
 import staticModule, { entry, playground as staticPlayground } from "./sparkbar";
 
@@ -25,6 +26,7 @@ export const playground: PlaygroundSpec = {
         mode={s.mode as "bar" | "winloss"}
         gap={gap}
         label={s.label ? "last" : "none"}
+        positive={s.positive as "up" | "down"}
         locale={s.locale as string}
         animate={ui.animate}
         className="w-full max-w-md"
@@ -41,6 +43,7 @@ export const playground: PlaygroundSpec = {
       `  mode="${s.mode}"`,
       gap !== 0.25 && `  gap={${gap}}`,
       s.label && '  label="last"',
+      s.positive !== "up" && `  positive="${s.positive}"`,
       s.locale !== "en-US" && `  locale="${s.locale}"`,
       ui.animate && " animate",
       "/>",
@@ -52,6 +55,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: SparkBar,
+  ChartLive: SparkBarInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

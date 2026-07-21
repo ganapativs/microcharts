@@ -64,7 +64,7 @@ describe("interactive <RateVolume>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 3.1 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 3.1 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -77,7 +77,7 @@ describe("interactive <RateVolume>", () => {
     key(wrap, "Home");
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 3.1 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 3.1 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();

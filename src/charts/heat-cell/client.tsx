@@ -20,6 +20,8 @@ export interface InteractiveHeatCellProps extends HeatCellProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** The cell was activated (click, tap, Enter or Space): `{ index: 0, value }` — the cell's value. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -36,6 +38,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     summary,
     strings = EN_SCALAR,
     animate = false,
+    readout = true,
     onSelect,
     className,
     style,
@@ -54,7 +57,12 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Drill-down: the cell's own value (the number the readout shows).
-  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? value : null,
+      formatted: geo.step !== null ? strings.level(fmt(value), geo.step + 1, steps) : fmt(value),
+    });
 
   return (
     <span
@@ -86,9 +94,9 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{active ? text : ""}</LiveRegion>
-      {active && geo.step !== null ? (
+      {readout && active && geo.step !== null ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {`${fmt(value)} — level ${geo.step + 1}/${steps}`}
+          {strings.level(fmt(value), geo.step + 1, steps)}
         </span>
       ) : null}
     </span>

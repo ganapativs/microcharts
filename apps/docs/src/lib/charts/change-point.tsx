@@ -145,12 +145,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Error rate this week{" "}
         <span className="mc-inline">
-          <ChangePoint data={ERRORS} label="delta" height={16} summary={false} />
+          <ChangePoint data={ERRORS} label="none" height={16} summary={false} />
         </span>{" "}
         — step-up on day 14, regime break at 2.1%.
       </p>
     ),
-    code: "<p>\n  Error rate this week <ChangePoint data={errors} /> — step-up on day 14, regime break at 2.1%.\n</p>",
+    code: '<p>\n  Error rate this week{" "}\n  <span className="mc-inline">\n    <ChangePoint data={errors} summary={false} />\n  </span>{" "}\n  — step-up on day 14, regime break at 2.1%.\n</p>',
   },
   cell: {
     render: () => (
@@ -160,7 +160,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <ChangePoint data={row.data} label="delta" height={18} summary={false} />
+                <ChangePoint data={row.data} label="none" height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -194,7 +194,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <ChangePoint data={row.data} label="delta" height={14} summary={false} />
+            <ChangePoint data={row.data} label="none" height={14} summary={false} />
           </span>
         ))}
       </div>

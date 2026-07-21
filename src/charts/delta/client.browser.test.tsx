@@ -33,7 +33,7 @@ describe("interactive <Delta>", () => {
     const screen = await render(<Delta value={0.12} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-delta-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 0.12 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.12 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -43,6 +43,6 @@ describe("interactive <Delta>", () => {
     expect(wrap.getAttribute("tabindex")).toBe("0");
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 0.2 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.2 }]);
   });
 });

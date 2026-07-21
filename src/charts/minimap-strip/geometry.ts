@@ -93,12 +93,19 @@ export function minimapGeometry(opts: {
   fogRects: Rect[];
   markX: number[];
   unknownShare: number;
+  /** Bottom of the top annotation lane = top of the content band. Lane ticks
+   *  fill 0.5→contentTop; content and fog sit below it. */
+  contentTop: number;
+  /** Bottom of the content band; overlay-mode ticks reach it. */
+  contentBottom: number;
 } {
   const { content, window: win, marks, known, domain, width, height } = opts;
   const [d0, d1] = domain;
   const span = d1 - d0 || 1;
   const inset = 1;
-  const laneH = 2; // top annotation lane
+  // Top annotation lane scales with height so lane-mode ticks stay legible
+  // (a fixed 2u lane vanishes on taller strips), clamped so it never dominates.
+  const laneH = Math.max(2, Math.min(6, round2(height * 0.22)));
   const contentTop = inset + laneH;
   const contentH = height - contentTop - inset;
   const xOf = (v: number): number =>
@@ -166,7 +173,16 @@ export function minimapGeometry(opts: {
 
   const markX = marks.filter(isFiniteValue).map(xOf);
 
-  return { buckets, windowRect, windowKnown: winPair !== null, fogRects, markX, unknownShare };
+  return {
+    buckets,
+    windowRect,
+    windowKnown: winPair !== null,
+    fogRects,
+    markX,
+    unknownShare,
+    contentTop: round2(contentTop),
+    contentBottom: round2(height - inset),
+  };
 }
 
 /** Diagonal-hatch path across a rect (fog-of-war texture; unknown ≠ zero). */

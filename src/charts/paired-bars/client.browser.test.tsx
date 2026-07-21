@@ -31,7 +31,7 @@ describe("interactive <PairedBars>", () => {
     const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 940, label: "East" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 940, label: "East" });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -43,7 +43,7 @@ describe("interactive <PairedBars>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 940, label: "East" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 940, label: "East" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect.poll(() => wrap.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

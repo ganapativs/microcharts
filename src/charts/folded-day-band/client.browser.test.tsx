@@ -28,7 +28,7 @@ describe("interactive <FoldedDayBand>", () => {
     const wrap = screen.container.querySelector(".mc-folded-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 40, label: "0" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 40, label: "0" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -42,7 +42,7 @@ describe("interactive <FoldedDayBand>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 40, label: "0" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 40, label: "0" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

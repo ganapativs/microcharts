@@ -18,24 +18,24 @@ const PL = [
 ];
 
 function gallery(): string {
-  const sentence = `Q2 profit bridged ${svg({ data: PL, start: 60, width: 80, summary: false })} from opening to close.`;
+  const sentence = `Q2 profit bridged ${svg({ data: PL, open: 60, width: 80, summary: false })} from opening to close.`;
   const cell = `<table><tbody>
-    <tr><td>Q1</td><td>${svg({ data: PL, start: 60, summary: false })}</td></tr>
-    <tr><td>Q2</td><td>${svg({ data: PL.map((d) => ({ label: d.label, value: -d.value })), start: 60, summary: false })}</td></tr>
+    <tr><td>Q1</td><td>${svg({ data: PL, open: 60, summary: false })}</td></tr>
+    <tr><td>Q2</td><td>${svg({ data: PL.map((d) => ({ label: d.label, value: -d.value })), open: 60, summary: false })}</td></tr>
   </tbody></table>`;
   const kpi = `<div class="card"><div class="label">Net income bridge</div><div class="value">$87k</div>
-    ${svg({ data: PL, start: 60, width: 150, height: 24, title: "Net income bridge" })}</div>`;
-  const tab = `<div class="tab"><span>P&amp;L</span> ${svg({ data: PL, start: 60, width: 44, height: 10, summary: false })}</div>`;
+    ${svg({ data: PL, open: 60, width: 150, height: 24, title: "Net income bridge" })}</div>`;
+  const tab = `<div class="tab"><span>P&amp;L</span> ${svg({ data: PL, open: 60, width: 44, height: 10, summary: false })}</div>`;
   const variants = [
-    svg({ data: PL, start: 60, width: 90, title: "with total" }),
-    svg({ data: PL, start: 60, totalBar: false, width: 90, title: "no total" }),
-    svg({ data: PL, start: 60, positive: "down", width: 90, title: "costs: down is good" }),
-    svg({ data: [{ label: "One", value: 12 }], start: 0, width: 90, title: "single step" }),
+    svg({ data: PL, open: 60, width: 90, title: "with total" }),
+    svg({ data: PL, open: 60, totalBar: false, width: 90, title: "no total" }),
+    svg({ data: PL, open: 60, positive: "down", width: 90, title: "costs: down is good" }),
+    svg({ data: [{ label: "One", value: 12 }], open: 0, width: 90, title: "single step" }),
   ].join(" ");
   const presets = ["editorial", "mono", "vivid"]
     .map(
       (p) =>
-        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ data: PL, start: 60, width: 80, summary: false })}</span>`,
+        `<span data-mc-theme="${p}" class="preset">${p} ${svg({ data: PL, open: 60, width: 80, summary: false })}</span>`,
     )
     .join(" ");
   return `<style>${styles}

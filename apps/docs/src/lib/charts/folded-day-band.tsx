@@ -47,7 +47,7 @@ export const entry: ChartEntry = {
       description: "The current period overlaid.",
     },
     {
-      name: "bands",
+      name: "percentiles",
       type: "[number, number][]",
       required: false,
       description: "Percentile pairs, outermost last.",
@@ -97,7 +97,7 @@ export const playground: PlaygroundSpec = {
     <FoldedDayBand
       data={DATA}
       today={s.today ? TODAY : undefined}
-      bands={
+      percentiles={
         s.single
           ? [[25, 75]]
           : [
@@ -116,7 +116,7 @@ export const playground: PlaygroundSpec = {
       "<FoldedDayBand",
       "  data={observations}",
       s.today === true && "  today={today}",
-      s.single === true && "  bands={[[25, 75]]}",
+      s.single === true && "  percentiles={[[25, 75]]}",
       s.bins !== 24 && `  bins={${s.bins}}`,
       "/>",
     ]
@@ -164,7 +164,7 @@ export const contexts: ChartContexts = {
         — afternoon peak normal; tonight runs hot.
       </p>
     ),
-    code: "<p>\n  Traffic vs typical day <FoldedDayBand data={observations} /> — afternoon peak normal; tonight runs hot.\n</p>",
+    code: '<p>\n  Traffic vs typical day{" "}\n  <span className="mc-inline">\n    <FoldedDayBand data={observations} summary={false} />\n  </span>{" "}\n  — afternoon peak normal; tonight runs hot.\n</p>',
   },
   cell: {
     render: () => (

@@ -35,7 +35,7 @@ function gallery(): string {
     svg({ data: DATA, title: "rising" }),
     svg({ data: FALL, title: "falling" }),
     svg({ data: FALL, positive: "down", title: "falling is good" }),
-    svg({ data: DATA, bands: false, title: "no bands" }),
+    svg({ data: DATA, showBands: false, title: "no bands" }),
     svg({ data: DATA, label: "none", title: "no label" }),
   ].join(" ");
 

@@ -6,12 +6,23 @@
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
 
 export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
   live?: boolean;
   strings?: MoonStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the disc pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the per-change bloom the lit region already plays.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the clamped 0–1 fraction }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -23,6 +34,8 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     title,
     value,
     mode = "progress",
+    animate = false,
+    readout = true,
     onSelect,
     className,
     style,
@@ -30,6 +43,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   } = props;
   const summary = moonPhaseSummary(value, mode, strings);
   const wrap = useRef<HTMLSpanElement>(null);
+  useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const last = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -82,8 +96,9 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   // The lit AREA is the datum, so the clamped fraction is what both the readout
   // and `onSelect` report — one disc, one selectable unit (index 0).
   const frac = Math.min(1, Math.max(0, value));
-  const pct = `${Math.round(frac * 100)}%`;
-  const pick = (): void => onSelect?.({ index: 0, value: Number.isFinite(frac) ? frac : null });
+  const pct = `${Math.round((Number.isFinite(frac) ? frac : 0) * 100)}%`;
+  const pick = (): void =>
+    onSelect?.({ index: 0, value: Number.isFinite(frac) ? frac : null, formatted: pct });
 
   return (
     <span
@@ -110,7 +125,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
         summary={false}
       />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {hover ? (
+      {readout && hover ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {pct}
         </span>

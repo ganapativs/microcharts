@@ -1,16 +1,16 @@
 <div align="center">
 
-<img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, 0.95–3.93 kB gzip each." width="920">
+<img src="assets/promo.png" alt="microcharts — word-sized charts for React, made for AI first and for the people reading what it writes. 106 chart types, zero dependencies, ~2–7 kB interactive · ~1–4 kB static." width="920">
 
 # @microcharts/react
 
-**Word-sized charts for React** — zero runtime dependencies, ~1–3&nbsp;kB gzip each, accessible by default, and
-server-component safe.
+**Word-sized charts for React** — zero runtime dependencies, ~2–7&nbsp;kB interactive · ~1–4&nbsp;kB static, accessible
+by default, and server-component safe.
 
 <br>
 
 [![npm](https://img.shields.io/npm/v/@microcharts/react?color=c2410c&label=npm)](https://www.npmjs.com/package/@microcharts/react)
-[![gzip per chart](https://img.shields.io/badge/per_chart-0.95–3.93_kB_gz-c2410c)](https://microcharts.dev/docs/performance)
+[![gzip per chart](https://img.shields.io/badge/per_chart-~2–7_live_·_~1–4_static_kB-c2410c)](https://microcharts.dev/docs/performance)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-077353)](https://microcharts.dev)
 [![types](https://img.shields.io/npm/types/@microcharts/react?color=c2410c)](https://microcharts.dev)
 [![React 18 · 19](https://img.shields.io/badge/React-18_·_19-077353)](https://microcharts.dev/docs/quickstart)
@@ -47,8 +47,8 @@ to write are the ones that make it pleasant for a human to use.
   Interactivity is a separate opt-in `/interactive` import.
 - **Accessible by default.** Every chart is an `img` with a natural-language summary built from your data — nothing to
   remember, nothing to drift. → [Accessibility](https://microcharts.dev/docs/accessibility)
-- **Tiny + honest.** **0.95–3.93 kB gzip** per chart (median 2.51; 15 of 106 under 2 kB), budget-gated in CI. Every type
-  has one documented, honest encoding channel. Delight never lies.
+- **Tiny + honest.** **~2–7 kB interactive · ~1–4 kB static** gzip per chart, budget-gated in CI. Every type has one
+  documented, honest encoding channel. Delight never lies.
 
 ## Install
 
@@ -93,8 +93,10 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 Every interactive chart shares one contract, so you learn it once. Hover or arrow keys make a unit **active**; a click,
 tap, <kbd>Enter</kbd>, or <kbd>Space</kbd> **selects** it and pins the readout so it survives blur; <kbd>Escape</kbd>
 clears; <kbd>Home</kbd>/<kbd>End</kbd> jump to the ends. Read it back with `onActive` and `onSelect` — payload
-`{ index, value, label? }` — and control the pin with `selectedIndex` / `defaultSelectedIndex`. Single-unit scalar
-charts (Delta, Progress, StatusDot, Bullet, …) take `onSelect` alone.
+`{ index, value, label?, formatted? }`, where `value` is the raw number and `formatted` is the chart's ready-to-display
+string — and control the pin with `selectedIndex` / `defaultSelectedIndex`. Set `readout={false}` to hide the in-chart
+value chip and render `datum.formatted` wherever you like. Single-unit scalar charts (Delta, Progress, StatusDot,
+Bullet, …) take `onSelect` alone.
 
 ```tsx
 <Sparkline data={[3, 5, 4, 8, 6, 9]} onActive={(d) => setHovered(d?.value ?? null)} onSelect={(d) => pin(d)} />

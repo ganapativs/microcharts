@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ABStrips } from "@microcharts/react/ab-strips";
 import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
 import staticModule, { playground as staticPlayground, A, B, MS } from "./ab-strips";
 
@@ -51,6 +52,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ABStrips,
+  ChartLive: ABStripsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

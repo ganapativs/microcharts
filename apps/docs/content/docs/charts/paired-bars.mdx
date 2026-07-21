@@ -1,7 +1,8 @@
 ---
 title: PairedBars
-description:
-  Actual vs expected per category for React tables — grouped or overlay bars on one shared zero-anchored scale.
+description: >-
+  React paired bars chart — two related magnitudes side by side from zero. Tiny accessible SVG microchart; RSC-safe
+  static or /interactive.
 ---
 
 PairedBars answers "how does actual compare to expected, category by category?". Value and reference always share one
@@ -119,6 +120,7 @@ The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" 
   label="missing reference"
   code={`// value bar alone; the interactive entry announces "no reference"
 <PairedBars data={[{ label: "East", value: 940, ref: null }]} />`}
+  expectWarn
 >
   <PairedBars data={[{ label: "East", value: 940, ref: null }]} title="No plan yet" width={100} height={44} />
 </LiveDemo>

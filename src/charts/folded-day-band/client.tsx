@@ -38,7 +38,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     data,
     period = 24,
     today,
-    bands = [
+    percentiles = [
       [25, 75],
       [5, 95],
     ],
@@ -51,6 +51,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -64,8 +65,9 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
   useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
-    () => foldedBandGeometry({ data, today: today ?? null, period, bins, bands, width, height }),
-    [data, today, period, bins, bands, width, height],
+    () =>
+      foldedBandGeometry({ data, today: today ?? null, period, bins, percentiles, width, height }),
+    [data, today, period, bins, percentiles, width, height],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -98,6 +100,9 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         index: i,
         value: s ? s.median : null,
         label: s ? fmt(binPosition(s.bin, bins, period)) : undefined,
+        formatted: s
+          ? `${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)} (${fmt(s.q1)}–${fmt(s.q3)})`
+          : undefined,
       };
     },
     [geo, fmt, bins, period],
@@ -151,7 +156,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         data={data}
         period={period}
         today={today}
-        bands={bands}
+        percentiles={percentiles}
         bins={bins}
         width={width}
         height={height}
@@ -161,7 +166,6 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pinned ? (
           <line
             x1={pinned.x}
@@ -187,7 +191,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         {rest.children}
       </StaticFoldedDayBand>
       <LiveRegion>{announced}</LiveRegion>
-      {s ? (
+      {readout && s ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(s.x / width) * 100}%`, transform: "translateX(-50%)" }}

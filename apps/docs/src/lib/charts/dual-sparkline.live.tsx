@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DualSparkline } from "@microcharts/react/dual-sparkline";
 import { DualSparkline as DualSparklineInteractive } from "@microcharts/react/dual-sparkline/interactive";
 import staticModule, { playground as staticPlayground, US, BENCH } from "./dual-sparkline";
 
@@ -28,6 +29,7 @@ export const playground: PlaygroundSpec = {
       data={US}
       compare={BENCH}
       label={s.label as "last" | "none"}
+      dots={s.dots as "auto" | "none"}
       band={s.band ? [13, 16] : undefined}
       animate={ui.animate}
       summary={false}
@@ -41,6 +43,7 @@ export const playground: PlaygroundSpec = {
       "  data={ours}",
       "  compare={market}",
       s.label !== "none" && `  label="${s.label}"`,
+      s.dots !== "auto" && `  dots="${s.dots}"`,
       s.band && "  band={[13, 16]}",
       ui.animate && " animate",
       "/>",
@@ -51,6 +54,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DualSparkline,
+  ChartLive: DualSparklineInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

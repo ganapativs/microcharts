@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ChangePoint } from "@microcharts/react/change-point";
 import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
 import staticModule, { playground as staticPlayground, ERRORS, RAMP } from "./change-point";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ChangePoint,
+  ChartLive: ChangePointInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

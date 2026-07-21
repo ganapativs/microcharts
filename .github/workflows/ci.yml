@@ -42,10 +42,28 @@ jobs:
       - run: node scripts/gen-size-limits.mjs --check
       - run: node scripts/sync-sizes.mjs --check
       - run: node scripts/sync-bench.mjs --check
-      - run: pnpm dlx publint
+      - run: pnpm exec publint
       - run: pnpm exec attw --pack .
 
-  test:
+  # Static + core-math suite (jsdom). Its output is pure `renderToStaticMarkup`
+  # of deterministic geometry — identical on React 18 and 19 — so it runs ONCE,
+  # off the React matrix, and needs no browser (no Playwright container / image
+  # pull). React-version behaviour is covered by `test-browser` below.
+  test-node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run --project core --project dom
+
+  # Interactive entries — hooks, StrictMode double-invoke, useId — are the only
+  # surface where React 18 vs 19 can diverge, so the matrix lives HERE.
+  test-browser:
     runs-on: ubuntu-latest
     # Playwright's own image ships the browsers preinstalled and matched to
     # @playwright/test 1.61.1, so the browser vitest project needs no per-leg
@@ -74,7 +92,7 @@ jobs:
         # requires an explicit workspace-root flag to add the React-matrix pin to
         # the root (lib) package (ERR_PNPM_ADDING_TO_ROOT otherwise).
         run: pnpm add -D -w react@${{ matrix.react }} react-dom@${{ matrix.react }}
-      - run: pnpm test
+      - run: pnpm vitest run --project browser
 
   rsc:
     # Checkpoint 1 gate: static charts render server-side with zero client JS.

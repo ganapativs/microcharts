@@ -53,6 +53,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -139,8 +140,19 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
   // Navigable unit = a finite cohort period; `index` is its original period
   // (the data index the consumer knows), `value` its retained fraction.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: ptByPeriod.get(i)?.value ?? null }),
-    [ptByPeriod],
+    (i: number) => {
+      const pt = ptByPeriod.get(i);
+      return {
+        index: i,
+        value: pt?.value ?? null,
+        formatted: pt
+          ? pt.bench === null
+            ? fmt(pt.value)
+            : `${fmt(pt.value)} · ${fmt(pt.bench)}`
+          : undefined,
+      };
+    },
+    [ptByPeriod, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -185,7 +197,6 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the crosshair is transient. */}
         {pin ? (
           <circle
             cx={pin.x}
@@ -234,7 +245,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         ) : null}
         {rest.children}
       </StaticRetentionCurve>
-      {p ? (
+      {readout && p ? (
         <span
           className="mc-retention-readout mc-spark-readout"
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}

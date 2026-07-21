@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { seriesStats } from "../../core/stats.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
@@ -60,6 +61,8 @@ export interface DualSparklineProps {
   band?: readonly [number, number] | undefined;
   /** `"last"` labels both endpoints (coincident → one label). */
   label?: "last" | "none" | undefined;
+  /** Endpoint dots on both lines (`"auto"`, default) or `"none"`. */
+  dots?: "auto" | "none" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -83,6 +86,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
     curve = "linear",
     band,
     label = "none",
+    dots = "auto",
     domain,
     width = 60,
     height = 16,
@@ -104,7 +108,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
   }
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 8));
+  const fontSize = labelFont(height, 0.4);
   const lastText =
     label === "last"
       ? [...data].reverse().find((v): v is number => Number.isFinite(v ?? Number.NaN))
@@ -186,7 +190,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
-      {geo.lastCompare && !geo.coincident ? (
+      {dots !== "none" && geo.lastCompare && !geo.coincident ? (
         <circle
           cx={geo.lastCompare.x}
           cy={geo.lastCompare.y}
@@ -195,7 +199,7 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           style={{ fill: "var(--mc-neutral)" }}
         />
       ) : null}
-      {geo.lastPrimary ? (
+      {dots !== "none" && geo.lastPrimary ? (
         <circle cx={geo.lastPrimary.x} cy={geo.lastPrimary.y} r={2} data-mc-ink="accent" />
       ) : null}
       {label === "last" && geo.lastPrimary ? (

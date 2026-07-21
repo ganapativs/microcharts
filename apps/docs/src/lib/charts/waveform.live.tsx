@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Waveform } from "@microcharts/react/waveform";
 import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
 import staticModule, { playground as staticPlayground, WAVE } from "./waveform";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Waveform,
+  ChartLive: WaveformInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

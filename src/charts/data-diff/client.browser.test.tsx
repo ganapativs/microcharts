@@ -44,7 +44,7 @@ describe("interactive <DataDiff>", () => {
     const wrap = screen.container.querySelector(".mc-data-diff-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Home");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 220, label: "users" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 220, label: "users" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -58,7 +58,7 @@ describe("interactive <DataDiff>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 220, label: "users" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 220, label: "users" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

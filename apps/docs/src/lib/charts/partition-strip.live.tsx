@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PartitionStrip } from "@microcharts/react/partition-strip";
 import { PartitionStrip as PartitionStripInteractive } from "@microcharts/react/partition-strip/interactive";
 import staticModule, { playground as staticPlayground, TREE } from "./partition-strip";
 
@@ -40,6 +41,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PartitionStrip,
+  ChartLive: PartitionStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

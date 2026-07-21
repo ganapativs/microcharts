@@ -6,7 +6,12 @@ import type { SummaryStrings } from "./summary.js";
 
 export type ConstellationStrings = Pick<
   SummaryStrings,
-  "noData" | "constellation" | "constellationOne" | "constellationAt"
+  | "noData"
+  | "constellation"
+  | "constellationOne"
+  | "constellationAt"
+  | "constellationMagnitude"
+  | "constellationEvent"
 >;
 
 export const EN_CONSTELLATION: ConstellationStrings = {
@@ -15,4 +20,6 @@ export const EN_CONSTELLATION: ConstellationStrings = {
     `${n} events between ${first} and ${last}; largest at ${largest}.`,
   constellationOne: (label) => `1 event at ${label}.`,
   constellationAt: (label, value) => `${label}: ${value}.`,
+  constellationMagnitude: (value) => `magnitude ${value}`,
+  constellationEvent: "event",
 };

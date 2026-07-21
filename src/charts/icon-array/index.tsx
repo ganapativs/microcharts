@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
-import { labelFitsY, textGutter } from "../../core/labels.js";
+import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
 import {
@@ -18,7 +18,6 @@ import {
 } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual icon-array summary. Shared with the interactive entry. */
 export function iconArraySummary(
   geo: IconArrayGeometry,
   pctFmt: (n: number) => string,
@@ -78,7 +77,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
 
   // label a touch smaller than the strips so the countable grid stays the hero
   // (~0.5·height, clamped 7–10) — see coverage-strip
-  const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
+  const FONT = labelFont(height, 0.5);
   const wantCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
   // The ratio label lives in a gutter carved OUT of the width. On a narrow box
   // that gutter can swallow the grid whole — the units collapse to nothing and

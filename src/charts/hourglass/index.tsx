@@ -79,13 +79,10 @@ export function Hourglass(props: HourglassProps): ReactNode {
       // other glyphs. The box is the cap plates, the one part `value` can't move.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hourglass ${className}` : "mc-hourglass"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* glass — a faint filled silhouette gives the instrument body */}
       <path d={geo.frame} data-mc-ink="fill" />
-      {/* top sand — remaining (warm, lighter). The `mc-hourglass-sand` class
-          scopes the interactive value cross-fade to the sand alone, so the
-          static glass frame + outline never flicker on a tick. */}
+      {/* Top sand (remaining). .mc-hourglass-sand scopes interactive fade. */}
       {geo.topSand ? (
         <path
           className="mc-hourglass-sand"
@@ -93,7 +90,6 @@ export function Hourglass(props: HourglassProps): ReactNode {
           style={{ fill: color ?? "var(--mc-moon)", fillOpacity: 0.5 }}
         />
       ) : null}
-      {/* bottom sand — elapsed (warm, full) */}
       {geo.bottomSand ? (
         <path
           className="mc-hourglass-sand"
@@ -101,9 +97,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
           style={{ fill: color ?? "var(--mc-moon)" }}
         />
       ) : null}
-      {/* glass outline over the sand */}
       <path d={geo.frame} data-mc-ink="muted" style={{ fill: "none", strokeOpacity: 0.7 }} />
-      {/* frame end-cap plates */}
       {geo.caps.map((c) => (
         <rect
           key={`cap${c.y}`}
@@ -115,9 +109,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
           data-mc-ink="neutral"
         />
       ))}
-      {/* running-sand cue — a state mark, only while 0<value<1. `stroke` is
-          dynamic (color override), so it stays inline; width is the role
-          (orthogonal to ink), not a literal. */}
+      {/* Stream cue while running; inline stroke for color override. */}
       {stream && geo.stream ? (
         <line
           x1={geo.stream.x}

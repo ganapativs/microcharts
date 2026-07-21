@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Seismogram } from "@microcharts/react/seismogram";
 import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
 import staticModule, { playground as staticPlayground, BURSTS } from "./seismogram";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Seismogram,
+  ChartLive: SeismogramInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

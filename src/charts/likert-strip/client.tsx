@@ -15,7 +15,8 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
-import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
+import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
+import { labelFitsY } from "../../core/labels.js";
 import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps } from "./index.js";
 
 export interface InteractiveLikertStripProps extends LikertStripProps, PickerProps {
@@ -35,13 +36,14 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     neutral = "split",
     label = "ends",
     width = 60,
-    height = 12,
+    height = 14,
     format,
     locale,
     strings = EN_COMPOSITION,
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -64,8 +66,11 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       'rect[data-mc-ink="negative"], rect[data-mc-ink="positive"], rect[data-mc-ink="neutral"]',
   });
 
-  const fontSize = LIKERT_FONT;
-  const gutter = likertGutter(label !== "none", fontSize);
+  const fontSize = likertFont(height);
+  const gutter = likertGutter(
+    label !== "none" && labelFitsY(height / 2, fontSize, height),
+    fontSize,
+  );
   const geo = useMemo(
     () =>
       likertStripGeometry({
@@ -98,9 +103,14 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     (i: number) => {
       const s = geo?.segments[i];
       const d = s ? data[s.level] : undefined;
-      return { index: i, value: d && Number.isFinite(d.value) ? d.value : null, label: d?.label };
+      return {
+        index: i,
+        value: d && Number.isFinite(d.value) ? d.value : null,
+        label: d?.label,
+        formatted: s && d ? `${d.label} ${pctFmt(s.share)}` : undefined,
+      };
     },
-    [data, geo],
+    [data, geo, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -170,7 +180,6 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
@@ -188,7 +197,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       >
         {announced}
       </span>
-      {seg && segDatum ? (
+      {readout && seg && segDatum ? (
         <span
           className="mc-spark-readout"
           style={{

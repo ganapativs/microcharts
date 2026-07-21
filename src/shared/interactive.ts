@@ -56,8 +56,29 @@ export function fillFor(style: CSSProperties | undefined): CSSProperties {
  * Base style for a hit-testing interactive wrapper: an inline, positioned,
  * line-height-collapsed box that hugs the composed SVG (so absolute overlay
  * marks anchor to it and pointer→viewBox math stays exact).
+ *
+ * `verticalAlign: middle` matches `.mc-root` — without it the wrapper defaults
+ * to baseline and drifts ~2px vs adjacent text in table cells (four-homes).
+ * `width: fit-content` (+ `maxWidth: 100%`) stops flex/grid stretch from
+ * inflating the wrapper past the mark (FILL's `width: 100%` would otherwise
+ * grow with a stretched host) without `alignSelf: center`, which left-aligned
+ * KPI columns were centering. Tabs keep centering via the parent's
+ * `items-center` (`alignSelf: auto`). Fluid hosts still win with
+ * `style={{ width: "100%" }}`.
  */
-const WRAP: CSSProperties = { display: "inline-block", position: "relative", lineHeight: 0 };
+const WRAP: CSSProperties = {
+  display: "inline-block",
+  position: "relative",
+  lineHeight: 0,
+  verticalAlign: "middle",
+  width: "fit-content",
+  maxWidth: "100%",
+};
+
+type WrapAttrs = { className: string; style: CSSProperties; "data-mc-host": "" };
+
+/** Default wrap() result per base class — stable identity across renders. */
+const WRAP_CACHE = new Map<string, WrapAttrs>();
 
 /**
  * Compose the interactive wrapper's `className`/`style` from the chart's base
@@ -70,10 +91,21 @@ export function wrap(
   base: string,
   className: string | undefined,
   style: CSSProperties | undefined,
-): { className: string; style: CSSProperties } {
+): WrapAttrs {
+  if (!className && !style) {
+    let hit = WRAP_CACHE.get(base);
+    if (!hit) {
+      hit = { className: base, style: WRAP, "data-mc-host": "" };
+      WRAP_CACHE.set(base, hit);
+    }
+    return hit;
+  }
   return {
     className: className ? `${base} ${className}` : base,
     style: style ? { ...WRAP, ...style } : WRAP,
+    // Stable CSS hook — class suffixes are `-live` OR `-interactive`, so
+    // table-cell strut rules must not key off either name alone.
+    "data-mc-host": "",
   };
 }
 
@@ -104,6 +136,17 @@ export interface MicroDatum {
   index: number;
   value: number | null;
   label?: string | undefined;
+  /**
+   * The chart's OWN formatted display string for this unit — exactly what its
+   * in-chart readout chip would show (`"$0.53"`, `"12%"`, a composed
+   * `"3 of 12"`…). Handed to `onActive`/`onSelect` so a consumer can render the
+   * value wherever they like (a KPI card, a sentence) without re-deriving
+   * `format`/`locale`, and pair it with `readout={false}` to suppress the
+   * in-chart chip. Absent only when the unit has no value to format (the
+   * kernel's default empty datum). `value` remains the raw number for
+   * computation; `formatted` is the presentation of it.
+   */
+  formatted?: string | undefined;
 }
 
 /** Public interaction props shared by every `…/interactive` entry. */
@@ -116,6 +159,14 @@ export interface PickerProps {
   selectedIndex?: number | null | undefined;
   /** Uncontrolled initial selection. Ignored once `selectedIndex` is set. */
   defaultSelectedIndex?: number | null | undefined;
+  /**
+   * Show the floating in-chart value chip on hover/focus (default `true`).
+   * `false` suppresses only the chip — the hover crosshair/marker and the
+   * `onActive`/`onSelect` callbacks are untouched — so the value can be rendered
+   * elsewhere (a KPI card, a sentence) from `datum.formatted` while the chart
+   * itself stays clean. Charts that render no chip ignore it.
+   */
+  readout?: boolean | undefined;
 }
 
 interface PickerOptions extends PickerProps {
@@ -226,6 +277,10 @@ export function useActivePicker(opts: PickerOptions): Picker {
   const selRef = useRef(selected);
   selRef.current = selected;
   const down = useRef<[number, number] | null>(null);
+  // Cache the painted SVG across a scrub — skip querySelector on every move.
+  // Still measure getBoundingClientRect each move (scroll/resize while hovering
+  // would stale a cached rect).
+  const svgRef = useRef<Element | null>(null);
 
   const dat = (i: number): MicroDatum => (datum ? datum(i) : { index: i, value: null });
   const act = (i: number | null): void => {
@@ -239,6 +294,7 @@ export function useActivePicker(opts: PickerOptions): Picker {
     if (!controlled) setSel(next);
     onSelect?.(next === null ? null : dat(next));
   };
+
   // Pointer coords → viewBox space → unit index; `null` before layout.
   //
   // Measure the composed SVG, not the wrapper. They coincide in normal flow
@@ -250,7 +306,13 @@ export function useActivePicker(opts: PickerOptions): Picker {
   // box keeps pointer math honest under any transform the seat or the motion
   // engine applies.
   const at = (e: MouseEvent<HTMLElement>): number | null => {
-    const r = (e.currentTarget.querySelector("svg") ?? e.currentTarget).getBoundingClientRect();
+    const host = e.currentTarget;
+    let svg = svgRef.current;
+    if (!svg || !host.contains(svg)) {
+      svg = host.querySelector("svg") ?? host;
+      svgRef.current = svg;
+    }
+    const r = svg.getBoundingClientRect();
     if (!r.width || !r.height) return null;
     return locate(
       ((e.clientX - r.left) / r.width) * width,
@@ -264,7 +326,10 @@ export function useActivePicker(opts: PickerOptions): Picker {
     // Touch/pen have no hover: drop the transient active on lift so a pinned
     // selection is what stays visible. Mouse keeps its hover.
     onPointerUp: (e) => e.pointerType !== "mouse" && act(null),
-    onPointerLeave: () => act(null),
+    onPointerLeave: () => {
+      svgRef.current = null;
+      act(null);
+    },
     onClick: (e) => {
       const d = down.current;
       down.current = null;
@@ -289,7 +354,10 @@ export function useActivePicker(opts: PickerOptions): Picker {
       e.preventDefault();
       act(next);
     },
-    onBlur: () => act(null),
+    onBlur: () => {
+      svgRef.current = null;
+      act(null);
+    },
   };
 
   return { active, selected, bind };

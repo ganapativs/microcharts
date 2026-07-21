@@ -42,12 +42,21 @@ const interactiveSizes = STABLE_CHARTS.map((c) => CHART_GZIP[c.slug]?.interactiv
 /** Every chart's measured static gzip (kB) — for the size-distribution chart. */
 export const STATIC_SIZES = staticSizes;
 
+/** Every chart's measured interactive gzip (kB). */
+export const INTERACTIVE_SIZES = interactiveSizes;
+
+/** Durable marketing band — interactive first. Precise measured mins/maxes live in SIZE. */
+export const SIZE_MARKETING = "~2–7 kB interactive · ~1–4 kB static";
+
 export const SIZE = {
   count: staticSizes.length,
   min: Math.min(...staticSizes),
   median: round2(median(staticSizes)),
   max: Math.max(...staticSizes),
+  interactiveCount: interactiveSizes.length,
+  interactiveMin: Math.min(...interactiveSizes),
   interactiveMedian: round2(median(interactiveSizes)),
+  interactiveMax: Math.max(...interactiveSizes),
   under1_5: staticSizes.filter((n) => n <= 1.5).length,
   under2: staticSizes.filter((n) => n <= 2).length,
   under3: staticSizes.filter((n) => n <= 3).length,

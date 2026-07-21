@@ -123,7 +123,7 @@ export const contexts: ChartContexts = {
         — 64 open, approaching capacity.
       </p>
     ),
-    code: "<p>\n  Support queue backlog <QueueDepth data={data} capacity={100} /> — 64 open, approaching capacity.\n</p>",
+    code: '<p>\n  Support queue backlog{" "}\n  <span className="mc-inline">\n    <QueueDepth data={data} capacity={100} summary={false} />\n  </span>{" "}\n  — 64 open, approaching capacity.\n</p>',
   },
   cell: {
     render: () => (

@@ -128,7 +128,7 @@ export const contexts: ChartContexts = {
         — now at 87, with the last hour of momentum visible.
       </p>
     ),
-    code: '<p>\n  p95 latency is climbing <CometTrail data={rollingWindow} label="none" width={90} height={16} /> — now at 87.\n</p>',
+    code: '<p>\n  p95 latency is climbing{" "}\n  <span className="mc-inline">\n    <CometTrail data={rollingWindow} label="none" width={90} height={16} summary={false} />\n  </span>{" "}\n  — now at 87.\n</p>',
   },
   cell: {
     render: () => (

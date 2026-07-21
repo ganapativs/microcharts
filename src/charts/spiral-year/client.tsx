@@ -55,6 +55,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -118,9 +119,13 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
         index: i,
         value: typeof v === "number" && Number.isFinite(v) ? v : null,
         label: periodLabel(i, cadence),
+        formatted:
+          typeof v === "number" && Number.isFinite(v)
+            ? `${periodLabel(i, cadence)}: ${fmt(v)}`
+            : "",
       };
     },
-    [data, cadence],
+    [data, cadence, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -168,7 +173,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
     shownMark && typeof shownVal === "number" && Number.isFinite(shownVal)
       ? strings.spiralYearAt(shownLabel, fmt(shownVal))
       : "";
-  const readout =
+  const chip =
     shownMark && typeof shownVal === "number" && Number.isFinite(shownVal)
       ? `${shownLabel}: ${fmt(shownVal)}`
       : "";
@@ -189,15 +194,14 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticSpiralYear>
       <LiveRegion>{announced}</LiveRegion>
-      {shownMark && readout ? (
+      {readout && shownMark && chip ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {readout}
+          {chip}
         </span>
       ) : null}
     </span>

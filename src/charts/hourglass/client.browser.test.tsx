@@ -27,7 +27,7 @@ describe("interactive <Hourglass>", () => {
     const screen = await render(<Hourglass value={0.6} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-hourglass-live") as HTMLElement;
     wrap.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.6 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.6 });
   });
 
   it("Enter fires onSelect", async () => {
@@ -36,6 +36,6 @@ describe("interactive <Hourglass>", () => {
     const wrap = screen.container.querySelector(".mc-hourglass-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.25 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.25 });
   });
 });

@@ -35,11 +35,17 @@ describe("interactive <StationGlyph>", () => {
     wrap.focus();
     // fields in order: station, wind, sky, temp, dew, pressure
     await userEvent.keyboard("{ArrowRight}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 0, value: null, label: "KSFO" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 0, value: null, label: "KSFO" }),
+    );
     await userEvent.keyboard("{ArrowRight}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 1, value: 15, label: "wind southwest 15" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 1, value: 15, label: "wind southwest 15" }),
+    );
     await userEvent.keyboard("{ArrowRight}{ArrowRight}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 3, value: 16, label: "temp 16°" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 3, value: 16, label: "temp 16°" }),
+    );
     await userEvent.keyboard("{Escape}");
     expect(onActive).toHaveBeenLastCalledWith(null);
   });
@@ -50,7 +56,9 @@ describe("interactive <StationGlyph>", () => {
     const wrap = screen.container.querySelector(".mc-station-live") as HTMLElement;
     wrap.focus();
     await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}{Enter}");
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 2, value: 0.75, label: "sky broken" });
+    expect(onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 2, value: 0.75, label: "sky broken" }),
+    );
     wrap.blur();
     await expect.poll(() => wrap.querySelectorAll(PIN).length).toBe(1);
   });

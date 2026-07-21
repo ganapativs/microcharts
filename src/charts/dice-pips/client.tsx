@@ -4,6 +4,8 @@
 // No sub-part navigation — the pips are one value. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
@@ -12,6 +14,14 @@ export interface InteractiveDicePipsProps extends DicePipsProps {
   /** Announce face changes through a polite region (default true). */
   live?: boolean;
   strings?: DiceStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the face pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the per-roll pip pop-in this entry already drives.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the face count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -22,6 +32,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     strings = EN_DICE,
     title,
     value,
+    animate = false,
     onSelect,
     className,
     style,
@@ -32,6 +43,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
   useSeatHoist(wrap);
+  useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 
@@ -88,21 +100,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
         strings={strings}
         summary={false}
       />
-      {live ? (
-        <span
-          aria-live="polite"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-            clip: "rect(0 0 0 0)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {announced}
-        </span>
-      ) : null}
+      {live ? <LiveRegion>{announced}</LiveRegion> : null}
     </span>
   );
 }

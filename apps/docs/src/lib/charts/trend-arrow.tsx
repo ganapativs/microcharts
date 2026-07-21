@@ -162,7 +162,7 @@ export const contexts: ChartContexts = {
         is up 9% since the deploy — worth a look before it trips the SLO.
       </p>
     ),
-    code: `<p>\n  P95 latency{" "}\n  <TrendArrow value={0.09} positive="down" format={{ style: "percent" }} />{" "}\n  is up 9% since the deploy.\n</p>`,
+    code: `<p>\n  P95 latency{" "}\n  <span className="mc-inline">\n    <TrendArrow value={0.09} positive="down" format={{ style: "percent" }} summary={false} />\n  </span>\n  {" "}\n  is up 9% since the deploy.\n</p>`,
   },
   cell: {
     render: () => (

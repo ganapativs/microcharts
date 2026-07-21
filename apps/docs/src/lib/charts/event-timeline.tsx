@@ -163,7 +163,7 @@ export const contexts: ChartContexts = {
         — 3 spans covering 63% of the window, one incident logged.
       </p>
     ),
-    code: `<p>\n  API status today{" "}\n  <EventTimeline data={windows} domain={today} width={90} height={14} />{" "}\n  — 3 spans covering 63% of the window.\n</p>`,
+    code: `<p>\n  API status today{" "}\n  <span className="mc-inline">\n    <EventTimeline data={windows} domain={today} width={90} height={14} summary={false} />\n  </span>\n  {" "}\n  — 3 spans covering 63% of the window.\n</p>`,
   },
   cell: {
     render: () => (

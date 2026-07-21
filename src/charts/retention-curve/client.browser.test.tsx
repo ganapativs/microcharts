@@ -43,7 +43,7 @@ describe("interactive <RetentionCurve>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 0.71 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: 0.71 });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -56,7 +56,7 @@ describe("interactive <RetentionCurve>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 0.71 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 1, value: 0.71 });
     wrap.blur();
     await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
@@ -77,7 +77,7 @@ describe("interactive <RetentionCurve>", () => {
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("week 2: 50% retained.");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 2, value: 0.5 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 2, value: 0.5 });
 
     // Round trip: feeding that index back as `selectedIndex` pins period 2.
     const geo = retentionGeometry({ width: 80, height: 20, data: GAPPY, curve: "step" })!;

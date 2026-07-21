@@ -32,9 +32,7 @@ export type { CohortRow } from "./geometry.js";
  *  empty-track look reserved for gaps. */
 export const levelOpacity = (level: number): number => valueStepOpacity(level, LEVELS);
 
-/** Factual equal-maturity summary — cohort count, the worst vintage at the
- *  deepest common age, and the newest vintage's first reading. Shared with the
- *  interactive entry (one wording, no drift). */
+/** Cohort count, worst vintage at equal maturity, newest first reading. */
 export function cohortTriangleSummary(
   geo: CohortTriangleGeometry,
   strings: CohortTriangleStrings,
@@ -111,6 +109,7 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);
   const rootStyle = { ...style, "--mc-label-size": `${geo.fontSize}px` } as CSSProperties;
+  const cellFill = color ? ({ fill: color } as CSSProperties) : undefined;
 
   return (
     <Chart
@@ -136,7 +135,7 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
           rx={1}
           data-mc-ink={c.gap ? "gap" : "cell"}
           fillOpacity={c.gap ? undefined : levelOpacity(c.level)}
-          style={!c.gap && color ? { fill: color } : undefined}
+          style={!c.gap ? cellFill : undefined}
         />
       ))}
       {geo.labels.map((l) => (

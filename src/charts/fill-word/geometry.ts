@@ -4,6 +4,7 @@
 // hidden wider track). Glyph extent is estimated deterministically (0.62
 // em/char) and pinned with textLength so containment is provable without
 // measuring text server-side. All coords 2-dp.
+import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
 export type FillMode = "fill" | "drain";
@@ -23,10 +24,6 @@ export interface FillWordGeometry {
   numeralX: number | null;
 }
 
-function clamp01(n: number): number {
-  return n < 0 ? 0 : n > 1 ? 1 : n;
-}
-
 export function fillWordGeometry(opts: {
   value: number;
   word: string;
@@ -37,7 +34,7 @@ export function fillWordGeometry(opts: {
   label?: boolean;
 }): FillWordGeometry {
   const { word, fontSize, pad, mode, label = false } = opts;
-  const v = clamp01(Number.isFinite(opts.value) ? opts.value : 0);
+  const v = clamp(Number.isFinite(opts.value) ? opts.value : 0, 0, 1);
   const chars = word.length;
   const textLength = round2(chars * 0.62 * fontSize);
   const height = Math.ceil(fontSize * 1.4);

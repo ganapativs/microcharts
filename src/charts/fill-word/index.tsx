@@ -95,7 +95,7 @@ export function FillWord(props: FillWordProps): ReactNode {
       // a line high, which reads as a typo rather than a chart.
       seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fillword ${className}` : "mc-fillword"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {word.length > 0 ? (
         <>
@@ -104,7 +104,6 @@ export function FillWord(props: FillWordProps): ReactNode {
           <text {...textProps} data-mc-ink="label" style={{ fillOpacity: 0.4 }}>
             {word}
           </text>
-          {/* the accent copy, clipped to the value fraction of its own extent */}
           <text {...textProps} data-mc-ink="accent" style={{ clipPath: geo.clip ?? undefined }}>
             {word}
           </text>

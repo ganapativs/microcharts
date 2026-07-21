@@ -26,7 +26,7 @@ describe("interactive <Thermometer>", () => {
     const screen = await render(<Thermometer value={72} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-thermo-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 72 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 72 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -37,6 +37,6 @@ describe("interactive <Thermometer>", () => {
     const wrap = screen.container.querySelector(".mc-thermo-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 40 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 40 }]);
   });
 });

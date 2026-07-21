@@ -54,6 +54,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -89,8 +90,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     for (const l of lanes) max = Math.max(max, l.label.length);
     return max;
   }, [lanes]);
-  // Shared with the static entry, drop rule included: at small sizes it hands
-  // the gutter back to the lanes, and a copy that didn't would offset every tick.
+  // Same drop rule as static — a mismatch would offset every tick.
   const { gutter } = rasterLabels({
     labels: labelsProp ?? n <= 8,
     width,
@@ -183,13 +183,15 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const datum = useCallback(
     (i: number) => {
       const lane = laneOf(i);
+      const t = sorted[lane]![i - starts[lane]!] ?? null;
       return {
         index: i,
-        value: sorted[lane]![i - starts[lane]!] ?? null,
+        value: t,
         label: lanes[lane]?.label,
+        formatted: t === null ? undefined : `${lanes[lane]!.label} · ${fmt(t)}`,
       };
     },
-    [laneOf, sorted, starts, lanes],
+    [laneOf, sorted, starts, lanes, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -249,7 +251,6 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; band + crosshair are transient. */}
         {pinX !== undefined ? (
           <line
             x1={xOf(pinX)}
@@ -288,7 +289,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         {rest.children}
       </StaticEventRaster>
       <LiveRegion>{announced}</LiveRegion>
-      {t !== undefined && shownLane !== null ? (
+      {readout && t !== undefined && shownLane !== null ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(xOf(t) / width) * 100}%`, transform: "translateX(-50%)" }}

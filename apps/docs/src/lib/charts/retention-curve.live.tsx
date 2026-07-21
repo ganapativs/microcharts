@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
 import staticModule, { playground as staticPlayground, DEMO, BENCH } from "./retention-curve";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: RetentionCurve,
+  ChartLive: RetentionCurveInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

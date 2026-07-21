@@ -41,6 +41,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -120,9 +121,10 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         index: i,
         value: d && Number.isFinite(d.value) ? d.value : null,
         label: d?.label,
+        formatted: d ? `${d.label} ${isFiniteValue(d.value) ? fmt(d.value) : "—"}` : undefined,
       };
     },
-    [data],
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -189,13 +191,12 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus spoke is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticStarSpoke>
       <LiveRegion>{announced}</LiveRegion>
-      {spoke && shownDatum ? (
+      {readout && spoke && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{

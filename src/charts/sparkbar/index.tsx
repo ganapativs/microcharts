@@ -14,10 +14,15 @@ import { scaleLinear } from "../../core/scale.js";
 
 /** Ink role for a bar: valence color in win-loss / negatives, else neutral or
  *  accent for the endpoint. Position already encodes sign, so color is redundant
- *  reinforcement, never the sole channel. */
-function barInk(bar: Bar, mode: SparkBarMode): string {
-  if (bar.sign < 0) return "negative";
-  if (mode === "winloss") return bar.sign > 0 ? "positive" : "bar"; // zero = neutral, not a win
+ *  reinforcement, never the sole channel. `positive="down"` flips which sign
+ *  reads as the good outcome (StreakSpark semantics). */
+function barInk(bar: Bar, mode: SparkBarMode, positive: "up" | "down" = "up"): string {
+  const down = positive === "down";
+  if (mode === "winloss") {
+    if (bar.sign === 0) return "bar"; // zero = neutral, not a win
+    return (down ? bar.sign < 0 : bar.sign > 0) ? "positive" : "negative";
+  }
+  if (bar.sign < 0) return down ? "positive" : "negative";
   return bar.last ? "accent" : "bar";
 }
 
@@ -32,6 +37,8 @@ export interface SparkBarProps {
   gap?: number | undefined;
   /** Direct endpoint value label (bar mode). */
   label?: "none" | "last" | undefined;
+  /** Which sign is the good outcome: `"up"` (default) or `"down"`. */
+  positive?: "up" | "down" | undefined;
   color?: string | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -52,6 +59,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     mode = "bar",
     gap = 0.25,
     label = "none",
+    positive = "up",
     color,
     title,
     summary,
@@ -87,7 +95,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     gap,
     gutterRight: metrics?.gutter ?? 0,
   });
-  const last = geo.bars.at(-1);
+  const last = geo.bars[geo.bars.length - 1];
 
   // annotations host contract: Marker x = data INDEX (bar slot
   // center), Threshold/TargetZone y = data values (sign space in win-loss).
@@ -135,8 +143,8 @@ export function SparkBar(props: SparkBarProps): ReactNode {
           width={bar.width}
           height={bar.height}
           shapeRendering="crispEdges"
-          data-mc-ink={barInk(bar, mode)}
-          style={color && barInk(bar, mode) === "bar" ? { fill: color } : undefined}
+          data-mc-ink={barInk(bar, mode, positive)}
+          style={color && barInk(bar, mode, positive) === "bar" ? { fill: color } : undefined}
         />
       ))}
       {labelText !== undefined && metrics && last ? (

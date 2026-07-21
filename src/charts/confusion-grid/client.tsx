@@ -15,6 +15,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { labelFont } from "../../core/labels.js";
+import { makeFormatter } from "../../core/format.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import {
@@ -42,6 +43,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -68,14 +70,25 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const gutterCh = fontSize + 1;
   // The accuracy readout takes a right gutter out of the PLOT (the viewBox
   // stays `size`), so the grid is laid out in `size - rightGutter`.
+  // Measure the gutter off the SAME formatter string the static renders, so a
+  // locale that widens the percent (fr-FR "50 %") keeps ring and cells aligned.
   const accLabel =
     (props.label ?? "none") === "accuracy"
-      ? `${Math.round(confGeoAccuracy(counts, k) * 100)}%`
+      ? makeFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 })(
+          confGeoAccuracy(counts, k),
+        )
       : undefined;
   const rightGutter = accLabel ? accLabel.length * fontSize * 0.62 + 2 : 0;
   const geo = useMemo(
     () => confusionGridGeometry({ size: size - rightGutter, k, counts, normalize, gutterCh }),
     [size, rightGutter, k, counts, normalize, gutterCh],
+  );
+
+  // Same locale-aware percent formatter the static entry renders the accuracy
+  // label with — so the chip and announcement don't drift from "50 %" (fr-FR).
+  const pctFmt = useMemo(
+    () => makeFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 }),
+    [props.format, props.locale],
   );
 
   // Pointer (viewBox space) → cell index: the cell whose rect contains the
@@ -124,13 +137,17 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const datum = useCallback(
     (i: number) => {
       const c = geo.cells[i];
+      const rt = c ? (geo.rowTotals[c.row] ?? 0) : 0;
       return {
         index: i,
         value: c?.share ?? null,
         label: c ? `${labels[c.row] ?? ""}→${labels[c.col] ?? ""}` : undefined,
+        formatted: c
+          ? `${labels[c.row]}→${labels[c.col]} ${pctFmt(rt > 0 ? c.count / rt : 0)}`
+          : undefined,
       };
     },
-    [geo, labels],
+    [geo, labels, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -176,7 +193,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const shown = active ?? selected;
   const cell = shown !== null ? geo.cells[shown] : undefined;
   const rowTotal = cell ? (geo.rowTotals[cell.row] ?? 0) : 0;
-  const pct = cell && rowTotal > 0 ? `${Math.round((cell.count / rowTotal) * 100)}%` : "0%";
+  const pct = pctFmt(cell && rowTotal > 0 ? cell.count / rowTotal : 0);
   const announced = cell ? strings.confusionAt(labels[cell.row]!, labels[cell.col]!, pct) : "";
 
   return (
@@ -195,13 +212,12 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticConfusionGrid>
       <LiveRegion>{announced}</LiveRegion>
-      {cell ? (
+      {readout && cell ? (
         <span
           className="mc-spark-readout"
           style={{

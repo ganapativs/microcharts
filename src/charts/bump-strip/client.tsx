@@ -16,6 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
+import { labelFont } from "../../core/labels.js";
 import { bumpGeometry } from "./geometry.js";
 import { BumpStrip as StaticBumpStrip, bumpSummary, type BumpStripProps } from "./index.js";
 
@@ -40,6 +41,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -52,7 +54,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
+  const fontSize = labelFont(height, 0.4);
   // Widest rank label, in chars. A full scan of the series, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
   const maxLabelChars = useMemo(() => {
@@ -106,7 +108,10 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
 
   const datum = useCallback(
-    (i: number) => ({ index: i, value: byIndex.get(i)?.rank ?? null }),
+    (i: number) => {
+      const p = byIndex.get(i);
+      return { index: i, value: p?.rank ?? null, formatted: p ? `#${p.rank}` : undefined };
+    },
     [byIndex],
   );
 
@@ -164,13 +169,12 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBumpStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {point ? (
+      {readout && point ? (
         <span
           className="mc-spark-readout"
           style={{

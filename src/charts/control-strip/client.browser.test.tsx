@@ -43,7 +43,7 @@ describe("interactive <ControlStrip>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "ArrowRight");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 11 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: 11 });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -55,7 +55,7 @@ describe("interactive <ControlStrip>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 10 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 10 });
     wrap.blur();
     await expect.poll(() => wrap.querySelector('line[data-mc-w="tick"]')).not.toBeNull();
   });

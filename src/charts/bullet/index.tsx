@@ -6,12 +6,32 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { EN_BULLET, type BulletStrings } from "../../core/strings-bullet.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { bulletGeometry } from "./geometry.js";
 
-/** Factual S4 summary — value, target, and where the value lands. Shared with
- *  the interactive entry (one wording, no drift). */
-export function bulletSummary(value: string, target: string | null): string {
-  return target ? `${value} of ${target} target.` : `${value}.`;
+/** Value, target, and band landing. */
+export function bulletSummary(
+  value: string,
+  target: string | null,
+  strings: BulletStrings = EN_BULLET,
+): string {
+  return target ? strings.bulletTarget(value, target) : strings.bullet(value);
+}
+
+/** Direct label text per `label` mode — `"both"` prefers a compact `72 / 80`. */
+function bulletLabelText(
+  label: "none" | "value" | "target" | "both",
+  value: number,
+  target: number | undefined,
+  fmt: (n: number) => string,
+): string | undefined {
+  const hasTarget = target !== undefined && Number.isFinite(target);
+  if (label === "none") return undefined;
+  if (label === "target") return hasTarget ? fmt(target) : undefined;
+  const v = Number.isFinite(value) ? fmt(value) : "—";
+  if (label === "value" || !hasTarget) return v;
+  return `${v} / ${fmt(target)}`;
 }
 
 export interface BulletProps {
@@ -21,11 +41,14 @@ export interface BulletProps {
   bands?: readonly number[] | undefined;
   /** Explicit `[0, max]`; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
+  /** Direct value/target readout in a reserved right gutter (deterministic drop-out). */
+  label?: "none" | "value" | "target" | "both" | undefined;
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
+  strings?: BulletStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -40,11 +63,13 @@ export function Bullet(props: BulletProps): ReactNode {
     target,
     bands,
     domain,
+    label = "none",
     width = 80,
     height = 16,
     color,
     format,
     locale,
+    strings = EN_BULLET,
     title,
     summary,
     id,
@@ -53,8 +78,21 @@ export function Bullet(props: BulletProps): ReactNode {
     children,
   } = props;
 
-  const geo = bulletGeometry({ width, height, value, target, bands, domain });
   const fmt = makeFormatter(format, locale);
+  const fontSize = label === "none" ? 0 : labelFont(height, 0.6);
+  const rawLabel = bulletLabelText(label, value, target, fmt);
+  const labelText =
+    rawLabel !== undefined && labelFitsY(height / 2, fontSize, height) ? rawLabel : undefined;
+  const geo = bulletGeometry({
+    width,
+    height,
+    value,
+    target,
+    bands,
+    domain,
+    gutterCh: labelText?.length ?? 0,
+    fontSize,
+  });
 
   const accName =
     summary === false
@@ -65,15 +103,25 @@ export function Bullet(props: BulletProps): ReactNode {
           ? bulletSummary(
               fmt(value),
               target !== undefined && Number.isFinite(target) ? fmt(target) : null,
+              strings,
             )
-          : "No data.";
+          : strings.noData;
 
   // More bands → widen the shade spread so regions stay distinguishable.
   const steps = Math.max(1, geo.regions.length);
 
+  // Pin the label size in viewBox units. `styles.css` sets `font-size` on
+  // `.mc-root text`, and a CSS declaration outranks the SVG presentation
+  // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
+  // be sized for a font the browser never paints (see label-containment tests).
+  const rootStyle =
+    labelText !== undefined
+      ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+      : style;
+
   return (
     <Chart
-      width={width}
+      width={geo.totalWidth}
       height={height}
       title={title}
       summary={accName}
@@ -84,7 +132,7 @@ export function Bullet(props: BulletProps): ReactNode {
       // the edge, and it isn't part of the reading.
       seat={{ mode: "center", top: geo.track.y, bottom: geo.track.y + geo.track.height }}
       className={className ? `mc-bullet ${className}` : "mc-bullet"}
-      style={style}
+      style={rootStyle}
     >
       {geo.regions.map((r) => (
         <rect
@@ -95,7 +143,7 @@ export function Bullet(props: BulletProps): ReactNode {
           height={geo.track.height}
           shapeRendering="crispEdges"
           data-mc-ink="bar"
-          style={{ fillOpacity: 0.05 + (r.step / steps) * 0.16 }}
+          style={{ fillOpacity: 0.12 + (r.step / steps) * 0.26 }}
         />
       ))}
       <rect
@@ -117,6 +165,19 @@ export function Bullet(props: BulletProps): ReactNode {
           vectorEffect="non-scaling-stroke"
           style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.33)" }}
         />
+      ) : null}
+      {labelText !== undefined ? (
+        <text
+          x={geo.labelX}
+          y={geo.labelY}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="end"
+          data-mc-ink="label"
+          style={{ fontVariantNumeric: "tabular-nums" }}
+        >
+          {labelText}
+        </text>
       ) : null}
       {children}
     </Chart>

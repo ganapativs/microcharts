@@ -6,6 +6,7 @@
 // Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -19,6 +20,7 @@ import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.j
 import { eventTimelineGeometry } from "./geometry.js";
 import {
   EventTimeline as StaticEventTimeline,
+  eventTimelineSummary,
   formatDuration,
   normalizeItems,
   timelineDomain,
@@ -56,6 +58,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -73,7 +76,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
 
   const items = useMemo(() => normalizeItems(data), [data]);
   const win = useMemo(() => timelineDomain(items, domain), [items, domain]);
-  const fontSize = Math.max(4, Math.min(Math.round(height * 0.45), 6));
+  const fontSize = labelFont(height, 0.45);
   const geo = useMemo(
     () =>
       eventTimelineGeometry({
@@ -132,10 +135,19 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
   // A point event is an instant, so its duration is 0.
   const datum = useCallback(
     (k: number) => {
-      const it = items[ordered[k]!.i]!;
-      return { index: k, value: it.end === undefined ? 0 : it.end - it.start, label: it.label };
+      const o = ordered[k]!;
+      const it = items[o.i]!;
+      return {
+        index: k,
+        value: it.end === undefined ? 0 : it.end - it.start,
+        label: it.label,
+        formatted:
+          it.end !== undefined
+            ? `${it.label ?? fallbackLabel(o.i, "span")}: ${formatDuration(it.end - it.start)}`
+            : `${it.label ?? fallbackLabel(o.i, "point")}: ${dateFmt(new Date(it.start))}`,
+      };
     },
-    [ordered, items],
+    [ordered, items, dateFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -159,9 +171,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : geo.spans.length === 0 && geo.points.length === 0
-          ? strings.noData
-          : strings.timeline(geo.spans.length, geo.points.length, pctFmt(geo.coverage));
+        : eventTimelineSummary(geo.spans.length, geo.points.length, geo.coverage, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const shown = active ?? selected;
@@ -218,13 +228,12 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {pinned ? outline(pinned, true) : null}
         {active !== null && ordered[active] ? outline(ordered[active]!, false) : null}
         {rest.children}
       </StaticEventTimeline>
       <LiveRegion>{announced}</LiveRegion>
-      {shownItem && item ? (
+      {readout && shownItem && item ? (
         <span
           className="mc-spark-readout"
           style={{

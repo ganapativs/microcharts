@@ -18,7 +18,7 @@ function gridWave(seed: number): number[] {
 }
 
 /** Thursday 1970-01-01 — same fixed alignment day used in the docs page's
- *  "calendar-aligned" example, so the playground's `start` knob is deterministic. */
+ *  "calendar-aligned" example, so the playground's `anchor` knob is deterministic. */
 export const ALIGN_DATE = "1970-01-01";
 /** Widened bucket range for the `domain` knob — compresses every level below
  *  the wave's natural max (4) so the dimming is visible. */
@@ -60,7 +60,7 @@ export const entry: ChartEntry = {
       description: "Cell mark: crisp square, soft corners, or padded dot.",
     },
     {
-      name: "start",
+      name: "anchor",
       type: "string | Date",
       required: false,
       description: "First slot's calendar day (UTC) — pads the first column so weekday rows align.",
@@ -69,7 +69,7 @@ export const entry: ChartEntry = {
       name: "weekStart",
       type: "0 | 1",
       required: false,
-      description: "Start of week for start alignment (0 Sunday, 1 Monday).",
+      description: "Start of week for anchor alignment (0 Sunday, 1 Monday).",
     },
     {
       name: "cell",
@@ -139,7 +139,7 @@ export const playground: PlaygroundSpec = {
       layout={s.layout as "grid" | "strip"}
       shape={s.shape as "square" | "round" | "dot"}
       cell={Number(s.cell)}
-      start={s.align !== "none" ? ALIGN_DATE : undefined}
+      anchor={s.align !== "none" ? ALIGN_DATE : undefined}
       weekStart={s.align === "sunday" ? 0 : 1}
       domain={s.domain ? DOMAIN : undefined}
       title="Playground"
@@ -152,7 +152,7 @@ export const playground: PlaygroundSpec = {
       `  layout="${s.layout}"`,
       s.shape !== "square" && `  shape="${s.shape}"`,
       `  cell={${s.cell}}`,
-      s.align !== "none" && `  start="${ALIGN_DATE}"`,
+      s.align !== "none" && `  anchor="${ALIGN_DATE}"`,
       s.align === "sunday" && "  weekStart={0}",
       s.domain && "  domain={[0, 6]}",
       "/>",
@@ -212,7 +212,7 @@ export const contexts: ChartContexts = {
         — bursts of shipping, punctuated by two dead-quiet days.
       </p>
     ),
-    code: `<p>\n  Commit cadence for the last two weeks{" "}\n  <ActivityGrid data={commits.slice(0, 14)} layout="strip" cell={7} /> — bursts of shipping, punctuated by two dead-quiet days.\n</p>`,
+    code: `<p>\n  Commit cadence for the last two weeks{" "}\n  <span className="mc-inline">\n    <ActivityGrid data={commits.slice(0, 14)} layout="strip" cell={7} summary={false} />\n  </span>{" "}\n  — bursts of shipping, punctuated by two dead-quiet days.\n</p>`,
   },
   cell: {
     render: () => {

@@ -46,7 +46,8 @@ export function windBarbSummary(
   const m = Math.abs(magnitude);
   if (!Number.isFinite(m) || m < step / 4) return strings.windBarbCalm;
   const dir = magnitude < 0 ? direction + 180 : direction;
-  const deg = Math.round(((dir % 360) + 360) % 360);
+  // Round first, then normalize — else 359.6° rounds up to a bogus "360".
+  const deg = ((Math.round(dir) % 360) + 360) % 360;
   return strings.windBarb(strings.compass8[octant(deg)]!, String(deg), fmt(m));
 }
 

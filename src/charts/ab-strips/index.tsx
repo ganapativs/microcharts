@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
-import { labelFitsBand } from "../../core/labels.js";
+import { labelFont, labelFitsBand } from "../../core/labels.js";
 import { abStripsGeometry, abTagsFit, type ABStripsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -20,7 +20,6 @@ export function abDelta(geo: ABStripsGeometry, fmt: (n: number) => string): stri
   return `${pct > 0 ? "+" : ""}${pct}%`;
 }
 
-/** Factual A/B summary. Shared with the interactive entry. */
 export function abSummary(
   geo: ABStripsGeometry,
   fmt: (n: number) => string,
@@ -88,7 +87,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   // two stacked rows share the height, so the A/B tags of adjacent rows must
   // not collide — the row centers are only height/2 apart, so keep the font
   // safely under that (real-browser getBBox verified at 80×20, not just craft)
-  const FONT = Math.min(8, Math.max(6, Math.round(height * 0.3)));
+  const FONT = labelFont(height, 0.3);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-ab-strips ${className}` : "mc-ab-strips";
   // Row tags are seat-gated — they drop, and give their lead gutter back to the
@@ -168,9 +167,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* the CONTESTED ZONE — where the two middle-halves (p25–75) overlap. This
-          is the chart's thesis made visible: a narrow sliver = a clear win, a
-          wide band = inconclusive. Behind everything; skipped when they separate. */}
+      {/* Overlap of the two p25–75 bands (skipped when they separate). */}
       {ovX1 > ovX0 ? (
         <rect
           x={round2(ovX0)}
@@ -182,18 +179,10 @@ export function ABStrips(props: ABStripsProps): ReactNode {
           fillOpacity={0.14}
         />
       ) : null}
-      {/* the two strips: faint p5–95 outer, stronger p25–75 middle half. Row A is
-          always neutral (the baseline ink role); row B is accent unless `color`
-          overrides it, in which case the fill can't come from a static role. */}
+      {/* Outer p5–95 + inner p25–75. A = neutral; B = accent (or `color`). */}
       {geo.rows.map((r, i) => {
         const isB = i === 1;
-        // Row B's bands are accent-COLORED but must not carry the accent INK
-        // ROLE here: the motion engine casts accent ink into the closing "voice"
-        // act, which would pop B's bands late while row A's neutral bands fade in
-        // during the quiet opening stage — an asymmetric two-arm entrance.
-        // Painting the accent as a plain fill (exactly as the `color` override
-        // already does) keeps both rows' bands in the opening stage so the two
-        // arms arrive together; the accent voice stays with B's median dot.
+        // Accent fill without accent ink-role — otherwise motion stages B late.
         const bandFill = isB ? (color ?? "var(--mc-accent)") : undefined;
         const bandInk = isB ? undefined : "neutral";
         return (
@@ -221,8 +210,6 @@ export function ABStrips(props: ABStripsProps): ReactNode {
           </g>
         );
       })}
-      {/* median-shift connector — A's median to B's median, so the size AND
-          direction of the shift read at a glance (the dots sit on top). */}
       <line
         x1={geo.rows[0].median.x}
         y1={geo.rows[0].y}
@@ -234,7 +221,6 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         strokeDasharray="1.6 1.4"
         vectorEffect="non-scaling-stroke"
       />
-      {/* median dots + row tags, on top */}
       {geo.rows.map((r, i) => {
         const isB = i === 1;
         const custom = isB && color ? color : undefined;

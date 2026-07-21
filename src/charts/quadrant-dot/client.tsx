@@ -1,9 +1,9 @@
 "use client";
 // Interactive <QuadrantDot>. useActivePicker owns interaction: one pointer
-// listener + nearest-point (2-D) lookup within a hit radius, ←/→/Home/End cycle
-// the peer field in nearest-first order, click / Enter / Space selects
-// (onSelect). Composes the static component (canon); the focus ring + persistent
-// pin + readout chip are overlay children.
+// listener + nearest-point (2-D) lookup, ←/→/Home/End cycle focal then peers
+// nearest-first, click / Enter / Space selects (onSelect). Composes the static
+// component (canon); the focus ring + persistent pin + readout chip are overlay
+// children. Index 0 is the focal; 1…n are peers in nearest-first order.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
@@ -34,7 +34,6 @@ export interface InteractiveQuadrantDotProps extends QuadrantDotProps, PickerPro
   animate?: boolean;
 }
 
-// derive the quadrant name from a peer's quadrant index (TL0 TR1 BL2 BR3)
 const nameOf = (
   q: 0 | 1 | 2 | 3,
   xLabel: string,
@@ -45,6 +44,8 @@ const nameOf = (
   quadrants
     ? quadrants[q]
     : strings.quadrantName(q === 0 || q === 1, yLabel, q === 1 || q === 3, xLabel);
+
+type Target = { x: number; y: number; vx: number; vy: number; quadrant: 0 | 1 | 2 | 3 };
 
 export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode {
   const {
@@ -64,6 +65,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -74,12 +76,6 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // The soft accent glow behind the focal dot has no data-mc-ink attribute
-  // (a literal fill), so it isn't selected — it still fades in with the base
-  // whole-svg fade.
-  // Focal + peer ghosts settle together. (The focal is always present; the
-  // peer `field` is optional, so it must stay in the selector — deferring it
-  // would leave a fieldless chart with no story mark and collapse to a wipe.)
   useEntrance(hostRef, "settle", animate, {
     selector: 'circle[data-mc-ink="data"], circle[data-mc-ink="ghost"]',
   });
@@ -90,41 +86,53 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
-  const count = geo?.ghosts.length ?? 0;
+  // Focal first, then peers nearest-first — so the orange subject is hoverable
+  // and Home lands on it. Always-nearest (no hit-radius dead zone): at gallery
+  // scale ghosts are ~2–3px and a tight radius left the plate feeling dead.
+  const targets = useMemo((): Target[] => {
+    if (!geo) return [];
+    const focal: Target = {
+      x: geo.dot.x,
+      y: geo.dot.y,
+      vx: geo.dot.vx,
+      vy: geo.dot.vy,
+      quadrant: geo.quadrant,
+    };
+    return [focal, ...geo.ghosts];
+  }, [geo]);
 
-  const { focal: focalR, ghost: ghostR } = quadrantDotRadii(width, height);
-  // A forgiving margin of 1 unit around the PAINTED ghost: the whole visible dot
-  // must respond (a fixed radius went dead at the rim once the box passed ~58
-  // units), plus a little slack for imprecise pointers on a word-sized chart.
-  const hitDist = (ghostR + 1) ** 2;
+  const count = targets.length;
+  const peerCount = Math.max(0, count - 1);
+  const { focal: focalR } = quadrantDotRadii(width, height);
 
-  // Nearest peer to the pointer within the hit radius. The navigable units are
-  // the peer ghosts; datum.index is the ghost index in the chart's nearest-first
-  // order (not the input `field` order — field is re-sorted by distance from the
-  // focal, then capped at 30).
   const locate = useCallback(
     (x: number, y: number) => {
-      if (!geo) return null;
-      let best = -1;
-      let bestDist = hitDist;
-      geo.ghosts.forEach((g, i) => {
-        const d = (g.x - x) ** 2 + (g.y - y) ** 2;
+      if (targets.length === 0) return null;
+      let best = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < targets.length; i++) {
+        const t = targets[i]!;
+        const d = (t.x - x) ** 2 + (t.y - y) ** 2;
         if (d < bestDist) {
           bestDist = d;
           best = i;
         }
-      });
-      return best >= 0 ? best : null;
+      }
+      return best;
     },
-    [geo, hitDist],
+    [targets],
   );
 
-  // A scatter point has no single "primary" number, so we report the y value
-  // (the conventional dependent axis — `domain` is the y grammar); the readout
-  // still shows both coordinates.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo?.ghosts[i]?.vy ?? null }),
-    [geo],
+    (i: number) => {
+      const t = targets[i];
+      return {
+        index: i,
+        value: t?.vy ?? null,
+        formatted: t ? `${fmt(t.vx)}, ${fmt(t.vy)}` : undefined,
+      };
+    },
+    [targets, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -150,12 +158,12 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const ring = (i: number, pinned: boolean) => {
-    const g = geo?.ghosts[i];
-    if (!g) return null;
+    const t = targets[i];
+    if (!t) return null;
     return (
       <circle
-        cx={g.x}
-        cy={g.y}
+        cx={t.x}
+        cy={t.y}
         r={focalR + 1.4}
         fill="none"
         stroke="var(--mc-accent)"
@@ -166,18 +174,13 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   };
 
   const shown = active ?? selected;
-  const g = shown !== null && geo ? geo.ghosts[shown] : undefined;
+  const t = shown !== null ? targets[shown] : undefined;
+  const qName = t ? nameOf(t.quadrant, xLabel, yLabel, quadrants, strings) : "";
   const announced =
-    g && shown !== null
-      ? strings.quadrantAt(
-          shown + 1,
-          count,
-          xLabel,
-          fmt(g.vx),
-          yLabel,
-          fmt(g.vy),
-          nameOf(g.quadrant, xLabel, yLabel, quadrants, strings),
-        )
+    t && shown !== null
+      ? shown === 0
+        ? strings.quadrantLone(yLabel, fmt(t.vy), xLabel, fmt(t.vx), qName)
+        : strings.quadrantAt(shown, peerCount, xLabel, fmt(t.vx), yLabel, fmt(t.vy), qName)
       : "";
 
   return (
@@ -205,21 +208,16 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticQuadrantDot>
-      {g && geo ? (
+      {readout && t ? (
         <span
           className="mc-quadrant-dot-readout mc-spark-readout"
-          style={{ left: `${(g.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `${(t.x / width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {/* Axis names are constant for the whole chart (they are in the title
-              and the summary), and the quadrant IS the dot's position in the
-              grid — naming it here repeated both axis labels a second time. The
-              live region below still announces the full quadrant sentence. */}
-          {`${fmt(g.vx)}, ${fmt(g.vy)}`}
+          {`${fmt(t.vx)}, ${fmt(t.vy)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

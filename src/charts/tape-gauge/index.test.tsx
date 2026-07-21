@@ -31,8 +31,14 @@ describe("<TapeGauge>", () => {
     const { container } = draw(
       <TapeGauge value={142} rate={2} zones={ZONES} span={25} height={64} />,
     );
-    // chevron path uses the accent ink role (element-split: strokes on path)
-    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    // chevron path uses the accent ink role (element-split: strokes on path).
+    // It is an OPEN path (no trailing z) — unlike the filled pointer triangle —
+    // so it must carry fill="none" or the accent rule fills it into a blob.
+    const chevron = [
+      ...container.querySelectorAll<SVGPathElement>('path[data-mc-ink="accent"]'),
+    ].find((p) => !(p.getAttribute("d") ?? "").trim().endsWith("z"));
+    expect(chevron).toBeTruthy();
+    expect(chevron!.getAttribute("fill")).toBe("none");
   });
 
   it("the center pointer is a solid filled triangle (not a hollow outline)", () => {

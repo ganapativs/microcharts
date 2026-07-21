@@ -7,8 +7,8 @@ export interface Snippet {
 export const AI_SNIPPETS: Record<string, Snippet> = {
   parse: {
     lang: "ts",
-    code: `const FENCE = /\`\`\`chart (\\w+)\\n([\\s\\S]*?)\`\`\`/g;
-const INLINE = /\`chart (\\w+) ([^\`]+)\`/g;
+    code: `const FENCE = /\`\`\`microchart (\\w+)\\n([\\s\\S]*?)\`\`\`/g;
+const INLINE = /\`microchart (\\w+) ([^\`]+)\`/g;
 
 const nums = (b: string) => b.split(/[\\s,]+/).map(Number).filter(Number.isFinite);
 const kv = (b: string) =>
@@ -53,9 +53,9 @@ export function ChartBlock({ type, body }: { type: string; body: string }) {
   systemPrompt: {
     lang: "text",
     code: `When a number series would help, emit a chart block instead of prose.
-Fenced for a standalone chart, inline \`chart …\` for a word-sized one:
+Fenced for a standalone chart, inline \`microchart …\` for a word-sized one:
 
-\`\`\`chart sparkline
+\`\`\`microchart sparkline
 132 148 141 165 159 182 176 203
 \`\`\`
 
@@ -69,14 +69,14 @@ Never invent a pie or gauge — they aren't supported.`,
     code: `User: How did deploys trend this week?
 Assistant: Steady, with a strong Thursday:
 
-\`\`\`chart sparkbar
+\`\`\`microchart sparkbar
 6 9 5 11 7 12 8 10
 \`\`\`
 
 User: And are we on track for the quota?
-Assistant: Close — \`chart delta +0.184\` week over week puts us here:
+Assistant: Close — \`microchart delta +0.184\` week over week puts us here:
 
-\`\`\`chart bullet
+\`\`\`microchart bullet
 value=72 target=80 bands=50,90
 \`\`\``,
   },

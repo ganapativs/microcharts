@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
 import staticModule, { playground as staticPlayground, TRAJ } from "./phase-trace";
 
@@ -56,6 +57,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: PhaseTrace,
+  ChartLive: PhaseTraceInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { EtaBar } from "@microcharts/react/eta-bar";
 import { EtaBar as EtaBarInteractive } from "@microcharts/react/eta-bar/interactive";
 import staticModule, { playground as staticPlayground, min } from "./eta-bar";
 
@@ -55,6 +56,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: EtaBar,
+  ChartLive: EtaBarInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

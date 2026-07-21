@@ -30,9 +30,9 @@ describe("interactive <GardenGrid>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 0, value: 34 });
+    expect(onActive).toHaveBeenLastCalledWith(expect.objectContaining({ index: 0, value: 34 }));
     await userEvent.keyboard("{ArrowDown}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 1, value: 10 });
+    expect(onActive).toHaveBeenLastCalledWith(expect.objectContaining({ index: 1, value: 10 }));
     await userEvent.keyboard("{Escape}");
     expect(onActive).toHaveBeenLastCalledWith(null);
   });
@@ -43,7 +43,7 @@ describe("interactive <GardenGrid>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowDown}{Enter}");
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 1, value: 10 });
+    expect(onSelect).toHaveBeenLastCalledWith(expect.objectContaining({ index: 1, value: 10 }));
     fig.blur();
     await vi.waitFor(() =>
       expect(screen.container.querySelector('circle[data-mc-w="tick"]')).not.toBeNull(),

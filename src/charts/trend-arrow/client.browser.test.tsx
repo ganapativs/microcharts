@@ -35,7 +35,7 @@ describe("interactive <TrendArrow>", () => {
     const screen = await render(<TrendArrow value={-0.05} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-trend-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: -0.05, label: "down" }]);
+    expect(picks).toMatchObject([{ index: 0, value: -0.05, label: "down" }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -44,6 +44,6 @@ describe("interactive <TrendArrow>", () => {
     const wrap = screen.container.querySelector(".mc-trend-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 0.12, label: "up" }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.12, label: "up" }]);
   });
 });

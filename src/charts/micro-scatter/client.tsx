@@ -62,6 +62,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -130,7 +131,12 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
   const datum = useCallback(
     (i: number) => {
       const p = geo.dots[i] ? data[geo.dots[i]!.index] : undefined;
-      return { index: i, value: p?.y ?? null, label: p ? fmt(p.x) : undefined };
+      return {
+        index: i,
+        value: p?.y ?? null,
+        label: p ? fmt(p.x) : undefined,
+        formatted: p ? `${fmt(p.x)}, ${fmt(p.y)}` : undefined,
+      };
     },
     [geo, data, fmt],
   );
@@ -198,13 +204,12 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticMicroScatter>
       <LiveRegion>{announced}</LiveRegion>
-      {shownDot && shownPoint ? (
+      {readout && shownDot && shownPoint ? (
         <span
           className="mc-spark-readout"
           style={{

@@ -12,7 +12,7 @@ describe("expandComponents", () => {
 
   it("expands <GrammarExplorer> into a text grammar reference", () => {
     const out = expandComponents(`<GrammarExplorer />`);
-    expect(out).toContain("```chart sparkline");
+    expect(out).toContain("```microchart sparkline");
     expect(out).toContain("Equivalent React");
     expect(out).not.toContain("<GrammarExplorer");
   });
@@ -61,11 +61,12 @@ describe("expandComponents", () => {
     expect(out).toBe("");
   });
 
-  it("expands <Usage> to the import/usage snippet plus install", () => {
+  it("expands <Usage> to the import/usage snippet plus full setup", () => {
     const out = expandComponents(`## Install\n\n<Usage chart="delta" />`, resolve);
     expect(out).toContain("```tsx");
     expect(out).toContain("<Delta value={0.12} />");
-    expect(out).toContain("pnpm add @microcharts/react");
+    expect(out).toContain("/docs/quickstart#set-up-with-an-ai-agent");
+    expect(out).toContain("/agent-setup.md");
     expect(out).not.toContain("<Usage");
   });
 

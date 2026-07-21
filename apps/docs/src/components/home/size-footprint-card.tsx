@@ -2,22 +2,22 @@
 
 import { useCallback, useMemo, useState, type PointerEvent } from "react";
 import { HistogramStrip } from "@microcharts/react/histogram-strip/interactive";
-import { SIZE, STATIC_SIZES } from "@/lib/docs-facts";
+import { INTERACTIVE_SIZES, SIZE } from "@/lib/docs-facts";
 
 const W = 520;
 const H = 56;
 /** Match HistogramStrip auto bins: min(12, ⌈√n⌉). */
-const BIN_N = Math.min(12, Math.ceil(Math.sqrt(STATIC_SIZES.length)));
+const BIN_N = Math.min(12, Math.ceil(Math.sqrt(INTERACTIVE_SIZES.length)));
 
-const LO = Math.min(...STATIC_SIZES);
-const HI = Math.max(...STATIC_SIZES);
+const LO = Math.min(...INTERACTIVE_SIZES);
+const HI = Math.max(...INTERACTIVE_SIZES);
 const STEP = (HI - LO) / BIN_N || 1;
 
 function countsInBin(i: number): number {
   const hi = i === BIN_N - 1 ? HI : LO + (i + 1) * STEP;
   const lo = LO + i * STEP;
   let n = 0;
-  for (const kB of STATIC_SIZES) {
+  for (const kB of INTERACTIVE_SIZES) {
     if (i === BIN_N - 1 ? kB >= lo && kB <= hi : kB >= lo && kB < hi) n++;
   }
   return n;
@@ -38,10 +38,10 @@ export function SizeFootprintCard() {
   const readout = useMemo(() => {
     if (active === null) {
       return {
-        count: SIZE.count,
+        count: SIZE.interactiveCount,
         countLabel: "charts",
-        lo: SIZE.min,
-        hi: SIZE.max,
+        lo: SIZE.interactiveMin,
+        hi: SIZE.interactiveMax,
         scope: "catalog" as const,
       };
     }
@@ -63,8 +63,10 @@ export function SizeFootprintCard() {
 
       <div className="relative">
         <div className="mono-label mb-2 flex items-center justify-between gap-3 opacity-70">
-          <span>static gzip · distribution</span>
-          <span>mark 3 kB</span>
+          <span>interactive gzip · distribution</span>
+          <span>
+            static {SIZE.min}–{SIZE.max}
+          </span>
         </div>
 
         <div
@@ -73,22 +75,21 @@ export function SizeFootprintCard() {
           onPointerLeave={() => setActive(null)}
         >
           <HistogramStrip
-            data={STATIC_SIZES}
+            data={INTERACTIVE_SIZES}
             bins={BIN_N}
-            markValue={3}
             width={W}
             height={H}
             animate
             format={{ maximumFractionDigits: 1, style: "unit", unit: "kilobyte" }}
-            title={`Static gzip size of all ${SIZE.count} charts`}
+            title={`Interactive gzip size of all ${SIZE.interactiveCount} charts`}
             className="h-auto w-full"
           />
         </div>
 
         <div className="mt-1 flex justify-between font-mono text-[0.58rem] tabular-nums text-fd-muted-foreground">
-          <span>{fmt(SIZE.min)}</span>
-          <span>3.0</span>
-          <span>{fmt(SIZE.max)} kB</span>
+          <span>{fmt(SIZE.interactiveMin)}</span>
+          <span>{fmt(SIZE.interactiveMedian)}</span>
+          <span>{fmt(SIZE.interactiveMax)} kB</span>
         </div>
       </div>
 
@@ -119,7 +120,7 @@ export function SizeFootprintCard() {
           </div>
         </div>
         <div className="mono-label w-full opacity-55">
-          median {SIZE.median} · {SIZE.under2}/{SIZE.count} under 2 kB
+          median {SIZE.interactiveMedian} · static median {SIZE.median}
           {active === null ? " · hover" : ""}
         </div>
       </div>

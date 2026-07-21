@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { QueueDepth } from "@microcharts/react/queue-depth";
 import { QueueDepth as QueueDepthInteractive } from "@microcharts/react/queue-depth/interactive";
 import staticModule, { playground as staticPlayground, DATA, CAP } from "./queue-depth";
 
@@ -49,6 +50,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: QueueDepth,
+  ChartLive: QueueDepthInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

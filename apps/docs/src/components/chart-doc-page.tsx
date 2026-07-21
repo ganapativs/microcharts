@@ -17,6 +17,10 @@ import { abs } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
 import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
+import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
+import { getChart } from "@/lib/charts/entries";
+import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
+import { SITE } from "@/lib/site";
 
 /**
  * Render a docs page from the **chart route** — the /docs/charts index and every
@@ -33,6 +37,8 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
   const url = abs(page.url);
+  // Per-chart pages only — LiveDemo variants swap static → interactive via this.
+  const chartSlug = page.slugs.length >= 2 ? page.slugs[1] : undefined;
 
   const crumbs = [
     { name: "Docs", url: abs("/docs") },
@@ -46,7 +52,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      breadcrumb={{ enabled: false }}
+      breadcrumb={{ includeSeparator: true, includePage: true }}
       // prev/next in sidebar-tree order — 106 chart pages are a reference you
       // page through; without this every hop reopens the sidebar (worst on
       // mobile, where the tree hides behind the hamburger).
@@ -64,17 +70,14 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           }),
         )}
       </script>
-      {/* Calm fade + lift on navigation. Wraps only the article content — never
-          the DocsPage grid-area siblings (toc/sidebar), which must stay direct
-          grid children of the layout. Keyed on pathname; reduced-motion gated. */}
+      {/* Transition on article only — toc/sidebar must stay layout grid kids. */}
       <RouteTransition className="flex flex-1 flex-col gap-4">
         <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
           {page.data.title}
         </DocsTitle>
         <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
         <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
-          {/* Route the Fumadocs built-ins through the canon secondary button so the
-              title row matches every other text action on the site. */}
+          {/* Fumadocs actions use cta-ghost like the rest of the site. */}
           <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
           <ViewOptionsPopover
             markdownUrl={markdownUrl}
@@ -83,7 +86,9 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           />
         </div>
         <DocsBody>
-          <MDX components={getChartMDXComponents({ a: createRelativeLink(source, page) })} />
+          <ChartSlugProvider slug={chartSlug}>
+            <MDX components={getChartMDXComponents({ a: createRelativeLink(source, page) })} />
+          </ChartSlugProvider>
         </DocsBody>
       </RouteTransition>
     </DocsPage>
@@ -95,11 +100,24 @@ export async function chartDocMetadata(slug: string[]): Promise<Metadata> {
   const page = source.getPage(slug);
   if (!page || page.slugs[0] !== "charts") notFound();
 
+  const entry = page.slugs[1] ? getChart(page.slugs[1]) : undefined;
+  const title = entry ? chartSeoTitle(entry.name) : page.data.title;
+  const description = entry
+    ? chartSeoDescription(entry.name, page.data.description ?? "", entry.tagline)
+    : (page.data.description ?? "");
+
   return docsMeta({
-    title: page.data.title,
-    description: page.data.description ?? "",
+    title,
+    description,
     path: page.url as `/${string}`,
     image: getPageImage(page).url as `/${string}`,
+    imageAlt: entry
+      ? `${entry.name} React chart — word-sized SVG from ${SITE.name}`
+      : SITE.ogImageAlt,
     markdown: getPageMarkdownUrl(page).url as `/${string}`,
+    type: "article",
+    keywords: entry
+      ? [entry.name, "react chart", "sparkline", "microcharts", "svg chart", entry.collection]
+      : undefined,
   });
 }

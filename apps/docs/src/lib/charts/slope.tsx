@@ -146,7 +146,7 @@ export const contexts: ChartContexts = {
         after the March price change — down 25%.
       </p>
     ),
-    code: `<p>\n  West's renewal rate slid from best to worst region{" "}\n  <Slope data={[{ label: "West", from: 55, to: 41 }]} width={40} height={18} /> — down 25%.\n</p>`,
+    code: `<p>\n  West's renewal rate slid from best to worst region{" "}\n  <span className="mc-inline">\n    <Slope data={[{ label: "West", from: 55, to: 41 }]} width={40} height={18} summary={false} />\n  </span>{" "}\n  — down 25%.\n</p>`,
   },
   cell: {
     render: () => (
@@ -202,12 +202,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <Slope data={rows} summary={false} width={40} height={18} />
+            <Slope data={rows} summary={false} width={64} height={20} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Regions <Slope data={cohorts} width={40} height={18} />\n</button>`,
+    code: `<button className="tab">\n  Regions <Slope data={cohorts} width={64} height={20} />\n</button>`,
   },
 };
 

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { LIKERT_FONT, likertGutter, likertStripGeometry } from "./geometry.js";
+import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
 
-const base = { width: 60, height: 12, neutral: "split" as const };
+const base = { width: 60, height: 14, neutral: "split" as const };
 
 describe("likertStripGeometry", () => {
   it("negatives left of center, positives right, neutral straddles (split)", () => {
@@ -58,12 +58,13 @@ describe("likertStripGeometry", () => {
 
 describe("likertGutter (shared static/interactive gutter)", () => {
   it("is 0 without end labels and a deterministic 4-char reserve with them", () => {
-    expect(likertGutter(false)).toBe(0);
-    expect(likertGutter(true)).toBe(Math.ceil(4 * LIKERT_FONT * 0.62) + 4);
+    const font = likertFont(14);
+    expect(likertGutter(false, font)).toBe(0);
+    expect(likertGutter(true, font)).toBe(Math.ceil(4 * font * 0.62) + 4);
   });
 
   it("shrinks the plot — both entries must pass the same value", () => {
-    const g = likertGutter(true);
+    const g = likertGutter(true, likertFont(14));
     const wide = likertStripGeometry({ ...base, values: [1, 2, 3], gutterL: 0, gutterR: 0 });
     const gutted = likertStripGeometry({ ...base, values: [1, 2, 3], gutterL: g, gutterR: g });
     const span = (geo: NonNullable<ReturnType<typeof likertStripGeometry>>): number =>

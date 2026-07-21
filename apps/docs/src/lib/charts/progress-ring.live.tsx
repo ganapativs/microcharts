@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { ProgressRing } from "@microcharts/react/progress-ring";
 import { ProgressRing as ProgressRingInteractive } from "@microcharts/react/progress-ring/interactive";
 import staticModule, { playground as staticPlayground } from "./progress-ring";
 
@@ -49,6 +50,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: ProgressRing,
+  ChartLive: ProgressRingInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

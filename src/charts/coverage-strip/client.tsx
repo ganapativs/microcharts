@@ -19,7 +19,11 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { labelFitsBand } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
-import { CoverageStrip as StaticCoverageStrip, type CoverageStripProps } from "./index.js";
+import {
+  CoverageStrip as StaticCoverageStrip,
+  coverageSummary,
+  type CoverageStripProps,
+} from "./index.js";
 
 export interface InteractiveCoverageStripProps extends CoverageStripProps, PickerProps {
   strings?: CoverageStrings;
@@ -50,6 +54,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -107,9 +112,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : geo.expected === 0
-          ? strings.noData
-          : strings.coverage(geo.measured, geo.expected, pctFmt(geo.coverage), geo.longestGap);
+        : coverageSummary(geo, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Pointer (viewBox space) → slot index by pitch division, clamped to the strip.
@@ -124,8 +127,15 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   // index = slot (time-ordered); value = the measured number, or `null` for a
   // gap (no measurement) or an unreadable NaN. Slots have no human name.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const c = geo.cells[i];
+      return {
+        index: i,
+        value: c?.value ?? null,
+        formatted: c ? (c.present && c.value !== null ? fmt(c.value) : "—") : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -191,12 +201,11 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticCoverageStrip>
-      {cell ? (
+      {readout && cell ? (
         <span
           className="mc-coverage-readout mc-spark-readout"
           style={{

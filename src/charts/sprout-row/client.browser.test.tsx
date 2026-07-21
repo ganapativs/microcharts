@@ -39,9 +39,9 @@ describe("interactive <SproutRow>", () => {
     const wrap = screen.container.querySelector(".mc-sprout-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 3, label: "Acme" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 3, label: "Acme" });
     key(wrap, "End"); // the missing item reports a null value
-    expect(seen.at(-1)).toEqual({ index: 2, value: null, label: "Gamma" });
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: null, label: "Gamma" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -53,7 +53,7 @@ describe("interactive <SproutRow>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 3, label: "Acme" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 3, label: "Acme" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

@@ -38,6 +38,10 @@ export interface SummaryStrings {
   stepsDone: (done: number, total: number) => string;
   /** S3 discrete units, e.g. "5 of 8." (pictogram-row). */
   countOf: (value: string, total: number) => string;
+  /** S4 bullet value-only, e.g. "72." (bullet). */
+  bullet: (value: string) => string;
+  /** S4 bullet vs target, e.g. "72 of 80 target." (bullet). */
+  bulletTarget: (value: string, target: string) => string;
   /** S4 counted total, e.g. "23 counted." (tally-marks). */
   tally: (value: string) => string;
   /** S4 dice face, e.g. "4 out of 6." (dice-pips). */
@@ -91,6 +95,10 @@ export interface SummaryStrings {
   gardenGrid: (n: number, unit: string, peak: string, active: number) => string;
   /** S1 garden cell, e.g. "3 of 12: 8, step 2 of 5." (garden-grid). */
   gardenCell: (pos: number, total: number, value: string, k: number, steps: number) => string;
+  /** ActivityGrid empty, e.g. "No activity." — distinct from series `noData`. */
+  noActivity: string;
+  /** S1-binned activity, e.g. "Total 6 over 3 periods. Busiest 3." (activity-grid). */
+  activityGrid: (total: string, count: number, busiest: string) => string;
   /** S2 bubble row, e.g. "4 items; largest EMEA at 1,240, smallest LATAM at 210." */
   bubbleRow: (
     n: number,
@@ -125,6 +133,10 @@ export interface SummaryStrings {
   constellationOne: (label: string) => string;
   /** Hovered/focused constellation event, e.g. "Mar: 82, magnitude 5." */
   constellationAt: (label: string, value: string) => string;
+  /** Magnitude clause in a hovered event detail, e.g. "magnitude 5" (constellation). */
+  constellationMagnitude: (value: string) => string;
+  /** Fallback detail when an event carries no numeric value, e.g. "event" (constellation). */
+  constellationEvent: string;
   /** S1 cyclic, e.g. "Peaks at 14:00 (312); quietest 04:00." (polar-clock). */
   polarClock: (peakLabel: string, max: string, minLabel: string) => string;
   /** Flat cycle, e.g. "Flat at 120 across the cycle." (polar-clock). */
@@ -199,6 +211,10 @@ export interface SummaryStrings {
   rows: (count: number, topLabel: string, topDirection: "up" | "down", topPct: string) => string;
   /** Referenced pair announcement, e.g. "East: 940 vs 1,200." (paired-bars). */
   pairAt: (label: string, value: string, ref: string) => string;
+  /** Referenced pair with no reference value, e.g. "East: 940, no reference." (paired-bars). */
+  pairAtNoRef: (label: string, value: string) => string;
+  /** Referenced pair with no value, e.g. "East: no data." (paired-bars). */
+  pairAtEmpty: (label: string) => string;
   /** Referenced pairs summary, e.g. "4 pairs. Largest gap East: 940 vs 1,200." */
   pairs: (count: number, gapLabel: string, value: string, ref: string) => string;
   /** Slope announcement, e.g. "Berlin: 48 to 61, up 27%." */
@@ -375,6 +391,10 @@ export interface SummaryStrings {
   ) => string;
   /** Rate-volume zero-volume period, e.g. "Period 5 of 12: no events." */
   rateVolumeNoEvents: (position: number, total: number) => string;
+  /** Compact rate-volume readout chip, e.g. "4.1% · 38 events (low)". */
+  rateVolumeChip: (rate: string, volume: string, unit: string, low: boolean) => string;
+  /** Compact rate-volume chip for a zero-volume period, e.g. "no events". */
+  rateVolumeChipEmpty: string;
   /** Net-flow summary, e.g. "Net +1.1k last period; in 4.2k vs out 3.1k; net positive 9 of 12 periods." */
   netFlow: (
     netLast: string,
@@ -476,6 +496,8 @@ export interface SummaryStrings {
     side: "upper" | "lower" | null,
     limit: string,
   ) => string;
+  /** Compact control readout chip, e.g. "82.1 above 79.4" (side null → just the value). */
+  controlChip: (value: string, side: "upper" | "lower" | null, limit: string) => string;
   /** Forecast summary, e.g. "Median forecast 42 by week 14 (80% between 33 and 55), from 38 today." */
   forecast: (
     mid: string,
@@ -673,6 +695,8 @@ export interface SummaryStrings {
   tokenTierNames: readonly [string, string, string];
   /** Interactive token announce, e.g. "sauce: guessing, 0.22." (token-confidence). */
   tokenAt: (token: string, tier: string, confidence: string) => string;
+  /** TokenConfidence aria-label fallback when title and summary are absent. */
+  tokenConfidenceLabel: string;
   /** WindBarb reading, e.g. "Southwest (225°), magnitude 32." */
   windBarb: (compass: string, deg: string, value: string) => string;
   /** Calm state, e.g. "Calm." (wind-barb). */
@@ -733,6 +757,8 @@ export interface SummaryStrings {
   calibrationAt: (p: string, o: string, n: number, lowClause: string) => string;
   /** Low-support clause appended to a bin announce, e.g. ", low support". */
   calibrationLow: string;
+  /** Compact calibration readout chip, e.g. "0.7 → 0.52 (n=40, low support)". */
+  calibrationChip: (p: string, o: string, n: string, lowClause: string) => string;
   /** ConfusionGrid overview, e.g.
    *  "Accuracy 87%. Most confused: cat predicted as dog (12% of cats)." */
   confusion: (acc: string, actual: string, predicted: string, pct: string) => string;

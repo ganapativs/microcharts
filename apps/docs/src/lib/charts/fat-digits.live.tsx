@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { FatDigits } from "@microcharts/react/fat-digits";
 import { FatDigits as FatDigitsInteractive } from "@microcharts/react/fat-digits/interactive";
 import staticModule, { playground as staticPlayground, COLUMN, DOMAIN } from "./fat-digits";
 
@@ -54,6 +55,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: FatDigits,
+  ChartLive: FatDigitsInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

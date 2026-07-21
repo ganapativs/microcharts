@@ -33,10 +33,13 @@ describe("<GradedBand>", () => {
     );
   });
 
-  it("label='median' states the median next to its tick (none shows no text)", () => {
-    const labeled = draw(<GradedBand data={SAMPLE} label="median" />).container;
+  it("label='median' states the median in the right gutter (none shows no text)", () => {
+    const labeled = draw(<GradedBand data={SAMPLE} label="median" width={80} />).container;
     const none = draw(<GradedBand data={SAMPLE} />).container;
-    expect(labeled.querySelector("text")!.textContent).toBe("50");
+    const t = labeled.querySelector("text")!;
+    expect(t.textContent).toBe("50");
+    expect(t.getAttribute("text-anchor")).toBe("end");
+    expect(Number(t.getAttribute("x"))).toBeGreaterThan(80);
     expect(none.querySelector("text")).toBeNull();
   });
 

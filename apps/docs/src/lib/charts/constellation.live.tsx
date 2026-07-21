@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Constellation } from "@microcharts/react/constellation";
 import { Constellation as ConstellationInteractive } from "@microcharts/react/constellation/interactive";
 import staticModule, { playground as staticPlayground, INCIDENTS } from "./constellation";
 
@@ -47,6 +48,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Constellation,
+  ChartLive: ConstellationInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

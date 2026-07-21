@@ -153,7 +153,7 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
             : { mode: "center", top: geo.y0, bottom: geo.y1 }
       }
       className={className ? `mc-bubble ${className}` : "mc-bubble"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {geo.bubbles.map((b) => (
         <circle

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BubbleRow } from "@microcharts/react/bubble-row";
 import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
 import staticModule, { playground as staticPlayground, REGIONS } from "./bubble-row";
 
@@ -39,6 +40,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BubbleRow,
+  ChartLive: BubbleRowInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

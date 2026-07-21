@@ -143,22 +143,12 @@ export const recipes: Recipe[] = [
   },
 ];
 
+// Default windows are [3, 30] — each home needs ≥30 samples or the slow
+// trace never fills and the mark reads as an empty hairline.
 const CTX_ROWS = [
-  {
-    name: "Track 1",
-    meta: "−22",
-    data: [-18.04, -18.61, -19.17, -19.74, -20.3, -20.87, -21.43, -22.0],
-  },
-  {
-    name: "Track 2",
-    meta: "−19",
-    data: [-15.58, -16.07, -16.56, -17.05, -17.53, -18.02, -18.51, -19.0],
-  },
-  {
-    name: "Track 3",
-    meta: "−24",
-    data: [-19.68, -20.3, -20.91, -21.53, -22.15, -22.77, -23.38, -24.0],
-  },
+  { name: "Track 1", meta: "−22", data: LOUDNESS },
+  { name: "Track 2", meta: "−19", data: LOUDNESS.map((v) => v + 3) },
+  { name: "Track 3", meta: "−24", data: LOUDNESS.map((v) => v - 2) },
 ];
 
 export const contexts: ChartContexts = {
@@ -178,7 +168,7 @@ export const contexts: ChartContexts = {
         — −22 LUFS, within broadcast target.
       </p>
     ),
-    code: "<p>\n  Integrated loudness <DualWindowMeter data={samples} target={-23} /> — −22 LUFS, within broadcast target.\n</p>",
+    code: '<p>\n  Integrated loudness{" "}\n  <span className="mc-inline">\n    <DualWindowMeter data={samples} target={-23} summary={false} />\n  </span>{" "}\n  — −22 LUFS, within broadcast target.\n</p>',
   },
   cell: {
     render: () => (

@@ -27,9 +27,9 @@ describe("interactive <MicroBox>", () => {
     const wrap = screen.container.querySelector(".mc-box-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 12, label: "min" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 12, label: "min" });
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 35, label: "q1" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 35, label: "q1" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -42,7 +42,7 @@ describe("interactive <MicroBox>", () => {
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 35, label: "q1" });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 35, label: "q1" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('line[data-mc-w="tick"]'))

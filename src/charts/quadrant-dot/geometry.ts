@@ -17,7 +17,8 @@ export interface QuadrantDotGeometry {
   cross: { x: number | null; y: number | null };
   /** Focal in px (`x`,`y`) plus its raw data values (`vx`,`vy`). */
   dot: { x: number; y: number; vx: number; vy: number };
-  /** Peers in px + raw values + quadrant, sorted nearest-first from the focal. */
+  /** Peers in px + raw values + quadrant, sorted nearest-first from the focal.
+   *  Interactive index 0 is the focal; peers are 1…n in this order. */
   ghosts: { x: number; y: number; vx: number; vy: number; quadrant: 0 | 1 | 2 | 3 }[];
   /** TL=0, TR=1, BL=2, BR=3. */
   quadrant: 0 | 1 | 2 | 3;

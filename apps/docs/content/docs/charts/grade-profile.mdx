@@ -1,8 +1,8 @@
 ---
 title: GradeProfile
-description:
-  A word-sized route profile for React — elevation ridge with pitches coloured by grade, so the hard climbs read at a
-  glance.
+description: >-
+  React grade profile chart — distance vs elevation with grade readable as slope. Tiny accessible SVG microchart;
+  RSC-safe static or /interactive.
 ---
 
 GradeProfile answers "how hard is this route, and where does it bite?" Each segment between two points is filled from
@@ -24,7 +24,7 @@ for shape; the encoded channel is the colour, and the interactive readout gives 
       { d: 700, elev: 833 },
       { d: 900, elev: 865 },
     ]}
-    format={(n) => `${n} m`}
+    format={{ style: "unit", unit: "meter", unitDisplay: "short" }}
     title="Queen stage"
     width={240}
     height={48}
@@ -96,7 +96,7 @@ const trail = [
       { d: 900, elev: 865 },
     ]}
     bins={[5, 8, 12]}
-    format={(n) => `${n} m`}
+    format={{ style: "unit", unit: "meter", unitDisplay: "short" }}
     title="Custom bins"
     width={240}
     height={44}
@@ -128,9 +128,9 @@ const trail = [
   />
 </LiveDemo>
 
-`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and applies to the distance and
-elevation numbers in the summary and readout. Grades carry their own percent formatting, so the locale still decides the
-decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
+`format` accepts `Intl.NumberFormatOptions` (with a `locale`) or a formatting function, and applies to **distance and
+elevation** numbers in the summary and readout — not grade. Grades are always percent-encoded; the locale still decides
+the decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,3% at 3.500."** in German.
 
 ## Edge cases
 
@@ -146,7 +146,7 @@ decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest 12,
       { d: 300, elev: 840 },
       { d: 600, elev: 780 },
     ]}
-    format={(n) => `${n} m`}
+    format={{ style: "unit", unit: "meter", unitDisplay: "short" }}
     title="Descent"
     width={200}
     height={44}

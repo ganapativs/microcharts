@@ -112,8 +112,10 @@ const CASES: Record<string, Case> = {
     markSel: "rect[data-mc-ink]",
   },
   waterfall: {
-    ui: <Waterfall data={FLOW} width={220} height={30} />,
-    // 4 steps + the total column.
+    ui: <Waterfall data={FLOW} width={220} height={30} label="none" />,
+    // 4 steps + the total column. `label="none"` keeps viewH === height so the
+    // full-column band ring spans the viewBox and skips the concentric-y check
+    // (with default `label="delta"` the label band makes the ring look asymmetric).
     units: [0, 1, 2, 3, 4],
     markSel: "rect[data-mc-ink]",
   },

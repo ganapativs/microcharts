@@ -9,6 +9,7 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { miniBarGeometry } from "./geometry.js";
@@ -23,9 +24,9 @@ export interface MiniBarDatum {
 export function sortData(
   data: readonly MiniBarDatum[],
   order: "data" | "desc" | "asc",
-): MiniBarDatum[] {
-  if (order === "data") return [...data];
-  const copy = [...data];
+): readonly MiniBarDatum[] {
+  if (order === "data") return data;
+  const copy = data.slice();
   copy.sort((a, b) => {
     const av = isFiniteValue(a.value) ? a.value : Number.NEGATIVE_INFINITY;
     const bv = isFiniteValue(b.value) ? b.value : Number.NEGATIVE_INFINITY;
@@ -34,7 +35,6 @@ export function sortData(
   return copy;
 }
 
-/** Factual S2 summary — count + extremes. Shared with the interactive entry. */
 export function miniBarSummary(
   data: readonly MiniBarDatum[],
   fmt: (n: number) => string,
@@ -60,6 +60,8 @@ export interface MiniBarProps {
   orientation?: "horizontal" | "vertical" | undefined;
   /** Which sign is good — engages pos/neg tokens on signed data. */
   positive?: "up" | "down" | undefined;
+  /** Direct max-value readout (vertical only; drops when the box is too short). */
+  label?: "none" | "max" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -82,6 +84,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
     highlight,
     orientation = "vertical",
     positive,
+    label = "none",
     domain,
     width = 50,
     height = 16,
@@ -116,13 +119,28 @@ export function MiniBar(props: MiniBarProps): ReactNode {
 
   const hasNegative = sorted.some((d) => isFiniteValue(d.value) && d.value < 0);
   const goodSign = positive === "down" ? -1 : 1;
+  let maxText: string | undefined;
+  let maxIdx = -1;
+  let fontSize = 0;
+  if (label === "max" && orientation === "vertical") {
+    fontSize = labelFont(height, 0.45);
+    let maxVal = -Infinity;
+    for (let i = 0; i < sorted.length; i++) {
+      const v = sorted[i]!.value;
+      if (isFiniteValue(v) && v > maxVal) {
+        maxVal = v;
+        maxIdx = i;
+      }
+    }
+    if (maxIdx >= 0 && labelFitsY(height / 2, fontSize, height)) maxText = fmt(maxVal);
+  }
 
   // annotations host contract: Marker x = category slot (bar center), Threshold/
   // TargetZone y = data values. Only VERTICAL bars carry value on the y-axis;
   // horizontal flips the axes, so an annotation's y would be meaningless there —
   // pass those children straight through untouched (they'd dev-warn if annotations).
   const ann =
-    orientation === "vertical"
+    orientation === "vertical" && children
       ? resolveAnnotations(children, {
           x: (i) => {
             const b = geo.bars[Math.round(i)];
@@ -152,7 +170,11 @@ export function MiniBar(props: MiniBarProps): ReactNode {
           : { mode: "center", top: 0, bottom: height }
       }
       className={className ? `mc-minibar ${className}` : "mc-minibar"}
-      style={style}
+      style={
+        maxText !== undefined
+          ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+          : style
+      }
     >
       {ann.under}
       {geo.bars.map((b, i) => {
@@ -182,17 +204,30 @@ export function MiniBar(props: MiniBarProps): ReactNode {
               ? "right"
               : "left";
         return (
-          <rect
-            key={b.index}
-            x={b.x}
-            y={b.y}
-            width={b.w}
-            height={b.h}
-            shapeRendering="crispEdges"
-            data-mc-ink={ink}
-            data-mc-origin={origin}
-            style={!isHl && color ? { fill: color } : undefined}
-          />
+          <g key={b.index}>
+            <rect
+              x={b.x}
+              y={b.y}
+              width={b.w}
+              height={b.h}
+              shapeRendering="crispEdges"
+              data-mc-ink={ink}
+              data-mc-origin={origin}
+              style={!isHl && color ? { fill: color } : undefined}
+            />
+            {maxText !== undefined && i === maxIdx ? (
+              <text
+                x={b.x + b.w / 2}
+                y={Math.max(fontSize * 0.55, b.y - 1)}
+                fontSize={fontSize}
+                dominantBaseline="auto"
+                textAnchor="middle"
+                data-mc-ink="label"
+              >
+                {maxText}
+              </text>
+            ) : null}
+          </g>
         );
       })}
       {ann.over}

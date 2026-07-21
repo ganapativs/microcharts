@@ -10,6 +10,7 @@
 // kernel, no roving, no selection state to rove between.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
+import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -25,6 +26,16 @@ import {
 
 export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
   strings?: OrbitStatusStrings;
+  /**
+   * Opt-in entrance motion (default `false`): the glyph pops in (fade + scale)
+   * when the chart first mounts client-side — a whole-svg animation, so it
+   * never collides with the continuous orbit this entry already drives.
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
+   */
+  animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -38,13 +49,15 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     rate,
     latencyDomain,
     rateDomain,
-    alert,
+    threshold,
     size = 20,
     format,
     locale,
     strings = EN_ORBIT_STATUS,
     title,
     summary,
+    animate = false,
+    readout = true,
     className,
     style,
     onSelect,
@@ -53,9 +66,11 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
+  useEntrance(wrapRef, "pop", animate);
   const geo = useMemo(
-    () => orbitStatusGeometry({ latency, rate, size, latencyDomain, rateDomain, alert, pad: 1 }),
-    [latency, rate, size, latencyDomain, rateDomain, alert],
+    () =>
+      orbitStatusGeometry({ latency, rate, size, latencyDomain, rateDomain, threshold, pad: 1 }),
+    [latency, rate, size, latencyDomain, rateDomain, threshold],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [announced, setAnnounced] = useState("");
@@ -69,7 +84,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       ? undefined
       : typeof summary === "string"
         ? summary
-        : orbitStatusSummary(latency, rate, { alert, strings, format, locale });
+        : orbitStatusSummary(latency, rate, { threshold, strings, format, locale });
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // ONE unit — the dependency itself. There is nothing to rove between and no
@@ -83,6 +98,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       index: 0,
       value: geo.unknown ? null : Math.max(0, latency),
       label: title,
+      formatted: geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`,
     });
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
@@ -120,8 +136,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     if (prevAlerted.current === alerted) return;
     prevAlerted.current = alerted;
     if (alerted) setAnnounced(strings.orbitAlert(fmt(Math.max(0, latency))));
-    else setAnnounced(orbitStatusSummary(latency, rate, { alert, strings, format, locale }));
-  }, [geo.satellite.alerted, latency, rate, alert, strings, fmt, format, locale]);
+    else setAnnounced(orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
+  }, [geo.satellite.alerted, latency, rate, threshold, strings, fmt, format, locale]);
 
   return (
     <span
@@ -147,7 +163,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         rate={rate}
         latencyDomain={latencyDomain}
         rateDomain={rateDomain}
-        alert={alert}
+        threshold={threshold}
         size={size}
         format={format}
         locale={locale}
@@ -155,7 +171,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {open ? (
+      {readout && open ? (
         <span
           className="mc-spark-readout"
           style={{

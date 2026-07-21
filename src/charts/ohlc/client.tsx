@@ -6,6 +6,7 @@
 // (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import {
   named,
@@ -45,6 +46,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -73,7 +75,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 }),
     [format, locale],
   );
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
+  const fontSize = labelFont(height, 0.4);
   const lastClose = data.at(-1)?.close;
   const geo = useMemo(
     () =>
@@ -129,9 +131,15 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const p = rendered[i];
-      return { index: i, value: p ? p.close : null };
+      return {
+        index: i,
+        value: p ? p.close : null,
+        formatted: p
+          ? `O${fmt(p.open)} H${fmt(p.high)} L${fmt(p.low)} C${fmt(p.close)}`
+          : undefined,
+      };
     },
-    [rendered],
+    [rendered, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -209,13 +217,12 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; the focus frame is transient. */}
         {selected !== null && selected !== active ? frame(selected, true) : null}
         {active !== null ? frame(active, false) : null}
         {rest.children}
       </StaticOhlc>
       <LiveRegion>{announced}</LiveRegion>
-      {mark && period ? (
+      {readout && mark && period ? (
         <span
           className="mc-spark-readout"
           style={{

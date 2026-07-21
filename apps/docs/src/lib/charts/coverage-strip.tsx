@@ -197,7 +197,7 @@ export const contexts: ChartContexts = {
           <CoverageStrip
             data={[...COVERAGE]}
             expected={18}
-            label="percent"
+            label="none"
             height={16}
             summary={false}
           />
@@ -205,7 +205,7 @@ export const contexts: ChartContexts = {
         — 86% coverage, two gaps on Tuesday.
       </p>
     ),
-    code: "<p>\n  Sensor uptime this week <CoverageStrip data={readings} /> — 86% coverage, two gaps on Tuesday.\n</p>",
+    code: '<p>\n  Sensor uptime this week{" "}\n  <span className="mc-inline">\n    <CoverageStrip data={readings} summary={false} />\n  </span>{" "}\n  — 86% coverage, two gaps on Tuesday.\n</p>',
   },
   cell: {
     render: () => (
@@ -216,9 +216,9 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <CoverageStrip
-                  data={[...COVERAGE]}
+                  data={row.data}
                   expected={18}
-                  label="percent"
+                  label="none"
                   height={18}
                   summary={false}
                 />
@@ -261,13 +261,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <CoverageStrip
-              data={[...COVERAGE]}
-              expected={18}
-              label="percent"
-              height={14}
-              summary={false}
-            />
+            <CoverageStrip data={row.data} expected={18} label="none" height={14} summary={false} />
           </span>
         ))}
       </div>

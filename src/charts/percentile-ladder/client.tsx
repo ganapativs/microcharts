@@ -50,6 +50,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -105,12 +106,27 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     },
     [geo],
   );
+  // median reference = the p50 tick if present, else the lowest percentile.
+  // Declared above `datum` so the chip-mirroring `formatted` (below) can read it.
+  const medianValue = useMemo(() => {
+    if (!geo) return 0;
+    const mid = geo.ticks.find((t) => t.p === 50) ?? geo.ticks[0]!;
+    return mid.value;
+  }, [geo]);
+
   const datum = useCallback(
     (i: number) => {
       const t = geo?.ticks[i];
-      return { index: i, value: t?.value ?? null, label: t ? `p${t.p}` : undefined };
+      return {
+        index: i,
+        value: t?.value ?? null,
+        label: t ? `p${t.p}` : undefined,
+        formatted: t
+          ? `p${t.p} ${fmt(t.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(t.value / medianValue))}×)`
+          : undefined,
+      };
     },
-    [geo],
+    [geo, fmt, ratioFmt, medianValue],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -134,13 +150,6 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
           ? strings.noData
           : ladderSummary(geo, fmt, ratioFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
-
-  // median reference = the p50 tick if present, else the lowest percentile
-  const medianValue = useMemo(() => {
-    if (!geo) return 0;
-    const mid = geo.ticks.find((t) => t.p === 50) ?? geo.ticks[0]!;
-    return mid.value;
-  }, [geo]);
 
   const probe = (i: number, pinned: boolean) => {
     const t = geo?.ticks[i];
@@ -189,12 +198,11 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; probe is transient. */}
         {selected !== null && selected !== active ? probe(selected, true) : null}
         {active !== null ? probe(active, false) : null}
         {rest.children}
       </StaticPercentileLadder>
-      {tick ? (
+      {readout && tick ? (
         <span
           className="mc-ladder-readout mc-spark-readout"
           style={{ left: `${(tick.x / width) * 100}%`, transform: "translateX(-50%)" }}

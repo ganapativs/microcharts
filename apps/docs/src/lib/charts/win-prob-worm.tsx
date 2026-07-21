@@ -133,7 +133,7 @@ export const contexts: ChartContexts = {
         — home team leads 62%, swing at Q3.
       </p>
     ),
-    code: '<p>\n  Win probability <WinProbWorm data={winProb} sides={["home", "away"]} /> — home team leads 62%, swing at Q3.\n</p>',
+    code: '<p>\n  Win probability{" "}\n  <span className="mc-inline">\n    <WinProbWorm data={winProb} sides={["home", "away"]} summary={false} />\n  </span>{" "}\n  — home team leads 62%, swing at Q3.\n</p>',
   },
   cell: {
     render: () => (

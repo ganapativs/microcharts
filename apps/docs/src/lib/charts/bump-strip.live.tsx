@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { BumpStrip } from "@microcharts/react/bump-strip";
 import { BumpStrip as BumpStripInteractive } from "@microcharts/react/bump-strip/interactive";
 import staticModule, { playground as staticPlayground, RANKS } from "./bump-strip";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: BumpStrip,
+  ChartLive: BumpStripInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

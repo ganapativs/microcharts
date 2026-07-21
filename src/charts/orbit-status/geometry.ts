@@ -31,7 +31,7 @@ export function orbitStatusGeometry(opts: {
   size: number;
   latencyDomain?: readonly [number, number] | undefined;
   rateDomain?: readonly [number, number] | undefined;
-  alert?: number | undefined;
+  threshold?: number | undefined;
   pad: number;
 }): OrbitStatusGeometry {
   const { size, pad } = opts;
@@ -69,9 +69,9 @@ export function orbitStatusGeometry(opts: {
 
   const alerted =
     !unknown &&
-    typeof opts.alert === "number" &&
-    Number.isFinite(opts.alert) &&
-    latency >= opts.alert;
+    typeof opts.threshold === "number" &&
+    Number.isFinite(opts.threshold) &&
+    latency >= opts.threshold;
   const satR = round2((alerted ? 2 : 1) * Math.max(1, size * 0.06));
 
   // Satellite at the top (angle 0 = 12 o'clock); the angle encodes nothing.

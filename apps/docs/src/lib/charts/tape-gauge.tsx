@@ -182,9 +182,9 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Eng 1", meta: "142", data: [102, 108, 114, 119, 125, 131, 136, 142] },
-  { name: "Eng 2", meta: "138", data: [99, 105, 110, 116, 121, 127, 132, 138] },
-  { name: "Eng 3", meta: "145", data: [104, 110, 116, 122, 128, 133, 139, 145] },
+  { name: "Eng 1", meta: "142", value: 142, rate: 1 },
+  { name: "Eng 2", meta: "138", value: 138, rate: -1 },
+  { name: "Eng 3", meta: "145", value: 145, rate: 2 },
 ];
 
 export const contexts: ChartContexts = {
@@ -193,12 +193,21 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Airspeed reading{" "}
         <span className="mc-inline">
-          <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={16} summary={false} />
+          <TapeGauge
+            value={142}
+            rate={1}
+            zones={ZONES}
+            span={60}
+            orientation="horizontal"
+            width={88}
+            height={14}
+            summary={false}
+          />
         </span>{" "}
         — 142 knots, rising into caution band.
       </p>
     ),
-    code: "<p>\n  Airspeed reading <TapeGauge value={142} rate={1} zones={zones} span={60} /> — 142 knots, rising into caution band.\n</p>",
+    code: '<p>\n  Airspeed reading{" "}\n  <span className="mc-inline">\n    <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" summary={false} />\n  </span>{" "}\n  — 142 knots, rising into caution band.\n</p>',
   },
   cell: {
     render: () => (
@@ -209,11 +218,13 @@ export const contexts: ChartContexts = {
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
                 <TapeGauge
-                  value={142}
-                  rate={1}
+                  value={row.value}
+                  rate={row.rate}
                   zones={ZONES}
                   span={60}
-                  height={18}
+                  orientation="horizontal"
+                  width={100}
+                  height={16}
                   summary={false}
                 />
               </td>
@@ -223,7 +234,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</td>",
+    code: '<td>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" />\n</td>',
   },
   kpi: {
     render: () => (
@@ -235,10 +246,19 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">knots ↑</span>
           </div>
         </div>
-        <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={36} summary={false} />
+        <TapeGauge
+          value={142}
+          rate={1}
+          zones={ZONES}
+          span={60}
+          orientation="horizontal"
+          width={180}
+          height={22}
+          summary={false}
+        />
       </>
     ),
-    code: '<div className="kpi">\n  <span className="figure">142</span>\n  <span className="unit">knots ↑</span>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</div>',
+    code: '<div className="kpi">\n  <span className="figure">142</span>\n  <span className="unit">knots ↑</span>\n  <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" />\n</div>',
   },
   tab: {
     render: () => (
@@ -249,12 +269,21 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <TapeGauge value={142} rate={1} zones={ZONES} span={60} height={14} summary={false} />
+            <TapeGauge
+              value={row.value}
+              rate={row.rate}
+              zones={ZONES}
+              span={60}
+              orientation="horizontal"
+              width={48}
+              height={12}
+              summary={false}
+            />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Cruise <TapeGauge value={142} rate={1} zones={zones} span={60} />\n</button>',
+    code: '<button className="tab">\n  Cruise <TapeGauge value={142} rate={1} zones={zones} span={60} orientation="horizontal" />\n</button>',
   },
 };
 

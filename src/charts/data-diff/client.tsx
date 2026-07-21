@@ -6,6 +6,7 @@
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -48,6 +49,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -75,7 +77,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   // Mirror the static's tag gutter + totals footer exactly — they move the row
   // band and centerX, so omitting them slides the focus ring off the rows.
   const geo = useMemo(() => {
-    const font = Math.min(10, Math.max(6, Math.round(height * 0.4)));
+    const font = labelFont(height, 0.4);
     const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
     const footer = label === "totals" && height >= 34 ? font + 3 : 0;
     const rowH = nRows > 0 ? (height - 4 - footer) / nRows : 0;
@@ -121,9 +123,16 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const r = geo?.rows[i];
-      return { index: i, value: r?.net ?? null, label: r?.key };
+      return {
+        index: i,
+        value: r?.net ?? null,
+        label: r?.key,
+        formatted: r
+          ? `${r.key}: +${fmt(r.addedValue)} · −${fmt(r.removedValue)} (${signed(r.net, fmt)})`
+          : "",
+      };
     },
-    [geo],
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -196,12 +205,11 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticDataDiff>
-      {row && geo ? (
+      {readout && row && geo ? (
         <span
           className="mc-data-diff-readout mc-spark-readout"
           style={{

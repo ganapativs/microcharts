@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { CitySkyline } from "@microcharts/react/city-skyline";
 import { CitySkyline as CitySkylineInteractive } from "@microcharts/react/city-skyline/interactive";
 import staticModule, { playground as staticPlayground, TEAMS } from "./city-skyline";
 
@@ -44,6 +45,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: CitySkyline,
+  ChartLive: CitySkylineInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -163,7 +163,6 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       className={className ? `mc-hypno ${className}` : "mc-hypno"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* faint row guides + state names — a read-back scaffold, quieter than the data */}
       {rowStates.map((s, r) => {
         const y = geo.rowY[r] ?? geo.rowHeight * (r + 0.5) + 1;
         return (

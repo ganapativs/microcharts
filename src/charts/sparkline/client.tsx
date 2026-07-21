@@ -2,15 +2,18 @@
 // Interactive <Sparkline>. Opt-in entry:
 //   import { Sparkline } from '@microcharts/react/sparkline/interactive'
 //
-//   1. COMPOSE the static component (`summary={false}`, overlay marks passed
-//      as its children) — never re-implement the visual; it cannot drift.
+//   1. COMPOSE the static component (`summary={false}`) — never re-implement
+//      the visual; it cannot drift. Overlay marks are painted into the SVG via
+//      a UI layer so scrubbing does not rebuild static geometry (memo + stable
+//      children). Marks stay inside the SVG so `.mc-inline` seat transforms
+//      still apply.
 //   2. useActivePicker owns interaction: ONE pointer listener + nearest-stop
 //      math, roving keyboard, touch tap-to-pin, and the onActive/onSelect
 //      contract — never a DOM node per point (500 rows × 30 pts stays cheap).
 //   3. The wrapper owns the accessible name (role=img + aria-label) and the
 //      roving keyboard; announcements go through a polite live region using
 //      the i18n-able SummaryStrings.
-import { useCallback, useMemo, useRef } from "react";
+import { memo, useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
   named,
@@ -27,6 +30,19 @@ import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
+
+const Static = memo(StaticSparkline);
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function uiGroup(svg: SVGSVGElement): SVGGElement {
+  let g = svg.querySelector("g[data-mc-ui]") as SVGGElement | null;
+  if (!g) {
+    g = document.createElementNS(SVG_NS, "g");
+    g.setAttribute("data-mc-ui", "");
+    svg.appendChild(g);
+  }
+  return g;
+}
 
 export interface InteractiveSparklineProps extends SparklineProps, PickerProps {
   /** Swappable announcement strings (defaults to EN). */
@@ -54,6 +70,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     locale,
     strings = EN_SERIES,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -118,7 +135,10 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
 
   const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
 
-  const datum = useCallback((i: number) => ({ index: i, value: data[i] as number }), [data]);
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: data[i] as number, formatted: fmt(data[i] as number) }),
+    [data, fmt],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count: stops.length,
@@ -142,6 +162,43 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const shownPoint = shown !== null ? geo.points[shown] : null;
   const shownPos = shown !== null ? stops.indexOf(shown) + 1 : 0;
   const selPoint = selected !== null ? geo.points[selected] : null;
+  const svgStyle = useMemo(() => fillFor(style), [style]);
+
+  // Scrub/selection marks — DOM, not React children — so memo(Static) can skip
+  // rebuilding the series path on every active step.
+  useLayoutEffect(() => {
+    const svg = hostRef.current?.querySelector("svg");
+    if (!svg) return;
+    const g = uiGroup(svg);
+    g.replaceChildren();
+    if (selPoint) {
+      const ring = document.createElementNS(SVG_NS, "circle");
+      ring.setAttribute("cx", String(selPoint[0]));
+      ring.setAttribute("cy", String(selPoint[1]));
+      ring.setAttribute("r", "3.2");
+      ring.setAttribute("fill", "none");
+      ring.setAttribute("data-mc-ink", "accent");
+      ring.setAttribute("data-mc-w", "tick");
+      ring.setAttribute("vector-effect", "non-scaling-stroke");
+      g.appendChild(ring);
+    }
+    if (shownPoint) {
+      const line = document.createElementNS(SVG_NS, "line");
+      line.setAttribute("x1", String(shownPoint[0]));
+      line.setAttribute("y1", String(geo.plot.y0));
+      line.setAttribute("x2", String(shownPoint[0]));
+      line.setAttribute("y2", String(geo.plot.y1));
+      line.setAttribute("data-mc-ink", "muted");
+      line.setAttribute("vector-effect", "non-scaling-stroke");
+      g.appendChild(line);
+      const dot = document.createElementNS(SVG_NS, "circle");
+      dot.setAttribute("cx", String(shownPoint[0]));
+      dot.setAttribute("cy", String(shownPoint[1]));
+      dot.setAttribute("r", "2.6");
+      dot.setAttribute("data-mc-ink", "accent");
+      g.appendChild(dot);
+    }
+  }, [selPoint, shownPoint, geo.plot.y0, geo.plot.y1]);
 
   return (
     <span
@@ -150,7 +207,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       {...named([title, accName].filter(Boolean).join(". ") || undefined)}
       {...bind}
     >
-      <StaticSparkline
+      <Static
         {...rest}
         data={data}
         domain={domain}
@@ -162,41 +219,15 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         format={format}
         locale={locale}
         summary={false}
-        /* Fill the focusable wrapper exactly so pointer math + overlay marks
-           map 1:1 (the wrapper box === the SVG box) and the chart is fluid. */
-        style={fillFor(style)}
+        style={svgStyle}
       >
-        {/* Pinned selection: a persistent ring that survives pointer-leave. */}
-        {selPoint ? (
-          <circle
-            cx={selPoint[0]}
-            cy={selPoint[1]}
-            r={3.2}
-            fill="none"
-            data-mc-ink="accent"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
-        {shownPoint ? (
-          <line
-            x1={shownPoint[0]}
-            y1={geo.plot.y0}
-            x2={shownPoint[0]}
-            y2={geo.plot.y1}
-            data-mc-ink="muted"
-            vectorEffect="non-scaling-stroke"
-          />
-        ) : null}
-        {shownPoint ? (
-          <circle cx={shownPoint[0]} cy={shownPoint[1]} r={2.6} data-mc-ink="accent" />
-        ) : null}
         {rest.children}
-      </StaticSparkline>
+      </Static>
       <LiveRegion>
         {shownValue !== null ? strings.point(shownPos, stops.length, fmt(shownValue)) : ""}
       </LiveRegion>
-      {shownPoint &&
+      {readout &&
+      shownPoint &&
       shownValue !== null &&
       /* At the endpoint the persistent `label="last"` already shows this value —
          a floating readout there just collides with it. Skip it; every other

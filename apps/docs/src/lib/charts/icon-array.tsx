@@ -136,7 +136,7 @@ export const contexts: ChartContexts = {
         — 3 of 20 patients, 15%.
       </p>
     ),
-    code: "<p>\n  Adverse event rate <IconArray value={0.15} total={20} /> — 3 of 20 patients, 15%.\n</p>",
+    code: '<p>\n  Adverse event rate{" "}\n  <span className="mc-inline">\n    <IconArray value={0.15} total={20} summary={false} />\n  </span>{" "}\n  — 3 of 20 patients, 15%.\n</p>',
   },
   cell: {
     render: () => (
@@ -146,7 +146,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <IconArray value={0.15} total={20} height={18} summary={false} />
+                <IconArray value={row.data.at(-1)!} total={20} height={18} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -180,7 +180,7 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <IconArray value={0.15} total={20} height={14} summary={false} />
+            <IconArray value={row.data.at(-1)!} total={20} height={14} summary={false} />
           </span>
         ))}
       </div>

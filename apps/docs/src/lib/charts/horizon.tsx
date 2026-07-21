@@ -154,7 +154,7 @@ export const contexts: ChartContexts = {
         — peaked near 45 before dropping under 10, now steady at 20.
       </p>
     ),
-    code: `<p>\n  Cluster load this hour{" "}\n  <Horizon data={cpuLoad} width={64} height={14} /> — peaked near 45 before dropping under 10, now steady at 20.\n</p>`,
+    code: `<p>\n  Cluster load this hour{" "}\n  <span className="mc-inline">\n    <Horizon data={cpuLoad} width={64} height={14} summary={false} />\n  </span>{" "}\n  — peaked near 45 before dropping under 10, now steady at 20.\n</p>`,
   },
   cell: {
     render: () => (

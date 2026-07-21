@@ -149,7 +149,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
       // seating the whole box would sink the plants by that band's height.
       seat={{ mode: "floor", bottom: geo.soil.y1 }}
       className={className ? `mc-sprout ${className}` : "mc-sprout"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <line
         x1={geo.soil.x1}

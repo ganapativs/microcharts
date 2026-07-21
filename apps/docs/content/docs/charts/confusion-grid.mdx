@@ -1,8 +1,8 @@
 ---
 title: ConfusionGrid
-description:
-  A k×k agreement matrix for React at glyph scale — rows are actual, columns predicted, cell ink is the row-normalized
-  share, and the diagonal is accented by shape.
+description: >-
+  React confusion grid chart — 2×2 classification outcomes at a glance. Tiny accessible SVG microchart; RSC-safe static
+  or /interactive.
 ---
 
 ConfusionGrid answers "where do the errors go?" — the one thing accuracy-as-a-number hides. Rows are the actual class,
@@ -80,6 +80,7 @@ const counts = { labels: ["A", "B", "C"], counts: [ [70, 8, 2], [6, 62, 12], [3,
   }}
   title="5 classes"
 />`}
+  expectWarn
 >
   <ConfusionGrid
     data={{

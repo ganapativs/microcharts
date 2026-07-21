@@ -5,6 +5,7 @@
 // Math.random, no jitter) so the same input renders identically every time.
 // Coords 2-dp, integer viewBox.
 import { round2, isFiniteValue } from "../../core/types.js";
+import { clamp } from "../../core/scale.js";
 
 /** Frame inset the paths are scaled into — shared with the static entry's seat. */
 export const PAD = 2;
@@ -41,6 +42,17 @@ export interface EnsembleGeometry {
   /** Endpoint of the emphasised ("typical") path — for the summary. */
   typicalEnd: number;
   memberCount: number;
+  /** Endpoint of the emphasised path, in viewBox coords (label anchor). */
+  landing: { x: number; y: number; value: number };
+  /** x for a member's Nth point on the shared index scale (annotations Marker). */
+  xFor: (i: number) => number;
+  /** y for a data value on the shared domain (annotations Threshold/TargetZone). */
+  yFor: (v: number) => number;
+  /** Resolved value domain `[min,max]` — the annotation-host y-frame. */
+  domain: readonly [number, number];
+  labelX: number;
+  labelY: number;
+  totalWidth: number;
 }
 
 export function ensembleGeometry(opts: {
@@ -51,15 +63,21 @@ export function ensembleGeometry(opts: {
   emphasis?: "nearest-median" | "median" | number | undefined;
   domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
+  /** Chars in the reserved right-hand label gutter (0 = none). */
+  gutterCh?: number | undefined;
+  fontSize?: number | undefined;
 }): EnsembleGeometry | null {
   const { width, height, data } = opts;
   const validIdx = data.map((_, i) => i).filter((i) => cleanMember(data[i]!));
   if (validIdx.length === 0) return null;
 
   const pad = opts.pad ?? PAD;
+  const gutterCh = opts.gutterCh ?? 0;
+  const fontSize = opts.fontSize ?? 0;
+  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
   const maxLen = Math.max(...validIdx.map((i) => data[i]!.length));
 
-  // y-domain across all valid values (inlined min/max — lean bundle)
+  // inlined min/max (avoids pulling extent into this entry)
   let lo = Infinity;
   let hi = -Infinity;
   for (const i of validIdx)
@@ -130,12 +148,42 @@ export function ensembleGeometry(opts: {
     y: sy(data[m]![data[m]!.length - 1]!),
   }));
 
+  const resolvedTypicalEnd = Number.isFinite(typicalEnd) ? typicalEnd : ends[0]!;
+  const landingX = emphMember !== null ? sx(data[emphMember]!.length - 1) : sx(maxLen - 1);
+
   return {
     ghostPaths,
     emphasisPath,
     ghostEnds,
     spread: { lastLo: Math.min(...ends), lastHi: Math.max(...ends) },
-    typicalEnd: Number.isFinite(typicalEnd) ? typicalEnd : ends[0]!,
+    typicalEnd: resolvedTypicalEnd,
     memberCount: validIdx.length,
+    landing: { x: landingX, y: sy(resolvedTypicalEnd), value: resolvedTypicalEnd },
+    xFor: sx,
+    yFor: sy,
+    domain: [d0, d1],
+    labelX: round2(width + 3),
+    labelY:
+      fontSize > 0
+        ? round2(clamp(sy(resolvedTypicalEnd), fontSize * 0.5, height - fontSize * 0.5))
+        : sy(resolvedTypicalEnd),
+    totalWidth: width + gutter,
+  };
+}
+
+/** Right-gutter box for an endpoint readout — paths ignore gutter, so call after geometry. */
+export function ensembleEndLabel(
+  width: number,
+  height: number,
+  landingY: number,
+  text: string,
+  fontSize: number,
+): { totalWidth: number; labelX: number; labelY: number } {
+  if (!text || fontSize <= 0) return { totalWidth: width, labelX: width + 3, labelY: landingY };
+  const gutter = Math.ceil(text.length * fontSize * 0.72) + 4;
+  return {
+    totalWidth: width + gutter,
+    labelX: width + 3,
+    labelY: round2(clamp(landingY, fontSize * 0.5, height - fontSize * 0.5)),
   };
 }

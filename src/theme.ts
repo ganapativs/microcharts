@@ -65,6 +65,8 @@ export interface ThemeSpec {
   surface?: string;
   surfaceInk?: string;
   surfaceEdge?: string;
+  /** Ink for labels painted on top of saturated data fills. */
+  onFill?: string;
   /** Turn accent-seeded derivation on/off (defaults on when `accent` is set). */
   derive?: boolean;
   /** Dark-mode overrides. Defaults to `"auto"` — derived twins of every hex token. */
@@ -259,6 +261,7 @@ function directVars(spec: ThemeSpec): Vars {
   set("--mc-surface", spec.surface);
   set("--mc-surface-ink", spec.surfaceInk);
   set("--mc-surface-edge", spec.surfaceEdge);
+  set("--mc-on-fill", spec.onFill);
   return v;
 }
 

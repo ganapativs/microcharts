@@ -51,6 +51,12 @@ export const entry: ChartEntry = {
       required: false,
       description: 'Noun for the summary (e.g. "seats").',
     },
+    {
+      name: "label",
+      type: '"none" | "count" | "percent"',
+      required: false,
+      description: 'Centered readout when the comb has room (default "none").',
+    },
   ],
   demo: [34],
   example: {
@@ -73,12 +79,20 @@ export const playground: PlaygroundSpec = {
       options: ["outline", "blank"],
       init: "outline",
     },
+    {
+      kind: "segmented",
+      key: "label",
+      label: "label",
+      options: ["none", "count", "percent"],
+      init: "none",
+    },
   ],
   render: (s) => (
     <Honeycomb
       value={s.value as number}
       total={s.total as number}
       empty={s.empty as "outline" | "blank"}
+      label={s.label as "none" | "count" | "percent"}
       unit="seats"
       summary={false}
       cell={7}
@@ -90,6 +104,7 @@ export const playground: PlaygroundSpec = {
       `  value={${s.value}}`,
       `  total={${s.total}}`,
       s.empty !== "outline" && `  empty="${s.empty}"`,
+      s.label !== "none" && `  label="${s.label}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -128,7 +143,7 @@ export const contexts: ChartContexts = {
         — 34 of 40 taken, one row left.
       </p>
     ),
-    code: "<p>\n  Seat occupancy <Honeycomb value={34} total={40} /> — 34 of 40 taken, one row left.\n</p>",
+    code: '<p>\n  Seat occupancy{" "}\n  <span className="mc-inline">\n    <Honeycomb value={34} total={40} summary={false} />\n  </span>{" "}\n  — 34 of 40 taken, one row left.\n</p>',
   },
   cell: {
     render: () => (
@@ -138,7 +153,13 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Honeycomb value={34} total={40} unit="seats" cell={9} summary={false} />
+                <Honeycomb
+                  value={row.data.at(-1)!}
+                  total={40}
+                  unit="seats"
+                  cell={9}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -172,7 +193,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Honeycomb value={34} total={40} unit="seats" cell={7} summary={false} />
+            <Honeycomb
+              value={Math.round((row.data.at(-1)! / 40) * 12)}
+              total={12}
+              unit="seats"
+              rows={2}
+              cell={7}
+              summary={false}
+            />
           </span>
         ))}
       </div>

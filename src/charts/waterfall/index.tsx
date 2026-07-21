@@ -12,25 +12,25 @@ import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type WaterfallDatum = MiniBarDatum;
 
-/** Factual waterfall summary — endpoints + split gains/losses. Shared. */
+/** Endpoints + split gains/losses. */
 export function waterfallSummary(
   data: readonly WaterfallDatum[],
-  start: number,
+  open: number,
   fmt: (n: number) => string,
   strings: FlowStrings,
 ): string {
   const deltas = data.map((d) => (isFiniteValue(d.value) ? d.value : 0));
   if (deltas.length === 0) return strings.noData;
-  const end = deltas.reduce((s, d) => s + d, start);
+  const end = deltas.reduce((s, d) => s + d, open);
   const gains = deltas.filter((d) => d > 0).reduce((s, d) => s + d, 0);
   const losses = deltas.filter((d) => d < 0).reduce((s, d) => s + d, 0);
   return strings.waterfall(
-    fmt(start),
+    fmt(open),
     fmt(end),
     deltas.length,
     `+${fmt(gains)}`,
@@ -42,7 +42,7 @@ export interface WaterfallProps {
   /** Signed deltas in order. */
   data: readonly WaterfallDatum[];
   /** Opening level (prior-period close). */
-  start?: number | undefined;
+  open?: number | undefined;
   /** Zero-anchored closing total bar — the key back to reality. */
   totalBar?: boolean | undefined;
   /** `"delta"` = signed value labels (deterministic drop-out). */
@@ -66,9 +66,9 @@ export interface WaterfallProps {
 export function Waterfall(props: WaterfallProps): ReactNode {
   const {
     data,
-    start = 0,
+    open = 0,
     totalBar = true,
-    label = "none",
+    label = "delta",
     positive = "up",
     domain,
     width = 70,
@@ -88,18 +88,18 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     width,
     height,
     deltas: data.map((d) => d.value),
-    start,
+    open,
     total: totalBar,
     domain,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = resolveSummary(summary, () => waterfallSummary(data, start, fmt, strings));
+  const accName = resolveSummary(summary, () => waterfallSummary(data, open, fmt, strings));
   const goodSign = positive === "down" ? -1 : 1;
 
   // Direct value labels sit in a reserved band BELOW the plot (like the endpoint
   // gutter idiom): the viewBox grows downward, so the plot — and every
   // interactive overlay drawn over it — keeps its y∈[0,height] coordinates.
-  const FONT = Math.min(9, Math.max(6, Math.round(height * 0.5)));
+  const FONT = labelFont(height, 0.5);
   const labelText = (v: number): string => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
   const labels =
     label === "delta"

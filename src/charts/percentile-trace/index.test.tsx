@@ -32,8 +32,8 @@ describe("<PercentileTrace>", () => {
     expect(container.querySelectorAll("circle").length).toBe(1);
   });
 
-  it("bands={false} hides the population fields", () => {
-    const { container } = draw(<PercentileTrace data={SAMPLE} bands={false} />);
+  it("showBands={false} hides the population fields", () => {
+    const { container } = draw(<PercentileTrace data={SAMPLE} showBands={false} />);
     expect(container.querySelector("rect")).toBeNull();
   });
 

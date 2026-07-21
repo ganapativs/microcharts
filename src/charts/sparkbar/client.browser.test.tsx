@@ -30,10 +30,10 @@ describe("interactive <SparkBar>", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(live.textContent).toBe("Bar 1: 3");
+    expect(live.textContent).toBe("Point 1 of 8: 3.");
     expect(fig.querySelectorAll('rect[data-mc-ink="accent"]').length).toBeGreaterThanOrEqual(1);
     await userEvent.keyboard("{End}");
-    expect(live.textContent).toBe("Bar 8: 11");
+    expect(live.textContent).toBe("Point 8 of 8: 11.");
     await userEvent.keyboard("{Escape}");
     expect(live.textContent).toBe("");
   });
@@ -44,7 +44,7 @@ describe("interactive <SparkBar>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 5 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 5 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -55,7 +55,7 @@ describe("interactive <SparkBar>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 5 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 5 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

@@ -39,6 +39,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -143,9 +144,16 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const s = geo.rects[i];
-      return { index: i, value: s?.duration ?? null, label: s?.label };
+      return {
+        index: i,
+        value: s?.duration ?? null,
+        label: s?.label,
+        formatted: s
+          ? `${s.label} ${fmt(s.duration)}${s.critical ? strings.traceCritical : ""}`
+          : undefined,
+      };
     },
-    [geo],
+    [geo, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -213,13 +221,12 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticTraceFold>
       <LiveRegion>{announced}</LiveRegion>
-      {span ? (
+      {readout && span ? (
         <span
           className="mc-spark-readout"
           style={{

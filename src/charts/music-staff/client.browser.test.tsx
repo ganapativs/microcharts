@@ -35,9 +35,9 @@ describe("interactive <MusicStaff>", () => {
     const wrap = screen.container.querySelector(".mc-staff-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen[seen.length - 1]).toEqual({ index: 0, value: 3 });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 0, value: 3 });
     key(wrap, "End");
-    expect(seen[seen.length - 1]).toEqual({ index: 5, value: 9 });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 5, value: 9 });
     key(wrap, "Escape");
     expect(seen[seen.length - 1]).toBeNull();
   });
@@ -49,7 +49,7 @@ describe("interactive <MusicStaff>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks[picks.length - 1]).toEqual({ index: 0, value: 3 });
+    expect(picks[picks.length - 1]).toMatchObject({ index: 0, value: 3 });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))

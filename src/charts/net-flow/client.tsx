@@ -42,6 +42,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -77,7 +78,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
   const total = data.length;
   const navigable = geo !== null && !geo.degenerate;
 
-  // Pointer (viewBox space) → nearest period by x.
   const locate = useCallback(
     (x: number) => {
       if (!geo || geo.degenerate) return null;
@@ -98,8 +98,15 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
   // Period (DATA) index; `value` is the signed NET (in − out) — this chart's
   // decision value. Its gross in/out are still announced + shown in the readout.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo?.points[i]?.net ?? null }),
-    [geo],
+    (i: number) => {
+      const p = geo?.points[i];
+      return {
+        index: i,
+        value: p?.net ?? null,
+        formatted: p ? `${fmt(p.in)} / ${fmt(p.out)} · ${signedNet(p.net, fmt)}` : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -151,7 +158,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection: a persistent net ring that survives pointer-leave. */}
         {sp ? (
           <circle
             cx={sp.x}
@@ -206,7 +212,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticNetFlow>
-      {rp ? (
+      {readout && rp ? (
         <span
           className="mc-net-flow-readout mc-spark-readout"
           style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}

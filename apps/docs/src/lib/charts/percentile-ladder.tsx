@@ -86,7 +86,7 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <PercentileLadder data={LATENCY} summary={false} width={140} height={14} />;
+  return <PercentileLadder data={LATENCY} summary={false} label="none" width={160} height={20} />;
 }
 export const playground: PlaygroundSpec = {
   knobs: [
@@ -165,7 +165,7 @@ export const contexts: ChartContexts = {
         — p99 at 2.1 s, long tail visible.
       </p>
     ),
-    code: "<p>\n  Request latency <PercentileLadder data={latencies} /> — p99 at 2.1 s, long tail visible.\n</p>",
+    code: '<p>\n  Request latency{" "}\n  <span className="mc-inline">\n    <PercentileLadder data={latencies} summary={false} />\n  </span>{" "}\n  — p99 at 2.1 s, long tail visible.\n</p>',
   },
   cell: {
     render: () => (

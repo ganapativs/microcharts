@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { GardenGrid } from "@microcharts/react/garden-grid";
 import { GardenGrid as GardenGridInteractive } from "@microcharts/react/garden-grid/interactive";
 import staticModule, { playground as staticPlayground, WEEKS } from "./garden-grid";
 
@@ -41,6 +42,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: GardenGrid,
+  ChartLive: GardenGridInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

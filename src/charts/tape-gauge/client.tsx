@@ -86,7 +86,12 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   }, [full, announceEvery]);
 
   // Drill-down: the reading under the fixed pointer — the number the tape shows.
-  const select = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+  const select = (): void =>
+    onSelect?.({
+      index: 0,
+      value: Number.isFinite(value) ? value : null,
+      formatted: Number.isFinite(value) ? fmt(value) : undefined,
+    });
 
   return (
     <span

@@ -16,9 +16,20 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
 
-const report = JSON.parse(
-  execFileSync("pnpm", ["exec", "size-limit", "--json"], { cwd: root, encoding: "utf8" }),
-);
+// size-limit exits non-zero when any entry is over budget — sync still needs
+// the measured sizes. Same pattern as scripts/rebaseline-sizes.mjs.
+let raw;
+try {
+  raw = execFileSync("pnpm", ["exec", "size-limit", "--json"], {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  });
+} catch (e) {
+  raw = e.stdout;
+  if (!raw) throw e;
+}
+const report = JSON.parse(raw.slice(raw.indexOf("[")));
 
 /** "@microcharts/react/sparkline (static)" → { slug, kind } (null for non-chart rows). */
 function parseName(name) {

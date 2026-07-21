@@ -50,6 +50,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -99,9 +100,18 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = rolled[geo.wedges[i]!.index];
-      return { index: i, value: d?.value ?? null, label: d?.label };
+      return {
+        index: i,
+        value: d?.value ?? null,
+        label: d?.label,
+        formatted: d
+          ? d.members > 1
+            ? `${d.label} ${pcts[i]}% (${d.members} ${d.members === 1 ? "category" : "categories"})`
+            : `${d.label} ${pcts[i]}% (${fmt(d.value)})`
+          : "",
+      };
     },
-    [geo, rolled],
+    [geo, rolled, pcts, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -180,13 +190,12 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus wedge is transient. */}
         {selected !== null && selected !== active ? mark(selected, true) : null}
         {active !== null ? mark(active, false) : null}
         {rest.children}
       </StaticMicroDonut>
       <LiveRegion>{announced}</LiveRegion>
-      {shownWedge && shownDatum ? (
+      {readout && shownWedge && shownDatum ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {shownDatum.members > 1
             ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`

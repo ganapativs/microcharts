@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Hourglass } from "@microcharts/react/hourglass";
 import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
 import staticModule, { playground as staticPlayground } from "./hourglass";
 
@@ -43,6 +44,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Hourglass,
+  ChartLive: HourglassInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

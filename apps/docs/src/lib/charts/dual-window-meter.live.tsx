@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
 import staticModule, { playground as staticPlayground, LOUDNESS } from "./dual-window-meter";
 
@@ -52,6 +53,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: DualWindowMeter,
+  ChartLive: DualWindowMeterInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

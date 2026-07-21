@@ -45,6 +45,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -62,6 +63,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
     [width, height, data, domain, bins, markValue],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Counts are cardinal integers, not axis values — format them with the locale
+  // (thousands grouping) but never the value `format` (units/decimals).
+  const countFmt = useMemo(
+    () => makeFormatter(undefined, locale, { maximumFractionDigits: 0 }),
+    [locale],
+  );
 
   const modal = geo.modalBin >= 0 ? geo.bars[geo.modalBin] : undefined;
   const accName =
@@ -90,9 +97,10 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         index: i,
         value: b && b.count > 0 ? b.count : null,
         label: b ? `${fmt(b.x0)}–${fmt(b.x1)}` : undefined,
+        formatted: b ? `${fmt(b.x0)}–${fmt(b.x1)}: ${countFmt(b.count)}` : "",
       };
     },
-    [geo, fmt],
+    [geo, fmt, countFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -151,13 +159,12 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus outline is transient. */}
         {selected !== null && selected !== active ? outline(selected, true) : null}
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticHistogramStrip>
       <LiveRegion>{announced}</LiveRegion>
-      {bar ? (
+      {readout && bar ? (
         <span
           className="mc-spark-readout"
           style={{
@@ -165,7 +172,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
             transform: "translateX(-50%)",
           }}
         >
-          {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${bar.count}`}
+          {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${countFmt(bar.count)}`}
         </span>
       ) : null}
     </span>

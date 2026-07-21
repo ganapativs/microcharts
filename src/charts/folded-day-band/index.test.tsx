@@ -29,7 +29,7 @@ describe("<FoldedDayBand>", () => {
       today: TODAY,
       period: 24,
       bins: 24,
-      bands: BANDS,
+      percentiles: BANDS,
       width: 120,
       height: 32,
     });
@@ -38,9 +38,13 @@ describe("<FoldedDayBand>", () => {
     );
   });
 
-  it("today overlay renders an accent line", () => {
+  it("today overlay renders an accent line, not a filled shape", () => {
     const { container } = draw(<FoldedDayBand data={DATA} today={TODAY} />);
-    expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    const today = container.querySelector('path[data-mc-ink="accent"]');
+    expect(today).not.toBeNull();
+    // Open polyline: must carry fill="none" or the accent ink rule fills it
+    // (auto-closing the M…L… path into a solid blob). See styles.css accent rule.
+    expect(today!.getAttribute("fill")).toBe("none");
   });
 
   it("no today → no today clause", () => {
@@ -49,7 +53,7 @@ describe("<FoldedDayBand>", () => {
       today: null,
       period: 24,
       bins: 24,
-      bands: BANDS,
+      percentiles: BANDS,
       width: 120,
       height: 32,
     });

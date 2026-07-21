@@ -84,7 +84,6 @@ export function honeycombGeometry(opts: {
     else emptyPath += d;
   }
 
-  // width: cols (+ half for the offset rows), height: rows
   const offset = rows > 1 ? colSpace / 2 : 0;
   const width = Math.max(1, Math.ceil(pad * 2 + cols * colSpace + offset));
   const height = Math.max(1, Math.ceil(pad * 2 + r + (rows - 1) * rowSpace + r));

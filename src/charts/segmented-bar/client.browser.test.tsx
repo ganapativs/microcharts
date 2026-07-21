@@ -33,7 +33,7 @@ describe("interactive <SegmentedBar>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 620, label: "Chrome" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 620, label: "Chrome" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

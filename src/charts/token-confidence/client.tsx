@@ -68,7 +68,7 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       : typeof summary === "string"
         ? summary
         : tokenConfidenceSummary(tokens, strings);
-  const label = [title, accName].filter(Boolean).join(". ") || "Token confidence";
+  const label = [title, accName].filter(Boolean).join(". ") || strings.tokenConfidenceLabel;
 
   const announce = useCallback(
     (tokenIndex: number) => {

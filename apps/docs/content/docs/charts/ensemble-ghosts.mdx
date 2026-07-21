@@ -1,8 +1,8 @@
 ---
 title: EnsembleGhosts
-description:
-  An ensemble / hypothetical-outcome chart for React — a faint bundle of simulated paths with one emphasized
-  representative, so futures that disagree in shape stay visible.
+description: >-
+  React ensemble ghosts chart — faint ensemble paths with an emphasised median-like member. Tiny accessible SVG
+  microchart; RSC-safe static or /interactive.
 ---
 
 EnsembleGhosts answers "what could happen, across the simulated futures?". It draws a faint bundle of member paths with
@@ -156,7 +156,8 @@ ensembles can share an average and a final range while telling completely differ
 emphasized path defaults to the **real member** closest to the pointwise median, so the representative is an outcome
 that actually happened in the simulation, not a synthetic average of paths that never occurred (`emphasis="median"`
 draws that synthetic path instead). Selection and emphasis are deterministic — nothing about this chart varies between
-renders of the same data.
+renders of the same data. `label="end"` (default) states the emphasized path's landing value in a right gutter; pass
+`label="none"` to drop it.
 
 The static frame is not a hypothetical-outcome plot. The **loop** — flipping through the members one at a time on hover
 — is the HOP, and it lives only in the interactive entry, gated on reduced motion with arrow-key stepping as the

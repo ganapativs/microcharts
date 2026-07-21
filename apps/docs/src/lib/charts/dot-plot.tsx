@@ -128,7 +128,7 @@ export const contexts: ChartContexts = {
         spread from Kim's 41 to Ada's 96 — a 55-point range.
       </p>
     ),
-    code: `<p>\n  This cycle's review scores{" "}\n  <DotPlot data={team} width={76} height={34} /> spread from Kim's 41\n  to Ada's 96 — a 55-point range.\n</p>`,
+    code: `<p>\n  This cycle's review scores{" "}\n  <span className="mc-inline">\n    <DotPlot data={team} width={76} height={34} summary={false} />\n  </span>{" "}\n  spread from Kim's 41\n  to Ada's 96 — a 55-point range.\n</p>`,
   },
   cell: {
     render: () => (
@@ -187,7 +187,7 @@ export const contexts: ChartContexts = {
       <div className="flex flex-wrap gap-1.5">
         {(
           [
-            ["Engineering", TEAM],
+            ["Engineering", TEAM.slice(0, 3)],
             ["Design", DESIGN],
           ] as const
         ).map(([name, rows], i) => (
@@ -200,12 +200,12 @@ export const contexts: ChartContexts = {
             }`}
           >
             {name}
-            <DotPlot data={rows} summary={false} width={40} height={16} />
+            <DotPlot data={rows} summary={false} width={44} height={20} />
           </span>
         ))}
       </div>
     ),
-    code: `<button className="tab">\n  Engineering <DotPlot data={pod.scores} width={40} height={16} />\n</button>`,
+    code: `<button className="tab">\n  Engineering <DotPlot data={pod.scores.slice(0, 3)} width={44} height={20} summary={false} />\n</button>`,
   },
 };
 

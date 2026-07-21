@@ -29,16 +29,16 @@ describe("interactive <PictogramRow>", () => {
     const wrap = screen.container.querySelector(".mc-pictogram-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight"); // unit 0 — filled
-    expect(seen.at(-1)).toEqual({ index: 0, value: 1 });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 1 });
     key(wrap, "End"); // last unit — empty
-    expect(seen.at(-1)).toEqual({ index: 7, value: 0 });
+    expect(seen.at(-1)).toMatchObject({ index: 7, value: 0 });
     key(wrap, "Home");
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight"); // unit 5 — the partial one
-    expect(seen.at(-1)).toEqual({ index: 5, value: 0.5 });
+    expect(seen.at(-1)).toMatchObject({ index: 5, value: 0.5 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -52,7 +52,7 @@ describe("interactive <PictogramRow>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 1 });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 1 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

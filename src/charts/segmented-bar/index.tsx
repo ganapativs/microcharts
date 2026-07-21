@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -34,7 +35,7 @@ export interface SegmentedBarProps {
   maxSegments?: number | undefined;
   /** `"data"` preserves inherent sequences; `"desc"` ranks the composition. */
   order?: "data" | "desc" | undefined;
-  /** `"percent"` | `"value"` centered per segment (deterministic drop-out). */
+  /** `"percent"` (default) | `"value"` centered per segment (deterministic drop-out). */
   label?: "none" | "percent" | "value" | undefined;
   /** Per-segment colours, cycled; overrides `--mc-cat-N` for this instance. The
    *  rolled-up "Other" segment stays neutral. */
@@ -59,7 +60,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     data,
     maxSegments = 5,
     order = "data",
-    label = "none",
+    label = "percent",
     colors,
     width = 60,
     height = 10,
@@ -86,22 +87,24 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       a.label === strings.otherLabel ? 1 : b.label === strings.otherLabel ? -1 : b.value - a.value,
     );
   }
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.6), 7));
+  const fontSize = label === "none" ? 0 : labelFont(height, 0.6);
   const geo = segmentedBarGeometry({
     width,
     height,
     values: rolled.map((d) => d.value),
     fontSize,
   });
-  const fmt = makeFormatter(format, locale);
-  const pcts = largestRemainderPercents(geo.segments.map((s) => s.share));
+  const fmt = label === "none" ? null : makeFormatter(format, locale);
+  const pcts =
+    label === "percent" ? largestRemainderPercents(geo.segments.map((s) => s.share)) : null;
   const accName = resolveSummary(summary, () => sharesSummary(rolled, strings));
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle =
+    fontSize > 0 ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties) : style;
 
   return (
     <Chart
@@ -121,7 +124,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
         const d = rolled[seg.index]!;
         const isOther = d.members > 1;
         const text =
-          label === "percent" ? `${pcts[i]}%` : label === "value" ? fmt(d.value) : undefined;
+          label === "percent" ? `${pcts![i]}%` : label === "value" ? fmt!(d.value) : undefined;
         return (
           <g key={seg.index}>
             <rect

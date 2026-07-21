@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { StatusDot } from "@microcharts/react/status-dot";
 import { StatusDot as StatusDotInteractive } from "@microcharts/react/status-dot/interactive";
 import staticModule, { playground as staticPlayground } from "./status-dot";
 
@@ -49,6 +50,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: StatusDot,
+  ChartLive: StatusDotInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Thermometer } from "@microcharts/react/thermometer";
 import { Thermometer as ThermometerInteractive } from "@microcharts/react/thermometer/interactive";
 import staticModule, { playground as staticPlayground } from "./thermometer";
 
@@ -47,6 +48,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Thermometer,
+  ChartLive: ThermometerInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

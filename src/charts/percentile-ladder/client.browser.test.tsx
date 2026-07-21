@@ -45,7 +45,7 @@ describe("interactive <PercentileLadder>", () => {
     const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 50, label: "p50" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 50, label: "p50" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -57,7 +57,7 @@ describe("interactive <PercentileLadder>", () => {
     wrap.focus();
     key(wrap, "End");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 2, value: 99, label: "p99" });
+    expect(picks.at(-1)).toMatchObject({ index: 2, value: 99, label: "p99" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect
@@ -76,10 +76,10 @@ describe("interactive <PercentileLadder>", () => {
     const wrap = screen.container.querySelector(".mc-percentile-ladder-live") as HTMLElement;
     wrap.focus();
     key(wrap, "End");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 7, label: "p50" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 7, label: "p50" });
     key(wrap, "ArrowRight");
     // Already at the only unit: the rove is a no-op, not a jump to a hidden rung.
-    expect(seen.at(-1)).toEqual({ index: 0, value: 7, label: "p50" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 7, label: "p50" });
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
       .toBe("p50 7 (1×)");

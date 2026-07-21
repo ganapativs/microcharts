@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { TapeGauge } from "@microcharts/react/tape-gauge";
 import { TapeGauge as TapeGaugeInteractive } from "@microcharts/react/tape-gauge/interactive";
 import staticModule, { playground as staticPlayground, ZONES } from "./tape-gauge";
 
@@ -57,6 +58,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: TapeGauge,
+  ChartLive: TapeGaugeInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -20,7 +20,7 @@ export interface OrbitStatusProps {
   /** Rate extent. Default [0, 2·rate]. */
   rateDomain?: readonly [number, number] | undefined;
   /** Latency threshold: at/above it the satellite doubles + the summary flags it. */
-  alert?: number | undefined;
+  threshold?: number | undefined;
   /** ms numeral beside the orbit (`latency`), or none (default). */
   label?: "latency" | "none" | undefined;
   size?: number | undefined;
@@ -43,16 +43,17 @@ export function orbitStatusSummary(
   latency: number,
   rate: number,
   opts: {
-    alert?: number | undefined;
+    threshold?: number | undefined;
     strings?: OrbitStatusStrings | undefined;
     format?: Format | undefined;
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { alert, strings = EN_ORBIT_STATUS, format, locale } = opts;
+  const { threshold, strings = EN_ORBIT_STATUS, format, locale } = opts;
   if (!(Number.isFinite(latency) && Number.isFinite(rate))) return strings.orbitUnknown;
   const fmt = makeFormatter(format, locale);
-  const alerted = typeof alert === "number" && Number.isFinite(alert) && latency >= alert;
+  const alerted =
+    typeof threshold === "number" && Number.isFinite(threshold) && latency >= threshold;
   return strings.orbitStatus(fmt(Math.max(0, latency)), fmt(Math.max(0, rate)), alerted);
 }
 
@@ -62,7 +63,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     rate,
     latencyDomain,
     rateDomain,
-    alert,
+    threshold,
     label = "none",
     size = 20,
     color,
@@ -84,13 +85,13 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     size,
     latencyDomain,
     rateDomain,
-    alert,
+    threshold,
     pad: PAD,
   });
   const accName =
     summary === false
       ? false
-      : (summary ?? orbitStatusSummary(latency, rate, { alert, strings, format, locale }));
+      : (summary ?? orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
   const labelText = label === "latency" && !geo.unknown ? `${fmt(Math.max(0, latency))}ms` : null;
   // Reserve the gutter from the real text extent so the ms numeral never spills
@@ -110,9 +111,8 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       // The label only widens the viewBox; the dial's band is unmoved.
       seat={{ mode: "center", top: 0, bottom: geo.size }}
       className={className ? `mc-orbit ${className}` : "mc-orbit"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {/* orbit — radius is latency, dash density is rate */}
       <circle
         cx={geo.orbit.cx}
         cy={geo.orbit.cy}
@@ -127,7 +127,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
             : null),
         }}
       />
-      {/* the service */}
       <circle
         cx={geo.center.cx}
         cy={geo.center.cy}
@@ -135,7 +134,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
         data-mc-ink={geo.unknown ? "neutral" : "bar"}
         style={geo.unknown ? { fillOpacity: 0.5 } : undefined}
       />
-      {/* the dependency */}
       {!geo.unknown ? (
         <circle
           className="mc-orbit-satellite"

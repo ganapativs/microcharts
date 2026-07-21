@@ -1,8 +1,8 @@
 ---
 title: CyclePlot
-description:
-  A cycle plot (seasonal-subseries chart) for React — a slot-mean spine plus raw within-slot micro-trends, so
-  seasonality and drift stay separate reads.
+description: >-
+  React cycle plot chart — seasonal slots with within-slot drift on a shared spine. Tiny accessible SVG microchart;
+  RSC-safe static or /interactive.
 ---
 
 CyclePlot answers "what repeats beneath the trend — and is any slot itself drifting?". The series is reshaped into
@@ -68,7 +68,7 @@ within-slot lines) are different questions of the same data — so they never sh
 <CyclePlot
   data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
   period={7}
-  trend="none"
+  trend={false}
 />`}
 >
   <span className="inline-flex gap-4 items-center">
@@ -82,7 +82,7 @@ within-slot lines) are different questions of the same data — so they never sh
     <CyclePlot
       data={[38, 40, 45, 48, 52, 61, 44, 38, 42, 45, 48, 52, 61, 44, 38, 44, 45, 48, 52, 61, 44]}
       period={7}
-      trend="none"
+      trend={false}
       width={150}
       height={32}
     />

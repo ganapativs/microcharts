@@ -37,4 +37,12 @@ describe.skipIf(!hasBuild)("built docs metadata", () => {
     // the catalog's `$schema` target must ship alongside it (copied from public/)
     expect(existsSync(outDir + "catalog.schema.json")).toBe(true);
   });
+
+  it("sitemap URLs match trailingSlash:false canonicals", () => {
+    const xml = readFileSync(outDir + "sitemap.xml", "utf8");
+    expect(xml).toMatch(/<loc>https?:\/\/[^/]+\/charts<\/loc>/);
+    expect(xml).not.toMatch(/<loc>[^<]+\/charts\/<\/loc>/);
+    expect(xml).toMatch(/<loc>https?:\/\/[^/]+\/docs<\/loc>/);
+    expect(xml).toMatch(/<loc>https?:\/\/[^/]+\/docs\/charts\/sparkline<\/loc>/);
+  });
 });

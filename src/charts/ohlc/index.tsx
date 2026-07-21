@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import { round2 } from "../../core/types.js";
 import { ohlcGeometry, type OhlcInput } from "./geometry.js";
@@ -14,7 +15,6 @@ import { resolveSummary } from "../../core/summary.js";
 
 export type OhlcDatum = OhlcInput;
 
-/** Factual OHLC run summary. Shared with the interactive entry. */
 export function ohlcSummary(
   periods: readonly OhlcDatum[],
   fmt: (n: number) => string,
@@ -91,7 +91,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.4), 7));
+  const fontSize = labelFont(height, 0.4);
   const lastClose = data.at(-1)?.close;
   const geo = ohlcGeometry({
     width,

@@ -36,8 +36,8 @@ describe("<CyclePlot>", () => {
     expect(container.querySelectorAll('path[data-mc-ink="ghost"]').length).toBe(7); // slot lines
   });
 
-  it("trend='none' → spine only, no slot lines", () => {
-    const { container } = draw(<CyclePlot data={WEEKS} period={7} trend="none" />);
+  it("trend={false} → spine only, no slot lines", () => {
+    const { container } = draw(<CyclePlot data={WEEKS} period={7} trend={false} />);
     expect(container.querySelectorAll('path[data-mc-ink="ghost"]').length).toBe(0);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();
   });

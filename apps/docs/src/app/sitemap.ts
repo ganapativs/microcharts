@@ -1,29 +1,83 @@
 import type { MetadataRoute } from "next";
 import { source } from "@/lib/source";
-import { docLastModified } from "@/lib/doc-dates";
+import { docLastModified, fileLastModified } from "@/lib/doc-dates";
 import { abs } from "@/lib/site";
+
+const HOME = "apps/docs/src/app/(home)";
 
 export const dynamic = "force-static";
 
-/** The site exports with `trailingSlash: true` — sitemap URLs must match the
- *  canonical form or every entry 308-redirects on the host. */
-function canonical(path: string): string {
-  return abs(path.endsWith("/") ? path : `${path}/`);
+/** Match `trailingSlash: false` and per-page `<link rel="canonical">`. Trailing
+ *  slashes here would disagree with canonicals and dilute crawl signals. */
+function loc(path: string): string {
+  if (path === "/") return abs("/");
+  return abs(path.endsWith("/") ? path.slice(0, -1) : path);
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["/", "/charts", "/brand"].map((path) => ({
-    url: canonical(path),
-    changeFrequency: "weekly" as const,
-    priority: path === "/" ? 1 : 0.8,
+  // Per-route lastmod from the source file's real git-commit date, so an
+  // unchanged rebuild/redeploy doesn't bump `<lastmod>` (build-time `now` did).
+  const staticRoutes = [
+    { path: "/", priority: 1, changeFrequency: "weekly" as const, src: `${HOME}/page.tsx` },
+    {
+      path: "/charts",
+      priority: 0.9,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/charts/page.tsx`,
+    },
+    {
+      path: "/charts/core",
+      priority: 0.85,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/charts/collections.ts`,
+    },
+    {
+      path: "/charts/decision",
+      priority: 0.85,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/charts/collections.ts`,
+    },
+    {
+      path: "/charts/expressive",
+      priority: 0.85,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/charts/collections.ts`,
+    },
+    {
+      path: "/charts/frontier",
+      priority: 0.85,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/charts/collections.ts`,
+    },
+    {
+      path: "/docs",
+      priority: 0.9,
+      changeFrequency: "weekly" as const,
+      src: "apps/docs/src/app/docs/[[...slug]]/page.tsx",
+    },
+    {
+      path: "/brand",
+      priority: 0.5,
+      changeFrequency: "monthly" as const,
+      src: `${HOME}/brand/page.tsx`,
+    },
+  ].map((r) => ({
+    url: loc(r.path),
+    lastModified: fileLastModified(r.src),
+    changeFrequency: r.changeFrequency,
+    priority: r.priority,
   }));
 
-  const docRoutes = source.getPages().map((page) => ({
-    url: canonical(page.url),
-    lastModified: docLastModified(page.path),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  const seen = new Set(staticRoutes.map((r) => r.url));
+  const docRoutes = source
+    .getPages()
+    .map((page) => ({
+      url: loc(page.url),
+      lastModified: docLastModified(page.path),
+      changeFrequency: "weekly" as const,
+      priority: page.url.startsWith("/docs/charts/") ? 0.8 : 0.7,
+    }))
+    .filter((r) => !seen.has(r.url));
 
   return [...staticRoutes, ...docRoutes];
 }

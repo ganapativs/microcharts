@@ -1,8 +1,10 @@
 /**
  * The agent-setup prompt has ONE source of truth: the fenced ```md block under
- * `### Set up with an AI agent` in `content/docs/quickstart.mdx`. That block is
- * what `<AgentPromptCopy>` copies (read from the DOM) and what the docs render
- * with syntax highlighting.
+ * `### Set up with an AI agent` in `content/docs/quickstart.mdx` (always visible,
+ * not in an accordion). That block is what `<AgentPromptCopy>` copies (read from
+ * the DOM) and what the docs render with syntax highlighting. Keep it lean —
+ * point at `/catalog.json` + chart `.md` for props/callbacks instead of inlining
+ * the full API.
  *
  * This module extracts that same block so `/agent-setup.md` can serve it at a
  * canonical, fetchable URL — byte-identical to the page, no second copy to

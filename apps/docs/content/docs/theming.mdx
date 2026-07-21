@@ -437,6 +437,30 @@ Dark values are hand-tuned per token — never auto-inverted, so overriding one 
 surface. microcharts follows `prefers-color-scheme` out of the box, and you can force a scope with
 `data-mc-theme="dark"`. Charts never paint their own background, so they always sit cleanly on your surface.
 
+If your app toggles theme with a **class** (next-themes `.dark`, a `[data-theme]` attribute, …) rather than the OS media
+query, rebind the tokens under that class the same way you bind accent — the library's media-query defaults are
+`:where()` zero-specificity, so your class rules win:
+
+```css
+:root {
+  --mc-accent: var(--brand);
+}
+.dark {
+  --mc-stroke: #eae9e6;
+  --mc-positive: #45a385;
+  --mc-negative: #df7856;
+  --mc-accent: var(--brand);
+  /* …or data-mc-theme="dark" on a scope, if you prefer the shipped dark bundle */
+}
+```
+
+### Frosted or translucent surfaces
+
+Default valence inks clear 4.5:1 on opaque white and near-black. On a frosted glass / tinted panel the composited
+backdrop is quieter, so deepen `--mc-stroke` / `--mc-positive` / `--mc-negative` / `--mc-neutral` on that surface until
+contrast holds — don't patch chart CSS. (This docs site does exactly that under `:root` / `.dark` so marks stay legible
+on glass.)
+
 Under Windows High Contrast (`forced-colors`), the semantic tokens defer to system colors — ink to `CanvasText`, accent
 to `Highlight`, muted marks to `GrayText` — so a chart stays legible even when your palette is overridden entirely.
 

@@ -7,6 +7,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import { rollup } from "../segmented-bar/geometry.js";
@@ -23,9 +25,13 @@ export interface MicroDonutProps {
   decorative?: boolean | undefined;
   /** Annulus thickness (shared with ProgressRing). */
   weight?: number | undefined;
+  /** Center total readout when the hole has room. */
+  label?: "none" | "total" | undefined;
   /** Per-wedge colours, cycled; overrides `--mc-cat-N`. "Other" stays neutral. */
   colors?: readonly string[] | undefined;
   size?: number | undefined;
+  format?: Format | undefined;
+  locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -43,8 +49,11 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     maxWedges = 4,
     decorative = false,
     weight = 5,
+    label = "none",
     colors,
     size = 24,
+    format,
+    locale,
     strings = EN_COMPOSITION,
     title,
     summary,
@@ -64,8 +73,16 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     shares: rolled.map((d) => d.value),
     weight,
   });
+  const total = rolled.reduce((s, d) => s + (isFiniteValue(d.value) ? d.value : 0), 0);
+  const fontSize = label === "total" ? labelFont(size, 0.28) : 0;
+  const totalText =
+    label === "total" && Number.isFinite(total) ? makeFormatter(format, locale)(total) : undefined;
+  const showLabel = !decorative && totalText !== undefined && labelFitsY(size / 2, fontSize, size);
   const accName =
     decorative || summary === false ? false : (summary ?? sharesSummary(rolled, strings));
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+    : style;
 
   return (
     <Chart
@@ -79,7 +96,7 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
       // viewBox: the half-unit inset would otherwise seat it a touch low.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-donut ${className}` : "mc-donut"}
-      style={style}
+      style={rootStyle}
     >
       {geo.wedges.map((w, i) => {
         const d = rolled[w.index]!;
@@ -102,6 +119,18 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
           />
         );
       })}
+      {showLabel ? (
+        <text
+          x={size / 2}
+          y={size / 2}
+          fontSize={fontSize}
+          dominantBaseline="central"
+          textAnchor="middle"
+          data-mc-ink="label"
+        >
+          {totalText}
+        </text>
+      ) : null}
       {children}
     </Chart>
   );

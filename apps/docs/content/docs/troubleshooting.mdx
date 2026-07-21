@@ -78,10 +78,11 @@ fires for the same reason on every chart in the catalog rather than under a diff
 <Sparkline data={data} onActive={(d) => setHovered(d?.index ?? null)} />
 ```
 
-The payload is a `MicroDatum` — `{ index, value, label? }` — or `null` when the chart clears. `onPointFocus` on
-Sparkline and SparkBar and StreakSpark's `onRunFocus` map across directly. Note that `index` identifies the chart's
-_navigable unit_, which isn't always a series index: on Waveform it's a bucket, on Hypnogram a run, on SegmentedBar a
-segment. Each chart's page names its own unit. If you also want click-to-pin, add `onSelect` — see
+The payload is a `MicroDatum` — `{ index, value, label?, formatted? }` (`value` is the raw number, `formatted` the
+chart's ready-to-display string) — or `null` when the chart clears. `onPointFocus` on Sparkline and SparkBar and
+StreakSpark's `onRunFocus` map across directly. Note that `index` identifies the chart's _navigable unit_, which isn't
+always a series index: on Waveform it's a bucket, on Hypnogram a run, on SegmentedBar a segment. Each chart's page names
+its own unit. If you also want click-to-pin, add `onSelect` — see
 [Accessibility](/docs/accessibility#one-interaction-contract).
 
 ## `animate` does nothing

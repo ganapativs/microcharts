@@ -139,7 +139,7 @@ export const contexts: ChartContexts = {
         — peak 0.82 at 63%, 200 samples compressed to word width.
       </p>
     ),
-    code: `<p>\n  Voice memo amplitude{" "}\n  <Waveform data={samples} progress={0.63} width={90} height={16} /> — peak 0.82 at 63%.\n</p>`,
+    code: `<p>\n  Voice memo amplitude{" "}\n  <span className="mc-inline">\n    <Waveform data={samples} progress={0.63} width={90} height={16} summary={false} />\n  </span>{" "}\n  — peak 0.82 at 63%.\n</p>`,
   },
   cell: {
     render: () => (

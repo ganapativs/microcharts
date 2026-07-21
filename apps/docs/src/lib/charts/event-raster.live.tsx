@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { EventRaster } from "@microcharts/react/event-raster";
 import { EventRaster as EventRasterInteractive } from "@microcharts/react/event-raster/interactive";
 import staticModule, { playground as staticPlayground, RASTER } from "./event-raster";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: EventRaster,
+  ChartLive: EventRasterInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

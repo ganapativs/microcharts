@@ -6,6 +6,7 @@
 // drifts.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import {
   named,
@@ -53,6 +54,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -78,7 +80,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   }, [data, order]);
 
   const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.3), 7));
+  const fontSize = labelFont(height, 0.3);
   const geo = useMemo(
     () =>
       stackedAreaGeometry({
@@ -119,14 +121,27 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   // index = column (x-sample) index; value = the stack total at that column
   // (series summed, negatives clamped to 0 — matching the drawn stack).
   const datum = useCallback(
-    (i: number) => ({
-      index: i,
-      value: series.reduce<number>(
-        (t, s) => t + (isFiniteValue(s.values[i]) ? Math.max(0, s.values[i] as number) : 0),
-        0,
-      ),
-    }),
-    [series],
+    (i: number) => {
+      // Mirror the chip: the LEADER band at this column, not the whole stack.
+      const shares = geo.sharesAt[i];
+      let formatted: string | undefined;
+      if (shares) {
+        let top = 0;
+        for (let j = 1; j < series.length; j++) {
+          if ((shares[j] ?? 0) > (shares[top] ?? 0)) top = j;
+        }
+        formatted = `${series[top]?.label ?? strings.seriesFallback(top + 1)} ${pctFmt(shares[top] ?? 0)}`;
+      }
+      return {
+        index: i,
+        value: series.reduce<number>(
+          (t, s) => t + (isFiniteValue(s.values[i]) ? Math.max(0, s.values[i] as number) : 0),
+          0,
+        ),
+        formatted,
+      };
+    },
+    [series, geo, pctFmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -192,7 +207,6 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
-        {/* Pinned selection: a persistent crosshair that survives pointer-leave. */}
         {selX !== undefined && selected !== active ? (
           <line
             x1={selX}
@@ -218,7 +232,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         {rest.children}
       </StaticStackedArea>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null && shares && shownX !== undefined ? (
+      {readout && shown !== null && shares && shownX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{

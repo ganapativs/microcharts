@@ -15,7 +15,6 @@ export interface ScatterPoint {
   y: number;
 }
 
-/** Factual relationship summary. Shared with the interactive entry. */
 export function microScatterSummary(
   count: number,
   r: number | null,

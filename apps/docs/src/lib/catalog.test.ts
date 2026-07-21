@@ -93,4 +93,52 @@ describe("catalog shared + interactive props", () => {
     expect(owns("eta-bar", "announceEvery")).toBe(true);
     expect(owns("tape-gauge", "announceEvery")).toBe(true);
   });
+
+  it("catalog.json emits per-chart sharedInteractive without agents guessing", async () => {
+    const { buildCatalog } = await import("./catalog-json");
+    const catalog = buildCatalog();
+    expect(catalog.howToRead.length).toBeGreaterThan(40);
+    expect(catalog.sharedProps.map((p) => p.name)).toEqual(
+      expect.arrayContaining([
+        "data",
+        "onActive",
+        "onSelect",
+        "animate",
+        "live",
+        "selectedIndex",
+        "defaultSelectedIndex",
+      ]),
+    );
+
+    const spark = catalog.charts.find((c) => c.slug === "sparkline")!;
+    expect(spark.interactiveImport).toBeTruthy();
+    expect(spark.picker).toBe(true);
+    expect(spark.animates).toBe(true);
+    expect(spark.sharedInteractive).toEqual([
+      "animate",
+      "onActive",
+      "onSelect",
+      "selectedIndex",
+      "defaultSelectedIndex",
+      "readout",
+    ]);
+
+    const delta = catalog.charts.find((c) => c.slug === "delta")!;
+    expect(delta.picker).toBe(false);
+    expect(delta.sharedInteractive).toEqual(["animate", "live", "onSelect"]);
+
+    const minimap = catalog.charts.find((c) => c.slug === "minimap-strip")!;
+    expect(minimap.picker).toBe(false);
+    expect(minimap.sharedInteractive).toEqual(["animate"]);
+    expect(minimap.props.some((p) => p.name === "onWindowChange" && p.interactive)).toBe(true);
+
+    const token = catalog.charts.find((c) => c.slug === "token-confidence")!;
+    expect(token.picker).toBe(false);
+    expect(token.animates).toBe(false);
+    expect(token.sharedInteractive).toEqual([]);
+
+    const wind = catalog.charts.find((c) => c.slug === "wind-barb")!;
+    expect(wind.interactiveImport).toBeUndefined();
+    expect(wind.sharedInteractive).toBeUndefined();
+  });
 });

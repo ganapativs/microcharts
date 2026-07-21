@@ -53,18 +53,18 @@ export function foldedBandGeometry(opts: {
   today: readonly TP[] | null;
   period: number;
   bins: number;
-  bands: readonly [number, number][];
+  percentiles: readonly [number, number][];
   width: number;
   height: number;
 }): FoldedBandResult {
-  const { data, today, period, bins, bands, width, height } = opts;
+  const { data, today, period, bins, percentiles, width, height } = opts;
   const pad = 1;
   const plotW = width - pad * 2;
   const plotH = height - pad * 2;
   const buckets = foldBins(data, period, bins);
 
   // percentiles per bin
-  const ps = [0.5, ...bands.flatMap(([lo, hi]) => [lo / 100, hi / 100])];
+  const ps = [0.5, ...percentiles.flatMap(([lo, hi]) => [lo / 100, hi / 100])];
   const perBin = buckets.map((vals) => quantiles(vals, ps));
 
   // domain from all finite values
@@ -91,7 +91,7 @@ export function foldedBandGeometry(opts: {
 
   // band areas (outermost drawn first / faintest — bands ordered inner→outer,
   // we reverse for z-order in the component)
-  const bandPaths: string[] = bands.map((_pair, bi) => {
+  const bandPaths: string[] = percentiles.map((_pair, bi) => {
     const loIdx = 1 + bi * 2;
     const hiIdx = 2 + bi * 2;
     const top: string[] = [];

@@ -11,6 +11,9 @@ type MetaInput = {
   /** Markdown-mirror URL — emitted as `<link rel="alternate" type="text/markdown">`
    *  so agents can discover the machine-readable copy of the page. */
   markdown?: `/${string}`;
+  /** Docs/chart pages are articles; marketing pages stay `website`. */
+  type?: "website" | "article";
+  keywords?: readonly string[] | string[];
 };
 
 /** Shared metadata contract for every docs route. */
@@ -22,6 +25,8 @@ export function docsMeta({
   imageAlt = SITE.ogImageAlt,
   noindex = false,
   markdown,
+  type = "website",
+  keywords,
 }: MetaInput): Metadata {
   const url = abs(path);
   const imageUrl = abs(image);
@@ -31,18 +36,26 @@ export function docsMeta({
        site name exactly once (a manual suffix here doubled it). */
     title,
     description,
+    ...(keywords ? { keywords: [...keywords] } : {}),
     metadataBase: new URL(SITE.url),
     alternates: {
       canonical: url,
       ...(markdown ? { types: { "text/markdown": abs(markdown) } } : {}),
     },
-    robots: noindex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: noindex
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+        },
     openGraph: {
-      type: "website",
+      type,
       siteName: SITE.name,
       title,
       description,
       url,
+      locale: "en_US",
       images: [{ url: imageUrl, width: 1200, height: 630, alt: imageAlt }],
     },
     twitter: {
@@ -51,7 +64,7 @@ export function docsMeta({
       creator: SITE.authorXHandle,
       title,
       description,
-      images: [imageUrl],
+      images: [{ url: imageUrl, alt: imageAlt }],
     },
   };
 }

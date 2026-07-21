@@ -157,7 +157,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
         bottom: geo.center.cy + geo.maxR,
       }}
       className={className ? `mc-tree ${className}` : "mc-tree"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {rings === "fill"
         ? geo.rings.map((r) =>

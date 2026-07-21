@@ -175,7 +175,7 @@ export const contexts: ChartContexts = {
         — 62% agree, 24% disagree. Leans positive.
       </p>
     ),
-    code: `<p>\n  Checkout satisfaction, Q1{" "}\n  <LikertStrip data={responses} label="none" height={16} /> — 62% agree, 24% disagree. Leans positive.\n</p>`,
+    code: `<p>\n  Checkout satisfaction, Q1{" "}\n  <span className="mc-inline">\n    <LikertStrip data={responses} label="none" height={16} summary={false} />\n  </span>{" "}\n  — 62% agree, 24% disagree. Leans positive.\n</p>`,
   },
   cell: {
     render: () => (
@@ -185,14 +185,14 @@ export const contexts: ChartContexts = {
             <tr key={row.q}>
               <td className="py-1.5 pr-3 text-fd-muted-foreground">{row.q}</td>
               <td className="py-1.5">
-                <LikertStrip data={row.data} summary={false} label="net" width={120} height={16} />
+                <LikertStrip data={row.data} summary={false} label="none" width={120} height={16} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     ),
-    code: `<td>\n  <LikertStrip data={q.responses} label="net" />\n</td>`,
+    code: `<td>\n  <LikertStrip data={q.responses} label="none" />\n</td>`,
   },
   kpi: {
     render: () => (

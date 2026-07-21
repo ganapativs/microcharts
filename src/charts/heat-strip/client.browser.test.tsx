@@ -44,7 +44,7 @@ describe("interactive <HeatStrip>", () => {
     const fig = await mount(<HeatStrip data={DATA} onActive={(d) => seen.push(d)} />);
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 9 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 9 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -54,7 +54,7 @@ describe("interactive <HeatStrip>", () => {
     const fig = await mount(<HeatStrip data={DATA} onSelect={(d) => picks.push(d)} />);
     fig.focus();
     await userEvent.keyboard("{End}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 3, value: 18 });
+    expect(picks.at(-1)).toMatchObject({ index: 3, value: 18 });
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });

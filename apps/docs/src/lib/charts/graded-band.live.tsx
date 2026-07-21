@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { GradedBand } from "@microcharts/react/graded-band";
 import { GradedBand as GradedBandInteractive } from "@microcharts/react/graded-band/interactive";
 import staticModule, { playground as staticPlayground, DRAWS } from "./graded-band";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: GradedBand,
+  ChartLive: GradedBandInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

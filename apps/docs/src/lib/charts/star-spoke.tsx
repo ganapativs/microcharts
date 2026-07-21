@@ -153,12 +153,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Product profile{" "}
         <span className="mc-inline">
-          <StarSpoke data={PROFILE} dots="tips" size={20} summary={false} />
+          <StarSpoke data={PROFILE} labels={false} dots="tips" size={28} summary={false} />
         </span>{" "}
         — strong on speed, weak on cost.
       </p>
     ),
-    code: "<p>\n  Product profile <StarSpoke data={metrics} /> — strong on speed, weak on cost.\n</p>",
+    code: '<p>\n  Product profile{" "}\n  <span className="mc-inline">\n    <StarSpoke data={metrics} summary={false} />\n  </span>{" "}\n  — strong on speed, weak on cost.\n</p>',
   },
   cell: {
     render: () => (
@@ -168,7 +168,7 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <StarSpoke data={row.data} dots="tips" size={22} summary={false} />
+                <StarSpoke data={row.data} labels={false} dots="tips" size={32} summary={false} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -188,7 +188,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">top dimension</span>
           </div>
         </div>
-        <StarSpoke data={CTX_ROWS[0]!.data} dots="tips" size={48} summary={false} />
+        <StarSpoke data={CTX_ROWS[0]!.data} dots="tips" size={72} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">0.9</span>\n  <span className="unit">top dimension</span>\n  <StarSpoke data={metrics} />\n</div>',
@@ -202,13 +202,14 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <StarSpoke data={row.data} dots="tips" size={18} summary={false} />
+            <StarSpoke data={row.data} labels={false} dots="tips" size={28} summary={false} />
           </span>
         ))}
       </div>
     ),
     code: '<button className="tab">\n  Product A <StarSpoke data={metrics} />\n</button>',
   },
+  note: "Best at KPI/card scale — spoke tips need room to read.",
 };
 
 export function Mark(props: { data: number[]; width?: number; height?: number }) {

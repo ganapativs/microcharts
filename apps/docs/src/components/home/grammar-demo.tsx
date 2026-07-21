@@ -273,8 +273,7 @@ export function GrammarDemo() {
       <div className="grid gap-0 sm:grid-cols-2">
         <div className="border-b border-hairline p-5 sm:border-b-0 sm:border-r">
           <p className="mono-label mb-3 opacity-60">a model writes</p>
-          {/* aria-hidden: a screen reader gets the finished code once, not a
-              character churn — the sr-only twin below is the alternative. */}
+          {/* Animated type is aria-hidden; sr-only twin below. */}
           <pre
             aria-hidden
             className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground"
@@ -295,8 +294,7 @@ export function GrammarDemo() {
         </div>
       </div>
 
-      {/* stacked, not side-by-side: the sentence wraps to two lines on most
-          tabs, and a tall paragraph beside a small chip reads broken */}
+      {/* Stacked: sentence wraps on narrow viewports. */}
       <div className="border-t border-hairline px-5 py-4">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
           <span className="mono-label rounded-md bg-fd-primary/10 px-1.5 py-1 leading-none text-fd-primary">

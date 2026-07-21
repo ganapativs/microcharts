@@ -1,8 +1,8 @@
 ---
 title: WindBarb
-description:
-  A direction-and-magnitude glyph for React — shaft angle is the bearing, quantized WMO barbs are the strength, all in
-  one character.
+description: >-
+  React wind barb chart — shaft angle for bearing and quantized WMO barbs for strength. Tiny accessible SVG microchart;
+  RSC-safe, static-only (no /interactive entry).
 ---
 
 WindBarb answers "which way is it flowing and roughly how hard — in one character?". The shaft points along the bearing
@@ -97,6 +97,7 @@ is five.
 <LiveDemo
   label="negative magnitude flips the bearing 180° (dev warning, not an error)"
   code={`<WindBarb direction={90} magnitude={-25} />`}
+  expectWarn
 >
   <WindBarb direction={90} magnitude={-25} title="Flipped" size={40} />
 </LiveDemo>

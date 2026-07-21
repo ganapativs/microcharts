@@ -60,6 +60,12 @@ export const entry: ChartEntry = {
       description: "Endpoint value label for the primary series.",
     },
     {
+      name: "dots",
+      type: '"auto" | "none"',
+      required: false,
+      description: 'Endpoint dots on both lines (default "auto").',
+    },
+    {
       name: "seriesStrings",
       type: "SeriesStrings",
       required: false,
@@ -95,6 +101,13 @@ export const playground: PlaygroundSpec = {
       options: ["none", "last"],
       init: "none",
     },
+    {
+      kind: "segmented",
+      key: "dots",
+      label: "dots",
+      options: ["auto", "none"],
+      init: "auto",
+    },
     { kind: "toggle", key: "band", label: "band", init: false },
   ],
   render: (s) => (
@@ -102,6 +115,7 @@ export const playground: PlaygroundSpec = {
       data={US}
       compare={BENCH}
       label={s.label as "last" | "none"}
+      dots={s.dots as "auto" | "none"}
       band={s.band ? [13, 16] : undefined}
       summary={false}
       width={260}
@@ -114,6 +128,7 @@ export const playground: PlaygroundSpec = {
       "  data={ours}",
       "  compare={market}",
       s.label !== "none" && `  label="${s.label}"`,
+      s.dots !== "auto" && `  dots="${s.dots}"`,
       s.band && "  band={[13, 16]}",
       "/>",
     ]
@@ -155,7 +170,7 @@ export const contexts: ChartContexts = {
         — up 75% this quarter against the market&apos;s 33% gain.
       </p>
     ),
-    code: `<p>\n  Checkout conversion is outrunning the market{" "}\n  <DualSparkline data={ours} compare={market} width={70} height={18} /> — up 75% vs the market's 33%.\n</p>`,
+    code: `<p>\n  Checkout conversion is outrunning the market{" "}\n  <span className="mc-inline">\n    <DualSparkline data={ours} compare={market} width={70} height={18} summary={false} />\n  </span>{" "}\n  — up 75% vs the market's 33%.\n</p>`,
   },
   cell: {
     render: () => (

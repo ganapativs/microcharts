@@ -1,8 +1,8 @@
 ---
 title: Introduction
 description:
-  Word-sized charts for React, made for LLMs and humans — zero dependencies, 1–3.9 kB gzip each, accessible by default,
-  and server-component safe. 106 chart types, one grammar.
+  Word-sized React charts for LLMs and humans — zero dependencies, sparklines & inline SVG microcharts, ~2–7 kB
+  interactive · ~1–4 kB static, accessible by default, RSC-safe. 106 chart types, one grammar.
 ---
 
 microcharts is a set of tiny, handcrafted charts for React — **made for AI first, and for the people reading what it
@@ -11,11 +11,13 @@ describes itself in words, so a chart an LLM streams into a chat reply, a docume
 can read and trust. They're built to sit _inside_ an interface — in a sentence, a table cell, a KPI card, a tab header,
 a streamed reply — where a full chart library would be too heavy and too loud. One quiet signal, read at a glance.
 
+Prefer [Set up with AI](/docs/quickstart#set-up-with-an-ai-agent) — paste one prompt and an agent installs the package,
+imports the stylesheet, and verifies with a first chart. Or install manually (both steps are required):
+
 <PackageTabs />
 
-Installing is half the setup — the other half is one stylesheet import at your app root; the
-[Quickstart](/docs/quickstart) shows both, or hands the whole thing to
-[your coding agent](/docs/quickstart#set-up-with-an-ai-agent).
+The other half of manual setup is one stylesheet import at your app root — see the
+[Quickstart](/docs/quickstart#set-up-manually).
 
 Every chart renders from `data` alone, ships as pure SVG with **zero runtime dependencies**, and carries an accessible
 description generated from the data itself — the same properties that make it safe for a model to write are the ones
@@ -43,8 +45,7 @@ that make it pleasant for a human to use.
   have nothing to rove between and take `onSelect` alone.
 - **Accessible by default.** Each chart is an `img` with a natural-language summary built from your data — nothing to
   remember, nothing to drift.
-- **Tiny.** Static charts span **1–3.9 kB gzip** (median 2.5), each imported from its own subpath and budget-gated in
-  CI.
+- **Tiny.** **~2–7 kB interactive · ~1–4 kB static** gzip each, imported from their own subpath and budget-gated in CI.
 
 ## One catalog, one grammar
 
@@ -80,8 +81,35 @@ Here's the same chart doing its job in four of those homes:
 <FourContexts slug="sparkline" />
 
 [Composition](/docs/composition) has the exact placement recipe for each surface — a table cell, a KPI card, a tab, or
-inline in a sentence. Ready to render one? The [Quickstart](/docs/quickstart) gets you from install to a live chart in
-minutes.
+inline in a sentence. Unsure whether this library or a full chart library fits?
+[When to use microcharts](/docs/when-to-use). Ready to render one? The [Quickstart](/docs/quickstart) gets you from
+install to a live chart in minutes.
+
+## FAQ
+
+### What is microcharts?
+
+microcharts is a React chart library of word-sized SVG charts — sparklines, bars, bullets, and the rest of the catalog —
+built to sit inside sentences, table cells, KPI cards, and AI replies. Zero runtime dependencies, accessible by default,
+and server-component safe.
+
+### How is microcharts different from Recharts or Chart.js?
+
+Those are full chart libraries for surfaces that are mostly chart. microcharts is built to sit _inside_ an interface —
+word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, typically **~2–7
+kB interactive · ~1–4 kB static** gzip, no axes or legends, static entries with **zero client JavaScript** from an RSC.
+We are not a replacement; see [When to use](/docs/when-to-use) and [Full chart libraries](/docs/full-chart-libraries).
+
+### Are microcharts accessible?
+
+Yes. Every chart is `role="img"` with a natural-language summary generated from the data. Interactive entries add
+keyboard navigation and a polite live region. Direction and state are never color-alone — see
+[Accessibility](/docs/accessibility).
+
+### Do static microcharts need client JavaScript?
+
+No. Default exports are hook-free pure SVG — RSC-safe with zero client JS. Import the matching `/interactive` subpath
+only when you need hover, keyboard, touch, or selection.
 
 <Callout type="info" title="Production-ready, still earning its scars">
   microcharts is tested and ready to use in production — but it hasn't been battle-tested across every stack and edge

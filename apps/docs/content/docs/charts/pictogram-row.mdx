@@ -1,7 +1,8 @@
 ---
 title: PictogramRow
-description:
-  A unit pictogram for React — filled vs hollow units a reader can count, with honest fractional units and no size lies.
+description: >-
+  React pictogram row chart — counts as a row of pictograms you can tally at a glance. Tiny accessible SVG microchart;
+  RSC-safe static or /interactive.
 ---
 
 PictogramRow answers "how many of the N units are filled?" — ●●●○○ — counts a human can verify by counting. Filled vs
@@ -57,7 +58,7 @@ classic pictogram lie this component refuses to tell.
 
 ## Edge cases
 
-<LiveDemo label="zero total" code={`<PictogramRow value={3} total={0} title="No capacity" />`}>
+<LiveDemo label="zero total" code={`<PictogramRow value={3} total={0} title="No capacity" />`} expectWarn>
   <PictogramRow value={3} total={0} title="No capacity" width={90} height={18} />
 </LiveDemo>
 
@@ -65,7 +66,11 @@ classic pictogram lie this component refuses to tell.
   <PictogramRow value={-2} total={4} title="Deficit" width={90} height={18} />
 </LiveDemo>
 
-<LiveDemo label="overflow — value past the total" code={`<PictogramRow value={9} total={8} title="Over capacity" />`}>
+<LiveDemo
+  label="overflow — value past the total"
+  code={`<PictogramRow value={9} total={8} title="Over capacity" />`}
+  expectWarn
+>
   <PictogramRow value={9} total={8} title="Over capacity" width={90} height={18} />
 </LiveDemo>
 

@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
 import staticModule, { playground as staticPlayground, LD, RD } from "./orbit-status";
 
@@ -29,7 +30,7 @@ export const playground: PlaygroundSpec = {
       rate={s.rate as number}
       latencyDomain={LD}
       rateDomain={RD}
-      alert={s.alert === "on" ? 300 : undefined}
+      threshold={s.threshold === "on" ? 300 : undefined}
       summary={false}
       size={120}
     />
@@ -41,7 +42,7 @@ export const playground: PlaygroundSpec = {
       `  rate={${s.rate}}`,
       "  latencyDomain={[0, 500]}",
       "  rateDomain={[0, 20]}",
-      s.alert === "on" && "  alert={300}",
+      s.threshold === "on" && "  threshold={300}",
       "/>",
     ]
       .filter(Boolean)
@@ -50,6 +51,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: OrbitStatus,
+  ChartLive: OrbitStatusInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

@@ -5,6 +5,7 @@
 // static component (canon); the edge ticks are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -46,6 +47,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -61,11 +63,27 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   // concentrically outward from the center (the point estimate) instead.
   useEntrance(hostRef, "grow", animate);
 
-  const geo = useMemo(
-    () => gradedBandGeometry({ width, height, data, levels, value, domain: props.domain }),
-    [width, height, data, levels, value, props.domain],
-  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const geo = useMemo(() => {
+    const bare = gradedBandGeometry({ width, height, data, levels, value, domain: props.domain });
+    if (bare === null) return null;
+    // Mirror the static's median right-gutter reservation (index.tsx) so
+    // totalWidth/labelX/labelY match byte-for-byte when label="median".
+    const FONT = labelFont(height, 0.62);
+    const showLabel = label === "median" && labelFitsY(height / 2, FONT, height);
+    if (!showLabel) return bare;
+    const medText = fmt(bare.median.value);
+    return gradedBandGeometry({
+      width,
+      height,
+      data,
+      levels,
+      value,
+      domain: props.domain,
+      gutterCh: medText.length,
+      fontSize: FONT,
+    })!;
+  }, [width, height, data, levels, value, props.domain, label, fmt]);
 
   // ascending by level → ←/→ steps from the most-certain (innermost) outward
   const stops = useMemo(() => (geo ? [...geo.bands].sort((a, b) => a.p - b.p) : []), [geo]);
@@ -88,7 +106,17 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   );
   // index = band index in ascending level order (0 = innermost / most-certain);
   // value = the band's probability level (p).
-  const datum = useCallback((i: number) => ({ index: i, value: stops[i]?.p ?? null }), [stops]);
+  const datum = useCallback(
+    (i: number) => {
+      const b = stops[i];
+      return {
+        index: i,
+        value: b?.p ?? null,
+        formatted: b ? `${b.p}% ${fmt(b.lo)}–${fmt(b.hi)}` : undefined,
+      };
+    },
+    [stops, fmt],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count: stops.length,
@@ -167,12 +195,11 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus edges are transient. */}
         {selected !== null && selected !== active ? edges(selected, true) : null}
         {active !== null ? edges(active, false) : null}
         {rest.children}
       </StaticGradedBand>
-      {band && geo ? (
+      {readout && band && geo ? (
         <span
           className="mc-graded-band-readout mc-spark-readout"
           style={{

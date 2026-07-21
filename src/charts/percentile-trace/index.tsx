@@ -18,7 +18,6 @@ import {
 import { round2, type Polarity, type Value } from "../../core/types.js";
 import { percentileGeometry, type PercentileGeometry } from "./geometry.js";
 
-/** Factual percentile-drift summary. Shared with the interactive entry. */
 export function percentileSummary(
   geo: PercentileGeometry,
   pStr: (n: number) => string,
@@ -37,7 +36,7 @@ export interface PercentileTraceProps {
   /** Percentile ranks per reading, 0–100 (out-of-range values are clamped). */
   data: readonly Value[];
   /** Draw the fixed p25–75 + p5–95 population bands (default true). */
-  bands?: boolean | undefined;
+  showBands?: boolean | undefined;
   /** Which direction is good — colors the endpoint dot (default "up"). */
   positive?: Polarity | undefined;
   /** `"last"` states the final percentile in a right gutter. */
@@ -86,7 +85,7 @@ export const percentileLabelFits = (height: number): boolean =>
 export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const {
     data,
-    bands = true,
+    showBands = true,
     positive = "up",
     label = "last",
     width = 80,
@@ -123,6 +122,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
         title={title}
         summary={accName}
         id={id}
+        seat={{ mode: "floor", bottom: height - 2 }}
         className={cls}
         style={style}
       >
@@ -177,7 +177,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
       {ann.under}
       {/* outer p5–95 field (faintest, half the band token) then the inner
           p25–75 middle half painted full-strength on top */}
-      {bands
+      {showBands
         ? [geo.bands.outer, geo.bands.inner].map((b, i) => (
             <rect
               key={i}

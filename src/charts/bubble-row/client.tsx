@@ -44,6 +44,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     summary,
     strings = EN_BUBBLE,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -68,7 +69,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
       label === "none"
         ? undefined
         : data.map((d) => {
-            if (d.value === null) return 0;
+            if (!isFiniteValue(d.value)) return 0;
             const t = label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
             return t.length * 0.72 * fontSize + fontSize;
           }),
@@ -106,8 +107,21 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   );
   // `value` = the bubble's magnitude (the encoded area), `null` when missing.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: data[i]?.value ?? null, label: data[i]?.label }),
-    [data],
+    (i: number) => {
+      const d = data[i];
+      const text = d
+        ? isFiniteValue(d.value)
+          ? strings.bubbleAt(d.label, fmt(d.value))
+          : strings.bubbleEmpty(d.label)
+        : "";
+      return {
+        index: i,
+        value: d?.value ?? null,
+        label: d?.label,
+        formatted: text ? text.replace(/[.。]$/, "") : undefined,
+      };
+    },
+    [data, strings, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -177,18 +191,16 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         strings={strings}
         summary={false}
       >
-        {/* Pinned selection persists through pointer-leave; focus ring is transient. */}
         {selected !== null && selected !== active ? ring(selected, true) : null}
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBubbleRow>
       <LiveRegion>{announced}</LiveRegion>
-      {b && announced ? (
+      {readout && b && announced ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(b.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {/* chips are terse — the live region keeps the full sentence */}
           {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}

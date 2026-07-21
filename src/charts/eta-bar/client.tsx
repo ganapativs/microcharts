@@ -26,6 +26,8 @@ export interface InteractiveEtaBarProps extends EtaBarProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** The bar was activated (click, tap, Enter or Space): `{ index: 0, value }` — the clamped progress. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -43,6 +45,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     summary,
     announceEvery = 10000,
     animate = false,
+    readout = true,
     onSelect,
     className,
     style,
@@ -93,6 +96,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     onSelect?.({
       index: 0,
       value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,
+      formatted: chip,
     });
 
   return (
@@ -123,7 +127,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {focused && chip ? (
+      {readout && focused && chip ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {chip}
         </span>

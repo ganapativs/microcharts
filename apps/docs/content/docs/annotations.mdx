@@ -106,9 +106,10 @@ The children don't know which chart drew them — they resolve against the host'
 Every **value-series** chart hosts annotations — the charts with a continuous value axis and an index / slot / time
 x-axis, so a data-space `x` and `y` map cleanly onto the frame. That's Sparkline, SparkBar, MiniBar, CyclePlot,
 CitySkyline, ChangePoint, DualSparkline, SpreadBand, ForecastCone, ControlStrip, QueueDepth, BurnChart, Waterfall,
-PercentileTrace, RetentionCurve, WinProbWorm, and ErrorBudget. The same `<Threshold>` or `<Marker>` lands in each
-chart's own data-space, unchanged. (MiniBar hosts in its default **vertical** orientation, where value lives on the
-y-axis; a horizontal MiniBar flips the axes, so it passes annotation children straight through.)
+PercentileTrace, RetentionCurve, WinProbWorm, ErrorBudget, NetFlow, Horizon, EnsembleGhosts, PairedBars (vertical), and
+Slope. The same `<Threshold>` or `<Marker>` lands in each chart's own data-space, unchanged. (MiniBar and PairedBars
+host in their default **vertical** orientation, where value lives on the y-axis; a horizontal layout flips the axes, so
+annotation children pass through.)
 
 Charts without a single continuous value-y don't host them, by design — there's no shared `y` for a `<Threshold>` to
 land on:

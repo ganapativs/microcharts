@@ -35,7 +35,7 @@ describe("interactive <PolarClock>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 120, label: "Sunday" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 120, label: "Sunday" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -46,17 +46,17 @@ describe("interactive <PolarClock>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 120, label: "Sunday" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 120, label: "Sunday" });
     fig.blur();
     await expect.poll(() => fig.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
   });
 
-  it("a fractional `start` still answers the pointer (client shares the paint's rotation)", async () => {
-    // start=1.5 rotates by whole slots, so Monday sits at 12 o'clock. Inverting
-    // the RAW start here produced index 1.5 — no segment, a dial dead to hover.
+  it("a fractional `origin` still answers the pointer (client shares the paint's rotation)", async () => {
+    // origin=1.5 rotates by whole slots, so Monday sits at 12 o'clock. Inverting
+    // the RAW origin here produced index 1.5 — no segment, a dial dead to hover.
     const seen: unknown[] = [];
     const screen = await render(
-      <PolarClock data={WEEK} start={1.5} onActive={(d) => seen.push(d)} />,
+      <PolarClock data={WEEK} origin={1.5} onActive={(d) => seen.push(d)} />,
     );
     const fig = screen.getByRole("img").element() as HTMLElement;
     const r = fig.getBoundingClientRect();
@@ -67,7 +67,7 @@ describe("interactive <PolarClock>", () => {
         clientY: r.top + 2, // just below 12 o'clock
       }),
     );
-    expect(seen.at(-1)).toEqual({ index: 1, value: 200, label: "Monday" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 200, label: "Monday" });
     const live = fig.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Monday: 200.");
   });

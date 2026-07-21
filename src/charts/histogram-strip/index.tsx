@@ -10,7 +10,6 @@ import type { Value } from "../../core/types.js";
 import { histogramGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual distribution summary — count + the modal bin. Shared with client. */
 export function histogramSummary(
   total: number,
   modal: { x0: number; x1: number } | undefined,

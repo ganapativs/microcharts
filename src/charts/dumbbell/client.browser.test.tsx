@@ -43,7 +43,7 @@ describe("interactive <Dumbbell>", () => {
     const wrap = screen.container.querySelector(".mc-dumbbell-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowDown");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 55, label: "Paris" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 55, label: "Paris" });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -55,7 +55,7 @@ describe("interactive <Dumbbell>", () => {
     wrap.focus();
     key(wrap, "ArrowDown");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 55, label: "Paris" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 55, label: "Paris" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();

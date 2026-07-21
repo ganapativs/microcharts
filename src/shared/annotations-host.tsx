@@ -1,9 +1,6 @@
-// Host-side annotation resolver — deliberately TINY. The mark-rendering code
-// lives as a static field ON each annotation component (shared/annotations.tsx),
-// which ships in the `@microcharts/react/annotations` entry the CONSUMER
-// imports. A host that renders no annotations therefore pays only this walker
-// (~0.2 kB), not the whole annotation layer — the per-subpath budgets stay
-// honest.
+// Annotation host walker only (~0.2 kB). Mark renderers live on each annotation
+// component in `@microcharts/react/annotations`, so hosts that render none don't
+// pay for the layer.
 import { Children, Fragment, isValidElement, type ReactNode } from "react";
 
 /** Brand key — a static field on each annotation component function. */
@@ -38,10 +35,14 @@ export interface ResolvedAnnotations {
   rest: ReactNode;
 }
 
+const NO_ANNOTATIONS: ResolvedAnnotations = { under: null, over: null, rest: null };
+
 export function resolveAnnotations(
   children: ReactNode,
   frame: AnnotationFrame,
 ): ResolvedAnnotations {
+  if (children == null || children === false || children === true) return NO_ANNOTATIONS;
+
   const under: ReactNode[] = [];
   const over: ReactNode[] = [];
   const rest: ReactNode[] = [];
@@ -50,7 +51,7 @@ export function resolveAnnotations(
   const walk = (nodes: ReactNode): void => {
     Children.forEach(nodes, (child: ReactNode) => {
       if (isValidElement(child)) {
-        // unwrap fragments so <><Threshold/><Marker/></> works as expected
+        // unwrap fragments
         if (child.type === Fragment) {
           walk((child.props as { children?: ReactNode }).children);
           return;

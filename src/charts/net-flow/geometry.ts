@@ -66,6 +66,11 @@ export interface NetFlowGeometry {
   labelX: number;
   labelY: number;
   totalWidth: number;
+  /** Signed value domain `[-maxMag, maxMag]` — annotations frame (Threshold/
+   *  TargetZone y), not the plotted magnitude range. */
+  domain: readonly [number, number];
+  /** Data value → viewBox y for annotations. */
+  yFor: (v: number) => number;
 }
 
 const mag = (v: number): number => (isFiniteValue(v) && v > 0 ? v : 0);
@@ -182,5 +187,7 @@ export function netFlowGeometry(opts: {
     labelX: round2(width + 3),
     labelY: zeroY,
     totalWidth: width + gutter,
+    domain: [-(maxMag || 1), maxMag || 1],
+    yFor: scaleLinear([-(maxMag || 1), maxMag || 1], [height - pad, pad]),
   };
 }

@@ -38,6 +38,12 @@ export const entry: ChartEntry = {
       description: "Explicit [0, max]; auto-fit otherwise.",
     },
     {
+      name: "label",
+      type: '"none" | "value" | "target" | "both"',
+      required: false,
+      description: "Value/target readout in a right gutter (default none).",
+    },
+    {
       name: "title",
       type: "string",
       required: false,
@@ -69,6 +75,13 @@ export const playground: PlaygroundSpec = {
     { kind: "range", key: "target", min: 0, max: 100, init: 80 },
     { kind: "toggle", key: "bands", init: true },
     { kind: "toggle", key: "domain", label: "narrow domain (0–60)", init: false },
+    {
+      kind: "segmented",
+      key: "label",
+      label: "label",
+      options: ["none", "value", "target", "both"],
+      init: "none",
+    },
   ],
   render: (s) => (
     <Bullet
@@ -76,6 +89,7 @@ export const playground: PlaygroundSpec = {
       target={s.target as number}
       bands={s.bands ? [50, 90] : undefined}
       domain={s.domain ? [0, 60] : undefined}
+      label={s.label as "none" | "value" | "target" | "both"}
       width={300}
       height={28}
       className="w-full max-w-md"
@@ -90,6 +104,7 @@ export const playground: PlaygroundSpec = {
       `  target={${s.target}}`,
       s.bands && "  bands={[50, 90]}",
       s.domain && "  domain={[0, 60]}",
+      s.label !== "none" && `  label="${s.label}"`,
       "/>",
     ]
       .filter(Boolean)
@@ -148,7 +163,7 @@ export const contexts: ChartContexts = {
         — inside the good band, short of target.
       </p>
     ),
-    code: `<p>\n  Q3 quota attainment sits at{" "}\n  <Bullet value={72} target={80} bands={[50, 90]} height={14} /> — inside the good band, short of target.\n</p>`,
+    code: `<p>\n  Q3 quota attainment sits at{" "}\n  <span className="mc-inline">\n    <Bullet value={72} target={80} bands={[50, 90]} height={14} summary={false} />\n  </span>{" "}\n  — inside the good band, short of target.\n</p>`,
   },
   cell: {
     render: () => (

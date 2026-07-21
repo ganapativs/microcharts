@@ -143,12 +143,20 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Fundraiser progress{" "}
         <span className="mc-inline">
-          <Thermometer value={72} target={80} height={16} summary={false} />
+          <Thermometer
+            value={72}
+            target={80}
+            orientation="horizontal"
+            bulb={false}
+            width={72}
+            height={12}
+            summary={false}
+          />
         </span>{" "}
         — $72K raised, $8K from goal.
       </p>
     ),
-    code: "<p>\n  Fundraiser progress <Thermometer value={72} target={80} /> — $72K raised, $8K from goal.\n</p>",
+    code: '<p>\n  Fundraiser progress{" "}\n  <span className="mc-inline">\n    <Thermometer value={72} target={80} orientation="horizontal" bulb={false} summary={false} />\n  </span>{" "}\n  — $72K raised, $8K from goal.\n</p>',
   },
   cell: {
     render: () => (
@@ -158,7 +166,15 @@ export const contexts: ChartContexts = {
             <tr key={row.name}>
               <td className="py-1.5 pr-3 font-mono text-fd-muted-foreground text-xs">{row.name}</td>
               <td className="py-1.5">
-                <Thermometer value={row.value} target={row.target} height={18} summary={false} />
+                <Thermometer
+                  value={row.value}
+                  target={row.target}
+                  orientation="horizontal"
+                  bulb={false}
+                  width={96}
+                  height={14}
+                  summary={false}
+                />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{row.meta}</td>
             </tr>
@@ -166,7 +182,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <Thermometer value={72} target={80} />\n</td>",
+    code: '<td>\n  <Thermometer value={72} target={80} orientation="horizontal" bulb={false} />\n</td>',
   },
   kpi: {
     render: () => (
@@ -178,10 +194,18 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">of $80K goal</span>
           </div>
         </div>
-        <Thermometer value={72} target={80} height={36} summary={false} />
+        <Thermometer
+          value={72}
+          target={80}
+          orientation="horizontal"
+          bulb={false}
+          width={180}
+          height={18}
+          summary={false}
+        />
       </>
     ),
-    code: '<div className="kpi">\n  <span className="figure">$72K</span>\n  <span className="unit">of $80K goal</span>\n  <Thermometer value={72} target={80} />\n</div>',
+    code: '<div className="kpi">\n  <span className="figure">$72K</span>\n  <span className="unit">of $80K goal</span>\n  <Thermometer value={72} target={80} orientation="horizontal" bulb={false} />\n</div>',
   },
   tab: {
     render: () => (
@@ -192,12 +216,20 @@ export const contexts: ChartContexts = {
             className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm ${i === 0 ? "border-fd-primary/40 bg-fd-primary/5 text-fd-foreground" : "border-fd-border text-fd-muted-foreground"}`}
           >
             {row.name}
-            <Thermometer value={row.value} target={row.target} height={14} summary={false} />
+            <Thermometer
+              value={row.value}
+              target={row.target}
+              orientation="horizontal"
+              bulb={false}
+              width={44}
+              height={10}
+              summary={false}
+            />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Annual <Thermometer value={72} target={80} />\n</button>',
+    code: '<button className="tab">\n  Annual <Thermometer value={72} target={80} orientation="horizontal" bulb={false} />\n</button>',
   },
 };
 

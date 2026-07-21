@@ -10,7 +10,7 @@ import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { pictogramGeometry, type PictogramUnit } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Factual S3 summary — true numbers even on overflow ("9 of 8."). */
+/** True numbers even on overflow ("9 of 8."). */
 export function pictogramSummary(
   value: number,
   total: number,
@@ -101,8 +101,6 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
     >
       {geo.units.map((u) => {
         if (renderPoint) return renderPoint(u);
-        // ring only ever renders below the fill>=1 early return, so the fill
-        // guard is always true here — kept for defensive clarity, not dropped
         const ring =
           shape === "dot" ? (
             <circle

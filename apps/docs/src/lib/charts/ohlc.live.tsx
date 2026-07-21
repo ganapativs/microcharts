@@ -1,4 +1,5 @@
 import type { ChartModule, PlaygroundSpec } from "./types";
+import { Ohlc } from "@microcharts/react/ohlc";
 import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
 import staticModule, { playground as staticPlayground, PERIODS } from "./ohlc";
 
@@ -42,6 +43,8 @@ export const playground: PlaygroundSpec = {
 
 export default {
   ...staticModule,
+  Chart: Ohlc,
+  ChartLive: OhlcInteractive,
   PreviewLive,
   playground,
 } satisfies ChartModule;

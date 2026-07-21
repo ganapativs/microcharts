@@ -61,6 +61,12 @@ export const entry: ChartEntry = {
       description: "Annulus thickness (shared with ProgressRing).",
     },
     {
+      name: "label",
+      type: '"none" | "total"',
+      required: false,
+      description: 'Center total when the hole has room (default "none").',
+    },
+    {
       name: "colors",
       type: "string[]",
       required: false,
@@ -95,6 +101,13 @@ export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "range", key: "maxWedges", label: "max wedges", min: 2, max: 4, init: 4 },
     { kind: "range", key: "weight", label: "weight", min: 3, max: 10, init: 5 },
+    {
+      kind: "segmented",
+      key: "label",
+      label: "label",
+      options: ["none", "total"],
+      init: "none",
+    },
     { kind: "toggle", key: "decorative", label: "decorative (aria-hidden)", init: false },
   ],
   render: (s) => (
@@ -102,6 +115,7 @@ export const playground: PlaygroundSpec = {
       data={MIX}
       maxWedges={s.maxWedges as number}
       weight={s.weight as number}
+      label={s.label as "none" | "total"}
       decorative={s.decorative as boolean}
       size={48}
       summary={false}
@@ -114,6 +128,7 @@ export const playground: PlaygroundSpec = {
       "  data={mix}",
       s.maxWedges !== 4 && `  maxWedges={${s.maxWedges}}`,
       s.weight !== 5 && `  weight={${s.weight}}`,
+      s.label !== "none" && `  label="${s.label}"`,
       (s.decorative as boolean) && "  decorative",
       "/>",
     ]
@@ -151,11 +166,7 @@ export const contexts: ChartContexts = {
         — Safari, Firefox, Edge, and Arc split the rest.
       </p>
     ),
-    code: `// the number is the datum; the donut repeats it — declare it decorative
-<p>
-  Chrome carried 62% of this week's sessions{" "}
-  <MicroDonut data={mix} decorative /> — the rest split across four browsers.
-</p>`,
+    code: `// the number is the datum; the donut repeats it — declare it decorative\n<p>\n  Chrome carried 62% of this week's sessions{" "}\n  <span className="mc-inline">\n    <MicroDonut data={mix} decorative summary={false} />\n  </span>{" "}\n  — the rest split across four browsers.\n</p>`,
   },
   cell: {
     render: () => (
