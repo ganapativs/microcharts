@@ -14,7 +14,13 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import { gitConfig } from "@/lib/shared";
 import { docsMeta } from "@/lib/metadata";
 import { abs } from "@/lib/site";
-import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
+import {
+  breadcrumbJsonLd,
+  DOCS_INTRO_FAQS,
+  faqJsonLd,
+  jsonLdScript,
+  techArticleJsonLd,
+} from "@/lib/jsonld";
 import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
 
@@ -30,6 +36,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
   const url = abs(page.url);
+  const isIntro = !params.slug || params.slug.length === 0;
 
   const crumbs = [
     { name: "Docs", url: abs("/docs") },
@@ -43,7 +50,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      breadcrumb={{ enabled: false }}
+      breadcrumb={{ includeSeparator: true, includePage: true }}
       footer={{ enabled: true }}
     >
       <script type="application/ld+json">{jsonLdScript(breadcrumbJsonLd(crumbs))}</script>
@@ -58,6 +65,9 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
           }),
         )}
       </script>
+      {isIntro ? (
+        <script type="application/ld+json">{jsonLdScript(faqJsonLd(DOCS_INTRO_FAQS))}</script>
+      ) : null}
       {/* Calm fade + lift on navigation. Wraps only the article content — never
           the DocsPage grid-area siblings (toc/sidebar), which must stay direct
           grid children of the layout. Keyed on pathname; reduced-motion gated. */}
@@ -102,5 +112,6 @@ export async function generateMetadata(props: PageProps<"/docs/[[...slug]]">): P
     path: page.url as `/${string}`,
     image: getPageImage(page).url as `/${string}`,
     markdown: getPageMarkdownUrl(page).url as `/${string}`,
+    type: "article",
   });
 }

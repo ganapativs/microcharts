@@ -88,6 +88,8 @@
     --mc-surface: Canvas;
     --mc-surface-ink: CanvasText;
     --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
+    /* Label ink on saturated data fills (heat cells, progress fill, …). */
+    --mc-on-fill: rgba(255, 255, 255, 0.96);
 
     /* motion */
     --mc-duration: 300ms;

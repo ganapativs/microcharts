@@ -35,7 +35,7 @@ describe("interactive <DepthWedge>", () => {
     wrap.focus();
     // steps merge both sides sorted by x: the leftmost is the deepest bid (99, cum 600)
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 600 });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 600 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -49,7 +49,7 @@ describe("interactive <DepthWedge>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 600 });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 600 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

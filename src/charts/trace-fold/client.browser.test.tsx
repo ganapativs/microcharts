@@ -32,7 +32,7 @@ describe("interactive <TraceFold>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowDown}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 120, label: "db" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 120, label: "db" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -51,7 +51,7 @@ describe("interactive <TraceFold>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{ArrowDown}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 120, label: "db" });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 120, label: "db" });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

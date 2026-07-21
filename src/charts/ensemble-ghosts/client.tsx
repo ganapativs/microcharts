@@ -209,7 +209,13 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
 
   // `value` = the member's TERMINAL value — the number this chart is read for
   // ("ends at …"), and the key the ghost bundle is ranked by.
-  const datum = useCallback((member: number) => ({ index: member, value: endOf(member) }), [endOf]);
+  const datum = useCallback(
+    (member: number) => {
+      const end = endOf(member);
+      return { index: member, value: end, formatted: isFiniteValue(end) ? fmt(end) : "" };
+    },
+    [endOf, fmt],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count: paths.length,

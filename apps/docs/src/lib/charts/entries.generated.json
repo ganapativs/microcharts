@@ -119,6 +119,12 @@
         "description": "Direct endpoint value label."
       },
       {
+        "name": "positive",
+        "type": "\"up\" | \"down\"",
+        "required": false,
+        "description": "\"up\" (default); \"down\" flips which sign is good."
+      },
+      {
         "name": "title",
         "type": "string",
         "required": false,
@@ -259,6 +265,12 @@
         "type": "[number, number]",
         "required": false,
         "description": "Explicit [0, max]; auto-fit otherwise."
+      },
+      {
+        "name": "label",
+        "type": "\"none\" | \"value\" | \"target\" | \"both\"",
+        "required": false,
+        "description": "Value/target readout in a right gutter (default none)."
       },
       {
         "name": "title",
@@ -685,6 +697,12 @@
         "type": "\"up\" | \"down\"",
         "required": false,
         "description": "Engages pos/neg tokens on signed data."
+      },
+      {
+        "name": "label",
+        "type": "\"none\" | \"max\"",
+        "required": false,
+        "description": "Peak-value readout (vertical only; default \"none\")."
       }
     ],
     "demo": [940, 410, 620, 120],
@@ -1042,10 +1060,6 @@
       {
         "name": "regions",
         "code": "const regions = [\n  { label: \"East\", value: 940, ref: 1200 },\n  { label: \"West\", value: 410, ref: 400 },\n  { label: \"South\", value: 620, ref: 600 },\n  { label: \"North\", value: 120, ref: 300 },\n];"
-      },
-      {
-        "name": "marketing",
-        "code": "const marketing = [\n  { label: \"Ads\", value: 82, ref: 65 },\n  { label: \"Content\", value: 38, ref: 50 },\n  { label: \"Events\", value: 21, ref: 20 },\n];"
       }
     ]
   },
@@ -1210,7 +1224,7 @@
         "name": "label",
         "type": "\"none\" | \"percent\" | \"value\"",
         "required": false,
-        "description": "Centered per segment (deterministic drop-out)."
+        "description": "Centered per segment (deterministic drop-out; default percent)."
       },
       {
         "name": "colors",
@@ -1451,6 +1465,12 @@
         "description": "Annulus thickness (shared with ProgressRing)."
       },
       {
+        "name": "label",
+        "type": "\"none\" | \"total\"",
+        "required": false,
+        "description": "Center total when the hole has room (default \"none\")."
+      },
+      {
         "name": "colors",
         "type": "string[]",
         "required": false,
@@ -1508,7 +1528,7 @@
         "name": "label",
         "type": "\"none\" | \"percent\" | \"value\"",
         "required": false,
-        "description": "Above each column (deterministic drop-out)."
+        "description": "Above each column (deterministic drop-out; default percent)."
       },
       {
         "name": "highlight",
@@ -1622,7 +1642,7 @@
         "name": "label",
         "type": "\"none\" | \"delta\"",
         "required": false,
-        "description": "\"delta\" prints each step's signed value in a band below the plot; the biggest movers win when labels would collide."
+        "description": "\"delta\" (default) prints each step's signed value in a band below the plot; the biggest movers win when labels would collide."
       }
     ],
     "demo": [42, 18, -12, -26, 5],
@@ -1737,6 +1757,12 @@
         "type": "\"last\" | \"none\"",
         "required": false,
         "description": "Endpoint value label for the primary series."
+      },
+      {
+        "name": "dots",
+        "type": "\"auto\" | \"none\"",
+        "required": false,
+        "description": "Endpoint dots on both lines (default \"auto\")."
       },
       {
         "name": "seriesStrings",
@@ -3522,6 +3548,12 @@
         "type": "boolean",
         "required": false,
         "description": "Ghost endpoint dots — makes the final-value spread countable."
+      },
+      {
+        "name": "label",
+        "type": "\"end\" | \"none\"",
+        "required": false,
+        "description": "Emphasised path endpoint in a right gutter (default end)."
       }
     ],
     "demo": [
@@ -4379,6 +4411,12 @@
         "type": "string",
         "required": false,
         "description": "Noun for the summary (e.g. \"seats\")."
+      },
+      {
+        "name": "label",
+        "type": "\"none\" | \"count\" | \"percent\"",
+        "required": false,
+        "description": "Centered readout when the comb has room (default \"none\")."
       }
     ],
     "demo": [34],
@@ -5621,6 +5659,12 @@
         "type": "\"dots\" | \"bars\"",
         "required": false,
         "description": "Bars draw signed deviation columns."
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "required": false,
+        "description": "Accent stroke/fill override."
       }
     ],
     "demo": [70, 52],
@@ -5681,6 +5725,12 @@
         "type": "\"square\" | \"round\"",
         "required": false,
         "description": "Cell shape from the shared vocabulary (default 'square')."
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "required": false,
+        "description": "Accent fill override."
       }
     ],
     "demo": [87, 12],

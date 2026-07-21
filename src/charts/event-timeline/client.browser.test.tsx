@@ -48,10 +48,10 @@ describe("interactive <EventTimeline>", () => {
     );
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
     await userEvent.keyboard("{ArrowRight}");
     // A point event is an instant — zero duration.
-    expect(seen.at(-1)).toEqual({ index: 1, value: 0, label: "Incident" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 0, label: "Incident" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -64,7 +64,7 @@ describe("interactive <EventTimeline>", () => {
     fig.focus();
     await userEvent.keyboard("{Home}");
     await userEvent.keyboard("{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 4.5 * H, label: "Deploy freeze" });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

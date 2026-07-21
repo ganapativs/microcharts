@@ -1,0 +1,102 @@
+---
+title: Inline charts
+description:
+  Word-sized inline React charts for sentences, table cells, KPI cards, tabs, and streamed replies — zero runtime
+  dependencies, accessible by default, RSC-safe static SVG. Where a full chart library would be too heavy and too loud.
+---
+
+Word-sized charts sit _inside_ the interface you already ship: a trend in a table cell, a sparkline after a number, a
+bullet in a KPI, a mark in a streamed reply — not a chart page you navigate to. That is what `@microcharts/react` is
+built for. Full dashboard canvases belong with [full chart libraries](/docs/full-chart-libraries).
+
+<CatalogTotal /> types, one grammar. Size band: <SizeMarketing />. Static entries ship **zero client JavaScript** from a
+React Server Component. Accessible by default — each chart is an `img` with a summary generated from the data.
+
+## One mark, four homes
+
+<FourContexts slug="sparkline" />
+
+## The surfaces
+
+### In a sentence
+
+Wrap with `mc-inline`, drop endpoint dots, mark decorative when the sentence already carries the meaning:
+
+<LiveDemo
+  label="Inline in prose"
+  code={`<p>
+  p95 latency this week{" "}
+  <span className="mc-inline">
+    <Sparkline data={latency} dots="none" summary={false} width={64} height={16} />
+  </span>{" "}
+  — trending down.
+</p>`}
+>
+  <p className="max-w-md text-[0.95rem] leading-relaxed">
+    {"p95 latency this week "}
+    <span className="mc-inline">
+      <Sparkline data={[48, 45, 44, 40, 38, 36, 33, 31]} dots="none" summary={false} width={64} height={16} />
+    </span>
+    {" — trending down."}
+  </p>
+</LiveDemo>
+
+### In a table cell
+
+<LiveDemo label="Table cell">
+  <table className="w-full max-w-sm text-sm tabular-nums">
+    <thead className="sr-only">
+      <tr>
+        <th scope="col">Service</th>
+        <th scope="col">Trend</th>
+        <th scope="col">Now</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr className="border-b border-hairline">
+        <td className="py-1.5 pr-3 text-fd-muted-foreground">checkout</td>
+        <td className="py-1.5">
+          <Sparkline data={[40, 38, 36, 34, 32, 31, 30, 31]} width={72} height={16} dots="none" summary={false} />
+        </td>
+        <td className="py-1.5 pl-3 text-right">31ms</td>
+      </tr>
+      <tr>
+        <td className="py-1.5 pr-3 text-fd-muted-foreground">search</td>
+        <td className="py-1.5">
+          <Sparkline data={[80, 78, 82, 79, 81, 80, 79, 78]} width={72} height={16} dots="none" summary={false} />
+        </td>
+        <td className="py-1.5 pl-3 text-right">78ms</td>
+      </tr>
+    </tbody>
+  </table>
+</LiveDemo>
+
+### In a KPI / tab
+
+Attainment and cadence marks stay tiny on purpose — [Bullet](/docs/charts/bullet), [Progress](/docs/charts/progress),
+[Delta](/docs/charts/delta), [StatusDot](/docs/charts/status-dot).
+
+Exact placement recipes: [Composition](/docs/composition). Broader fit: [When to use microcharts](/docs/when-to-use).
+
+## Server-component safe
+
+Static charts are hook-free and listener-free — they render to HTML with zero client JavaScript. Add interactivity only
+from a separate `/interactive` subpath.
+
+```tsx
+// Server Component — no "use client", nothing to hydrate for the chart
+import { Sparkline } from "@microcharts/react/sparkline";
+
+export default function Row() {
+  return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
+}
+```
+
+## Start here
+
+<PackageTabs />
+
+- [When to use microcharts](/docs/when-to-use)
+- [React sparklines](/docs/react-sparklines)
+- [Introduction](/docs) — grammar and catalog
+- [Quickstart](/docs/quickstart)

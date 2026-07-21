@@ -103,7 +103,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
       // glyph. The seat tracks `vPad`, which `label="last"` widens.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-comet ${className}` : "mc-comet"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {geo.trail.map((t) => (
         <circle

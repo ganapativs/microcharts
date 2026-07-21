@@ -4,20 +4,15 @@ import { SectionMark } from "@/components/home/section-mark";
 import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
 import { SIZE } from "@/lib/docs-facts";
+import { RECHARTS } from "@/lib/competitor-facts";
 
 /** 05 · Size. Weight bar is linear (library vs one Recharts chart). Receipts
  *  below are the measured numbers from docs-facts.ts. */
 
-// External reference point, pinned + dated (never hand-wave a competitor).
-// Package: recharts 3.9.2 = 145 kB min+gzip, 11 deps — bundlephobia, 2026-07-15.
-// One chart: esbuild minify+gzip of a tree-shaken LineChart set (LineChart, Line,
-// XAxis, YAxis, Tooltip, ResponsiveContainer; react external) = ~106 kB — 2026-07-21.
-// Recharts ships sideEffects: false, so tree-shaking does run; the shared Redux/d3
-// kernel keeps a single chart in the ~70–106 kB band (LineChart alone ≈ 69 kB).
-const RECHARTS_ONE_CHART_KB = 106;
-const RECHARTS_PACKAGE_KB = 145;
-const RECHARTS_DEPS = 11;
-const RECHARTS_VERSION = "3.9.2";
+const RECHARTS_ONE_CHART_KB = RECHARTS.oneChartGzipKb;
+const RECHARTS_PACKAGE_KB = RECHARTS.packageGzipKb;
+const RECHARTS_DEPS = RECHARTS.runtimeDeps;
+const RECHARTS_VERSION = RECHARTS.version;
 
 export function HomeCostSection() {
   const receipts = [

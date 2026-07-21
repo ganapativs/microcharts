@@ -51,6 +51,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -109,8 +110,15 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
 
   // Sample DATA index; `value` is the backlog depth there.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: ptByIndex.get(i)?.value ?? null }),
-    [ptByIndex],
+    (i: number) => {
+      const pt = ptByIndex.get(i);
+      return {
+        index: i,
+        value: pt?.value ?? null,
+        formatted: pt ? `${fmt(pt.value)}${pt.above ? strings.queueAbove : ""}` : undefined,
+      };
+    },
+    [ptByIndex, fmt, strings],
   );
 
   // The static reserves a right gutter for the endpoint/capacity labels and
@@ -208,7 +216,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticQueueDepth>
-      {rp ? (
+      {readout && rp ? (
         <span
           className="mc-queue-readout mc-spark-readout"
           style={{ left: `${(rp.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}

@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type ControlStrings = Pick<
   SummaryStrings,
-  "noData" | "control" | "controlInControl" | "controlProvisional" | "controlAt"
+  "noData" | "control" | "controlInControl" | "controlProvisional" | "controlAt" | "controlChip"
 >;
 
 export const EN_CONTROL: ControlStrings = {
@@ -19,4 +19,6 @@ export const EN_CONTROL: ControlStrings = {
     side === null
       ? `Point ${position} of ${total}: ${value} — in control.`
       : `Point ${position} of ${total}: ${value} — ${side === "upper" ? "above the upper" : "below the lower"} limit (${limit}).`,
+  controlChip: (value, side, limit) =>
+    side === null ? value : `${value} ${side === "upper" ? "above" : "below"} ${limit}`,
 };

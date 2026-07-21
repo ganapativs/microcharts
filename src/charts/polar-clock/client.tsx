@@ -63,6 +63,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -134,9 +135,10 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         index: i,
         value: typeof v === "number" && Number.isFinite(v) ? v : null,
         label: seg(i),
+        formatted: `${seg(i)}: ${typeof v === "number" && Number.isFinite(v) ? fmt(v) : "—"}`,
       };
     },
-    [data, seg],
+    [data, seg, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -175,7 +177,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         ? strings.polarClockAt(seg(shown!), fmt(shownVal))
         : strings.polarClockAt(seg(shown!), "—")
       : "";
-  const readout =
+  const chip =
     shownSeg !== undefined
       ? `${seg(shown!)}: ${typeof shownVal === "number" && Number.isFinite(shownVal) ? fmt(shownVal) : "—"}`
       : "";
@@ -204,9 +206,9 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
         {rest.children}
       </StaticPolarClock>
       <LiveRegion>{announced}</LiveRegion>
-      {shownSeg !== undefined ? (
+      {readout && shownSeg !== undefined ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {readout}
+          {chip}
         </span>
       ) : null}
     </span>

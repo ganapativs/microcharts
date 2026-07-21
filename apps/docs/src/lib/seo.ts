@@ -1,0 +1,36 @@
+import { CATALOG } from "./docs-facts";
+import { SITE } from "./site";
+
+/** High-intent phrases for `<meta name="keywords">` (Bing/others; Google ignores). */
+export const SEO_KEYWORDS = [
+  "react charts",
+  "react sparkline",
+  "sparkline react",
+  "microcharts",
+  "microchart",
+  "inline charts react",
+  "tiny svg charts",
+  "accessible charts",
+  "rsc charts",
+  "server component charts",
+  "zero dependency chart library",
+  "svg charts react",
+  "word-sized charts",
+  "dataviz react",
+] as const;
+
+export function chartSeoTitle(name: string): string {
+  return `${name} React Chart`;
+}
+
+export function chartSeoDescription(name: string, pageDesc: string, tagline?: string): string {
+  const base =
+    pageDesc.trim() || tagline?.trim() || `${name} — tiny accessible SVG chart for React.`;
+  const suffix = " Zero-dependency React microchart.";
+  if (base.length >= 140) return base;
+  return `${base}${suffix}`;
+}
+
+export function chartsIndexDescription(): string {
+  return `Browse all ${CATALOG.total} React microcharts — sparklines, bars, bullets, heat strips, and more. Tiny accessible SVG charts from ${SITE.pkg}, searchable by collection.`;
+}

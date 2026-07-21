@@ -18,16 +18,18 @@ import { useGalleryDock } from "./use-gallery-dock";
 export function GalleryDockBar({
   counts,
   collections,
+  activeCollection,
 }: {
   counts: Record<string, number>;
-  collections: { key: ChartCollection; label: string }[];
+  collections: readonly { key: ChartCollection; label: string }[];
+  activeCollection: ChartCollection | "all";
 }) {
   const {
     mounted,
     q,
     setQ,
     col,
-    setCol,
+    goCollection,
     density,
     setDensity,
     sort,
@@ -37,7 +39,7 @@ export function GalleryDockBar({
     dockHidden,
     mode,
     inputRef,
-  } = useGalleryDock(collections);
+  } = useGalleryDock(collections, activeCollection);
 
   const total = counts.all ?? 0;
   const pills = [{ key: "all", label: "All" }, ...collections] as {
@@ -65,7 +67,7 @@ export function GalleryDockBar({
                 key={p.key}
                 type="button"
                 className="g2-pill"
-                onClick={() => !empty && setCol(p.key)}
+                onClick={() => !empty && goCollection(p.key)}
                 disabled={empty}
                 aria-pressed={active}
                 title={empty ? "Coming before launch" : undefined}
@@ -87,7 +89,14 @@ export function GalleryDockBar({
             type="search"
             placeholder="Search…"
             aria-label="Search charts"
+            aria-keyshortcuts="/"
+            title="Press / to search"
           />
+          {q === "" ? (
+            <kbd className="g2-dock-kbd" aria-hidden>
+              /
+            </kbd>
+          ) : null}
         </div>
         <div className="g2-seg" role="group" aria-label="Render mode">
           {(

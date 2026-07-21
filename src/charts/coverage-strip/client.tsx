@@ -54,6 +54,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -126,8 +127,15 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   // index = slot (time-ordered); value = the measured number, or `null` for a
   // gap (no measurement) or an unreadable NaN. Slots have no human name.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const c = geo.cells[i];
+      return {
+        index: i,
+        value: c?.value ?? null,
+        formatted: c ? (c.present && c.value !== null ? fmt(c.value) : "—") : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -197,7 +205,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticCoverageStrip>
-      {cell ? (
+      {readout && cell ? (
         <span
           className="mc-coverage-readout mc-spark-readout"
           style={{

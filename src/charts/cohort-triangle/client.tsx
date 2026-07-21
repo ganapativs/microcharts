@@ -53,6 +53,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
     className,
     style,
     animate = false,
+    readout = true,
     onActive,
     onSelect,
     selectedIndex,
@@ -145,9 +146,10 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         index: i,
         value: c?.value ?? null,
         label: c ? data[c.row]?.label : undefined,
+        formatted: c ? (c.value === null ? "—" : fmt(c.value)) : undefined,
       };
     },
-    [geo, data],
+    [geo, data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -226,7 +228,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         {rest.children}
       </StaticCohortTriangle>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell ? (
+      {readout && shownCell ? (
         <span
           className="mc-spark-readout"
           style={{

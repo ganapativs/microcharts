@@ -61,8 +61,9 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
 
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
-              Word-sized charts for React. {catalogTotal} types that sit inside a sentence, a table
-              cell, or a streamed reply, where a full chart library would be too heavy and too loud.
+              Word-sized React charts — sparklines and inline SVG microcharts. {catalogTotal} types
+              that sit inside a sentence, a table cell, or a streamed reply, where a full chart
+              library would be too heavy and too loud.
             </p>
           </Reveal>
 

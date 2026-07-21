@@ -113,8 +113,11 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     [geo],
   );
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.units[i]?.fill ?? null }),
-    [geo],
+    (i: number) => {
+      const u = geo.units[i];
+      return { index: i, value: u?.fill ?? null, formatted: u ? pctFmt(u.fill) : undefined };
+    },
+    [geo, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({

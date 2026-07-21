@@ -5,7 +5,12 @@ import type { SummaryStrings } from "./summary.js";
 
 export type CalibrationStrings = Pick<
   SummaryStrings,
-  "noData" | "calibration" | "calibrationGood" | "calibrationAt" | "calibrationLow"
+  | "noData"
+  | "calibration"
+  | "calibrationGood"
+  | "calibrationAt"
+  | "calibrationLow"
+  | "calibrationChip"
 >;
 
 export const EN_CALIBRATION: CalibrationStrings = {
@@ -15,4 +20,5 @@ export const EN_CALIBRATION: CalibrationStrings = {
   calibrationGood: (bins) => `${bins} bins; well calibrated.`,
   calibrationAt: (p, o, n, lowClause) => `predicted ${p}, observed ${o}, ${n} samples${lowClause}.`,
   calibrationLow: ", low support",
+  calibrationChip: (p, o, n, lowClause) => `${p} → ${o} (n=${n}${lowClause})`,
 };

@@ -40,7 +40,7 @@ const ANIMATE_ROW_NOTE =
   '(interactive) Opt-in entrance motion when the chart mounts client-side — add `import "@microcharts/react/motion"` once. Inert on the server, on hydrated server HTML, and under `prefers-reduced-motion`.';
 
 const SHARED_GRAMMAR_NOTE =
-  "Plus the shared grammar — `data`, `domain`, `color`, `title`, `summary`, `format` — and the layout props (`width`, `height`, `className`, `style`) that every chart accepts. Interactive entries also share `animate` and `live`, and — wherever a chart has more than one navigable unit — `onActive`, `onSelect`, `selectedIndex` and `defaultSelectedIndex`. See [the shared grammar](/docs/quickstart#the-shared-grammar).";
+  "Plus the shared grammar — `data`, `domain`, `color`, `title`, `summary`, `format` — and the layout props (`width`, `height`, `className`, `style`) that every chart accepts. Interactive entries also share `animate` and `live`, and — wherever a chart has more than one navigable unit — `onActive`, `onSelect`, `selectedIndex` and `defaultSelectedIndex`; and — wherever the chart shows a hover value — `readout`. See [the shared grammar](/docs/quickstart#the-shared-grammar).";
 
 /** Escape `|` so a type/description never breaks the GFM table row. */
 const cell = (s: string) => s.replace(/\|/g, "\\|");

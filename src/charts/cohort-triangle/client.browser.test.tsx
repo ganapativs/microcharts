@@ -75,7 +75,7 @@ describe("interactive <CohortTriangle>", () => {
     const fig = await mount(<CohortTriangle data={COHORTS} onActive={(d) => seen.push(d)} />);
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 0.6, label: "Jan" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 0.6, label: "Jan" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -85,7 +85,7 @@ describe("interactive <CohortTriangle>", () => {
     const fig = await mount(<CohortTriangle data={COHORTS} onSelect={(d) => picks.push(d)} />);
     fig.focus();
     await userEvent.keyboard("{End}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 13, value: 0.52, label: "Apr" });
+    expect(picks.at(-1)).toMatchObject({ index: 13, value: 0.52, label: "Apr" });
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });

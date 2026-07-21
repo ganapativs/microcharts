@@ -91,7 +91,7 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       // the ring it happens to be drawn at, so the dot holds still as load moves.
       seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-breathing ${className}` : "mc-breathing"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {/* Level ring (distance from core); hair stroke role. */}
       {!geo.unknown ? (

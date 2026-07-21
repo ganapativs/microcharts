@@ -26,7 +26,7 @@ describe("interactive <DicePips>", () => {
     const screen = await render(<DicePips value={4} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-dice-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 4 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 4 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -35,6 +35,6 @@ describe("interactive <DicePips>", () => {
     const wrap = screen.container.querySelector(".mc-dice-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 5 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 5 }]);
   });
 });

@@ -43,6 +43,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -133,9 +134,15 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
-      return { index: i, value: isFiniteValue(d?.value) ? d!.value : null, label: d?.label };
+      const v = isFiniteValue(d?.value) ? d!.value : null;
+      return {
+        index: i,
+        value: v,
+        label: d?.label,
+        formatted: v === null ? undefined : `${d!.label}: ${fmt(v)}`,
+      };
     },
-    [data],
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -212,7 +219,11 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         {rest.children}
       </StaticDotPlot>
       <LiveRegion>{announced}</LiveRegion>
-      {shownRow && shownDatum && isFiniteValue(shownDatum.value) && shownRow.x !== null ? (
+      {readout &&
+      shownRow &&
+      shownDatum &&
+      isFiniteValue(shownDatum.value) &&
+      shownRow.x !== null ? (
         <span
           className="mc-spark-readout"
           style={{

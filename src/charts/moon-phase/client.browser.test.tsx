@@ -26,7 +26,7 @@ describe("interactive <MoonPhase>", () => {
     const screen = await render(<MoonPhase value={0.68} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-moon-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 0.68 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 0.68 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -35,6 +35,6 @@ describe("interactive <MoonPhase>", () => {
     const wrap = screen.container.querySelector(".mc-moon-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 1 }]); // clamped, like the lit area
+    expect(picks).toMatchObject([{ index: 0, value: 1 }]); // clamped, like the lit area
   });
 });

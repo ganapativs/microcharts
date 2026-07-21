@@ -60,7 +60,8 @@ export function PropTable({ slug }: { slug: string }) {
         and <code className="text-xs">live</code>, and — wherever a chart has more than one
         navigable unit — <code className="text-xs">onActive</code>,{" "}
         <code className="text-xs">onSelect</code>, <code className="text-xs">selectedIndex</code>{" "}
-        and <code className="text-xs">defaultSelectedIndex</code>. See{" "}
+        and <code className="text-xs">defaultSelectedIndex</code>; and — wherever the chart shows a
+        hover value — <code className="text-xs">readout</code>. See{" "}
         <Link prefetch={false} href="/docs/quickstart#the-shared-grammar" className="underline">
           the shared grammar
         </Link>

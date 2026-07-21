@@ -18,6 +18,9 @@ import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld"
 import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
 import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
+import { getChart } from "@/lib/charts/entries";
+import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
+import { SITE } from "@/lib/site";
 
 /**
  * Render a docs page from the **chart route** — the /docs/charts index and every
@@ -49,7 +52,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      breadcrumb={{ enabled: false }}
+      breadcrumb={{ includeSeparator: true, includePage: true }}
       // prev/next in sidebar-tree order — 106 chart pages are a reference you
       // page through; without this every hop reopens the sidebar (worst on
       // mobile, where the tree hides behind the hamburger).
@@ -97,11 +100,24 @@ export async function chartDocMetadata(slug: string[]): Promise<Metadata> {
   const page = source.getPage(slug);
   if (!page || page.slugs[0] !== "charts") notFound();
 
+  const entry = page.slugs[1] ? getChart(page.slugs[1]) : undefined;
+  const title = entry ? chartSeoTitle(entry.name) : page.data.title;
+  const description = entry
+    ? chartSeoDescription(entry.name, page.data.description ?? "", entry.tagline)
+    : (page.data.description ?? "");
+
   return docsMeta({
-    title: page.data.title,
-    description: page.data.description ?? "",
+    title,
+    description,
     path: page.url as `/${string}`,
     image: getPageImage(page).url as `/${string}`,
+    imageAlt: entry
+      ? `${entry.name} React chart — word-sized SVG from ${SITE.name}`
+      : SITE.ogImageAlt,
     markdown: getPageMarkdownUrl(page).url as `/${string}`,
+    type: "article",
+    keywords: entry
+      ? [entry.name, "react chart", "sparkline", "microcharts", "svg chart", entry.collection]
+      : undefined,
   });
 }

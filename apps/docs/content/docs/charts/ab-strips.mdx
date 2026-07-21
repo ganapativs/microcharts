@@ -1,8 +1,8 @@
 ---
 title: ABStrips
-description:
-  A two-sample comparison for React — two graded quantile strips on one scale where the visible overlap of the middle
-  halves is the answer.
+description: >-
+  React A/B strips chart — two graded quantile strips on one scale so A/B overlap is visible at a glance. Tiny
+  accessible SVG microchart; RSC-safe static or /interactive.
 ---
 
 ABStrips answers "did B beat A — and by more than the overlap?". It draws **two graded quantile strips on one shared
@@ -16,7 +16,7 @@ average delta without its spread is how A/B results lie.
       a: Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22),
       b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
     }}
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     positive="down"
     title="Latency A/B"
     width={260}
@@ -57,7 +57,7 @@ const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
         a: Array.from({ length: 80 }, (_, i) => 130 + ((i * 13) % 44) - 22),
         b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
       }}
-      format={(n) => `${Math.round(n)} ms`}
+      format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
       seriesLabels={["Ctrl", "Test"]}
       title="Labelled"
       width={240}
@@ -68,7 +68,7 @@ const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
         a: Array.from({ length: 80 }, (_, i) => 170 + ((i * 13) % 44) - 22),
         b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
       }}
-      format={(n) => `${Math.round(n)} ms`}
+      format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
       positive="down"
       title="Clearly separated"
       width={240}
@@ -98,7 +98,7 @@ const test = Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22);
       a: [100, 130, 145],
       b: Array.from({ length: 80 }, (_, i) => 116 + ((i * 13) % 44) - 22),
     }}
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="Small A arm"
     width={220}
     height={26}

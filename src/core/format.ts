@@ -35,8 +35,10 @@ export function makeFormatter(
   locale: string | string[] | undefined,
   defaults?: Intl.NumberFormatOptions,
 ): (n: number) => string {
-  // `toPrecision` passes ±Infinity/NaN through unchanged.
-  const clean = (n: number) => Number(n.toPrecision(12));
+  // `toPrecision` passes ±Infinity/NaN through unchanged. Exact integers carry
+  // no binary-float noise, so skip the round-trip for them — `toPrecision(12)`
+  // would corrupt integers with 13+ digits (e.g. 1234567890123 → …120).
+  const clean = (n: number) => (Number.isInteger(n) ? n : Number(n.toPrecision(12)));
   if (typeof format === "function") {
     const fn = format;
     return (n) => fn(clean(n));

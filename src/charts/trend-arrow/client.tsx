@@ -28,7 +28,15 @@ export interface InteractiveTrendArrowProps extends TrendArrowProps {
 }
 
 export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, onSelect, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    summary,
+    onSelect,
+    ...rest
+  } = props;
   const model = trendArrowModel({ ...rest, strings });
   const [pulse, setPulse] = useState(false);
   const prev = useRef(model.direction);
@@ -44,7 +52,9 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
     return () => clearTimeout(t);
   }, [model.direction, live]);
 
-  const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
+  const accName =
+    summary === false ? undefined : typeof summary === "string" ? summary : model.summary;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // One glyph, one selectable unit (index 0): the signed change it encodes,
   // with the resolved direction as its name. No roving — nothing to rove.
@@ -70,7 +80,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       }}
     >
       <StaticTrendArrow {...rest} strings={strings} summary={false} />
-      {live ? <LiveRegion>{model.summary}</LiveRegion> : null}
+      {live && summary !== false ? <LiveRegion>{model.summary}</LiveRegion> : null}
     </span>
   );
 }

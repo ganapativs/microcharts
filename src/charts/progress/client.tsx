@@ -34,6 +34,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     animate = false,
     strings = EN_SCALAR,
     title,
+    summary,
     onSelect,
     className,
     style,
@@ -52,7 +53,9 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     if (live) setAnnounced(model.summary);
   }, [wholePct, model.summary, live]);
 
-  const label = [title, model.summary].filter(Boolean).join(". ") || undefined;
+  const accName =
+    summary === false ? undefined : typeof summary === "string" ? summary : model.summary;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // One bar, one selectable unit (index 0): the fraction it encodes (unclamped —
   // the label already tells the truth past 100%).

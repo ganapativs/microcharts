@@ -1,8 +1,8 @@
 ---
 title: TraceFold
-description:
-  A folded micro-trace for React — one rect per span by start, duration, and depth, with the critical path accented so
-  "where did the latency go" reads without a console.
+description: >-
+  React trace fold chart — one rect per span by start, duration, and depth — a folded trace. Tiny accessible SVG
+  microchart; RSC-safe static or /interactive.
 ---
 
 TraceFold answers "where did the latency go — which spans, at which depth, on the path that actually determined the
@@ -43,7 +43,7 @@ spans mattered" is immediate.
       { label: "log", start: 200, duration: 14, depth: 1, parent: 0 },
       { label: "gc", start: 90, duration: 5, depth: 2, parent: 1 },
     ]}
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="Request trace"
     width={300}
     height={48}
@@ -90,7 +90,7 @@ spans mattered" is immediate.
       { label: "index-scan", start: 12, duration: 70, depth: 2, parent: 1 },
     ]}
     emphasis="none"
-    format={(n) => `${Math.round(n)} ms`}
+    format={{ style: "unit", unit: "millisecond", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="Structure"
     width={300}
     height={44}

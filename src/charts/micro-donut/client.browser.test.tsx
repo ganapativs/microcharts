@@ -36,7 +36,7 @@ describe("interactive <MicroDonut>", () => {
     const wrap = screen.container.querySelector(".mc-donut-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 620, label: "Chrome" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 620, label: "Chrome" });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -48,7 +48,7 @@ describe("interactive <MicroDonut>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 620, label: "Chrome" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 620, label: "Chrome" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('path[data-mc-w="tick"]'))

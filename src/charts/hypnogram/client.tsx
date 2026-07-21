@@ -47,6 +47,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -114,9 +115,10 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         index: i,
         value: run ? run.t1 - run.t0 : null,
         label: run?.state,
+        formatted: run ? `${run.state} ${fmt(run.t0)}–${fmt(run.t1)}` : undefined,
       };
     },
-    [geo],
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -180,7 +182,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         {rest.children}
       </StaticHypnogram>
       <LiveRegion>{announced}</LiveRegion>
-      {run ? (
+      {readout && run ? (
         <span
           className="mc-spark-readout"
           style={{

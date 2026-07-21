@@ -6,6 +6,7 @@
 // (canon); the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -51,6 +52,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -72,7 +74,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   // Mirror the static's delta gutter: geometry is laid out in `width`, but the
   // rendered viewBox is `width + gutter`. Mapping the pointer over `width`
   // alone drifts the crosshair right of the cursor and mis-places the readout.
-  const FONT = Math.min(10, Math.max(6, Math.round(height * 0.55)));
+  const FONT = labelFont(height, 0.55);
   const lastBreak = geo ? geo.breaks[geo.breaks.length - 1] : undefined;
   const gutter =
     (props.label ?? "none") === "delta" && lastBreak
@@ -90,17 +92,21 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
           : changePointSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // regime index for a given point (0-based), plus its mean
-  const regimeOf = (i: number): { regime: number; mean: number } => {
-    const seg = geo
-      ? geo.segments.findIndex((_, s) => {
-          const lo = s === 0 ? 0 : geo.breaks[s - 1]!.index;
-          const hi = s === geo.segments.length - 1 ? geo.n : geo.breaks[s]!.index;
-          return i >= lo && i < hi;
-        })
-      : -1;
-    return { regime: seg + 1, mean: geo && seg >= 0 ? geo.segments[seg]!.mean : NaN };
-  };
+  // regime index for a given point (0-based), plus its mean. Memoised on `geo`
+  // so the `datum` callback that reads it stays referentially stable.
+  const regimeOf = useCallback(
+    (i: number): { regime: number; mean: number } => {
+      const seg = geo
+        ? geo.segments.findIndex((_, s) => {
+            const lo = s === 0 ? 0 : geo.breaks[s - 1]!.index;
+            const hi = s === geo.segments.length - 1 ? geo.n : geo.breaks[s]!.index;
+            return i >= lo && i < hi;
+          })
+        : -1;
+      return { regime: seg + 1, mean: geo && seg >= 0 ? geo.segments[seg]!.mean : NaN };
+    },
+    [geo],
+  );
 
   const locate = useCallback(
     (x: number) => {
@@ -113,11 +119,24 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   // index = the DATA index (points are 1:1 with `data`); value = the series
   // value there (`null` at a gap).
   const datum = useCallback(
-    (i: number) => ({
-      index: i,
-      value: Number.isFinite(data[i]) ? (data[i] as number) : null,
-    }),
-    [data],
+    (i: number) => {
+      // Mirror the readout chip exactly: a break shows "before→after (pct)",
+      // any other point shows its regime badge. (The chip only paints with `geo`
+      // present, so we never hit the bare-value fallback here.)
+      let formatted: string | undefined;
+      if (geo) {
+        const brk = geo.breaks.find((b) => b.index === i);
+        formatted = brk
+          ? `${fmt(brk.before)}→${fmt(brk.after)} (${pct(brk.delta)})`
+          : `regime ${regimeOf(i).regime}/${geo.segments.length}`;
+      }
+      return {
+        index: i,
+        value: Number.isFinite(data[i]) ? (data[i] as number) : null,
+        formatted,
+      };
+    },
+    [data, geo, fmt, regimeOf],
   );
 
   // The kernel's `step` sees only (current, key), but Shift+Tab must cycle the
@@ -199,7 +218,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   }
 
   const px = shown !== null && geo ? xOf(shown) : 0;
-  const readout =
+  const readoutText =
     shown === null
       ? ""
       : atBreak
@@ -234,12 +253,12 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         {active !== null ? crosshair(active, false) : null}
         {rest.children}
       </StaticChangePoint>
-      {shown !== null && geo ? (
+      {readout && shown !== null && geo ? (
         <span
           className="mc-change-point-readout mc-spark-readout"
           style={{ left: `${(px / totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {readout}
+          {readoutText}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

@@ -34,6 +34,8 @@ export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
    * always wins.
    */
   animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -55,6 +57,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onSelect,
@@ -95,6 +98,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       index: 0,
       value: geo.unknown ? null : Math.max(0, latency),
       label: title,
+      formatted: geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`,
     });
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
@@ -167,7 +171,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {open ? (
+      {readout && open ? (
         <span
           className="mc-spark-readout"
           style={{

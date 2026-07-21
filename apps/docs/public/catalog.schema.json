@@ -132,7 +132,8 @@
               "onActive",
               "onSelect",
               "selectedIndex",
-              "defaultSelectedIndex"
+              "defaultSelectedIndex",
+              "readout"
             ]
           }
         },

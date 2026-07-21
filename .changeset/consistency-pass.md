@@ -21,8 +21,10 @@ output.
 re-render wins (picker SVG cache, Sparkline memo overlays, EnsembleGhosts DOM hop); size sync tolerates over-budget
 `size-limit --json`; marketing band **~2–7 kB interactive · ~1–4 kB static**.
 
-**Non-breaking:** empty-state `seat` on 11 charts; `LiveRegion` on dice-pips / tally-marks / hourglass; `data-mc-ink` on
-Slope + forced-colors for `data-mc-status`; Delta / Bullet / ActivityGrid / TokenConfidence English via `strings-*`;
-core `clamp` / `lastFinite` reuse; docs registry + MDX synced (catalog.json / llms surfaces regenerate).
+**Non-breaking:** `MicroDatum.formatted` + `readout` on interactive pickers (hide in-chart chip, render the chart's own
+display string elsewhere); empty-state `seat` on 11 charts; `LiveRegion` on dice-pips / tally-marks / hourglass;
+`data-mc-ink` on Slope + forced-colors for `data-mc-status`; Delta / Bullet / ActivityGrid / TokenConfidence English via
+`strings-*`; core `clamp` / `lastFinite` reuse; docs registry + MDX synced (catalog.json / llms surfaces regenerate);
+gallery collections + comparison/SEO doc pages; CI splits `core`/`dom`/`browser` projects.
 
 Examples microsites migrate after publish — not in this release.

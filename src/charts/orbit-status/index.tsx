@@ -111,7 +111,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       // The label only widens the viewBox; the dial's band is unmoved.
       seat={{ mode: "center", top: 0, bottom: geo.size }}
       className={className ? `mc-orbit ${className}` : "mc-orbit"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <circle
         cx={geo.orbit.cx}

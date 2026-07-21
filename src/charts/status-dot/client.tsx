@@ -28,12 +28,23 @@ export interface InteractiveStatusDotProps extends StatusDotProps {
 }
 
 export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
-  const { live = true, animate = false, strings = EN_SCALAR, title, onSelect, ...rest } = props;
+  const {
+    live = true,
+    animate = false,
+    strings = EN_SCALAR,
+    title,
+    summary,
+    onSelect,
+    ...rest
+  } = props;
   const state = resolveStatus(rest.status, rest.states);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
   const summaryText = strings.status(state.label);
-  const label = [title, summaryText].filter(Boolean).join(". ");
+  const accName =
+    summary === false ? undefined : typeof summary === "string" ? summary : summaryText;
+  const generated = [title, summaryText].filter(Boolean).join(". ");
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Announce only real changes, not the initial mount (an aria-live region's
   // first content is read anyway by some SRs; keep the channel quiet until the
@@ -43,8 +54,8 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   useEffect(() => {
     if (prev.current === state.label) return;
     prev.current = state.label;
-    if (live) setAnnounced(label);
-  }, [state.label, label, live]);
+    if (live) setAnnounced(generated);
+  }, [state.label, generated, live]);
 
   // One state mark, one selectable unit (index 0). A status encodes no number,
   // so `value` is null and the state's name rides in `label`.

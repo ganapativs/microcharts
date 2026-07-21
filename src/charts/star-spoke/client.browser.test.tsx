@@ -62,7 +62,9 @@ describe("interactive <StarSpoke>", () => {
     const fig = screen.container.querySelector(".mc-star-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{End}");
-    expect(onActive).toHaveBeenLastCalledWith({ index: 2, value: 0.3, label: "Cost" });
+    expect(onActive).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 2, value: 0.3, label: "Cost" }),
+    );
     await userEvent.keyboard("{Escape}");
     expect(onActive).toHaveBeenLastCalledWith(null);
   });
@@ -75,7 +77,9 @@ describe("interactive <StarSpoke>", () => {
     const fig = screen.container.querySelector(".mc-star-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{Enter}");
-    expect(onSelect).toHaveBeenLastCalledWith({ index: 0, value: 0.9, label: "Speed" });
+    expect(onSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ index: 0, value: 0.9, label: "Speed" }),
+    );
     fig.blur();
     await vi.waitFor(() =>
       expect(screen.container.querySelector('line[data-mc-w="tick"]')).not.toBeNull(),

@@ -35,9 +35,9 @@ describe("interactive <Hypnogram>", () => {
     const wrap = screen.container.querySelector(".mc-hypno-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 10, label: "Awake" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 10, label: "Awake" });
     key(wrap, "End");
-    expect(seen.at(-1)).toEqual({ index: 4, value: 20, label: "Awake" });
+    expect(seen.at(-1)).toMatchObject({ index: 4, value: 20, label: "Awake" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -52,7 +52,7 @@ describe("interactive <Hypnogram>", () => {
     key(wrap, "ArrowRight");
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 20, label: "Light" });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 20, label: "Light" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

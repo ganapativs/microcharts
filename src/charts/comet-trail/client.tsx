@@ -156,8 +156,12 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
 
   // value = the point's value.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: shownValues[i] ?? null }),
-    [shownValues],
+    (i: number) => ({
+      index: i,
+      value: shownValues[i] ?? null,
+      formatted: shownValues[i] == null ? "" : fmt(shownValues[i]!),
+    }),
+    [shownValues, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({

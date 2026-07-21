@@ -177,7 +177,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
       // and keeps the whole mark inside the line box.
       seat={{ mode: "floor", bottom: labelBand > 0 ? labelY : height - PAD }}
       className={className ? `mc-beam ${className}` : "mc-beam"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <path d={geo.fulcrum} data-mc-ink="neutral" />
       <line

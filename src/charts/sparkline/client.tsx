@@ -70,6 +70,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     locale,
     strings = EN_SERIES,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -134,7 +135,10 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
 
   const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
 
-  const datum = useCallback((i: number) => ({ index: i, value: data[i] as number }), [data]);
+  const datum = useCallback(
+    (i: number) => ({ index: i, value: data[i] as number, formatted: fmt(data[i] as number) }),
+    [data, fmt],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count: stops.length,
@@ -222,7 +226,8 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       <LiveRegion>
         {shownValue !== null ? strings.point(shownPos, stops.length, fmt(shownValue)) : ""}
       </LiveRegion>
-      {shownPoint &&
+      {readout &&
+      shownPoint &&
       shownValue !== null &&
       /* At the endpoint the persistent `label="last"` already shows this value —
          a floating readout there just collides with it. Skip it; every other

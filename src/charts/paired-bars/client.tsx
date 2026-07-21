@@ -53,6 +53,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -124,9 +125,19 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
-      return { index: i, value: isFiniteValue(d?.value) ? d!.value : null, label: d?.label };
+      return {
+        index: i,
+        value: isFiniteValue(d?.value) ? d!.value : null,
+        label: d?.label,
+        formatted:
+          d && isFiniteValue(d.value)
+            ? isFiniteValue(d.ref)
+              ? `${d.label}: ${fmt(d.value)} / ${fmt(d.ref)}`
+              : `${d.label}: ${fmt(d.value)}`
+            : undefined,
+      };
     },
-    [data],
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -178,8 +189,8 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
     : isFiniteValue(shownDatum.value) && isFiniteValue(shownDatum.ref)
       ? strings.pairAt(shownDatum.label, fmt(shownDatum.value), fmt(shownDatum.ref))
       : isFiniteValue(shownDatum.value)
-        ? `${shownDatum.label}: ${fmt(shownDatum.value)}, no reference.`
-        : `${shownDatum.label}: ${strings.noData}`;
+        ? strings.pairAtNoRef(shownDatum.label, fmt(shownDatum.value))
+        : strings.pairAtEmpty(shownDatum.label);
 
   const shownPos = shown !== null ? shown * geo.pitch : 0;
 
@@ -204,7 +215,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         {rest.children}
       </StaticPairedBars>
       <LiveRegion>{announced}</LiveRegion>
-      {shownPair && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {readout && shownPair && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{

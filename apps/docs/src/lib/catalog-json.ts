@@ -65,6 +65,10 @@ function sharedInteractiveFor(c: ChartEntry): string[] | undefined {
   } else if (/\bonSelect\??\s*:/.test(src)) {
     names.push("onSelect");
   }
+  // `readout` applies to any entry that paints the floating value chip — keyed
+  // off the shared chip class rather than the picker flag, since chip-carrying
+  // scalars (Bullet, Thermometer…) have it too.
+  if (/mc-spark-readout/.test(src)) names.push("readout");
   return names;
 }
 

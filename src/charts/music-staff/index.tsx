@@ -83,7 +83,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
       // band out of geometry.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-staff ${className}` : "mc-staff"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <path
         d={geo.staffYs.map((y) => `M${PAD} ${y}L${width - gutter - PAD} ${y}`).join("")}

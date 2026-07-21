@@ -43,6 +43,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -132,6 +133,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         index: i,
         value: z ? (pct[z.key] ?? null) : null,
         label: z ? nameByKey[z.key] : undefined,
+        formatted: z ? `${nameByKey[z.key]} ${pct[z.key]}%` : undefined,
       };
     },
     [geo, pct, nameByKey],
@@ -197,7 +199,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         {rest.children}
       </StaticTimeInRange>
       <LiveRegion>{announced}</LiveRegion>
-      {zone ? (
+      {readout && zone ? (
         <span className="mc-spark-readout" style={chipPos}>
           {`${nameByKey[zone.key]} ${pct[zone.key]}%`}
         </span>

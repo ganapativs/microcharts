@@ -44,6 +44,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -102,9 +103,18 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
-      return { index: i, value: d && Number.isFinite(d.to) ? d.to : null, label: d?.label };
+      return {
+        index: i,
+        value: d && Number.isFinite(d.to) ? d.to : null,
+        label: d?.label,
+        formatted: d
+          ? Number.isFinite(d.from) && Number.isFinite(d.to)
+            ? `${d.label}: ${fmt(d.from)} → ${fmt(d.to)}`
+            : d.label
+          : undefined,
+      };
     },
-    [data],
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -194,7 +204,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         {rest.children}
       </StaticSlope>
       <LiveRegion>{announced}</LiveRegion>
-      {shownDatum && shownLine ? (
+      {readout && shownDatum && shownLine ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
             ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`

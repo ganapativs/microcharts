@@ -36,7 +36,7 @@ describe("interactive <Ohlc>", () => {
     const fig = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 149.5 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 149.5 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -47,7 +47,7 @@ describe("interactive <Ohlc>", () => {
     const fig = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 149.5 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 149.5 });
     fig.blur();
     await expect.poll(() => fig.querySelector(PIN)).not.toBeNull();
     await expect.poll(() => fig.querySelector(FOCUS)).toBeNull();
@@ -76,7 +76,7 @@ describe("interactive <Ohlc>", () => {
       .toBe("Period 3 of 5: open 20, high 25, low 18, close 23.");
     // The rove never lands on the corrupt period, and the datum names it by
     // its own data index.
-    expect(seen.at(-1)).toEqual({ index: 2, value: 23 });
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: 23 });
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
       .toBe("O20 H25 L18 C23");

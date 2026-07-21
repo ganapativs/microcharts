@@ -25,7 +25,7 @@ describe("interactive <Horizon>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: -12 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: -12 });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -38,7 +38,7 @@ describe("interactive <Horizon>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: -12 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 1, value: -12 });
     wrap.blur();
     await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });

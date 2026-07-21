@@ -46,7 +46,9 @@ describe("interactive <BreathingDot>", () => {
     const screen = await render(<BreathingDot value={0.9} onSelect={(d) => picks.push(d)} />);
     const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
     wrap.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.9, label: "strained" });
+    await expect
+      .poll(() => picks.at(-1))
+      .toMatchObject({ index: 0, value: 0.9, label: "strained" });
   });
 
   it("Enter fires onSelect", async () => {
@@ -55,6 +57,6 @@ describe("interactive <BreathingDot>", () => {
     const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 0.2, label: "calm" });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.2, label: "calm" });
   });
 });

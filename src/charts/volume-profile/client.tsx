@@ -51,6 +51,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -101,9 +102,16 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   const datum = useCallback(
     (i: number) => {
       const b = geo.bars[i];
-      return { index: i, value: rows[i]?.mass ?? null, label: b ? fmt(b.level) : undefined };
+      return {
+        index: i,
+        value: rows[i]?.mass ?? null,
+        label: b ? fmt(b.level) : undefined,
+        formatted: b
+          ? `${fmt(b.level)} · ${Math.round((total > 0 ? (rows[i]?.mass ?? 0) / total : 0) * 100)}%${b.poc ? strings.volumePoc : ""}`
+          : "",
+      };
     },
-    [rows, geo, fmt],
+    [rows, geo, fmt, total, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -182,7 +190,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         {rest.children}
       </StaticVolumeProfile>
       <LiveRegion>{announced}</LiveRegion>
-      {bar ? (
+      {readout && bar ? (
         /* Pinned to the bars' base edge: level labels + the poc flag sit at
            the bar TIPS, so the base side is the one spot the chip can never
            cover chart text. */

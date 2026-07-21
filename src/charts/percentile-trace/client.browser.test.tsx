@@ -38,7 +38,7 @@ describe("interactive <PercentileTrace>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 48 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 48 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -49,7 +49,7 @@ describe("interactive <PercentileTrace>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 48 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 48 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();

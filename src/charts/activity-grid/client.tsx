@@ -55,6 +55,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     summary,
     strings = EN_ACTIVITY,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -130,8 +131,11 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   );
 
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const v = geo.cells[i]?.value ?? null;
+      return { index: i, value: v, formatted: v === null ? "—" : fmt(v) };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -213,7 +217,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         {rest.children}
       </StaticActivityGrid>
       <LiveRegion>{announced}</LiveRegion>
-      {shownCell ? (
+      {readout && shownCell ? (
         <span
           className="mc-spark-readout"
           style={{

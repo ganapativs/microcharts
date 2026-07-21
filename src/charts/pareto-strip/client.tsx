@@ -46,6 +46,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -130,7 +131,12 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   const datum = useCallback(
     (i: number) => {
       const b = geo?.bars[i];
-      return { index: i, value: b?.value ?? null, label: b?.label };
+      return {
+        index: i,
+        value: b?.value ?? null,
+        label: b?.label,
+        formatted: b ? `${b.label} ${pct(b.share)} · ${pct(b.cum)}` : "",
+      };
     },
     [geo],
   );
@@ -210,7 +216,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticParetoStrip>
-      {b && geo ? (
+      {readout && b && geo ? (
         <span
           className="mc-pareto-readout mc-spark-readout"
           style={{

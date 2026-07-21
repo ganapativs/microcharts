@@ -139,6 +139,13 @@ import {
   ThroughputSummary,
   CatalogFacts,
 } from "@/components/ui/perf";
+import {
+  CatalogTotal,
+  ChartSize,
+  SizeMarketing,
+  VsChartJsTable,
+  VsRechartsTable,
+} from "@/components/ui/choose-facts";
 import dynamic from "next/dynamic";
 import type { FC } from "react";
 
@@ -349,6 +356,11 @@ export function getMDXComponents(components?: MDXComponents) {
     ScalingTable,
     ThroughputSummary,
     CatalogFacts,
+    CatalogTotal,
+    ChartSize,
+    SizeMarketing,
+    VsRechartsTable,
+    VsChartJsTable,
     ...components,
   } satisfies MDXComponents;
 }

@@ -20,15 +20,15 @@ build.
 
 <SizeDistribution />
 
-The interactive catalog lands between **1.86 kB and 6.49 kB** gzip, with a **median of 4.88 kB** — hover, roving
+The interactive catalog lands between **1.87 kB and 6.54 kB** gzip, with a **median of 4.92 kB** — hover, roving
 keyboard focus, select-to-pin, touch scrub, and live announcements from the `/interactive` subpath. The static twin
-lands between **0.97 kB and 3.96 kB**, with a **median of 2.58 kB** — pure SVG, zero client JavaScript. A page pays for
+lands between **0.97 kB and 3.97 kB**, with a **median of 2.59 kB** — pure SVG, zero client JavaScript. A page pays for
 interactivity only where it actually uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which
 the per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Twenty-two charts sit above the 3 kB static reference line, none of them by more than 0.96 kB. Sparkline, the most
+Twenty-two charts sit above the 3 kB static reference line, none of them by more than 0.97 kB. Sparkline, the most
 configurable primitive in the set, is the largest; most of the rest are value-series charts that host annotations
 (ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
 SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, ShiftHistogram, StackedArea, ABStrips,

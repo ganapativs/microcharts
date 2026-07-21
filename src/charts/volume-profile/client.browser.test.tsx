@@ -45,7 +45,7 @@ describe("interactive <VolumeProfile>", () => {
     const wrap = screen.container.querySelector(".mc-volprofile-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowDown");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 8, label: "138.8" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 8, label: "138.8" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -65,7 +65,7 @@ describe("interactive <VolumeProfile>", () => {
     wrap.focus();
     key(wrap, "ArrowDown");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 8, label: "138.8" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 8, label: "138.8" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

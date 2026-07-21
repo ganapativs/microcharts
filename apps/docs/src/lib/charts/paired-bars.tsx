@@ -70,14 +70,6 @@ export const entry: ChartEntry = {
   { label: "North", value: 120, ref: 300 },
 ];`,
     },
-    {
-      name: "marketing",
-      code: `const marketing = [
-  { label: "Ads", value: 82, ref: 65 },
-  { label: "Content", value: 38, ref: 50 },
-  { label: "Events", value: 21, ref: 20 },
-];`,
-    },
   ],
 };
 

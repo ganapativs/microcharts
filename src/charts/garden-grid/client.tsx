@@ -50,6 +50,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     summary,
     strings = EN_GARDEN,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -124,8 +125,18 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
   // index = data index (cells are 1:1 with `data`); value = the cell's number
   // (`null` when the datum is missing/non-finite).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const cell = geo.cells[i];
+      return {
+        index: i,
+        value: cell?.value ?? null,
+        formatted:
+          cell == null || cell.value === null
+            ? "—"
+            : `${fmt(cell.value)}, step ${cell.step}/${steps}`,
+      };
+    },
+    [geo, fmt, steps],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -196,7 +207,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         {rest.children}
       </StaticGardenGrid>
       <LiveRegion>{announced}</LiveRegion>
-      {c ? (
+      {readout && c ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(c.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}

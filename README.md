@@ -93,8 +93,10 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 Every interactive chart shares one contract, so you learn it once. Hover or arrow keys make a unit **active**; a click,
 tap, <kbd>Enter</kbd>, or <kbd>Space</kbd> **selects** it and pins the readout so it survives blur; <kbd>Escape</kbd>
 clears; <kbd>Home</kbd>/<kbd>End</kbd> jump to the ends. Read it back with `onActive` and `onSelect` — payload
-`{ index, value, label? }` — and control the pin with `selectedIndex` / `defaultSelectedIndex`. Single-unit scalar
-charts (Delta, Progress, StatusDot, Bullet, …) take `onSelect` alone.
+`{ index, value, label?, formatted? }`, where `value` is the raw number and `formatted` is the chart's ready-to-display
+string — and control the pin with `selectedIndex` / `defaultSelectedIndex`. Set `readout={false}` to hide the in-chart
+value chip and render `datum.formatted` wherever you like. Single-unit scalar charts (Delta, Progress, StatusDot,
+Bullet, …) take `onSelect` alone.
 
 ```tsx
 <Sparkline data={[3, 5, 4, 8, 6, 9]} onActive={(d) => setHovered(d?.value ?? null)} onSelect={(d) => pin(d)} />

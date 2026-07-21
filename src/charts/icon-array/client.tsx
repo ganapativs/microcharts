@@ -6,6 +6,7 @@
 // focus ring + persistent pin are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -16,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
-import { iconArrayGeometry } from "./geometry.js";
+import { GRID_DIMS, iconArrayGeometry } from "./geometry.js";
 import { IconArray as StaticIconArray, iconArraySummary, type IconArrayProps } from "./index.js";
 
 export interface InteractiveIconArrayProps extends IconArrayProps, PickerProps {
@@ -67,8 +68,13 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     maxMarks: 100,
   });
 
-  const FONT = Math.min(10, Math.max(7, Math.round(height * 0.5)));
-  const gutterCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
+  const FONT = labelFont(height, 0.5);
+  const wantCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
+  const [cols] = GRID_DIMS[total];
+  const wantGutter = wantCh > 0 ? textGutter(wantCh, FONT, 4) : 0;
+  const showLabel =
+    wantCh > 0 && labelFitsY(height / 2, FONT, height) && width - wantGutter >= cols * 1.5 * 1.25;
+  const gutterCh = showLabel ? wantCh : 0;
   const geo = useMemo(
     () => iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT }),
     [width, height, value, total, shape, gutterCh, FONT],

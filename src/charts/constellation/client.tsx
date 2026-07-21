@@ -51,6 +51,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -165,9 +166,23 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     (i: number) => {
       const s = starAt(i);
       const v = s && Number.isFinite(s.value) ? s.value : s && Number.isFinite(s.m) ? s.m : null;
-      return { index: i, value: v, label: s ? xFmt(s.x) : undefined };
+      // Mirror the readout chip: "<time>: <value, magnitude>".
+      const d = s
+        ? [
+            Number.isFinite(s.value) ? fmt(s.value) : null,
+            Number.isFinite(s.m) ? strings.constellationMagnitude(fmt(s.m)) : null,
+          ]
+            .filter(Boolean)
+            .join(", ") || strings.constellationEvent
+        : "";
+      return {
+        index: i,
+        value: v,
+        label: s ? xFmt(s.x) : undefined,
+        formatted: s ? `${xFmt(s.x)}: ${d}` : undefined,
+      };
     },
-    [starAt, xFmt],
+    [starAt, xFmt, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -203,12 +218,12 @@ export function Constellation(props: InteractiveConstellationProps): React.React
   const detail = shownStar
     ? [
         Number.isFinite(shownStar.value) ? fmt(shownStar.value) : null,
-        Number.isFinite(shownStar.m) ? `magnitude ${fmt(shownStar.m)}` : null,
+        Number.isFinite(shownStar.m) ? strings.constellationMagnitude(fmt(shownStar.m)) : null,
       ]
         .filter(Boolean)
-        .join(", ") || "event"
+        .join(", ") || strings.constellationEvent
     : "";
-  const readout = shownStar ? `${xFmt(shownStar.x)}: ${detail}` : "";
+  const readoutText = shownStar ? `${xFmt(shownStar.x)}: ${detail}` : "";
   const announced = shownStar ? strings.constellationAt(xFmt(shownStar.x), detail) : "";
 
   return (
@@ -259,12 +274,12 @@ export function Constellation(props: InteractiveConstellationProps): React.React
         {rest.children}
       </StaticConstellation>
       <LiveRegion>{announced}</LiveRegion>
-      {shownStar ? (
+      {readout && shownStar ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(shownStar.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {readout}
+          {readoutText}
         </span>
       ) : null}
     </span>

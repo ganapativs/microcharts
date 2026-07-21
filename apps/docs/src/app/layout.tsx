@@ -4,10 +4,12 @@ import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
 import {
   jsonLdScript,
+  organizationJsonLd,
   softwareApplicationJsonLd,
   softwareSourceCodeJsonLd,
   websiteJsonLd,
 } from "@/lib/jsonld";
+import { SEO_KEYWORDS } from "@/lib/seo";
 import "./global.css";
 
 const sans = Hanken_Grotesk({
@@ -61,22 +63,19 @@ export const metadata: Metadata = {
   authors: [{ name: SITE.author, url: SITE.authorUrl }],
   creator: SITE.author,
   publisher: SITE.author,
-  keywords: [
-    "react charts",
-    "sparkline",
-    "microchart",
-    "accessible charts",
-    "zero dependency",
-    "rsc",
-    "svg charts",
-    "tiny chart",
-    "dataviz",
-  ],
+  keywords: [...SEO_KEYWORDS],
+  category: "technology",
   alternates: {
     canonical: "/",
     types: {
       "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }],
+      "text/plain": [{ url: "/llms.txt", title: `${SITE.name} for LLMs` }],
     },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
   // Crisp env-aware SVG favicon (app/brand/icon.svg). The apple-touch icon must
   // be listed explicitly — an `icons` object suppresses the app/apple-icon.tsx
@@ -91,6 +90,7 @@ export const metadata: Metadata = {
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
     url: SITE.url,
+    locale: "en_US",
     images: [
       {
         url: "/og/default.png",
@@ -106,7 +106,7 @@ export const metadata: Metadata = {
     creator: SITE.authorXHandle,
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
-    images: ["/og/default.png"],
+    images: [{ url: "/og/default.png", alt: SITE.ogImageAlt }],
   },
 };
 
@@ -139,6 +139,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LIVE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
+        <script type="application/ld+json">{jsonLdScript(organizationJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareApplicationJsonLd())}</script>

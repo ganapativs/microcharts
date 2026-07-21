@@ -44,7 +44,7 @@ describe("interactive <BurnChart>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 38 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: 38 });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -59,7 +59,7 @@ describe("interactive <BurnChart>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 38 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 1, value: 38 });
     wrap.blur();
     await expect.poll(() => wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });

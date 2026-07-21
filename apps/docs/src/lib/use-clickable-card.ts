@@ -1,13 +1,18 @@
 "use client";
-import { useCallback, useRef, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
+import { useCallback, useRef, type MouseEvent, type PointerEvent } from "react";
 import { useRouter } from "next/navigation";
 
 const MOVE_PX = 6;
 
 /**
- * Whole-card navigation that coexists with chart hover/scrub: a click with
- * almost no pointer travel opens `href`; a scrub (moved) does not. Keyboard
- * Enter/Space on the card itself still navigates.
+ * Pointer-scrub-aware navigation for the card AREA the real anchor doesn't sit
+ * over (the raised interactive chart stage). A click with almost no pointer
+ * travel opens `href`; a scrub (moved, e.g. hovering/dragging a mark) does not.
+ *
+ * The card's accessible link + keyboard nav live on a real `<a>` overlay, so
+ * this hook returns pointer handlers only — no `role`/`tabIndex`/`onKeyDown`.
+ * Clicks that land on the anchor are ignored here (`closest("a")` guard) so the
+ * anchor's native navigation is never doubled.
  */
 export function useClickableCard(href: string) {
   const router = useRouter();
@@ -30,26 +35,34 @@ export function useClickableCard(href: string) {
       if (!o) return;
       if (Math.abs(e.clientX - o.x) > MOVE_PX || Math.abs(e.clientY - o.y) > MOVE_PX) return;
       e.preventDefault();
+      // ⌘/Ctrl/Shift-click opens a background/new tab, matching a real link.
+      if (e.metaKey || e.ctrlKey || e.shiftKey) {
+        window.open(href, "_blank", "noopener");
+        return;
+      }
       go();
     },
-    [go],
+    [go, href],
   );
 
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLElement>) => {
-      if (e.target !== e.currentTarget) return;
-      if (e.key !== "Enter" && e.key !== " ") return;
+  // Middle-click (button 1) fires `auxclick`, not `click` — open a new tab.
+  const onAuxClick = useCallback(
+    (e: MouseEvent<HTMLElement>) => {
+      if (e.button !== 1) return;
+      if ((e.target as HTMLElement).closest("a")) return;
+      const o = origin.current;
+      origin.current = null;
+      if (!o) return;
+      if (Math.abs(e.clientX - o.x) > MOVE_PX || Math.abs(e.clientY - o.y) > MOVE_PX) return;
       e.preventDefault();
-      go();
+      window.open(href, "_blank", "noopener");
     },
-    [go],
+    [href],
   );
 
   return {
-    role: "link" as const,
-    tabIndex: 0,
     onPointerDown,
     onClick,
-    onKeyDown,
+    onAuxClick,
   };
 }

@@ -21,7 +21,13 @@ export function parseUTCDay(input: string | Date): number | null {
   if (!m) return null;
   const t = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
   const d = new Date(t);
-  // reject rollover (2026-02-31 parses but lands in March)
-  if (d.getUTCMonth() !== Number(m[2]) - 1 || d.getUTCDate() !== Number(m[3])) return null;
+  // reject rollover (2026-02-31 parses but lands in March) and the 2-digit-year
+  // remap (Date.UTC maps years 0–99 to 1900–1999, so "0050-06-15" → 1950).
+  if (
+    d.getUTCFullYear() !== Number(m[1]) ||
+    d.getUTCMonth() !== Number(m[2]) - 1 ||
+    d.getUTCDate() !== Number(m[3])
+  )
+    return null;
   return t;
 }

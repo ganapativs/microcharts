@@ -136,6 +136,17 @@ export interface MicroDatum {
   index: number;
   value: number | null;
   label?: string | undefined;
+  /**
+   * The chart's OWN formatted display string for this unit — exactly what its
+   * in-chart readout chip would show (`"$0.53"`, `"12%"`, a composed
+   * `"3 of 12"`…). Handed to `onActive`/`onSelect` so a consumer can render the
+   * value wherever they like (a KPI card, a sentence) without re-deriving
+   * `format`/`locale`, and pair it with `readout={false}` to suppress the
+   * in-chart chip. Absent only when the unit has no value to format (the
+   * kernel's default empty datum). `value` remains the raw number for
+   * computation; `formatted` is the presentation of it.
+   */
+  formatted?: string | undefined;
 }
 
 /** Public interaction props shared by every `…/interactive` entry. */
@@ -148,6 +159,14 @@ export interface PickerProps {
   selectedIndex?: number | null | undefined;
   /** Uncontrolled initial selection. Ignored once `selectedIndex` is set. */
   defaultSelectedIndex?: number | null | undefined;
+  /**
+   * Show the floating in-chart value chip on hover/focus (default `true`).
+   * `false` suppresses only the chip — the hover crosshair/marker and the
+   * `onActive`/`onSelect` callbacks are untouched — so the value can be rendered
+   * elsewhere (a KPI card, a sentence) from `datum.formatted` while the chart
+   * itself stays clean. Charts that render no chip ignore it.
+   */
+  readout?: boolean | undefined;
 }
 
 interface PickerOptions extends PickerProps {

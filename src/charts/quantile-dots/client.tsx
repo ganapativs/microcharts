@@ -54,6 +54,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -72,10 +73,8 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pad = 2;
 
-  const plot = useMemo(
-    () => quantileDotplot(data, Math.max(1, Math.min(25, Math.round(count ?? 20)))),
-    [data, count],
-  );
+  const dotCount = Math.max(1, Math.min(25, Math.round(count ?? 20)));
+  const plot = useMemo(() => quantileDotplot(data, dotCount), [data, dotCount]);
   const columns = plot?.columns ?? 0;
   const colCounts = useMemo(() => {
     const c = Array.from<number>({ length: columns }).fill(0);
@@ -101,14 +100,23 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     (i: number) => {
       const lo = binLo(i);
       const mass = colCounts[i] ?? 0;
+      // Mirror the probe chip: "<past> in <count> <side> <threshold>", where the
+      // live threshold is this bin's lower edge (Number-finite `binLo` falls back
+      // to the prop threshold, exactly like `activeThreshold`).
+      const th = lo ?? threshold;
+      const formatted =
+        plot && th !== undefined && Number.isFinite(th)
+          ? `${plot.dots.filter((d) => (side === "above" ? d.value > th : d.value < th)).length} in ${dotCount} ${side} ${fmt(th)}`
+          : undefined;
       return {
         index: i,
         value: mass > 0 ? mass : null,
         label:
           lo === undefined ? undefined : `${fmt(lo)}–${fmt(round2(lo + (plot?.binWidth ?? 0)))}`,
+        formatted,
       };
     },
-    [binLo, colCounts, fmt, plot],
+    [binLo, colCounts, fmt, plot, threshold, side, dotCount],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -214,7 +222,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
             ) : null}
             {rest.children}
           </StaticQuantileDots>
-          {shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
+          {readout && shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
             <span
               className="mc-quantile-dots-readout mc-spark-readout"
               style={{

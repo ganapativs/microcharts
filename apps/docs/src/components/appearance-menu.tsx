@@ -243,6 +243,7 @@ export function AppearanceMenu() {
                       key={t.id}
                       type="button"
                       onClick={() => setTheme(t.id)}
+                      aria-pressed={active}
                       className={cn(
                         "flex flex-col items-center gap-1 rounded-lg border py-2 text-[0.68rem] transition-colors",
                         active

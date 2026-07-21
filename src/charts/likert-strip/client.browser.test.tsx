@@ -32,7 +32,7 @@ describe("interactive <LikertStrip>", () => {
     const wrap = screen.container.querySelector(".mc-likert-live") as HTMLElement;
     wrap.focus();
     key(wrap, "End");
-    expect(seen.at(-1)).toEqual({ index: 4, value: 28, label: "Strongly agree" });
+    expect(seen.at(-1)).toMatchObject({ index: 4, value: 28, label: "Strongly agree" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -44,7 +44,7 @@ describe("interactive <LikertStrip>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 10, label: "Strongly disagree" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 10, label: "Strongly disagree" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

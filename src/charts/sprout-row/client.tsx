@@ -52,6 +52,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     // when names are shown — mirror the static default exactly.
     height = labels ? 40 : 20,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -109,8 +110,17 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   // `value` = the clamped growth STAGE (0–3), the number the glyph encodes;
   // `null` for a missing item (soil tick only).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.slots[i]?.stage ?? null, label: data[i]?.label }),
-    [geo, data],
+    (i: number) => {
+      const stage = geo.slots[i]?.stage ?? null;
+      // Mirror the chip, which renders the same announcement string (see `announce`).
+      const formatted = !data[i]
+        ? ""
+        : stage === null
+          ? strings.sproutEmpty(data[i]!.label)
+          : strings.sproutStage(data[i]!.label, strings.sproutStageNames[stage]!, stage + 1);
+      return { index: i, value: stage, label: data[i]?.label, formatted };
+    },
+    [geo, data, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -192,7 +202,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         {rest.children}
       </StaticSproutRow>
       <LiveRegion>{announced}</LiveRegion>
-      {announced ? (
+      {readout && announced ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {announced}
         </span>

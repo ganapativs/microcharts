@@ -10,7 +10,7 @@ describe("interactive <HeatCell>", () => {
     wrap.focus();
     await expect
       .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("42 — level 3/5");
+      .toBe("42 — level 3 of 5.");
     expect(document.querySelector('[aria-live="polite"]')!.textContent).toBe("42 — level 3 of 5.");
   });
 
@@ -30,7 +30,7 @@ describe("interactive <HeatCell>", () => {
     );
     const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
     wrap.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 42 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 42 });
   });
 
   it("Enter fires onSelect (readout stays)", async () => {
@@ -41,6 +41,6 @@ describe("interactive <HeatCell>", () => {
     const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 7 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 7 });
   });
 });

@@ -54,6 +54,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -182,13 +183,15 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const datum = useCallback(
     (i: number) => {
       const lane = laneOf(i);
+      const t = sorted[lane]![i - starts[lane]!] ?? null;
       return {
         index: i,
-        value: sorted[lane]![i - starts[lane]!] ?? null,
+        value: t,
         label: lanes[lane]?.label,
+        formatted: t === null ? undefined : `${lanes[lane]!.label} · ${fmt(t)}`,
       };
     },
-    [laneOf, sorted, starts, lanes],
+    [laneOf, sorted, starts, lanes, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -286,7 +289,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         {rest.children}
       </StaticEventRaster>
       <LiveRegion>{announced}</LiveRegion>
-      {t !== undefined && shownLane !== null ? (
+      {readout && t !== undefined && shownLane !== null ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(xOf(t) / width) * 100}%`, transform: "translateX(-50%)" }}

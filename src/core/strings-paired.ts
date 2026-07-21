@@ -10,6 +10,8 @@ export type PairedStrings = Pick<
   | "flatPair"
   | "rows"
   | "pairAt"
+  | "pairAtNoRef"
+  | "pairAtEmpty"
   | "pairs"
   | "slopeAt"
   | "slopes"
@@ -23,6 +25,8 @@ export const EN_PAIRED: PairedStrings = {
   rows: (count, topLabel, topDirection, topPct) =>
     `${count} rows. Largest change ${topLabel}, ${topDirection} ${topPct}.`,
   pairAt: (label, value, ref) => `${label}: ${value} vs ${ref}.`,
+  pairAtNoRef: (label, value) => `${label}: ${value}, no reference.`,
+  pairAtEmpty: (label) => `${label}: no data.`,
   pairs: (count, gapLabel, value, ref) =>
     `${count} ${count === 1 ? "pair" : "pairs"}. Largest gap ${gapLabel}: ${value} vs ${ref}.`,
   slopeAt: (label, from, to, direction, pct) => `${label}: ${from} to ${to}, ${direction} ${pct}.`,

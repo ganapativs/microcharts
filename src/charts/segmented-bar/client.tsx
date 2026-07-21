@@ -5,6 +5,7 @@
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -45,6 +46,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -75,7 +77,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     return r;
   }, [data, maxSegments, order, strings]);
 
-  const fontSize = Math.max(5, Math.min(Math.round(height * 0.6), 7));
+  const fontSize = labelFont(height, 0.6);
   const geo = useMemo(
     () => segmentedBarGeometry({ width, height, values: rolled.map((d) => d.value), fontSize }),
     [width, height, rolled, fontSize],
@@ -93,9 +95,18 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   const datum = useCallback(
     (i: number) => {
       const d = rolled[geo.segments[i]!.index];
-      return { index: i, value: d?.value ?? null, label: d?.label };
+      return {
+        index: i,
+        value: d?.value ?? null,
+        label: d?.label,
+        formatted: d
+          ? d.members > 1
+            ? `${d.label} ${pcts[i]}% (${d.members} ${d.members === 1 ? "category" : "categories"})`
+            : `${d.label} ${pcts[i]}% (${fmt(d.value)})`
+          : "",
+      };
     },
-    [geo, rolled],
+    [geo, rolled, fmt, pcts],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -165,7 +176,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         {rest.children}
       </StaticSegmentedBar>
       <LiveRegion>{announced}</LiveRegion>
-      {shownSeg && shownDatum ? (
+      {readout && shownSeg && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={{

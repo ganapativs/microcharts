@@ -1,4 +1,3 @@
-"use client";
 import type { ReactNode } from "react";
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 import { SparkBar } from "@microcharts/react/sparkbar/interactive";
@@ -73,6 +72,14 @@ function ProductSurface() {
         />
       </div>
       <table className="mc-inline-table w-full text-sm tabular-nums">
+        <thead className="sr-only">
+          <tr>
+            <th scope="col">Service</th>
+            <th scope="col">Trend</th>
+            <th scope="col">Latency</th>
+            <th scope="col">Change</th>
+          </tr>
+        </thead>
         <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-hairline">
           {SERVICES.map((s) => (
             <tr key={s.name}>
@@ -124,6 +131,12 @@ function PlacementQuad() {
       <div className="plate-inner flex flex-col gap-1.5 p-3">
         <Where>table cell</Where>
         <table className="mc-inline-table w-full text-[0.82rem] tabular-nums">
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">Region</th>
+              <th scope="col">Trend</th>
+            </tr>
+          </thead>
           <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-hairline">
             <tr>
               <td className="py-1 pr-2 text-fd-muted-foreground">EU</td>

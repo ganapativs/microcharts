@@ -1,12 +1,20 @@
 "use client";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useClickableCard } from "@/lib/use-clickable-card";
 
 /**
  * Gallery plate: fully clickable (opens docs) and interactive (hover/scrub on
- * the mark). A short click navigates; a pointer scrub does not. No nested
- * `<a>` — the plate itself is the link surface.
+ * the mark).
+ *
+ * The link is a real `<a>` overlay (`.g2-cover`) — crawlable for SEO, shows the
+ * URL in the status bar, and supports right-click "Open in new tab" / "Copy
+ * link". By z-index it sits above the meta + dead plate but BELOW the raised
+ * chart stage, so the interactive mark still gets hover/scrub and the cover
+ * never nests the focusable chart inside the `<a>`. Clicks that land on the
+ * raised stage (which the cover doesn't sit over) are handled by
+ * `useClickableCard`: a short click navigates, a pointer scrub does not.
  */
 export function GalleryCard({
   href,
@@ -24,7 +32,8 @@ export function GalleryCard({
   const nav = useClickableCard(href);
 
   return (
-    <div className="g2-card cursor-pointer" aria-label={`${name}: ${tagline}`} {...nav}>
+    <div className="g2-card cursor-pointer" {...nav}>
+      <Link prefetch={false} href={href} className="g2-cover" aria-label={`${name}: ${tagline}`} />
       <span className="g2-spot" aria-hidden />
       <span className="g2-arrow" aria-hidden>
         <ArrowUpRight className="size-4" />

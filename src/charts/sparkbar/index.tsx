@@ -95,7 +95,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     gap,
     gutterRight: metrics?.gutter ?? 0,
   });
-  const last = geo.bars.at(-1);
+  const last = geo.bars[geo.bars.length - 1];
 
   // annotations host contract: Marker x = data INDEX (bar slot
   // center), Threshold/TargetZone y = data values (sign space in win-loss).

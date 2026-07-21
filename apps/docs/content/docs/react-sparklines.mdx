@@ -1,0 +1,77 @@
+---
+title: React sparklines
+description:
+  Word-sized React sparklines with @microcharts/react — accessible by default, RSC-safe static SVG, zero runtime
+  dependencies. For sentences, table cells, and KPIs. Full API on the Sparkline chart page.
+---
+
+A **sparkline** is a trend small enough to sit in a sentence: direction and shape at a glance — not a dashboard panel
+with axes. In React, that means a word-sized SVG mark next to a number or inside a table cell, where a full chart
+library would be too heavy and too loud.
+
+This page covers that mark in `@microcharts/react`. Props, variants, and edge cases live on
+[Sparkline](/docs/charts/sparkline).
+
+<LiveDemo label="Sparkline" sizeOf="sparkline">
+  <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
+</LiveDemo>
+
+## Install
+
+Both steps are required — package and stylesheet:
+
+<PackageTabs />
+
+```tsx
+import { Sparkline } from "@microcharts/react/sparkline";
+import "@microcharts/react/styles.css"; // once, at the app root
+
+<Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
+```
+
+Measured size for this chart: <ChartSize slug="sparkline" /> gzip (CI-enforced). Catalog-wide band:
+
+<SizeMarketing />. The default export is static — RSC-safe, zero client JavaScript. Add
+`@microcharts/react/sparkline/interactive` only when hover, keyboard, touch, or selection is needed.
+
+## Where it sits
+
+Same component in four homes — product UI, report, docs, and an AI reply:
+
+<FourContexts slug="sparkline" />
+
+Placement recipes: [Composition](/docs/composition). When this library fits vs a full chart library:
+[When to use microcharts](/docs/when-to-use).
+
+## About `react-sparklines`
+
+Many searches still land on [`react-sparklines`](https://www.npmjs.com/package/react-sparklines) (Boris Yankov) — about
+**242k downloads** in the week ending **2026-07-19**, last npm publish **2017-07-27** (`1.7.0`). Same visual idea; a
+different era of React (class-component patterns, `prop-types`, no generated accessible summary, not aimed at RSC).
+
+microcharts is not that package rewritten. It is a word-sized catalog — <CatalogTotal /> types, one grammar — where
+Sparkline is one chart: `data` alone renders, accessible by default (`role="img"` + a summary from the data), static RSC
+entry, **zero runtime dependencies**. If `react-sparklines` still fits your stack, that is a valid choice. If you want
+the contract above, start here.
+
+## When not to use a sparkline
+
+- Exact category comparison → [MiniBar](/docs/charts/mini-bar) or [SparkBar](/docs/charts/sparkbar)
+- Value against a target → [Bullet](/docs/charts/bullet)
+- Part-to-whole → [SegmentedBar](/docs/charts/segmented-bar) or [MicroDonut](/docs/charts/micro-donut)
+- Full axes, legend, brush, zoom → a [full chart library](/docs/full-chart-libraries)
+
+## Related marks
+
+- [SparkBar](/docs/charts/sparkbar) — discrete magnitudes or win–loss
+- [DualSparkline](/docs/charts/dual-sparkline) — two series, one scale
+- [TrendArrow](/docs/charts/trend-arrow) — direction as a glyph
+- [Delta](/docs/charts/delta) — a single signed change
+- [Horizon](/docs/charts/horizon) — wide-range series in a slim band
+
+## Next
+
+- [Sparkline API](/docs/charts/sparkline)
+- [Inline charts](/docs/inline-charts)
+- [When to use microcharts](/docs/when-to-use)
+- [Quickstart](/docs/quickstart)

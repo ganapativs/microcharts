@@ -1,8 +1,8 @@
 ---
 title: QuantileDots
-description:
-  A quantile dotplot for React — odds you can count. Each dot is a 1-in-N chance; a threshold turns the plot from shape
-  into a "N in 20" read.
+description: >-
+  React quantile dots chart — sample or posterior as quantile dots against a decision threshold. Tiny accessible SVG
+  microchart; RSC-safe static or /interactive.
 ---
 
 QuantileDots answers "what are the odds?" — in **countable** form. It's a quantile dotplot: each dot is an
@@ -16,7 +16,7 @@ because odds you can count beat odds you must trust, and a frequency reads truer
       Math.round(4 + (i % 30) * 0.35 + ((i * 7) % 13) * 1.1 + (i % 50 === 0 ? 20 : 0)),
     )}
     threshold={15}
-    format={(n) => `${n} min`}
+    format={{ style: "unit", unit: "minute", unitDisplay: "short", maximumFractionDigits: 0 }}
     title="Bus wait"
     width={260}
     height={30}
@@ -55,7 +55,7 @@ because odds you can count beat odds you must trust, and a frequency reads truer
       )}
       count={15}
       threshold={15}
-      format={(n) => `${n} min`}
+      format={{ style: "unit", unit: "minute", unitDisplay: "short", maximumFractionDigits: 0 }}
       title="15 dots"
       width={220}
       height={28}
@@ -66,7 +66,7 @@ because odds you can count beat odds you must trust, and a frequency reads truer
       )}
       threshold={10}
       side="below"
-      format={(n) => `${n} min`}
+      format={{ style: "unit", unit: "minute", unitDisplay: "short", maximumFractionDigits: 0 }}
       title="under 10 min"
       width={220}
       height={28}

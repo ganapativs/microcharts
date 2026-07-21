@@ -47,7 +47,9 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
     format,
     locale,
     strings = EN_STREAK_SPARK,
+    id,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -110,9 +112,12 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         index: i,
         value: run?.len ?? null,
         label: run ? (run.on ? strings.streakWords[0] : strings.streakWords[1]) : undefined,
+        formatted: run
+          ? `${fmt(run.len)} ${run.on ? strings.streakWords[0] : strings.streakWords[1]}${run.record ? strings.streakRecord : ""}`
+          : undefined,
       };
     },
-    [geo, strings],
+    [geo, strings, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -181,6 +186,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         format={format}
         locale={locale}
         strings={strings}
+        id={id}
         summary={false}
         style={fillFor(style)}
       >
@@ -189,7 +195,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         {active !== null ? outline(active, false) : null}
       </StaticStreakSpark>
       <LiveRegion>{announced}</LiveRegion>
-      {shownRun ? (
+      {readout && shownRun ? (
         <span
           className="mc-spark-readout"
           style={{

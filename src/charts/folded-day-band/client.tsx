@@ -51,6 +51,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -99,6 +100,9 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         index: i,
         value: s ? s.median : null,
         label: s ? fmt(binPosition(s.bin, bins, period)) : undefined,
+        formatted: s
+          ? `${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)} (${fmt(s.q1)}–${fmt(s.q3)})`
+          : undefined,
       };
     },
     [geo, fmt, bins, period],
@@ -187,7 +191,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         {rest.children}
       </StaticFoldedDayBand>
       <LiveRegion>{announced}</LiveRegion>
-      {s ? (
+      {readout && s ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(s.x / width) * 100}%`, transform: "translateX(-50%)" }}

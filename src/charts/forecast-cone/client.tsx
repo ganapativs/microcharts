@@ -48,6 +48,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -125,9 +126,17 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
   const datum = useCallback(
     (i: number) => {
       const p = geo?.points[i];
-      return { index: i, value: p ? p.value : null };
+      return {
+        index: i,
+        value: p ? p.value : null,
+        formatted: p
+          ? p.kind === "history"
+            ? `${unit} ${p.period}: ${fmt(p.value)}`
+            : `${unit} ${p.period}: ${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
+          : "",
+      };
     },
-    [geo],
+    [geo, fmt, unit],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -171,7 +180,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       ? strings.forecastAtHistory(unit, p.period, fmt(p.value))
       : strings.forecastAtForecast(unit, p.period, fmt(p.value), fmt(p.lo!), fmt(p.hi!))
     : "";
-  const readout = p
+  const chip = p
     ? p.kind === "history"
       ? `${unit} ${p.period}: ${fmt(p.value)}`
       : `${unit} ${p.period}: ${fmt(p.value)} · ${fmt(p.lo!)}–${fmt(p.hi!)}`
@@ -214,12 +223,12 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         {active !== null ? dot(active, false) : null}
         {rest.children}
       </StaticForecastCone>
-      {p ? (
+      {readout && p ? (
         <span
           className="mc-forecast-readout mc-spark-readout"
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
         >
-          {readout}
+          {chip}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

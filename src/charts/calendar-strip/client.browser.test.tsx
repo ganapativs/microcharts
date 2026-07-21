@@ -64,7 +64,7 @@ describe("interactive <CalendarStrip>", () => {
     const fig = await mount(<CalendarStrip data={DATA} end={END} onActive={(d) => seen.push(d)} />);
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 5, label: "Monday, June 8" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 5, label: "Monday, June 8" });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -76,7 +76,7 @@ describe("interactive <CalendarStrip>", () => {
     );
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 0, label: "Tuesday, June 9" });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 0, label: "Tuesday, June 9" });
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });

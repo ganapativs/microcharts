@@ -48,9 +48,9 @@ describe("interactive <RubricStrip>", () => {
     const wrap = screen.container.querySelector(".mc-rubric-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowDown");
-    expect(seen[seen.length - 1]).toEqual({ index: 0, value: 0.92, label: "Correctness" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 0, value: 0.92, label: "Correctness" });
     key(wrap, "End");
-    expect(seen[seen.length - 1]).toEqual({ index: 2, value: 0.41, label: "Style" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 2, value: 0.41, label: "Style" });
     key(wrap, "Escape");
     expect(seen[seen.length - 1]).toBeNull();
   });
@@ -64,7 +64,7 @@ describe("interactive <RubricStrip>", () => {
     wrap.focus();
     key(wrap, "ArrowDown");
     key(wrap, "Enter");
-    expect(picks[picks.length - 1]).toEqual({ index: 0, value: 0.92, label: "Correctness" });
+    expect(picks[picks.length - 1]).toMatchObject({ index: 0, value: 0.92, label: "Correctness" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

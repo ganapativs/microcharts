@@ -44,7 +44,7 @@ describe("interactive <EnsembleGhosts>", () => {
     const { wrap } = await mount({ onActive: (d: unknown) => seen.push(d) });
     wrap.focus();
     key(wrap, "Home");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 31 });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 31 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -55,7 +55,7 @@ describe("interactive <EnsembleGhosts>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 31 });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 31 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

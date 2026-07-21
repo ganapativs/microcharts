@@ -1,8 +1,8 @@
 ---
 title: Quickstart
 description:
-  Install @microcharts/react, import the stylesheet once, and render your first accessible chart — static in a Server
-  Component, or interactive on the client.
+  Install @microcharts/react — the React sparkline and microchart library. Import styles once, render an accessible SVG
+  chart in a Server Component or add /interactive for hover and keyboard.
 ---
 
 ## Set up
@@ -219,15 +219,29 @@ tap, **Enter**, or **Space** **selects** it and pins the readout so it survives 
 drag scrubs. What a "unit" is depends on the chart — a point, a bar, a day cell, a segment — and each chart's page names
 its own.
 
-| Prop                   | Type                                  | What it does                                                                 |
-| ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------- |
-| `onActive`             | `(datum: MicroDatum \| null) => void` | The active unit changed (pointer or keyboard). `null` when the chart clears. |
-| `onSelect`             | `(datum: MicroDatum \| null) => void` | A unit was selected or unselected — click, tap, `Enter`, `Space`, `Escape`.  |
-| `selectedIndex`        | `number \| null`                      | Control the selection yourself.                                              |
-| `defaultSelectedIndex` | `number \| null`                      | Seed the selection once, then let the chart own it.                          |
+| Prop                   | Type                                  | What it does                                                                         |
+| ---------------------- | ------------------------------------- | ------------------------------------------------------------------------------------ |
+| `onActive`             | `(datum: MicroDatum \| null) => void` | The active unit changed (pointer or keyboard). `null` when the chart clears.         |
+| `onSelect`             | `(datum: MicroDatum \| null) => void` | A unit was selected or unselected — click, tap, `Enter`, `Space`, `Escape`.          |
+| `selectedIndex`        | `number \| null`                      | Control the selection yourself.                                                      |
+| `defaultSelectedIndex` | `number \| null`                      | Seed the selection once, then let the chart own it.                                  |
+| `readout`              | `boolean`                             | Show the floating value chip on hover (default `true`). `false` hides only the chip. |
 
-`MicroDatum` is `{ index, value, label? }` — `index` identifies the unit, `value` is its primary encoded number (`null`
-when the unit encodes nothing), `label` its human name where one exists.
+`MicroDatum` is `{ index, value, label?, formatted? }`. Two of the fields carry the value in different forms, so you
+pick the one that fits: **`value`** is the raw primary number — compute with it (`null` when the unit encodes nothing);
+**`formatted`** is the ready-to-display string the chart's own readout would show, built with your `format`/`locale` —
+render it. For a plain chart that's just the value (`"$0.53"`); for a two-part unit it's the whole readout
+(`"48 → 68 (up 42%)"`). `index` identifies the unit (point, bar, cell, segment…), and `label` is its human name where
+one exists (`"Berlin"`, `"Checkout"`). Same shape on every chart and both callbacks.
+
+Pair the two to lift the value out of the chart. Set `readout={false}` to keep the hover crosshair but suppress the
+in-chart chip, and read `datum.formatted` in `onActive` to render that value wherever you like — a KPI number, a
+sentence, a table cell — without re-deriving `format`/`locale` yourself:
+
+```tsx
+const [spend, setSpend] = useState("$0.53");
+<Sparkline data={cost} format="$,.2f" readout={false} onActive={(d) => d && setSpend(d.formatted!)} />;
+```
 
 Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onSelect` only; there's
 nothing to rove between. Fifteen of them also take `live` (default `true`): as the value updates, the new reading is

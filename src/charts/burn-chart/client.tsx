@@ -45,6 +45,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -141,9 +142,18 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       return {
         index: pt?.period ?? i,
         value: pt ? (pt.actual ?? pt.projected ?? pt.plan) : null,
+        formatted: pt
+          ? pt.actual !== null
+            ? `${fmt(pt.actual)}${pt.plan !== null ? ` / ${fmt(pt.plan)}` : ""} ${workWord}`
+            : pt.projected !== null
+              ? `${fmt(pt.projected)}⋯ ${workWord}`
+              : pt.plan !== null
+                ? `${fmt(pt.plan)} ${workWord}`
+                : ""
+          : undefined,
       };
     },
-    [geo],
+    [geo, fmt, workWord],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -236,7 +246,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         ) : null}
         {rest.children}
       </StaticBurnChart>
-      {p ? (
+      {readout && p ? (
         <span
           className="mc-burn-readout mc-spark-readout"
           style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}

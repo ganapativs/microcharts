@@ -132,7 +132,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       // appends a text band below, which would otherwise drag the dial upward.
       seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-polar ${className}` : "mc-polar"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <circle
         cx={geo.guide.cx}

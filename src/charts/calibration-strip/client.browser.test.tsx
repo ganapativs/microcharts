@@ -34,9 +34,9 @@ describe("interactive <CalibrationStrip>", () => {
     const wrap = screen.container.querySelector(".mc-calib-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 0.18, label: "0.2" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.18, label: "0.2" });
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 0.55, label: "0.5" });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 0.55, label: "0.5" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -50,7 +50,7 @@ describe("interactive <CalibrationStrip>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 0.18, label: "0.2" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 0.18, label: "0.2" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))

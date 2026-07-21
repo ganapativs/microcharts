@@ -47,6 +47,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -97,9 +98,13 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         index: i,
         value: d && isFiniteValue(d.value) ? d.value : null,
         label: d?.label,
+        formatted:
+          d && isFiniteValue(d.value)
+            ? `${d.label} ${pctFmt(geo.stages[i]!.share)} (${fmt(d.value)})`
+            : undefined,
       };
     },
-    [data, geo],
+    [data, geo, fmt, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -176,7 +181,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         {rest.children}
       </StaticFunnel>
       <LiveRegion>{announced}</LiveRegion>
-      {st && stDatum && isFiniteValue(stDatum.value) ? (
+      {readout && st && stDatum && isFiniteValue(stDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{

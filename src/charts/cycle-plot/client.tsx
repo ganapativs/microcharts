@@ -76,6 +76,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -185,14 +186,22 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
   // label = the slot's name when supplied.
   const datum = useCallback(
     (i: number) => {
-      const c = geo?.slots[i]?.center.value;
+      const s = geo?.slots[i];
+      const c = s?.center.value;
       return {
         index: i,
         value: c !== undefined && Number.isFinite(c) ? c : null,
         label: slots?.[i],
+        // The slot-level readout (the drill is a keyboard-only readout depth, not
+        // a reported unit — datum always speaks the whole slot).
+        formatted: s
+          ? !isFiniteValue(s.center.value)
+            ? `${slotName(slots, i)}: —`
+            : `${slotName(slots, i)}: ${fmt(s.center.value)} (${driftName(strings, s.drift)})`
+          : undefined,
       };
     },
-    [geo, slots],
+    [geo, slots, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -301,7 +310,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         {active !== null ? band(active, false) : null}
         {rest.children}
       </StaticCyclePlot>
-      {sl && geo && shown !== null ? (
+      {readout && sl && geo && shown !== null ? (
         <span
           className="mc-cycle-plot-readout mc-spark-readout"
           style={{ left: `${(sl.center.x / width) * 100}%`, transform: "translateX(-50%)" }}

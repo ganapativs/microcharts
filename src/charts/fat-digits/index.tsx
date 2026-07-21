@@ -90,7 +90,7 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
       // construction, so the frame is the plot box.
       seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fat ${className}` : "mc-fat"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {formatted ? (
         <text x={geo.x} y={geo.y} fontSize={fontSize} dominantBaseline="central" textAnchor="start">

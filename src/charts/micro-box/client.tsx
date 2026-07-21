@@ -60,6 +60,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -114,8 +115,11 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
       index: i,
       value: resolved ? resolved.five[STOPS[i]!] : null,
       label: STOPS[i],
+      formatted: resolved
+        ? strings.boxStat(STOPS[i]!, fmt(resolved.five[STOPS[i]!])).replace(/\.$/, "")
+        : undefined,
     }),
-    [resolved],
+    [resolved, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -182,7 +186,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         {rest.children}
       </StaticMicroBox>
       <LiveRegion>{announced}</LiveRegion>
-      {shownStop && statX && resolved ? (
+      {readout && shownStop && statX && resolved ? (
         <span
           className="mc-spark-readout"
           style={{

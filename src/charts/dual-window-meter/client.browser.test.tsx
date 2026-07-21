@@ -28,7 +28,7 @@ describe("interactive <DualWindowMeter>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{ArrowRight}");
-    expect(seen.at(-1)).toEqual({ index: 2, value: 20 });
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: 20 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -41,7 +41,7 @@ describe("interactive <DualWindowMeter>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{ArrowRight}{ArrowRight}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 2, value: 20 });
+    expect(picks.at(-1)).toMatchObject({ index: 2, value: 20 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('line[data-mc-w="support"]')).not.toBeNull();

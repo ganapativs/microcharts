@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
 import type { ChartCollection } from "@/lib/charts/types";
 import { getGalleryMode, subscribeGalleryMode, type GalleryMode } from "./gallery-mode";
 
@@ -13,12 +14,10 @@ const TILT_MAX = 3;
 
 function initialState(): {
   q: string;
-  col: string;
   density: GalleryDensity;
   sort: GallerySort;
 } {
-  if (typeof window === "undefined")
-    return { q: "", col: "all", density: "comfortable", sort: "catalog" };
+  if (typeof window === "undefined") return { q: "", density: "comfortable", sort: "catalog" };
   const p = new URLSearchParams(window.location.search);
   const d = p.get("density");
   const stored = localStorage.getItem(DENSITY_KEY);
@@ -30,18 +29,25 @@ function initialState(): {
         : "comfortable";
   return {
     q: p.get("q") ?? "",
-    col: p.get("collection") ?? "all",
     density,
     sort: p.get("sort") === "name" ? "name" : "catalog",
   };
 }
 
-export function useGalleryDock(collections: { key: ChartCollection; label: string }[]) {
+export function useGalleryDock(
+  collections: readonly { key: ChartCollection; label: string }[],
+  activeCollection: ChartCollection | "all",
+) {
+  const router = useRouter();
+  const col = activeCollection;
+  const goCollection = (key: string) => {
+    router.push(key === "all" ? "/charts" : `/charts/${key}`);
+  };
+
   // Read the URL + localStorage ONCE, not once per state initializer.
   const init = useRef<ReturnType<typeof initialState>>(undefined as never);
   init.current ??= initialState();
   const [q, setQ] = useState(init.current.q);
-  const [col, setCol] = useState<string>(init.current.col);
   const [density, setDensity] = useState<GalleryDensity>(init.current.density);
   const [sort, setSort] = useState<GallerySort>(init.current.sort);
   const [shown, setShown] = useState<number | null>(null);
@@ -54,16 +60,8 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
   );
   const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const lastCol = useRef<string | null>(null);
   const syncDock = useRef<() => void>(() => {});
   const remeasure = useRef<() => void>(() => {});
-  const domRef = useRef<{
-    cards: HTMLElement[];
-    empty: HTMLElement | null;
-    emptyQ: HTMLElement | null;
-    grid: HTMLElement | null;
-    root: HTMLElement | null;
-  } | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -79,8 +77,6 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     const p = new URLSearchParams(window.location.search);
     if (q) p.set("q", q);
     else p.delete("q");
-    if (col !== "all") p.set("collection", col);
-    else p.delete("collection");
     if (density !== "comfortable") p.set("density", density);
     else p.delete("density");
     if (sort !== "catalog") p.set("sort", sort);
@@ -91,7 +87,7 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
       "",
       window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash,
     );
-  }, [q, col, density, sort]);
+  }, [q, density, sort]);
 
   useEffect(() => {
     const grid = document.querySelector<HTMLElement>(".g2-grid");
@@ -249,33 +245,28 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
   }, []);
 
   useEffect(() => {
-    const dom = (domRef.current ??= {
-      cards: Array.from(document.querySelectorAll<HTMLElement>("[data-gallery-card]")),
-      empty: document.querySelector<HTMLElement>("[data-gallery-empty]"),
-      emptyQ: document.querySelector<HTMLElement>("[data-empty-q]"),
-      grid: document.querySelector<HTMLElement>(".g2-grid"),
-      root: document.querySelector<HTMLElement>(".g2"),
-    });
+    // Re-query every run: hub navigations swap the SSR grid without remounting the dock.
+    const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-gallery-card]"));
+    const empty = document.querySelector<HTMLElement>("[data-gallery-empty]");
+    const emptyQ = document.querySelector<HTMLElement>("[data-empty-q]");
+    const grid = document.querySelector<HTMLElement>(".g2-grid");
     const trimmed = q.trim();
     const needle = trimmed.toLowerCase();
     let count = 0;
-    for (const card of dom.cards) {
-      const okCol = col === "all" || card.dataset.collection === col;
-      const okQ = !needle || (card.dataset.keywords ?? "").includes(needle);
-      const on = okCol && okQ;
+    for (const card of cards) {
+      const on = !needle || (card.dataset.keywords ?? "").includes(needle);
       card.hidden = !on;
       if (on) count++;
     }
-    if (dom.grid) {
-      dom.grid.hidden = count === 0;
-      dom.grid.dataset.collectionFilter = col;
-      if (col === "all" && !needle && sort === "catalog") dom.grid.dataset.browse = "true";
-      else delete dom.grid.dataset.browse;
+    if (grid) {
+      grid.hidden = count === 0;
+      if (col === "all" && !needle && sort === "catalog") grid.dataset.browse = "true";
+      else delete grid.dataset.browse;
     }
-    if (dom.empty) dom.empty.hidden = count !== 0;
-    if (count === 0 && dom.emptyQ) {
+    if (empty) empty.hidden = count !== 0;
+    if (count === 0 && emptyQ) {
       const label = collections.find((c) => c.key === col)?.label;
-      dom.emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
+      emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
     }
     setShown(count);
     // Filtering changes the document height, so the overflow test has to be
@@ -289,7 +280,9 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     if (!grid) return;
     const onKey = (e: KeyboardEvent) => {
       if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
-      const cards = Array.from(grid.querySelectorAll<HTMLElement>(".g2-card")).filter(
+      // The focusable element per card is now the `.g2-cover` anchor (the card
+      // itself is no longer a tab stop), so rove across those.
+      const cards = Array.from(grid.querySelectorAll<HTMLElement>(".g2-cover")).filter(
         (c) => c.offsetParent !== null,
       );
       const here = cards.indexOf(document.activeElement as HTMLElement);
@@ -315,28 +308,13 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
   }, []);
 
   useEffect(() => {
-    if (lastCol.current === null || lastCol.current === col) {
-      lastCol.current = col;
-      return;
-    }
-    lastCol.current = col;
-    window.scrollTo(0, 0);
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const grid = document.querySelector<HTMLElement>(".g2-grid");
-    grid?.animate?.([{ opacity: 0.5 }, { opacity: 1 }], {
-      duration: 260,
-      easing: "ease-out",
-    });
-  }, [col]);
-
-  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = inputRef.current;
       if (!el) return;
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        el.focus();
-      } else if (e.key === "/" && document.activeElement !== el) {
+      // `/` focuses the gallery filter. ⌘K is intentionally NOT bound here — it
+      // is owned site-wide by Fumadocs' global doc search; binding it too fired
+      // both listeners and opened the search dialog over the focused filter.
+      if (e.key === "/" && document.activeElement !== el) {
         e.preventDefault();
         el.focus();
       } else if (e.key === "Escape" && document.activeElement === el) {
@@ -353,7 +331,7 @@ export function useGalleryDock(collections: { key: ChartCollection; label: strin
     q,
     setQ,
     col,
-    setCol,
+    goCollection,
     density,
     setDensity,
     sort,

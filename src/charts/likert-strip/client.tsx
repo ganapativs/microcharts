@@ -43,6 +43,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -102,9 +103,14 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     (i: number) => {
       const s = geo?.segments[i];
       const d = s ? data[s.level] : undefined;
-      return { index: i, value: d && Number.isFinite(d.value) ? d.value : null, label: d?.label };
+      return {
+        index: i,
+        value: d && Number.isFinite(d.value) ? d.value : null,
+        label: d?.label,
+        formatted: s && d ? `${d.label} ${pctFmt(s.share)}` : undefined,
+      };
     },
-    [data, geo],
+    [data, geo, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -191,7 +197,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       >
         {announced}
       </span>
-      {seg && segDatum ? (
+      {readout && seg && segDatum ? (
         <span
           className="mc-spark-readout"
           style={{

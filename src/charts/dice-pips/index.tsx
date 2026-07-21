@@ -63,7 +63,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
       // the pip grid is laid out inside it, so the seat survives the switch.
       seat={{ mode: "center", top: geo.face.y, bottom: geo.face.y + geo.face.height }}
       className={className ? `mc-dice ${className}` : "mc-dice"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {face ? (
         <rect

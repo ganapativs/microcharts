@@ -43,6 +43,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -98,10 +99,19 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     (i: number) => {
       const d = data[i];
       // The total column has no i18n-able name, so it carries no `label`.
-      if (!d) return { index: i, value: endLevel };
-      return { index: i, value: isFiniteValue(d.value) ? d.value : null, label: d.label };
+      if (!d) return { index: i, value: endLevel, formatted: fmt(endLevel) };
+      return {
+        index: i,
+        value: isFiniteValue(d.value) ? d.value : null,
+        label: d.label,
+        formatted: `${d.label}: ${
+          isFiniteValue(d.value)
+            ? `${d.value < 0 ? "−" : "+"}${fmt(Math.abs(d.value))}`
+            : strings.noData
+        } → ${fmt(geo.levels[i] ?? open)}`,
+      };
     },
-    [data, endLevel],
+    [data, endLevel, fmt, geo, strings, open],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -186,7 +196,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         {rest.children}
       </StaticWaterfall>
       <LiveRegion>{announced}</LiveRegion>
-      {shown !== null ? (
+      {readout && shown !== null ? (
         <span
           className="mc-spark-readout"
           style={{

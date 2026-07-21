@@ -46,6 +46,10 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     format,
     locale,
     animate = false,
+    // `readout` (the public chip toggle) is aliased: a local `readout` const
+    // below already holds the chip's numerals string.
+    readout: showChip = true,
+    summary,
     className,
     style,
     onActive,
@@ -54,7 +58,8 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const summary = honeycombSummary(value, { total, unit, strings, format, locale });
+  const generated = honeycombSummary(value, { total, unit, strings, format, locale });
+  const accName = summary === false ? undefined : typeof summary === "string" ? summary : generated;
   const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prev = useRef(value);
@@ -74,12 +79,13 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     while (geo.cells[n] && geo.cells[n]!.cy === first.cy) n++;
     return n;
   }, [geo]);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(summary);
-  }, [value, summary, live]);
+    if (live) setAnnounced(generated);
+  }, [value, generated, live]);
 
   // Pointer (viewBox space) → cell index: nearest hex center within one
   // circumradius (hexes tile, so the nearest center is the containing cell).
@@ -145,8 +151,13 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   // the cell's occupancy — 1 when filled, 0 when empty (a cell has no other
   // encoded number; the chart's magnitude is the count of filled cells).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.cells[i] ? (geo.cells[i]!.filled ? 1 : 0) : null }),
-    [geo],
+    (i: number) => ({
+      index: i,
+      value: geo.cells[i] ? (geo.cells[i]!.filled ? 1 : 0) : null,
+      // Mirror the visual chip's per-cell numerals ("7 / 40").
+      formatted: geo.cells[i] ? `${fmt(i + 1)} / ${fmt(geo.cells.length)}` : undefined,
+    }),
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -162,8 +173,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     defaultSelectedIndex,
   });
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
   const shown = active ?? selected;
   // The VISUAL chip is numerals only ("7 / 40") — it sits next to the comb, which
   // supplies the rest. The SPOKEN form can't lean on that context, so it goes
@@ -224,7 +234,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
         {rest.children}
       </StaticHoneycomb>
       {live ? <LiveRegion>{shown === null ? announced : cellSpoken}</LiveRegion> : null}
-      {hover || shown !== null ? (
+      {showChip && (hover || shown !== null) ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {shown === null ? readout : cellReadout}
         </span>

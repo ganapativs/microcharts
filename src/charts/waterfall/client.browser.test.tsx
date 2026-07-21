@@ -31,9 +31,9 @@ describe("interactive <Waterfall>", () => {
     const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen[seen.length - 1]).toEqual({ index: 0, value: 300, label: "Product" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 0, value: 300, label: "Product" });
     key(wrap, "ArrowRight");
-    expect(seen[seen.length - 1]).toEqual({ index: 1, value: -140, label: "Refunds" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 1, value: -140, label: "Refunds" });
     key(wrap, "Escape");
     expect(seen[seen.length - 1]).toBeNull();
   });
@@ -47,7 +47,7 @@ describe("interactive <Waterfall>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks[picks.length - 1]).toEqual({ index: 0, value: 300, label: "Product" });
+    expect(picks[picks.length - 1]).toMatchObject({ index: 0, value: 300, label: "Product" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

@@ -43,6 +43,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -103,9 +104,13 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const v = bucketVals[i];
-      return { index: i, value: v == null ? null : Math.abs(v) };
+      return {
+        index: i,
+        value: v == null ? null : Math.abs(v),
+        formatted: `${Math.round((i / Math.max(1, buckets - 1)) * 100)}% · ${fmt(v == null ? 0 : Math.abs(v))}`,
+      };
     },
-    [bucketVals],
+    [bucketVals, fmt, buckets],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -184,7 +189,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
         {rest.children}
       </StaticWaveform>
       <LiveRegion>{announced}</LiveRegion>
-      {shownBar ? (
+      {readout && shownBar ? (
         <span
           className="mc-spark-readout"
           style={{

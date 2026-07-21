@@ -29,7 +29,7 @@ describe("interactive <Bullet>", () => {
     const picks: unknown[] = [];
     const fig = await mount(<Bullet value={72} target={80} onSelect={(d) => picks.push(d)} />);
     fig.click();
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 72 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 72 });
   });
 
   it("Enter fires onSelect", async () => {
@@ -37,6 +37,6 @@ describe("interactive <Bullet>", () => {
     const fig = await mount(<Bullet value={72} target={80} onSelect={(d) => picks.push(d)} />);
     fig.focus();
     fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 72 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 72 });
   });
 });

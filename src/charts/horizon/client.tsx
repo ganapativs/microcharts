@@ -49,6 +49,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -89,8 +90,12 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
   // Navigable unit = a data sample; `index` is the data index, `value` its
   // number (or `null` when non-finite).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: isFiniteValue(data[i]) ? (data[i] as number) : null }),
-    [data],
+    (i: number) => ({
+      index: i,
+      value: isFiniteValue(data[i]) ? (data[i] as number) : null,
+      formatted: isFiniteValue(data[i]) ? fmt(data[i] as number) : "—",
+    }),
+    [data, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -168,7 +173,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
         {rest.children}
       </StaticHorizon>
       <LiveRegion>{announced}</LiveRegion>
-      {crossX !== undefined ? (
+      {readout && crossX !== undefined ? (
         <span
           className="mc-spark-readout"
           style={{

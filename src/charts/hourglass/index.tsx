@@ -79,7 +79,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
       // other glyphs. The box is the cap plates, the one part `value` can't move.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hourglass ${className}` : "mc-hourglass"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <path d={geo.frame} data-mc-ink="fill" />
       {/* Top sand (remaining). .mc-hourglass-sand scopes interactive fade. */}

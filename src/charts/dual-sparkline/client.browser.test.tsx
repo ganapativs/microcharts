@@ -27,7 +27,7 @@ describe("interactive <DualSparkline>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 1, value: 15 });
+    expect(seen.at(-1)).toMatchObject({ index: 1, value: 15 });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -42,7 +42,7 @@ describe("interactive <DualSparkline>", () => {
     key(wrap, "Home");
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 1, value: 15 });
+    expect(picks.at(-1)).toMatchObject({ index: 1, value: 15 });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

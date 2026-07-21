@@ -36,11 +36,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     value,
     animate = false,
     onSelect,
+    summary,
     className,
     style,
     ...rest
   } = props;
-  const summary = hourglassSummary(value, strings);
+  const generated = hourglassSummary(value, strings);
+  const accName = summary === false ? undefined : typeof summary === "string" ? summary : generated;
   const wrap = useRef<HTMLSpanElement>(null);
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
@@ -71,10 +73,10 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     }
     // announce only when a documented threshold was crossed
     const crossed = THRESHOLDS.some((t) => before < t !== value < t);
-    if (live && crossed) setAnnounced(summary);
-  }, [value, summary, live]);
+    if (live && crossed) setAnnounced(generated);
+  }, [value, generated, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Drill-down: the one interaction a single-value glyph needs. The payload
   // carries the SAME clamped elapsed fraction the sand encodes.

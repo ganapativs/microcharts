@@ -61,6 +61,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     className,
     style,
     animate = false,
+    readout = true,
     onActive,
     onSelect,
     selectedIndex,
@@ -118,8 +119,11 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
 
   // `value` = the note's PITCH — the datum value the staff position encodes.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.notes.find((n) => n.index === i)?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const v = geo.notes.find((n) => n.index === i)?.value ?? null;
+      return { index: i, value: v, formatted: v === null ? undefined : fmt(v) };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -180,7 +184,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
       >
         {shownNote ? strings.point(shownPos, stops.length, fmt(shownNote.value)) : ""}
       </span>
-      {shownNote ? (
+      {readout && shownNote ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(shownNote.cx / width) * 100}%`, transform: "translateX(-50%)" }}

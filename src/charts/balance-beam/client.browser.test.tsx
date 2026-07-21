@@ -44,9 +44,9 @@ describe("interactive <BalanceBeam>", () => {
     const wrap = screen.container.querySelector(".mc-beam-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen[seen.length - 1]).toEqual({ index: 1, value: 480, label: "outflow" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 1, value: 480, label: "outflow" });
     key(wrap, "ArrowLeft");
-    expect(seen[seen.length - 1]).toEqual({ index: 0, value: 620, label: "Inflow" });
+    expect(seen[seen.length - 1]).toMatchObject({ index: 0, value: 620, label: "Inflow" });
     key(wrap, "Escape");
     expect(seen[seen.length - 1]).toBeNull();
   });
@@ -58,7 +58,7 @@ describe("interactive <BalanceBeam>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks[picks.length - 1]).toEqual({ index: 1, value: 480, label: "outflow" });
+    expect(picks[picks.length - 1]).toMatchObject({ index: 1, value: 480, label: "outflow" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

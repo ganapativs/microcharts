@@ -50,7 +50,7 @@ describe("interactive <MiniBar>", () => {
     const wrap = screen.container.querySelector(".mc-minibar-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 940, label: "East" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 940, label: "East" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -62,7 +62,7 @@ describe("interactive <MiniBar>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 940, label: "East" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 940, label: "East" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('rect[data-mc-w="tick"]'))

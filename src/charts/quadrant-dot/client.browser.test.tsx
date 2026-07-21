@@ -67,10 +67,10 @@ describe("interactive <QuadrantDot>", () => {
     const wrap = screen.container.querySelector(".mc-quadrant-dot-live") as HTMLElement;
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 9 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 9 });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     // First peer nearest the focal: {x:2,y:8} → y = 8 at index 1.
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 8 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: 8 });
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -91,7 +91,7 @@ describe("interactive <QuadrantDot>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 1, value: 8 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 1, value: 8 });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))

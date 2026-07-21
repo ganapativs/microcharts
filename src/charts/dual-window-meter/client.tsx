@@ -47,6 +47,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -62,7 +63,13 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
   const [wf, ws] = windows[0] < windows[1] ? windows : [windows[1], windows[0]];
   const fast = useMemo(() => rollingMean(data, wf), [data, wf]);
   const slow = useMemo(() => rollingMean(data, ws), [data, ws]);
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // `{ maximumFractionDigits: 1 }` mirrors the static default (index.tsx) so the
+  // readout, live announcement and accessible name don't over-claim precision on
+  // raw rolling-mean floats — and the label gutter matches the composed static.
+  const fmt = useMemo(
+    () => makeFormatter(format, locale, { maximumFractionDigits: 1 }),
+    [format, locale],
+  );
   // Same font metric as the static — it sizes the label gutter, and therefore
   // every x the crosshair and readout are placed at.
   const fontSize = labelFont(height, 0.32);
@@ -92,7 +99,18 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
   );
   // `value` reports the sustained (slow) window mean — the headline reading
   // (the `data`-ink thick trace + the summary's leading number).
-  const datum = useCallback((i: number) => ({ index: i, value: slow[i] ?? null }), [slow]);
+  const datum = useCallback(
+    (i: number) => {
+      const fi = fast[i];
+      const si = slow[i];
+      return {
+        index: i,
+        value: si ?? null,
+        formatted: `${fi == null ? "—" : fmt(fi)} · ${si == null ? "—" : fmt(si)} · target ${fmt(target)}`,
+      };
+    },
+    [fast, slow, fmt, target],
+  );
 
   const { active, selected, bind } = useActivePicker({
     count: data.length,
@@ -178,7 +196,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
         {rest.children}
       </StaticDualWindowMeter>
       <LiveRegion>{announced}</LiveRegion>
-      {shown != null ? (
+      {readout && shown != null ? (
         <span
           className="mc-spark-readout"
           style={{ left: `${(shownX / width) * 100}%`, transform: "translateX(-50%)" }}

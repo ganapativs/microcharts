@@ -28,7 +28,7 @@ describe("interactive <Waveform>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 0 });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0 });
     await userEvent.keyboard("{Escape}");
     expect(seen.at(-1)).toBeNull();
   });
@@ -41,7 +41,7 @@ describe("interactive <Waveform>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{Home}{Enter}");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 0 });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 0 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

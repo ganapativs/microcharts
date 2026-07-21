@@ -6,7 +6,13 @@ import type { SummaryStrings } from "./summary.js";
 
 export type RateVolumeStrings = Pick<
   SummaryStrings,
-  "noData" | "rateVolume" | "rateVolumeShort" | "rateVolumeAt" | "rateVolumeNoEvents"
+  | "noData"
+  | "rateVolume"
+  | "rateVolumeShort"
+  | "rateVolumeAt"
+  | "rateVolumeNoEvents"
+  | "rateVolumeChip"
+  | "rateVolumeChipEmpty"
 >;
 
 const lowFlag = (low: boolean): string => (low ? " (low volume)" : "");
@@ -20,4 +26,6 @@ export const EN_RATE_VOLUME: RateVolumeStrings = {
   rateVolumeAt: (position, total, rate, volume, unit, low) =>
     `Period ${position} of ${total}: ${rate} on ${volume} ${unit}${lowFlag(low)}.`,
   rateVolumeNoEvents: (position, total) => `Period ${position} of ${total}: no events.`,
+  rateVolumeChip: (rate, volume, unit, low) => `${rate} · ${volume} ${unit}${low ? " (low)" : ""}`,
+  rateVolumeChipEmpty: "no events",
 };

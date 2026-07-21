@@ -173,7 +173,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
         vertical ? { mode: "floor", bottom: boxH - PAD } : { mode: "center", top: 0, bottom: boxH }
       }
       className={className ? `mc-thermo ${className}` : "mc-thermo"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       {/* Bulb always full; fill inline, width from role. */}
       {geo.bulb ? (

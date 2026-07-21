@@ -24,7 +24,7 @@ describe("interactive <BumpStrip>", () => {
     const wrap = screen.container.querySelector(".mc-bump-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Home");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 5 });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 5 });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -36,7 +36,7 @@ describe("interactive <BumpStrip>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 5 });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 5 });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('circle[data-mc-w="tick"]'))

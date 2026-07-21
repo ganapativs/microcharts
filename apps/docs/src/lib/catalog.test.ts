@@ -120,6 +120,7 @@ describe("catalog shared + interactive props", () => {
       "onSelect",
       "selectedIndex",
       "defaultSelectedIndex",
+      "readout",
     ]);
 
     const delta = catalog.charts.find((c) => c.slug === "delta")!;

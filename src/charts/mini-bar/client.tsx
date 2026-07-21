@@ -49,6 +49,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -110,13 +111,15 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = sorted[i];
+      const v = isFiniteValue(d?.value) ? (d!.value as number) : null;
       return {
         index: i,
-        value: isFiniteValue(d?.value) ? (d!.value as number) : null,
+        value: v,
         label: d?.label,
+        formatted: v === null ? `${d?.label}: ${strings.noData}` : `${d?.label}: ${fmt(v)}`,
       };
     },
-    [sorted],
+    [sorted, fmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -193,7 +196,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         {rest.children}
       </StaticMiniBar>
       <LiveRegion>{announced}</LiveRegion>
-      {shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {readout && shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
           style={{

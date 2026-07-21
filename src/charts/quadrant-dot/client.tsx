@@ -65,6 +65,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -123,8 +124,15 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
   );
 
   const datum = useCallback(
-    (i: number) => ({ index: i, value: targets[i]?.vy ?? null }),
-    [targets],
+    (i: number) => {
+      const t = targets[i];
+      return {
+        index: i,
+        value: t?.vy ?? null,
+        formatted: t ? `${fmt(t.vx)}, ${fmt(t.vy)}` : undefined,
+      };
+    },
+    [targets, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -204,7 +212,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticQuadrantDot>
-      {t ? (
+      {readout && t ? (
         <span
           className="mc-quadrant-dot-readout mc-spark-readout"
           style={{ left: `${(t.x / width) * 100}%`, transform: "translateX(-50%)" }}

@@ -126,7 +126,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       // the baseline lands low in the cap band the way a real trace reads.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-heartbeat ${className}` : "mc-heartbeat"}
-      style={{ "--mc-label-size": `${fontSize}px`, ...style } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
       <line
         x1={geo.baseline.x1}

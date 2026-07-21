@@ -59,9 +59,9 @@ describe("interactive <CitySkyline>", () => {
     const wrap = screen.container.querySelector(".mc-skyline-live") as HTMLElement;
     wrap.focus();
     key(wrap, "ArrowRight");
-    expect(seen.at(-1)).toEqual({ index: 0, value: 46, label: "Platform" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 46, label: "Platform" });
     key(wrap, "End");
-    expect(seen.at(-1)).toEqual({ index: 2, value: 28, label: "Web" });
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: 28, label: "Web" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -73,7 +73,7 @@ describe("interactive <CitySkyline>", () => {
     wrap.focus();
     key(wrap, "ArrowRight");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: 46, label: "Platform" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: 46, label: "Platform" });
     // Pin survives blur (it is selection, not hover).
     wrap.blur();
     await expect

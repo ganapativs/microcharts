@@ -61,6 +61,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -122,7 +123,12 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const p = geo.points[i];
-      return { index: i, value: p?.dataY ?? null, label: p ? fmt(p.dataX) : undefined };
+      return {
+        index: i,
+        value: p?.dataY ?? null,
+        label: p ? fmt(p.dataX) : undefined,
+        formatted: p ? `${fmt(p.dataX)}, ${fmt(p.dataY)}` : undefined,
+      };
     },
     [geo, fmt],
   );
@@ -191,7 +197,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         {rest.children}
       </StaticPhaseTrace>
       <LiveRegion>{announced}</LiveRegion>
-      {pt ? (
+      {readout && pt ? (
         <span
           className="mc-spark-readout"
           style={{

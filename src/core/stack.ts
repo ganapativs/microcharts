@@ -128,7 +128,10 @@ export function divergingStack(
   // loops below index `counts` unguarded, so an out-of-range `split` would
   // otherwise read undefined and emit NaN segments (matches the file's
   // null-means-no-neutral convention).
-  const neutralIndex = rawNeutral !== null && rawNeutral >= 0 && rawNeutral < n ? rawNeutral : null;
+  const neutralIndex =
+    rawNeutral !== null && Number.isInteger(rawNeutral) && rawNeutral >= 0 && rawNeutral < n
+      ? rawNeutral
+      : null;
   const mode = opts.neutral ?? "split";
 
   const counts = values.map((v) => (isFiniteValue(v) && v > 0 ? v : 0));

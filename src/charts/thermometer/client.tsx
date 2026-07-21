@@ -34,6 +34,8 @@ export interface InteractiveThermometerProps extends ThermometerProps {
    * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  readout?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the reading }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -50,6 +52,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     format,
     locale,
     animate = false,
+    readout = true,
     onSelect,
     className,
     style,
@@ -72,10 +75,11 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
 
   const label = [title, summary].filter(Boolean).join(". ") || undefined;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const readout = isFiniteValue(value) ? fmt(value) : "";
+  const readoutText = isFiniteValue(value) ? fmt(value) : "";
   // One reading, one selectable unit (index 0) — the same number the readout
   // shows, in domain units.
-  const pick = (): void => onSelect?.({ index: 0, value: isFiniteValue(value) ? value : null });
+  const pick = (): void =>
+    onSelect?.({ index: 0, value: isFiniteValue(value) ? value : null, formatted: readoutText });
 
   return (
     <span
@@ -106,9 +110,9 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         style={fillFor(style)}
       />
       {live ? <LiveRegion>{announced}</LiveRegion> : null}
-      {hover && readout ? (
+      {readout && hover && readoutText ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {readout}
+          {readoutText}
         </span>
       ) : null}
     </span>

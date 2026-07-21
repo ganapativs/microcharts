@@ -28,7 +28,7 @@ describe("interactive <FatDigits>", () => {
     );
     const wrap = screen.container.querySelector(".mc-fat-live") as HTMLElement;
     wrap.click();
-    expect(picks).toEqual([{ index: 0, value: 1204 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 1204 }]);
   });
 
   it("Enter fires onSelect from the focused wrapper", async () => {
@@ -39,6 +39,6 @@ describe("interactive <FatDigits>", () => {
     const wrap = screen.container.querySelector(".mc-fat-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Enter");
-    expect(picks).toEqual([{ index: 0, value: 200 }]);
+    expect(picks).toMatchObject([{ index: 0, value: 200 }]);
   });
 });

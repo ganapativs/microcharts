@@ -145,7 +145,14 @@ export function CatalogGrid({
 
 /**
  * One board cell. Fully clickable (opens the chart docs) and interactive
- * (hover/scrub on the mark). A short click navigates; a pointer scrub does not.
+ * (hover/scrub on the mark).
+ *
+ * The link is a real `<a>` overlay (`.hx-tile-link`) — crawlable, shows its URL
+ * in the status bar, and supports right-click "Open in new tab" / "Copy link".
+ * It covers the name row + dead tile but sits BELOW the raised chart slot
+ * (`z-index`), so the interactive mark keeps hover/scrub and the focusable chart
+ * is never nested inside the `<a>`. Clicks on the raised slot are handled by
+ * `useClickableCard`: a short click navigates, a pointer scrub does not.
  */
 export function CatalogTile({
   i,
@@ -162,10 +169,15 @@ export function CatalogTile({
   return (
     <li className="hx-stagger" style={{ "--i": i % 12 } as React.CSSProperties}>
       <div
-        className="hx-tile group flex h-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4"
-        aria-label={`${entry.name}: ${entry.tagline}`}
+        className="hx-tile group relative flex h-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4"
         {...nav}
       >
+        <Link
+          prefetch={false}
+          href={href}
+          className="hx-tile-link"
+          aria-label={`${entry.name}: ${entry.tagline}`}
+        />
         <div className="hx-slot hx-swap flex min-h-[4.25rem] w-full items-center justify-center">
           {children}
         </div>

@@ -50,6 +50,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -105,8 +106,15 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
 
   // Observed-step index; `value` is the budget remaining fraction (0–1).
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo?.points[i]?.value ?? null }),
-    [geo],
+    (i: number) => {
+      const p = geo?.points[i];
+      return {
+        index: i,
+        value: p?.value ?? null,
+        formatted: p ? `${fmt(p.value)} · ${RATE_FMT(p.rate)}×` : undefined,
+      };
+    },
+    [geo, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -202,7 +210,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         ) : null}
         {rest.children}
       </StaticErrorBudget>
-      {rp ? (
+      {readout && rp ? (
         <span
           className="mc-error-budget-readout mc-spark-readout"
           style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}

@@ -2,3 +2,28 @@
 # Next content-hashes everything under /_next/static — safe to cache forever.
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Lighthouse / best-practices security baseline for every HTML + asset response.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/og/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/brand/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/apple-icon
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/icon-192
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/icon-512
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/manifest.webmanifest
+  Cache-Control: public, max-age=86400

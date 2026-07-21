@@ -44,9 +44,9 @@ describe("interactive <CyclePlot>", () => {
     const wrap = screen.container.querySelector(".mc-cycle-plot-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Home");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 38, label: "Sun" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 38, label: "Sun" });
     key(wrap, "ArrowRight");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 1, value: 45, label: "Mon" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 1, value: 45, label: "Mon" });
     key(wrap, "Escape");
     await expect.poll(() => seen.at(-1)).toBeNull();
   });
@@ -58,7 +58,7 @@ describe("interactive <CyclePlot>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    await expect.poll(() => picks.at(-1)).toEqual({ index: 0, value: 38, label: "Sun" });
+    await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 38, label: "Sun" });
     wrap.blur();
     await expect.poll(() => wrap.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
@@ -134,7 +134,7 @@ describe("interactive <CyclePlot>", () => {
     const wrap = screen.container.querySelector(".mc-cycle-plot-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Home");
-    await expect.poll(() => seen.at(-1)).toEqual({ index: 0, value: 38, label: "Sun" });
+    await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 38, label: "Sun" });
     const before = seen.length;
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown");

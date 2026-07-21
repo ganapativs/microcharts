@@ -50,7 +50,7 @@ describe("interactive <BenchmarkStrip>", () => {
     const wrap = screen.container.querySelector(".mc-benchmark-strip-live") as HTMLElement;
     wrap.focus();
     key(wrap, "Home");
-    expect(seen.at(-1)).toEqual({ index: 0, value: expect.any(Number), label: "p5" });
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: expect.any(Number), label: "p5" });
     key(wrap, "Escape");
     expect(seen.at(-1)).toBeNull();
   });
@@ -64,7 +64,7 @@ describe("interactive <BenchmarkStrip>", () => {
     wrap.focus();
     key(wrap, "Home");
     key(wrap, "Enter");
-    expect(picks.at(-1)).toEqual({ index: 0, value: expect.any(Number), label: "p5" });
+    expect(picks.at(-1)).toMatchObject({ index: 0, value: expect.any(Number), label: "p5" });
     wrap.blur();
     await expect
       .poll(() => screen.container.querySelector('line[data-mc-w="tick"]'))
