@@ -1,0 +1,1118 @@
+/* ============================================================================
+   CORTEX — eval & observability instrument.
+
+   Aesthetic: a refined scientific instrument. Warm-graphite near-black,
+   one exacting blueprint-cobalt signal, three typographic voices —
+   Spectral (editorial headlines), Hanken Grotesk (interface & reading),
+   Spline Sans Mono (machine readout). Nothing glows for glow's sake.
+
+   Light tokens live in :root; a hand-tuned dark block sits at the END so it
+   wins the cascade against microcharts' zero-specificity prefers-color-scheme.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+}
+
+:root {
+  /* ── three typographic voices ─────────────────────────────────────────── */
+  /* Editorial serif — the human headline voice. */
+  --display: "Spectral", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  /* Interface + reading grotesque. Also --mc-font, so SVG chart text stays a
+     clean sans and never inherits a display/serif face. */
+  --ui:
+    "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  /* Machine readout — every figure, every spec label. */
+  --mono: "Spline Sans Mono", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+  /* fixed rem scale for a product UI — ratio ~1.28 through the heads */
+  --fs-eyebrow: 0.6875rem; /* 11 */
+  --fs-cap: 0.75rem; /* 12 */
+  --fs-label: 0.8125rem; /* 13 */
+  --fs-body: 0.9375rem; /* 15 */
+  --fs-lg: 1.0625rem; /* 17 */
+  --fs-h3: 1.1875rem; /* 19 */
+  --fs-h2: clamp(1.35rem, 1.15rem + 0.9vw, 1.75rem);
+  --fs-h1: clamp(1.9rem, 1.4rem + 2.4vw, 2.9rem);
+
+  /* 4pt spatial scale */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4.5rem;
+
+  --r-sm: 7px;
+  --r: 11px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* ── neutrals — warm graphite, tinted toward the ink (hue ~78) ─────────── */
+  --bg: oklch(0.975 0.004 82);
+  --bg-grid: oklch(0.93 0.006 82);
+  --panel: oklch(0.995 0.002 82);
+  --panel-2: oklch(0.968 0.004 82);
+  --panel-inset: oklch(0.945 0.006 80);
+  --ink: oklch(0.245 0.012 74);
+  --ink-2: oklch(0.43 0.012 74);
+  --ink-3: oklch(0.56 0.01 76);
+  --ink-4: oklch(0.68 0.008 78);
+  --line: oklch(0.9 0.006 80);
+  --line-2: oklch(0.938 0.005 82);
+
+  /* ── the one signal: blueprint cobalt (hue ~252, steely, never purple) ─── */
+  --accent: oklch(0.5 0.16 252);
+  --accent-ink: oklch(0.46 0.16 252);
+  --accent-soft: oklch(0.5 0.16 252 / 0.08);
+  --accent-line: oklch(0.5 0.16 252 / 0.24);
+
+  --shadow-sm: 0 1px 2px oklch(0.245 0.012 74 / 0.06);
+  --shadow:
+    0 2px 6px -2px oklch(0.245 0.012 74 / 0.08), 0 14px 30px -18px oklch(0.245 0.012 74 / 0.18);
+  --shadow-lg:
+    0 4px 12px -4px oklch(0.245 0.012 74 / 0.1), 0 28px 60px -26px oklch(0.245 0.012 74 / 0.24);
+
+  /* microcharts contract — share the identity, never touch valence hues */
+  --mc-font: var(--ui);
+  --mc-font-numeric: var(--mono);
+  --mc-accent: var(--accent);
+
+  color-scheme: light dark;
+}
+
+body {
+  font-family: var(--ui);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+  /* a faint engineering grid — registration, not decoration */
+  background-image:
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: -1px -1px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: none;
+}
+
+/* ── primitives ───────────────────────────────────────────────────────────── */
+.num,
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.muted {
+  color: var(--ink-3);
+}
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 620;
+  letter-spacing: -0.014em;
+  line-height: 1.14;
+}
+p {
+  margin: 0;
+}
+a {
+  color: inherit;
+}
+
+/* ── app shell ──────────────────────────────────────────────────────────── */
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s3) clamp(var(--s4), 4vw, var(--s7));
+  background: color-mix(in oklab, var(--panel) 92%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-width: 0;
+}
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+}
+.brand-mark svg {
+  display: block;
+}
+.brand-name {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+}
+.brand-sub {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  color: var(--ink-3);
+  letter-spacing: 0.03em;
+  margin-top: 4px;
+}
+.brand-sub b {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+}
+.live-cluster {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.live-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 5px var(--s3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--panel-2);
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.live-chip .num {
+  color: var(--ink);
+  font-weight: 600;
+}
+.live-chip svg {
+  display: block;
+}
+.hide-sm {
+  display: none;
+}
+
+/* ── tab bar ─────────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 clamp(var(--s4), 4vw, var(--s7));
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--panel) 70%, transparent);
+  position: sticky;
+  top: 53px;
+  z-index: 40;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: var(--fs-label);
+  font-weight: 550;
+  padding: var(--s3) var(--s3) calc(var(--s3) + 1px);
+  min-height: 46px;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  transition: color 0.18s ease;
+}
+.tab:hover {
+  color: var(--ink);
+}
+.tab[aria-selected="true"] {
+  color: var(--ink);
+}
+.tab::after {
+  content: "";
+  position: absolute;
+  left: var(--s3);
+  right: var(--s3);
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+.tab .tab-count {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--ink-4);
+  letter-spacing: 0;
+}
+.tab[aria-selected="true"] .tab-count {
+  color: var(--accent-ink);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+  border-radius: var(--r-sm);
+}
+
+/* ── view container ─────────────────────────────────────────────────────── */
+main {
+  flex: 1 1 auto;
+}
+.container {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: clamp(var(--s5), 4vw, var(--s7)) clamp(var(--s4), 4vw, var(--s7)) var(--s8);
+  /* Sticky tab bar is ~40px under the 53px topbar — keep heads clear. */
+  scroll-margin-top: 100px;
+}
+
+/* editorial, left-aligned, asymmetric head with a mono spec line */
+.view-head {
+  margin-bottom: var(--s6);
+  max-width: 60ch;
+  scroll-margin-top: 100px;
+}
+.view-head .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  padding-bottom: var(--s3);
+}
+.view-head .eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 1px;
+  background: var(--accent);
+}
+.view-head h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--fs-h1);
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+  margin: 0 0 var(--s4);
+  text-wrap: balance;
+}
+.view-head p {
+  color: var(--ink-2);
+  font-size: var(--fs-lg);
+  line-height: 1.6;
+  max-width: 58ch;
+}
+
+/* ── bento grid — 12-col so the rhythm can be genuinely varied ──────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s4);
+}
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--s4);
+    align-items: start;
+  }
+  .col-2 {
+    grid-column: span 4;
+  }
+  .col-3 {
+    grid-column: span 5;
+  }
+  .col-4 {
+    grid-column: span 7;
+  }
+  .col-6 {
+    grid-column: span 12;
+  }
+}
+@media (min-width: 1000px) {
+  .grid {
+    gap: var(--s5);
+  }
+  .col-2 {
+    grid-column: span 4;
+  }
+  .col-3 {
+    grid-column: span 6;
+  }
+  .col-4 {
+    grid-column: span 8;
+  }
+}
+
+/* ── card ───────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  min-width: 0;
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+.card.pad-lg {
+  padding: clamp(var(--s5), 3vw, var(--s6));
+}
+.card.hover:hover {
+  /* NO transform here: a transform on a card breaks the interactive charts' pointer→SVG
+     mapping (hover/focus drift). The shadow + border lift is the affordance instead. */
+  box-shadow: var(--shadow);
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+}
+.card.accent {
+  border-color: var(--accent-line);
+  background: linear-gradient(178deg, var(--accent-soft), transparent 38%), var(--panel);
+}
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.card-title {
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+}
+.card-sub {
+  color: var(--ink-3);
+  font-size: var(--fs-label);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+.card-tag {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  color: var(--ink-3);
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--panel-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* chart fills its frame; the frame is a quiet instrument bezel */
+.chart-fill {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.chart-frame {
+  position: relative;
+  border-radius: var(--r);
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  /* extra top headroom: the interactive hover readout (.mc-spark-readout) anchors
+     just above the chart's top edge, so it needs clear space or it crowds the top lane. */
+  padding: 30px var(--s4) var(--s4);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.5);
+}
+
+/* a picker readout under a chart — the active/pinned unit read back in words */
+.picker-readout {
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  letter-spacing: 0.01em;
+}
+.picker-readout .num {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+/* a live scrub chip pinned to a chart-frame corner (onActive readouts that
+   don't already get one from the chart's own interactive entry) */
+.scrub-chip {
+  position: absolute;
+  top: var(--s2);
+  right: var(--s2);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--accent-line);
+  background: color-mix(in oklab, var(--panel) 85%, var(--accent-soft));
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  color: var(--accent-ink);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Legend for the flame chart's blue/gray span coding. */
+.trace-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5, 20px);
+  margin-top: var(--s3);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+  color: var(--ink-2);
+}
+.trace-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.trace-sw {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex: none;
+}
+.trace-sw--crit {
+  background: var(--mc-accent);
+}
+.trace-sw--off {
+  background: var(--mc-neutral, oklch(0.5 0.012 250));
+}
+
+/* ── readout bar (KPI cluster — one instrument, not four cards) ─────────── */
+.readout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+@media (min-width: 720px) {
+  .readout {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.readout-cell {
+  background: var(--panel);
+  padding: var(--s4) var(--s4) var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  position: relative;
+}
+.readout-label {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.readout-value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--ink);
+}
+.readout-value small {
+  font-size: 0.52em;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-left: 3px;
+  letter-spacing: 0;
+}
+.readout-delta {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+}
+
+/* ── model roster ───────────────────────────────────────────────────────── */
+.roster {
+  display: flex;
+  flex-direction: column;
+}
+.roster-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s2);
+  border-radius: var(--r-sm);
+  transition: background 0.15s ease;
+}
+.roster-row:hover {
+  background: var(--panel-inset);
+}
+.roster-row + .roster-row {
+  border-top: 1px solid var(--line-2);
+}
+.roster-name {
+  font-family: var(--mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.roster-tier {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+}
+.roster-metric {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-label);
+  text-align: right;
+  color: var(--ink-2);
+}
+.roster-metric small {
+  color: var(--ink-4);
+  font-size: 0.72em;
+  margin-left: 2px;
+}
+
+/* ── orbit small-multiples ──────────────────────────────────────────────── */
+.orbit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: var(--s3);
+}
+.orbit-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3) var(--s2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  background: var(--panel-2);
+  text-align: center;
+  transition: border-color 0.18s ease;
+}
+.orbit-cell:hover {
+  border-color: var(--accent-line);
+}
+.orbit-cell .glyph {
+  width: 64px;
+  height: 64px;
+}
+.orbit-name {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+/* ── legend / meta rows ─────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend .num {
+  color: var(--ink-2);
+}
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex: none;
+}
+.statline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line-2);
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.statline b {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: -0.01em;
+}
+.statline span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* ── transcript reader (the signature) ──────────────────────────────────── */
+.transcript {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s5);
+}
+@media (min-width: 900px) {
+  .transcript {
+    grid-template-columns: minmax(0, 1.7fr) minmax(258px, 1fr);
+    align-items: start;
+  }
+}
+
+/* the confidence instrument that frames the reading */
+.conf-readout {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s5);
+  padding: var(--s5);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--r);
+  background: linear-gradient(176deg, var(--accent-soft), transparent 70%), var(--panel-2);
+}
+.conf-mean {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s2);
+  flex: none;
+  padding-right: var(--s5);
+  border-right: 1px solid var(--line);
+}
+.conf-mean-value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(2rem, 1.5rem + 2vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--ink);
+}
+.conf-mean-scale {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  color: var(--ink-4);
+  letter-spacing: 0.04em;
+}
+.conf-mean-label {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  line-height: 1.35;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.conf-meter-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--s3);
+}
+.conf-meter-caption {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.conf-meter {
+  display: flex;
+  height: 12px;
+  gap: 2px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.conf-seg {
+  min-width: 3px;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .conf-seg {
+    transform-origin: left center;
+    animation: seg-grow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes seg-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+.conf-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+}
+.conf-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.conf-tier b {
+  color: var(--ink);
+  font-weight: 600;
+}
+@media (max-width: 559px) {
+  .conf-readout {
+    flex-direction: column;
+    gap: var(--s4);
+    padding: var(--s4);
+  }
+  .conf-mean {
+    flex-direction: row;
+    align-items: baseline;
+    padding-right: 0;
+    padding-bottom: var(--s4);
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    width: 100%;
+    gap: var(--s3);
+  }
+}
+
+.msg {
+  display: flex;
+  gap: var(--s3);
+  align-items: flex-start;
+}
+.msg + .msg {
+  margin-top: var(--s5);
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-3);
+}
+.avatar.assistant {
+  color: oklch(0.99 0 0);
+  border: 0;
+  background: var(--accent);
+}
+.bubble {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.bubble .who {
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--s2);
+}
+/* the reading itself — generous, editorial measure */
+.answer-body {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  letter-spacing: -0.002em;
+  max-width: 60ch;
+  color: var(--ink);
+}
+.answer-body .mc-root {
+  line-height: inherit;
+}
+.user-q {
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+  line-height: 1.65;
+  max-width: 62ch;
+}
+
+/* flagged spans — leading confidence chip + full hairline, no accent stripe */
+.flags {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.flag {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s3);
+  align-items: center;
+  padding: var(--s3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--panel-2);
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.16s ease;
+}
+.flag:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--flag-hue) 40%, var(--line));
+}
+.flag.unsure {
+  --flag-hue: var(--mc-cat-1, #c98a1e);
+}
+.flag.guessing {
+  --flag-hue: var(--mc-negative, #bd4b2d);
+}
+.flag-conf {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  color: var(--flag-hue);
+  padding: 4px 7px;
+  border-radius: var(--r-sm);
+  background: color-mix(in oklab, var(--flag-hue) 12%, transparent);
+  white-space: nowrap;
+  align-self: start;
+}
+.flag-body {
+  min-width: 0;
+}
+.flag-text {
+  font-size: var(--fs-label);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.flag-meta {
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ── generic small stat pills ───────────────────────────────────────────── */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.pill {
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+  background: var(--panel-2);
+}
+
+/* ── footer ─────────────────────────────────────────────────────────────── */
+.foot {
+  border-top: 1px solid var(--line);
+  padding: var(--s5) clamp(var(--s4), 4vw, var(--s7));
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3) var(--s5);
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  letter-spacing: 0.02em;
+}
+.foot .mono {
+  color: var(--ink-2);
+}
+
+/* ── entrance motion (reduced-motion safe) ──────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  /* Two animations: opacity persists (forwards); the TRANSFORM animation has NO fill so
+     it reverts to `none` at rest. A `forwards` transform (even ending at translateY(0)) leaves
+     an identity matrix on the card, and any ancestor transform breaks the interactive charts'
+     pointer→SVG mapping (hover/focus drift). No lasting transform = no drift. */
+  .stagger > * {
+    opacity: 0;
+    animation:
+      riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+      riseUp 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .stagger > *:nth-child(1) {
+    animation-delay: 0.03s;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 0.13s;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 0.18s;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 0.23s;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 0.28s;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 0.33s;
+  }
+  .stagger > *:nth-child(8) {
+    animation-delay: 0.38s;
+  }
+  .view-enter {
+    animation: fade 0.34s ease both;
+  }
+  @keyframes riseIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes riseUp {
+    from {
+      transform: translateY(12px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* ── responsive tuning ──────────────────────────────────────────────────── */
+@media (min-width: 560px) {
+  .hide-sm {
+    display: inline-flex;
+  }
+}
+@media (max-width: 559px) {
+  .brand-sub {
+    display: none;
+  }
+  .card {
+    padding: var(--s4);
+    border-radius: var(--r);
+  }
+  .chart-frame {
+    padding: var(--s3);
+  }
+}
+
+/* ============================================================================
+   DARK — hand-tuned (not inverted), placed last so it wins over microcharts'
+   prefers-color-scheme block. Warm-graphite near-black, brighter cobalt.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(0.17 0.008 78);
+    --bg-grid: oklch(0.215 0.009 78);
+    --panel: oklch(0.205 0.009 78);
+    --panel-2: oklch(0.228 0.01 78);
+    --panel-inset: oklch(0.265 0.011 78);
+    --ink: oklch(0.94 0.006 82);
+    --ink-2: oklch(0.79 0.008 82);
+    --ink-3: oklch(0.63 0.009 80);
+    --ink-4: oklch(0.51 0.009 80);
+    --line: oklch(0.29 0.01 78);
+    --line-2: oklch(0.25 0.009 78);
+
+    --accent: oklch(0.72 0.145 250);
+    --accent-ink: oklch(0.8 0.13 250);
+    --accent-soft: oklch(0.72 0.145 250 / 0.12);
+    --accent-line: oklch(0.72 0.145 250 / 0.32);
+
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+    --shadow: 0 2px 8px -2px oklch(0 0 0 / 0.5), 0 18px 40px -22px oklch(0 0 0 / 0.7);
+    --shadow-lg: 0 4px 14px -4px oklch(0 0 0 / 0.55), 0 30px 64px -28px oklch(0 0 0 / 0.8);
+  }
+  .chart-frame {
+    box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.04);
+  }
+  .avatar.assistant {
+    color: oklch(0.16 0.008 78);
+  }
+}

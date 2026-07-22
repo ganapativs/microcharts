@@ -1,0 +1,22 @@
+{
+  "name": "example-cortex-ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4007 --strictPort",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 4007 --strictPort"
+  },
+  "dependencies": {
+    "@microcharts/react": "^0.8.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^7.0.0"
+  }
+}

@@ -1,0 +1,1081 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   SHIPYARD — SRE service-health console.
+   Aesthetic: an industrial control-room / blueprint instrument. A precise
+   grotesque (Archivo) for signage labels, a mono (Overpass Mono, drawn from
+   Highway Gothic lineage) for machine data. Fine graph-paper substrate, colour
+   reserved strictly for status meaning. Charts run mono (grayscale); the chrome
+   is a tinted blueprint near-black that stays legible in either OS scheme.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark light;
+
+  --font-label: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* microcharts contract — keep chart SVG text on our clean legible faces. */
+  --mc-font: var(--font-label);
+  --mc-font-numeric: var(--font-mono);
+
+  /* 4pt spatial scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-8: 48px;
+
+  /* ── LIGHT — blueprint on cool paper (blue-slate hue 256, neutrals tinted) ── */
+  --bg: oklch(0.962 0.006 256);
+  --grid-minor: oklch(0.93 0.009 256);
+  --grid-major: oklch(0.9 0.012 256);
+  --panel: oklch(0.987 0.004 256);
+  --panel-2: oklch(0.952 0.006 256);
+  --ink: oklch(0.26 0.02 256);
+  --ink-dim: oklch(0.47 0.017 256);
+  --ink-faint: oklch(0.62 0.013 256);
+  --edge: oklch(0.86 0.011 256);
+  --edge-soft: oklch(0.91 0.008 256);
+  --accent: oklch(0.26 0.02 256);
+  --row-hover: oklch(0.94 0.008 256);
+  --graticule: oklch(0.9 0.01 256);
+
+  /* Okabe-Ito semantic valence — meaning only, never decoration. */
+  --good: oklch(0.52 0.1 168);
+  --bad: oklch(0.54 0.16 38);
+  --warn: oklch(0.57 0.1 70);
+
+  --mc-accent: oklch(0.55 0.09 252);
+
+  --lift: 0 1px 0 oklch(0.26 0.02 256 / 0.04), 0 8px 22px oklch(0.26 0.03 256 / 0.09);
+
+  /* type scale — dense console keeps small steps for data; hierarchy lives in
+     the masthead readout + wordmark, which jump the scale. */
+  --t-9: 9px;
+  --t-10: 10px;
+  --t-11: 11px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-15: 15px;
+  --t-readout: clamp(24px, 5vw, 30px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(0.165 0.014 256);
+    --grid-minor: oklch(0.205 0.016 256);
+    --grid-major: oklch(0.245 0.02 256);
+    --panel: oklch(0.198 0.016 256);
+    --panel-2: oklch(0.228 0.018 256);
+    --ink: oklch(0.925 0.008 256);
+    --ink-dim: oklch(0.7 0.014 256);
+    --ink-faint: oklch(0.56 0.014 256);
+    --edge: oklch(0.31 0.019 256);
+    --edge-soft: oklch(0.26 0.016 256);
+    --accent: oklch(0.925 0.01 256);
+    --row-hover: oklch(0.235 0.018 256);
+    --graticule: oklch(0.27 0.017 256);
+
+    --good: oklch(0.72 0.1 168);
+    --bad: oklch(0.7 0.14 40);
+    --warn: oklch(0.79 0.1 75);
+
+    --mc-accent: oklch(0.68 0.11 252);
+
+    --lift: 0 0 0 1px oklch(0.31 0.02 256 / 0.6), 0 14px 34px oklch(0.1 0.02 256 / 0.55);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-13);
+  line-height: 1.5;
+  color: var(--ink);
+  background-color: var(--bg);
+  /* Graph-paper substrate: a fine minor grid with a heavier major every 5th.
+     This is the blueprint the instruments are drawn on. */
+  background-image:
+    linear-gradient(var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px),
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px);
+  background-size:
+    22px 22px,
+    22px 22px,
+    110px 110px,
+    110px 110px;
+  background-position: -1px -1px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Subtle blueprint vignette — depth without chrome. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    120% 90% at 50% -10%,
+    transparent 55%,
+    oklch(0.1 0.02 256 / 0.28) 100%
+  );
+}
+@media (prefers-color-scheme: light) {
+  body::before {
+    background: radial-gradient(
+      120% 90% at 50% -10%,
+      transparent 62%,
+      oklch(0.6 0.02 256 / 0.08) 100%
+    );
+  }
+}
+
+::selection {
+  background: color-mix(in oklch, var(--accent) 22%, transparent);
+}
+
+.shipyard {
+  position: relative;
+  z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 28px) clamp(12px, 3vw, 22px) var(--sp-8);
+}
+
+/* ── masthead ─────────────────────────────────────────────────────────────── */
+.masthead {
+  padding-bottom: var(--sp-5);
+}
+.masthead-rail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--sp-4);
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+}
+.brand-mark {
+  font-size: 15px;
+  color: var(--ink);
+  transform: translateY(1px);
+}
+.brand-name {
+  font-family: var(--font-label);
+  font-weight: 800;
+  letter-spacing: 0.34em;
+  font-size: 16px;
+  padding-left: 2px;
+}
+.brand-sub {
+  font-family: var(--font-label);
+  color: var(--ink-faint);
+  font-size: var(--t-11);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+}
+
+.rail-readout {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+.tally {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.tally-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 10px;
+  font-family: var(--font-label);
+  font-size: var(--t-11);
+}
+.tally-item + .tally-item {
+  border-left: 1px solid var(--edge-soft);
+}
+.tally-item b {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--t-13);
+  font-variant-numeric: tabular-nums;
+}
+.tally-item i {
+  font-style: normal;
+  color: var(--ink-faint);
+  font-size: var(--t-10);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tally-item span[role="img"] {
+  align-self: center;
+}
+.tally-item.ok b {
+  color: var(--good);
+}
+.tally-item.warn b {
+  color: var(--warn);
+}
+.tally-item.error b {
+  color: var(--bad);
+}
+.coord {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-dim);
+  font-size: var(--t-11);
+  letter-spacing: 0.02em;
+}
+.coord-sep {
+  color: var(--ink-faint);
+  padding: 0 5px;
+}
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--good);
+}
+
+/* ── scope: the instrument spine — a labelled oscilloscope readout ────────── */
+.scope {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(120px, auto) minmax(0, 1fr) minmax(96px, auto);
+  align-items: center;
+  gap: clamp(16px, 3.5vw, 34px);
+  padding: 16px clamp(18px, 3vw, 26px);
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 4px;
+}
+/* crop-mark corner ticks — the signature instrument bezel, used only here. */
+.scope::before,
+.scope::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--ink-faint);
+  opacity: 0.7;
+}
+.scope::before {
+  top: 5px;
+  left: 5px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.scope::after {
+  bottom: 5px;
+  right: 5px;
+  border-left: 0;
+  border-top: 0;
+}
+.scope-chan {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chan-name {
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: var(--t-13);
+  letter-spacing: 0.03em;
+}
+.chan-unit {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.scope-trace {
+  min-width: 0;
+  padding: 4px 0;
+  /* faint vertical graticule — time divisions behind the trace. */
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--graticule) 0 1px,
+    transparent 1px calc(100% / 8)
+  );
+  background-position: 0 50%;
+}
+.scope-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+}
+.readout-v {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--t-readout);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.readout-v i {
+  font-style: normal;
+  font-size: 0.44em;
+  font-weight: 500;
+  color: var(--ink-dim);
+  margin-left: 3px;
+}
+.readout-k {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.readout-k b {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* ── tabs — channel selector ──────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin: var(--sp-5) 0 var(--sp-5);
+  border-bottom: 1px solid var(--edge);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 18px 12px;
+  margin-bottom: -1px;
+  font: inherit;
+  font-family: var(--font-label);
+  color: var(--ink-dim);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+  min-height: 46px;
+  transition:
+    color 0.16s ease,
+    border-color 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.tab + .tab {
+  border-left: 1px solid var(--edge-soft);
+}
+.tab:hover {
+  color: var(--ink);
+  background: color-mix(in oklch, var(--panel) 60%, transparent);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+  border-radius: 3px;
+}
+.tab.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.tab-label {
+  font-weight: 700;
+  font-size: var(--t-13);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.tab-hint {
+  font-family: var(--font-mono);
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+/* ── layout primitives ────────────────────────────────────────────────────── */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+.panel {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  padding: 14px var(--sp-4) var(--sp-4);
+  min-width: 0;
+  transition:
+    box-shadow 0.24s ease,
+    transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 0.24s ease;
+}
+/* the lead panel earns a heavier top hairline — a printed rule, not a stripe. */
+.panel-lead {
+  border-color: color-mix(in oklch, var(--ink) 24%, var(--edge));
+}
+.span-2 {
+  grid-column: 1 / -1;
+}
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: 13px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--edge-soft);
+}
+.panel-head h2 {
+  margin: 0;
+  font-family: var(--font-label);
+  font-size: var(--t-12);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.panel-meta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+  text-align: right;
+}
+
+/* annotation note — a drawing caption. Leading pointer glyph + hanging indent,
+   never a side stripe. */
+.note {
+  margin: var(--sp-3) 0 0;
+  padding-left: 16px;
+  text-indent: -16px;
+  font-family: var(--font-label);
+  font-size: var(--t-11);
+  color: var(--ink-dim);
+  line-height: 1.6;
+  max-width: 68ch;
+}
+.note::before {
+  content: "▸";
+  color: var(--ink-faint);
+  margin-right: 8px;
+  font-size: 9px;
+}
+.bad-note {
+  color: var(--bad);
+}
+.bad-note::before {
+  content: "▸";
+  color: var(--bad);
+}
+
+/* interactive readout — the pinned/hovered reading, printed like a channel tag */
+.picker-readout {
+  margin: var(--sp-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-11);
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  min-height: 1.4em;
+}
+
+.mc-inline {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* ── dense tables — scroll horizontally INSIDE the panel; body never scrolls ── */
+.svc-table,
+.inc-table {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--edge) transparent;
+}
+.svc-table::-webkit-scrollbar,
+.inc-table::-webkit-scrollbar {
+  height: 6px;
+}
+.svc-table::-webkit-scrollbar-thumb,
+.inc-table::-webkit-scrollbar-thumb {
+  background: var(--edge);
+  border-radius: 999px;
+}
+.svc-row {
+  display: grid;
+  grid-template-columns: 20px 150px 78px minmax(140px, 1fr) 62px 78px 66px 82px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  min-width: 748px;
+  border-bottom: 1px solid var(--edge-soft);
+  transition: background 0.14s ease;
+}
+.svc-row:last-child {
+  border-bottom: none;
+}
+.svc-row:not(.svc-head):hover {
+  background: var(--row-hover);
+}
+.svc-head,
+.inc-head {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--edge);
+  padding-bottom: 9px;
+}
+.svc-name {
+  font-weight: 600;
+}
+.svc-zone {
+  color: var(--ink-faint);
+  font-size: var(--t-11);
+}
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dim {
+  color: var(--ink-dim);
+}
+.good {
+  color: var(--good);
+}
+.bad {
+  color: var(--bad);
+}
+.warn-t {
+  color: var(--warn);
+}
+
+/* ── mini rows (label + strip) ────────────────────────────────────────────── */
+.row-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mini-row {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.mini-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-11);
+  color: var(--ink-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mini-row-tag {
+  font-family: var(--font-label);
+  font-size: var(--t-9);
+  color: var(--ink-faint);
+  border: 1px solid var(--edge);
+  border-radius: 3px;
+  padding: 1px 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── dependency orbit grid ────────────────────────────────────────────────── */
+.dep-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+.dep-cell {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--edge-soft);
+  border-radius: 3px;
+  background: var(--panel-2);
+  transition: border-color 0.2s ease;
+}
+.dep-cell:hover {
+  border-color: var(--edge);
+}
+.dep-cell > .mc-root,
+.dep-cell > span[role="img"],
+.dep-cell > svg {
+  grid-row: 1 / 3;
+}
+.dep-name {
+  font-size: var(--t-11);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dep-kind {
+  grid-column: 2;
+  font-family: var(--font-label);
+  font-size: var(--t-9);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.dep-lat,
+.dep-rate {
+  grid-column: 2;
+  font-size: var(--t-10);
+  text-align: left;
+}
+.dep-rate {
+  color: var(--ink-faint);
+}
+
+/* ── coverage list ────────────────────────────────────────────────────────── */
+.cov-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.cov-row {
+  display: grid;
+  grid-template-columns: 108px 116px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.cov-metric {
+  font-size: var(--t-11);
+  font-weight: 600;
+}
+.cov-source {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+
+/* ── fleet heat matrix ────────────────────────────────────────────────────── */
+.heat-matrix {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+.heat-mrow {
+  display: grid;
+  grid-template-columns: minmax(88px, 1.2fr) 96px repeat(5, minmax(30px, 34px));
+  align-items: center;
+  gap: 6px;
+  padding: 3px 2px;
+}
+.heat-mhead {
+  padding-bottom: 8px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--edge);
+}
+.heat-mhead .heat-col,
+.heat-mhead .heat-node,
+.heat-mhead .heat-zone {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.heat-mhead .heat-col {
+  text-align: center;
+}
+.heat-mrow:not(.heat-mhead):hover {
+  background: var(--row-hover);
+  border-radius: 3px;
+}
+.heat-node {
+  font-size: var(--t-12);
+  font-weight: 600;
+}
+.heat-mrow.is-hot .heat-node {
+  color: var(--bad);
+}
+.heat-zone {
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+}
+.heat-col {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── capacity honeycombs ──────────────────────────────────────────────────── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-4);
+}
+.cap-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: 13px 15px;
+  border: 1px solid var(--edge-soft);
+  border-radius: 3px;
+  background: var(--panel-2);
+}
+.cap-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cap-label {
+  font-family: var(--font-label);
+  font-size: var(--t-12);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.cap-hint {
+  font-family: var(--font-label);
+  font-size: var(--t-10);
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cap-count {
+  font-size: var(--t-15);
+  margin-top: 5px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.cap-count strong {
+  font-weight: 700;
+}
+.cap-pct {
+  font-size: var(--t-11);
+  margin-left: 4px;
+}
+
+/* ── incident calendar ────────────────────────────────────────────────────── */
+.cal-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(18px, 4vw, 42px);
+  flex-wrap: wrap;
+}
+.cal-layout > span[role="img"],
+.cal-layout > .mc-root {
+  flex: 0 1 460px;
+}
+.cal-side {
+  flex: 1 1 240px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.cal-side .legend {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+/* Deploy-log lines driven by MinimapStrip window */
+.log-panel {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--edge-soft);
+  border-radius: 3px;
+  background: var(--panel-2);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.55;
+  max-height: 220px;
+  overflow: auto;
+}
+.log-line {
+  display: grid;
+  grid-template-columns: 52px 44px minmax(0, 1fr);
+  gap: 10px;
+  padding: 2px 0;
+}
+.log-n {
+  color: var(--ink-faint);
+  text-align: right;
+}
+.log-lvl {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.log-lvl.info {
+  color: var(--ink-soft);
+}
+.log-lvl.warn {
+  color: var(--warn, #c9a227);
+}
+.log-lvl.debug {
+  color: var(--ink-faint);
+}
+.log-msg {
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal-side .note {
+  margin: 0;
+  max-width: 44ch;
+}
+
+/* ── legend ───────────────────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--edge-soft);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--t-11);
+}
+.legend-label {
+  color: var(--ink-dim);
+}
+.legend-count {
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── bullets ──────────────────────────────────────────────────────────────── */
+.bullets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.bullet-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bullet-label {
+  font-family: var(--font-label);
+  font-size: var(--t-11);
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+
+/* ── incident table ───────────────────────────────────────────────────────── */
+.inc-row {
+  display: grid;
+  grid-template-columns: 20px 78px 132px minmax(160px, 1fr) 54px 62px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  min-width: 560px;
+  border-bottom: 1px solid var(--edge-soft);
+  transition: background 0.14s ease;
+}
+.inc-row:last-child {
+  border-bottom: none;
+}
+.inc-row:not(.inc-head):hover {
+  background: var(--row-hover);
+}
+.inc-id {
+  font-weight: 600;
+}
+.inc-svc {
+  color: var(--ink-dim);
+  font-size: var(--t-11);
+}
+.inc-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── footer ───────────────────────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--edge);
+  color: var(--ink-faint);
+  font-family: var(--font-label);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  flex-wrap: wrap;
+}
+
+/* ── motion — one orchestrated load, reduced-motion gated ─────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .masthead {
+    animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .tabs {
+    animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  }
+  .view {
+    animation: rise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .view > .grid-2 > .panel,
+  .view > .stack > .panel,
+  .view > .stack > .grid-2 > .panel {
+    animation: panel-in 0.46s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .view > * > .panel:nth-child(1),
+  .view > * > * > .panel:nth-child(1) {
+    animation-delay: 0.03s;
+  }
+  .view > * > .panel:nth-child(2),
+  .view > * > * > .panel:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+  .view > * > .panel:nth-child(3),
+  .view > * > * > .panel:nth-child(3) {
+    animation-delay: 0.13s;
+  }
+  .view > * > .panel:nth-child(4),
+  .view > * > * > .panel:nth-child(4) {
+    animation-delay: 0.18s;
+  }
+  .view > * > .panel:nth-child(n + 5) {
+    animation-delay: 0.22s;
+  }
+  .panel:hover {
+    box-shadow: var(--lift);
+    transform: translateY(-1px);
+    border-color: color-mix(in oklch, var(--ink) 18%, var(--edge));
+  }
+  .live-dot {
+    animation: live-pulse 2.6s ease-out infinite;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(11px);
+    }
+  }
+  @keyframes live-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--good) 55%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 6px transparent;
+    }
+  }
+}
+
+/* ── responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .scope {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "chan readout" "trace trace";
+    gap: 14px 18px;
+  }
+  .scope-chan {
+    grid-area: chan;
+  }
+  .scope-readout {
+    grid-area: readout;
+  }
+  .scope-trace {
+    grid-area: trace;
+  }
+}
+
+@media (max-width: 760px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .panel-head {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .panel-meta {
+    text-align: left;
+  }
+  .mini-row {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 9px;
+  }
+  .cov-row {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .cov-source {
+    display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  body {
+    font-size: 12px;
+  }
+  .brand-sub {
+    display: none;
+  }
+  .rail-readout {
+    gap: 10px;
+  }
+  .mini-row {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+  .readout-v {
+    font-size: 24px;
+  }
+  .tab {
+    padding: 8px 12px 12px;
+  }
+  .tab-hint {
+    display: none;
+  }
+}
