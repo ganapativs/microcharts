@@ -211,13 +211,13 @@
   {
     "name": "@microcharts/react/slope (static)",
     "path": "dist/charts/slope/index.js",
-    "limit": "3.82 kB",
+    "limit": "3.94 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/slope/interactive",
     "path": "dist/charts/slope/client.js",
-    "limit": "6.48 kB",
+    "limit": "6.60 kB",
     "gzip": true
   },
   {
@@ -1105,13 +1105,13 @@
   {
     "name": "@microcharts/react/folded-day-band (static)",
     "path": "dist/charts/folded-day-band/index.js",
-    "limit": "2.55 kB",
+    "limit": "2.56 kB",
     "gzip": true
   },
   {
     "name": "@microcharts/react/folded-day-band/interactive",
     "path": "dist/charts/folded-day-band/client.js",
-    "limit": "4.89 kB",
+    "limit": "4.90 kB",
     "gzip": true
   },
   {
