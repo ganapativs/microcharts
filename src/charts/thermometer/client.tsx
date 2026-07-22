@@ -109,7 +109,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && hover && readoutText ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readoutText}

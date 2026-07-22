@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
-import { labelFitsY } from "../../core/labels.js";
+import { labelFitsY, labelFont, proseCharsThatFit } from "../../core/labels.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
@@ -103,7 +103,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
     devWarn(`<Dumbbell> ${data.length} rows — past 5 the comparison blurs (documented cap).`);
   }
 
-  const fontSize = 6;
+  const fontSize = labelFont(height, 0.42);
   // Rows share the height evenly, so the row pitch IS the vertical room a row
   // label gets. Once the pitch drops under a line of text the names stack on
   // each other — the "Paris/Berlin/Rome in a tab header" failure. They DROP
@@ -113,11 +113,12 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
   // Pure arithmetic: the static path may never measure text.
   const rowPitch = data.length > 0 ? height / data.length : 0;
   const showRowLabels = data.some((d) => d.label) && rowPitch >= fontSize + 0.5;
+  const longest = showRowLabels ? data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0) : 0;
+  // Cap by remaining width using the prose per-char estimate (row names are
+  // author text, not tabular figures — see textGutterProse). Keep ≥55% of the
+  // plot for the dumbbell itself.
   const maxLabelChars = showRowLabels
-    ? Math.min(
-        6,
-        data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
-      )
+    ? Math.min(longest, Math.max(4, proseCharsThatFit(width * 0.42, fontSize, 4)))
     : 0;
   const geo = dumbbellGeometry({
     width,
@@ -208,7 +209,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 textAnchor="end"
                 data-mc-ink="label"
               >
-                {truncateLabel(d.label)}
+                {truncateLabel(d.label, maxLabelChars)}
               </text>
             ) : null}
             {!single && row.x0 !== null && row.x1 !== null && connector !== null ? (

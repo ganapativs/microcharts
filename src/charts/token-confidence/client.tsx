@@ -7,7 +7,7 @@ import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } fro
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { tokenTiers, type Tier } from "./geometry.js";
+import { DEFAULT_TIERS, tokenTiers, type Tier } from "./geometry.js";
 import { tokenConfidenceSummary, type TokenConfidenceProps } from "./index.js";
 
 const CLASS: Record<Tier, string | undefined> = {
@@ -16,7 +16,6 @@ const CLASS: Record<Tier, string | undefined> = {
   guessing: "mc-tc-guessing",
 };
 const TIER_INDEX: Record<Tier, 0 | 1 | 2> = { confident: 0, unsure: 1, guessing: 2 };
-
 export interface InteractiveTokenConfidenceProps extends TokenConfidenceProps {
   /**
    * Number format/locale for the focus announcement's confidence reading.
@@ -30,7 +29,7 @@ export interface InteractiveTokenConfidenceProps extends TokenConfidenceProps {
 export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.ReactNode {
   const {
     data,
-    tiers = [0.5, 0.8],
+    tiers = DEFAULT_TIERS,
     show = "flagged",
     legend = false,
     format,

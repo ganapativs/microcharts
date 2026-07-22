@@ -21,9 +21,10 @@ export interface AnnotationBrand {
 }
 
 /** The one annotation font-size ramp, shared by every host so label sizing can't
- *  drift chart-to-chart: ~22% of height, clamped to a legible 5–9 viewBox units. */
+ *  drift chart-to-chart: ~22% of height, clamped to a legible 5–11 viewBox units
+ *  (matches `labelFont`'s ceiling so figure-scale hosts stay readable). */
 export function annotationFontSize(height: number): number {
-  return Math.max(5, Math.min(Math.round(height * 0.22), 9));
+  return Math.max(5, Math.min(Math.round(height * 0.22), 11));
 }
 
 export interface ResolvedAnnotations {

@@ -12,6 +12,7 @@ import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import { round2 } from "../../core/types.js";
 import { ohlcGeometry, type OhlcInput } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 export type OhlcDatum = OhlcInput;
 
@@ -34,8 +35,8 @@ export function ohlcSummary(
   const last = valid.at(-1)!;
   const first = valid[0]!;
   const change = first.open !== 0 ? (last.close - first.open) / Math.abs(first.open) : 0;
-  const lo = Math.min(...valid.map((p) => p.low));
-  const hi = Math.max(...valid.map((p) => p.high));
+  const lo = minOf(valid.map((p) => p.low));
+  const hi = maxOf(valid.map((p) => p.high));
   return strings.ohlcRun(
     valid.length,
     fmt(last.close),

@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -202,10 +203,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
       {readout && band && geo ? (
         <span
           className="mc-graded-band-readout mc-spark-readout"
-          style={{
-            left: `${((band.x + band.width / 2) / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(band.x + band.width / 2, geo.totalWidth)}
         >
           {`${band.p}% ${fmt(band.lo)}–${fmt(band.hi)}`}
         </span>

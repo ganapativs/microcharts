@@ -7,6 +7,14 @@
 import { quantiles } from "../../core/quantile.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 
+/** Default band pair. Shared by BOTH entries so their defaults are one
+ *  object: a literal default is a fresh array per render, which defeats the
+ *  interactive entry's geometry memo (and drifts the two entries apart). */
+export const DEFAULT_PERCENTILES: readonly [number, number][] = [
+  [25, 75],
+  [5, 95],
+];
+
 export interface TP {
   t: number;
   value: number;
@@ -35,14 +43,19 @@ export interface FoldedBandResult {
   y1: number;
 }
 
+/** Bin ceiling — one bin is one drawn column, and `bins` is caller data: an
+ *  unclamped `bins={1e9}` allocates an array per bin and exhausts memory. */
+const MAX_BINS = 512;
+
 function foldBins(data: readonly TP[], period: number, bins: number): number[][] {
-  const buckets: number[][] = Array.from({ length: bins }, () => []);
+  const n = Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.floor(bins))) : 1;
+  const buckets: number[][] = Array.from({ length: n }, () => []);
   for (const d of data) {
     if (!isFiniteValue(d.value) || !Number.isFinite(d.t)) continue;
     const pos = ((d.t % period) + period) % period;
-    let b = Math.floor((pos / period) * bins);
-    if (b >= bins) b = bins - 1;
-    if (b < 0) b = 0;
+    let b = Math.floor((pos / period) * n);
+    if (!Number.isFinite(b) || b < 0) b = 0;
+    if (b >= n) b = n - 1;
     buckets[b]!.push(d.value);
   }
   return buckets;

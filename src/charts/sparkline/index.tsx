@@ -6,7 +6,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
-import { describeSeries, type DescribeOptions, resolveSummary } from "../../core/summary.js";
+import {
+  describeSeries,
+  type DescribeOptions,
+  type SeriesStrings,
+  resolveSummary,
+} from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { labelFitsY } from "../../core/labels.js";
 import { type Value } from "../../core/types.js";
@@ -42,6 +47,9 @@ export interface SparklineProps {
   /** Series color override (any CSS color); `prop > CSS var > preset`. */
   color?: string | undefined;
   /** Accessible name. A string overrides the auto-summary; `false` = decorative. */
+  /** Swappable summary strings (defaults to EN) — the accessible name is
+   *  generated, so this is how a non-English host localizes it. */
+  strings?: SeriesStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   /** Number formatting for the label + summary (`Intl` options or a fn). */
@@ -73,6 +81,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
     color,
     title,
     summary,
+    strings,
     format,
     locale,
     maxPoints,
@@ -134,7 +143,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
     fontSize: annotationFontSize(height),
   });
 
-  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale, strings }));
 
   const strokeStyle = color ? { stroke: color } : undefined;
   const fillStyle = color ? { fill: color } : undefined;

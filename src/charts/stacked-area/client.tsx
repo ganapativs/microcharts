@@ -13,6 +13,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -118,30 +119,37 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     },
     [geo],
   );
+  // The LEADER band at a column, not the whole stack: listing every band makes
+  // the chip grow with the series count — unbounded, and already 206px past its
+  // cap at three bands (see readout-containment tests). The full breakdown is
+  // in the live region, which is where a screen reader wants it anyway.
+  const leaderChip = useCallback(
+    (shares: readonly number[]) => {
+      let top = 0;
+      for (let i = 1; i < series.length; i++) {
+        if ((shares[i] ?? 0) > (shares[top] ?? 0)) top = i;
+      }
+      const name = series[top]?.label ?? strings.seriesFallback(top + 1);
+      return `${name} ${pctFmt(shares[top] ?? 0)}`;
+    },
+    [series, pctFmt, strings],
+  );
   // index = column (x-sample) index; value = the stack total at that column
   // (series summed, negatives clamped to 0 — matching the drawn stack).
+  // `formatted` mirrors the chip (leader band).
   const datum = useCallback(
     (i: number) => {
-      // Mirror the chip: the LEADER band at this column, not the whole stack.
       const shares = geo.sharesAt[i];
-      let formatted: string | undefined;
-      if (shares) {
-        let top = 0;
-        for (let j = 1; j < series.length; j++) {
-          if ((shares[j] ?? 0) > (shares[top] ?? 0)) top = j;
-        }
-        formatted = `${series[top]?.label ?? strings.seriesFallback(top + 1)} ${pctFmt(shares[top] ?? 0)}`;
-      }
       return {
         index: i,
         value: series.reduce<number>(
           (t, s) => t + (isFiniteValue(s.values[i]) ? Math.max(0, s.values[i] as number) : 0),
           0,
         ),
-        formatted,
+        formatted: shares ? leaderChip(shares) : undefined,
       };
     },
-    [series, geo, pctFmt, strings],
+    [series, geo, leaderChip],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -205,6 +213,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         locale={locale}
         strings={strings}
         summary={false}
+        labelAt={shown !== null ? shown : undefined}
         style={fillFor(style)}
       >
         {selX !== undefined && selected !== active ? (
@@ -233,25 +242,8 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
       </StaticStackedArea>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && shares && shownX !== undefined ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(shownX / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
-          {/* The LEADER at this column, not the whole stack. Listing every band
-              made the chip grow with the series count — unbounded, and already
-              206px over its cap at three bands. The full breakdown is in the
-              live region, which is where a screen reader wants it anyway. */}
-          {(() => {
-            let top = 0;
-            for (let i = 1; i < series.length; i++) {
-              if ((shares[i] ?? 0) > (shares[top] ?? 0)) top = i;
-            }
-            const name = series[top]?.label ?? strings.seriesFallback(top + 1);
-            return `${name} ${pctFmt(shares[top] ?? 0)}`;
-          })()}
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
+          {leaderChip(shares)}
         </span>
       ) : null}
     </span>

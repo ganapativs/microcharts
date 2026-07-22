@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -165,13 +166,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
       </StaticHistogramStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && bar ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${((bar.x + bar.w / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(bar.x + bar.w / 2, width)}>
           {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${countFmt(bar.count)}`}
         </span>
       ) : null}

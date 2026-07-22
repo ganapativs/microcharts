@@ -89,7 +89,7 @@ export function Delta({
       }
     >
       <StaticDelta {...props} />
-      {live ? <LiveRegion>{summary}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? summary : ""}</LiveRegion>
     </span>
   );
 }

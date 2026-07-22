@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -246,10 +247,12 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       {readout && at && geo ? (
         <span
           className="mc-ab-strips-readout mc-spark-readout"
-          style={{
-            left: `${(at.edge.x / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={rowReadoutStyle(
+            at.edge.x,
+            geo.rows[shownRow]?.y ?? height / 2,
+            geo.totalWidth,
+            height,
+          )}
         >
           {/* One terse form for every edge, median included. The median branch
               used to spell out the whole cross-arm comparison here — and the

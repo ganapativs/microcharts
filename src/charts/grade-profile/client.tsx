@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -191,11 +192,11 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
       </StaticGradeProfile>
       <LiveRegion>{announced}</LiveRegion>
       {readout && seg ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(midX / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
-          {`${fmt(seg.dEnd)}: ${pct(seg.grade)}, ${fmt(seg.cumGain)} gained`}
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(midX, width)}>
+          {/* The localized sentence minus its full stop — never hand-compose
+              English in a VISIBLE chip (i18n canon); "gained" lives in
+              `strings.gradeProfileAt`. */}
+          {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}
     </span>

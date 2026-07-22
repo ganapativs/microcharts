@@ -3,7 +3,7 @@
 // price charts are position reads (documented like Sparkline's baseline
 // note). NEVER downsampled: past maxPeriods the most recent N render and the
 // component dev-warns (averaging OHLC lies). 2-dp.
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, minOf, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
 
@@ -86,8 +86,8 @@ export function ohlcGeometry(opts: {
   const x0 = 1;
   const x1 = width - 1 - gutter;
 
-  const lo = Math.min(...valid.map((e) => e.p.low));
-  const hi = Math.max(...valid.map((e) => e.p.high));
+  const lo = minOf(valid.map((e) => e.p.low));
+  const hi = maxOf(valid.map((e) => e.p.high));
   let domain =
     opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : ([lo, hi] as const);
   if (domain[0] === domain[1]) domain = [domain[0] - 1, domain[1] + 1];

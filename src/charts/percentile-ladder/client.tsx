@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -205,7 +206,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
       {readout && tick ? (
         <span
           className="mc-ladder-readout mc-spark-readout"
-          style={{ left: `${(tick.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(tick.x, width)}
         >
           {`p${tick.p} ${fmt(tick.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×)`}
         </span>

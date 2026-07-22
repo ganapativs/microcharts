@@ -50,6 +50,13 @@ export const entry: ChartEntry = {
       description: "Endpoint share labels per series (deterministic drop-out).",
     },
     {
+      name: "labelAt",
+      type: "number",
+      required: false,
+      description:
+        'Column whose shares feed label="last" (default: final column). The interactive entry passes the focused column so the labels track the crosshair.',
+    },
+    {
       name: "curve",
       type: '"linear" | "smooth" | "step"',
       required: false,

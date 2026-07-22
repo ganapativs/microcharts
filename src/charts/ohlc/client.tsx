@@ -14,6 +14,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -223,13 +224,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       </StaticOhlc>
       <LiveRegion>{announced}</LiveRegion>
       {readout && mark && period ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(mark.x / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(mark.x, width)}>
           {`O${fmt(period.open)} H${fmt(period.high)} L${fmt(period.low)} C${fmt(period.close)}`}
         </span>
       ) : null}

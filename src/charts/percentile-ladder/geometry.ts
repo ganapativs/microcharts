@@ -5,7 +5,7 @@
 // transform (long latency tails) is never silent — a `log` tag renders in a
 // reserved left gutter so it never collides with a mark. Coords 2-dp.
 import { quantiles } from "../../core/quantile.js";
-import { clamp, extent, scaleLinear } from "../../core/scale.js";
+import { clamp, extent, maxOf, minOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { labelFitsY, textGutter } from "../../core/labels.js";
 
@@ -65,8 +65,8 @@ export function percentileLadderGeometry(opts: {
     finite,
     ps.map((p) => p / 100),
   )!;
-  const dataMax = Math.max(...vals, 0);
-  const dataMin = Math.min(...vals);
+  const dataMax = maxOf(vals, 0);
+  const dataMin = minOf(vals);
   const collapsed = dataMax === dataMin;
 
   // log only when every sample value is > 0 (a single ≤ 0 makes log a lie)
@@ -86,7 +86,7 @@ export function percentileLadderGeometry(opts: {
 
   let x: (v: number) => number;
   if (log) {
-    const lo = Math.min(...vals);
+    const lo = minOf(vals);
     const s = scaleLinear([Math.log(lo), Math.log(dataMax)], [x0, width - pad]);
     x = (v) => round2(clamp(s(Math.log(Math.max(v, lo))), x0, width - pad));
   } else {

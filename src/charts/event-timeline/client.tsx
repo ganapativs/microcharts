@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -38,10 +39,6 @@ export interface InteractiveEventTimelineProps extends EventTimelineProps, Picke
    */
   animate?: boolean;
 }
-
-/** Announcement name for an unlabelled item. */
-const fallbackLabel = (i: number, kind: "span" | "point"): string =>
-  kind === "span" ? `Span ${i + 1}` : `Event ${i + 1}`;
 
 export function EventTimeline(props: InteractiveEventTimelineProps): React.ReactNode {
   const {
@@ -143,11 +140,11 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
         label: it.label,
         formatted:
           it.end !== undefined
-            ? `${it.label ?? fallbackLabel(o.i, "span")}: ${formatDuration(it.end - it.start)}`
-            : `${it.label ?? fallbackLabel(o.i, "point")}: ${dateFmt(new Date(it.start))}`,
+            ? `${it.label ?? strings.timelineFallback(o.i + 1, "span")}: ${formatDuration(it.end - it.start)}`
+            : `${it.label ?? strings.timelineFallback(o.i + 1, "point")}: ${dateFmt(new Date(it.start))}`,
       };
     },
-    [ordered, items, dateFmt],
+    [ordered, items, dateFmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -182,13 +179,13 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     shownItem && item
       ? item.end !== undefined
         ? strings.spanAt(
-            item.label ?? fallbackLabel(shownItem.i, "span"),
+            item.label ?? strings.timelineFallback(shownItem.i + 1, "span"),
             dateFmt(new Date(item.start)),
             dateFmt(new Date(item.end)),
             formatDuration(item.end - item.start),
           )
         : strings.eventAt(
-            item.label ?? fallbackLabel(shownItem.i, "point"),
+            item.label ?? strings.timelineFallback(shownItem.i + 1, "point"),
             dateFmt(new Date(item.start)),
           )
       : "";
@@ -234,16 +231,10 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       </StaticEventTimeline>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownItem && item ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(readoutX / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(readoutX, width)}>
           {item.end !== undefined
-            ? `${item.label ?? fallbackLabel(shownItem.i, "span")}: ${formatDuration(item.end - item.start)}`
-            : `${item.label ?? fallbackLabel(shownItem.i, "point")}: ${dateFmt(new Date(item.start))}`}
+            ? `${item.label ?? strings.timelineFallback(shownItem.i + 1, "span")}: ${formatDuration(item.end - item.start)}`
+            : `${item.label ?? strings.timelineFallback(shownItem.i + 1, "point")}: ${dateFmt(new Date(item.start))}`}
         </span>
       ) : null}
     </span>

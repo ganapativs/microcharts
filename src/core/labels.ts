@@ -63,6 +63,16 @@ export function textGutterProse(chars: number, fontSize: number, pad: number): n
 }
 
 /**
+ * Inverse of `textGutterProse`: how many characters of caller-supplied prose fit
+ * in `room` viewBox units at `fontSize`, after `pad` breathing room. The one
+ * place a chart may turn available width into a character budget — never invert
+ * the 0.95 estimate inline.
+ */
+export function proseCharsThatFit(room: number, fontSize: number, pad: number): number {
+  return Math.max(0, Math.floor((room - pad) / (fontSize * 0.95)));
+}
+
+/**
  * Does one line of `fontSize` text anchored at baseline `y` fit vertically
  * inside a `height`-tall viewBox? `mid` = `dominant-baseline: central` (the box
  * straddles `y`); otherwise alphabetic (ascent above the baseline, descent

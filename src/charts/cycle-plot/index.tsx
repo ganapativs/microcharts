@@ -7,7 +7,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
-import { scaleLinear } from "../../core/scale.js";
+import { maxOf, minOf, scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_CYCLE, type CycleStrings } from "../../core/strings-cycle.js";
@@ -32,7 +32,7 @@ export function cycleSummary(
 
   // drift clause only when a slot's |drift| leads and exceeds 10% of spine range
   const finiteCenters = geo.centers.filter(Number.isFinite);
-  const spineRange = Math.max(...finiteCenters) - Math.min(...finiteCenters);
+  const spineRange = maxOf(finiteCenters) - minOf(finiteCenters);
   let leadSlot = -1;
   for (let s = 0; s < geo.slots.length; s++) {
     if (geo.slots[s]!.n <= 1) continue;

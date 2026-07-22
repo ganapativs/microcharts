@@ -4,7 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutter, textGutterProse } from "../../core/labels.js";
+import { labelFont, textGutter, textGutterProse } from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -29,8 +29,38 @@ export interface SlopeGeometry {
   domain: readonly [number, number];
 }
 
-/** Label font size (viewBox units) — shared by both entries. */
+/** Label font size (viewBox units) — shared by both entries; scales with size. */
 export const SLOPE_FONT = 6;
+/** Figure-scale CEILING for the type ramp; stays at 6 for the micro 40×40
+ *  default. A candidate, not a promise — `slopeFitFrame` walks down from here
+ *  until the labels actually fit, so growing the type can never be what drops
+ *  the labels it was meant to serve. */
+function slopeLabelFont(height: number, width = 40): number {
+  return Math.min(labelFont(height, 0.32), Math.max(6, Math.round(width * 0.12)));
+}
+
+/**
+ * Frame + font resolver shared by BOTH entries: the largest font size in
+ * [SLOPE_FONT … slopeLabelFont] whose gutters still leave the plot ≥ its floor
+ * (labels kept). Pure arithmetic, ≤ 6 candidate frames — cheap and
+ * deterministic. Falls back to the SLOPE_FONT frame (labels dropped) exactly
+ * like the old fixed-font path did at micro sizes.
+ */
+export function slopeFitFrame(opts: {
+  width: number;
+  height: number;
+  data: readonly { from: number; to: number; label: string }[];
+  domain?: readonly [number, number] | undefined;
+  label: "none" | "value" | "label" | "both";
+  fmt: (n: number) => string;
+}): { geo: SlopeGeometry; labelsDropped: boolean; fontSize: number } {
+  const top = slopeLabelFont(opts.height, opts.width);
+  for (let f = top; f > SLOPE_FONT; f--) {
+    const r = slopeFrame({ ...opts, fontSize: f });
+    if (!r.labelsDropped) return { ...r, fontSize: f };
+  }
+  return { ...slopeFrame({ ...opts, fontSize: SLOPE_FONT }), fontSize: SLOPE_FONT };
+}
 
 /**
  * The frame BOTH entries render against: label gutters reserved from the

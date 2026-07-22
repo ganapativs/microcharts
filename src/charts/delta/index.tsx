@@ -87,7 +87,7 @@ export function Delta(props: DeltaProps): ReactNode {
       className={className ? `mc-delta ${className}` : "mc-delta"}
       data-mc-valence={valence}
       style={style}
-      {...(decorative ? { "aria-hidden": true } : { role: "img", "aria-label": label })}
+      {...(decorative ? undefined : { role: "img" as const, "aria-label": label })}
     >
       <svg
         className="mc-delta-glyph"
@@ -98,7 +98,7 @@ export function Delta(props: DeltaProps): ReactNode {
       >
         <path d={GLYPH[glyphKey]} />
       </svg>
-      <span className="mc-delta-num" aria-hidden="true">
+      <span className="mc-delta-num" aria-hidden={decorative ? undefined : true}>
         {display}
       </span>
     </span>

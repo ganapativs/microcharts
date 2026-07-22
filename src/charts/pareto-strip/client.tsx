@@ -13,6 +13,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -219,10 +220,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       {readout && b && geo ? (
         <span
           className="mc-pareto-readout mc-spark-readout"
-          style={{
-            left: `${((b.x + b.width / 2) / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(b.x + b.width / 2, geo.totalWidth)}
         >
           {`${b.label} ${pct(b.share)} · ${pct(b.cum)}`}
         </span>

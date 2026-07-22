@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -185,10 +186,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
       {readout && run ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((run.x0 + run.x1) / 2 / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle((run.x0 + run.x1) / 2, width)}
         >
           {`${run.state} ${fmt(run.t0)}–${fmt(run.t1)}`}
         </span>

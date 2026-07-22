@@ -5,6 +5,10 @@
 // clock is passed in (`now`) — this file never calls Date.now (SSR must be
 // deterministic; a mismatch is a hydration bug). All coords 2-dp.
 import { round2 } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
+
+/** Documented default window (ms) — also the fallback for an unusable one. */
+export const DEFAULT_WINDOW = 60_000;
 
 export interface HeartbeatGeometry {
   baseline: { x1: number; x2: number; y: number };
@@ -31,7 +35,11 @@ export function heartbeatGeometry(opts: {
   height: number;
   pad: number;
 }): HeartbeatGeometry {
-  const { events, window: win, now, width, height, pad } = opts;
+  const { events, now, width, height, pad } = opts;
+  // The window is a DIVISOR for every spike's x, so a zero / non-finite one
+  // emits `x="NaN"` and the spikes vanish silently. Fall back to the documented
+  // default rather than drawing nothing.
+  const win = Number.isFinite(opts.window) && opts.window > 0 ? opts.window : DEFAULT_WINDOW;
   const innerW = width - pad * 2;
   const baseY = round2(height * 0.62);
   const peakY = round2(pad + 1); // top of the spike
@@ -56,7 +64,7 @@ export function heartbeatGeometry(opts: {
 
   let lastAgoMs: number | null = null;
   if (inWindow.length) {
-    const last = Math.max(...inWindow);
+    const last = maxOf(inWindow);
     lastAgoMs = Math.max(0, Math.round(now - last));
   }
 

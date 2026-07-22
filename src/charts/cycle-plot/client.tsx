@@ -27,6 +27,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -313,7 +314,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
       {readout && sl && geo && shown !== null ? (
         <span
           className="mc-cycle-plot-readout mc-spark-readout"
-          style={{ left: `${(sl.center.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(sl.center.x, width)}
         >
           {obs !== undefined
             ? `${slotName(slots, shown)} ${cycle + 1}/${cycleVals.length}: ${fmt(obs)}`

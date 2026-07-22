@@ -13,6 +13,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -275,10 +276,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
       </StaticConstellation>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownStar ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(shownStar.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownStar.cx, geo.width)}>
           {readoutText}
         </span>
       ) : null}

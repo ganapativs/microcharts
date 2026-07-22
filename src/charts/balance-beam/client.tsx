@@ -210,7 +210,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticBeam>
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && panKnown ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {`${pan!.label} ${fmt(pan!.value)}`}

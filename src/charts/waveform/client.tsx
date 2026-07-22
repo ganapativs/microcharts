@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -190,13 +191,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       </StaticWaveform>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownBar ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(shownX / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
           {`${pct} · ${fmt(shownVal == null ? 0 : Math.abs(shownVal))}`}
         </span>
       ) : null}

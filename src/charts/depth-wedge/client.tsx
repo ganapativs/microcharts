@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -179,10 +180,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
       </StaticDepthWedge>
       <LiveRegion>{announced}</LiveRegion>
       {readout && step ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(step.x / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(step.x, width)}>
           {`${sideName} ${fmt(step.cum)} (± ${fmt(step.dist)})`}
         </span>
       ) : null}

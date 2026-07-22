@@ -20,6 +20,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -258,11 +259,10 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       {readout && shownField ? (
         <span
           className="mc-spark-readout"
-          style={{
-            // a markless field (calm wind) reads out over the glyph's center
-            left: `${((shownField.box ? shownField.box[0] + shownField.box[2] / 2 : L.width / 2) / L.width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(
+            shownField.box ? shownField.box[0] + shownField.box[2] / 2 : L.width / 2,
+            L.width,
+          )}
         >
           {shownField.text}
         </span>

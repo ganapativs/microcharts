@@ -25,9 +25,15 @@ export function stepOpacity(step: number, steps: number): number {
   return steps <= 1 ? 1 : 0.25 + (step / (steps - 1)) * 0.75;
 }
 
-/** Ramp for calibrated VALUE cells (HeatCell/HeatStrip): every step stays
- *  visible (0.25 → 1) — a real bottom-of-scale value must not vanish into the
- *  0.06 empty-track look, which is reserved for truly-empty slots. */
+/** Ramp for calibrated VALUE cells (HeatCell/HeatStrip): mix accent into the
+ *  band so steps stay distinct on both light and dark surfaces. Opacity-only
+ *  ramps collapse when `--mc-accent` is already dark. Caps below 100 so hot
+ *  cells stay tinted — pure accent washes out and kills label contrast. */
+export function valueStepMixPct(step: number, steps: number): number {
+  return steps <= 1 ? 82 : Math.round(28 + (step / (steps - 1)) * 54);
+}
+
+/** Opacity ramp kept for ActivityGrid empty-track semantics (level 0 faint). */
 export function valueStepOpacity(step: number, steps: number): number {
   return steps <= 1 ? 1 : 0.25 + (step / (steps - 1)) * 0.75;
 }

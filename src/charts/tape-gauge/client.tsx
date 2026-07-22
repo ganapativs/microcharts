@@ -12,7 +12,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
 import { autoSpan } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
-import { tapeGaugeGeometry } from "./geometry.js";
+import { NO_ZONES, tapeGaugeGeometry } from "./geometry.js";
 
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
@@ -34,7 +34,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   const {
     value,
     rate,
-    zones = [],
+    zones = NO_ZONES,
     span: spanProp,
     rateTiers: tiersProp,
     orientation = "vertical",

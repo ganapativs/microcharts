@@ -132,7 +132,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
         strings={strings}
         summary={false}
       />
-      <LiveRegion>{announced}</LiveRegion>
+      <LiveRegion>{props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

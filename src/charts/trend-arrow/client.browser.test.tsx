@@ -25,9 +25,13 @@ describe("interactive <TrendArrow>", () => {
     expect(document.querySelector('.mc-trend-live[data-pulse="1"]')).not.toBeNull();
   });
 
-  it("live={false} → no live region", async () => {
-    await render(<TrendArrow value={0.1} live={false} />);
-    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+  it("live={false} → the live region stays mounted but says nothing", async () => {
+    const screen = await render(<TrendArrow value={0.1} live={false} />);
+    // The region is the inline-seat host (shared/live-region.tsx), so it must
+    // never be unmounted to silence a chart — silence is empty children.
+    const region = screen.container.querySelector('[aria-live="polite"]');
+    expect(region).not.toBeNull();
+    expect(region!.textContent).toBe("");
   });
 
   it("click fires onSelect with the signed change + direction", async () => {

@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -208,10 +209,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
       {readout && cell ? (
         <span
           className="mc-coverage-readout mc-spark-readout"
-          style={{
-            left: `${((cell.x + cell.w / 2) / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(cell.x + cell.w / 2, geo.totalWidth)}
         >
           {/* no hardcoded English in the chip (i18n canon): non-values show a
               dash; the live region carries the localized full sentence */}

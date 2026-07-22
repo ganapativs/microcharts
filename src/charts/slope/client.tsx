@@ -12,13 +12,14 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { pairChange } from "../dumbbell/index.js";
-import { SLOPE_FONT, slopeFrame } from "./geometry.js";
+import { slopeFitFrame } from "./geometry.js";
 import { Slope as StaticSlope, slopeSummary, type SlopeProps } from "./index.js";
 
 export interface InteractiveSlopeProps extends SlopeProps, PickerProps {
@@ -57,13 +58,12 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate, { selector: "line" });
 
-  const fontSize = SLOPE_FONT;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // The overlay + hit-test must resolve against the SAME frame the composed
   // static renders — label gutters included (shared rule, never re-derived).
   const geo = useMemo(
-    () => slopeFrame({ width, height, data, domain, label, fmt, fontSize }).geo,
-    [width, height, data, domain, label, fmt, fontSize],
+    () => slopeFitFrame({ width, height, data, domain, label, fmt }).geo,
+    [width, height, data, domain, label, fmt],
   );
 
   /** Rows ordered by `to` (descending) for ↑/↓ roving. */
@@ -205,7 +205,14 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
       </StaticSlope>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDatum && shownLine ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span
+          className="mc-spark-readout"
+          style={
+            shownLine.y0 != null && shownLine.y1 != null
+              ? rowReadoutStyle(width / 2, (shownLine.y0 + shownLine.y1) / 2, width, height)
+              : { left: "50%", transform: "translateX(-50%)" }
+          }
+        >
           {Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
             ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`
             : shownDatum.label}

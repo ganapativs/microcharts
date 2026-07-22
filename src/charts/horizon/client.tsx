@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -174,13 +175,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
       </StaticHorizon>
       <LiveRegion>{announced}</LiveRegion>
       {readout && crossX !== undefined ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(crossX / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(crossX, width)}>
           {isFiniteValue(value) ? fmt(value) : "—"}
         </span>
       ) : null}

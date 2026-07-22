@@ -66,7 +66,11 @@ export function activityGridGeometry(
   const width = cols > 0 ? cols * step - gap : 0;
   const height = rows > 0 ? rows * step - gap : 0;
 
-  const e = opts.domain ?? extent(data);
+  // A caller `domain` has to be validated, not trusted: `[NaN, NaN]` (which is
+  // what `[Math.min(...vals), Math.max(...vals)]` yields when `vals` holds one
+  // NaN) makes `levelOf` return NaN and every cell paints `fill-opacity="NaN"`.
+  // Same guard the other domain-taking charts already apply.
+  const e = opts.domain?.every((d) => Number.isFinite(d)) ? opts.domain : extent(data);
   const [min, max] = e ?? [0, 0];
 
   const cells: Cell[] = data.map((v, i) => {

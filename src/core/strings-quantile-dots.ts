@@ -7,7 +7,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type QuantileDotsStrings = Pick<
   SummaryStrings,
-  "noData" | "quantileDots" | "quantileDotsRange"
+  "noData" | "quantileDots" | "quantileDotsRange" | "quantileDotsChip" | "quantileDotsOdds"
 >;
 
 export const EN_QUANTILE_DOTS: QuantileDotsStrings = {
@@ -16,4 +16,8 @@ export const EN_QUANTILE_DOTS: QuantileDotsStrings = {
     `${past} in ${count} chances ${side} ${threshold}.`,
   quantileDotsRange: (modeLo, modeHi, min, max) =>
     `Most likely ${modeLo}–${modeHi}; range ${min} to ${max}.`,
+  // The visible chip drops "chances" and the full stop — it sits over the plot,
+  // where the frequency framing is already carried by the dots themselves.
+  quantileDotsChip: (past, count, side, threshold) => `${past} in ${count} ${side} ${threshold}`,
+  quantileDotsOdds: (past, count) => `${past} in ${count}`,
 };

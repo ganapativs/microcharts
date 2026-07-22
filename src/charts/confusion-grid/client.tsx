@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -218,13 +219,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
       </StaticConfusionGrid>
       <LiveRegion>{announced}</LiveRegion>
       {readout && cell ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${((cell.x + cell.w / 2) / size) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(cell.x + cell.w / 2, size)}>
           {`${labels[cell.row]}→${labels[cell.col]} ${pct}`}
         </span>
       ) : null}

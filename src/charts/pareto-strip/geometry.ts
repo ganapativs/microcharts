@@ -5,6 +5,7 @@
 // one job is to say where to stop reading. `Other` never participates in
 // ranking. Coords 2-dp, integer viewBox.
 import { round2 } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
 
 interface ParetoBar {
   x: number;
@@ -97,7 +98,10 @@ export function paretoGeometry(opts: {
   const barPlotH = height - pad;
   const k = rows.length;
   const colW = plotW / k;
-  const maxVal = Math.max(...rows.map((r) => r.value), 0);
+  const maxVal = maxOf(
+    rows.map((r) => r.value),
+    0,
+  );
 
   const thFrac = threshold === null ? null : threshold / 100;
 

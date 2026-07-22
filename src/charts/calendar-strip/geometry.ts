@@ -6,6 +6,7 @@
 import { weekGrid } from "../../core/calendar-grid.js";
 import { stepIndex } from "../../shared/cell.js";
 import type { CellShape } from "../../shared/cell.js";
+import { maxOf } from "../../core/scale.js";
 
 type DayState = "value" | "zero" | "empty" | "future";
 
@@ -51,7 +52,7 @@ export function calendarStripGeometry(opts: {
 
   const values = [...opts.entries.values()].filter((v) => Number.isFinite(v) && v > 0);
   let d0 = 0;
-  let d1 = values.length ? Math.max(...values) : 1;
+  let d1 = values.length ? maxOf(values) : 1;
   if (opts.domain && opts.domain.every((d) => Number.isFinite(d))) {
     d0 = Math.min(opts.domain[0], opts.domain[1]);
     d1 = Math.max(opts.domain[0], opts.domain[1]);

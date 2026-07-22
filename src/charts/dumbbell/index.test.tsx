@@ -82,6 +82,22 @@ describe("<Dumbbell>", () => {
   // Degradation contract: a label that no longer fits is DROPPED, never stacked
   // on its neighbour (the "Paris/Berlin/Rome in a tab header" bug) and never
   // painted outside the box. See tests/craft/floor.mjs.
+  it("wide figure: row names use the gutter char budget, not a hard 6-char cap", () => {
+    const { container } = draw(
+      <Dumbbell
+        data={[
+          { label: "Minas Gerais", from: 1420, to: 980 },
+          { label: "Espírito Santo", from: 1100, to: 900 },
+        ]}
+        width={640}
+        height={220}
+      />,
+    );
+    const labels = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(labels).toContain("Minas Gerais");
+    expect(labels).toContain("Espírito Santo");
+  });
+
   it("small box: row names drop rather than stacking, dots still render", () => {
     const rows = [
       { label: "East", from: 47, to: 1 },

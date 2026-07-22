@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -208,11 +209,12 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       </StaticGardenGrid>
       <LiveRegion>{announced}</LiveRegion>
       {readout && c ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(c.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
-        >
-          {c.value === null ? "—" : `${fmt(c.value)}, step ${c.step}/${steps}`}
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(c.cx, geo.width)}>
+          {/* The localized sentence minus its full stop — "step" must not be
+              hand-composed in a VISIBLE chip (i18n canon). An empty cell keeps
+              the dash: the localized "no data" sentence is carried by the live
+              region, and a dash reads at chip size where a sentence does not. */}
+          {c.value === null ? "—" : announced.replace(/[.。]$/, "")}
         </span>
       ) : null}
     </span>

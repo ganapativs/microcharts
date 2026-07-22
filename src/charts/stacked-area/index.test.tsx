@@ -47,6 +47,20 @@ describe("<StackedArea>", () => {
     expect(first.style.fillOpacity).toBe("1");
   });
 
+  it("label='last' + labelAt paints that column's shares, not only the endpoint", () => {
+    const last = draw(
+      <StackedArea data={TRAFFIC} label="last" width={200} height={60} />,
+    ).container;
+    const mid = draw(
+      <StackedArea data={TRAFFIC} label="last" labelAt={0} width={200} height={60} />,
+    ).container;
+    const lastTxt = [...last.querySelectorAll("text")].map((t) => t.textContent);
+    const midTxt = [...mid.querySelectorAll("text")].map((t) => t.textContent);
+    expect(lastTxt).not.toEqual(midTxt);
+    // col 0: 30+40+15=85 → Mobile 35%, Web 47%, API 18%
+    expect(midTxt).toContain("35%");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<StackedArea data={TRAFFIC} title="Traffic mix" />);
     await expectNoA11yViolations(container);

@@ -15,6 +15,7 @@ import {
   type HypnoEntry,
 } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf } from "../../core/scale.js";
 
 export type HypnogramDatum = HypnoEntry;
 
@@ -130,7 +131,10 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     width,
     height,
     rows: rowsN,
-    maxChars: Math.max(...rowStates.map((s) => s.length), 1),
+    maxChars: maxOf(
+      rowStates.map((s) => s.length),
+      1,
+    ),
   });
 
   const domain = domainProp ?? resolveDomain(data);

@@ -147,16 +147,17 @@ export function TargetZone(_props: TargetZoneProps): ReactNode {
           style={p.color ? { fill: p.color } : undefined}
         />
         {p.label ? (
+          // Start-anchor at the band's floor. Threshold labels end-anchor above
+          // their hairline on the opposite corner — when both share a host they
+          // no longer collide mid-band at the same (width-1, midY) point.
           <text
-            x={width - 1}
-            y={round2(
-              Math.max(fontSize * 0.8, Math.min(height - 1, top + h / 2 + fontSize * 0.35)),
-            )}
+            x={1}
+            y={round2(Math.min(height - 1, Math.max(fontSize * 0.8, top + h - fontSize * 0.2)))}
             fontSize={fontSize}
-            textAnchor="end"
+            textAnchor="start"
             data-mc-ink="label"
           >
-            {fit(p.label, fontSize, width - 1)}
+            {fit(p.label, fontSize, width - 2)}
           </text>
         ) : null}
       </g>

@@ -15,6 +15,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -106,7 +107,12 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       const th = lo ?? threshold;
       const formatted =
         plot && th !== undefined && Number.isFinite(th)
-          ? `${plot.dots.filter((d) => (side === "above" ? d.value > th : d.value < th)).length} in ${dotCount} ${side} ${fmt(th)}`
+          ? strings.quantileDotsChip(
+              plot.dots.filter((d) => (side === "above" ? d.value > th : d.value < th)).length,
+              dotCount,
+              side,
+              fmt(th),
+            )
           : undefined;
       return {
         index: i,
@@ -116,7 +122,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
         formatted,
       };
     },
-    [binLo, colCounts, fmt, plot, threshold, side, dotCount],
+    [binLo, colCounts, fmt, plot, threshold, side, dotCount, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -177,13 +183,14 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       : null;
 
   const showIdleOdds =
-    shown === null &&
     (props.label ?? "count") === "count" &&
     threshold !== undefined &&
     Number.isFinite(threshold) &&
     staticGeo != null &&
     labelFitsY(height / 2, labelFont(height), height);
-  const idleOdds = showIdleOdds && staticGeo ? `${staticGeo.past} in ${staticGeo.count}` : null;
+  const idleOdds =
+    showIdleOdds && staticGeo ? strings.quantileDotsOdds(staticGeo.past, staticGeo.count) : null;
+  const oddsHidden = shown !== null;
 
   return (
     <span
@@ -225,12 +232,9 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
           {readout && shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
             <span
               className="mc-quantile-dots-readout mc-spark-readout"
-              style={{
-                left: `${(geo.threshold.x / width) * 100}%`,
-                transform: "translateX(-50%)",
-              }}
+              style={crosshairReadoutStyle(geo.threshold.x, width)}
             >
-              {`${geo.past} in ${geo.count} ${side} ${fmt(activeThreshold)}`}
+              {strings.quantileDotsChip(geo.past, geo.count, side, fmt(activeThreshold))}
             </span>
           ) : null}
         </span>
@@ -245,6 +249,9 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
               lineHeight: 1,
               whiteSpace: "nowrap",
               pointerEvents: "none",
+              // Keep the gutter reserved while probing so the plate never
+              // shifts under the cursor when idle odds hide.
+              visibility: oddsHidden ? "hidden" : "visible",
             }}
           >
             {idleOdds}

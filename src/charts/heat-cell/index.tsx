@@ -5,11 +5,10 @@
 // exists to kill, so a lone cell defaults to [0, 1] (documented loudly).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { ON_FILL_INK } from "../../core/color.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
+import { valueStepMixPct, type CellShape } from "../../shared/cell.js";
 import { heatCellGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -78,7 +77,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
     heatCellSummary(value, geo.step, steps, fmt, strings),
   );
 
-  const fontSize = 6;
+  const fontSize = 7;
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;
   const showLabel = text !== undefined && geo.labelFits(text.length, fontSize);
 
@@ -112,8 +111,19 @@ export function HeatCell(props: HeatCellProps): ReactNode {
         // real background band would be the invisible 8% fill this cell must
         // NOT collapse into (empty must read distinct from any real value)
         data-mc-ink={geo.step === null ? "gap" : "cell"}
-        fillOpacity={geo.step === null ? undefined : valueStepOpacity(geo.step, steps)}
-        style={geo.step === null || !color ? undefined : { fill: color }}
+        // The ramp rides a custom property, never an inline `fill`: the
+        // stylesheet owns the fill so the forced-colors mapping (fill:
+        // Highlight + a per-level fill-opacity) can still win — an inline fill
+        // would beat any stylesheet rule and break high-contrast mode.
+        {...(geo.step === null ? undefined : { "data-mc-cell-mix": "" })}
+        style={
+          geo.step === null
+            ? undefined
+            : ({
+                "--mc-cell-mix": String(valueStepMixPct(geo.step, steps)),
+                ...(color ? { "--mc-cell-color": color } : undefined),
+              } as CSSProperties)
+        }
       />
       {showLabel ? (
         <text
@@ -123,9 +133,9 @@ export function HeatCell(props: HeatCellProps): ReactNode {
           dominantBaseline="central"
           style={{ fontWeight: 600 }}
           textAnchor="middle"
-          // Upper steps are opaque enough for on-fill ink (--mc-on-fill);
+          // Upper steps mix enough accent for on-fill ink (--mc-on-fill);
           // faint cells keep stroke ink so the number doesn't wash out.
-          fill={geo.step !== null && geo.step >= steps / 2 ? ON_FILL_INK : undefined}
+          {...(geo.step !== null && geo.step >= steps / 2 ? { "data-mc-on-fill": "" } : undefined)}
         >
           {text}
         </text>

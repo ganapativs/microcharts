@@ -5,6 +5,7 @@
 // +20/−0 trickle. Added/removed are MAGNITUDES — negatives are clamped to 0.
 // Coords 2-dp, integer viewBox.
 import { round2 } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
 
 interface DataDiffRow {
   key: string;
@@ -81,7 +82,11 @@ export function dataDiffGeometry(opts: {
 
   // one symmetric scale across ALL rows (churn must not shrink to fit)
   const scaleMax =
-    opts.domain?.[1] ?? Math.max(...rowsIn.map((r) => Math.max(r.added, r.removed)), 0);
+    opts.domain?.[1] ??
+    maxOf(
+      rowsIn.map((r) => Math.max(r.added, r.removed)),
+      0,
+    );
   const degenerate = scaleMax === 0;
 
   // label gutter sits on the LEFT (keys read before the diverging bars)

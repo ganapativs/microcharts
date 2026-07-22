@@ -4,6 +4,11 @@
 // and a gradient prop will never exist (color-alone would fail a11y anyway).
 export type Tier = "confident" | "unsure" | "guessing";
 
+/** Default confidence cutoffs. Shared by BOTH entries so their defaults are
+ *  one object: a literal default is a fresh array per render, which defeats
+ *  the interactive entry's tiering memo (and drifts the two entries apart). */
+export const DEFAULT_TIERS: readonly [number, number] = [0.5, 0.8];
+
 export interface TokenDatum {
   token: string;
   confidence: number;

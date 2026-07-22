@@ -49,6 +49,9 @@ export interface StackedAreaProps {
   order?: "data" | "asc" | undefined;
   /** `"last"` = endpoint share labels per series (deterministic drop-out). */
   label?: "last" | "none" | undefined;
+  /** Column whose shares feed `label="last"` (default: final column). Interactive
+   *  scrub passes the focused column so the end labels track the crosshair. */
+  labelAt?: number | undefined;
   /** Per-series colours, cycled; overrides `--mc-cat-N` for this instance. */
   colors?: readonly string[] | undefined;
   curve?: Curve | undefined;
@@ -75,6 +78,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     mode = "stacked",
     order = "data",
     label = "none",
+    labelAt,
     colors,
     curve = "linear",
     domain,
@@ -129,6 +133,9 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
 
   // endpoint labels drop when rows are too dense for the series count
   const labelsFit = height / Math.max(1, series.length) >= fontSize * 1.1;
+  const tip =
+    labelAt !== undefined && labelAt >= 0 && labelAt < geo.n ? labelAt : Math.max(0, geo.n - 1);
+  const tipShares = geo.sharesAt[tip] ?? [];
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
@@ -195,7 +202,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
               textAnchor="end"
               data-mc-ink="label"
             >
-              {pctFmt(layer.lastShare)}
+              {pctFmt(tipShares[layer.index] ?? layer.lastShare)}
             </text>
           ))
         : null}

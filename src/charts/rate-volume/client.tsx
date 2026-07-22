@@ -13,6 +13,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -248,10 +249,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
       {readout && sBar && sDatum ? (
         <span
           className="mc-rate-volume-readout mc-spark-readout"
-          style={{
-            left: `${((sBar.x + sBar.width / 2) / geo!.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(sBar.x + sBar.width / 2, geo!.totalWidth)}
         >
           {valid(shown!)
             ? strings.rateVolumeChip(

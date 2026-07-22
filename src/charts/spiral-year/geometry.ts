@@ -7,6 +7,7 @@
 import { arcPath, polarPoint } from "../../core/arc.js";
 import { monthStartDays } from "../../core/calendar-grid.js";
 import { round2, type Value } from "../../core/types.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 const TAU = Math.PI * 2;
 
@@ -73,8 +74,8 @@ export function spiralYearGeometry(opts: {
   if (finite.length === 0) return empty;
 
   const vals = finite.map((e) => e.v);
-  const max = Math.max(...vals);
-  const min = Math.min(...vals);
+  const max = maxOf(vals);
+  const min = minOf(vals);
   const span = max - min || 1;
 
   let peakIndex = finite[0]!.index;

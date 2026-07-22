@@ -11,6 +11,7 @@ import { isFiniteValue } from "../../core/types.js";
 import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
 import { labelFitsY } from "../../core/labels.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 export type LikertDatum = MiniBarDatum;
 
@@ -104,8 +105,8 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const midY = height / 2;
   // direct labels hug the BAR ends, not the frame — a small negative pole
   // must not leave its label floating at the far edge
-  const barX0 = geo?.segments.length ? Math.min(...geo.segments.map((g) => g.x)) : 0;
-  const barX1 = geo?.segments.length ? Math.max(...geo.segments.map((g) => g.x + g.width)) : width;
+  const barX0 = geo?.segments.length ? minOf(geo.segments.map((g) => g.x)) : 0;
+  const barX1 = geo?.segments.length ? maxOf(geo.segments.map((g) => g.x + g.width)) : width;
   const estL = 4 * fontSize * 0.62;
   const leftLabel =
     barX0 - 4 - estL >= 0

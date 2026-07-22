@@ -8,6 +8,18 @@
 // here fixes those charts without threading a ref through each of them. The
 // handful of entries that ship no LiveRegion call `useSeatHoist` themselves.
 //
+// BECAUSE of that coupling, a client entry must render this element
+// UNCONDITIONALLY and mute its CHILDREN instead:
+//
+//     <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
+//
+// Unmounting it to silence a decorative chart (`summary={false}`, `live={false}`)
+// also removes the seat hoist, so an inline chart loses its baseline seat, and
+// its readout chip and hit box detach from the mark by a full seat (28–40 px,
+// measured — see seat-hoist.ts). Empty children announce nothing, so muting is
+// all the silence a decorative chart needs. Guarded by
+// src/test/live-region-seat.browser.test.tsx.
+//
 // Nesting under role="img" is INTENTIONAL and verified. The interactive wrapper
 // carries role="img" + aria-label (see shared/interactive.ts `named`), and this
 // region renders as its child. ARIA lists role="img" as "Children Presentational:

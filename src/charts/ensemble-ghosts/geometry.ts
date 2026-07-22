@@ -5,7 +5,7 @@
 // Math.random, no jitter) so the same input renders identically every time.
 // Coords 2-dp, integer viewBox.
 import { round2, isFiniteValue } from "../../core/types.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, maxOf, minOf } from "../../core/scale.js";
 
 /** Frame inset the paths are scaled into — shared with the static entry's seat. */
 export const PAD = 2;
@@ -75,7 +75,7 @@ export function ensembleGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  const maxLen = Math.max(...validIdx.map((i) => data[i]!.length));
+  const maxLen = maxOf(validIdx.map((i) => data[i]!.length));
 
   // inlined min/max (avoids pulling extent into this entry)
   let lo = Infinity;
@@ -155,7 +155,7 @@ export function ensembleGeometry(opts: {
     ghostPaths,
     emphasisPath,
     ghostEnds,
-    spread: { lastLo: Math.min(...ends), lastHi: Math.max(...ends) },
+    spread: { lastLo: minOf(ends), lastHi: maxOf(ends) },
     typicalEnd: resolvedTypicalEnd,
     memberCount: validIdx.length,
     landing: { x: landingX, y: sy(resolvedTypicalEnd), value: resolvedTypicalEnd },

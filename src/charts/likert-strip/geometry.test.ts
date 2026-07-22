@@ -30,6 +30,22 @@ describe("likertStripGeometry", () => {
     expect(Math.min(...pos.map((s) => s.x))).toBeCloseTo(geo.centerX, 1);
   });
 
+  it("unequal poles fill the plot — no empty short-side gutter in the bar", () => {
+    const geo = likertStripGeometry({
+      ...base,
+      width: 760,
+      values: [12, 10, 21, 33, 24],
+      gutterL: 32,
+      gutterR: 32,
+    })!;
+    const left = Math.min(...geo.segments.map((s) => s.x));
+    const right = Math.max(...geo.segments.map((s) => s.x + s.width));
+    expect(left).toBeCloseTo(32, 0);
+    expect(right).toBeCloseTo(728, 0);
+    // lean positive → center sits left of the frame midpoint
+    expect(geo.centerX).toBeLessThan((32 + 728) / 2);
+  });
+
   it("grading: opacity grows toward the poles, never magnitude", () => {
     const geo = likertStripGeometry({ ...base, values: [10, 20, 14, 30, 26] })!;
     const neg = geo.segments.filter((s) => s.side < 0).sort((a, b) => a.level - b.level);

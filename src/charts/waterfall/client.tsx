@@ -4,7 +4,7 @@
 // 1,410."), End focuses the total, click / Enter / Space selects (onSelect).
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, withPlus } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -199,17 +200,16 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       {readout && shown !== null ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shown * geo.pitch + geo.pitch / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shown * geo.pitch + geo.pitch / 2, width)}
         >
           {isTotal
             ? fmt(endLevel)
             : step
               ? `${step.label}: ${
                   isFiniteValue(step.value)
-                    ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
+                    ? step.value < 0
+                      ? `−${fmt(Math.abs(step.value))}`
+                      : withPlus(step.value, (v) => fmt(Math.abs(v)))
                     : strings.noData
                 } → ${fmt(geo.levels[shown] ?? open)}`
               : fmt(geo.levels[shown] ?? open)}

@@ -36,6 +36,14 @@ export interface TickLabel {
 /** Thin coloured band beside the pointer (viewBox units). */
 const ZONE = 2.4;
 
+/** Empty zone list. Shared by BOTH entries so their defaults are one array:
+ *  a literal `[]` default is a fresh array per render, which defeats the
+ *  interactive entry's geometry memo (and drifts the two entries apart). */
+export const NO_ZONES: readonly Zone[] = [];
+/** Hard ceiling on emitted ticks — a tape this dense is unreadable long before
+ *  it is slow, and the cap is what keeps a pathological `span`/`tick` bounded. */
+const MAX_TICKS = 200;
+
 /** A "nice" tick step near `rough` (1/2/5 × 10ⁿ). */
 export function niceStep(rough: number): number {
   if (!Number.isFinite(rough) || rough <= 0) return 1;
@@ -97,9 +105,18 @@ export function tapeGaugeGeometry(opts: {
       : round2(pad + ((v - lo) / span) * alongInner);
 
   const step = tick && tick > 0 ? tick : niceStep(span / 5);
-  const first = Math.ceil(lo / step) * step;
+  // COUNT the ticks, never walk `t += step` to a bound: at large `value` the
+  // step is smaller than one ULP of `t`, so the accumulator stops advancing and
+  // the loop never terminates — the tab hangs, then dies on `Invalid array
+  // length` (reproduced with value 1e17 / span 10, and with a non-finite
+  // value, which `zones`-derived auto-span can also produce). Counting also
+  // caps the work at a tick density anyone can read.
   const ticks: number[] = [];
-  for (let t = first; t <= hi + 1e-9; t += step) ticks.push(round2(t));
+  if (Number.isFinite(lo) && Number.isFinite(hi) && Number.isFinite(step) && step > 0) {
+    const first = Math.ceil(lo / step) * step;
+    const n = Math.min(MAX_TICKS, Math.floor((hi - first) / step) + 1);
+    for (let i = 0; i < n; i++) ticks.push(round2(first + i * step));
+  }
 
   // zone stripe: a thin band hugging the pointer, clipped to the window
   const zoneRects: TapeRect[] = [];

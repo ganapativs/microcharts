@@ -104,7 +104,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
         strings={strings}
         summary={false}
       />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

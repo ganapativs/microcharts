@@ -16,7 +16,11 @@ export const PAD = 2;
 export const leaderProb = (v: number): number => (v >= 50 ? v : 100 - v);
 const leaderSide = (v: number, sides: readonly [string, string]): string =>
   v >= 50 ? sides[0] : sides[1];
-const pct = (v: number, fmt: (n: number) => string): string => `${fmt(v)}%`;
+const pct = (v: number, fmt: (n: number) => string): string => {
+  const s = fmt(v);
+  // Callers often pass a formatter that already ends in `%` — don't double it.
+  return s.endsWith("%") ? s : `${s}%`;
+};
 const signed = (d: number, fmt: (n: number) => string): string =>
   `${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d))}`;
 

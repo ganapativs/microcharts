@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -290,10 +291,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
       </StaticEventRaster>
       <LiveRegion>{announced}</LiveRegion>
       {readout && t !== undefined && shownLane !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(xOf(t) / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(xOf(t), width)}>
           {`${lanes[shownLane]!.label} · ${fmt(t)}`}
         </span>
       ) : null}

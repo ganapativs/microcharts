@@ -40,11 +40,11 @@ export function fillWordGeometry(opts: {
   const height = Math.ceil(fontSize * 1.4);
   const x = pad;
   const y = round2(height / 2);
-  // The numeral hugs the word: place it at the word's REAL extent (~0.53 em/char
-  // for a proportional font) plus a snug gap, not at the 0.62 containment
-  // over-estimate (which left a big dead space). The containment box still uses
-  // the over-estimate so the natural word never overflows.
-  const wordExtent = round2(chars * 0.56 * fontSize);
+  // Numeral hugs the word's real extent. Mixed-case ≈ 0.56 em/ch; ALL CAPS runs
+  // ~0.64–0.72 (see core/labels.ts) — under-estimating puts "41%" inside SNOWPACK.
+  const caps = [...word].filter((c) => c >= "A" && c <= "Z").length;
+  const extentFactor = chars > 0 && caps / chars >= 0.7 ? 0.72 : 0.56;
+  const wordExtent = round2(chars * extentFactor * fontSize);
   const numeralExtent = round2(4 * 0.62 * fontSize); // "100%"
   const numeralX = label && chars > 0 ? round2(x + wordExtent + fontSize * 0.3) : null;
   const width =

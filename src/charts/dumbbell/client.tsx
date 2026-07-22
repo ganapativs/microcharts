@@ -10,11 +10,13 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
+import { labelFont, proseCharsThatFit } from "../../core/labels.js";
 import { dumbbellGeometry } from "./geometry.js";
 import {
   Dumbbell as StaticDumbbell,
@@ -69,19 +71,14 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     link: "line[data-mc-ink]",
   });
 
-  const fontSize = 6;
+  const fontSize = labelFont(height, 0.42);
   // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
-  const maxLabelChars = useMemo(
-    () =>
-      data.some((d) => d.label)
-        ? Math.min(
-            6,
-            data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
-          )
-        : 0,
-    [data],
-  );
+  const maxLabelChars = useMemo(() => {
+    if (!data.some((d) => d.label)) return 0;
+    const longest = data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0);
+    return Math.min(longest, Math.max(4, proseCharsThatFit(width * 0.42, fontSize, 4)));
+  }, [data, width, fontSize]);
   const geo = useMemo(
     () =>
       dumbbellGeometry({
@@ -92,7 +89,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
         gutterCh: maxLabelChars > 0 ? maxLabelChars + 1 : 0,
         fontSize,
       }),
-    [width, height, data, domain, maxLabelChars],
+    [width, height, data, domain, maxLabelChars, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -245,10 +242,12 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
       {readout && shownRow && shownDatum ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${(((shownRow.x0 ?? 0) + (shownRow.x1 ?? shownRow.x0 ?? 0)) / 2 / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={rowReadoutStyle(
+            ((shownRow.x0 ?? 0) + (shownRow.x1 ?? shownRow.x0 ?? 0)) / 2,
+            shownRow.y,
+            width,
+            height,
+          )}
         >
           {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
         </span>

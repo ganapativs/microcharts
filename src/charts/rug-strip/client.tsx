@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -190,7 +191,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
           className="mc-spark-readout"
           style={
             orientation === "horizontal"
-              ? { left: `${(shownTick.pos / width) * 100}%`, transform: "translateX(-50%)" }
+              ? crosshairReadoutStyle(shownTick.pos, width)
               : {
                   left: "100%",
                   top: `${(shownTick.pos / height) * 100}%`,

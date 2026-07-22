@@ -8,6 +8,7 @@
 // coords 2-dp.
 import { annulusSector } from "../../core/arc.js";
 import { round2, type Value } from "../../core/types.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 const TAU = Math.PI * 2;
 
@@ -101,9 +102,9 @@ export function polarClockGeometry(opts: {
   if (finite.length === 0) return empty;
 
   const vals = finite.map((e) => e.v);
-  const max = Math.max(...vals, 0);
-  const minV = Math.min(...vals);
-  const maxV = Math.max(...vals);
+  const max = maxOf(vals, 0);
+  const minV = minOf(vals);
+  const maxV = maxOf(vals);
   const flat = maxV === minV;
 
   // First argmax / argmin over the finite segments.

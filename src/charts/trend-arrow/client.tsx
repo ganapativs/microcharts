@@ -80,7 +80,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       }}
     >
       <StaticTrendArrow {...rest} strings={strings} summary={false} />
-      {live && summary !== false ? <LiveRegion>{model.summary}</LiveRegion> : null}
+      <LiveRegion>{live && summary !== false ? model.summary : ""}</LiveRegion>
     </span>
   );
 }

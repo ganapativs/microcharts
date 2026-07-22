@@ -14,6 +14,7 @@ import {
   type RasterLaneInput,
 } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf } from "../../core/scale.js";
 
 export type EventRasterDatum = RasterLaneInput;
 
@@ -97,7 +98,10 @@ export function EventRaster(props: EventRasterProps): ReactNode {
     width,
     height,
     lanes: lanesN,
-    maxChars: Math.max(...data.slice(0, LANE_CAP).map((d) => d.label.length), 1),
+    maxChars: maxOf(
+      data.slice(0, LANE_CAP).map((d) => d.label.length),
+      1,
+    ),
   });
 
   const domain = domainProp ?? rasterDomain(data);
@@ -137,7 +141,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
           as a plain `opacity` on each lane's own marks instead of one group */}
       {geo.lanes.flatMap((lane) => {
         const active = emphasis ? lane.label === emphasis : true;
-        const dim = emphasis && !active ? 0.45 : 1;
+        const dim = emphasis && !active ? 0.7 : 1;
         const ink = emphasis ? (active ? "accent" : "neutral") : undefined;
         const cy = round2(lane.y + lane.laneH / 2);
         const nodes: ReactNode[] = lane.binned

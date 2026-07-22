@@ -7,6 +7,9 @@ import { normalizeShares } from "../../core/stack.js";
 import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
+/** Default score domain, shared by both entries (see DEFAULT_PERCENTILES). */
+export const UNIT_DOMAIN: readonly [number, number] = [0, 1];
+
 export interface RubricInput {
   label: string;
   score: number;

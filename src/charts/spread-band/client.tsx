@@ -5,12 +5,13 @@
 // math, roving keyboard, touch tap-to-pin, and the onActive/onSelect contract.
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, withPlus } from "../../core/format.js";
 import {
   named,
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -102,7 +103,8 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       return {
         index: i,
         value: g,
-        formatted: g === null ? "—" : g === 0 ? "level" : `${g > 0 ? la : lb} +${fmt(Math.abs(g))}`,
+        formatted:
+          g === null ? "—" : g === 0 ? "level" : `${g > 0 ? la : lb} ${withPlus(Math.abs(g), fmt)}`,
       };
     },
     [data, seriesLabels, fmt],
@@ -148,14 +150,18 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         ? strings.spreadBandAtEmpty(shown + 1, n)
         : gap === 0
           ? strings.spreadBandAtTie(shown + 1, n)
-          : strings.spreadBandAt(shown + 1, n, leader, `+${fmt(Math.abs(gap))}`, other);
+          : strings.spreadBandAt(shown + 1, n, leader, withPlus(Math.abs(gap), fmt), other);
 
   const xAt = (i: number): number | undefined =>
     geo.subjectPoints[i]?.[0] ?? geo.referencePoints[i]?.[0];
   const crossX = shown !== null ? xAt(shown) : undefined;
   const pinX = selected !== null && selected !== active ? xAt(selected) : undefined;
 
-  const chip = !bothFinite ? "—" : gap === 0 ? "level" : `${leader} +${fmt(Math.abs(gap))}`;
+  const chip = !bothFinite
+    ? "—"
+    : gap === 0
+      ? "level"
+      : `${leader} ${withPlus(Math.abs(gap), fmt)}`;
 
   return (
     <span
@@ -223,10 +229,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       </StaticSpreadBand>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && crossX !== undefined ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(crossX / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(crossX, width)}>
           {chip}
         </span>
       ) : null}

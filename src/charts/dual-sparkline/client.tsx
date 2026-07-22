@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -226,13 +227,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
       </StaticDualSparkline>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && crossX !== undefined ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(crossX / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(crossX, width)}>
           {`${isFiniteValue(pv) ? fmt(pv) : "—"} / ${isFiniteValue(cv) ? fmt(cv) : "—"}`}
         </span>
       ) : null}

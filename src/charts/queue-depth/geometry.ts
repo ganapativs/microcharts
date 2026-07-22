@@ -4,7 +4,7 @@
 // negative ink (shape + color, never color alone). The trend glyph comes from a
 // plain linear fit over the last quarter of the window. Coords 2-dp, integer
 // viewBox.
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 type QueueTrend = "up" | "down" | "flat";
@@ -83,7 +83,7 @@ export function queueDepthGeometry(opts: {
   if (finite.length === 0) return null;
 
   const capacity = isFiniteValue(opts.capacity) ? opts.capacity : null;
-  const yMax = opts.domain?.[1] ?? Math.max(1, Math.max(...finite), capacity ?? 0);
+  const yMax = opts.domain?.[1] ?? Math.max(1, maxOf(finite), capacity ?? 0);
   const yMin = opts.domain?.[0] ?? 0; // zero-anchored (stock)
 
   const xScale = scaleLinear([0, Math.max(1, n - 1)], [pad, width - pad]);

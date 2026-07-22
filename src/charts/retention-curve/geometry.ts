@@ -4,7 +4,7 @@
 // truncating the floor manufactures drama. Non-monotone bumps (resurrection)
 // render as-is, never sorted or smoothed away. Coords 2-dp, integer viewBox.
 import { smoothPath, stepPath } from "../../core/path.js";
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
 export type RetentionCurveType = "step" | "smooth";
@@ -40,7 +40,7 @@ export interface RetentionGeometry {
 // share input may arrive as 0–1 or 0–100; a max over 1.001 means percent input
 function normalize(data: readonly number[]): number[] {
   const finite = data.filter(isFiniteValue);
-  const max = finite.length ? Math.max(...finite) : 0;
+  const max = finite.length ? maxOf(finite) : 0;
   const scale = max > 1.001 ? 1 / 100 : 1;
   return data.map((v) => (isFiniteValue(v) ? v * scale : Number.NaN));
 }

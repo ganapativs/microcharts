@@ -12,6 +12,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -210,7 +211,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
       {readout && p ? (
         <span
           className="mc-percentile-readout mc-spark-readout"
-          style={{ left: `${(p.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(p.x, vbWidth)}
         >
           {`${unit} ${p.index}: ${pStr(p.value)}`}
         </span>

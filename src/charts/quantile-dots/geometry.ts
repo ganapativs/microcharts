@@ -4,7 +4,7 @@
 // dot ≈ a 1-in-count chance — NOT a raw observation — so "N past a threshold" is
 // counted on the true quantile value, never the bin. Coords 2-dp, integer viewBox.
 import { quantileDotplot } from "../../core/quantile.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, maxOf, minOf } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
 export type ThresholdSide = "above" | "below";
@@ -109,8 +109,8 @@ export function quantileDotsGeometry(opts: {
     past,
     count,
     mode: { lo: round2(modeLo), hi: round2(modeHi) },
-    min: round2(Math.min(...values)),
-    max: round2(Math.max(...values)),
+    min: round2(minOf(values)),
+    max: round2(maxOf(values)),
     x0: round2(plot.x0),
     range: round2(range),
     columns: plot.columns,

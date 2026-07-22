@@ -119,7 +119,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

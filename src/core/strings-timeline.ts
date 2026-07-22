@@ -2,10 +2,14 @@
 // for the chunk rationale).
 import type { SummaryStrings } from "./summary.js";
 
-export type TimelineStrings = Pick<SummaryStrings, "noData" | "spanAt" | "eventAt" | "timeline">;
+export type TimelineStrings = Pick<
+  SummaryStrings,
+  "noData" | "spanAt" | "eventAt" | "timeline" | "timelineFallback"
+>;
 
 export const EN_TIMELINE: TimelineStrings = {
   noData: "No data.",
+  timelineFallback: (index, kind) => (kind === "span" ? `Span ${index}` : `Event ${index}`),
   spanAt: (label, startLabel, endLabel, duration) =>
     `${label}: ${startLabel} to ${endLabel} — ${duration}.`,
   eventAt: (label, atLabel) => `${label}: ${atLabel}.`,

@@ -4,6 +4,7 @@
 // shared time scale — never per-row normalized; the only distortion is a 1-unit
 // floor for zero-duration spans. 2-dp.
 import { round2 } from "../../core/types.js";
+import { minOf } from "../../core/scale.js";
 
 export interface Span {
   label: string;
@@ -70,7 +71,11 @@ export function criticalPath(data: readonly Span[]): boolean[] {
   if (root < 0) root = 0;
 
   let cur = root;
-  while (cur >= 0) {
+  // `onPath` doubles as the visited set: a `parent` graph with a cycle (a span
+  // parented to itself, or any 2-cycle) otherwise walks forever and hangs the
+  // tab. Spans are caller data, so the cycle is an input we must survive, not
+  // an invariant we can assume.
+  while (cur >= 0 && !onPath[cur]) {
     onPath[cur] = true;
     const kids = children[cur]!;
     if (kids.length === 0) break;
@@ -121,7 +126,12 @@ export function traceFoldGeometry(opts: {
     minStart = 0;
     maxEnd = 1;
   }
-  const total = maxEnd - minStart || 1;
+  // The span is a DIVISOR for every x. Finite starts and durations can still
+  // sum past 1e308, and `Infinity / Infinity` is NaN — which reaches the
+  // emitted width and the span disappears. Collapse an unrepresentable trace
+  // to a unit span so the rows still draw in order.
+  const rawTotal = maxEnd - minStart;
+  const total = Number.isFinite(rawTotal) && rawTotal > 0 ? rawTotal : 1;
 
   // compact depth rows (gaps compacted)
   const depths = [...new Set(spans.map((s) => s.depth))].sort((a, b) => a - b);
@@ -135,7 +145,7 @@ export function traceFoldGeometry(opts: {
   // "longest" excludes the top depth level — a root span trivially spans the
   // whole trace, so it is never the interesting answer (fall back to all spans
   // only when the trace is flat / single-level).
-  const minDepth = Math.min(...spans.map((s) => s.depth));
+  const minDepth = minOf(spans.map((s) => s.depth));
   const hasSubLevel = spans.some((s) => s.depth > minDepth);
 
   let longest: { label: string; duration: number; critical: boolean } | null = null;
@@ -148,7 +158,13 @@ export function traceFoldGeometry(opts: {
     // absent rather than as a zero-duration sliver at time 0.
     const placed = Number.isFinite(s.start);
     const x = placed ? xOf(s.start) : round2(pad);
-    const w = placed ? round2(Math.max(1, xOf(s.start + dur) - x)) : 0;
+    // `start + dur` can overflow to Infinity even when both are finite, and an
+    // infinite end makes `xOf` (and the width) infinite. Clamp the end to the
+    // plot's right edge — a span that runs past the trace is drawn as running
+    // to the end of it, which is what it means.
+    const end = Math.min(s.start + dur, maxEnd);
+    const right = placed && Number.isFinite(end) ? xOf(end) : x;
+    const w = placed ? round2(Math.max(1, right - x)) : 0;
     const row = rowOf.get(s.depth) ?? 0;
     const eligible = placed && (!hasSubLevel || s.depth > minDepth);
     if (eligible && (!longest || dur > longest.duration))

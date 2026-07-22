@@ -12,6 +12,7 @@ import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry, type DataDiffGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf } from "../../core/scale.js";
 
 const signed = (n: number, fmt: (v: number) => string): string =>
   `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
@@ -101,7 +102,12 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   // the row pitch to never touch its neighbour; only draw tags with real room
   const showTags = labels && rowH >= 10;
   const tagFont = showTags ? Math.max(5, Math.min(FONT, Math.floor(rowH * 0.5))) : FONT;
-  const gutterCh = showTags ? Math.max(...data.map((d) => d.key.length), 0) : 0;
+  const gutterCh = showTags
+    ? maxOf(
+        data.map((d) => d.key.length),
+        0,
+      )
+    : 0;
 
   // A stack of diverging rows has no floor — added/removed grow sideways from a
   // shared vertical axis — so the row band centres on the cap band. It is the

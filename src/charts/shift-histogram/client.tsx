@@ -14,6 +14,7 @@ import {
   nav1d,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -241,10 +242,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
       {readout && b && geo ? (
         <span
           className="mc-shift-readout mc-spark-readout"
-          style={{
-            left: `${((b.x + b.width / 2) / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(b.x + b.width / 2, geo.totalWidth)}
         >
           {`${fmt(b.x0)}–${fmt(b.x1)}: ${pct(b.beforeShare)} / ${pct(b.afterShare)}`}
         </span>

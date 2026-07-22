@@ -268,6 +268,15 @@
     font-size: calc(var(--mc-label-size) * min(1.25, var(--mc-density)));
     fill: var(--mc-stroke);
   }
+  /* Labels seated ON a solid mark (HeatCell upper steps, TimeInRange zones,
+     EventTimeline spans) take the on-fill ink. A stylesheet rule, not an SVG
+     `fill` attribute — the `.mc-root text` fill above is a CSS declaration and
+     outranks any presentation attribute, which silently kept these labels in
+     stroke ink (dark-on-dark on hot cells). Placed after it so source order
+     decides between the two zero-specificity rules. */
+  :where(.mc-root text[data-mc-on-fill]) {
+    fill: var(--mc-on-fill);
+  }
   /* small-multiples wrapper — layout-neutral by default */
   :where(.mc-group) {
     display: inline-flex;
@@ -584,6 +593,18 @@
     fill: var(--mc-accent);
     stroke: none;
   }
+  /* calibrated VALUE cells (HeatCell/HeatStrip): mix accent into the band per
+     discrete step — the unitless --mc-cell-mix (0–100) is set inline by the
+     chart. A mix ramp stays distinct on both light and dark surfaces where an
+     opacity-only ramp collapses once --mc-accent is already dark. The fill
+     lives HERE (not inline) so the forced-colors mapping below can override. */
+  :where(.mc-root [data-mc-cell-mix]) {
+    fill: color-mix(
+      in oklab,
+      var(--mc-cell-color, var(--mc-accent)) calc(var(--mc-cell-mix, 100) * 1%),
+      var(--mc-band)
+    );
+  }
   /* IconArray empty unit + CoverageStrip gap — a "measured nothing here" slot,
      never a void: faint band fill + hairline neutral outline. Static, so the
      color lives here (was inline) to earn a forced-colors mapping below. The
@@ -730,6 +751,17 @@
     outline-offset: 1px;
   }
   /* @mc-chart-end */
+
+  /* Interactive hosts scrub on pointer drag. Claim the HORIZONTAL gesture so a
+     touch drag reveals the readout chip the same way mouse hover does — without
+     this, the page steals the gesture and labels never appear on phones. But
+     keep vertical panning (and pinch-zoom) with the browser: these are
+     word-sized marks inside scrolling pages, and `touch-action: none` would
+     trap the whole page scroll under every chart a finger lands on. A vertical
+     drag pans the page and fires pointercancel; the picker clears on it. */
+  :where([data-mc-host]) {
+    touch-action: pan-y pinch-zoom;
+  }
 
   /* MinimapStrip is a range slider, not an image: it drags a window along the
      series, so it advertises a horizontal-resize cursor and opts out of the
@@ -949,6 +981,13 @@
     :where(.mc-root [data-mc-ink="cell"]) {
       forced-color-adjust: none;
       fill: Highlight;
+    }
+    /* mix-ramp cells (HeatCell/HeatStrip): same system accent; the discrete
+       level survives as fill-opacity, driven by the same unitless mix var. */
+    :where(.mc-root [data-mc-cell-mix]) {
+      forced-color-adjust: none;
+      fill: Highlight;
+      fill-opacity: calc(var(--mc-cell-mix, 100) / 100);
     }
     /* empty/gap slots read as EMPTY (not filled): system background + a system
        outline, so they stay visibly distinct from filled units. (The filled

@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -182,13 +183,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
       </StaticFunnel>
       <LiveRegion>{announced}</LiveRegion>
       {readout && st && stDatum && isFiniteValue(stDatum.value) ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${((st.x + st.w / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(st.x + st.w / 2, width)}>
           {`${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`}
         </span>
       ) : null}

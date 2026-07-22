@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -249,7 +250,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       {readout && p ? (
         <span
           className="mc-burn-readout mc-spark-readout"
-          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
         >
           {p.actual !== null
             ? `${fmt(p.actual)}${p.plan !== null ? ` / ${fmt(p.plan)}` : ""} ${workWord}`

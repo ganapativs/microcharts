@@ -10,7 +10,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { heartbeatGeometry } from "./geometry.js";
+import { DEFAULT_WINDOW, heartbeatGeometry } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
   /** Event timestamps (ms). Not a value series. */
@@ -60,7 +60,13 @@ export function heartbeatSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { window: win = 60_000, strings = EN_HEARTBEAT } = opts;
+  const { strings = EN_HEARTBEAT } = opts;
+  // Same fallback the geometry applies, so the spoken window can never disagree
+  // with the drawn one — and "in the last NaN minutes" never reaches a reader.
+  const win =
+    Number.isFinite(opts.window) && (opts.window as number) > 0
+      ? (opts.window as number)
+      : DEFAULT_WINDOW;
   const now = resolveNow(events, opts.now);
   const geo = heartbeatGeometry({
     events,

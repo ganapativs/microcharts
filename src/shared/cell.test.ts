@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { stepOpacity, valueStepOpacity, stepIndex, cellMetrics } from "./cell.js";
+import { stepOpacity, valueStepOpacity, valueStepMixPct, stepIndex, cellMetrics } from "./cell.js";
 
 describe("stepOpacity", () => {
   it("level 0 is the faint empty track", () => {
@@ -16,6 +16,16 @@ describe("stepOpacity", () => {
     expect(stepOpacity(0, 1)).toBe(0.06);
     expect(stepOpacity(1, 1)).toBe(1);
     expect(Number.isFinite(stepOpacity(1, 1))).toBe(true);
+  });
+});
+
+describe("valueStepMixPct", () => {
+  it("steps <= 1 → top of the capped ramp", () => {
+    expect(valueStepMixPct(0, 1)).toBe(82);
+  });
+  it("spreads 28 → 100 across steps", () => {
+    expect(valueStepMixPct(0, 5)).toBe(28);
+    expect(valueStepMixPct(4, 5)).toBe(82);
   });
 });
 

@@ -13,6 +13,7 @@ import {
   nav1d,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -256,7 +257,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
       {readout && shown !== null && geo ? (
         <span
           className="mc-change-point-readout mc-spark-readout"
-          style={{ left: `${(px / totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(px, totalWidth)}
         >
           {readoutText}
         </span>

@@ -36,8 +36,11 @@ describe("interactive <QuantileDots>", () => {
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
       .toMatch(/^\d+ in 20 above \d+/);
-    // Idle HTML odds hide while probing (chip carries the readout).
-    expect(wrap.querySelector(".mc-quantile-dots-odds")).toBeNull();
+    // Idle HTML odds stay mounted (visibility:hidden) so the plate never shifts.
+    expect(wrap.querySelector(".mc-quantile-dots-odds")).not.toBeNull();
+    expect(getComputedStyle(wrap.querySelector(".mc-quantile-dots-odds")!).visibility).toBe(
+      "hidden",
+    );
   });
 
   it("viewBox width stays at the plot width while probing (no gutter reflow)", async () => {
@@ -85,6 +88,9 @@ describe("interactive <QuantileDots>", () => {
     const vbWidth = Number(svg.getAttribute("viewBox")!.split(" ")[2]);
     const line = wrap.querySelector('line[data-mc-ink="muted"]') as SVGLineElement;
     const lineFrac = Number(line.getAttribute("x1")) / vbWidth;
+    // Compare the AUTHORED anchor, not a measured box: this spec does not load
+    // styles.css, so the chip has no `position: absolute` here and its rect
+    // would describe normal flow rather than where it paints in a product.
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
     const chipFrac = parseFloat(chip.style.left) / 100;
     expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.02);

@@ -75,7 +75,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
       }}
     >
       <StaticStatusDot {...rest} strings={strings} summary={false} />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

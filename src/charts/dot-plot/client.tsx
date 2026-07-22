@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -18,7 +19,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import { miniBarSummary } from "../mini-bar/index.js";
-import { dotPlotGeometry } from "./geometry.js";
+import { dotPlotGeometry, dotPlotFontSize, dotPlotLabelChars } from "./geometry.js";
 import { DotPlot as StaticDotPlot, type DotPlotProps } from "./index.js";
 
 export interface InteractiveDotPlotProps extends DotPlotProps, PickerProps {
@@ -52,7 +53,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const height = props.height ?? Math.max(16, data.length * 8);
+  const height = props.height ?? Math.max(16, data.length * 9);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Dots settle onto the scale (the story). With `stem`, the stem line is the
@@ -61,17 +62,13 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
   // (No-op when stem is off — its default — since no stem lines exist.)
   useEntrance(hostRef, "settle", animate, { link: 'line[data-mc-ink="muted"]' });
 
-  const fontSize = 6;
+  const fontSize = dotPlotFontSize(height, data.length);
   // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
-  const maxLabelChars = useMemo(
-    () =>
-      Math.min(
-        6,
-        data.reduce((m, d) => Math.max(m, d.label.length), 0),
-      ),
-    [data],
-  );
+  const maxLabelChars = useMemo(() => {
+    const longest = data.reduce((m, d) => Math.max(m, d.label.length), 0);
+    return dotPlotLabelChars(width, fontSize, longest);
+  }, [data, width, fontSize]);
   const geo = useMemo(
     () =>
       dotPlotGeometry({
@@ -83,7 +80,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         fontSize,
         stem,
       }),
-    [width, height, data, domain, maxLabelChars, stem],
+    [width, height, data, domain, maxLabelChars, stem, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -226,10 +223,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
       shownRow.x !== null ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${(shownRow.x / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={rowReadoutStyle(shownRow.x, shownRow.y, width, height)}
         >
           {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>

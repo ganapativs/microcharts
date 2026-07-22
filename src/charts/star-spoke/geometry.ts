@@ -6,6 +6,9 @@
 import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 
+/** Default spoke domain, shared by both entries. */
+export const UNIT_DOMAIN: readonly [number, number] = [0, 1];
+
 export interface Spoke {
   x1: number;
   y1: number;

@@ -4,6 +4,7 @@
 import { divergingStack, type DivergingStack } from "../../core/stack.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { round2, type Value } from "../../core/types.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 interface LikertSegment {
   x: number;
@@ -55,14 +56,21 @@ export function likertStripGeometry(opts: {
 
   const x0 = gutterL;
   const x1 = width - gutterR;
-  // scale share-units (center 0, max extent ±max(neg+half, pos+half)) onto the
-  // plot symmetrically so the center line is always the geometric center
-  const maxExtent = Math.max(
-    ...stack.segments.map((s) => Math.max(Math.abs(s.x0), Math.abs(s.x1))),
-    0.5,
+  // Map the full signed span onto the plot. Neutral stays at data-zero (the
+  // center line), but an unequal poll no longer leaves empty plot on the short
+  // pole — the bar fills [x0, x1] and the center line shifts with the lean.
+  const dataMin = minOf(
+    stack.segments.map((s) => s.x0),
+    0,
   );
-  const centerX = round2((x0 + x1) / 2);
-  const scale = (x1 - x0) / 2 / maxExtent;
+  const dataMax = maxOf(
+    stack.segments.map((s) => s.x1),
+    0,
+  );
+  const dataSpan = Math.max(dataMax - dataMin, 1e-9);
+  const scale = (x1 - x0) / dataSpan;
+  const toX = (u: number) => round2(x0 + (u - dataMin) * scale);
+  const centerX = toX(0);
 
   const n = values.length;
   const neutralIdx =
@@ -80,7 +88,7 @@ export function likertStripGeometry(opts: {
             : Math.ceil(s.index - n / 2 + 1);
     const maxDist = Math.max(1, Math.ceil(n / 2));
     return {
-      x: round2(centerX + s.x0 * scale),
+      x: toX(s.x0),
       width: round2((s.x1 - s.x0) * scale),
       level: s.index,
       side: s.side,

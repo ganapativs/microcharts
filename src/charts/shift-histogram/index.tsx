@@ -6,7 +6,7 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
@@ -16,7 +16,7 @@ import { resolveSummary } from "../../core/summary.js";
 /** Signed median shift string (sign in text). */
 export function shiftDelta(geo: ShiftHistogramGeometry, fmt: (n: number) => string): string {
   if (geo.shift === null) return "";
-  return geo.shift > 0 ? `+${fmt(geo.shift)}` : fmt(geo.shift);
+  return withPlus(geo.shift, fmt);
 }
 
 export function shiftSummary(

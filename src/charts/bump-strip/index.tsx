@@ -11,11 +11,12 @@ import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { bumpGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { minOf } from "../../core/scale.js";
 
 export function bumpSummary(ranks: readonly Value[], strings: FlowStrings): string {
   const clean = ranks.filter((r): r is number => isFiniteValue(r) && r >= 1).map(Math.round);
   if (clean.length === 0) return strings.noData;
-  return strings.rankRun(clean[0]!, clean.at(-1)!, Math.min(...clean), ranks.length);
+  return strings.rankRun(clean[0]!, clean.at(-1)!, minOf(clean), ranks.length);
 }
 
 export interface BumpStripProps {

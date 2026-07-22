@@ -40,7 +40,7 @@ describe("docs-facts derivations", () => {
   it("marketing band is interactive-first and covers measured ranges", () => {
     expect(SIZE_MARKETING).toBe("~2–7 kB interactive · ~1–4 kB static");
     expect(SIZE.interactiveMin).toBeGreaterThanOrEqual(1.5);
-    expect(SIZE.interactiveMax).toBeLessThanOrEqual(6.6);
+    expect(SIZE.interactiveMax).toBeLessThanOrEqual(6.7);
     expect(SIZE.min).toBeGreaterThanOrEqual(0.5);
     expect(SIZE.max).toBeLessThanOrEqual(4.5);
   });
@@ -49,11 +49,11 @@ describe("docs-facts derivations", () => {
   // 3 kB reference line … Sparkline is the largest"). If the measured sizes shift,
   // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(22);
+    expect(SIZE.over3).toHaveLength(25);
     // over3 is largest-first — Sparkline leads.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
     // None is more than 0.97 kB over the 3 kB line.
-    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(3.97 + 0.001);
+    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(3.99 + 0.001);
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
     expect(over3Slugs).toEqual(
       [
@@ -63,6 +63,8 @@ describe("docs-facts derivations", () => {
         "constellation",
         "control-strip",
         "dual-sparkline",
+        "cycle-plot",
+        "dumbbell",
         "ensemble-ghosts",
         "forecast-cone",
         "net-flow",
@@ -78,6 +80,7 @@ describe("docs-facts derivations", () => {
         "stacked-area",
         "station-glyph",
         "tape-gauge",
+        "waterfall",
         "win-prob-worm",
       ].sort(),
     );

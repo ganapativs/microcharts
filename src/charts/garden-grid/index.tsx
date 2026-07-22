@@ -9,6 +9,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { isFiniteValue, type EmptyCellStyle, type Value } from "../../core/types.js";
 import { gardenGridGeometry } from "./geometry.js";
+import { maxOf } from "../../core/scale.js";
 
 export interface GardenGridProps {
   data: readonly Value[];
@@ -48,7 +49,7 @@ export function gardenGridSummary(
   const { unit = "periods", strings = EN_GARDEN, format, locale } = opts;
   const finite = data.filter(isFiniteValue);
   if (finite.length === 0) return strings.noData;
-  const peak = Math.max(...finite);
+  const peak = maxOf(finite);
   const active = finite.filter((v) => v > 0).length;
   return strings.gardenGrid(data.length, unit, makeFormatter(format, locale)(peak), active);
 }

@@ -109,6 +109,46 @@ export function wrap(
   };
 }
 
+/** The chip's `left`, as a percentage of the plot width.
+ *
+ *  Deliberately NOT clamped inward. The chip points AT the unit it reads out,
+ *  so any inset decouples it from its mark: a fixed 18%/82% clamp moved the
+ *  chip ~100 px off the crosshair on a figure-width chart, and an em-based one
+ *  moved it 22% of the box on a word-sized chart (both measured). These marks
+ *  are word-sized by design — a chip is often wider than the chart it annotates
+ *  — so a chip that overhangs the plot edge is the correct, honest rendering,
+ *  and chip TEXT length is what gets capped instead (readout-containment
+ *  tests). `.mc-spark-readout` floats above the mark and never affects layout. */
+function readoutLeft(x: number, width: number): string {
+  return `${(x / Math.max(1, width)) * 100}%`;
+}
+
+/** Crosshair chip: centred on the mark's x. */
+export function crosshairReadoutStyle(x: number, width: number): CSSProperties {
+  return {
+    left: readoutLeft(x, width),
+    transform: "translateX(-50%)",
+  };
+}
+
+/** Row-anchored chip: sits just above the active row, not at the plate top.
+ *  Multi-row charts (DotPlot, Dumbbell, horizontal bars) must use this — the
+ *  default `.mc-spark-readout` `bottom: 100%` floats the chip above the whole
+ *  chart and reads as a jump/flicker when the active row changes. */
+export function rowReadoutStyle(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): CSSProperties {
+  return {
+    left: readoutLeft(x, width),
+    top: `${(y / Math.max(1, height)) * 100}%`,
+    bottom: "auto",
+    transform: "translate(-50%, calc(-100% - 0.3em))",
+  };
+}
+
 /**
  * Naming attributes for an interactive wrapper, given its resolved name.
  *
@@ -208,6 +248,7 @@ export interface Picker {
     onPointerDown: (e: PointerEvent<HTMLElement>) => void;
     onPointerMove: (e: PointerEvent<HTMLElement>) => void;
     onPointerUp: (e: PointerEvent<HTMLElement>) => void;
+    onPointerCancel: (e: PointerEvent<HTMLElement>) => void;
     onPointerLeave: () => void;
     onClick: (e: MouseEvent<HTMLElement>) => void;
     onKeyDown: (e: KeyboardEvent) => void;
@@ -256,12 +297,15 @@ export function navOrder(order: readonly number[], cur: number, key: string): nu
 
 /**
  * The one interaction kernel behind every `…/interactive` entry: pointer scrub
- * (mouse hover + touch drag), touch tap-to-pin, roving keyboard (←/→/Home/End,
- * Enter/Space to select, Escape to clear), and controlled/uncontrolled
- * selection — all firing the shared `onActive`/`onSelect` contract. The chart
- * supplies only its pure `locate`/`datum`/`step`; overlay marks are still
- * rendered by the client from the returned `active`/`selected`, so the visual
- * cannot drift from the composed static component.
+ * (mouse hover + touch/pen drag with pointer capture), touch tap-to-pin, roving
+ * keyboard (←/→/Home/End, Enter/Space to select, Escape to clear), and
+ * controlled/uncontrolled selection — all firing the shared `onActive`/`onSelect`
+ * contract. The chart supplies only its pure `locate`/`datum`/`step`; overlay
+ * marks are still rendered by the client from the returned `active`/`selected`,
+ * so the visual cannot drift from the composed static component.
+ *
+ * Touch: drag with the finger down to scrub (readout follows); lift clears the
+ * transient highlight; a short tap pins via `onSelect` so the value stays.
  */
 export function useActivePicker(opts: PickerOptions): Picker {
   const { count, width, height, locate, datum, step, onActive, onSelect } = opts;
@@ -321,11 +365,47 @@ export function useActivePicker(opts: PickerOptions): Picker {
   };
 
   const bind: Picker["bind"] = {
-    onPointerDown: (e) => (down.current = [e.clientX, e.clientY]),
+    onPointerDown: (e) => {
+      down.current = [e.clientX, e.clientY];
+      // Touch/pen: capture so a drag that leaves the mark still scrubs, and
+      // light the unit under the finger immediately (no hover prelude).
+      if (e.pointerType !== "mouse") {
+        try {
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } catch {
+          /* setPointerCapture can throw if the element isn't in the tree */
+        }
+        act(at(e));
+      }
+    },
     onPointerMove: (e) => act(at(e)),
     // Touch/pen have no hover: drop the transient active on lift so a pinned
     // selection is what stays visible. Mouse keeps its hover.
-    onPointerUp: (e) => e.pointerType !== "mouse" && act(null),
+    onPointerUp: (e) => {
+      if (e.pointerType === "mouse") return;
+      try {
+        if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        /* ignore */
+      }
+      act(null);
+    },
+    // Hosts allow vertical panning (`touch-action: pan-y`): when the browser
+    // takes the gesture over, the stream ends in pointercancel, not pointerup —
+    // clear like a lift or the last-touched unit stays lit under the scroll.
+    onPointerCancel: (e) => {
+      down.current = null;
+      try {
+        if (e.currentTarget.hasPointerCapture?.(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+      } catch {
+        /* ignore */
+      }
+      act(null);
+    },
     onPointerLeave: () => {
       svgRef.current = null;
       act(null);

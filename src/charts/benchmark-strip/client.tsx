@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -185,10 +186,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
       {readout && edge ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${(edge.x / (geo!.totalWidth || width)) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(edge.x, geo!.totalWidth || width)}
         >
           {`${edge.name} ${fmt(edge.value)}`}
         </span>

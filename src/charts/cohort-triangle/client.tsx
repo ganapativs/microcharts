@@ -13,6 +13,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import {
@@ -229,13 +230,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
       </StaticCohortTriangle>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${((shownCell.x + cell / 2) / w) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownCell.x + cell / 2, w)}>
           {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}

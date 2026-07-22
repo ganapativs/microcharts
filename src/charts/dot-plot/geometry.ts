@@ -4,7 +4,7 @@
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { textGutterProse } from "../../core/labels.js";
+import { proseCharsThatFit, textGutterProse } from "../../core/labels.js";
 
 interface DotRow {
   /** Row center on the category axis. */
@@ -29,6 +29,27 @@ export interface DotPlotGeometry {
   x0: number;
   x1: number;
   fontSize: number;
+}
+
+/** Row-pitch-aware type size — denser than `labelFont` so micro DotPlots keep
+ *  category labels, taller plates still climb to the shared 11-unit ceiling. */
+export function dotPlotFontSize(height: number, rows: number): number {
+  const pitch = rows > 0 ? height / rows : height;
+  // Progressive floor: 7 when rows are roomy (≥9), else 6 — never lower. Below
+  // 6 units the type is illegible; dense plates CULL via showCategories
+  // instead (shrinking the type is not an escape hatch — see labelFitsBand).
+  const floor = pitch >= 9 ? 7 : 6;
+  return Math.min(11, Math.max(floor, Math.round(pitch * 0.48)));
+}
+
+/** How many category characters the left gutter can afford at this width.
+ *  The budget must use the SAME per-char estimate the gutter is reserved at
+ *  (`textGutterProse`, via `proseCharsThatFit`) — an optimistic divisor here
+ *  hands the reservation over half the plot at mid widths. Floor of 6 keeps
+ *  the micro default usable; cap of 14 stops labels from eating a figure. */
+export function dotPlotLabelChars(width: number, fontSize: number, longest: number): number {
+  const budget = Math.max(6, proseCharsThatFit(width * 0.32, fontSize, 3));
+  return Math.min(14, budget, Math.max(1, longest));
 }
 
 export function dotPlotGeometry(opts: {

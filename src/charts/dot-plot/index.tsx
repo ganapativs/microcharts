@@ -8,7 +8,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
-import { dotPlotGeometry, truncateLabel } from "./geometry.js";
+import { dotPlotGeometry, truncateLabel, dotPlotFontSize, dotPlotLabelChars } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 import { miniBarSummary } from "../mini-bar/index.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -58,17 +58,15 @@ export function DotPlot(props: DotPlotProps): ReactNode {
     style,
     children,
   } = props;
-  const height = props.height ?? Math.max(16, data.length * 8);
+  const height = props.height ?? Math.max(16, data.length * 9);
 
   if (data.length > 7) {
     devWarn(`<DotPlot> ${data.length} rows — past 7 the rows blur (documented cap).`);
   }
 
-  const fontSize = 6;
-  const maxLabelChars = Math.min(
-    6,
-    data.reduce((m, d) => Math.max(m, d.label.length), 0),
-  );
+  const fontSize = dotPlotFontSize(height, data.length);
+  const longest = data.reduce((m, d) => Math.max(m, d.label.length), 0);
+  const maxLabelChars = dotPlotLabelChars(width, fontSize, longest);
   const geo = dotPlotGeometry({
     width,
     height,
@@ -141,7 +139,7 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                 textAnchor="end"
                 data-mc-ink="label"
               >
-                {truncateLabel(d.label)}
+                {truncateLabel(d.label, maxLabelChars)}
               </text>
             ) : null}
             {showValues && isFiniteValue(d.value)

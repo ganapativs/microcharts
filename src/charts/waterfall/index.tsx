@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
@@ -33,7 +33,7 @@ export function waterfallSummary(
     fmt(open),
     fmt(end),
     deltas.length,
-    `+${fmt(gains)}`,
+    withPlus(gains, fmt),
     `−${fmt(Math.abs(losses))}`,
   );
 }

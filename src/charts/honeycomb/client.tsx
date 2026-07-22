@@ -233,7 +233,9 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticHoneycomb>
-      {live ? <LiveRegion>{shown === null ? announced : cellSpoken}</LiveRegion> : null}
+      <LiveRegion>
+        {live && props.summary !== false ? (shown === null ? announced : cellSpoken) : ""}
+      </LiveRegion>
       {showChip && (hover || shown !== null) ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {shown === null ? readout : cellReadout}

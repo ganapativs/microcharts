@@ -23,9 +23,9 @@ import {
   type VolumeProfileProps,
 } from "./index.js";
 
-// Bars are single merged `path`s (one per role), not `rect`s — the default
-// `sweep` selector only matches rects.
-const PROFILE_SELECTOR = 'path[data-mc-ink="bar"], path[data-mc-ink="accent"]';
+// Normal bars merge into one `path`; POC is a filled `rect` (accent on `path`
+// is stroke-only in styles.css — same contract as Progress / SparkBar fills).
+const PROFILE_SELECTOR = 'path[data-mc-ink="bar"], rect[data-mc-ink="accent"]';
 
 export interface InteractiveVolumeProfileProps extends VolumeProfileProps, PickerProps {
   /**
