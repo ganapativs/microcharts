@@ -1,0 +1,1030 @@
+/* ============================================================================
+   DISPATCH — an editorial specimen for @microcharts/react
+   ----------------------------------------------------------------------------
+   A high-end print magazine on warm paper stock. Charts sit as typographic
+   marks on the baseline; the article is the star. One second ink (madder red),
+   hairline rules, a real reading serif, a didone display voice, letterpress
+   restraint. Committed to LIGHT — a magazine is one paper, not two.
+   ============================================================================ */
+
+/* --- TYPE TOKENS ---------------------------------------------------------- */
+:root {
+  /* Three voices. Bodoni Moda is the didone display (masthead, headlines,
+     numerals, drop cap). Literata is the reading serif. Hanken Grotesk is the
+     grotesque used for department labels, folios, captions — and, crucially,
+     for the chart SVG text so inline marks never inherit a serif. */
+  --font-display: "Bodoni Moda", "Bodoni 72", "Didot", "Times New Roman", serif;
+  --font-serif:
+    "Literata", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* THE FONT TRAP — pin the microcharts font token to the grotesque so every
+     label, value and axis figure stays clean sans while the body sets serif. */
+  --mc-font: var(--font-sans);
+  --mc-font-numeric: var(--font-sans);
+
+  /* --- CHART TOKEN PINNING (the invisible-stroke fix) ---------------------
+     @microcharts flips --mc-stroke to near-white under prefers-color-scheme:
+     dark via a zero-specificity :where(:root). Because this page commits to
+     warm paper in every OS scheme, we re-assert the light-appropriate chart
+     tokens here at :root (specificity 0,1,0) so that media query can never win
+     and strokes never vanish on a dark-OS machine. Semantic valence
+     (positive / negative) is preserved exactly; only accent is retuned. */
+  --mc-stroke: var(--ink);
+  --mc-positive: #0e7a5f; /* bluish-green — never recolored */
+  --mc-negative: #bd4b2d; /* vermillion — never recolored */
+  --mc-neutral: color-mix(in oklab, var(--ink) 45%, var(--paper));
+  --mc-accent: var(--accent); /* madder red, matches the page ink */
+  --mc-moon: #b8862b;
+  --mc-cat-1: #b06a2c;
+  --mc-cat-2: #3f7d8c;
+  --mc-cat-3: #2e8c66;
+  --mc-cat-4: #7d5a86;
+  --mc-cat-5: #c2543a;
+  --mc-cat-6: #9c7a3f;
+
+  /* --- SPACE SCALE (4pt, semantic) --------------------------------------- */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Reading measure — the printed column. */
+  --measure: 65ch;
+}
+
+/* --- PAPER PALETTE (OKLCH, warm, no pure #fff/#000) ----------------------- */
+:root {
+  color-scheme: light;
+
+  /* Neutrals tinted toward the madder hue (~55) for subconscious cohesion. */
+  --paper: oklch(0.968 0.011 78); /* warm ivory press sheet */
+  --paper-edge: oklch(0.945 0.014 74); /* card / plate stock, one shade down */
+  --paper-sink: oklch(0.925 0.016 72); /* pressed-in wells */
+  --ink: oklch(0.255 0.017 55); /* warm near-black, the body ink */
+  --ink-soft: oklch(0.42 0.02 50); /* secondary text */
+  --ink-faint: oklch(0.575 0.019 55); /* labels, captions, folios */
+  --rule: oklch(0.86 0.02 68); /* hairline rules */
+  --rule-strong: oklch(0.6 0.025 55); /* the double rule under the nameplate */
+  --accent: oklch(0.47 0.132 32); /* MADDER RED — the one second ink */
+  --accent-deep: oklch(0.4 0.12 32); /* pressed accent (active states) */
+  --highlight: oklch(0.95 0.05 78); /* faint underlay for drop cap etc. */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  /* A whisper of paper tooth — two offset dot fields, near-invisible, that
+     keep the flat ivory from reading as a screen. */
+  background-image:
+    radial-gradient(oklch(0.5 0.02 55 / 0.02) 0.5px, transparent 0.5px),
+    radial-gradient(oklch(0.5 0.02 55 / 0.018) 0.5px, transparent 0.5px);
+  background-size:
+    22px 22px,
+    22px 22px;
+  background-position:
+    0 0,
+    11px 11px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 19px;
+  line-height: 1.62;
+  font-feature-settings:
+    "kern",
+    "liga",
+    "onum" 1,
+    "pnum" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.page {
+  min-height: 100vh;
+}
+
+::selection {
+  background: oklch(0.47 0.132 32 / 0.16);
+}
+
+/* ============================================================================
+   MASTHEAD
+   ============================================================================ */
+.masthead {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 28px) var(--space-lg) 0;
+}
+
+/* Top folio: edition · ornament · dateline. Grotesque small-caps, tabular. */
+.masthead__bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-md);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+
+.masthead__bar > :last-child {
+  text-align: right;
+}
+
+.masthead__ornament {
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em; /* optical: the letter-spacing hangs right */
+}
+
+.masthead__nameplate {
+  text-align: center;
+  padding: clamp(14px, 2.6vw, 24px) 0 var(--space-sm);
+  border-bottom: 3px double var(--rule-strong);
+}
+
+.masthead__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(56px, 13vw, 116px);
+  font-weight: 800;
+  font-optical-sizing: auto;
+  letter-spacing: -0.012em;
+  line-height: 1.05;
+  color: var(--ink);
+  padding-bottom: 0.06em;
+}
+
+.masthead__tagline {
+  margin: var(--space-lg) 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15.5px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.masthead__nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 clamp(6px, 2.4vw, 22px);
+  margin-top: var(--space-sm);
+}
+
+.tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: var(--space-sm) var(--space-2xs) 10px;
+  position: relative;
+  transition: color 0.18s ease;
+}
+
+/* The active/hover mark is a printed underline that grows from the center —
+   not a pill. A pill reads app-chrome; an underline reads editorial. */
+.tab::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 4px;
+  height: 1.5px;
+  background: var(--accent);
+  transition:
+    left 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    right 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab:hover::after {
+  left: 20%;
+  right: 20%;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.tab:active {
+  color: var(--accent-deep);
+}
+
+.tab--active {
+  color: var(--ink);
+}
+
+.tab--active::after {
+  left: 6%;
+  right: 6%;
+}
+
+/* ============================================================================
+   ARTICLE
+   ============================================================================ */
+.article {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 56px) var(--space-lg) var(--space-4xl);
+}
+
+.article__kicker {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+/* a short madder rule leading the kicker, like a printed section mark */
+.article__kicker::before {
+  content: "";
+  width: 26px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.article__headline {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6.4vw, 62px);
+  font-weight: 700;
+  font-optical-sizing: auto;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-md);
+  text-wrap: balance;
+}
+
+.article__dek {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2.6vw, 24px);
+  line-height: 1.42;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 var(--space-lg);
+  max-width: 54ch;
+  text-wrap: pretty;
+}
+
+.article__byline {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--rule);
+}
+
+.article__author {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.article p {
+  margin: 0 0 var(--space-lg);
+  text-wrap: pretty;
+  hanging-punctuation: first last;
+}
+
+/* Drop cap in the display face — a raised, slightly overhung madder initial. */
+.article__lead::first-letter {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 4.6em;
+  line-height: 0.74;
+  font-weight: 700;
+  padding: 0.06em 0.09em 0 0;
+  margin-left: -0.04em; /* optical hang into the margin */
+  color: var(--accent);
+}
+
+/* Pull quote — NO side stripe. A centered display aside, hairline-ruled top
+   and bottom, with a hanging madder open-quote as the ornament. */
+.pullquote {
+  margin: var(--space-2xl) auto;
+  max-width: 34ch;
+  padding: var(--space-lg) 0 var(--space-md);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.6vw, 31px);
+  font-weight: 600;
+  font-optical-sizing: auto;
+  line-height: 1.24;
+  font-style: italic;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  position: relative;
+}
+
+.pullquote::before {
+  content: "\201C";
+  display: block;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: 1.9em;
+  line-height: 0.6;
+  color: var(--accent);
+  margin-bottom: 0.08em;
+}
+
+.article__end {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+.article__end::after {
+  content: " \25A0";
+  font-style: normal;
+  font-size: 0.8em;
+  color: var(--accent);
+  margin-left: 0.15em;
+}
+
+/* --- INLINE CHARTS ------------------------------------------------------- */
+/* SVG marks only. Leave <Delta> bare — it owns baseline (styles.css). */
+.article .mc-inline {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -0.18em;
+  margin: 0 0.12em;
+  padding: 0;
+  border: 0;
+  background: none;
+  --mc-inline-nudge: 0;
+}
+.article .mc-inline .mc-root,
+.article .mc-inline [data-mc-seated] {
+  translate: none;
+}
+.article .mc-delta-live {
+  font-size: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.article .mc-delta {
+  font-size: 1em;
+  font-weight: 600;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* ============================================================================
+   FIGURES — plate + hairline-ruled caption
+   ============================================================================ */
+.figure {
+  margin: var(--space-2xl) 0;
+  padding: 0;
+}
+
+.figure__plate {
+  padding: clamp(14px, 2.4vw, 22px);
+  background: var(--paper-edge);
+  border: 1px solid var(--rule);
+}
+
+.figure__plate > * {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+.figure__plate svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* wide figure breaks the reading measure for the big series chart */
+.figure--wide {
+  margin-left: calc((100% - min(94vw, 800px)) / 2);
+  margin-right: calc((100% - min(94vw, 800px)) / 2);
+  width: min(94vw, 800px);
+}
+
+.figure figcaption {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  margin-top: var(--space-sm);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+  max-width: 60ch;
+}
+
+/* the "Fig. N —" lead-in reads as a printed caption label */
+.figure figcaption b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.figure--wide figcaption {
+  margin-inline: auto;
+}
+
+/* ============================================================================
+   CHARTS INDEX — a type specimen, grouped by role, not a uniform card grid
+   ============================================================================ */
+.index {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 56px) var(--space-lg) var(--space-4xl);
+}
+
+.index__title {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 5.4vw, 50px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+  margin: 0 0 var(--space-sm);
+}
+
+.index__intro {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 58ch;
+  margin: 0 0 var(--space-2xl);
+}
+
+/* A role group: a small-caps header on a hairline, then its specimens. */
+.index__group {
+  margin-top: var(--space-2xl);
+}
+
+.index__group-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.index__group-title {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+
+.index__group-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-faint);
+}
+
+.index__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px; /* hairline seams between specimen cells */
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.card {
+  background: var(--paper-edge);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.2s ease;
+}
+
+.card:hover {
+  background: var(--paper);
+}
+
+/* figure specimens want the full measure — span every column so an all-figure
+   register never strands an empty trailing column. */
+.card--figure {
+  grid-column: 1 / -1;
+}
+
+.card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.card__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.card__role {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.card__demo {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: var(--space-xs) 0 var(--space-md);
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.card__demo .mc-inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  margin: 0 0.12em;
+  vertical-align: -0.18em;
+}
+.card__demo .mc-delta,
+.card__demo .mc-delta-live {
+  font-size: 1em;
+  font-weight: 600;
+  background: none;
+  padding: 0;
+  border: 0;
+}
+.card__demo > * {
+  max-width: 100%;
+}
+.card--figure .card__demo > * {
+  width: 100%;
+}
+.card__demo svg {
+  max-width: 100%;
+  height: auto;
+}
+.card--figure .card__demo svg {
+  width: 100%;
+}
+
+.card--inline .card__demo {
+  justify-content: flex-start;
+}
+
+.card--glyph .card__demo {
+  justify-content: center;
+  min-height: 96px;
+}
+
+.card--glyph .card__demo svg {
+  width: auto;
+  max-width: 100%;
+}
+
+.card__caption {
+  margin: 0;
+  margin-top: auto;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__caption code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.85em;
+  color: var(--ink-soft);
+}
+
+/* --- OUTPUT-CONTEXT SPECIMENS — print & e-ink token bundles, side by side -- */
+.specimen-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.specimen {
+  padding: var(--space-lg);
+  background: var(--paper-edge);
+}
+
+/* e-ink is genuinely paper-white, unlike the warm ivory page — it's the one
+   specimen meant to simulate a physical grayscale display, not print stock. */
+.specimen[data-mc-theme="eink"] {
+  background: #fff;
+}
+
+.specimen__label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: var(--space-sm);
+}
+
+.specimen__charts {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* ============================================================================
+   THE ALMANAC — a field ledger of glyph charts
+   ============================================================================ */
+.almanac {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 56px) var(--space-lg) var(--space-4xl);
+}
+
+.almanac__head {
+  max-width: 60ch;
+  margin: 0 auto var(--space-xs);
+  text-align: center;
+  padding-bottom: var(--space-lg);
+  border-bottom: 3px double var(--rule-strong);
+}
+
+.almanac__title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5.6vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+  margin: var(--space-2xs) 0 var(--space-sm);
+}
+
+.almanac__standfirst {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin: 0 auto;
+}
+
+.alm-section {
+  margin-top: var(--space-3xl);
+}
+
+.alm-section__head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-md);
+  align-items: baseline;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--rule);
+}
+
+.alm-section__index {
+  grid-row: 1 / 3;
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6.4vw, 56px);
+  font-weight: 600;
+  font-style: italic;
+  line-height: 0.9;
+  color: var(--accent);
+  padding-right: var(--space-2xs);
+}
+
+.alm-section__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(23px, 3.6vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+}
+
+.alm-section__blurb {
+  grid-column: 2;
+  margin: var(--space-sm) 0 0;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  max-width: 68ch;
+}
+
+.alm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.alm-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--paper-edge);
+  padding: var(--space-md);
+  transition: background 0.2s ease;
+}
+
+.alm-entry:hover {
+  background: var(--paper);
+}
+
+.alm-entry__label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.alm-entry__glyph {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96px;
+  padding: var(--space-sm) 0;
+}
+
+.alm-entry__glyph svg {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.alm-entry__reading {
+  width: 100%;
+  margin: 0;
+  padding: var(--space-sm) 0 var(--space-md);
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.alm-entry__reading b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.alm-entry--wide {
+  grid-column: 1 / -1;
+}
+
+.alm-entry--wide .alm-entry__glyph {
+  min-height: 0;
+}
+
+.alm-entry--wide .alm-entry__reading {
+  max-width: 52ch;
+}
+
+/* ============================================================================
+   FOOTER — a printer's colophon
+   ============================================================================ */
+.site-footer {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-lg) var(--space-2xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  border-top: 3px double var(--rule-strong);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+.site-footer__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.site-footer code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+/* ============================================================================
+   MOTION — one orchestrated page-load, all gated on reduced-motion.
+   ============================================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  /* View swap: a quick paper-settle. */
+  .view {
+    animation: view-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes view-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Masthead lays itself up like a printed page: folio, then nameplate, then
+     the rest — a short staggered cascade on first paint. */
+  .masthead__bar,
+  .masthead__nameplate,
+  .masthead__nav {
+    opacity: 0;
+    animation: lift-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .masthead__bar {
+    animation-delay: 0.02s;
+  }
+  .masthead__nameplate {
+    animation-delay: 0.12s;
+  }
+  .masthead__nav {
+    animation-delay: 0.24s;
+  }
+
+  /* Article header stagger — kicker → headline → dek → byline → lead. */
+  .article__kicker,
+  .article__headline,
+  .article__dek,
+  .article__byline,
+  .article__lead,
+  .almanac__head {
+    opacity: 0;
+    animation: lift-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .article__kicker {
+    animation-delay: 0.06s;
+  }
+  .article__headline {
+    animation-delay: 0.13s;
+  }
+  .article__dek {
+    animation-delay: 0.22s;
+  }
+  .article__byline {
+    animation-delay: 0.31s;
+  }
+  .article__lead {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes lift-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Figures & almanac entries develop as they scroll into view. */
+  .figure,
+  .alm-entry {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .figure[data-revealed="true"],
+  .alm-entry[data-revealed="true"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   RESPONSIVE — verified at 375 / 768 / 1280. No horizontal scroll at 375.
+   ============================================================================ */
+
+/* Tablet: collapse the wide-figure bleed. */
+@media (max-width: 860px) {
+  .figure--wide {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+}
+
+/* Phone. */
+@media (max-width: 620px) {
+  body {
+    font-size: 18px;
+  }
+  .masthead,
+  .article,
+  .almanac,
+  .index,
+  .site-footer {
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+  }
+  .masthead__bar {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+  }
+  .card--figure {
+    grid-column: span 1;
+  }
+  .index__list {
+    grid-template-columns: 1fr;
+  }
+  .alm-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .alm-section__blurb {
+    font-size: 14px;
+  }
+}
+
+/* Narrow phone: two-up almanac, roomier tap targets, tighter folio. */
+@media (max-width: 400px) {
+  .masthead__bar {
+    font-size: 9.5px;
+    gap: var(--space-xs);
+  }
+  .alm-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .alm-entry--wide {
+    grid-column: 1 / -1;
+  }
+}

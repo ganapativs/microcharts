@@ -1,0 +1,8 @@
+# examples are an independent, manual visual-test harness — never commit installed deps or builds
+**/node_modules/
+**/dist/
+**/.next/
+**/out/
+**/.vite/
+**/package-lock.json
+*.log
