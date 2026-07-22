@@ -1147,8 +1147,6 @@
     "build": "tsdown && node scripts/gen-style-splits.mjs",
     "build:site": "pnpm --filter @microcharts/react build && pnpm --filter @microcharts/docs build",
     "gen:promo": "node scripts/gen-promo.mjs",
-    "figma:export": "node scripts/figma-export/generate.mjs",
-    "figma:export:full": "pnpm build && node scripts/figma-export/generate.mjs --qa",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
