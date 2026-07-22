@@ -14,6 +14,7 @@ import { scaleLinear, maxOf, minOf } from "../core/scale.js";
 import { criticalPath } from "../charts/trace-fold/geometry.js";
 import { tapeGaugeGeometry } from "../charts/tape-gauge/geometry.js";
 import { cycleGeometry } from "../charts/cycle-plot/geometry.js";
+import { foldedBandGeometry } from "../charts/folded-day-band/geometry.js";
 import { ActivityGrid } from "../charts/activity-grid/index.js";
 import { PictogramRow } from "../charts/pictogram-row/index.js";
 import { Progress } from "../charts/progress/index.js";
@@ -125,6 +126,30 @@ describe("an unbounded count saturates instead of exhausting memory", () => {
   it("Thermometer: a huge `ticks` renders a bounded number of ticks", () => {
     const markup = renderToStaticMarkup(<Thermometer value={40} ticks={1_000_000} />);
     expect(markup.match(/<line/g)?.length ?? 0).toBeLessThanOrEqual(220);
+  });
+
+  // Saturating is only half the job: every consumer of the count has to agree
+  // on the saturated value. Clamping the bucketing alone left the x scale
+  // dividing by the raw prop, which drew the whole fold as a sliver at x≈pad
+  // and reported a bin count that was never rendered.
+  it("FoldedDayBand: a huge `bins` still spans the plot and reports what it drew", () => {
+    const data = Array.from({ length: 200 }, (_, i) => ({ t: i, value: 10 + (i % 24) }));
+    const width = 120;
+    const geo = foldedBandGeometry({
+      data,
+      today: null,
+      period: 24,
+      bins: 1_000_000,
+      percentiles: [[25, 75]],
+      width,
+      height: 32,
+    });
+    expect(geo.bins).toBe(512);
+    expect(geo.binStats.length).toBeGreaterThan(0);
+    const xs = geo.binStats.map((s) => s.x);
+    // The populated bins reach the far side of the plot rather than piling up
+    // against the left edge.
+    expect(Math.max(...xs)).toBeGreaterThan(width * 0.5);
   });
 });
 

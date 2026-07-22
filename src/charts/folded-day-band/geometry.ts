@@ -47,8 +47,17 @@ export interface FoldedBandResult {
  *  unclamped `bins={1e9}` allocates an array per bin and exhausts memory. */
 const MAX_BINS = 512;
 
+/** The bin count actually used, resolved ONCE per geometry call. Every consumer
+ *  — the buckets, the x scale, the reported `bins` — must share it: clamping
+ *  inside the bucketing alone left the x scale dividing by the raw prop, which
+ *  collapsed the whole plot into a sliver at the left edge (and reported a bin
+ *  count that was never drawn). */
+function resolveBins(bins: number): number {
+  return Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.floor(bins))) : 1;
+}
+
 function foldBins(data: readonly TP[], period: number, bins: number): number[][] {
-  const n = Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.floor(bins))) : 1;
+  const n = resolveBins(bins);
   const buckets: number[][] = Array.from({ length: n }, () => []);
   for (const d of data) {
     if (!isFiniteValue(d.value) || !Number.isFinite(d.t)) continue;
@@ -70,7 +79,10 @@ export function foldedBandGeometry(opts: {
   width: number;
   height: number;
 }): FoldedBandResult {
-  const { data, today, period, bins, percentiles, width, height } = opts;
+  const { data, today, period, percentiles, width, height } = opts;
+  // Resolve the bin count once — the buckets, the x scale and the reported
+  // `bins` all have to agree (see `resolveBins`).
+  const bins = resolveBins(opts.bins);
   const pad = 1;
   const plotW = width - pad * 2;
   const plotH = height - pad * 2;
