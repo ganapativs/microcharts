@@ -8,7 +8,7 @@
 // zero. Coords 2-dp, integer viewBox.
 import { stepIndex } from "../../shared/cell.js";
 import { labelFont, textGutter } from "../../core/labels.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, maxOf } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 /** Empty track + four intensity steps — the shared stepped ramp calibration. */
@@ -105,11 +105,9 @@ export function cohortTriangleGeometry(
   // labels seat only when the row is tall enough to hold the floor font; the
   // gutter is then sized to the widest label (deterministic 0.62·em/char).
   const showLabels = opts.labels === true && nRows > 0 && cell >= fontSize + 0.8;
-  const gutter = showLabels
-    ? textGutter(Math.max(...rows.map((r) => r.label.length)), fontSize, 3)
-    : 0;
+  const gutter = showLabels ? textGutter(maxOf(rows.map((r) => r.label.length)), fontSize, 3) : 0;
 
-  const cols = nRows === 0 ? 0 : Math.min(MAX_AGES, Math.max(...rows.map((r) => r.values.length)));
+  const cols = nRows === 0 ? 0 : Math.min(MAX_AGES, maxOf(rows.map((r) => r.values.length)));
 
   const cells: CohortCell[] = [];
   rows.forEach((r, i) => {

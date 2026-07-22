@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -201,7 +202,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(pt.x / width) * 100}%`,
+            ...crosshairReadoutStyle(pt.x, width),
             top: `${(pt.y / height) * 100}%`,
             transform: "translate(-50%, -140%)",
             bottom: "auto",

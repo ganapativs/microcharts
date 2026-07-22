@@ -13,6 +13,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -219,7 +220,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
       {readout && rp ? (
         <span
           className="mc-queue-readout mc-spark-readout"
-          style={{ left: `${(rp.x / vbWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(rp.x, vbWidth)}
         >
           {`${fmt(rp.value)}${rp.above ? strings.queueAbove : ""}`}
         </span>

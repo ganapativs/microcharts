@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -179,10 +180,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
       {readout && shownSeg && shownDatum ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shownSeg.x + shownSeg.w / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shownSeg.x + shownSeg.w / 2, width)}
         >
           {shownDatum.members > 1
             ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`

@@ -16,6 +16,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { activityGridGeometry } from "./geometry.js";
@@ -38,6 +39,8 @@ export interface InteractiveActivityGridProps extends ActivityGridProps, PickerP
    */
   animate?: boolean;
 }
+
+const ANNOUNCE_BASE = { ...EN_SERIES, ...EN_SLOTS };
 
 export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNode {
   const {
@@ -65,7 +68,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     ...rest
   } = props;
 
-  const announce = { ...EN_SERIES, ...EN_SLOTS, ...strings };
+  // Base hoisted to module scope and the merge memoised: this allocated a
+  // ~60-key object on every render, including every hovered cell of a 365-cell
+  // grid. (Siblings that take no override just use a module-level constant.)
+  const announce = useMemo(() => ({ ...ANNOUNCE_BASE, ...strings }), [strings]);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "reveal", animate);
@@ -220,10 +226,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
       {readout && shownCell ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shownCell.x + shownCell.size / 2) / w) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shownCell.x + shownCell.size / 2, w)}
         >
           {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>

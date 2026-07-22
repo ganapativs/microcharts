@@ -21,9 +21,13 @@ describe("interactive <StatusDot>", () => {
     expect(live.textContent).toBe("Deploys. Status: warning.");
   });
 
-  it("live={false} → no live region", async () => {
-    await render(<StatusDot status="ok" live={false} />);
-    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+  it("live={false} → the live region stays mounted but says nothing", async () => {
+    const screen = await render(<StatusDot status="ok" live={false} />);
+    // The region is the inline-seat host (shared/live-region.tsx), so it must
+    // never be unmounted to silence a chart — silence is empty children.
+    const region = screen.container.querySelector('[aria-live="polite"]');
+    expect(region).not.toBeNull();
+    expect(region!.textContent).toBe("");
   });
 
   it("click fires onSelect with the state name (a status encodes no number)", async () => {

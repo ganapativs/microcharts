@@ -13,7 +13,7 @@ import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { spreadLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
-import { SLOPE_FONT, slopeFrame } from "./geometry.js";
+import { slopeFitFrame } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type SlopeDatum = DumbbellDatum & { label: string };
@@ -80,13 +80,19 @@ export function Slope(props: SlopeProps): ReactNode {
     devWarn(`<Slope> ${data.length} categories — crossings tangle past 7.`);
   }
 
-  const fontSize = SLOPE_FONT;
   const fmt = makeFormatter(format, locale);
   const wantLeft = label === "value" || label === "both";
   const wantLabel = label === "label" || label === "both";
   // gutters ate the plot → drop labels AND give the reclaimed room back to
   // the lines (a squeezed slope with labels is a pile, without them a sliver)
-  const { geo, labelsDropped } = slopeFrame({ width, height, data, domain, label, fmt, fontSize });
+  const { geo, labelsDropped, fontSize } = slopeFitFrame({
+    width,
+    height,
+    data,
+    domain,
+    label,
+    fmt,
+  });
   const accName = resolveSummary(summary, () => slopeSummary(data, strings));
 
   const goodDir = positive === "down" ? -1 : 1;

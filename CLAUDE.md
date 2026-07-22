@@ -32,8 +32,8 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
    JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
    `scripts/size-budgets.json`), never hand-edited. **Two of these ceilings no longer describe the shipped budgets and
-   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 22 statics sit above 3 kB, none by more
-   than 0.96 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 101 of 105 interactive entries are above
+   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 25 statics sit above 3 kB, none by more
+   than 0.99 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 101 of 105 interactive entries are above
    that delta (most by ~1.8–2.3 kB), because size-limit measures each subpath standalone and so charges every one of
    them the full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —

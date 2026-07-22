@@ -25,6 +25,9 @@ export interface ProgressGeometry {
   labelY: number;
 }
 
+/** Drawn-slot ceiling — one slot is one DOM node and `segments` is caller data. */
+const MAX_SEGMENTS = 200;
+
 export function progressGeometry(opts: {
   width: number;
   height: number;
@@ -45,7 +48,10 @@ export function progressGeometry(opts: {
 
   let slots: { x: number; w: number; fill: number }[] | null = null;
   if (segments !== undefined && Number.isFinite(segments) && segments >= 2) {
-    const n = Math.floor(segments);
+    // One slot is one DOM node and `segments` is unbounded caller data — a
+    // stray `segments={1e9}` would exhaust memory before it drew anything
+    // readable. Saturate (the fill itself still encodes the true fraction).
+    const n = Math.min(MAX_SEGMENTS, Math.floor(segments));
     const gap = 1;
     // exact layout, rounded per slot with the width clamped to the bar so
     // 2-dp rounding can never push the last slot past the track

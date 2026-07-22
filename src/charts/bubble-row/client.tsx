@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -197,10 +198,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
       </StaticBubbleRow>
       <LiveRegion>{announced}</LiveRegion>
       {readout && b && announced ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(b.cx / geo.width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(b.cx, geo.width)}>
           {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}

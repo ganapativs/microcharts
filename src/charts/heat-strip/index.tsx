@@ -8,7 +8,7 @@ import { describeSeries, resolveSummary } from "../../core/summary.js";
 import type { SeriesStrings } from "../../core/summary.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import type { Value } from "../../core/types.js";
-import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
+import { valueStepMixPct, type CellShape } from "../../shared/cell.js";
 import { heatStripGeometry } from "./geometry.js";
 
 export interface HeatStripProps {
@@ -99,8 +99,15 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             rx={c.rx}
             shapeRendering={geo.crisp ? "crispEdges" : undefined}
             data-mc-ink="cell"
-            fillOpacity={valueStepOpacity(c.step, steps)}
-            style={color ? { fill: color } : undefined}
+            // Custom property, never an inline `fill` — the stylesheet owns the
+            // fill so the forced-colors mapping can still win (see HeatCell).
+            data-mc-cell-mix=""
+            style={
+              {
+                "--mc-cell-mix": String(valueStepMixPct(c.step, steps)),
+                ...(color ? { "--mc-cell-color": color } : undefined),
+              } as CSSProperties
+            }
           />
         ),
       )}

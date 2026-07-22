@@ -90,11 +90,13 @@ describe("<Delta>", () => {
     expect(container.querySelector(".mc-delta-num")!.textContent).toBe("—");
   });
 
-  it("summary={false} → decorative, aria-hidden, no role", () => {
+  it("summary={false} → decorative: no role; number stays in the text flow", () => {
     const { container } = draw(<Delta value={0.1} summary={false} />);
     const el = container.querySelector(".mc-delta")!;
-    expect(el.getAttribute("aria-hidden")).toBe("true");
+    expect(el.getAttribute("aria-hidden")).toBeNull();
     expect(el.getAttribute("role")).toBeNull();
+    expect(el.querySelector(".mc-delta-num")!.getAttribute("aria-hidden")).toBeNull();
+    expect(el.querySelector(".mc-delta-num")!.textContent).toMatch(/\+/);
   });
 
   it("is axe-clean", async () => {

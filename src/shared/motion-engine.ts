@@ -13,6 +13,7 @@
 //     interactive wrapper owns the single listener), data re-renders mutate
 //     attributes underneath running transform/opacity tracks without a reset,
 //     and unmount/`beforeprint` resolve instantly to the finished frame.
+import { maxOf, minOf } from "../core/scale.js";
 import {
   registerMotionEngine,
   MC_EASE_ENTER,
@@ -206,8 +207,8 @@ function orderNorm(marks: SVGGraphicsElement[], order: "index" | "x" | "y"): num
       return i;
     }
   });
-  const min = Math.min(...pos);
-  const span = Math.max(...pos) - min || 1;
+  const min = minOf(pos);
+  const span = maxOf(pos) - min || 1;
   return pos.map((v) => (v - min) / span);
 }
 

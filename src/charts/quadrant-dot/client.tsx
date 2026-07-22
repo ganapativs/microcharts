@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -215,7 +216,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
       {readout && t ? (
         <span
           className="mc-quadrant-dot-readout mc-spark-readout"
-          style={{ left: `${(t.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(t.x, width)}
         >
           {`${fmt(t.vx)}, ${fmt(t.vy)}`}
         </span>

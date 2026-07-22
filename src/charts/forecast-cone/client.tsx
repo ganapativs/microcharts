@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -226,7 +227,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       {readout && p ? (
         <span
           className="mc-forecast-readout mc-spark-readout"
-          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
         >
           {chip}
         </span>

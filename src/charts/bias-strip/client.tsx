@@ -22,6 +22,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 
@@ -190,13 +191,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
       </StaticBiasStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDot && shownPair ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(shownDot.x / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownDot.x, width)}>
           {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? strings.biasOutside : ""}`}
         </span>
       ) : null}

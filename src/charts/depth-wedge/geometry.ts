@@ -4,6 +4,7 @@
 // no silent log (documented steer to full-size tools). The visible `levels`
 // span is part of the claim. 2-dp.
 import { round2 } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
 
 export interface Level {
   level: number;
@@ -70,7 +71,7 @@ export function depthWedgeGeometry(opts: {
   const extents: number[] = [];
   for (const d of demand) extents.push(mid - d.level);
   for (const s of supply) extents.push(s.level - mid);
-  const autoLevels = extents.length > 0 ? Math.max(...extents) : 1;
+  const autoLevels = extents.length > 0 ? maxOf(extents) : 1;
   const levels = opts.levels != null && opts.levels > 0 ? opts.levels : autoLevels || 1;
 
   const halfW = width / 2 - pad;

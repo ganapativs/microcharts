@@ -7,6 +7,14 @@
 import { quantiles } from "../../core/quantile.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 
+/** Default band pair. Shared by BOTH entries so their defaults are one
+ *  object: a literal default is a fresh array per render, which defeats the
+ *  interactive entry's geometry memo (and drifts the two entries apart). */
+export const DEFAULT_PERCENTILES: readonly [number, number][] = [
+  [25, 75],
+  [5, 95],
+];
+
 export interface TP {
   t: number;
   value: number;
@@ -35,14 +43,28 @@ export interface FoldedBandResult {
   y1: number;
 }
 
+/** Bin ceiling — one bin is one drawn column, and `bins` is caller data: an
+ *  unclamped `bins={1e9}` allocates an array per bin and exhausts memory. */
+const MAX_BINS = 512;
+
+/** The bin count actually used, resolved ONCE per geometry call. Every consumer
+ *  — the buckets, the x scale, the reported `bins` — must share it: clamping
+ *  inside the bucketing alone left the x scale dividing by the raw prop, which
+ *  collapsed the whole plot into a sliver at the left edge (and reported a bin
+ *  count that was never drawn). */
+function resolveBins(bins: number): number {
+  return Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.floor(bins))) : 1;
+}
+
 function foldBins(data: readonly TP[], period: number, bins: number): number[][] {
-  const buckets: number[][] = Array.from({ length: bins }, () => []);
+  const n = resolveBins(bins);
+  const buckets: number[][] = Array.from({ length: n }, () => []);
   for (const d of data) {
     if (!isFiniteValue(d.value) || !Number.isFinite(d.t)) continue;
     const pos = ((d.t % period) + period) % period;
-    let b = Math.floor((pos / period) * bins);
-    if (b >= bins) b = bins - 1;
-    if (b < 0) b = 0;
+    let b = Math.floor((pos / period) * n);
+    if (!Number.isFinite(b) || b < 0) b = 0;
+    if (b >= n) b = n - 1;
     buckets[b]!.push(d.value);
   }
   return buckets;
@@ -57,7 +79,10 @@ export function foldedBandGeometry(opts: {
   width: number;
   height: number;
 }): FoldedBandResult {
-  const { data, today, period, bins, percentiles, width, height } = opts;
+  const { data, today, period, percentiles, width, height } = opts;
+  // Resolve the bin count once — the buckets, the x scale and the reported
+  // `bins` all have to agree (see `resolveBins`).
+  const bins = resolveBins(opts.bins);
   const pad = 1;
   const plotW = width - pad * 2;
   const plotH = height - pad * 2;

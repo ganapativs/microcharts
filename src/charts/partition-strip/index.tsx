@@ -130,7 +130,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
             opacity = seg.row === 0 ? 0.85 : 0.55;
           } else {
             ink = { "data-mc-ink": "neutral" };
-            opacity = 0.28;
+            opacity = 0.55;
           }
         } else {
           ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };

@@ -13,7 +13,7 @@ import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { named, fillFor, wrap, crosshairReadoutStyle } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -172,14 +172,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       />
       <LiveRegion>{announced}</LiveRegion>
       {readout && open ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            // centered over the ORBIT square, not the gutter-widened viewBox
-            left: `${(geo.size / 2 / vbWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(geo.size / 2, vbWidth)}>
           {geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`}
         </span>
       ) : null}

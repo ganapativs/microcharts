@@ -32,6 +32,18 @@ describe("<RubricStrip>", () => {
     expect(container.querySelector("line[stroke-dasharray]")).not.toBeNull();
   });
 
+  it("labels sit clear of the track — not kissing the bar", () => {
+    const { container } = draw(<RubricStrip data={RUBRIC} labels width={240} height={80} />);
+    const label = [...container.querySelectorAll("text")].find(
+      (t) => t.textContent === "Correctness",
+    )!;
+    const tracks = [...container.querySelectorAll("rect")].filter(
+      (r) => r.getAttribute("data-mc-ink") === "neutral",
+    );
+    const trackX = Math.min(...tracks.map((r) => Number(r.getAttribute("x"))));
+    expect(Number(label.getAttribute("x"))).toBeLessThanOrEqual(trackX - 8);
+  });
+
   it("labels render the criterion names in the gutter", () => {
     const { container } = draw(<RubricStrip data={RUBRIC} width={120} height={56} />);
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);

@@ -5,7 +5,7 @@
 // at zero both ways; the net sign is stated in TEXT (never color-alone).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -19,7 +19,7 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 
 /** Signed value string — direction lives in the text, not the color. */
 export function signedNet(net: number, fmt: (n: number) => string): string {
-  return net > 0 ? `+${fmt(net)}` : fmt(net);
+  return withPlus(net, fmt);
 }
 
 export function netFlowSummary(

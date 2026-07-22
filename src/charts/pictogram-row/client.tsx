@@ -212,7 +212,9 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
         {active !== null ? ring(active, false) : null}
         {rest.children}
       </StaticPictogramRow>
-      {live ? <LiveRegion>{shown === null ? announced : unitSpoken}</LiveRegion> : null}
+      <LiveRegion>
+        {live && props.summary !== false ? (shown === null ? announced : unitSpoken) : ""}
+      </LiveRegion>
     </span>
   );
 }

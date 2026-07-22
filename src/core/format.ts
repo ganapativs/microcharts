@@ -47,6 +47,14 @@ export function makeFormatter(
   return (n) => nf.format(clean(n));
 }
 
+/** Prepend `+` for positive values only when `fmt` did not already emit a sign.
+ *  Guards `++1.3%` when callers pass signed percent formatters. */
+export function withPlus(n: number, fmt: (n: number) => string): string {
+  if (!(n > 0)) return fmt(n);
+  const s = fmt(n);
+  return s.startsWith("+") || s.startsWith("-") || s.startsWith("−") ? s : `+${s}`;
+}
+
 // Cached date/time formatting — same caching
 // discipline as numbers. `Intl.DateTimeFormat` construction is even costlier.
 export type DateFormat = Intl.DateTimeFormatOptions | ((d: Date) => string);

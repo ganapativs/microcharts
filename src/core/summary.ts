@@ -324,6 +324,9 @@ export interface SummaryStrings {
   eventAt: (label: string, atLabel: string) => string;
   /** "4 spans covering 82% of the window; 2 events." */
   timeline: (spans: number, events: number, coveragePct: string) => string;
+  /** Name for an UNLABELLED item, e.g. "Span 3" / "Event 2". Reaches the live
+   *  region and the visible chip, so it can never be composed inline. */
+  timelineFallback: (index: number, kind: "span" | "point") => string;
 
   /* ── Batch 2 — decision micrographs ──────────────────────────────────── */
 
@@ -368,6 +371,10 @@ export interface SummaryStrings {
   quantileDots: (past: number, count: number, side: string, threshold: string) => string;
   /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */
   quantileDotsRange: (modeLo: string, modeHi: string, min: string, max: string) => string;
+  /** Terse VISIBLE chip form of `quantileDots`, e.g. "4 in 20 above 15 min". */
+  quantileDotsChip: (past: number, count: number, side: string, threshold: string) => string;
+  /** Idle odds shown beside the plot, e.g. "4 in 20". */
+  quantileDotsOdds: (past: number, count: number) => string;
   /** Rate-volume summary, e.g. "4.1% on 38 events (low volume); up from 2.3% across 12 periods." */
   rateVolume: (
     rateLast: string,

@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import type { Polarity } from "../../core/types.js";
 import { EN_SPREAD_BAND, type SpreadBandStrings } from "../../core/strings-spread-band.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -21,7 +21,7 @@ import {
 
 /** Signed gap string — direction lives in the sign (and the text), not the color. */
 export function signedGap(gap: number, fmt: (n: number) => string): string {
-  return gap > 0 ? `+${fmt(gap)}` : fmt(gap);
+  return withPlus(gap, fmt);
 }
 
 /** Placeholder names, used for whichever half of the pair the caller omitted. */

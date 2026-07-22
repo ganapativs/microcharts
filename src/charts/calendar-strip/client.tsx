@@ -17,6 +17,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
@@ -247,10 +248,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
       {readout && shownCell && shown !== null ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shownCell.x + shownCell.size / 2) / geo.width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shownCell.x + shownCell.size / 2, geo.width)}
         >
           {shownCell.value === null
             ? `${dayLabelAt(shown)}: —`

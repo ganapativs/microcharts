@@ -42,7 +42,7 @@ export const CATEGORICAL = [
   PALETTE.mauve,
 ] as const;
 
-/** Label ink for text sitting ON a saturated data fill (dense cells, wedges).
- *  Resolves `--mc-on-fill` (default near-white in styles.css) so themes can
- *  retint pastel fills without touching chart code. */
-export const ON_FILL_INK = "var(--mc-on-fill)";
+// Label ink for text sitting ON a saturated data fill lives in the stylesheet:
+// charts mark the <text> with `data-mc-on-fill` and styles.css applies
+// `--mc-on-fill`. It must NOT be an SVG `fill` attribute — the `.mc-root text`
+// CSS declaration outranks presentation attributes and silently wins.

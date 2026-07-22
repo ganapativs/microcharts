@@ -19,6 +19,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { labelMetrics, sparkBarGeometry } from "./geometry.js";
@@ -217,10 +218,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       {readout && shownBar && shownValue !== null ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shownBar.x + shownBar.width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shownBar.x + shownBar.width / 2, width)}
         >
           {fmt(shownValue)}
         </span>

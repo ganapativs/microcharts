@@ -197,9 +197,11 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownWedge && shownDatum ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {shownDatum.members > 1
-            ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`
-            : `${shownDatum.label} ${pcts[shown!]}% (${fmt(shownDatum.value)})`}
+          {/* The localized sentence, minus its full stop — the chip must never
+              hand-compose English (i18n canon), and this is the same text the
+              live region announces. Siblings (TreeRings, SproutRow, BubbleRow)
+              render `announced` here too. */}
+          {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}
     </span>

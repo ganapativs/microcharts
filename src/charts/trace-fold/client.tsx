@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -229,10 +230,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
       {readout && span ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((span.x + span.width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(span.x + span.width / 2, width)}
         >
           {/* Depth is the span's own y-row and share is its own width — both are
               already on screen, so repeating them cost 31px past the cap to say

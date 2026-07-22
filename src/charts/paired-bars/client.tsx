@@ -12,6 +12,8 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -218,14 +220,11 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
       {readout && shownPair && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
-          style={{
-            // `pitch` is a length on the CATEGORY axis — x when vertical, but y
-            // when horizontal. Only the vertical orientation may spend it on
-            // `left`; a horizontal chart's rows differ in y, and the chip has no
-            // vertical anchor (it sits at `bottom: 100%`), so it centres.
-            left: `${((orientation === "vertical" ? shownPos + bandW / 2 : width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={
+            orientation === "vertical"
+              ? crosshairReadoutStyle(shownPos + bandW / 2, width)
+              : rowReadoutStyle(width / 2, shownPos + bandW / 2, width, height)
+          }
         >
           {isFiniteValue(shownDatum.ref)
             ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`

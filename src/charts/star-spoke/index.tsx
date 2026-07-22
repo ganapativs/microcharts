@@ -10,7 +10,7 @@ import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
-import { starSpokeGeometry } from "./geometry.js";
+import { UNIT_DOMAIN, starSpokeGeometry } from "./geometry.js";
 
 export interface StarSpokeDatum {
   label: string;
@@ -76,7 +76,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     guides = true,
     compare,
     labels = true,
-    domain = [0, 1],
+    domain = UNIT_DOMAIN,
     size = 80,
     format,
     locale,

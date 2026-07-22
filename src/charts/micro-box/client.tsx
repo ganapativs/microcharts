@@ -16,6 +16,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -187,13 +188,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
       </StaticMicroBox>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownStop && statX && resolved ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(statX[shownStop] / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(statX[shownStop], width)}>
           {strings.boxStat(shownStop, fmt(resolved.five[shownStop])).replace(/\.$/, "")}
         </span>
       ) : null}

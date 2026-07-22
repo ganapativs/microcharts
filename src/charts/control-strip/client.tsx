@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -203,7 +204,7 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
       {readout && p && value !== undefined ? (
         <span
           className="mc-control-readout mc-spark-readout"
-          style={{ left: `${(p.x / width) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(p.x, width)}
         >
           {strings.controlChip(
             fmt(value),

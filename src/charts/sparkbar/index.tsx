@@ -6,7 +6,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter } from "../../core/format.js";
-import { describeSeries, type DescribeOptions, resolveSummary } from "../../core/summary.js";
+import {
+  describeSeries,
+  type DescribeOptions,
+  type SeriesStrings,
+  resolveSummary,
+} from "../../core/summary.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { labelMetrics, sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
@@ -40,6 +45,9 @@ export interface SparkBarProps {
   /** Which sign is the good outcome: `"up"` (default) or `"down"`. */
   positive?: "up" | "down" | undefined;
   color?: string | undefined;
+  /** Swappable summary strings (defaults to EN) — the accessible name is
+   *  generated, so this is how a non-English host localizes it. */
+  strings?: SeriesStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   format?: DescribeOptions["format"] | undefined;
@@ -63,6 +71,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     color,
     title,
     summary,
+    strings,
     format,
     locale,
     id,
@@ -71,7 +80,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     children,
   } = props;
 
-  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale, strings }));
   const fmt = makeFormatter(format, locale);
 
   // The endpoint label reserves a deterministic right gutter BEFORE geometry, so

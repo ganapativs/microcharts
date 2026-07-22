@@ -130,8 +130,11 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
         />
       ) : null}
       {pocBar ? (
-        <path
-          d={`M${pocBar.x} ${pocBar.y}h${pocBar.width}v${pocBar.height}h${-pocBar.width}z`}
+        <rect
+          x={pocBar.x}
+          y={pocBar.y}
+          width={pocBar.width}
+          height={pocBar.height}
           data-mc-ink="accent"
           shapeRendering="crispEdges"
         />

@@ -11,6 +11,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -175,13 +176,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
       </StaticBumpStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && point ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(point.x / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(point.x, width)}>
           {`#${point.rank}`}
         </span>
       ) : null}

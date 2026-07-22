@@ -14,6 +14,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
@@ -198,10 +199,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
       {readout && shownRun ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((shownRun.x + shownRun.width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(shownRun.x + shownRun.width / 2, width)}
         >
           {`${fmt(shownRun.len)} ${word}${shownRun.record ? strings.streakRecord : ""}`}
         </span>

@@ -3,7 +3,7 @@
 // tukey (1.5×IQR fences, outliers as dots, ≤ 3 rendered per side). Never a box
 // from fewer than 5 observations — degenerate honesty handled by the caller.
 import { fiveNumber, type FiveNumber } from "../../core/quantile.js";
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, minOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 type StatX = Record<"min" | "q1" | "median" | "q3" | "max", number>;
@@ -108,8 +108,8 @@ export function microBoxGeometry(opts: {
   if (whiskers === "tukey" && raw.length > 0) {
     const inside = raw.filter((v) => v >= loFence && v <= hiFence);
     if (inside.length > 0) {
-      lo = Math.min(...inside);
-      hi = Math.max(...inside);
+      lo = minOf(inside);
+      hi = maxOf(inside);
     }
     outlierValues = raw.filter((v) => v < loFence || v > hiFence);
   }

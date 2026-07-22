@@ -9,6 +9,7 @@ import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-ga
 import { isFiniteValue } from "../../core/types.js";
 import { labelFitsY } from "../../core/labels.js";
 import {
+  NO_ZONES,
   chevronTier,
   tapeGaugeGeometry,
   type Orientation,
@@ -100,7 +101,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const {
     value,
     rate,
-    zones = [],
+    zones = NO_ZONES,
     span: spanProp,
     rateTiers: tiersProp,
     orientation = "vertical",

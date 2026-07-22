@@ -16,9 +16,18 @@ export function scaleLinear(
   const [d0, d1] = domain;
   const [r0, r1] = range;
   // degenerate domain — zero span (slope NaN/±Infinity) or a denormal span
-  // (slope overflows, then 0 × Infinity poisons results): map to the midpoint
-  const m = (r1 - r0) / (d1 - d0);
-  if (!Number.isFinite(m)) {
+  // (slope overflows, then 0 × Infinity poisons results): map to the midpoint.
+  //
+  // The span itself must be checked too, not just the slope: an INFINITE span
+  // (`[-Infinity, Infinity]`, or a finite domain whose difference overflows —
+  // e.g. a running total past 1e308) gives a slope of exactly 0, which is
+  // finite and sails through. Then `(value - d0) * 0` is `Infinity * 0` → NaN,
+  // and every downstream `clamp` is NaN-transparent (`NaN < min` and
+  // `NaN > max` are both false), so the NaN reaches the emitted coordinate and
+  // the mark silently vanishes.
+  const span = d1 - d0;
+  const m = (r1 - r0) / span;
+  if (!Number.isFinite(m) || !Number.isFinite(span) || !Number.isFinite(d0)) {
     const mid = (r0 + r1) / 2;
     return () => mid;
   }
@@ -27,6 +36,35 @@ export function scaleLinear(
 
 export function clamp(value: number, min: number, max: number): number {
   return value < min ? min : value > max ? max : value;
+}
+
+/**
+ * `Math.max(...values, seed)` without the spread. Same semantics — including
+ * NaN propagation and the `-Infinity` identity — but it never pushes one
+ * argument per element onto the call stack.
+ *
+ * The spread form throws `RangeError: Maximum call stack size exceeded` past
+ * roughly 125k arguments, and `data` is caller-sized: a chart handed a long
+ * series would crash rather than render. Use this (or `extent`) for anything
+ * derived from caller data; never spread an array whose length you don't own.
+ */
+export function maxOf(values: Iterable<number>, seed = -Infinity): number {
+  let m = seed;
+  for (const v of values) {
+    if (Number.isNaN(v)) return NaN;
+    if (v > m) m = v;
+  }
+  return m;
+}
+
+/** `Math.min(...values, seed)` without the spread — see `maxOf`. */
+export function minOf(values: Iterable<number>, seed = Infinity): number {
+  let m = seed;
+  for (const v of values) {
+    if (Number.isNaN(v)) return NaN;
+    if (v < m) m = v;
+  }
+  return m;
 }
 
 /**

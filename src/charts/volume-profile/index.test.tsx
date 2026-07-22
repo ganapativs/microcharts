@@ -23,6 +23,9 @@ describe("<VolumeProfile>", () => {
   it("renders bars + POC accent summary", () => {
     const { container } = draw(<VolumeProfile data={PROFILE} bins={5} width={80} height={40} />);
     expect(container.querySelector('path[data-mc-ink="bar"]')).not.toBeNull();
+    // POC must be a filled rect — path[data-mc-ink=accent] is stroke-only in CSS.
+    expect(container.querySelector('rect[data-mc-ink="accent"]')).not.toBeNull();
+    expect(container.querySelector('path[data-mc-ink="accent"]')).toBeNull();
     const geo = volumeProfileGeometry({
       data: PROFILE,
       bins: 5,

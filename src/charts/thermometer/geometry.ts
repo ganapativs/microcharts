@@ -27,7 +27,9 @@ function ticksToValues(
   domain: readonly [number, number],
 ): number[] {
   if (Array.isArray(ticks)) return ticks.filter((t) => t >= domain[0] && t <= domain[1]);
-  const n = Math.max(2, Math.floor(ticks as number));
+  // Ceiling as well as floor: `ticks` is caller data, and a stray `1e9` would
+  // allocate a tick per pixel-millionth before drawing anything readable.
+  const n = Math.min(200, Math.max(2, Math.floor(ticks as number) || 2));
   const [d0, d1] = domain;
   return Array.from({ length: n }, (_, i) => d0 + ((d1 - d0) * i) / (n - 1));
 }

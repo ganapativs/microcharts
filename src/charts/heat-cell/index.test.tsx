@@ -15,17 +15,26 @@ describe("<HeatCell>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("42 — level 3 of 5.");
   });
 
-  it("higher value → higher opacity (calibrated, discrete)", () => {
-    const op = (v: number) =>
+  it("higher value → stronger accent mix (calibrated, discrete)", () => {
+    const mix = (v: number) =>
       Number(
-        draw(<HeatCell value={v} domain={[0, 100]} />)
-          .container.querySelector("rect")!
-          .getAttribute("fill-opacity"),
+        /--mc-cell-mix:\s*(\d+)/.exec(
+          draw(<HeatCell value={v} domain={[0, 100]} />)
+            .container.querySelector("rect")!
+            .getAttribute("style") ?? "",
+        )?.[1] ?? 0,
       );
-    expect(op(90)).toBeGreaterThan(op(50));
-    expect(op(50)).toBeGreaterThan(op(30));
-    // same step → same opacity (discrete honesty)
-    expect(op(45)).toBe(op(50));
+    expect(mix(90)).toBeGreaterThan(mix(50));
+    expect(mix(50)).toBeGreaterThan(mix(30));
+    // same step → same mix (discrete honesty)
+    expect(mix(45)).toBe(mix(50));
+  });
+
+  it("the fill stays in the stylesheet — an inline fill would beat the forced-colors mapping", () => {
+    const { container } = draw(<HeatCell value={0.8} />);
+    const rect = container.querySelector("rect[data-mc-cell-mix]")!;
+    expect(rect).not.toBeNull();
+    expect(rect.getAttribute("style") ?? "").not.toMatch(/(?:^|;)\s*fill:/);
   });
 
   it("default domain is [0, 1] — documented lone-cell calibration", () => {

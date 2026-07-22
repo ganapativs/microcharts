@@ -13,6 +13,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -248,7 +249,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       {readout && p ? (
         <span
           className="mc-retention-readout mc-spark-readout"
-          style={{ left: `${(p.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
         >
           {p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`}
         </span>

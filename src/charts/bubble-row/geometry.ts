@@ -4,6 +4,7 @@
 // Area comparison is the weakest common channel — precision is LOW and the docs
 // carry the standing "for precise comparison, use MiniBar" steer. All coords 2-dp.
 import { round2 } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
 
 export type BubbleAlign = "center" | "baseline";
 
@@ -37,7 +38,7 @@ export function bubbleRowGeometry(opts: {
   const finite = values.filter(
     (v): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0,
   );
-  const max = finite.length ? Math.max(...finite) : 0;
+  const max = finite.length ? maxOf(finite) : 0;
   const bandTop = pad;
   // Reserve a 2px gap between the bubble band and the numeral band so the largest
   // bubble's rim never touches its label's ascenders (a 1px kiss at max radius).

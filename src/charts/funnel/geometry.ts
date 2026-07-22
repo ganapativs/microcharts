@@ -3,6 +3,7 @@
 // interpolates data that doesn't exist. `rate` normalizes every stage to the
 // FIRST stage (never the previous — that hides compounding loss). 2-dp.
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { maxOf } from "../../core/scale.js";
 
 interface FunnelStage {
   x: number;
@@ -37,7 +38,7 @@ export function funnelGeometry(opts: {
   if (n === 0) return { stages: [], slats: [], labelsFit: () => false, pitch: 0 };
 
   const first = finite[0] ?? 0;
-  const max = mode === "rate" ? 1 : Math.max(...finite, 1);
+  const max = mode === "rate" ? 1 : maxOf(finite, 1);
   const rel = finite.map((v) => (mode === "rate" ? (first > 0 ? v / first : 0) : v / max));
 
   const colW = (width - gap * (n - 1)) / n;

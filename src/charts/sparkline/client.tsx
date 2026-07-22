@@ -21,6 +21,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -233,13 +234,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
          a floating readout there just collides with it. Skip it; every other
          point still gets the readout. */
       !(label === "last" && shown === stops[stops.length - 1]) ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(shownPoint[0] / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownPoint[0], width)}>
           {fmt(shownValue)}
         </span>
       ) : null}

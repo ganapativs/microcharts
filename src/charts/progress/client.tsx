@@ -75,7 +75,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
       }}
     >
       <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

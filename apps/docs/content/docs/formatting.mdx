@@ -176,6 +176,26 @@ _written_ — the thousands separator, decimal mark, currency placement — matc
   localized chart: `locale` for the figures, translated `strings` for the prose.
 </Callout>
 
+### Server rendering: pass a `locale` explicitly
+
+Omitting `locale` means `Intl` resolves the _runtime's_ default — and on a server-rendered page that runtime is the
+server. Node typically resolves to the host's locale while the visitor's browser resolves to theirs, so the same chart
+can render `1,600` into the HTML and `1.600` after hydration. React reports that as a hydration mismatch, and the
+mismatched text is not patched up.
+
+This is not specific to microcharts — it is how `Intl` defaults work — but charts hit it more often than most UI,
+because the number reaches three places at once: the label, the accessible summary, and the readout.
+
+The fix is to make the choice explicit rather than ambient:
+
+```tsx
+// Deterministic: the server and the browser format identically.
+<Sparkline data={revenue} label="last" locale="en-US" />
+```
+
+Pass the locale your page has already resolved (from the request, a cookie, or your i18n provider) and use the same one
+on both sides. If a chart is client-only, the ambient default is fine.
+
 ## Scale: the `domain` decision
 
 `domain` sets the value range the geometry is drawn against — the vertical frame. Omit it and the chart **auto-fits to

@@ -5,7 +5,7 @@
 // RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { ON_FILL_INK } from "../../core/color.js";
+
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
@@ -229,7 +229,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
                 dominantBaseline="central"
                 style={{ fontWeight: 600 }}
                 textAnchor="middle"
-                fill={ON_FILL_INK}
+                data-mc-on-fill=""
               >
                 {items[s.i]!.label}
               </text>

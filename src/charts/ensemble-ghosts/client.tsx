@@ -3,8 +3,10 @@
 // one at a time at full opacity (~400 ms/frame ≈ 2.5 Hz, the studied
 // Hypothetical-Outcome-Plots cadence), looping until the pointer leaves.
 // Reduced-motion: NO loop — ←/→ step members discretely (same information, no
-// motion). The live region announces only on a keyboard step or when the loop
-// stops — never per frame. Composes the static component (canon).
+// motion). A readout chip names the active/hopped member's endpoint so the
+// cycle is readable frame by frame. The live region announces only on a
+// keyboard step or when the loop stops — never per frame. Composes the static
+// component (canon).
 //
 // useActivePicker owns the DISCRETE side of the interaction (roving keyboard,
 // tap/click selection, the onActive/onSelect contract); the ambient loop stays
@@ -69,6 +71,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     title,
     summary,
     animate = false,
+    readout = true,
     className,
     style,
     onActive,
@@ -86,9 +89,9 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     [width, height, data, ghosts, emphasis, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // Ambient HOP frame — DOM only (no React state). setState every 400ms was
-  // rebuilding the whole static bundle; the loop never announces per frame.
+  // Ambient HOP frame — path paint stays DOM-only; hopMember drives the chip.
   const hopRef = useRef<number | null>(null);
+  const [hopMember, setHopMember] = useState<number | null>(null);
   const [stopped, setStopped] = useState("");
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const reduced = usePrefersReducedMotion();
@@ -161,6 +164,13 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         : strings.ensembleEmpty(member + 1, geo.memberCount);
     },
     [endOf, geo, strings, fmt],
+  );
+  const chip = useCallback(
+    (member: number): string => {
+      const end = endOf(member);
+      return isFiniteValue(end) ? `#${member + 1} · ${fmt(end)}` : `#${member + 1}`;
+    },
+    [endOf, fmt],
   );
 
   // Tap/click picks the nearest strand: x is weighted low because the members
@@ -237,12 +247,14 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       const p = hopRef.current === null ? -1 : posOf(hopRef.current);
       const next = paths[(p + 1) % paths.length]!.member;
       hopRef.current = next;
+      setHopMember(next);
       paintHop(next);
     }, 400);
   }, [reduced, paths, posOf, selected, paintHop]);
 
   const clearHop = useCallback(() => {
     hopRef.current = null;
+    setHopMember(null);
     paintHop(null);
   }, [paintHop]);
 
@@ -258,10 +270,11 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
           : ensembleSummary(geo, fmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const shown = active ?? selected;
-  const announced = shown !== null ? say(shown) : stopped;
+  const shown = active ?? selected ?? hopMember;
+  // announce where the loop stopped (never per frame) — hopMember drives only
+  // the visual chip, not the live region
+  const announced = shown !== null && (active !== null || selected !== null) ? say(shown) : stopped;
 
-  // announce where the loop stopped (never per frame)
   const leave = () => {
     stop();
     const last = hopRef.current ?? active;
@@ -339,6 +352,11 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         {rest.children}
       </Static>
       <LiveRegion>{announced}</LiveRegion>
+      {readout && shown !== null ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {chip(shown)}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -9,7 +9,13 @@ import {
   EN_TOKEN_CONFIDENCE,
   type TokenConfidenceStrings,
 } from "../../core/strings-token-confidence.js";
-import { tokenTierCounts, tokenTiers, type TieredToken, type TokenDatum } from "./geometry.js";
+import {
+  DEFAULT_TIERS,
+  tokenTierCounts,
+  tokenTiers,
+  type TieredToken,
+  type TokenDatum,
+} from "./geometry.js";
 
 export type TokenConfidenceDatum = TokenDatum;
 
@@ -48,7 +54,7 @@ const CLASS: Record<string, string | undefined> = {
 export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
   const {
     data,
-    tiers = [0.5, 0.8],
+    tiers = DEFAULT_TIERS,
     show = "flagged",
     legend = false,
     strings = EN_TOKEN_CONFIDENCE,

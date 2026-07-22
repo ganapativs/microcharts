@@ -3,7 +3,7 @@
 // the SAME stack offsets with smooth silhouettes (editorial texture, zero
 // semantic change — the visual test asserts identical offsets). 2-dp.
 import { linePath, smoothPath, type Curve } from "../../core/path.js";
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
 import { stackSeries } from "../../core/stack.js";
 import { normalizeShares } from "../../core/stack.js";
 import { round2, type Value } from "../../core/types.js";
@@ -56,7 +56,7 @@ export function stackedAreaGeometry(opts: {
     return { layers: [], baselineY: y1, sharesAt: [], plot: { x0, x1, y0, y1 }, n: 0 };
   }
 
-  const maxTotal = Math.max(...stacked.totals, 0);
+  const maxTotal = maxOf(stacked.totals, 0);
   const domain =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))
       ? opts.domain

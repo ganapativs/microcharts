@@ -9,8 +9,9 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { EN_RUBRIC, type RubricStrings } from "../../core/strings-rubric.js";
-import { rubricStripGeometry, type RubricInput } from "./geometry.js";
+import { UNIT_DOMAIN, rubricStripGeometry, type RubricInput } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf } from "../../core/scale.js";
 
 export interface RubricStripDatum {
   label: string;
@@ -67,7 +68,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     data,
     target,
     labels = true,
-    domain = [0, 1],
+    domain = UNIT_DOMAIN,
     width = 80,
     height: heightProp,
     format,
@@ -94,11 +95,20 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
   if (data.some((d) => d.score < domain[0] || d.score > domain[1]))
     devWarn("<RubricStrip> score outside domain — clamped.");
 
+  // Reserve label ink + a clear gap before the track (was +4 / x=gutter-2 →
+  // criterion names kissed the bars).
+  const labelGap = 8;
   const gutter =
     labels && labelsFit
       ? Math.min(
           width * 0.62,
-          Math.max(...data.map((d) => d.label.length), 1) * fontSize * 0.64 + 4,
+          maxOf(
+            data.map((d) => d.label.length),
+            1,
+          ) *
+            fontSize *
+            0.64 +
+            labelGap,
         )
       : 0;
 
@@ -152,7 +162,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
           nodes.push(
             <text
               key={`label-${row.label}`}
-              x={round2(gutter - 2)}
+              x={round2(gutter - labelGap)}
               y={ty}
               dominantBaseline="central"
               textAnchor="end"

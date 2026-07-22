@@ -5,7 +5,7 @@
 // NOTHING — the connector's slope is then meaningless, and the summary never
 // mentions vertical position. Two-layer render: one connector polyline (time
 // order) + one <circle> per event. All coords 2-dp.
-import { clamp, extent, scaleLinear } from "../../core/scale.js";
+import { clamp, extent, maxOf, scaleLinear } from "../../core/scale.js";
 import { jitter } from "../../core/jitter.js";
 import { round2 } from "../../core/types.js";
 
@@ -75,7 +75,7 @@ export function constellationGeometry(opts: {
 
   // Magnitude → area-true radius. mMax over finite magnitudes.
   const mags = items.map((p) => p.m).filter((m) => Number.isFinite(m) && m > 0);
-  const mMax = mags.length ? Math.max(...mags) : 0;
+  const mMax = mags.length ? maxOf(mags) : 0;
   const radiusOf = (m: number): number => {
     if (!Number.isFinite(m) || mMax <= 0) return rBase;
     return Math.max(R_MIN, round2(rBase * Math.sqrt(clamp(m / mMax, 0, 1))));

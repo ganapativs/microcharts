@@ -74,7 +74,7 @@ describe("resolveAnnotations", () => {
       draw(<svg>{node}</svg>).container.querySelector("text")!.textContent!;
     const perChar = FRAME.fontSize * 0.62;
 
-    // Threshold + TargetZone end-anchor at width-1 → available run = width - 1
+    // Threshold end-anchors at width-1; TargetZone start-anchors at x=1
     const longThresh = textOf(
       resolveAnnotations(<Threshold y={10} label={"x".repeat(40)} />, FRAME).over,
     );
@@ -86,7 +86,7 @@ describe("resolveAnnotations", () => {
       resolveAnnotations(<TargetZone y={[5, 15]} label={"y".repeat(40)} />, FRAME).under,
     );
     expect(longZone.endsWith("…")).toBe(true);
-    expect(longZone.length * perChar).toBeLessThanOrEqual(FRAME.width - 1);
+    expect(longZone.length * perChar).toBeLessThanOrEqual(FRAME.width - 2);
 
     // Callout runs toward the wider half from its anchor tx
     const longCallout = textOf(
@@ -98,6 +98,17 @@ describe("resolveAnnotations", () => {
     // short labels are byte-identical (truncation never engages)
     expect(textOf(resolveAnnotations(<Threshold y={10} label="SLA" />, FRAME).over)).toBe("SLA");
     expect(textOf(resolveAnnotations(<Callout x={0} label="dip" />, FRAME).over)).toBe("dip");
+  });
+
+  it("TargetZone label sits opposite Threshold (start/floor vs end/above)", () => {
+    const zone = resolveAnnotations(<TargetZone y={[4, 8]} label="band" />, FRAME).under;
+    const thresh = resolveAnnotations(<Threshold y={6} label="line" />, FRAME).over;
+    const z = draw(<svg>{zone}</svg>).container.querySelector("text")!;
+    const t = draw(<svg>{thresh}</svg>).container.querySelector("text")!;
+    expect(z.getAttribute("text-anchor")).toBe("start");
+    expect(t.getAttribute("text-anchor")).toBe("end");
+    // Zone floor is below mid-band; threshold sits above its hairline.
+    expect(Number(z.getAttribute("y"))).toBeGreaterThan(Number(t.getAttribute("y")));
   });
 
   it("standalone annotation renders nothing + dev-warns", () => {

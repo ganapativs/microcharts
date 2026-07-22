@@ -10,6 +10,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -200,10 +201,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       {readout && seg && segDatum ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((seg.x + seg.width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={crosshairReadoutStyle(seg.x + seg.width / 2, width)}
         >
           {`${segDatum.label} ${pctFmt(seg.share)}`}
         </span>

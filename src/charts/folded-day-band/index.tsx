@@ -6,7 +6,12 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FOLDED_BAND, type FoldedBandStrings } from "../../core/strings-folded-band.js";
-import { foldedBandGeometry, type FoldedBandResult, type TP } from "./geometry.js";
+import {
+  DEFAULT_PERCENTILES,
+  foldedBandGeometry,
+  type FoldedBandResult,
+  type TP,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface FoldedDayBandProps {
@@ -62,10 +67,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
     data,
     period = 24,
     today,
-    percentiles = [
-      [25, 75],
-      [5, 95],
-    ],
+    percentiles = DEFAULT_PERCENTILES,
     bins = 24,
     width = 120,
     height = 32,

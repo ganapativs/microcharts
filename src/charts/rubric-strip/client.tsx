@@ -11,12 +11,13 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
-import { rubricStripGeometry } from "./geometry.js";
+import { UNIT_DOMAIN, rubricStripGeometry } from "./geometry.js";
 import {
   RubricStrip as StaticRubricStrip,
   rubricStripSummary,
@@ -37,7 +38,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
   const {
     data,
     labels = true,
-    domain = [0, 1],
+    domain = UNIT_DOMAIN,
     width = 80,
     height: heightProp,
     format,
@@ -75,8 +76,9 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
     for (const d of data) if (d.label.length > longest) longest = d.label.length;
     return longest;
   }, [data]);
+  const labelGap = 8;
   const gutter =
-    labels && labelsFit ? Math.min(width * 0.62, longestLabel * fontSize * 0.64 + 4) : 0;
+    labels && labelsFit ? Math.min(width * 0.62, longestLabel * fontSize * 0.64 + labelGap) : 0;
   const geo = useMemo(
     () =>
       rubricStripGeometry({
@@ -182,7 +184,10 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       </StaticRubricStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && row ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span
+          className="mc-spark-readout"
+          style={rowReadoutStyle(width / 2, row.y + row.height / 2, width, height)}
+        >
           {`${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${weightPct})`}
         </span>
       ) : null}

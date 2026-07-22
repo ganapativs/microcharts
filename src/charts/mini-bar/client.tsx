@@ -12,6 +12,8 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -199,10 +201,11 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
       {readout && shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
         <span
           className="mc-spark-readout"
-          style={{
-            left: `${((orientation === "vertical" ? shownBar.x + shownBar.w / 2 : width / 2) / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={
+            orientation === "vertical"
+              ? crosshairReadoutStyle(shownBar.x + shownBar.w / 2, width)
+              : rowReadoutStyle(width / 2, shownBar.y + shownBar.h / 2, width, height)
+          }
         >
           {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>

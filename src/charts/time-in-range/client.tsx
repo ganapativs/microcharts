@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -172,15 +173,15 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   const shown = active ?? selected;
   const zone = shown !== null ? geo.zones[shown] : undefined;
   const announced = zone ? strings.tirZone(nameByKey[zone.key]!, `${pct[zone.key]}%`) : "";
+  // Horizontal: clamp to the zone mid-x. Vertical: float ABOVE the column —
+  // a centered chip sits inside a ~34px KPI and collides with the default
+  // `bottom: 100%` rule, so the value never appears.
   const chipPos = zone
     ? horizontal
-      ? { left: `${((zone.x + zone.width / 2) / width) * 100}%`, transform: "translateX(-50%)" }
-      : {
-          top: `${((zone.y + zone.height / 2) / height) * 100}%`,
-          left: "50%",
-          transform: "translate(-50%,-50%)",
-        }
+      ? crosshairReadoutStyle(zone.x + zone.width / 2, width)
+      : { left: "50%", bottom: "100%", top: "auto", transform: "translateX(-50%)" }
     : undefined;
+  const chipText = zone ? `${nameByKey[zone.key]} ${pct[zone.key]}%` : "";
 
   return (
     <span ref={hostRef} {...wrap("mc-tir-live", className, style)} {...named(label)} {...bind}>
@@ -201,7 +202,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
       <LiveRegion>{announced}</LiveRegion>
       {readout && zone ? (
         <span className="mc-spark-readout" style={chipPos}>
-          {`${nameByKey[zone.key]} ${pct[zone.key]}%`}
+          {chipText}
         </span>
       ) : null}
     </span>

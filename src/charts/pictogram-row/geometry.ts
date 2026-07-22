@@ -5,6 +5,10 @@
 // never generate ids). Coords 2-dp.
 import { round2 } from "../../core/types.js";
 
+/** Drawn-unit ceiling. One unit is one DOM node, and `total` is unbounded
+ *  caller data — see the saturation note in `pictogramGeometry`. */
+const PICTOGRAM_MAX_UNITS = 200;
+
 export interface PictogramUnit {
   cx: number;
   cy: number;
@@ -57,7 +61,14 @@ export function pictogramGeometry(opts: {
   fractional: "clip" | "round";
 }): PictogramGeometry {
   const { width, height, shape, fractional } = opts;
-  const total = Number.isFinite(opts.total) ? Math.floor(opts.total) : 0;
+  // `total` is caller data with no upper bound in the type, and one unit is one
+  // DOM node: an accidental `total={3e6}` (a raw count where a share was meant)
+  // exhausts memory, and `1e21` throws `Invalid array length`. Saturate like
+  // TallyMarks does — a row this dense stopped being countable at ~20 anyway,
+  // and the accessible summary still reports the true numbers.
+  const total = Number.isFinite(opts.total)
+    ? Math.min(PICTOGRAM_MAX_UNITS, Math.max(0, Math.floor(opts.total)))
+    : 0;
   // No units to draw: collapse the band to the box mid-line so a seated empty
   // chart still centres where a drawn one would.
   if (total <= 0) {

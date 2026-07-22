@@ -11,6 +11,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -213,7 +214,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
       {readout && rp ? (
         <span
           className="mc-error-budget-readout mc-spark-readout"
-          style={{ left: `${(rp.x / geo!.totalWidth) * 100}%`, transform: "translateX(-50%)" }}
+          style={crosshairReadoutStyle(rp.x, geo!.totalWidth)}
         >
           {`${fmt(rp.value)} · ${RATE_FMT(rp.rate)}×`}
         </span>

@@ -65,7 +65,12 @@ export function cycleGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): CycleGeometry | null {
-  const period = Math.min(Math.max(1, Math.round(opts.period)), CYCLE_MAX_PERIOD);
+  // NaN must be rejected BEFORE the clamp: `Math.max(1, NaN)` is NaN, which
+  // makes `Array.from({ length: NaN })` an EMPTY array, and the bucket write
+  // below then dereferences `values[NaN]` and throws. `period={Number(input)}`
+  // on an empty field is an ordinary way for a host to produce NaN.
+  const rounded = Math.round(opts.period);
+  const period = Number.isFinite(rounded) ? Math.min(Math.max(1, rounded), CYCLE_MAX_PERIOD) : 1;
   const { width, height } = opts;
   const pad = opts.pad ?? CYCLE_PAD;
 

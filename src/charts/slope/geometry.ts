@@ -4,7 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutter, textGutterProse } from "../../core/labels.js";
+import { labelFont, textGutter, textGutterProse } from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -29,8 +29,140 @@ export interface SlopeGeometry {
   domain: readonly [number, number];
 }
 
-/** Label font size (viewBox units) — shared by both entries. */
+/** Label font size (viewBox units) — shared by both entries; scales with size. */
 export const SLOPE_FONT = 6;
+/** Figure-scale CEILING for the type ramp; stays at 6 for the micro 40×40
+ *  default. A candidate, not a promise — `slopeFitFrame` walks down from here
+ *  until the labels actually fit, so growing the type can never be what drops
+ *  the labels it was meant to serve. */
+function slopeLabelFont(height: number, width = 40): number {
+  return Math.min(labelFont(height, 0.32), Math.max(6, Math.round(width * 0.12)));
+}
+
+/**
+ * Frame + font resolver shared by BOTH entries: the largest font size in
+ * [SLOPE_FONT … slopeLabelFont] whose gutters still leave the plot ≥ its floor
+ * (labels kept). Pure arithmetic, ≤ 6 candidate frames — cheap and
+ * deterministic. Falls back to the SLOPE_FONT frame (labels dropped) exactly
+ * like the old fixed-font path did at micro sizes.
+ */
+export function slopeFitFrame(opts: {
+  width: number;
+  height: number;
+  data: readonly { from: number; to: number; label: string }[];
+  domain?: readonly [number, number] | undefined;
+  label: "none" | "value" | "label" | "both";
+  fmt: (n: number) => string;
+}): { geo: SlopeGeometry; labelsDropped: boolean; fontSize: number } {
+  const { width, height, data, domain, label } = opts;
+  // Measure the label CHARACTER counts once, outside the font loop. They are a
+  // property of the data, not of the type size — and measuring them costs one
+  // `fmt` call per row, so re-measuring per candidate multiplied an `Intl`
+  // format over the whole series by the number of candidates (10k rows × 2
+  // columns × 6 fonts timed the shared edge suite out in CI).
+  const chars = slopeLabelChars(data, label, opts.fmt);
+  const wantLabel = label === "label" || label === "both";
+
+  // Choose the size ARITHMETICALLY, then build the geometry once. The fit rule
+  // reads only the gutters and the row pitch, so a candidate never needs the
+  // line set — and building it per candidate meant paying `slopeGeometry`'s
+  // per-row de-overlap scan up to six times over.
+  let fontSize = SLOPE_FONT;
+  for (let f = slopeLabelFont(height, width); f > SLOPE_FONT; f--) {
+    if (labelsFitAt({ width, height, rows: data.length, chars, wantLabel, fontSize: f })) {
+      fontSize = f;
+      break;
+    }
+  }
+  const pairs = data.map((d) => ({ from: d.from, to: d.to }));
+  return {
+    ...frameFor({ width, height, pairs, domain, chars, wantLabel, fontSize }),
+    fontSize,
+  };
+}
+
+/** The `labelsFit` rule, without building the geometry: gutters at this type
+ *  size leave the plot at or above its floor, and the row pitch can seat a
+ *  line of text. Must stay in step with `slopeGeometry`'s `labelsFit`. */
+function labelsFitAt(opts: {
+  width: number;
+  height: number;
+  rows: number;
+  chars: LabelChars;
+  wantLabel: boolean;
+  fontSize: number;
+}): boolean {
+  const { width, height, rows, chars, wantLabel, fontSize } = opts;
+  const r = 1.5;
+  const gutterL = chars.left > 0 ? textGutter(chars.left, fontSize, 3) : 0;
+  const estimateRight = wantLabel ? textGutterProse : textGutter;
+  const gutterR = chars.right > 0 ? estimateRight(chars.right, fontSize, 3) : 0;
+  const plot = round2(width - gutterR - r) - round2(gutterL + r);
+  return plot >= Math.max(10, width * 0.35) && (rows === 0 || height / rows >= fontSize * 1.1);
+}
+
+interface LabelChars {
+  left: number;
+  right: number;
+}
+
+/** Deterministic label widths in CHARACTERS — independent of the type size, so
+ *  a font-fitting loop measures them once rather than per candidate. */
+function slopeLabelChars(
+  data: readonly { from: number; to: number; label: string }[],
+  label: "none" | "value" | "label" | "both",
+  fmt: (n: number) => string,
+): LabelChars {
+  const wantLeft = label === "value" || label === "both";
+  const wantLabel = label === "label" || label === "both";
+  if (label === "none") return { left: 0, right: 0 };
+  let left = 0;
+  let right = 0;
+  for (const d of data) {
+    if (wantLeft && Number.isFinite(d.from)) left = Math.max(left, fmt(d.from).length);
+    const r =
+      (wantLeft && Number.isFinite(d.to) ? fmt(d.to).length : 0) +
+      (wantLabel ? Math.min(6, d.label.length) + 1 : 0);
+    if (r > right) right = r;
+  }
+  return { left: wantLeft ? left : 0, right };
+}
+
+/** One candidate frame: gutters at this type size, with the reclaim rule. */
+function frameFor(opts: {
+  width: number;
+  height: number;
+  pairs: readonly { from: number; to: number }[];
+  domain?: readonly [number, number] | undefined;
+  chars: LabelChars;
+  wantLabel: boolean;
+  fontSize: number;
+}): { geo: SlopeGeometry; labelsDropped: boolean } {
+  const { width, height, pairs, domain, chars, wantLabel, fontSize } = opts;
+  const geo = slopeGeometry({
+    width,
+    height,
+    pairs,
+    domain,
+    gutterLeftCh: chars.left,
+    gutterRightCh: chars.right,
+    rightIsProse: wantLabel,
+    fontSize,
+  });
+  if (geo.labelsFit) return { geo, labelsDropped: false };
+  return {
+    geo: slopeGeometry({
+      width,
+      height,
+      pairs,
+      domain,
+      gutterLeftCh: 0,
+      gutterRightCh: 0,
+      fontSize,
+    }),
+    labelsDropped: true,
+  };
+}
 
 /**
  * The frame BOTH entries render against: label gutters reserved from the
@@ -49,48 +181,15 @@ export function slopeFrame(opts: {
   fontSize?: number;
 }): { geo: SlopeGeometry; labelsDropped: boolean } {
   const { width, height, data, domain, label, fmt, fontSize = SLOPE_FONT } = opts;
-  const wantLeft = label === "value" || label === "both";
-  const wantLabel = label === "label" || label === "both";
-  const estLeftCh = wantLeft
-    ? data.reduce((m, d) => Math.max(m, Number.isFinite(d.from) ? fmt(d.from).length : 0), 0)
-    : 0;
-  const estRightCh =
-    label === "none"
-      ? 0
-      : data.reduce(
-          (m, d) =>
-            Math.max(
-              m,
-              (wantLeft && Number.isFinite(d.to) ? fmt(d.to).length : 0) +
-                (wantLabel ? Math.min(6, d.label.length) + 1 : 0),
-            ),
-          0,
-        );
-
-  const pairs = data.map((d) => ({ from: d.from, to: d.to }));
-  const geo = slopeGeometry({
+  return frameFor({
     width,
     height,
-    pairs,
+    pairs: data.map((d) => ({ from: d.from, to: d.to })),
     domain,
-    gutterLeftCh: estLeftCh,
-    gutterRightCh: estRightCh,
-    rightIsProse: wantLabel,
+    chars: slopeLabelChars(data, label, fmt),
+    wantLabel: label === "label" || label === "both",
     fontSize,
   });
-  if (geo.labelsFit) return { geo, labelsDropped: false };
-  return {
-    geo: slopeGeometry({
-      width,
-      height,
-      pairs,
-      domain,
-      gutterLeftCh: 0,
-      gutterRightCh: 0,
-      fontSize,
-    }),
-    labelsDropped: true,
-  };
 }
 
 export function slopeGeometry(opts: {

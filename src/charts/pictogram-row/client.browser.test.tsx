@@ -16,9 +16,13 @@ describe("interactive <PictogramRow>", () => {
     await expect.poll(() => live.textContent).toBe("6 of 8.");
   });
 
-  it("live={false} → no live region", async () => {
-    await render(<PictogramRow value={5} total={8} live={false} />);
-    expect(document.querySelector('[aria-live="polite"]')).toBeNull();
+  it("live={false} → the live region stays mounted but says nothing", async () => {
+    const screen = await render(<PictogramRow value={5} total={8} live={false} />);
+    // The region is the inline-seat host (shared/live-region.tsx), so it must
+    // never be unmounted to silence a chart — silence is empty children.
+    const region = screen.container.querySelector('[aria-live="polite"]');
+    expect(region).not.toBeNull();
+    expect(region!.textContent).toBe("");
   });
 
   it("onActive reports the focused unit (value = its fill fraction); null once cleared", async () => {

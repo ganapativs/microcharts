@@ -16,6 +16,7 @@ import {
   navOrder,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -210,13 +211,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
       </StaticMicroScatter>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDot && shownPoint ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: `${(shownDot.x / width) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownDot.x, width)}>
           {`${fmt(shownPoint.x)}, ${fmt(shownPoint.y)}`}
         </span>
       ) : null}

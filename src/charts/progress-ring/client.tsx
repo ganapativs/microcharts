@@ -93,7 +93,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       }}
     >
       <StaticProgressRing {...rest} style={fillFor(style)} strings={strings} summary={false} />
-      {live ? <LiveRegion>{announced}</LiveRegion> : null}
+      <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );
 }

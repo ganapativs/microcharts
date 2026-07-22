@@ -11,12 +11,13 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
-import { foldedBandGeometry } from "./geometry.js";
+import { DEFAULT_PERCENTILES, foldedBandGeometry } from "./geometry.js";
 import {
   FoldedDayBand as StaticFoldedDayBand,
   binPosition,
@@ -38,10 +39,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
     data,
     period = 24,
     today,
-    percentiles = [
-      [25, 75],
-      [5, 95],
-    ],
+    percentiles = DEFAULT_PERCENTILES,
     bins = 24,
     width = 120,
     height = 32,
@@ -192,10 +190,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
       </StaticFoldedDayBand>
       <LiveRegion>{announced}</LiveRegion>
       {readout && s ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(s.x / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(s.x, width)}>
           {`${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)} (${fmt(s.q1)}–${fmt(s.q3)})`}
         </span>
       ) : null}

@@ -100,7 +100,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
         // path (bench floor 15 charts/ms). fontSize stays an attribute (the
         // craft gate + containment estimates read it).
         const ink = emphasis === "none" ? "bar" : r.critical ? "accent" : "neutral";
-        const opacity = emphasis === "none" ? 0.85 : r.critical ? undefined : 0.4;
+        const opacity = emphasis === "none" ? 0.85 : r.critical ? undefined : 0.62;
         // a label must SEAT: wide enough for the text AND a row tall enough to
         // hold the floor font without bleeding onto neighbor rows — otherwise
         // it drops out and the strip reads clean (inline/tab sizes)

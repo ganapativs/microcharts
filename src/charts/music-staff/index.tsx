@@ -4,7 +4,7 @@
 // new summary template. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { describeSeries, resolveSummary } from "../../core/summary.js";
+import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { lastFinite } from "../../core/stats.js";
@@ -24,6 +24,9 @@ export interface MusicStaffProps {
   fontSize?: number | undefined;
   format?: Format | undefined;
   locale?: string | string[] | undefined;
+  /** Swappable summary strings (defaults to EN) — the accessible name is
+   *  generated, so this is how a non-English host localizes it. */
+  strings?: SeriesStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -47,6 +50,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     locale,
     title,
     summary,
+    strings,
     id,
     className,
     style,
@@ -66,7 +70,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     mode,
     pad: PAD,
   });
-  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale }));
+  const accName = resolveSummary(summary, () => describeSeries(data, { format, locale, strings }));
   const paint = color;
 
   return (

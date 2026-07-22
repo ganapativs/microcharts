@@ -14,6 +14,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -33,7 +34,10 @@ export interface InteractiveWinProbWormProps extends WinProbWormProps, PickerPro
   animate?: boolean;
 }
 
-const pct = (v: number, fmt: (n: number) => string): string => `${fmt(v)}%`;
+const pct = (v: number, fmt: (n: number) => string): string => {
+  const s = fmt(v);
+  return s.endsWith("%") ? s : `${s}%`;
+};
 
 export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode {
   const {
@@ -182,10 +186,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         {rest.children}
       </StaticWinProbWorm>
       {readout && clampedShown !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(px / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(px, width)}>
           {`${clampedShown >= 50 ? sides[0] : sides[1]} ${pct(leaderProb(clampedShown), fmt)}`}
         </span>
       ) : null}

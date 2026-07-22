@@ -39,6 +39,19 @@ describe("fillWordGeometry — the label is the bar", () => {
     expect(labelled.numeralX!).toBeLessThan(labelled.width);
   });
 
+  it("ALL-CAPS words use a wider extent so the numeral clears the glyphs", () => {
+    const r = fillWordGeometry({
+      value: 0.41,
+      word: "SNOWPACK",
+      fontSize: 26,
+      pad: 2,
+      mode: "fill",
+      label: true,
+    });
+    // 0.72 em/ch for caps — numeral must clear the word body.
+    expect(r.numeralX!).toBeGreaterThanOrEqual(2 + "SNOWPACK".length * 0.72 * 26);
+  });
+
   test.prop([fc.double({ min: 0, max: 1, noNaN: true }), fc.boolean()])(
     "the word extent + numeral stay within width",
     (value, label) => {

@@ -12,6 +12,7 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -106,10 +107,10 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       return {
         index: i,
         value: si ?? null,
-        formatted: `${fi == null ? "—" : fmt(fi)} · ${si == null ? "—" : fmt(si)} · target ${fmt(target)}`,
+        formatted: `${fi == null ? "—" : fmt(fi)} · ${si == null ? "—" : fmt(si)}`,
       };
     },
-    [fast, slow, fmt, target],
+    [fast, slow, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -197,11 +198,8 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
       </StaticDualWindowMeter>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown != null ? (
-        <span
-          className="mc-spark-readout"
-          style={{ left: `${(shownX / width) * 100}%`, transform: "translateX(-50%)" }}
-        >
-          {`${f == null ? "—" : fmt(f)} · ${s == null ? "—" : fmt(s)} · target ${fmt(target)}`}
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
+          {`${f == null ? "—" : fmt(f)} · ${s == null ? "—" : fmt(s)}`}
         </span>
       ) : null}
     </span>

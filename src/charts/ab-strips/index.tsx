@@ -5,7 +5,7 @@
 // bar. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
@@ -14,8 +14,7 @@ import { resolveSummary } from "../../core/summary.js";
 
 /** Signed percent (or absolute when the base is 0) delta of B vs A. */
 export function abDelta(geo: ABStripsGeometry, fmt: (n: number) => string): string {
-  if (geo.aMedian === 0)
-    return geo.deltaMedian > 0 ? `+${fmt(geo.deltaMedian)}` : fmt(geo.deltaMedian);
+  if (geo.aMedian === 0) return withPlus(geo.deltaMedian, fmt);
   const pct = Math.round((geo.deltaMedian / Math.abs(geo.aMedian)) * 100);
   return `${pct > 0 ? "+" : ""}${pct}%`;
 }

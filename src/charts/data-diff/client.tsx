@@ -5,13 +5,14 @@
 // row's added / removed / net. Composes the static component (canon); the focus
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, withPlus } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
   useActivePicker,
   wrap,
+  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -19,6 +20,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry } from "./geometry.js";
 import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from "./index.js";
+import { maxOf } from "../../core/scale.js";
 
 export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
   strings?: DataDiffStrings;
@@ -31,7 +33,7 @@ export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
 }
 
 const signed = (n: number, fmt: (v: number) => string): string =>
-  `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
+  n < 0 ? `−${fmt(Math.abs(n))}` : n === 0 ? fmt(0) : withPlus(n, (v) => fmt(Math.abs(v)));
 
 export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   const {
@@ -89,7 +91,12 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       order,
       domain,
       maxItems,
-      gutterCh: tags ? Math.max(...data.map((d) => d.key.length), 0) : 0,
+      gutterCh: tags
+        ? maxOf(
+            data.map((d) => d.key.length),
+            0,
+          )
+        : 0,
       fontSize: tags ? Math.max(5, Math.min(font, Math.floor(rowH * 0.5))) : font,
       footer,
     });
@@ -212,10 +219,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       {readout && row && geo ? (
         <span
           className="mc-data-diff-readout mc-spark-readout"
-          style={{
-            left: `${(geo.centerX / geo.totalWidth) * 100}%`,
-            transform: "translateX(-50%)",
-          }}
+          style={rowReadoutStyle(geo.centerX, row.y + 4, geo.totalWidth, height)}
         >
           {`${row.key}: +${fmt(row.addedValue)} · −${fmt(row.removedValue)} (${signed(row.net, fmt)})`}
         </span>

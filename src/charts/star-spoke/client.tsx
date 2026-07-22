@@ -12,12 +12,13 @@ import {
   fillFor,
   useActivePicker,
   wrap,
+  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
-import { starSpokeGeometry } from "./geometry.js";
+import { UNIT_DOMAIN, starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
 
 export interface InteractiveStarSpokeProps extends StarSpokeProps, PickerProps {
@@ -32,7 +33,7 @@ export interface InteractiveStarSpokeProps extends StarSpokeProps, PickerProps {
 export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   const {
     data,
-    domain = [0, 1],
+    domain = UNIT_DOMAIN,
     size = 80,
     labels = true,
     format,
@@ -200,7 +201,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            left: `${(spoke.tx / size) * 100}%`,
+            ...crosshairReadoutStyle(spoke.tx, size),
             top: `${(spoke.ty / size) * 100}%`,
             transform: "translate(-50%, -140%)",
             bottom: "auto",
