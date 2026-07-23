@@ -16,7 +16,8 @@
     "start": "serve out -l 3001",
     "typecheck": "fumadocs-mdx && next typegen && tsc --noEmit",
     "test": "vitest run",
-    "cf:deploy": "pnpm build && wrangler deploy",
+    "cf:deploy": "pnpm build && wrangler deploy && pnpm seo:indexnow",
+    "seo:indexnow": "node scripts/indexnow-submit.mjs",
     "cf:preview": "pnpm build && wrangler dev"
   },
   "dependencies": {
