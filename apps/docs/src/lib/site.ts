@@ -7,7 +7,7 @@ export const SITE = {
   name: "microcharts",
   tagline: "Word-sized charts for React.",
   description:
-    "Word-sized React charts — sparklines & inline SVG microcharts. Zero runtime deps, ~2–7 kB interactive · ~1–4 kB static, accessible by default, RSC-safe. Sit in a sentence, table cell, KPI card, or AI reply.",
+    "Word-sized React charts — tiny sparklines, micro charts & inline SVG trend lines. Zero runtime deps, ~2–7 kB interactive · ~1–4 kB static, accessible by default, RSC-safe. Sit in a sentence, table cell, KPI card, or AI reply.",
   pkg: "@microcharts/react",
   repo: "https://github.com/ganapativs/microcharts",
   npm: "https://www.npmjs.com/package/@microcharts/react",

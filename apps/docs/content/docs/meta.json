@@ -19,6 +19,12 @@
     "when-to-use",
     "react-sparklines",
     "inline-charts",
-    "full-chart-libraries"
+    "full-chart-libraries",
+    "---Comparisons---",
+    "vs-recharts",
+    "vs-chartjs",
+    "vs-react-sparklines",
+    "vs-mui-x-sparkline",
+    "vs-visx"
   ]
 }

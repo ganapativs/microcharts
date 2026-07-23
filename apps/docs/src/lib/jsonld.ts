@@ -165,12 +165,16 @@ export function faqJsonLd(faqs: readonly { q: string; a: string }[]) {
 /** Intro / docs home FAQ — must match visible copy on `/docs`. */
 export const DOCS_INTRO_FAQS = [
   {
+    q: "What are micro charts?",
+    a: "Micro charts — also called sparklines, tiny charts, or inline charts — are small, word-sized data visualizations: a trend line, bar, or dot that fits inside a sentence, table cell, or KPI card without axes or legends. They answer one question at a glance in the space of a word, where a full chart would be too heavy and too loud.",
+  },
+  {
     q: "What is microcharts?",
     a: "microcharts is a React chart library of word-sized SVG charts — sparklines, bars, bullets, and the rest of the catalog — built to sit inside sentences, table cells, KPI cards, and AI replies. Zero runtime dependencies, accessible by default, and server-component safe.",
   },
   {
     q: "How is microcharts different from Recharts or Chart.js?",
-    a: "Those are full chart libraries for surfaces that are mostly chart. microcharts sits inside an interface — word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, ~2–7 kB interactive · ~1–4 kB static gzip, no axes or legends, static RSC entries with zero client JavaScript. Not a replacement. See /docs/when-to-use and /docs/full-chart-libraries.",
+    a: "Those are full chart libraries for surfaces that are mostly chart. microcharts sits inside an interface — word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, ~2–7 kB interactive · ~1–4 kB static gzip, no axes or legends, static RSC entries with zero client JavaScript. Not a replacement. See /docs/when-to-use and /docs/full-chart-libraries, or the measured per-library pages: /docs/vs-recharts, /docs/vs-chartjs, /docs/vs-react-sparklines, /docs/vs-mui-x-sparkline, and /docs/vs-visx.",
   },
   {
     q: "Are microcharts accessible?",
