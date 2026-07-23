@@ -18,6 +18,7 @@ import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld"
 import { docLastModified } from "@/lib/doc-dates";
 import { RouteTransition } from "@/components/route-transition";
 import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
+import { RelatedCharts } from "@/components/charts/related-charts";
 import { getChart } from "@/lib/charts/entries";
 import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
 import { SITE } from "@/lib/site";
@@ -90,6 +91,9 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
             <MDX components={getChartMDXComponents({ a: createRelativeLink(source, page) })} />
           </ChartSlugProvider>
         </DocsBody>
+        {/* Per-chart pages only — deterministic cross-links (SEO + discovery);
+            the index page is the catalog itself. */}
+        {chartSlug ? <RelatedCharts slug={chartSlug} /> : null}
       </RouteTransition>
     </DocsPage>
   );
