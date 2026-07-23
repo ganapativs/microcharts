@@ -19,7 +19,7 @@ describe("seo helpers", () => {
 
   it("describes the charts index with catalog count + package", () => {
     const d = chartsIndexDescription();
-    expect(d).toMatch(/\d+ React microcharts/);
+    expect(d).toMatch(/\d+ micro charts for React/);
     expect(d).toContain(SITE.pkg);
   });
 

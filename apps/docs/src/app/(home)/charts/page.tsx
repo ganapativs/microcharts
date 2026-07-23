@@ -4,10 +4,14 @@ import { chartsIndexDescription } from "@/lib/seo";
 import { GalleryView } from "./gallery-view";
 
 export const metadata: Metadata = docsMeta({
-  title: "React Microcharts Catalog",
+  title: "Micro Charts for React — Full Catalog",
   description: chartsIndexDescription(),
   path: "/charts",
   keywords: [
+    "micro charts",
+    "micro charts react",
+    "tiny charts",
+    "small charts react",
     "react charts",
     "react sparkline",
     "microcharts catalog",
