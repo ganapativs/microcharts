@@ -165,6 +165,10 @@ export function faqJsonLd(faqs: readonly { q: string; a: string }[]) {
 /** Intro / docs home FAQ — must match visible copy on `/docs`. */
 export const DOCS_INTRO_FAQS = [
   {
+    q: "What are micro charts?",
+    a: "Micro charts — also called sparklines, tiny charts, or inline charts — are small, word-sized data visualizations: a trend line, bar, or dot that fits inside a sentence, table cell, or KPI card without axes or legends. They answer one question at a glance in the space of a word, where a full chart would be too heavy and too loud.",
+  },
+  {
     q: "What is microcharts?",
     a: "microcharts is a React chart library of word-sized SVG charts — sparklines, bars, bullets, and the rest of the catalog — built to sit inside sentences, table cells, KPI cards, and AI replies. Zero runtime dependencies, accessible by default, and server-component safe.",
   },

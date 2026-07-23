@@ -16,6 +16,9 @@
 /brand/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
+/favicon.ico
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
 /apple-icon
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 

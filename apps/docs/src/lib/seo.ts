@@ -6,9 +6,19 @@ export const SEO_KEYWORDS = [
   "react charts",
   "react sparkline",
   "sparkline react",
+  "react sparklines",
+  "sparkline chart",
   "microcharts",
   "microchart",
+  "micro charts",
+  "micro charts react",
+  "tiny charts",
+  "tiny charts react",
+  "small charts react",
+  "inline charts",
   "inline charts react",
+  "inline sparkline",
+  "kpi charts react",
   "tiny svg charts",
   "accessible charts",
   "rsc charts",
@@ -32,5 +42,5 @@ export function chartSeoDescription(name: string, pageDesc: string, tagline?: st
 }
 
 export function chartsIndexDescription(): string {
-  return `Browse all ${CATALOG.total} React microcharts — sparklines, bars, bullets, heat strips, and more. Tiny accessible SVG charts from ${SITE.pkg}, searchable by collection.`;
+  return `Browse all ${CATALOG.total} micro charts for React — tiny sparklines, bars, bullets, heat strips, and more. Small accessible SVG charts from ${SITE.pkg}, searchable by collection.`;
 }
