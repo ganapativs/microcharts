@@ -37,8 +37,9 @@ export function SizeMarketing() {
   return <span>{SIZE_MARKETING}</span>;
 }
 
-/** Shared two-column comparison table shell — same markup as the hand-written
- *  Vs tables below so every comparison page reads identically. */
+/** Shared comparison table — rides the site's `.prose table` panel shell (same
+ *  as markdown tables) so every Vs page reads identically. Row headers stay
+ *  `<th scope="row">`; global.css styles `tbody th` to match `tbody td`. */
 function CompareTable({
   competitor,
   rows,
@@ -49,35 +50,29 @@ function CompareTable({
   note: string;
 }) {
   return (
-    <div className="not-prose my-6 overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-hairline text-left">
-            <th className="py-2 pr-4 font-medium" scope="col">
-              Signal
-            </th>
-            <th className="py-2 pr-4 font-medium" scope="col">
-              {competitor}
-            </th>
-            <th className="py-2 font-medium" scope="col">
-              microcharts Sparkline
-            </th>
-          </tr>
-        </thead>
-        <tbody className="tabular-nums text-fd-muted-foreground">
-          {rows.map((r, i) => (
-            <tr key={r.signal} className={i < rows.length - 1 ? "border-b border-hairline" : ""}>
-              <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-                {r.signal}
-              </th>
-              <td className="py-2 pr-4">{r.them}</td>
-              <td className="py-2">{r.us}</td>
+    <>
+      <div className="prose-no-margin relative my-6 overflow-auto">
+        <table className="tabular-nums">
+          <thead>
+            <tr>
+              <th scope="col">Signal</th>
+              <th scope="col">{competitor}</th>
+              <th scope="col">microcharts Sparkline</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="mono-label mt-3 opacity-70">{note}</p>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.signal}>
+                <th scope="row">{r.signal}</th>
+                <td>{r.them}</td>
+                <td>{r.us}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mono-label opacity-70">{note}</p>
+    </>
   );
 }
 
@@ -201,120 +196,63 @@ export function VsVisxTable() {
 export function VsRechartsTable() {
   const spark = CHART_GZIP.sparkline;
   return (
-    <div className="not-prose my-6 overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-hairline text-left">
-            <th className="py-2 pr-4 font-medium" scope="col">
-              Signal
-            </th>
-            <th className="py-2 pr-4 font-medium" scope="col">
-              Recharts {RECHARTS.version}
-            </th>
-            <th className="py-2 font-medium" scope="col">
-              microcharts Sparkline
-            </th>
-          </tr>
-        </thead>
-        <tbody className="tabular-nums text-fd-muted-foreground">
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Gzip for one chart
-            </th>
-            <td className="py-2 pr-4">~{RECHARTS.oneChartGzipKb} kB (tree-shaken LineChart)</td>
-            <td className="py-2">
-              {spark?.static} kB static · {spark?.interactive} kB interactive
-            </td>
-          </tr>
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Whole package (gzip)
-            </th>
-            <td className="py-2 pr-4">~{RECHARTS.packageGzipKb} kB</td>
-            <td className="py-2">one subpath; catalog median {SIZE.median} kB static</td>
-          </tr>
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Runtime dependencies
-            </th>
-            <td className="py-2 pr-4">{RECHARTS.runtimeDeps}</td>
-            <td className="py-2">0 (React is a peer)</td>
-          </tr>
-          <tr>
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Typical job
-            </th>
-            <td className="py-2 pr-4">Full chart surfaces (axes, legends, tooltips)</td>
-            <td className="py-2">Word-sized marks inside UI / prose / RSC</td>
-          </tr>
-        </tbody>
-      </table>
-      <p className="mono-label mt-3 opacity-70">
-        Orientation only — different jobs. Recharts package via bundlephobia {RECHARTS.measuredAt};
-        one-chart via esbuild tree-shake {RECHARTS.measuredAt}. microcharts from .size-limit.json
-        (CI).
-      </p>
-    </div>
+    <CompareTable
+      competitor={`Recharts ${RECHARTS.version}`}
+      rows={[
+        {
+          signal: "Gzip for one chart",
+          them: `~${RECHARTS.oneChartGzipKb} kB (tree-shaken LineChart)`,
+          us: `${spark?.static} kB static · ${spark?.interactive} kB interactive`,
+        },
+        {
+          signal: "Whole package (gzip)",
+          them: `~${RECHARTS.packageGzipKb} kB`,
+          us: `one subpath; catalog median ${SIZE.median} kB static`,
+        },
+        {
+          signal: "Runtime dependencies",
+          them: RECHARTS.runtimeDeps,
+          us: "0 (React is a peer)",
+        },
+        {
+          signal: "Typical job",
+          them: "Full chart surfaces (axes, legends, tooltips)",
+          us: "Word-sized marks inside UI / prose / RSC",
+        },
+      ]}
+      note={`Orientation only — different jobs. Recharts package via bundlephobia ${RECHARTS.measuredAt}; one-chart via esbuild tree-shake ${RECHARTS.measuredAt}. microcharts from .size-limit.json (CI).`}
+    />
   );
 }
 
 export function VsChartJsTable() {
   const spark = CHART_GZIP.sparkline;
   return (
-    <div className="not-prose my-6 overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-hairline text-left">
-            <th className="py-2 pr-4 font-medium" scope="col">
-              Signal
-            </th>
-            <th className="py-2 pr-4 font-medium" scope="col">
-              Chart.js {CHART_JS.version} + {CHART_JS.wrapper}
-            </th>
-            <th className="py-2 font-medium" scope="col">
-              microcharts Sparkline
-            </th>
-          </tr>
-        </thead>
-        <tbody className="tabular-nums text-fd-muted-foreground">
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Gzip (library)
-            </th>
-            <td className="py-2 pr-4">
-              ~{CHART_JS.packageGzipKb} kB (+ ~{CHART_JS.wrapperGzipKb} kB wrapper)
-            </td>
-            <td className="py-2">
-              {spark?.static} kB static · {spark?.interactive} kB interactive
-            </td>
-          </tr>
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Renderer
-            </th>
-            <td className="py-2 pr-4">Canvas</td>
-            <td className="py-2">SVG</td>
-          </tr>
-          <tr className="border-b border-hairline">
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Runtime dependencies
-            </th>
-            <td className="py-2 pr-4">{CHART_JS.runtimeDeps} (in chart.js)</td>
-            <td className="py-2">0 (React is a peer)</td>
-          </tr>
-          <tr>
-            <th className="py-2 pr-4 text-left font-normal text-fd-foreground" scope="row">
-              Typical job
-            </th>
-            <td className="py-2 pr-4">Dashboard / report canvases, Chart.js plugins</td>
-            <td className="py-2">Inline marks; static RSC with zero client JS</td>
-          </tr>
-        </tbody>
-      </table>
-      <p className="mono-label mt-3 opacity-70">
-        Orientation only — different jobs. Chart.js via bundlephobia {CHART_JS.measuredAt}.
-        microcharts from .size-limit.json (CI).
-      </p>
-    </div>
+    <CompareTable
+      competitor={`Chart.js ${CHART_JS.version} + ${CHART_JS.wrapper}`}
+      rows={[
+        {
+          signal: "Gzip (library)",
+          them: `~${CHART_JS.packageGzipKb} kB (+ ~${CHART_JS.wrapperGzipKb} kB wrapper)`,
+          us: `${spark?.static} kB static · ${spark?.interactive} kB interactive`,
+        },
+        {
+          signal: "Renderer",
+          them: "Canvas",
+          us: "SVG",
+        },
+        {
+          signal: "Runtime dependencies",
+          them: `${CHART_JS.runtimeDeps} (in chart.js)`,
+          us: "0 (React is a peer)",
+        },
+        {
+          signal: "Typical job",
+          them: "Dashboard / report canvases, Chart.js plugins",
+          us: "Inline marks; static RSC with zero client JS",
+        },
+      ]}
+      note={`Orientation only — different jobs. Chart.js via bundlephobia ${CHART_JS.measuredAt}. microcharts from .size-limit.json (CI).`}
+    />
   );
 }
