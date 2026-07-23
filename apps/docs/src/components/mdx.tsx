@@ -144,7 +144,10 @@ import {
   ChartSize,
   SizeMarketing,
   VsChartJsTable,
+  VsMuiXTable,
+  VsReactSparklinesTable,
   VsRechartsTable,
+  VsVisxTable,
 } from "@/components/ui/choose-facts";
 import dynamic from "next/dynamic";
 import type { FC } from "react";
@@ -361,6 +364,9 @@ export function getMDXComponents(components?: MDXComponents) {
     SizeMarketing,
     VsRechartsTable,
     VsChartJsTable,
+    VsReactSparklinesTable,
+    VsMuiXTable,
+    VsVisxTable,
     ...components,
   } satisfies MDXComponents;
 }

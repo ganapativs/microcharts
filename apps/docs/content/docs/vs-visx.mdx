@@ -1,0 +1,63 @@
+---
+title: microcharts vs visx — tiny charts comparison
+description:
+  Airbnb's visx primitives against microcharts' finished word-sized marks — measured size of a minimal visx sparkline,
+  what each approach makes you responsible for, and when building your own charts is the right call.
+---
+
+[visx](https://airbnb.io/visx/) is Airbnb's collection of low-level visualization primitives: shapes, scales, axes, and
+gradients you compose into your own charts. It is deliberately not a chart library — you are the chart library.
+microcharts is the opposite bet: finished, opinionated word-sized marks with the design decisions already made.
+
+That makes this less a competition than a fork in the road. Both keep bundles lean through per-package (visx) or
+per-chart (microcharts) imports; the real question is who does the chart design — you or the library.
+
+## The numbers
+
+<VsVisxTable />
+
+The visx figure is a floor, not a typical cost: `LinePath` plus one scale, before curves, tooltips, or axes. Each
+`@visx/*` package you add brings its own dependencies (d3 arrives vendored through `@visx/vendor`).
+
+## Where the difference actually shows
+
+**Who owns the design.** With visx you decide geometry, padding, label placement, empty-data behavior, negative-value
+handling, and color semantics per chart — full control, and a real design task at 16 pixels tall. microcharts hard-codes
+those decisions: areas anchor at zero, direction is never color-alone, labels reserve deterministic gutters, empty and
+all-null data render documented placeholders.
+
+**Who owns accessibility.** A visx `LinePath` renders a bare `<path>` — `role`, `<title>`, and a description of the data
+are yours to author on every chart you build. Every microchart defaults to `role="img"` with a natural-language summary
+generated from the data.
+
+**Dependency posture.** visx keeps React in control of the DOM and slices d3 into per-package imports — genuinely
+lighter than shipping all of d3. microcharts goes further for its narrower job: scales, paths, easing, color, and
+summaries are in-house, so `dependencies: {}` is a CI-enforced invariant.
+
+**Edge cases.** NaN, ±Infinity, single points, all-equal series — with primitives, each is your code path. Every
+microchart documents and tests these in a shared fixture suite.
+
+## Reach for visx
+
+- The visualization is bespoke — no catalog anywhere has your chart
+- You have design capacity and want d3's power with React's rendering
+- You are building your organization's own charting layer, at any surface size
+
+## Reach for microcharts
+
+- The chart you need already exists in the catalog — <CatalogTotal /> word-sized types, one grammar
+- You want accessibility, edge cases, and design handled by default
+- You want static RSC output with zero client JavaScript, at <SizeMarketing /> gzip per chart
+
+## What this page is not saying
+
+- Not "visx is heavy" — 16 kB for a floor is honest for hand-built charts, and visx's modularity is well executed
+- Not "never build your own" — a bespoke visualization deserves primitives
+- The visx figure is a dated pin for one minimal composition, not a benchmark of visx overall
+
+## Next
+
+- [When to use microcharts](/docs/when-to-use)
+- [Design notes](/docs/design-notes) — the decisions microcharts makes for you
+- [microcharts vs Recharts](/docs/vs-recharts)
+- [Composition](/docs/composition) — placing marks in real surfaces

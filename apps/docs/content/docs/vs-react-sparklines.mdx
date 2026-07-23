@@ -1,0 +1,68 @@
+---
+title: microcharts vs react-sparklines — React sparkline comparison
+description:
+  The 2017-era react-sparklines package against a maintained, accessible, RSC-safe sparkline — measured sizes,
+  dependency and accessibility differences, and an honest note on when the older package is still fine.
+---
+
+[`react-sparklines`](https://www.npmjs.com/package/react-sparklines) put sparklines into thousands of React apps and
+still gets massive weekly downloads. It is the package many "react sparkline" searches land on, so if you are choosing
+between it and microcharts, this page is the factual side-by-side. It is not a takedown — the package earned its
+adoption.
+
+## The numbers
+
+<VsReactSparklinesTable />
+
+## Where the difference actually shows
+
+**Maintenance.** `react-sparklines` last published in 2017 (`1.7.0`). It predates hooks and Server Components — nothing
+from that era can be expected to target them. microcharts is actively maintained against React 18 and 19, with
+StrictMode-safe rendering tested in CI.
+
+**Accessibility.** `react-sparklines` renders a bare `<svg>` — no `role`, no `<title>`, no accessible name; a screen
+reader finds nothing. Every microchart is `role="img"` with a natural-language summary generated from the data
+(`describeSeries`), and interactive entries add keyboard navigation with a polite live region.
+
+**Server Components.** `react-sparklines` components are class components, which need a client boundary in an App Router
+app. The microcharts default export is hook-free static SVG that renders directly in an RSC with zero client JavaScript.
+
+**Scope.** microcharts is a word-sized catalog — <CatalogTotal /> chart types, one grammar: `data` alone renders
+something correct, and the same prop names mean the same thing on every chart. Sparkline is one entry in it.
+`react-sparklines` is one visual idea with composable overlays.
+
+**Size.** Both are small. `react-sparklines` is a single ~7.9 kB gzip package; microcharts charges per chart subpath
+(<ChartSize slug="sparkline" /> for Sparkline) with a CI gate that keeps every chart inside its budget.
+
+## When react-sparklines is still fine
+
+- A legacy codebase already uses it, the charts are decorative, and nothing is broken
+- You need its exact composable-overlay API and have your own accessibility layer
+
+No urgency to migrate in those cases. The gaps above matter when accessibility, RSC, or maintenance actually bite.
+
+## Migrating
+
+The shapes map directly:
+
+```tsx
+// react-sparklines
+import { Sparklines, SparklinesLine } from "react-sparklines";
+<Sparklines data={[3, 5, 4, 8, 6, 9]} width={100} height={20}>
+  <SparklinesLine color="steelblue" />
+</Sparklines>;
+
+// microcharts
+import { Sparkline } from "@microcharts/react/sparkline";
+<Sparkline data={[3, 5, 4, 8, 6, 9]} width={100} height={20} color="steelblue" title="Weekly revenue" />;
+```
+
+`title` gives the chart its accessible subject; the summary is generated from the data. Bars map to
+[SparkBar](/docs/charts/sparkbar), reference lines to [`<Threshold>`](/docs/annotations).
+
+## Next
+
+- [React sparklines](/docs/react-sparklines) — the mark itself, in depth
+- [Sparkline API](/docs/charts/sparkline)
+- [When to use microcharts](/docs/when-to-use)
+- [Accessibility](/docs/accessibility)

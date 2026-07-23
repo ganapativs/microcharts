@@ -1,0 +1,66 @@
+---
+title: microcharts vs Chart.js for inline charts
+description:
+  Canvas vs SVG for word-sized charts in React — measured bundle sizes, react-chartjs-2 wrapper cost, RSC behavior, and
+  accessibility paths. Chart.js remains the right call for dashboard and report canvases; this page covers only the
+  inline-chart decision.
+---
+
+[Chart.js](https://www.chartjs.org) is a Canvas-first chart library with a large plugin ecosystem, usually wrapped by
+[`react-chartjs-2`](https://react-chartjs-2.js.org) in React apps. microcharts is not a replacement for it — a dense
+analyst dashboard or a report full of chart panels is Chart.js territory. This page compares the two for one narrow job:
+a chart the size of a word, inside a sentence, a table cell, or a KPI card.
+
+The broader positioning lives in [When to use microcharts](/docs/when-to-use) and
+[Full chart libraries](/docs/full-chart-libraries).
+
+## The numbers
+
+<VsChartJsTable />
+
+microcharts numbers come from `.size-limit.json` — the CI gate, re-measured on every build. The Chart.js figures are
+pinned with version and date; they are orientation, not a scoreboard.
+
+## Where the difference actually shows
+
+**Renderer.** Chart.js draws to a `<canvas>`, and a canvas only exists in the browser — there is no static-HTML output
+path. The chart appears after JavaScript runs. microcharts renders SVG markup, so the mark is real DOM: it exists in the
+server-rendered HTML, prints correctly, and scales crisply at any zoom.
+
+**Server Components.** `react-chartjs-2` manages the canvas with hooks and effects, so it runs in a client boundary and
+ships Chart.js to the browser. The microcharts default export is hook-free static SVG — an RSC can render it with zero
+client JavaScript.
+
+**Accessibility.** A canvas is a bitmap to assistive technology; the Chart.js docs recommend supplying your own fallback
+content or ARIA labeling per chart, and plugins exist to help. That path works — it is just manual. Every microchart
+defaults to `role="img"` plus a natural-language summary generated from the data.
+
+**Text and theming.** Inline marks sit next to your text, so they must inherit its rhythm. SVG takes CSS custom
+properties, `currentColor`, and container-relative sizing directly; a canvas repaints through JavaScript when the theme
+flips.
+
+## Reach for Chart.js
+
+- Dashboard or report canvases with many series and heavy point counts
+- You already run Chart.js configs or depend on its plugin ecosystem
+- Canvas rendering is a requirement, not an implementation detail
+
+## Reach for microcharts
+
+- The mark lives inline — prose, cells, tabs, KPI cards, streamed AI replies
+- You want the chart present in server-rendered HTML, with zero client JS by default
+- You want an accessible name without per-chart wiring
+- Per-mark budget: <SizeMarketing /> gzip, zero runtime dependencies
+
+## What this page is not saying
+
+- Not "Canvas is wrong" — above a few thousand points it is usually right
+- Not "Chart.js cannot be made accessible" — it can; it is manual
+- The gzip figures are dated pins, not live measurements
+
+## Next
+
+- [Full chart libraries](/docs/full-chart-libraries) — Recharts and Chart.js in one view
+- [microcharts vs Recharts](/docs/vs-recharts)
+- [When to use microcharts](/docs/when-to-use)
+- [Accessibility](/docs/accessibility) — what the defaults actually do

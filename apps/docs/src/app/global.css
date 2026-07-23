@@ -2154,6 +2154,21 @@ figure:has(> pre) .shiki,
 .mc-table tbody tr:first-child td {
   border-top: 0;
 }
+/* Row headers (`<th scope="row">`, e.g. the compare tables) — same cell as a
+   td, not the mono column-header treatment. */
+.prose tbody th,
+.mc-table tbody th {
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+  padding: 0.7rem 1rem;
+  vertical-align: top;
+  text-align: left;
+  font-weight: 400;
+}
+.prose tbody tr:first-child th,
+.mc-table tbody tr:first-child th {
+  border-top: 0;
+}
 
 /* PropTable — auto layout by default; fixed only after a manual resize. */
 .mc-prop-table thead th {

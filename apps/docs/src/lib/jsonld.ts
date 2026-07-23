@@ -174,7 +174,7 @@ export const DOCS_INTRO_FAQS = [
   },
   {
     q: "How is microcharts different from Recharts or Chart.js?",
-    a: "Those are full chart libraries for surfaces that are mostly chart. microcharts sits inside an interface — word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, ~2–7 kB interactive · ~1–4 kB static gzip, no axes or legends, static RSC entries with zero client JavaScript. Not a replacement. See /docs/when-to-use and /docs/full-chart-libraries.",
+    a: "Those are full chart libraries for surfaces that are mostly chart. microcharts sits inside an interface — word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, ~2–7 kB interactive · ~1–4 kB static gzip, no axes or legends, static RSC entries with zero client JavaScript. Not a replacement. See /docs/when-to-use and /docs/full-chart-libraries, or the measured per-library pages: /docs/vs-recharts, /docs/vs-chartjs, /docs/vs-react-sparklines, /docs/vs-mui-x-sparkline, and /docs/vs-visx.",
   },
   {
     q: "Are microcharts accessible?",
