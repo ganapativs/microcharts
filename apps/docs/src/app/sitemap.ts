@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { source } from "@/lib/source";
 import { docLastModified, fileLastModified } from "@/lib/doc-dates";
 import { abs } from "@/lib/site";
+import { SHOWCASE } from "@/lib/showcase";
 
 const HOME = "apps/docs/src/app/(home)";
 
@@ -55,6 +56,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       src: "apps/docs/src/app/docs/[[...slug]]/page.tsx",
     },
+    {
+      path: "/examples",
+      priority: 0.8,
+      changeFrequency: "weekly" as const,
+      src: `${HOME}/examples/page.tsx`,
+    },
+    ...SHOWCASE.map((a) => ({
+      path: `/examples/${a.slug}`,
+      priority: 0.7,
+      changeFrequency: "monthly" as const,
+      src: "apps/docs/src/lib/showcase.ts",
+    })),
     {
       path: "/brand",
       priority: 0.5,

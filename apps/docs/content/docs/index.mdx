@@ -120,6 +120,33 @@ keyboard navigation and a polite live region. Direction and state are never colo
 No. Default exports are hook-free pure SVG — RSC-safe with zero client JS. Import the matching `/interactive` subpath
 only when you need hover, keyboard, touch, or selection.
 
+### Why is there no pie chart, gauge, or waffle?
+
+They fail at word size: pie angles are unreadable in a table cell, a needle gauge spends its pixels on chrome, a waffle
+doesn't fit in a word. Each refusal has an honest in-catalog replacement — [SegmentedBar](/docs/charts/segmented-bar)
+for pie, [Bullet](/docs/charts/bullet) for gauges, [IconArray](/docs/charts/icon-array) for waffle. The reasoning lives
+in [Design notes](/docs/design-notes) and [When to use](/docs/when-to-use).
+
+### Why does my first chart render unstyled, or with serif labels?
+
+Almost always one of two setup steps: the stylesheet isn't imported at your app root
+(`import "@microcharts/react/styles.css"`, once), or the surrounding page never sets a `font-family`, so SVG text falls
+back to a serif — set `--mc-font` or give the page a font. Both are covered in the
+[Quickstart](/docs/quickstart#set-up-manually).
+
+### Can I match the charts to my brand color?
+
+Yes — pass one accent to `defineTheme` and it derives a color-blind-safe categorical palette plus hand-tuned-style dark
+twins, in OKLCH, with zero dependencies; or set the `--mc-*` tokens directly. The one thing a theme can never change is
+what the data means: positive and negative keep their hues on every accent and preset. See [Theming](/docs/theming).
+
+### How do I propose a new chart type?
+
+Open an issue first. A new type must clear the admission bar: a unique data story the catalog can't already answer, one
+honest encoding channel, and readable at ≤ 200×60 px without training. It's a high bar on purpose — every shipped chart
+clears it, and [CONTRIBUTING.md](https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md) walks through the
+rest.
+
 <Callout type="info" title="Production-ready, still earning its scars">
   microcharts is tested and ready to use in production — but it hasn't been battle-tested across every stack and edge
   yet, so you may hit the occasional rough edge. When you do, tell us: bug reports and feature requests on

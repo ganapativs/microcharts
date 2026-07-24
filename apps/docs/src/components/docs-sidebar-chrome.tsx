@@ -1,5 +1,6 @@
 import { SITE } from "@/lib/site";
 import { AppearanceMenu } from "@/components/appearance-menu";
+import { GithubStarCount } from "@/components/github-stars";
 
 function GithubMark() {
   return (
@@ -22,9 +23,10 @@ export function DocsSidebarChrome() {
           target="_blank"
           rel="noreferrer noopener"
           aria-label="GitHub repository"
-          className="ghost-ctrl size-8"
+          className="ghost-ctrl h-8 min-w-8 gap-1.5 px-1.5"
         >
           <GithubMark />
+          <GithubStarCount />
         </a>
         <a
           href={`${SITE.repo}/releases`}

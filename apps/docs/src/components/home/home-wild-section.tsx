@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 import { SHOWCASE, type ShowcaseApp } from "@/lib/showcase";
@@ -57,10 +57,12 @@ function cardinal(n: number): string {
 
 function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?: boolean }) {
   return (
-    <a
-      href={app.url}
-      target="_blank"
-      rel="noreferrer noopener"
+    // On-domain now: the card leads to the app's walk-through page (which then
+    // opens the live app), so the homepage feeds the /examples hub instead of
+    // being a second gallery that jumps straight off-site.
+    <Link
+      prefetch={false}
+      href={`/examples/${app.slug}`}
       className={`wild-card no-underline${wide ? " wild-card--wide" : " wild-card--defer"}`}
       style={
         {
@@ -89,7 +91,7 @@ function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?:
         >
           {app.host}
         </span>
-        <ArrowUpRight aria-hidden className="wild-arrow size-3.5 shrink-0" />
+        <ArrowRight aria-hidden className="wild-arrow size-3.5 shrink-0" />
       </span>
       <span className="wild-shot" aria-hidden />
       <span
@@ -116,9 +118,9 @@ function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?:
         >
           {app.blurb}
         </span>
-        {wide && app.charts && (
-          <span className="mt-4 flex flex-wrap gap-1.5">
-            {app.charts.map((c) => (
+        {wide && app.charts.length > 0 && (
+          <span className="mt-4 flex flex-wrap items-center gap-1.5">
+            {app.charts.slice(0, 6).map((c) => (
               <span
                 key={c}
                 className="plate-inner px-2 py-1 font-mono text-[0.62rem] leading-none text-fd-muted-foreground"
@@ -126,10 +128,15 @@ function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?:
                 {c}
               </span>
             ))}
+            {app.charts.length > 6 && (
+              <span className="font-mono text-[0.62rem] leading-none text-fd-muted-foreground/70">
+                +{app.charts.length - 6} more
+              </span>
+            )}
           </span>
         )}
       </span>
-    </a>
+    </Link>
   );
 }
 
@@ -137,7 +144,7 @@ export function HomeWildSection() {
   const [featured, ...rest] = SHOWCASE;
   return (
     <section id="examples" className="mx-auto max-w-shell scroll-mt-20 px-4 py-14 sm:px-6">
-      <SectionMark n="06">the examples</SectionMark>
+      <SectionMark n="08">the examples</SectionMark>
       <Reveal>
         <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
           The catalog, put to work.
@@ -146,7 +153,15 @@ export function HomeWildSection() {
           {cardinal(SHOWCASE.length)} example apps, each built with{" "}
           <code className="text-fd-foreground">@microcharts/react</code> installed from npm: a
           trading terminal, a print magazine, an eval console. Between them they exercise all{" "}
-          {CATALOG.total} chart types. Every card opens the live example.
+          {CATALOG.total} chart types. Every card opens the live example — or{" "}
+          <Link
+            prefetch={false}
+            href="/examples"
+            className="font-medium text-fd-primary underline decoration-1 underline-offset-[3px] hover:text-fd-foreground"
+          >
+            walk through them as pages
+          </Link>
+          .
         </p>
       </Reveal>
 

@@ -90,11 +90,7 @@ guess. The rules are inlined too, so it still works when the agent can't reach t
 
 ### Set up manually
 
-Two steps, once, at your app root — package plus stylesheet. Both are required.
-
-<Accordions type="single">
-
-<Accordion title="Install the package and import styles.css">
+Two steps, once, at your app root — package plus stylesheet. Both are required, and both fit in the next minute.
 
 **1 · Install.** React 18 or 19 is a peer dependency; there are no other runtime dependencies.
 
@@ -139,10 +135,6 @@ Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/th
 
 </Callout>
 
-</Accordion>
-
-</Accordions>
-
 ## Your first chart
 
 Every series chart renders from `data` alone — single-value charts take `value`. Either way it works in a React Server
@@ -161,6 +153,13 @@ return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
 </LiveDemo>
+
+### Try it live
+
+No install needed to feel it out. This is a full Vite + React app with the package installed, running in your browser —
+static and interactive charts, inline and block, four themes. Run it here, or open it in StackBlitz to edit.
+
+<StackBlitzSandbox />
 
 ## The shared grammar
 

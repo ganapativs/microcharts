@@ -4,6 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "@/components/ui/copy";
 import type { SampleData } from "@/lib/charts/types";
+import { usedSampleData } from "@/lib/charts/runnable";
 
 /** Snippet with collapsible sample-data disclosure; `copyAll` is runnable. */
 export function CodeWithData({
@@ -17,11 +18,7 @@ export function CodeWithData({
   lang?: string;
   className?: string;
 }) {
-  const used = (sampleData ?? []).filter(
-    (s) =>
-      new RegExp(`\\b${s.name}\\b`).test(code) &&
-      !new RegExp(`\\b(?:const|let|var)\\s+${s.name}\\b`).test(code),
-  );
+  const used = usedSampleData(code, sampleData);
   const defs = used.length ? used.map((s) => s.code).join("\n\n") : "";
   const pointer = used.length
     ? `// ${used.map((s) => s.name).join(", ")} — real values under “Sample data” below`

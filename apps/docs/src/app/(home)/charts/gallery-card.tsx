@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useClickableCard } from "@/lib/use-clickable-card";
+import { CopyButton } from "@/components/ui/copy";
 
 /**
  * Gallery plate: fully clickable (opens docs) and interactive (hover/scrub on
@@ -21,12 +22,16 @@ export function GalleryCard({
   name,
   collection,
   tagline,
+  copyText,
   children,
 }: {
   href: string;
   name: string;
   collection: string;
   tagline: string;
+  /** Runnable snippet (import + sample data + JSX) — collapses discovery and
+   *  adoption into one trip: hover a tile, copy working code. */
+  copyText?: string;
   children: ReactNode;
 }) {
   const nav = useClickableCard(href);
@@ -38,6 +43,17 @@ export function GalleryCard({
       <span className="g2-arrow" aria-hidden>
         <ArrowUpRight className="size-4" />
       </span>
+      {copyText ? (
+        // z above the cover anchor; swallow pointer events so a copy is never
+        // also a navigation (the card's clickable-area handler sees no click).
+        <span
+          className="g2-copy"
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <CopyButton text={copyText} size={7} className="bg-fd-background/70" />
+        </span>
+      ) : null}
       <div className="g2-stage">{children}</div>
       <div className="g2-meta">
         <span className="g2-name">{name}</span>

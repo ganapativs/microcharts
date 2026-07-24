@@ -65,6 +65,16 @@ export default {
     const page = await env.ASSETS.fetch(request);
     const headers = new Headers(page.headers);
     addVary(headers, "Accept");
+    // Cross-origin isolation, scoped to the one route that needs it: the
+    // Quickstart embeds a StackBlitz WebContainer inline, which only runs when
+    // the host document is isolated. `credentialless` keeps the blast radius
+    // small (cross-origin subresources load without credentials rather than
+    // being blocked); every other route stays un-isolated. A mirror of these
+    // lives in public/_headers for non-Worker hosts.
+    if (url.pathname === "/docs/quickstart") {
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
+      headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+    }
     return new Response(request.method === "HEAD" ? null : page.body, {
       status: page.status,
       statusText: page.statusText,

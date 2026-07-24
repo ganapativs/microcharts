@@ -8,6 +8,7 @@ import { SITE } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { Brandmark } from "@/components/brandmark";
 import { AppearanceMenu } from "@/components/appearance-menu";
+import { GithubStarCount } from "@/components/github-stars";
 
 function GithubMark() {
   return (
@@ -25,6 +26,7 @@ function GithubMark() {
 const links = [
   { href: "/docs", label: "Documentation" },
   { href: "/charts", label: "Charts" },
+  { href: "/examples", label: "Examples" },
   { href: "/docs/ai", label: "AI-native" },
   { href: "/brand", label: "Brand" },
 ];
@@ -32,7 +34,7 @@ const links = [
 /** Documentation claims all of /docs except /docs/ai, which the AI entry owns. */
 function isActive(href: string, pathname: string): boolean {
   if (href === "/docs") return pathname.startsWith("/docs") && !pathname.startsWith("/docs/ai");
-  return pathname === href || pathname.startsWith(href);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function Wordmark() {
@@ -122,14 +124,17 @@ export function SiteNav() {
           {/* Fumadocs' SearchTrigger renders its own icon (ignores children), so
               style it as a clean square icon button matching GitHub + palette. */}
           <SearchTrigger aria-label="Search" className="ghost-ctrl size-8" />
+          {/* Auto width, not the square ctrl: the star count (fail-open, may
+              never render) sits inside the same anchor as a quiet pill. */}
           <a
             href={SITE.repo}
             target="_blank"
             rel="noreferrer noopener"
             aria-label="GitHub repository"
-            className={ctrl}
+            className="ghost-ctrl h-8 min-w-8 gap-1.5 px-1.5"
           >
             <GithubMark />
+            <GithubStarCount />
           </a>
           <AppearanceMenu />
           {/* !: .ghost-ctrl's unlayered display:inline-flex outranks layered

@@ -13,7 +13,7 @@ import { MiniBar } from "@microcharts/react/mini-bar/interactive";
 import { Seismogram } from "@microcharts/react/seismogram/interactive";
 import { HistogramStrip } from "@microcharts/react/histogram-strip/interactive";
 import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
-import { LIVE_SAMPLES, parseLiveReply, type ChartSpec } from "@/lib/live-grammar";
+import { LIVE_SAMPLES, parseLiveReply, speakLiveReply, type ChartSpec } from "@/lib/live-grammar";
 import { useLiveModel } from "@/components/home/use-live-model";
 
 /**
@@ -442,6 +442,20 @@ export function StreamVignette({
     if (el && followRef.current) el.scrollTop = el.scrollHeight;
   }, [live.text]);
 
+  // Announce the reply to a screen reader — once, on completion, as prose (its
+  // charts flattened to their summaries), never per streamed chunk. Keyed on
+  // `phase` only: at "done" the text is already final. "thinking" gives submit
+  // feedback; the visible error copy is mirrored here.
+  const [announce, setAnnounce] = useState("");
+  useEffect(() => {
+    if (live.phase === "thinking") setAnnounce("Generating a report…");
+    else if (live.phase === "done") setAnnounce(speakLiveReply(live.text));
+    else if (live.phase === "error")
+      setAnnounce("The on-device model didn’t answer. Ask again, or resume the tour.");
+    else setAnnounce("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live.phase]);
+
   // Start on viewport entry; reduced motion jumps straight to the finished reply.
   useEffect(() => {
     const host = hostRef.current;
@@ -644,6 +658,14 @@ export function StreamVignette({
               />
             )}
           </div>
+        )}
+        {/* Screen-reader announcement — the reply as prose (charts flattened to
+            their summaries), spoken once on completion. Separate from the
+            visible box so the per-chunk stream never spams the live region. */}
+        {live.supported && (
+          <p className="sr-only" aria-live="polite">
+            {announce}
+          </p>
         )}
       </div>
       {/* Always mount .hv-composer (0fr→1fr) so 1fr = real height when collapsed.

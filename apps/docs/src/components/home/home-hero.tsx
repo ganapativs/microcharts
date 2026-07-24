@@ -68,8 +68,21 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
 
           <Reveal delay={180} className="mt-8">
+            {/* Two doors, two intents: "Get started" (accent) converts the
+                visitor with a table cell to fill today; "Browse charts" opens
+                the catalog for the one who needs to see the goods first. The
+                AI door lives in the meta row — the hero's streamed reply and
+                act 04 already carry that story, and the quickstart's first
+                section IS the agent path, so nothing is lost. */}
             <div className="flex flex-wrap items-center gap-3">
-              <SetupWithAi />
+              <Link
+                prefetch={false}
+                href="/docs/quickstart"
+                className="cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5"
+              >
+                Get started
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
               <Link
                 prefetch={false}
                 href="/charts"
@@ -84,16 +97,11 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
               <span className="select-none text-sm text-fd-muted-foreground/40" aria-hidden>
                 /
               </span>
-              <Link
-                prefetch={false}
-                href="/docs"
-                className="group inline-flex items-center gap-1 text-[0.72rem] font-medium tracking-[0.08em] text-fd-muted-foreground uppercase transition-colors hover:text-fd-foreground"
-              >
-                <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
-                  docs
-                </span>
-                <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
-              </Link>
+              <SetupWithAi
+                variant="link"
+                tone="muted"
+                className="text-[0.72rem] uppercase tracking-[0.08em]"
+              />
               <span className="select-none text-sm text-fd-muted-foreground/40" aria-hidden>
                 /
               </span>

@@ -9,6 +9,10 @@
 // - A small on-device model WILL mangle syntax sometimes. Anything that fails
 //   validation stays visible as literal code text — never a broken chart,
 //   never invented data.
+//
+// `describeSeries` (core, React-free) is reused for the spoken form below.
+
+import { describeSeries } from "@microcharts/react";
 
 export type ChartSpec =
   | { type: "sparkline" | "sparkbar" | "rug-strip"; values: number[] }
@@ -238,6 +242,53 @@ export function parseLiveReply(input: string): LiveSeg[] {
     if (next?.kind === "text") next.text = next.text.replace(/^[ \t]*\n\s*/, "");
   }
   return segs.filter((seg) => seg.kind !== "text" || seg.text !== "");
+}
+
+// ---------------------------------------------------------------------------
+// Spoken form. The hero's live reply is a real interaction (a person asks, the
+// model answers), so a screen reader must hear the answer — not the chart
+// grammar. This flattens a finished reply into one plain sentence: prose stays
+// verbatim, each chart becomes the same natural-language summary the chart
+// itself would carry (`describeSeries` for series marks). Pure + React-free so
+// the node test can pin it; announced once on completion, never per chunk.
+
+function speakSpec(spec: ChartSpec): string {
+  switch (spec.type) {
+    case "sparkline":
+    case "sparkbar":
+    case "rug-strip":
+      return describeSeries(spec.values);
+    case "histogram":
+    case "seismogram":
+      return `${spec.title}: ${describeSeries(spec.values)}`;
+    case "delta":
+    case "trend-arrow": {
+      // The parser normalizes value to a fraction (see the delta test), so the
+      // percent is safe to speak alongside the direction.
+      if (spec.value === 0) return "flat";
+      const dir = spec.value > 0 ? "up" : "down";
+      return `${dir} ${Math.round(Math.abs(spec.value) * 100)}%`;
+    }
+    case "bullet":
+      return spec.target != null
+        ? `${spec.value} against a target of ${spec.target}`
+        : String(spec.value);
+    case "status-dot":
+      return `status ${spec.status}`;
+    case "mini-bar":
+    case "segmented":
+      return `${spec.title}: ${spec.items.map((it) => `${it.label} ${it.value}`).join(", ")}`;
+  }
+}
+
+/** Flatten a finished live reply to one screen-reader sentence. */
+export function speakLiveReply(text: string): string {
+  const parts: string[] = [];
+  for (const seg of parseLiveReply(text)) {
+    if (seg.kind === "text" || seg.kind === "code") parts.push(seg.text);
+    else if (seg.complete && seg.spec) parts.push(speakSpec(seg.spec));
+  }
+  return parts.join(" ").replace(/\s+/g, " ").trim();
 }
 
 // ---------------------------------------------------------------------------

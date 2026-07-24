@@ -1,15 +1,23 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { getModule, STABLE_CHARTS } from "@/lib/charts/registry";
+import { resolveRunnable } from "@/lib/charts/runnable";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { chartCatalogJsonLd, jsonLdScript } from "@/lib/jsonld";
 import { GalleryStage } from "./gallery-stage";
 import { GalleryCard } from "./gallery-card";
+import { ChartQuestions } from "./chart-questions";
 import { WildStrip } from "./wild-strip";
 import { COLLECTIONS, COLLECTION_ORDER, getCollection, type CollectionDef } from "./collections";
 
 function keywords(c: ChartEntry): string {
-  return [c.name, c.tagline, c.dataShape, c.encoding.channel, c.collection].join(" ").toLowerCase();
+  // Includes `bestFor` — the decisions each chart answers ("rank shuffles",
+  // "progress to goal", "distribution beside a stat") — so the filter matches
+  // the QUESTION a reader has, not just the chart's name. `avoidFor` is left
+  // out on purpose: it would surface a chart for the very use it's wrong for.
+  return [c.name, c.tagline, c.dataShape, c.encoding.channel, c.collection, ...c.bestFor]
+    .join(" ")
+    .toLowerCase();
 }
 
 function catalogCounts() {
@@ -71,6 +79,14 @@ export function GalleryView({
               </>
             )}
           </p>
+          {/* Glanceable "these are alive" signal — the page's one live pulse.
+              Hidden in static mode; the prose above carries it for a reader. */}
+          {!hub && (
+            <p className="g2-live-chip mt-3" aria-hidden>
+              <span className="g2-live-chip-dot" />
+              live · hover any mark to scrub
+            </p>
+          )}
           {hub ? (
             <p className="mt-3 max-w-3xl text-sm text-fd-muted-foreground">
               <span className="text-fd-foreground">Good for.</span> {hub.goodFor}{" "}
@@ -107,6 +123,7 @@ export function GalleryView({
               </Link>
             ))}
           </nav>
+          <ChartQuestions />
         </header>
 
         <div
@@ -147,6 +164,7 @@ export function GalleryView({
                     name={c.name}
                     collection={c.collection}
                     tagline={c.tagline}
+                    copyText={resolveRunnable(c.example.code, c.sampleData)}
                   >
                     <GalleryStage slug={c.slug}>{Preview ? <Preview /> : null}</GalleryStage>
                   </GalleryCard>

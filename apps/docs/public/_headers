@@ -10,6 +10,15 @@
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+# Cross-origin isolation, scoped to the one route that needs it: the Quickstart
+# frames a StackBlitz WebContainer inline, which only runs when the host
+# document is isolated (COOP + COEP). `credentialless` loads cross-origin
+# subresources without credentials rather than blocking them, so the blast
+# radius stays on this page. Mirrored in worker.ts for the Cloudflare path.
+/docs/quickstart
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
 /og/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 

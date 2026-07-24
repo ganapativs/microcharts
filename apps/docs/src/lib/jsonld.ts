@@ -184,6 +184,22 @@ export const DOCS_INTRO_FAQS = [
     q: "Do static microcharts need client JavaScript?",
     a: "No. Default exports are hook-free pure SVG — RSC-safe with zero client JS. Import the matching /interactive subpath only when you need hover, keyboard, touch, or selection.",
   },
+  {
+    q: "Why is there no pie chart, gauge, or waffle?",
+    a: "They fail at word size: pie angles are unreadable in a table cell, a needle gauge spends its pixels on chrome, a waffle doesn't fit in a word. Each refusal has an honest in-catalog replacement — SegmentedBar for pie, Bullet for gauges, IconArray for waffle. The reasoning lives in /docs/design-notes and /docs/when-to-use.",
+  },
+  {
+    q: "Why does my first chart render unstyled, or with serif labels?",
+    a: 'Almost always one of two setup steps: the stylesheet isn\'t imported at your app root (import "@microcharts/react/styles.css", once), or the surrounding page never sets a font-family, so SVG text falls back to a serif — set --mc-font or give the page a font. Both are covered in /docs/quickstart.',
+  },
+  {
+    q: "Can I match the charts to my brand color?",
+    a: "Yes — pass one accent to defineTheme and it derives a color-blind-safe categorical palette plus hand-tuned-style dark twins, in OKLCH, with zero dependencies; or set the --mc-* tokens directly. The one thing a theme can never change is what the data means: positive and negative keep their hues on every accent and preset. See /docs/theming.",
+  },
+  {
+    q: "How do I propose a new chart type?",
+    a: "Open an issue first. A new type must clear the admission bar: a unique data story the catalog can't already answer, one honest encoding channel, and readable at ≤ 200×60 px without training. It's a high bar on purpose — every shipped chart clears it, and CONTRIBUTING.md in the repository walks through the rest.",
+  },
 ] as const;
 
 /** Serialize JSON-LD for inline `<script type="application/ld+json">`. */
