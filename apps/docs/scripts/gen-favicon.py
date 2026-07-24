@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""Generate src/app/favicon.ico (16+32+48) from the canonical brand mark.
+"""Generate public/favicon.ico (16+32+48) from the canonical brand mark.
 
 The SVG favicon (app/brand/icon.svg) stays the primary tab icon; this ICO
 exists for Google SERP + legacy fallbacks, where /favicon.ico is probed
-directly. Cells are size-tuned (bolder than the 32-unit spec) so the climbing
-mark survives 16 px — a straight downscale of the canonical geometry reads as
-noise at SERP size.
+directly.
+
+Two rules the old size-tuned geometry broke:
+  * FULL-BLEED background — the rounded square reaches the box edge so Google's
+    circular SERP mask fills edge-to-edge with accent (no whitespace ring).
+  * CANONICAL cell spacing — cells carry the same ~28% margin the brand mark
+    gives them (lib/brand.ts: 32-unit box, cell 4, x = 9/14/19), so the climb
+    never crowds the edge. The previous build sat the cells ~9% from the edge,
+    which read as "touching". Proportions are derived from the brand spec so the
+    ICO can't drift from the SVG / nav / OG surfaces.
 
 Run: python3 scripts/gen-favicon.py   (from apps/docs)
 """
@@ -17,22 +24,27 @@ CELL = (250, 247, 241)  # #faf7f1 — lib/brand.ts CELL_FILL
 OPACITIES = (0.4, 0.7, 1.0)
 SS = 16  # supersample factor
 
-# Per-size tuned geometry: (cell_px, [x positions], corner_radius, bg_radius)
-# y positions mirror x (bottom-left -> top-right climb).
-TUNED = {
-    16: (4.0, [1.5, 6.0, 10.5], 1.2, 3.0),
-    32: (7.0, [3.0, 12.5, 22.0], 2.2, 6.0),
-    48: (10.0, [5.0, 19.0, 33.0], 3.2, 9.0),
-}
+# Canonical proportions from lib/brand.ts (32-unit box): cell 4, first cell at
+# x=9, 5-unit diagonal step, cell corner 1.2, background corner ~6.
+CELL_RATIO = 4 / 32  # 0.125
+FIRST_RATIO = 9 / 32  # 0.28125 — symmetric ~28% margin
+STEP_RATIO = 5 / 32  # 0.15625
+CELL_R_RATIO = 1.2 / 4  # 0.30 of a cell
+BG_R_RATIO = 6 / 32  # 0.1875 — iOS-style rounded square
+
+SIZES = (16, 32, 48)
 
 
 def draw_icon(size: int) -> Image.Image:
-    cell, xs, r, bg_r = TUNED[size]
+    cell = size * CELL_RATIO
+    xs = [size * FIRST_RATIO + i * size * STEP_RATIO for i in range(3)]
+    r = cell * CELL_R_RATIO
+    bg_r = size * BG_R_RATIO
     s = size * SS
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    # Full-bleed rounded-square background (SERP chips mask to a circle anyway;
-    # full bleed keeps the mark as large as possible).
+    # Full-bleed rounded-square background (SERP chips mask to a circle; full
+    # bleed keeps the accent edge-to-edge with no whitespace ring).
     d.rounded_rectangle([0, 0, s - 1, s - 1], radius=bg_r * SS, fill=EMBER)
     for x, o in zip(xs, OPACITIES):
         y = size - x - cell  # mirror: climb bottom-left -> top-right
@@ -49,7 +61,7 @@ def draw_icon(size: int) -> Image.Image:
 
 
 def main() -> None:
-    icons = {size: draw_icon(size) for size in TUNED}
+    icons = {size: draw_icon(size) for size in SIZES}
     out = "public/favicon.ico"
     icons[48].save(
         out,

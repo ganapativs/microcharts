@@ -3,6 +3,7 @@ import { Sparkline } from "@microcharts/react/sparkline";
 import { SectionMark } from "@/components/home/section-mark";
 import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
+import { CountUp } from "@/components/ui/count-up";
 import { SIZE } from "@/lib/docs-facts";
 import { RECHARTS } from "@/lib/competitor-facts";
 
@@ -55,7 +56,7 @@ export function HomeCostSection() {
 
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="05">the cost</SectionMark>
+      <SectionMark n="06">the cost</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">
@@ -83,7 +84,7 @@ export function HomeCostSection() {
             <div className="space-y-3">
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">recharts, one LineChart</span>
-                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                <span className="cost-wipe min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
                     value={RECHARTS_ONE_CHART_KB}
                     max={RECHARTS_ONE_CHART_KB}
@@ -95,14 +96,19 @@ export function HomeCostSection() {
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  {RECHARTS_ONE_CHART_KB} kB
+                  <CountUp
+                    to={RECHARTS_ONE_CHART_KB}
+                    suffix=" kB"
+                    durationMs={1050}
+                    startDelayMs={280}
+                  />
                 </span>
               </div>
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">
                   microcharts, one interactive
                 </span>
-                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                <span className="cost-wipe min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
                     value={SIZE.interactiveMedian}
                     max={RECHARTS_ONE_CHART_KB}
@@ -113,7 +119,13 @@ export function HomeCostSection() {
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  {SIZE.interactiveMedian} kB
+                  <CountUp
+                    to={SIZE.interactiveMedian}
+                    decimals={2}
+                    suffix=" kB"
+                    durationMs={1050}
+                    startDelayMs={280}
+                  />
                 </span>
               </div>
             </div>

@@ -1146,6 +1146,37 @@ body {
     transform: none;
   }
 
+  /* Header "live" chip — the page's single pulse, inviting the first hover.
+     Hidden in static mode; the header prose carries it for a screen reader. */
+  .g2-live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-fd-muted-foreground);
+  }
+  .g2-live-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  /* Pulse only with motion allowed — the reduced-motion reset elsewhere keys on
+     the .hx-pulse CLASS, not this dot, so gate it here. At rest it stays a solid
+     accent dot: still a fine "live" signal. */
+  @media (prefers-reduced-motion: no-preference) {
+    .g2-live-chip-dot {
+      animation: hx-pulse 2.4s ease-in-out infinite;
+    }
+  }
+  html[data-g2-mode="static"] .g2-live-chip {
+    display: none;
+  }
+
   /* Hover visuals live ONLY on hover-capable devices, so a touch tap (which
      emulates :hover and would leave it stuck) never lifts/lights a plate. Touch
      gets feedback through :focus-within instead; tilt is already off on coarse
@@ -2027,6 +2058,166 @@ figure:has(> pre) .shiki,
   pointer-events: none;
   z-index: 1;
 }
+/* Examples detail — framed theme-aware hero screenshot + live chart-mark tiles
+   ("the catalog, put to work" made literal: every mark an app uses, linked to
+   its doc page). */
+/* The hero screenshot is a link to the live app: the frame holds the border +
+   shadow + clip, the inner .ex-shot holds the (theme-swapped) image and zooms
+   gently on hover — same touch as the homepage marquee card. */
+.ex-shot-frame {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in oklab, var(--hairline) 60%, transparent);
+  box-shadow: var(--glass-shadow);
+  transition:
+    border-color 0.32s var(--ease-out-quint),
+    box-shadow 0.32s var(--ease-out-quint);
+}
+.ex-shot {
+  display: block;
+  aspect-ratio: 16 / 10;
+  background-image: var(--shot-l);
+  background-size: cover;
+  background-position: top center;
+  transform-origin: top center;
+  transition: scale 0.5s var(--ease-out-quint);
+}
+html.dark .ex-shot {
+  background-image: var(--shot-d);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ex-shot-frame:hover {
+    border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
+    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+  }
+  .ex-shot-frame:hover .ex-shot {
+    scale: 1.02;
+  }
+}
+.ex-shot-frame:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Prev / next cards — tokenized (was inline rounded-xl + color-mix). */
+.ex-nav {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel);
+  transition: border-color 0.28s var(--ease-out-quint);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ex-nav:hover {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline));
+  }
+}
+.ex-marks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.7rem;
+}
+.ex-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.85rem 0.75rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--hairline) 55%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--glass-surface);
+  text-decoration: none;
+  transition:
+    border-color 0.28s var(--ease-out-quint),
+    box-shadow 0.28s var(--ease-out-quint),
+    transform 0.28s var(--ease-out-quint);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ex-mark:hover {
+    border-color: color-mix(in oklab, var(--accent) 40%, var(--hairline));
+    box-shadow: var(--glass-edge-lift), var(--glass-shadow-lift);
+    transform: translateY(-2px);
+  }
+}
+/* Press feedback — these tiles are tap targets; match .wild-card's press. */
+.ex-mark:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 0.12s;
+}
+.ex-mark:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+/* The preview sits in a fixed centered band so 25 different marks line up on a
+   grid — the same fit the /charts gallery uses (svg scaled to the box,
+   preserving aspect), but constrained on BOTH axes so a tall mark (dot plots,
+   ladders) scales down to fit instead of clipping. */
+.ex-mark-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 5.5rem;
+  padding: 0.2rem;
+  overflow: hidden;
+}
+.ex-mark-body svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+/* HTML-based previews (Delta, FatDigits…) aren't SVGs to axis-scale — cap them
+   so a big-type mark can't overflow the band. */
+.ex-mark-body > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+.ex-mark-name {
+  font-size: 0.6rem;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-fd-muted-foreground);
+  transition: color 0.28s var(--ease-out-quint);
+}
+.ex-mark:hover .ex-mark-name {
+  color: var(--color-fd-foreground);
+}
+
+/* Live sandbox (StackBlitz). Idle: a framed poster; live: the SDK's iframe
+   fills the frame. Matches the panel language — hairline border, panel radius. */
+.sandbox {
+  margin: 1.5rem 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  background: var(--glass-surface);
+}
+.sandbox-poster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+.sandbox-copy {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-fd-muted-foreground);
+}
+.sandbox-copy code {
+  font-size: 0.85em;
+  color: var(--color-fd-foreground);
+}
+.sandbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+}
+
 .agent-prompt-actions {
   position: absolute;
   left: 50%;
@@ -2405,6 +2596,30 @@ div:where(
 }
 .route-fade {
   animation: route-fade 0.34s var(--ease-out-expo) both;
+}
+
+/* Cost bars sweep in together when the panel reveals: a single left-to-right
+   wipe over both bars. Same duration for each, so the long recharts bar keeps
+   filling long after the tiny microcharts bar has stopped — the scale gap is
+   felt, not just read. Rest state (no motion, no JS) is the full bar. */
+@keyframes cost-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Only the "in" transition animates — the rest state never clips, so the
+     comparison bars can't be left hidden if a reveal lingers at "pending".
+     The wipe plays under the panel's own opacity fade-in, so the from-frame
+     (empty) isn't a harsh flash. */
+  [data-reveal="in"] .cost-wipe {
+    /* delay ~ the panel's rise-in settle (0.72s blur) so the scale sweep lands
+       on a crisp, settled panel rather than through the entrance blur. */
+    animation: cost-wipe 1.05s var(--ease-out-quint) 0.28s both;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

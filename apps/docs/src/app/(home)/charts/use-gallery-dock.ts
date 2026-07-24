@@ -70,8 +70,15 @@ export function useGalleryDock(
     return () => {
       delete html.dataset.g2Mounted;
       delete html.dataset.g2Nav;
+      delete html.dataset.g2Mode;
     };
   }, []);
+
+  // Expose the live/static mode to CSS so the per-card "live" affordance can
+  // hide itself in static mode without threading state through 106 cards.
+  useEffect(() => {
+    document.documentElement.dataset.g2Mode = mode;
+  }, [mode]);
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);

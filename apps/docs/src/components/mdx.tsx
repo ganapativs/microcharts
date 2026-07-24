@@ -128,6 +128,8 @@ import { TokenSwatches, PresetDeltas } from "@/components/charts/token-swatches"
 import { TokenStudio } from "@/components/charts/token-studio";
 import { Snippet } from "@/components/ui/snippet";
 import { AgentPromptCopy } from "@/components/ui/agent-prompt-copy";
+import { CopyAgentSetup } from "@/components/ui/copy-agent-setup";
+import { StackBlitzSandbox } from "@/components/ui/stackblitz-sandbox";
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
 import { Accordions, Accordion } from "fumadocs-ui/components/accordion";
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
@@ -347,6 +349,8 @@ export function getMDXComponents(components?: MDXComponents) {
     SurfaceCards,
     Snippet,
     AgentPromptCopy,
+    CopyAgentSetup,
+    StackBlitzSandbox,
     DynamicCodeBlock,
     Accordions,
     Accordion,

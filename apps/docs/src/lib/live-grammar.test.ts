@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LIVE_FEW_SHOTS, parseLiveReply, type LiveSeg } from "./live-grammar";
+import { LIVE_FEW_SHOTS, parseLiveReply, speakLiveReply, type LiveSeg } from "./live-grammar";
 
 const charts = (segs: LiveSeg[]) => segs.filter((s) => s.kind === "chart");
 
@@ -183,5 +183,32 @@ describe("few-shot examples round-trip through the parser", () => {
         expect(c.spec).not.toBeNull();
       }
     }
+  });
+});
+
+describe("speakLiveReply — screen-reader prose", () => {
+  it("flattens a reply's charts to words, leaving no grammar", () => {
+    const spoken = speakLiveReply(
+      "Revenue built `microchart sparkline 3 5 4 8`, up `microchart delta 0.18`.",
+    );
+    expect(spoken).not.toContain("`");
+    expect(spoken).not.toContain("microchart");
+    expect(spoken).toContain("Revenue built");
+    // the series chart speaks its describeSeries summary
+    expect(spoken.toLowerCase()).toMatch(/trending|range|value/);
+  });
+
+  it("every few-shot reply speaks as non-empty, grammar-free prose", () => {
+    const assistant = LIVE_FEW_SHOTS.filter((m) => m.role === "assistant");
+    for (const m of assistant) {
+      const spoken = speakLiveReply(m.content);
+      expect(spoken.length).toBeGreaterThan(0);
+      expect(spoken).not.toContain("`");
+      expect(spoken).not.toContain("microchart ");
+    }
+  });
+
+  it("drops an in-flight chart rather than speaking half a tag", () => {
+    expect(speakLiveReply("Revenue built `microchart sparkli")).toBe("Revenue built");
   });
 });

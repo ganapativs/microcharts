@@ -13,10 +13,14 @@ const LABEL = "Set up with AI";
  */
 export function SetupWithAi({
   variant = "button",
+  tone = "accent",
   className,
   showArrow = variant === "button",
 }: {
   variant?: "button" | "chip" | "link";
+  /** `link` only: "accent" (default) or "muted" to sit as a quiet peer in a
+   *  meta row without out-shouting a nearby primary. */
+  tone?: "accent" | "muted";
   className?: string;
   showArrow?: boolean;
 }) {
@@ -41,7 +45,8 @@ export function SetupWithAi({
         prefetch={false}
         href={SETUP_HREF}
         className={cn(
-          "group inline-flex items-center gap-1.5 text-xs font-medium text-fd-primary transition-colors hover:text-fd-foreground",
+          "group inline-flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-fd-foreground",
+          tone === "muted" ? "text-fd-muted-foreground" : "text-fd-primary",
           className,
         )}
       >

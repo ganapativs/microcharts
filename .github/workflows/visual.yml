@@ -6,9 +6,8 @@ name: Visual
 #
 # Path-filtered to what can actually change a rendered chart (source, styles,
 # the specs, the build/runner config) so docs-only or tooling-only PRs don't
-# spend Argos screenshots — the free plan caps at 5,000/month. Combined with the
-# single-project light+dark capture (tests/visual/_fixtures.ts), a build uploads
-# 104 screenshots, not 208.
+# spend Argos screenshots. Combined with the single-project light+dark capture
+# (tests/visual/_fixtures.ts), a build uploads 104 screenshots, not 208.
 on:
   push:
     branches: [main]

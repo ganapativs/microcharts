@@ -6,6 +6,7 @@ import { SectionMark } from "@/components/home/section-mark";
 import { ProviderWall } from "@/components/charts/ai-static";
 import { PROVIDER_GROUPS } from "@/lib/ai-providers";
 import { Reveal } from "@/components/ui/reveal";
+import { CopyAgentSetup } from "@/components/ui/copy-agent-setup";
 
 /** 04 · Models (dark band). Provider wall first, then machine surfaces + a
  *  hostile-data card. `dark` re-scopes real theme tokens. Hostile rows call
@@ -23,6 +24,10 @@ const SURFACES = [
   {
     path: "/catalog.json",
     note: "all types with props and data shapes, machine-readable",
+  },
+  {
+    path: "/agent-setup.md",
+    note: "the whole setup as one prompt — install, conventions, first chart",
   },
 ] as const;
 
@@ -124,9 +129,15 @@ export function HomeModelsSection() {
                 ))}
               </ul>
             </div>
-            <p className="mono-label mt-3 opacity-60">
-              kept in sync with package.json#exports, gated by tests
-            </p>
+            {/* The highest-intent action on this band, one click instead of a
+                URL you have to know exists: the canonical setup prompt, onto
+                the clipboard. */}
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <CopyAgentSetup />
+              <p className="mono-label opacity-60">
+                kept in sync with package.json#exports, gated by tests
+              </p>
+            </div>
           </Reveal>
 
           <Reveal delay={160}>
