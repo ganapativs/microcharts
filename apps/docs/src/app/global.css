@@ -1146,30 +1146,6 @@ body {
     transform: none;
   }
 
-  /* Copy-working-code control, top-right twin of the arrow. Must out-stack the
-     cover anchor (z 3) to be clickable; hidden until the plate is engaged so a
-     hundred tiles don't grow a hundred buttons. Always visible to focus. */
-  /* translateZ keeps the copy control IN FRONT of the raised stage
-     (translateZ 16px) in the card's preserve-3d space — without it the click
-     hit-tests to the stage behind it and falls through to the cover anchor
-     (navigates instead of copying). The 2D slide + fade animate on top of it. */
-  .g2-copy {
-    position: absolute;
-    top: 0.55rem;
-    right: 0.55rem;
-    z-index: 5;
-    opacity: 0;
-    transform: translate3d(2px, 2px, 24px);
-    transition:
-      opacity 0.3s var(--ease-out-quint),
-      transform 0.3s var(--ease-out-quint);
-  }
-  .g2-cell:focus-within .g2-copy,
-  .g2-copy:focus-within {
-    opacity: 1;
-    transform: translate3d(0, 0, 24px);
-  }
-
   /* Header "live" chip — the page's single pulse, inviting the first hover.
      Hidden in static mode; the header prose carries it for a screen reader. */
   .g2-live-chip {
@@ -1226,10 +1202,6 @@ body {
     .g2-card:hover .g2-arrow {
       opacity: 1;
       transform: none;
-    }
-    .g2-card:hover .g2-copy {
-      opacity: 1;
-      transform: translate3d(0, 0, 24px);
     }
   }
 
@@ -2244,16 +2216,6 @@ html.dark .ex-shot {
   flex-wrap: wrap;
   gap: 0.6rem;
   margin-top: 0.35rem;
-}
-.sandbox-frame {
-  width: 100%;
-}
-.sandbox-frame iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: inherit;
-  border: 0;
 }
 
 .agent-prompt-actions {

@@ -1,7 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { getModule, STABLE_CHARTS } from "@/lib/charts/registry";
-import { resolveRunnable } from "@/lib/charts/runnable";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
 import { chartCatalogJsonLd, jsonLdScript } from "@/lib/jsonld";
 import { GalleryStage } from "./gallery-stage";
@@ -164,7 +163,6 @@ export function GalleryView({
                     name={c.name}
                     collection={c.collection}
                     tagline={c.tagline}
-                    copyText={resolveRunnable(c.example.code, c.sampleData)}
                   >
                     <GalleryStage slug={c.slug}>{Preview ? <Preview /> : null}</GalleryStage>
                   </GalleryCard>
