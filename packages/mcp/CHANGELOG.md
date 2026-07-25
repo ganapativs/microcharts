@@ -1,5 +1,16 @@
 # @microcharts/mcp
 
+## 0.1.2
+
+### Patch Changes
+
+- [#61](https://github.com/ganapativs/microcharts/pull/61)
+  [`4dc842d`](https://github.com/ganapativs/microcharts/commit/4dc842d77ae81813cb1cd89f6cd543863dce4e14) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Link the Glama registry listing from the server README.
+
+  The README ships inside the package, so the badge — which renders the registry's security and quality score — only
+  reaches npm on a release.
+
 ## 0.1.1
 
 ### Patch Changes
