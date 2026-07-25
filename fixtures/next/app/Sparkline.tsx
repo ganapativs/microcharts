@@ -1,4 +1,4 @@
-// Hand-assembled sparkline for Checkpoint 1 (plan/10 §1): composes the REAL
+// Hand-assembled sparkline for Checkpoint 1: composes the REAL
 // shipped shell — <Chart> + describeSeries from @microcharts/react — with inline
 // scale/path. No hooks, no 'use client' → renders entirely on the server as a
 // React Server Component, shipping zero client JS. The full <Sparkline> (Phase

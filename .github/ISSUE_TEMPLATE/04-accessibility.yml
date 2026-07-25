@@ -1,0 +1,122 @@
+name: Accessibility report
+description: A screen reader, keyboard, contrast, motion, or forced-colors problem in a chart or on the docs site.
+labels: ["bug", "a11y", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Accessibility is a **shipped guarantee**, not a nice-to-have: every chart is `role="img"` with a generated
+        natural-language summary as its accessible name, direction is never colour-alone, strokes clear 4.5:1 in the
+        default themes, and `prefers-reduced-motion` / `forced-colors` / `prefers-contrast` are all handled.
+
+        A failure in any of those is a bug at the same severity as a wrong number. Thank you for reporting it.
+
+  - type: dropdown
+    id: barrier
+    attributes:
+      label: What kind of barrier?
+      options:
+        - Screen reader — wrong, missing, or misleading announcement
+        - Screen reader — chart is announced when it should be decorative (or vice versa)
+        - Keyboard — can't reach, can't operate, or focus is lost/invisible
+        - Contrast — text or marks below threshold
+        - "`forced-colors` (Windows High Contrast) — marks vanish or merge"
+        - "`prefers-reduced-motion` — motion still plays"
+        - "`prefers-contrast: more` — no adaptation"
+        - Zoom / reflow / 200% text size
+        - Touch target size or pointer-only interaction
+        - Live region — announcement missing, spammy, or wrongly assertive
+        - Colour-alone encoding of state or direction
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: subpath
+    attributes:
+      label: Affected chart / page
+      description: The import subpath, or the docs URL.
+      placeholder: "@microcharts/react/bullet/interactive — or https://microcharts.dev/docs/charts/bullet"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry
+    attributes:
+      label: Static or interactive?
+      options:
+        - Static (default export)
+        - Interactive (`…/interactive`)
+        - Both
+        - Docs site itself (not a chart)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: >-
+        For screen readers, paste the announcement you heard **verbatim** and what it should have said. The
+        generated summary is deterministic, so exact text pins the bug fast.
+      placeholder: |
+        Expected: "Quota: 72 of 100, above target 80." — announced once on focus.
+        Actual: "image" — no name at all when `summary` is left at its default.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The component and props, or the steps on the page.
+      render: tsx
+
+  - type: input
+    id: at
+    attributes:
+      label: Assistive tech / mechanism + version
+      description: Screen reader + browser pairing, or the tool that flagged it.
+      placeholder: "VoiceOver (macOS 15.5) + Safari 18.5 · NVDA 2025.1 + Firefox · axe DevTools 4.x · keyboard only"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Package + React version
+      placeholder: "@microcharts/react 0.8.0 · React 19.1"
+    validations:
+      required: true
+
+  - type: input
+    id: wcag
+    attributes:
+      label: WCAG success criterion (optional)
+      description: If you know it. Helps triage, never required.
+      placeholder: "1.4.11 Non-text Contrast (AA)"
+
+  - type: textarea
+    id: tooling
+    attributes:
+      label: Automated tool output (optional)
+      description: axe, Lighthouse, or Accessibility Insights output — paste the relevant rule and node.
+      render: text
+
+  - type: checkboxes
+    id: conditions
+    attributes:
+      label: Conditions
+      options:
+        - label: Dark mode
+        - label: A non-default preset or a custom `defineTheme` palette
+        - label: OS-level reduced motion is on
+        - label: OS-level high contrast / forced colours is on
+        - label: Browser zoom above 100% or enlarged default font size
+        - label: Non-`en` locale
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: A recording of the screen-reader output is the gold standard, if you can capture one.

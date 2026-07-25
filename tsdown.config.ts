@@ -5,7 +5,7 @@ import { versionDefine } from "./scripts/pkg-version.mjs";
 //   'src/charts/sparkline/index.tsx', 'src/charts/sparkline/client.tsx', ...
 // Each becomes its own entry so consumers pay only for what they import.
 // CSS is NOT bundled through tsdown — it ships as one static `styles.css`
-// (see plan/19-css-delivery.md) so static charts stay zero-JS.
+// so static charts stay zero-JS.
 export default defineConfig({
   entry: [
     "src/index.ts",
@@ -13,7 +13,7 @@ export default defineConfig({
     "src/theme.ts",
     // Entrance-motion engine: dynamically imported by motion-gate when a
     // consumer passes `animate` — its own chunk so charts that never animate
-    // never load it (plan/04 §8.1, plan/06 §5).
+    // never load it.
     "src/shared/motion-engine.ts",
     "src/charts/sparkline/index.tsx",
     "src/charts/sparkline/client.tsx",

@@ -1,0 +1,89 @@
+name: Bug — docs site or machine surfaces
+description: A page is wrong, an example doesn't work, a link is dead, or /llms.txt · /catalog.json drifted from the code.
+labels: ["documentation", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The docs are meant to be **docs-as-tests**: every example is a real compiled component, every quoted
+        `describeSeries` string is the actual generated one, and the machine surfaces (`/llms.txt`,
+        `/llms-full.txt`, `/catalog.json`) track `package.json#exports`. So "the docs say X but the code does Y"
+        is a real bug, not a nitpick — please file it.
+
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      placeholder: https://microcharts.dev/docs/charts/sparkline
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which surface?
+      options:
+        - Chart page (a chart under /docs/charts/…)
+        - Guide / concept page
+        - API or props reference
+        - Gallery / catalog listing
+        - Theming page or the token-copy studio
+        - Interactive playground / live demo
+        - Search
+        - "`/llms.txt` or `/llms-full.txt`"
+        - "`/catalog.json`"
+        - "Markdown negotiation (`Accept: text/markdown`) or a `.md` mirror"
+        - Homepage / marketing pages
+        - Comparison pages (/docs/vs-…)
+        - README on npm or GitHub
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem?
+      options:
+        - Docs claim disagrees with shipped code (drift)
+        - Example doesn't compile or doesn't run
+        - Stale number (size, benchmark, chart count, version)
+        - Broken or wrong link
+        - Rendering / layout / theming bug on the page itself
+        - Missing or confusing explanation
+        - Typo / grammar
+        - Machine surface out of sync with `package.json#exports`
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What's wrong?
+      description: Quote the exact text or example, then say what it should be.
+      placeholder: |
+        The page says the summary is "Rose 12% over 7 days", but the shipped `describeSeries` output for that
+        dataset is "Up 12% across 7 points".
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: >-
+        For drift, point at the code (file path, or a `dist/` export) that contradicts the page. For a broken
+        example, paste the error. For a machine surface, paste the offending JSON/line.
+      render: text
+
+  - type: input
+    id: env
+    attributes:
+      label: Browser · OS (for rendering bugs)
+      placeholder: "Safari 18.5 · macOS 15.5 · dark mode"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Screenshots welcome — drag them in here.

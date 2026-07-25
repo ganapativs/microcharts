@@ -3,7 +3,7 @@
 Real apps that consume `@microcharts/react` to prove it works where it must:
 
 - **`next/`** — Next.js App Router. Asserts static charts render in a **Server Component with zero client JS** (the
-  RSC-native claim, plan/03). A build-output smoke test checks no `"use client"` chunk ships for static charts.
+  RSC-native claim). A build-output smoke test checks no `"use client"` chunk ships for static charts.
 - **`vite/`** — Vite + React. Asserts SSR + CSR hydration and the interactive (`…/interactive`) entries behave.
 
 **Status:** `next/` is **live** (Checkpoint 1 passed) — `pnpm --filter @microcharts/fixture-next build` static-exports a

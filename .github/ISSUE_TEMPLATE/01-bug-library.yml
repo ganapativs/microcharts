@@ -1,0 +1,206 @@
+name: Bug — chart library (@microcharts/react)
+description: A chart renders wrong, crashes, mis-types, breaks SSR/RSC, or ignores a theme token.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The fastest fixes come from issues that carry **the exact `data` and props**, the
+        **entry you imported** (static vs `/interactive`), and the **rendering context** (RSC / SSR / client).
+
+        Security problems: do **not** file here — use
+        [private vulnerability reporting](https://github.com/ganapativs/microcharts/security/advisories/new).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched [existing issues](https://github.com/ganapativs/microcharts/issues?q=is%3Aissue) and this isn't a duplicate.
+          required: true
+        - label: I reproduced this on the latest `@microcharts/react` release.
+          required: true
+        - label: I imported `@microcharts/react/styles.css` once in my app (or this bug is unrelated to styling).
+          required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected, and what you got instead. One paragraph is plenty.
+      placeholder: |
+        Expected: the area anchors at zero.
+        Got: the area anchors at the series minimum, so a flat series renders as a full-height block.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: >-
+        The smallest component that shows it — real `data`, real props, real imports. Inline the data;
+        don't link to a fetch.
+      render: tsx
+      placeholder: |
+        import { Sparkline } from "@microcharts/react/sparkline";
+
+        export function Repro() {
+          return <Sparkline data={[4, 4, 4, 4]} title="Flat" />;
+        }
+    validations:
+      required: true
+
+  - type: input
+    id: repro-link
+    attributes:
+      label: Live reproduction (optional but hugely helpful)
+      description: StackBlitz, CodeSandbox, or a minimal repo.
+      placeholder: https://stackblitz.com/edit/...
+
+  - type: input
+    id: subpath
+    attributes:
+      label: Affected import path(s)
+      description: The exact subpath(s) — this tells us which chart and which entry.
+      placeholder: "@microcharts/react/sparkline, @microcharts/react/bullet/interactive"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry
+    attributes:
+      label: Which entry?
+      options:
+        - Static (default export, e.g. `@microcharts/react/sparkline`)
+        - Interactive (`…/interactive`)
+        - Both
+        - Annotations (`@microcharts/react/annotations`)
+        - Theme (`@microcharts/react/theme` — `defineTheme`)
+        - Motion (`@microcharts/react/motion`)
+        - Stylesheet (`@microcharts/react/styles.css` or a `styles/*.css` split)
+        - Root (`@microcharts/react` — `MicroProvider`, `SparkGroup`)
+        - Types only (no runtime symptom)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: context
+    attributes:
+      label: Rendering context
+      description: Static entries are RSC-safe and hook-free; interactive entries are `'use client'`. Where did this run?
+      options:
+        - React Server Component (no client boundary)
+        - SSR, then hydrate
+        - Static export / SSG (prerendered HTML)
+        - Client-only (SPA, no SSR)
+        - Test environment — jsdom
+        - Test environment — browser (Playwright / @vitest/browser)
+        - Node — renderToString / renderToStaticMarkup
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: Framework / bundler
+      options:
+        - Next.js — App Router
+        - Next.js — Pages Router
+        - Vite
+        - React Router / Remix
+        - Astro
+        - TanStack Start
+        - Webpack (standalone)
+        - Rspack / Rollup / Parcel / esbuild
+        - Vitest / Jest (test-only)
+        - No bundler (browser ESM, CDN)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: "@microcharts/react version"
+      placeholder: "0.8.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: react
+    attributes:
+      label: React version
+      options:
+        - "19.x"
+        - "18.x"
+        - Both (reproduces on each)
+        - Other / canary
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Node · package manager · browser · OS
+      description: Browser matters for rendering bugs; Node matters for SSR/RSC and build bugs.
+      placeholder: "Node 22.11 · pnpm 11.15 · Chrome 141 · macOS 15.5"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: conditions
+    attributes:
+      label: Conditions in play
+      description: Tick anything active when the bug shows. These change what the chart is allowed to paint.
+      options:
+        - label: Dark mode
+        - label: "`prefers-reduced-motion: reduce`"
+        - label: "`forced-colors: active` (Windows High Contrast)"
+        - label: "`prefers-contrast: more`"
+        - label: A non-default preset (`editorial`, `mono`, `vivid`, `print`, `eink`)
+        - label: A custom theme from `defineTheme`, or hand-written `--mc-*` overrides
+        - label: A CSS reset / Tailwind Preflight / a global `svg { … }` rule
+        - label: "Non-default `--mc-density`, `--mc-label-size`, or `--mc-font-numeric`"
+        - label: A non-`en` locale (formatting or summary text)
+        - label: Container query / `zoom` / non-1 devicePixelRatio / print preview
+
+  - type: checkboxes
+    id: data-shape
+    attributes:
+      label: Data character
+      description: >-
+        Edge-case data bugs are explicitly welcome — hardening against them is a project goal.
+      options:
+        - label: Empty array
+        - label: Single point
+        - label: All values equal (degenerate domain)
+        - label: Contains `null` / `undefined` gaps
+        - label: All values null
+        - label: Negative values, or a domain crossing zero
+        - label: "`NaN` or `±Infinity`"
+        - label: Very large series (thousands of points) or very large/small magnitudes
+        - label: Ordinary, well-formed data
+
+  - type: textarea
+    id: svg
+    attributes:
+      label: Produced SVG
+      description: >-
+        Paste the rendered markup (DevTools → copy outerHTML of the `.mc-root` svg). This is the single most
+        useful attachment for a rendering bug — it turns "looks wrong" into exact coordinates.
+      render: html
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console output / stack trace / hydration mismatch
+      description: Paste verbatim, including the React warning text.
+      render: text
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Screenshots, a screen recording, what you already tried, or where you think it goes wrong.

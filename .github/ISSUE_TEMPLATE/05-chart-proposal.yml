@@ -1,0 +1,118 @@
+name: New chart type proposal
+description: Propose a chart the catalog doesn't have. Held to a deliberately high admission bar.
+labels: ["enhancement", "chart-proposal", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        microcharts ships 106 chart types and **prefers uncommon questions over uncommon shapes**. A new type is
+        admitted only when it answers a practical decision the catalog cannot already answer well.
+
+        Some shapes are excluded on purpose — pie, needle gauges, battery, waffle, violin — each fails at micro
+        scale or on the honest-encoding bar, and each has a strictly better in-catalog replacement (Bullet for
+        gauges, SegmentedBar for pie, MicroBox for violin). See "Not shipped (by design)" in
+        [`CLAUDE.md`](https://github.com/ganapativs/microcharts/blob/main/CLAUDE.md).
+
+        Proposals that get accepted usually answer the "closest existing chart, and why it fails" question in one
+        crisp paragraph. Start there.
+
+  - type: input
+    id: name
+    attributes:
+      label: Proposed name
+      placeholder: "Rate Ladder"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What decision does it help a reader make?
+      description: The signal it communicates at a glance — in one sentence, then the context it sits in.
+      placeholder: |
+        "Are we inside the agreed latency envelope, and which tier are we in?" — for an SLO row in a service table.
+    validations:
+      required: true
+
+  - type: textarea
+    id: closest
+    attributes:
+      label: Closest existing chart — and why it can't do this
+      description: >-
+        The most important field. Name the in-catalog chart you'd reach for today (Bullet, GradedBand, Sparkline,
+        PercentileLadder, …) and say specifically what it loses.
+    validations:
+      required: true
+
+  - type: textarea
+    id: shape
+    attributes:
+      label: Data shape
+      description: A TypeScript type. New data shape = new component; the same shape usually means a prop on an existing one.
+      render: ts
+      placeholder: |
+        type RateLadderDatum = { label: string; value: number; ceiling: number };
+        // data: RateLadderDatum[]
+    validations:
+      required: true
+
+  - type: textarea
+    id: encoding
+    attributes:
+      label: Primary encoding channel + honesty
+      description: >-
+        Every type documents one primary channel (position, length, angle, area, colour, density) and a precision
+        rating. State yours, and confirm lie factor = 1 — no truncated baselines, no area encoding a linear
+        quantity, no 3-D.
+      placeholder: |
+        Primary: position along a common scale (high precision).
+        Secondary: colour for tier, which is redundant with position — never the only cue.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: bar
+    attributes:
+      label: Admission bar
+      description: All four must hold. Tick honestly — an unticked box is fine and starts a useful conversation.
+      options:
+        - label: Reads at ≤ 200×60 px (and degrades sensibly smaller)
+        - label: Answers a data story the catalog can't already answer well
+        - label: Has one honest primary encoding channel, lie factor = 1
+        - label: Readable without training — no legend, no axes, no key
+        - label: Survives light, dark, print, and forced-colors rendering
+        - label: Fits inside a sentence, a table cell, a KPI card, or a tab header
+
+  - type: textarea
+    id: sketch
+    attributes:
+      label: Sketch or reference
+      description: >-
+        Drag in an image, or paste SVG/ASCII. A picture at true size (≤ 200×60) is worth more than a description
+        of one.
+
+  - type: textarea
+    id: dataset
+    attributes:
+      label: A real dataset it would render
+      description: Actual numbers you have, not a made-up ramp. Degenerate cases welcome.
+      render: json
+
+  - type: textarea
+    id: prior-art
+    attributes:
+      label: Prior art
+      description: Where you've seen this work — a paper, a product, a dashboard, a print publication.
+
+  - type: checkboxes
+    id: implement
+    attributes:
+      label: Implementation
+      description: >-
+        A chart lands in **one PR**: static + interactive entries, geometry + property tests, edge-case fixtures,
+        an inline `seat`, a summary template, size-budget entry, bench scenario, doc page, catalog/gallery rows.
+        The full bar is in `CLAUDE.md` → "Quality bar".
+      options:
+        - label: I'd like to implement this myself if it's accepted
+        - label: I've read the per-chart Definition of Done and can meet it
+        - label: I'm proposing the idea only — someone else should build it

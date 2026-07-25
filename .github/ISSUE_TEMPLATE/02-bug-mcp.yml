@@ -1,0 +1,123 @@
+name: Bug — MCP server / AI-SDK tools (@microcharts/mcp)
+description: The MCP server fails to start, a tool returns wrong data, or a rendered SVG is broken.
+labels: ["bug", "mcp", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `@microcharts/mcp` is a **stdio** server (and a Vercel AI-SDK toolset) that wraps its own bundled copy of
+        `@microcharts/react`. Nothing is hosted, so the useful evidence is your **client config**, the **exact tool
+        call arguments**, and the **raw output** you got back.
+
+        If the chart itself renders wrong in React too, file a
+        [library bug](https://github.com/ganapativs/microcharts/issues/new?template=01-bug-library.yml) instead.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: I reproduced it with `npx -y @microcharts/mcp@latest` (fresh copy, no stale cache).
+          required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface?
+      options:
+        - stdio MCP server (`npx @microcharts/mcp`)
+        - AI-SDK toolset (`@microcharts/mcp/ai-sdk`)
+        - Programmatic import (`@microcharts/mcp`)
+        - CLI binary (`microcharts-mcp`)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Which tool?
+      options:
+        - "`find_microchart` — ranking / catalog search"
+        - "`get_microchart` — props, imports, example, sample"
+        - "`render_microchart` — SVG output"
+        - Server startup / handshake / capability negotiation
+        - Not tool-specific
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Expected vs. actual.
+      placeholder: |
+        Expected: `get_microchart({ slug: "bullet" })` returns a `sample` I can pass straight to `render_microchart`.
+        Got: `sample` omits `target`, so the render falls back to a plain progress bar.
+    validations:
+      required: true
+
+  - type: textarea
+    id: call
+    attributes:
+      label: Tool call arguments
+      description: The exact JSON arguments sent.
+      render: json
+      placeholder: |
+        { "slug": "bullet" }
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: Actual response / error
+      description: Paste verbatim — the JSON result, the SVG, or the stderr from the server process.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: MCP client config
+      description: Your `mcpServers` entry (redact anything private).
+      render: json
+      placeholder: |
+        {
+          "mcpServers": {
+            "microcharts": { "command": "npx", "args": ["-y", "@microcharts/mcp"] }
+          }
+        }
+
+  - type: input
+    id: version
+    attributes:
+      label: "@microcharts/mcp version"
+      description: Printed at startup, or `npm view @microcharts/mcp version` for what you installed.
+      placeholder: "0.1.1"
+    validations:
+      required: true
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client / host + version
+      placeholder: "Claude Desktop 1.4.2 · or Claude Code 2.x · Cursor 0.5x · custom AI-SDK app"
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: Node version · OS
+      placeholder: "Node 22.11 · macOS 15.5"
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Server logs, the model's transcript around the call, or a rendered SVG that came out wrong.
