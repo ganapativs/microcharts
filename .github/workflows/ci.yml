@@ -146,4 +146,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # GHSA-frvp-7c67-39w9 — path traversal in @hono/node-server's Windows
+          # `serve-static`. It reaches us only as a transitive dependency of
+          # @modelcontextprotocol/sdk, which pulls Hono for its Streamable-HTTP
+          # transport; @microcharts/mcp imports StdioServerTransport only, so no
+          # code path here can reach it. Unfixable downstream: the SDK pins
+          # `^1.19.9` and the patch landed in Hono 2.0.5 (a major).
+          # REMOVE this entry once the SDK widens to Hono 2 — it is not a
+          # standing exemption, and nothing else should be added beside it.
+          allow-ghsas: GHSA-frvp-7c67-39w9
