@@ -29,6 +29,12 @@
       "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
+    },
+    {
+      "description": "engines + peerDependencies are the PUBLISHED contract, not the dev toolchain. `rangeStrategy: bump` would narrow them to whatever this repo happens to develop against — engines.node >=20 to >=24.18.0, or a peer range to the newest patch — locking consumers out for no gain. They move by hand, with intent. `.node-version` is unaffected, so the toolchain still tracks Node.",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["engines", "peerDependencies"],
+      "enabled": false
     }
   ]
 }
