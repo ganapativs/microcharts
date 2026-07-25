@@ -42,8 +42,35 @@ jobs:
       - run: node scripts/gen-size-limits.mjs --check
       - run: node scripts/sync-sizes.mjs --check
       - run: node scripts/sync-bench.mjs --check
+      - run: node scripts/sync-server-json.mjs --check
       - run: pnpm exec publint
       - run: pnpm exec attw --pack .
+      # @microcharts/mcp — the sibling MCP server. Runs after the library build
+      # above: its catalog-sync guard compares the committed snapshot against the
+      # live registry + the built dist/styles.css, and its render tests import the
+      # built @microcharts/react. The build must precede the tests — `dist.test.ts`
+      # spawns the built `dist/cli.mjs` and hard-fails in CI if it is missing.
+      - run: pnpm --filter @microcharts/mcp typecheck
+      - run: pnpm --filter @microcharts/mcp build
+      - run: pnpm --filter @microcharts/mcp test
+      - run: pnpm --filter @microcharts/mcp exec publint
+      - run: pnpm --filter @microcharts/mcp exec attw --pack .
+
+  # A change to packages/mcp must ship with a changeset, or npm keeps serving a
+  # stale embedded catalog — changesets does not cascade to a public dependent
+  # whose `workspace:^` range still covers the new library version. Needs full
+  # history to diff against the base branch, so it is its own small job.
+  mcp-release-guard:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+      - run: node scripts/check-mcp-changeset.mjs "origin/${{ github.base_ref }}"
 
   # Static + core-math suite (jsdom). Its output is pure `renderToStaticMarkup`
   # of deterministic geometry — identical on React 18 and 19 — so it runs ONCE,
