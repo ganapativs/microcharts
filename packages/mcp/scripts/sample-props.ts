@@ -110,6 +110,30 @@ function evalBody(expr: string): string {
   return `${stripTypes(`const __expr = (${expr});`)}\nreturn __expr;`;
 }
 
+/**
+ * Round every non-integer to a fixed precision, recursively.
+ *
+ * Load-bearing for portability, not cosmetics. Several examples generate their
+ * series with `Math.sin`/`Math.cos`, and those are NOT bit-identical across V8
+ * versions and CPU architectures — the committed snapshot diverged in the 17th
+ * significant digit between a dev machine (node 24 / arm64) and CI (node 22 /
+ * x64), which failed the drift guard for a difference no chart can express. Six
+ * decimals is far more precision than a word-sized mark can render, and matches
+ * the library's own "rounded at generation" rule for geometry.
+ *
+ * Integers pass through untouched, so `Date.UTC(…)` timestamps keep full value.
+ */
+const SAMPLE_PRECISION = 1e6;
+
+function roundDeep(v: unknown): unknown {
+  if (typeof v === "number")
+    return Number.isInteger(v) ? v : Math.round(v * SAMPLE_PRECISION) / SAMPLE_PRECISION;
+  if (Array.isArray(v)) return v.map(roundDeep);
+  if (v !== null && typeof v === "object")
+    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, roundDeep(x)]));
+  return v;
+}
+
 function isJsonSafe(v: unknown): boolean {
   if (v === null) return true;
   switch (typeof v) {
@@ -161,7 +185,7 @@ export function extractSample(
       continue;
     }
     if (value === undefined || !isJsonSafe(value)) skipped.push(name);
-    else sample[name] = value;
+    else sample[name] = roundDeep(value);
   }
 
   if (Object.keys(sample).length === 0)
