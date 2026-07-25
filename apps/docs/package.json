@@ -41,11 +41,11 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "ajv": "^8.20.0",
-    "postcss": "^8.5.21",
+    "postcss": "^8.5.23",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wrangler": "^4.112.0"
+    "wrangler": "^4.114.0"
   }
 }
