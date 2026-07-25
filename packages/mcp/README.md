@@ -1,5 +1,7 @@
 # @microcharts/mcp
 
+[![microcharts MCP server](https://glama.ai/mcp/servers/ganapativs/microcharts/badges/score.svg)](https://glama.ai/mcp/servers/ganapativs/microcharts)
+
 An MCP server and Vercel AI-SDK toolset for [microcharts](https://microcharts.dev) — let a model **find** the right
 word-sized chart, **get** exactly how to wire it, and **render** it to a finished SVG with real alt text.
 
