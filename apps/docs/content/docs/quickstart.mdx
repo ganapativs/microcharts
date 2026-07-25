@@ -41,6 +41,8 @@ Complete every step in order; don't stop to ask.
 - https://microcharts.dev/docs/charts/<slug>.md — one chart's page (import path, edge cases). Fetch only for charts you
   use — pick the slug from the index.
 - https://microcharts.dev/docs/quickstart.md — grammar + interactive contract, if you need more than the rules below.
+- Optional: if this client speaks MCP, `npx -y @microcharts/mcp` serves the same catalog as tools, plus a renderer —
+  https://microcharts.dev/docs/mcp.md
 
 If you can't fetch URLs, skip this step — the rules below are enough to render a first chart correctly.
 
@@ -87,6 +89,13 @@ the page rendering the test chart.
 The prompt fetches small, targeted files — the [`/llms.txt`](/llms.txt) index first, then one chart's `.md` page at a
 time — so it stays inside the context window of smaller models and works from today's real API instead of a memorized
 guess. The rules are inlined too, so it still works when the agent can't reach the network.
+
+<Callout type="info">
+  **Does your assistant speak MCP?** Add the server instead of pasting the prompt, and it can search the catalog and
+  render charts as tool calls rather than reading docs: `npx -y @microcharts/mcp`. Per-client config and the tool
+  reference are in [MCP server](/docs/mcp) — the two are complementary, not alternatives: the prompt wires the library
+  into your repo, the server answers chart questions while you work.
+</Callout>
 
 ### Set up manually
 

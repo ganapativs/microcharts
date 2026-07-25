@@ -42,8 +42,38 @@ jobs:
       - run: node scripts/gen-size-limits.mjs --check
       - run: node scripts/sync-sizes.mjs --check
       - run: node scripts/sync-bench.mjs --check
+      - run: node scripts/sync-server-json.mjs --check
       - run: pnpm exec publint
       - run: pnpm exec attw --pack .
+      # @microcharts/mcp — the sibling MCP server. Runs after the library build
+      # above: its catalog-sync guard compares the committed snapshot against the
+      # live registry + the built dist/styles.css, and its render tests import the
+      # built @microcharts/react. The build must precede the tests — `dist.test.ts`
+      # spawns the built `dist/cli.mjs` and hard-fails in CI if it is missing.
+      - run: pnpm --filter @microcharts/mcp typecheck
+      - run: pnpm --filter @microcharts/mcp build
+      - run: pnpm --filter @microcharts/mcp test
+      - run: pnpm --filter @microcharts/mcp exec publint
+      - run: pnpm --filter @microcharts/mcp exec attw --pack .
+
+  # A change to packages/mcp must ship with a changeset, or npm keeps serving a
+  # stale embedded catalog — changesets does not cascade to a public dependent
+  # whose `workspace:^` range still covers the new library version. Needs full
+  # history to diff against the base branch, so it is its own small job.
+  mcp-release-guard:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+        with:
+          fetch-depth: 0
+      # setup-node activates the repo's `packageManager` via corepack, so pnpm
+      # has to exist even though this job only runs a builtins-only node script.
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+      - run: node scripts/check-mcp-changeset.mjs "origin/${{ github.base_ref }}"
 
   # Static + core-math suite (jsdom). Its output is pure `renderToStaticMarkup`
   # of deterministic geometry — identical on React 18 and 19 — so it runs ONCE,
@@ -116,4 +146,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
-      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # GHSA-frvp-7c67-39w9 — path traversal in @hono/node-server's Windows
+          # `serve-static`. It reaches us only as a transitive dependency of
+          # @modelcontextprotocol/sdk, which pulls Hono for its Streamable-HTTP
+          # transport; @microcharts/mcp imports StdioServerTransport only, so no
+          # code path here can reach it. Unfixable downstream: the SDK pins
+          # `^1.19.9` and the patch landed in Hono 2.0.5 (a major).
+          # REMOVE this entry once the SDK widens to Hono 2 — it is not a
+          # standing exemption, and nothing else should be added beside it.
+          allow-ghsas: GHSA-frvp-7c67-39w9

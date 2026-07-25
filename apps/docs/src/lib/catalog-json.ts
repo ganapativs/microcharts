@@ -89,6 +89,16 @@ export function buildCatalog() {
     // `live`, picker callbacks). Listed once here so per-chart `props` carry
     // only chart-specific knobs; use `sharedInteractive` to know which
     // interactive shared names apply to a given chart.
+    // The same catalog, callable. An agent that can spawn an MCP server should
+    // prefer it over re-reading this file: it answers "which chart" and renders
+    // one, instead of handing over the whole API to reason about.
+    mcp: {
+      package: "@microcharts/mcp",
+      command: "npx -y @microcharts/mcp",
+      transport: "stdio" as const,
+      docs: abs("/docs/mcp"),
+      tools: ["find_microchart", "get_microchart", "render_microchart"],
+    },
     sharedProps: SHARED_PROPS.map(toCatalogProp),
     charts: CHARTS.map((c) => {
       const sharedInteractive = sharedInteractiveFor(c);

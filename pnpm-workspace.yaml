@@ -6,6 +6,7 @@ packages:
   # from the versionable set). pnpm resolves the root member fine.
   - "."
   - "apps/*"
+  - "packages/*"
   - "fixtures/*"
 
 # pnpm 11 reads project settings from here (not .npmrc).

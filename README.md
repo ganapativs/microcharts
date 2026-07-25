@@ -168,6 +168,28 @@ alongside the human ones:
 | [`/llms-full.txt`](https://microcharts.dev/llms-full.txt) | The complete generated docs corpus                  |
 | [`/catalog.json`](https://microcharts.dev/catalog.json)   | Every chart's name, import path, props, data shapes |
 
+## Call it over MCP
+
+Those surfaces are for a model that _reads_. [`@microcharts/mcp`](https://www.npmjs.com/package/@microcharts/mcp) is for
+one that _calls_ — a Model Context Protocol server that runs on your machine over stdio, with three tools backed by this
+library: **find** the chart type that answers a question, **get** its exact props and a ready-to-render sample, and
+**render** it to a self-contained SVG with the generated alt text attached.
+
+```json
+{
+  "mcpServers": {
+    "microcharts": {
+      "command": "npx",
+      "args": ["-y", "@microcharts/mcp"]
+    }
+  }
+}
+```
+
+Works in Claude Desktop, Claude Code, Cursor, and VS Code; nothing is hosted and no key is involved. The same three
+capabilities ship as Vercel AI SDK tools on the `@microcharts/mcp/ai-sdk` subpath. Full reference:
+[microcharts.dev/docs/mcp](https://microcharts.dev/docs/mcp).
+
 ## Compatibility
 
 React **18 and 19**. ESM-only, per-component subpath exports, types-first export conditions. Static charts render in any

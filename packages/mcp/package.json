@@ -1,0 +1,80 @@
+{
+  "name": "@microcharts/mcp",
+  "version": "0.1.0",
+  "description": "MCP server + Vercel AI-SDK tools for microcharts — let a model find, wire, and render word-sized charts.",
+  "keywords": [
+    "ai",
+    "ai-sdk",
+    "charts",
+    "llm",
+    "mcp",
+    "microcharts",
+    "model-context-protocol",
+    "sparkline",
+    "svg"
+  ],
+  "homepage": "https://microcharts.dev/docs/mcp",
+  "license": "MIT",
+  "author": "Ganapati V S",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ganapativs/microcharts.git",
+    "directory": "packages/mcp"
+  },
+  "bin": {
+    "microcharts-mcp": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./ai-sdk": {
+      "types": "./dist/ai-sdk.d.mts",
+      "default": "./dist/ai-sdk.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "gen": "tsx scripts/gen.ts",
+    "build": "tsdown",
+    "prepublishOnly": "pnpm build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@microcharts/react": "workspace:^",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "zod": "^3.25.76 || ^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "ai": "^7.0.37",
+    "esbuild": "^0.28.1",
+    "tsdown": "^0.22.14",
+    "tsx": "^4.23.1",
+    "vitest": "^4.1.10"
+  },
+  "peerDependencies": {
+    "ai": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ai": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "mcpName": "io.github.ganapativs/microcharts"
+}

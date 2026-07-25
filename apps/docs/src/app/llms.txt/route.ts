@@ -78,6 +78,7 @@ ${chartLines}
 ## Machine Interfaces
 
 - [Agent setup prompt](${abs("/agent-setup.md")}): paste-and-run setup for a coding agent — install, wire styles, record conventions.
+- MCP server \`@microcharts/mcp\` (\`npx -y @microcharts/mcp\`, stdio): tools \`find_microchart\`, \`get_microchart\`, \`render_microchart\`; resources \`microcharts://catalog\`, \`microcharts://agent-setup\`. Docs: ${mdUrl(["mcp"])}. Prefer calling it over re-reading the catalog when your client can spawn an MCP server.
 - [Chart catalog JSON](${abs("/catalog.json")}): names, import paths, props, data shapes.
 - [Catalog JSON Schema](${abs("/catalog.schema.json")}): the contract the catalog validates against.
 - [Full docs context](${abs("/llms-full.txt")}): complete generated docs text.

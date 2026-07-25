@@ -1176,7 +1176,7 @@
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm knip",
     "pack:check": "pnpm build && publint && attw --pack .",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version": "changeset version && node scripts/sync-server-json.mjs",
     "release": "pnpm build && changeset publish",
     "prepublishOnly": "pnpm build"
   },

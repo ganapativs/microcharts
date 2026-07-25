@@ -37,7 +37,8 @@ that make it pleasant for a human to use.
 
 - **AI-native, by design.** A chart is plain `data` plus generated words, so a model can emit one mid-sentence and read
   one back — [chat streams, agents, and tool output](/docs/ai) are the primary homes, not an afterthought. One grammar
-  across 106 types means an LLM that has seen one chart can write them all.
+  across 106 types means an LLM that has seen one chart can write them all, and an assistant that speaks
+  [MCP](/docs/mcp) can call them directly.
 - **Zero dependencies.** No chart engine, no D3 — just SVG. CI-enforced, forever.
 - **Server-component safe.** Static charts are hook-free and listener-free; they render to HTML with zero client
   JavaScript, and add interactivity only from a separate `/interactive` subpath — where one contract covers the catalog:

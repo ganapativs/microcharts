@@ -38,6 +38,7 @@ jobs:
         run: npm install -g npm@11
       - run: pnpm install --frozen-lockfile
       - name: Create release PR or publish
+        id: changesets
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           version: pnpm run version
@@ -45,3 +46,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+      # When @microcharts/mcp was just published to npm, register the pointer in
+      # the official MCP registry (Smithery / mcp.so / Glama crawl from there, so
+      # this one step feeds every directory). Auth is GitHub OIDC via the job's
+      # id-token permission — no token. server.json's version is synced to the
+      # published package version first so the registry never lags npm.
+      # One-time setup required: verify the `io.github.ganapativs` namespace on
+      # registry.modelcontextprotocol.io. Skipped automatically when only the
+      # library published (or on a version-PR run).
+      # NOTE the two output names. changesets/action v1.9.0 (the pinned SHA above)
+      # emits `publishedPackages`; a later version renamed it to
+      # `published-packages`. Reading only one would make this step silently stop
+      # firing on an action bump — a skipped step looks identical to "the library
+      # released on its own", so it would go unnoticed. Check both.
+      - name: Publish to the MCP registry
+        if: >-
+          steps.changesets.outputs.published == 'true' &&
+          contains(
+            format('{0}{1}',
+              steps.changesets.outputs.publishedPackages,
+              steps.changesets.outputs['published-packages']),
+            '@microcharts/mcp')
+        working-directory: packages/mcp
+        run: |
+          # The `version` script already synced this in the release PR; re-run so a
+          # hand-edited bump can't publish a manifest pointing at a version that
+          # isn't on npm.
+          node ../../scripts/sync-server-json.mjs
+          # Download to a file, then extract: piping into `tar xz <member>` makes
+          # tar close the stream at the member it wants and curl dies on the
+          # broken pipe. The arch map covers arm runners too.
+          asset="mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz"
+          curl -fsSL -o mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/latest/download/${asset}"
+          tar xzf mcp-publisher.tar.gz mcp-publisher
+          chmod +x mcp-publisher
+          # Cheap pre-flight: a schema error here names the field, where a failed
+          # publish just returns a rejection.
+          ./mcp-publisher validate
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
