@@ -40,6 +40,17 @@ if (!exists(base, "packages/mcp/package.json")) {
   process.exit(0);
 }
 
+// The release PR is the one branch that legitimately touches packages/mcp with
+// NO changeset: `changeset version` consumes them, then bumps package.json,
+// writes CHANGELOG.md, and (through the chained sync script) rewrites
+// server.json. Without this, the guard would fail every release PR it exists to
+// enable — verified by running both paths over an identical diff.
+const headRef = process.env.GITHUB_HEAD_REF ?? "";
+if (headRef.startsWith("changeset-release/")) {
+  console.log(`mcp-changeset: ${headRef} is the release branch — changesets already consumed.`);
+  process.exit(0);
+}
+
 const changed = git("diff", "--name-only", `${base}...HEAD`, "--", "packages/mcp")
   .split("\n")
   .filter(Boolean)
