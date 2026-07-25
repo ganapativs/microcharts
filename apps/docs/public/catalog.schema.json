@@ -5,7 +5,7 @@
   "description": "Machine-readable catalog of every microcharts chart: import paths, data shape, primary encoding, and props. Full API for a chart = sharedProps + charts[n].props; interactive shared callbacks apply only when listed in charts[n].sharedInteractive. See top-level howToRead. Generated from the chart registry; served at /catalog.json.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["package", "homepage", "howToRead", "sharedProps", "charts"],
+  "required": ["package", "homepage", "howToRead", "mcp", "sharedProps", "charts"],
   "properties": {
     "$schema": {
       "type": "string",
@@ -27,15 +27,53 @@
       "minLength": 1,
       "description": "Instructions for assembling a chart's full prop surface from sharedProps, props, and sharedInteractive."
     },
+    "mcp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package", "command", "transport", "docs", "tools"],
+      "description": "The same catalog exposed as a Model Context Protocol server: an agent that can spawn one should prefer calling it over re-reading this file.",
+      "properties": {
+        "package": {
+          "type": "string",
+          "description": "npm package providing the MCP server.",
+          "examples": ["@microcharts/mcp"]
+        },
+        "command": {
+          "type": "string",
+          "description": "Command an MCP client runs to start the server over stdio."
+        },
+        "transport": {
+          "const": "stdio",
+          "description": "Transport the server speaks."
+        },
+        "docs": {
+          "type": "string",
+          "format": "uri",
+          "description": "Human documentation for the server."
+        },
+        "tools": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Tool names the server registers."
+        }
+      }
+    },
     "sharedProps": {
       "type": "array",
       "description": "Props whose name means the same thing wherever they appear — grammar, layout, i18n, and shared interactive props. Interactive names in this list apply to a chart ONLY when also listed in that chart's sharedInteractive.",
-      "items": { "$ref": "#/$defs/prop" }
+      "items": {
+        "$ref": "#/$defs/prop"
+      }
     },
     "charts": {
       "type": "array",
       "description": "Every catalogued chart.",
-      "items": { "$ref": "#/$defs/chart" }
+      "items": {
+        "$ref": "#/$defs/chart"
+      }
     }
   },
   "$defs": {
@@ -148,17 +186,23 @@
         "bestFor": {
           "type": "array",
           "description": "Situations this chart is the right pick for.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "avoidFor": {
           "type": "array",
           "description": "Situations to reach for a different chart instead.",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "props": {
           "type": "array",
           "description": "Chart-specific props only. Combine with sharedProps; apply shared interactive names only when listed in sharedInteractive. Chart-specific callbacks (e.g. onWindowChange) appear here with interactive:true.",
-          "items": { "$ref": "#/$defs/prop" }
+          "items": {
+            "$ref": "#/$defs/prop"
+          }
         },
         "examples": {
           "type": "array",
@@ -169,8 +213,12 @@
             "additionalProperties": false,
             "required": ["title", "code"],
             "properties": {
-              "title": { "type": "string" },
-              "code": { "type": "string" }
+              "title": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
             }
           }
         }

@@ -42,11 +42,23 @@ describe("catalog.json conforms to catalog.schema.json", () => {
   });
 
   it("additionalProperties is locked at every object level", () => {
-    // A regression here would let new fields slip in un-described. Assert the
-    // three object schemas all forbid extras.
+    // A regression here would let new fields slip in un-described. Assert every
+    // object schema forbids extras.
     const defs = schema.$defs as Record<string, { additionalProperties?: boolean }>;
+    const props = schema.properties as Record<string, { additionalProperties?: boolean }>;
     expect(schema.additionalProperties).toBe(false);
     expect(defs.prop.additionalProperties).toBe(false);
     expect(defs.chart.additionalProperties).toBe(false);
+    expect(props.mcp.additionalProperties).toBe(false);
+  });
+
+  it("the MCP pointer names the real server, and its docs page exists", () => {
+    const { mcp } = buildCatalog();
+    // Guarded end-to-end in mcp-docs.test.ts against packages/mcp itself; here
+    // we only assert the catalog's own shape stays honest.
+    expect(mcp.transport).toBe("stdio");
+    expect(mcp.command).toContain(mcp.package);
+    expect(mcp.docs.endsWith("/docs/mcp")).toBe(true);
+    expect(mcp.tools.length).toBeGreaterThan(0);
   });
 });

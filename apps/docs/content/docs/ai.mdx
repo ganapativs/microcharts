@@ -201,6 +201,25 @@ plain text, never a crash.
 
 </Accordions>
 
+## Call it: the MCP server
+
+Everything above is a model **emitting** a chart into a surface you control, where your code maps a block to a
+component. Sometimes there is no such surface — a desktop assistant's reply, a terminal, a draft email. There, the model
+needs the finished mark, not an instruction to draw one.
+
+[`@microcharts/mcp`](/docs/mcp) is that third verb. It's a Model Context Protocol server, run over stdio on your own
+machine, that gives an assistant three tools: **find** the chart type that answers a question, **get** its exact props
+and a valid sample, **render** it to a self-contained SVG with the real generated alt text attached. The rendering is
+done by this library, so what comes back is the same mark you'd get from the component — honest by construction, not a
+picture of one.
+
+Point any MCP client at it — Claude Desktop, Claude Code, Cursor, VS Code — with the config it already understands:
+
+<Snippet id="mcpConfig" />
+
+The same three capabilities also ship as Vercel AI SDK tools, for an assistant you're building yourself. See
+[MCP server](/docs/mcp) for the tool reference, the per-client setup, and what each call returns.
+
 ## Machine-readable surfaces
 
 Real, generated routes — the substance behind "AI-native", not a slogan. Point an agent here and it reads the true API

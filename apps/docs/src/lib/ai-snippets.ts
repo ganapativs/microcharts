@@ -171,4 +171,29 @@ import { Sparkline } from "@microcharts/react/sparkline";
 const svg = renderToStaticMarkup(<Sparkline data={data} title="Revenue" />);
 // → a self-contained <svg> string for anywhere HTML goes`,
   },
+
+  // ── MCP (see /docs/mcp) ────────────────────────────────────────────────────
+  mcpConfig: {
+    lang: "json",
+    code: `{
+  "mcpServers": {
+    "microcharts": {
+      "command": "npx",
+      "args": ["-y", "@microcharts/mcp"]
+    }
+  }
+}`,
+  },
+
+  mcpAiSdk: {
+    lang: "ts",
+    code: `import { microchartsTools } from "@microcharts/mcp/ai-sdk";
+import { streamText } from "ai";
+
+const result = streamText({
+  model,
+  tools: microchartsTools, // find_microchart · get_microchart · render_microchart
+  prompt: "Summarise this quarter and show the revenue trend as a chart.",
+});`,
+  },
 };

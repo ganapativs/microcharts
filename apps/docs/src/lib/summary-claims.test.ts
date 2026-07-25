@@ -30,6 +30,31 @@ describe("accessibility.mdx quotes real describeSeries output", () => {
   }
 });
 
+// mcp.mdx documents how `render_microchart` behaves on degenerate input by
+// quoting the sentence each case produces. Same rule as above: the tool reads
+// the summary back out of the rendered markup, so these must be the generator's
+// real output, not a description of it.
+const mcp = readFileSync(resolve(process.cwd(), "content/docs/mcp.mdx"), "utf8");
+
+const MCP_INPUTS: readonly (number | null)[][] = [
+  [], // "No data."
+  [7], // "Single value 7."
+  [5, 5, 5, 5], // "Flat at 5."
+  [3, null, 5, null, 9], // nulls are gaps, not zeros
+  [NaN, 3, Infinity], // non-finite dropped
+  [-4, -2, -8], // negatives
+  [132, 148, 141, 165, 159, 182], // the render_microchart example call
+];
+
+describe("mcp.mdx quotes real describeSeries output", () => {
+  for (const data of MCP_INPUTS) {
+    const out = describeSeries(data);
+    it(`contains the generated summary for ${JSON.stringify(data)} — "${out}"`, () => {
+      expect(mcp, `expected mcp.mdx to quote "${out}"`).toContain(out);
+    });
+  }
+});
+
 // Same rule, different generator: formatting.mdx quotes a CalendarStrip summary
 // to explain why `format` doesn't restyle a day count. That literal was once
 // hand-invented ("Active 11 of 24 days over 4 weeks." — 4 weeks is 28 days), so

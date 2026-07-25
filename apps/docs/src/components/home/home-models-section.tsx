@@ -73,6 +73,61 @@ const CASES: readonly Case[] = [
 
 const PROVIDER_COUNT = PROVIDER_GROUPS.reduce((n, g) => n + g.names.length, 0);
 
+/** The three tools the MCP server registers, in call order. */
+const MCP_TOOLS = ["find_microchart", "get_microchart", "render_microchart"] as const;
+
+/**
+ * The band's third verb. Everything above it is a model *emitting* charts into a
+ * surface you control, and the surfaces panel is a model *reading* the API; this
+ * is a model *calling* them, for the surfaces you don't control.
+ *
+ * Deliberately the same `$ command` / `→ note` idiom as the surfaces panel above
+ * rather than a new shape — the band already has a grammar, and a third
+ * invention would read as three unrelated cards. The page still climaxes on the
+ * examples, not here.
+ */
+function CallItRow() {
+  return (
+    <div className="mt-10">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h3 className="font-medium text-fd-foreground">
+          Callable, where the surface can&rsquo;t run React.
+        </h3>
+        <a href="/docs/mcp" className="link-underline text-[0.8rem] text-fd-muted-foreground">
+          MCP server
+        </a>
+      </div>
+      <div className="panel mt-3 overflow-hidden">
+        <div className="flex items-center border-b border-hairline px-4 py-2.5">
+          <span className="mono-label">call it · mcp</span>
+        </div>
+        <ul className="space-y-4 px-5 py-5 font-mono text-[0.8rem] leading-relaxed">
+          <li className="hv-term-line" style={{ "--i": 0 } as React.CSSProperties}>
+            <span className="text-fd-foreground">
+              <span aria-hidden className="text-fd-primary">
+                ${" "}
+              </span>
+              npx -y @microcharts/mcp
+            </span>
+            <p
+              className="hv-term-line mt-0.5 pl-4 text-fd-muted-foreground"
+              style={{ "--i": 1 } as React.CSSProperties}
+            >
+              → {MCP_TOOLS.join(" · ")}
+            </p>
+          </li>
+        </ul>
+      </div>
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
+        A desktop assistant&rsquo;s reply, a terminal, an email draft — surfaces where emitting
+        grammar has nothing to render it. An MCP client spawns this on your machine, and the
+        assistant picks the right chart, reads its real props, and gets back a finished SVG with the
+        generated alt text already attached.
+      </p>
+    </div>
+  );
+}
+
 export function HomeModelsSection() {
   return (
     <section className="dark hv-band py-14 text-fd-foreground">
@@ -188,6 +243,10 @@ export function HomeModelsSection() {
             </p>
           </Reveal>
         </div>
+
+        <Reveal delay={200}>
+          <CallItRow />
+        </Reveal>
       </div>
     </section>
   );
