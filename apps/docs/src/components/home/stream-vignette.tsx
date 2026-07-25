@@ -626,14 +626,13 @@ export function StreamVignette({
           ))}
         </div>
         {mode === "tour" && (
-          // inset-y + justify-center: the settled reply sits optically centered
-          // in the ghost-reserved area instead of leaving a hole under it. The
-          // ghosts bound the overlay's height, so centering can never clip.
-          <div className="absolute inset-x-5 inset-y-5 flex flex-col justify-center text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
-            <div>
-              {view}
-              {streaming && started.current && <span className="mc-caret" aria-hidden />}
-            </div>
+          // Top-anchored, always. Centering was tried and reverted: the reply
+          // GROWS as it streams, so a centered block slides upward the whole
+          // time — the exact motion this panel is meant not to have. A settled
+          // reply leaves some room beneath it; that stillness is worth it.
+          <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
+            {view}
+            {streaming && started.current && <span className="mc-caret" aria-hidden />}
           </div>
         )}
         {mode === "live" && (
