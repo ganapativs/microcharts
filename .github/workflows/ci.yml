@@ -98,6 +98,11 @@ jobs:
     # Playwright's own image ships the browsers preinstalled and matched to
     # @playwright/test 1.61.1, so the browser vitest project needs no per-leg
     # `playwright install` download (same trick as visual.yml).
+    #
+    # This tag and the package version move TOGETHER — a mismatch fails every
+    # leg with "Executable doesn't exist at /ms-playwright/…". npm can ship a
+    # release before MCR publishes its image (1.62.0 did), so check
+    # https://mcr.microsoft.com/v2/playwright/tags/list before bumping either.
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     strategy:
