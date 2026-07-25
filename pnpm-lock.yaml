@@ -126,7 +126,7 @@ importers:
         specifier: ^1.25.0
         version: 1.25.0(react@19.2.7)
       next:
-        specifier: ^16.2.10
+        specifier: ^16.2.11
         version: 16.2.11(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next-themes:
         specifier: ^0.4.6
@@ -181,7 +181,7 @@ importers:
         specifier: workspace:*
         version: link:../..
       next:
-        specifier: ^16.2.10
+        specifier: ^16.2.11
         version: 16.2.11(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
         specifier: ^19.0.0
