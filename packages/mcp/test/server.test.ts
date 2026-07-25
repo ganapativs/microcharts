@@ -14,6 +14,15 @@ import { MCP_VERSION } from "../src/version";
  */
 let client: Client;
 
+/** True when a JSON Schema node says what it accepts — directly, or through
+ *  every branch of a union. `z.any()` emits `{}`, which says nothing. */
+const typed = (schema: unknown): boolean => {
+  const node = schema as { type?: unknown; anyOf?: unknown[]; oneOf?: unknown[] };
+  const branches = node.anyOf ?? node.oneOf;
+  if (branches) return branches.length > 0 && branches.every(typed);
+  return node.type !== undefined;
+};
+
 beforeAll(async () => {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: "test", version: "0" });
@@ -36,6 +45,45 @@ describe("mcp server", () => {
       expect(t.outputSchema, `${t.name} has no outputSchema`).toBeDefined();
       expect(t.description?.length ?? 0).toBeGreaterThan(40);
     }
+  });
+
+  /**
+   * A parameter declared as `z.any()` emits `{}` — no `type` — which a client
+   * building a form or a prompt from the schema reads as "unknown field type"
+   * (Glama's inspector says exactly that). Polymorphic parameters must still say
+   * what they accept, so assert every declared property carries a type, either
+   * directly or through the branches of a union.
+   */
+  it("declares a usable type for every input property", async () => {
+    const { tools } = await client.listTools();
+    for (const t of tools) {
+      const props = (t.inputSchema as { properties?: Record<string, unknown> }).properties ?? {};
+      for (const [name, schema] of Object.entries(props)) {
+        expect(typed(schema), `${t.name}.${name} has no JSON Schema type`).toBe(true);
+      }
+    }
+  });
+
+  it("accepts both data shapes the catalog uses, and refuses a scalar", async () => {
+    const series = await client.callTool({
+      name: "render_microchart",
+      arguments: { type: "sparkline", data: [3, 5, 4, 8, 6, 9] },
+    });
+    expect(series.isError).toBeFalsy();
+
+    // A handful of charts key their data instead of ordering it.
+    const keyed = await client.callTool({
+      name: "render_microchart",
+      arguments: { type: "burn-chart", data: { plan: [10, 7, 4, 0], actual: [10, 8, 6, 3] } },
+    });
+    expect(keyed.isError).toBeFalsy();
+
+    // `data` is never a bare scalar — those charts take a `value` prop instead.
+    const scalar = await client.callTool({
+      name: "render_microchart",
+      arguments: { type: "sparkline", data: 42 },
+    });
+    expect(scalar.isError).toBe(true);
   });
 
   it("serves both resources", async () => {
