@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, FUTURES } from "./ensembl
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <EnsembleGhostsInteractive data={FUTURES} summary={false} width={120} height={28} animate />
-  );
+  return <EnsembleGhostsInteractive data={FUTURES} summary={false} width={120} height={28} />;
 }
 
 export const playground: PlaygroundSpec = {

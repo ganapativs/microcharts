@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, GLUCOSE } from "./time-in
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <TimeInRangeInteractive data={GLUCOSE} summary={false} width={130} height={16} animate />;
+  return <TimeInRangeInteractive data={GLUCOSE} summary={false} width={130} height={16} />;
 }
 
 export const playground: PlaygroundSpec = {

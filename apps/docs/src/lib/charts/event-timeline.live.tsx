@@ -17,14 +17,7 @@ import staticModule, {
 
 export function PreviewLive() {
   return (
-    <EventTimelineInteractive
-      data={DATA}
-      domain={WINDOW}
-      summary={false}
-      width={150}
-      height={20}
-      animate
-    />
+    <EventTimelineInteractive data={DATA} domain={WINDOW} summary={false} width={150} height={20} />
   );
 }
 

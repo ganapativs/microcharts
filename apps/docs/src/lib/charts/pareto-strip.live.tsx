@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, CAUSES } from "./pareto-s
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ParetoStripInteractive data={CAUSES} summary={false} width={160} height={22} animate />;
+  return <ParetoStripInteractive data={CAUSES} summary={false} width={160} height={22} />;
 }
 
 export const playground: PlaygroundSpec = {

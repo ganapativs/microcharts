@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground } from "./icon-array";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <IconArrayInteractive value={0.15} total={20} summary={false} width={110} height={26} animate />
-  );
+  return <IconArrayInteractive value={0.15} total={20} summary={false} width={110} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

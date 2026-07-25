@@ -10,16 +10,7 @@ import staticModule, { playground as staticPlayground, FRAC, PCT } from "./rate-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <RateVolumeInteractive
-      data={FRAC}
-      format={PCT}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
-  );
+  return <RateVolumeInteractive data={FRAC} format={PCT} summary={false} width={150} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

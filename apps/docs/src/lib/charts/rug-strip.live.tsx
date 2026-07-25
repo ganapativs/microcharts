@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, FIELD } from "./rug-strip
 
 export function PreviewLive() {
   return (
-    <RugStripInteractive
-      data={FIELD}
-      markValue={62}
-      summary={false}
-      width={120}
-      height={16}
-      animate
-    />
+    <RugStripInteractive data={FIELD} markValue={62} summary={false} width={120} height={16} />
   );
 }
 

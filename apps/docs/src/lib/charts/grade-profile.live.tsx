@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, TRAIL, m } from "./grade-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} animate />;
+  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} />;
 }
 
 export const playground: PlaygroundSpec = {

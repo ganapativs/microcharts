@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, BANDS } from "./dumbbell"
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate />;
+  return <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} />;
 }
 
 export const playground: PlaygroundSpec = {

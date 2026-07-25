@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, PIPE } from "./funnel";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <FunnelInteractive data={PIPE} summary={false} width={130} height={40} animate />;
+  return <FunnelInteractive data={PIPE} summary={false} width={130} height={40} />;
 }
 
 export const playground: PlaygroundSpec = {

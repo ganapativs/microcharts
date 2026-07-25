@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, TEAMS } from "./city-skyl
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <CitySkylineInteractive data={TEAMS} summary={false} height={26} animate />;
+  return <CitySkylineInteractive data={TEAMS} summary={false} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

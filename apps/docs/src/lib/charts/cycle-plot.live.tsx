@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, WEEKS, DAYS } from "./cyc
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <CyclePlotInteractive data={WEEKS} period={7} summary={false} width={100} height={24} animate />
-  );
+  return <CyclePlotInteractive data={WEEKS} period={7} summary={false} width={100} height={24} />;
 }
 
 export const playground: PlaygroundSpec = {

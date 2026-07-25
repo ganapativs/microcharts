@@ -11,14 +11,7 @@ import staticModule, { entry, playground as staticPlayground } from "./sparkline
 
 export function PreviewLive() {
   return (
-    <SparklineInteractive
-      data={entry.demo}
-      width={180}
-      height={48}
-      dots="minmax"
-      summary={false}
-      animate
-    />
+    <SparklineInteractive data={entry.demo} width={180} height={48} dots="minmax" summary={false} />
   );
 }
 

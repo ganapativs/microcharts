@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, RANKS } from "./bump-stri
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate />;
+  return <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} />;
 }
 
 export const playground: PlaygroundSpec = {

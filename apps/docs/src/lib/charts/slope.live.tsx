@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, RANKS } from "./slope";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SlopeInteractive data={RANKS} summary={false} width={90} height={70} animate />;
+  return <SlopeInteractive data={RANKS} summary={false} width={90} height={70} />;
 }
 
 export const playground: PlaygroundSpec = {

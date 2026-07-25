@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, ERRORS, RAMP } from "./ch
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ChangePointInteractive data={ERRORS} summary={false} width={120} height={16} animate />;
+  return <ChangePointInteractive data={ERRORS} summary={false} width={120} height={16} />;
 }
 
 export const playground: PlaygroundSpec = {

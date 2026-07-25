@@ -12,7 +12,7 @@ import staticModule, { playground as staticPlayground, PCT } from "./trend-arrow
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-3">
-      <TrendArrowInteractive value={0.3} summary={false} animate />
+      <TrendArrowInteractive value={0.3} summary={false} />
       <TrendArrow value={0} summary={false} />
       <TrendArrow value={-0.3} summary={false} />
     </span>

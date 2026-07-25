@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, BOOK } from "./depth-wedg
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} animate />;
+  return <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} />;
 }
 
 export const playground: PlaygroundSpec = {

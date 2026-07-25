@@ -17,14 +17,7 @@ import staticModule, {
 
 export function PreviewLive() {
   return (
-    <WinProbWormInteractive
-      data={GAME}
-      sides={SIDES}
-      summary={false}
-      width={120}
-      height={16}
-      animate
-    />
+    <WinProbWormInteractive data={GAME} sides={SIDES} summary={false} width={120} height={16} />
   );
 }
 

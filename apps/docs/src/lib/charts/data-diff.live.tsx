@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DIFF } from "./data-diff"
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <DataDiffInteractive data={DIFF} summary={false} width={120} height={40} animate />;
+  return <DataDiffInteractive data={DIFF} summary={false} width={120} height={40} />;
 }
 
 export const playground: PlaygroundSpec = {

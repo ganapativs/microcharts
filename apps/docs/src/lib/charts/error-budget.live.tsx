@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, DEMO, WINDOW, BURNED } fr
 
 export function PreviewLive() {
   return (
-    <ErrorBudgetInteractive
-      data={DEMO}
-      window={WINDOW}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
+    <ErrorBudgetInteractive data={DEMO} window={WINDOW} summary={false} width={150} height={26} />
   );
 }
 

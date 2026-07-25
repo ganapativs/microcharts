@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, COHORTS } from "./cohort-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <CohortTriangleInteractive data={COHORTS} cell={10} labels={false} summary={false} animate />
-  );
+  return <CohortTriangleInteractive data={COHORTS} cell={10} labels={false} summary={false} />;
 }
 
 export const playground: PlaygroundSpec = {

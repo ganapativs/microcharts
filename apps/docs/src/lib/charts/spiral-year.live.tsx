@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, YEAR } from "./spiral-yea
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate />;
+  return <SpiralYearInteractive data={YEAR} summary={false} size={40} />;
 }
 
 export const playground: PlaygroundSpec = {

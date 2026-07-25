@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, HIST, FORE } from "./fore
 
 export function PreviewLive() {
   return (
-    <ForecastConeInteractive
-      data={HIST}
-      forecast={FORE}
-      summary={false}
-      width={150}
-      height={24}
-      animate
-    />
+    <ForecastConeInteractive data={HIST} forecast={FORE} summary={false} width={150} height={24} />
   );
 }
 

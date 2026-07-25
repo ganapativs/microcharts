@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, LOAD, D } from "./heat-st
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <HeatStripInteractive data={LOAD} domain={D} summary={false} width={130} height={18} animate />
-  );
+  return <HeatStripInteractive data={LOAD} domain={D} summary={false} width={130} height={18} />;
 }
 
 export const playground: PlaygroundSpec = {

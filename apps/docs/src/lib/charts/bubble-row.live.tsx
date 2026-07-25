@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, REGIONS } from "./bubble-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate />;
+  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} />;
 }
 
 export const playground: PlaygroundSpec = {

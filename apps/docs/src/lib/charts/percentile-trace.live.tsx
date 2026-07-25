@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DEMO } from "./percentile
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <PercentileTraceInteractive data={DEMO} summary={false} width={150} height={26} animate />;
+  return <PercentileTraceInteractive data={DEMO} summary={false} width={150} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

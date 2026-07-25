@@ -12,9 +12,9 @@ import staticModule, { playground as staticPlayground } from "./thermometer";
 export function PreviewLive() {
   return (
     <span className="inline-flex items-end gap-3">
-      <ThermometerInteractive value={72} target={80} summary={false} animate />
-      <ThermometerInteractive value={40} summary={false} animate />
-      <ThermometerInteractive value={95} summary={false} animate />
+      <ThermometerInteractive value={72} target={80} summary={false} />
+      <ThermometerInteractive value={40} summary={false} />
+      <ThermometerInteractive value={95} summary={false} />
     </span>
   );
 }

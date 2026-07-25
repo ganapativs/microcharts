@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, RUBRIC } from "./rubric-s
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <RubricStripInteractive data={RUBRIC} summary={false} width={120} height={30} animate />;
+  return <RubricStripInteractive data={RUBRIC} summary={false} width={120} height={30} />;
 }
 
 export const playground: PlaygroundSpec = {

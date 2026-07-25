@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, MIX } from "./micro-donut
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <MicroDonutInteractive data={MIX} summary={false} style={{ width: 40, height: 40 }} animate />
-  );
+  return <MicroDonutInteractive data={MIX} summary={false} style={{ width: 40, height: 40 }} />;
 }
 
 export const playground: PlaygroundSpec = {

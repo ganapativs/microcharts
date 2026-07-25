@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, BURSTS } from "./seismogr
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SeismogramInteractive data={BURSTS} summary={false} width={140} height={28} animate />;
+  return <SeismogramInteractive data={BURSTS} summary={false} width={140} height={28} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, MIX, SIGNED } from "./min
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <MiniBarInteractive data={MIX} summary={false} width={100} height={32} animate />;
+  return <MiniBarInteractive data={MIX} summary={false} width={100} height={32} />;
 }
 
 export const playground: PlaygroundSpec = {

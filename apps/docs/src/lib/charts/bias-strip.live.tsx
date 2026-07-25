@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, PAIRS } from "./bias-stri
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <BiasStripInteractive data={PAIRS} summary={false} width={120} height={64} animate />;
+  return <BiasStripInteractive data={PAIRS} summary={false} width={120} height={64} />;
 }
 
 export const playground: PlaygroundSpec = {

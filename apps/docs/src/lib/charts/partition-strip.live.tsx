@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, TREE } from "./partition-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <PartitionStripInteractive data={TREE} summary={false} width={140} height={24} animate />;
+  return <PartitionStripInteractive data={TREE} summary={false} width={140} height={24} />;
 }
 
 export const playground: PlaygroundSpec = {

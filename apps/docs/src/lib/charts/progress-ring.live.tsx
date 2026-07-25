@@ -10,14 +10,7 @@ import staticModule, { playground as staticPlayground } from "./progress-ring";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <ProgressRingInteractive
-      value={0.68}
-      summary={false}
-      style={{ width: 40, height: 40 }}
-      animate
-    />
-  );
+  return <ProgressRingInteractive value={0.68} summary={false} style={{ width: 40, height: 40 }} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DAY } from "./polar-clock
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <PolarClockInteractive data={DAY} now={14} summary={false} size={40} animate />;
+  return <PolarClockInteractive data={DAY} now={14} summary={false} size={40} />;
 }
 
 export const playground: PlaygroundSpec = {

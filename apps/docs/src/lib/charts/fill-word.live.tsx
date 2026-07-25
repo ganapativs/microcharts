@@ -12,7 +12,7 @@ import staticModule, { playground as staticPlayground } from "./fill-word";
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-4">
-      <FillWordInteractive word="uploading" value={0.62} summary={false} fontSize={13} animate />
+      <FillWordInteractive word="uploading" value={0.62} summary={false} fontSize={13} />
       <FillWord word="expiring" value={0.7} mode="drain" summary={false} fontSize={13} />
     </span>
   );

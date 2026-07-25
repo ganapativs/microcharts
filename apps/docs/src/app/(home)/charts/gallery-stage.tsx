@@ -65,13 +65,18 @@ function observeOnce(el: Element, cb: SeenCb): () => void {
 }
 
 /**
- * Gallery card stage — live (interactive + animate) by default; static on toggle
- * or reduced motion. The static preview (`children`) is rendered on the SERVER as
- * pure SVG, so the gallery's initial client graph carries zero interactive/motion
- * chart code. When live mode is on, after mount, the matching interactive preview
- * streams in as its own chunk (per-slug lazy `import()`) and swaps in over the
- * identical box — the entrance animates once, with no layout shift. Toggling back
- * to static drops to `children`; reduced motion never upgrades.
+ * Gallery card stage — live (interactive, NOT animated) by default; static on
+ * toggle or reduced motion. The static preview (`children`) is rendered on the
+ * SERVER as pure SVG, so the gallery's initial client graph carries zero
+ * interactive/motion chart code. When live mode is on, after mount, the matching
+ * interactive preview streams in as its own chunk (per-slug lazy `import()`) and
+ * swaps in over the identical box. Toggling back to static drops to `children`;
+ * reduced motion never upgrades.
+ *
+ * The `PreviewLive` components deliberately pass no `animate`: 106 cards drawing
+ * themselves as you scroll was the gallery's share of the "everything is moving"
+ * feedback. Hover/scrub still works — that's interaction, not ambient motion.
+ * (The docs playground keeps its own `animate` toggle.)
  */
 export function GalleryStage({ slug, children }: { slug: string; children: ReactNode }) {
   const [Live, setLive] = useState<ComponentType | null>(null);

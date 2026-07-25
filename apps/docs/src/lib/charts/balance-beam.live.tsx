@@ -12,7 +12,7 @@ import staticModule, { playground as staticPlayground, FLOW } from "./balance-be
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-4">
-      <BalanceBeamInteractive data={FLOW} summary={false} width={56} height={24} animate />
+      <BalanceBeamInteractive data={FLOW} summary={false} width={56} height={24} />
       <BalanceBeam
         data={[
           { label: "A", value: 500 },

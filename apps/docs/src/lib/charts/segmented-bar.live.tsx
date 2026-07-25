@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, MIX } from "./segmented-b
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SegmentedBarInteractive data={MIX} summary={false} width={130} height={16} animate />;
+  return <SegmentedBarInteractive data={MIX} summary={false} width={130} height={16} />;
 }
 
 export const playground: PlaygroundSpec = {

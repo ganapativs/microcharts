@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, LATENCY } from "./percent
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <PercentileLadderInteractive data={LATENCY} summary={false} width={140} height={14} animate />
-  );
+  return <PercentileLadderInteractive data={LATENCY} summary={false} width={140} height={14} />;
 }
 
 export const playground: PlaygroundSpec = {

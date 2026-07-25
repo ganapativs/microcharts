@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, YEARS } from "./tree-ring
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <TreeRingsInteractive data={YEARS} summary={false} size={28} animate />;
+  return <TreeRingsInteractive data={YEARS} summary={false} size={28} />;
 }
 
 export const playground: PlaygroundSpec = {

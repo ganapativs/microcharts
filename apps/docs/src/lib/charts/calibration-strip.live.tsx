@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, BINS } from "./calibratio
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <CalibrationStripInteractive data={BINS} summary={false} width={130} height={32} animate />
-  );
+  return <CalibrationStripInteractive data={BINS} summary={false} width={130} height={32} />;
 }
 
 export const playground: PlaygroundSpec = {

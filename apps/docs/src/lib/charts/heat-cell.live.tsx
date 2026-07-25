@@ -19,7 +19,6 @@ export function PreviewLive() {
           domain={D}
           summary={false}
           style={{ width: 16, height: 16 }}
-          animate
         />
       ))}
     </span>

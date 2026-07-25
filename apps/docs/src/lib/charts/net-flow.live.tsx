@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, DEMO, KFMT } from "./net-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <NetFlowInteractive data={DEMO} format={KFMT} summary={false} width={150} height={26} animate />
-  );
+  return <NetFlowInteractive data={DEMO} format={KFMT} summary={false} width={150} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

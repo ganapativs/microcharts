@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, MIX } from "./stacked-are
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} animate />;
+  return <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} />;
 }
 
 export const playground: PlaygroundSpec = {

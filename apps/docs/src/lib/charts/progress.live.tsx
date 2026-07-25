@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground } from "./progress";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate />;
+  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, PEERS } from "./benchmark
 
 export function PreviewLive() {
   return (
-    <BenchmarkStripInteractive
-      data={PEERS}
-      value={312}
-      summary={false}
-      width={140}
-      height={14}
-      animate
-    />
+    <BenchmarkStripInteractive data={PEERS} value={312} summary={false} width={140} height={14} />
   );
 }
 

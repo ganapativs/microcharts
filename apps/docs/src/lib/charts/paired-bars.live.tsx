@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, BUDGET } from "./paired-b
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <PairedBarsInteractive data={BUDGET} summary={false} width={120} height={40} animate />;
+  return <PairedBarsInteractive data={BUDGET} summary={false} width={120} height={40} />;
 }
 
 export const playground: PlaygroundSpec = {

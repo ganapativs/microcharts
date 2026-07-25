@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, MELODY } from "./music-st
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <MusicStaffInteractive data={MELODY} summary={false} width={80} height={22} animate />;
+  return <MusicStaffInteractive data={MELODY} summary={false} width={80} height={22} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DEMO } from "./control-st
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ControlStripInteractive data={DEMO} summary={false} width={150} height={22} animate />;
+  return <ControlStripInteractive data={DEMO} summary={false} width={150} height={22} />;
 }
 
 export const playground: PlaygroundSpec = {

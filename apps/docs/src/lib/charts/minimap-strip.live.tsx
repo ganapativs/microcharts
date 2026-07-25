@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DATA } from "./minimap-st
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <MinimapStripInteractive data={DATA} summary={false} width={130} height={16} animate />;
+  return <MinimapStripInteractive data={DATA} summary={false} width={130} height={16} />;
 }
 
 export const playground: PlaygroundSpec = {

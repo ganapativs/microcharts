@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, INCIDENTS } from "./const
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <ConstellationInteractive data={INCIDENTS} summary={false} width={90} height={26} animate />
-  );
+  return <ConstellationInteractive data={INCIDENTS} summary={false} width={90} height={26} />;
 }
 
 export const playground: PlaygroundSpec = {

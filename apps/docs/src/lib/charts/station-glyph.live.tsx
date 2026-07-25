@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, OBS } from "./station-gly
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <StationGlyphInteractive {...OBS} summary={false} size={48} animate />;
+  return <StationGlyphInteractive {...OBS} summary={false} size={48} />;
 }
 
 export const playground: PlaygroundSpec = {

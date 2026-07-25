@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, DATA, TODAY } from "./fol
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <FoldedDayBandInteractive data={DATA} summary={false} width={140} height={32} animate />;
+  return <FoldedDayBandInteractive data={DATA} summary={false} width={140} height={32} />;
 }
 
 export const playground: PlaygroundSpec = {

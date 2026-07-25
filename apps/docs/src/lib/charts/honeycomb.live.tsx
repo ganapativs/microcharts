@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground } from "./honeycomb";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <HoneycombInteractive value={34} total={40} unit="seats" summary={false} cell={4} animate />
-  );
+  return <HoneycombInteractive value={34} total={40} unit="seats" summary={false} cell={4} />;
 }
 
 export const playground: PlaygroundSpec = {

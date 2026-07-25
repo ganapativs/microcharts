@@ -10,15 +10,7 @@ import staticModule, { playground as staticPlayground, COVERAGE } from "./covera
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <CoverageStripInteractive
-      data={[...COVERAGE]}
-      summary={false}
-      width={130}
-      height={12}
-      animate
-    />
-  );
+  return <CoverageStripInteractive data={[...COVERAGE]} summary={false} width={130} height={12} />;
 }
 
 export const playground: PlaygroundSpec = {

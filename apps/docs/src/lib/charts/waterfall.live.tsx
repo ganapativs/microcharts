@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground, PL } from "./waterfall";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <WaterfallInteractive data={PL} open={60} summary={false} width={130} height={24} animate />
-  );
+  return <WaterfallInteractive data={PL} open={60} summary={false} width={130} height={24} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -12,7 +12,7 @@ import staticModule, { playground as staticPlayground } from "./delta";
 export function PreviewLive() {
   return (
     <span className="text-2xl">
-      <DeltaInteractive value={0.184} summary={false} animate />
+      <DeltaInteractive value={0.184} summary={false} />
     </span>
   );
 }

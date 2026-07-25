@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, US, BENCH } from "./dual-
 
 export function PreviewLive() {
   return (
-    <DualSparklineInteractive
-      data={US}
-      compare={BENCH}
-      summary={false}
-      width={130}
-      height={22}
-      animate
-    />
+    <DualSparklineInteractive data={US} compare={BENCH} summary={false} width={130} height={22} />
   );
 }
 

@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, PROFILE } from "./volume-
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <VolumeProfileInteractive data={PROFILE} summary={false} width={60} height={40} animate />;
+  return <VolumeProfileInteractive data={PROFILE} summary={false} width={60} height={40} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, PROFILE } from "./star-sp
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <StarSpokeInteractive data={PROFILE} summary={false} size={84} animate />;
+  return <StarSpokeInteractive data={PROFILE} summary={false} size={84} />;
 }
 
 export const playground: PlaygroundSpec = {

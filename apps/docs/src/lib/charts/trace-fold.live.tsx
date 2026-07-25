@@ -10,16 +10,7 @@ import staticModule, { playground as staticPlayground, TRACE, ms } from "./trace
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <TraceFoldInteractive
-      data={TRACE}
-      format={ms}
-      summary={false}
-      width={180}
-      height={48}
-      animate
-    />
-  );
+  return <TraceFoldInteractive data={TRACE} format={ms} summary={false} width={180} height={48} />;
 }
 
 export const playground: PlaygroundSpec = {

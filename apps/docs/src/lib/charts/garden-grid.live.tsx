@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, WEEKS } from "./garden-gr
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} animate />;
+  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} />;
 }
 
 export const playground: PlaygroundSpec = {

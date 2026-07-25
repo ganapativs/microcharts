@@ -16,7 +16,6 @@ export function PreviewLive() {
       end={END}
       summary={false}
       style={{ width: 110, height: 62 }}
-      animate
     />
   );
 }

@@ -10,9 +10,7 @@ import staticModule, { playground as staticPlayground } from "./pictogram-row";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return (
-    <PictogramRowInteractive value={5} total={8} summary={false} width={110} height={16} animate />
-  );
+  return <PictogramRowInteractive value={5} total={8} summary={false} width={110} height={16} />;
 }
 
 export const playground: PlaygroundSpec = {

@@ -18,7 +18,6 @@ export function PreviewLive() {
           status={s}
           summary={false}
           style={{ width: 14, height: 14 }}
-          animate
         />
       ))}
     </span>

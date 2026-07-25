@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, CLOUD } from "./micro-sca
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <MicroScatterInteractive data={CLOUD} summary={false} width={110} height={66} animate />;
+  return <MicroScatterInteractive data={CLOUD} summary={false} width={110} height={66} />;
 }
 
 export const playground: PlaygroundSpec = {

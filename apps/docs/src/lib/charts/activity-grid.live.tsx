@@ -15,7 +15,7 @@ import staticModule, {
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ActivityGridInteractive data={entry.demo} cell={10} summary={false} animate />;
+  return <ActivityGridInteractive data={entry.demo} cell={10} summary={false} />;
 }
 
 export const playground: PlaygroundSpec = {

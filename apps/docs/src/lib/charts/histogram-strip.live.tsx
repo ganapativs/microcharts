@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, TIMES } from "./histogram
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <HistogramStripInteractive data={TIMES} summary={false} width={130} height={34} animate />;
+  return <HistogramStripInteractive data={TIMES} summary={false} width={130} height={34} />;
 }
 
 export const playground: PlaygroundSpec = {

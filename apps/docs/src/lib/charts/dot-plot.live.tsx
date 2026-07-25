@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, TEAM } from "./dot-plot";
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <DotPlotInteractive data={TEAM} summary={false} width={130} height={70} animate />;
+  return <DotPlotInteractive data={TEAM} summary={false} width={130} height={70} />;
 }
 
 export const playground: PlaygroundSpec = {

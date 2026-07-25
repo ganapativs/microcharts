@@ -11,14 +11,7 @@ import staticModule, { playground as staticPlayground, DATA, CAP } from "./queue
 
 export function PreviewLive() {
   return (
-    <QueueDepthInteractive
-      data={DATA}
-      capacity={CAP}
-      summary={false}
-      width={150}
-      height={26}
-      animate
-    />
+    <QueueDepthInteractive data={DATA} capacity={CAP} summary={false} width={150} height={26} />
   );
 }
 

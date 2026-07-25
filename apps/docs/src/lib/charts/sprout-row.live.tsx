@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, ACCTS } from "./sprout-ro
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SproutRowInteractive data={ACCTS} summary={false} height={22} animate />;
+  return <SproutRowInteractive data={ACCTS} summary={false} height={22} />;
 }
 
 export const playground: PlaygroundSpec = {

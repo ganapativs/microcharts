@@ -10,7 +10,7 @@ import staticModule, { entry, playground as staticPlayground } from "./sparkbar"
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} animate />;
+  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} />;
 }
 
 export const playground: PlaygroundSpec = {

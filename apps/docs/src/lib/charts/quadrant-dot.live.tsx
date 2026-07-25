@@ -18,7 +18,6 @@ export function PreviewLive() {
       summary={false}
       width={72}
       height={72}
-      animate
     />
   );
 }

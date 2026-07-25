@@ -10,7 +10,7 @@ import staticModule, { playground as staticPlayground, CATDOG, THREE } from "./c
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
 export function PreviewLive() {
-  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate />;
+  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} />;
 }
 
 export const playground: PlaygroundSpec = {

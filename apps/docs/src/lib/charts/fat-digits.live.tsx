@@ -13,14 +13,7 @@ export function PreviewLive() {
   return (
     <span className="inline-flex flex-col items-end gap-1 tabular-nums">
       {COLUMN.map((v) => (
-        <FatDigitsInteractive
-          key={v}
-          value={v}
-          domain={DOMAIN}
-          summary={false}
-          fontSize={14}
-          animate
-        />
+        <FatDigitsInteractive key={v} value={v} domain={DOMAIN} summary={false} fontSize={14} />
       ))}
     </span>
   );
