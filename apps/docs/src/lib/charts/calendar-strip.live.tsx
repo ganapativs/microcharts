@@ -9,14 +9,14 @@ import staticModule, { playground as staticPlayground, DATA, END } from "./calen
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <CalendarStripInteractive
       data={DATA}
       end={END}
       summary={false}
       style={{ width: 110, height: 62 }}
-      animate
+      animate={animate}
     />
   );
 }

@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, COLUMN, DOMAIN } from "./
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex flex-col items-end gap-1 tabular-nums">
       {COLUMN.map((v) => (
@@ -19,7 +19,7 @@ export function PreviewLive() {
           domain={DOMAIN}
           summary={false}
           fontSize={14}
-          animate
+          animate={animate}
         />
       ))}
     </span>

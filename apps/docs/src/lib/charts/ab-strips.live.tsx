@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, A, B, MS } from "./ab-str
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ABStripsInteractive
       data={{ a: A, b: B }}
@@ -18,7 +18,7 @@ export function PreviewLive() {
       summary={false}
       width={160}
       height={22}
-      animate
+      animate={animate}
     />
   );
 }

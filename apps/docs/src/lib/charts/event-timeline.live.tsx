@@ -15,7 +15,7 @@ import staticModule, {
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <EventTimelineInteractive
       data={DATA}
@@ -23,7 +23,7 @@ export function PreviewLive() {
       summary={false}
       width={150}
       height={20}
-      animate
+      animate={animate}
     />
   );
 }

@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, WEEKS } from "./garden-gr
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <GardenGridInteractive data={WEEKS} summary={false} cell={9} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

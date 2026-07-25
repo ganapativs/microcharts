@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, TRAJ } from "./phase-trac
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <PhaseTraceInteractive
       data={TRAJ}
@@ -18,7 +18,7 @@ export function PreviewLive() {
       summary={false}
       width={44}
       height={40}
-      animate
+      animate={animate}
     />
   );
 }

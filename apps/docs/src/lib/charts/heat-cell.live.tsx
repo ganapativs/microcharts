@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, D } from "./heat-cell";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">
       {[12, 35, 58, 79, 96].map((v) => (
@@ -19,7 +19,7 @@ export function PreviewLive() {
           domain={D}
           summary={false}
           style={{ width: 16, height: 16 }}
-          animate
+          animate={animate}
         />
       ))}
     </span>

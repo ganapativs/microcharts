@@ -3,12 +3,13 @@ import { Sparkline } from "@microcharts/react/sparkline";
 import { SectionMark } from "@/components/home/section-mark";
 import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
-import { CountUp } from "@/components/ui/count-up";
 import { SIZE } from "@/lib/docs-facts";
 import { RECHARTS } from "@/lib/competitor-facts";
 
 /** 05 · Size. Weight bar is linear (library vs one Recharts chart). Receipts
- *  below are the measured numbers from docs-facts.ts. */
+ *  below are the measured numbers from docs-facts.ts. Bars and figures render
+ *  settled — a size comparison is evidence, and evidence doesn't need a
+ *  count-up (the animated version read as showmanship). */
 
 const RECHARTS_ONE_CHART_KB = RECHARTS.oneChartGzipKb;
 const RECHARTS_PACKAGE_KB = RECHARTS.packageGzipKb;
@@ -60,18 +61,20 @@ export function HomeCostSection() {
       <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">
-            Word-sized on screen. Word-sized on the wire.
+            {SIZE.interactiveMin}–{SIZE.interactiveMax} kB per interactive chart, enforced in CI.
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            Not a head-to-head. Recharts is a full charting toolkit — axes, legends, tooltips, every
-            chart type — and it costs about {RECHARTS_ONE_CHART_KB} kB gzip and {RECHARTS_DEPS}{" "}
-            dependencies for one tree-shaken LineChart. That bill is fine on a page that&nbsp;is
-            mostly chart. Inside a sentence or a table cell, it isn&rsquo;t.
+            This isn&rsquo;t a head-to-head. Recharts is a full charting toolkit - axes, legends,
+            tooltips, every chart type - and it costs about {RECHARTS_ONE_CHART_KB} kB gzip and
+            {/* template literal: SWC drops the leading space of an entity-bearing
+                multiline text node after an expression — see swc-ssr-spaces.test.ts */}
+            {` ${RECHARTS_DEPS} dependencies `}for one tree-shaken LineChart. That bill is fine on a
+            page that&nbsp;is mostly chart. Inside a sentence or a table cell, you want something
+            smaller.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
-            microcharts is for the other job: when you already know the shape of the answer and just
-            need the mark — minimal, honest, small enough to live in the interface. Every
-            chart&rsquo;s gzip size is a CI gate; the numbers on this page are the enforced ones.
+            microcharts covers the other job: you already know the shape of the answer and just need
+            the mark, small enough to live in the interface.
           </p>
         </Reveal>
 
@@ -84,7 +87,7 @@ export function HomeCostSection() {
             <div className="space-y-3">
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">recharts, one LineChart</span>
-                <span className="cost-wipe min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
                     value={RECHARTS_ONE_CHART_KB}
                     max={RECHARTS_ONE_CHART_KB}
@@ -96,19 +99,14 @@ export function HomeCostSection() {
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  <CountUp
-                    to={RECHARTS_ONE_CHART_KB}
-                    suffix=" kB"
-                    durationMs={1050}
-                    startDelayMs={280}
-                  />
+                  {RECHARTS_ONE_CHART_KB} kB
                 </span>
               </div>
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 sm:grid-cols-[6.5rem_minmax(0,1fr)_auto]">
                 <span className="text-sm text-fd-muted-foreground">
                   microcharts, one interactive
                 </span>
-                <span className="cost-wipe min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
+                <span className="min-w-0 [&_svg]:!h-auto [&_svg]:!w-full">
                   <Progress
                     value={SIZE.interactiveMedian}
                     max={RECHARTS_ONE_CHART_KB}
@@ -119,22 +117,14 @@ export function HomeCostSection() {
                   />
                 </span>
                 <span className="font-medium tabular-nums text-fd-foreground">
-                  <CountUp
-                    to={SIZE.interactiveMedian}
-                    decimals={2}
-                    suffix=" kB"
-                    durationMs={1050}
-                    startDelayMs={280}
-                  />
+                  {SIZE.interactiveMedian.toFixed(2)} kB
                 </span>
               </div>
             </div>
             <p className="mt-3 text-[0.8rem] text-fd-muted-foreground">
-              Same scale, different jobs. Recharts keeps the dashboard surface; tree-shaking drops
-              unused chart types, but one LineChart still ships the shared Redux/d3 kernel (~
-              {RECHARTS_ONE_CHART_KB} kB with axes + tooltip; LineChart alone ~69 kB; package{" "}
-              {RECHARTS_PACKAGE_KB} kB / {RECHARTS_DEPS} deps). microcharts is one subpath for the
-              inlined mark — static from {SIZE.min} kB.
+              Same scale, different jobs. Tree-shaking drops unused chart types, but one LineChart
+              still ships the shared Redux/d3 kernel; microcharts is one subpath for the inlined
+              mark - static from {SIZE.min} kB.
             </p>
             <p className="mono-label mt-4 opacity-60">
               recharts {RECHARTS_VERSION} one-chart: esbuild tree-shake, 2026-07 · package{" "}

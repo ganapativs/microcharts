@@ -9,8 +9,16 @@ import staticModule, { entry, playground as staticPlayground } from "./sparkbar"
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <SparkBarInteractive data={entry.demo} width={180} height={48} summary={false} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <SparkBarInteractive
+      data={entry.demo}
+      width={180}
+      height={48}
+      summary={false}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

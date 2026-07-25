@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, SLEEP, STATES, DOM } from
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <HypnogramInteractive
       data={SLEEP}
@@ -18,7 +18,7 @@ export function PreviewLive() {
       summary={false}
       width={150}
       height={64}
-      animate
+      animate={animate}
     />
   );
 }

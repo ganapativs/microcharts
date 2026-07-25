@@ -189,11 +189,16 @@ export interface ChartModuleStatic {
  */
 export interface ChartModule extends ChartModuleStatic {
   /**
-   * Interactive-entry twin of `Preview` at the SAME size/props, with entrance
-   * `animate` on. Gallery + homepage hero prefer it unless the visitor chooses
-   * static or prefers reduced motion (then they stay on `Preview`).
+   * Interactive-entry twin of `Preview` at the SAME size/props. Gallery +
+   * homepage hero prefer it unless the visitor chooses static or prefers reduced
+   * motion (then they stay on `Preview`).
+   *
+   * The entrance is OPT-IN (`animate` defaults to false): the boards that render
+   * these — the /charts gallery, the homepage catalog tiles — show many charts at
+   * once, and a hundred simultaneous entrances read as noise. The chart-doc hero
+   * (`EntryDemoDual`) passes `animate` because it renders exactly one.
    */
-  PreviewLive?: ComponentType;
+  PreviewLive?: ComponentType<{ animate?: boolean }>;
   /**
    * Static chart component identity used inside authored `contexts` JSX — paired
    * with `ChartLive` so four-homes can swap to the interactive twin in place.

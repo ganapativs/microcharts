@@ -27,7 +27,7 @@ const SURFACES = [
   },
   {
     path: "/agent-setup.md",
-    note: "the whole setup as one prompt — install, conventions, first chart",
+    note: "the whole setup as one prompt - install, conventions, first chart",
   },
 ] as const;
 
@@ -102,27 +102,20 @@ function CallItRow() {
           <span className="mono-label">call it · mcp</span>
         </div>
         <ul className="space-y-4 px-5 py-5 font-mono text-[0.8rem] leading-relaxed">
-          <li className="hv-term-line" style={{ "--i": 0 } as React.CSSProperties}>
+          <li>
             <span className="text-fd-foreground">
               <span aria-hidden className="text-fd-primary">
                 ${" "}
               </span>
               npx -y @microcharts/mcp
             </span>
-            <p
-              className="hv-term-line mt-0.5 pl-4 text-fd-muted-foreground"
-              style={{ "--i": 1 } as React.CSSProperties}
-            >
-              → {MCP_TOOLS.join(" · ")}
-            </p>
+            <p className="mt-0.5 pl-4 text-fd-muted-foreground">→ {MCP_TOOLS.join(" · ")}</p>
           </li>
         </ul>
       </div>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
-        A desktop assistant&rsquo;s reply, a terminal, an email draft — surfaces where emitting
-        grammar has nothing to render it. An MCP client spawns this on your machine, and the
-        assistant picks the right chart, reads its real props, and gets back a finished SVG with the
-        generated alt text already attached.
+        For surfaces with nothing to render React - a desktop assistant, a terminal, an email draft
+        - the MCP server picks the right chart and returns a finished SVG, alt text attached.
       </p>
     </div>
   );
@@ -136,13 +129,12 @@ export function HomeModelsSection() {
 
         <Reveal>
           <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
-            Built to be written by a model, read by a person.
+            Text is the wire format.
           </h2>
           <p className="mt-4 max-w-2xl text-fd-muted-foreground">
             A reply streams as plain text, and each chart block becomes the shipped component the
-            moment it closes. Text is the wire format, so the grammar already renders wherever your
-            models write: {PROVIDER_COUNT} assistants, coding agents, and SDKs, no adapter in
-            between.
+            moment it closes. It works wherever your models write: {PROVIDER_COUNT} assistants,
+            coding agents, and SDKs, no adapter in between.
           </p>
         </Reveal>
 
@@ -158,12 +150,8 @@ export function HomeModelsSection() {
                 <span className="mono-label">machine surfaces</span>
               </div>
               <ul className="space-y-4 px-5 py-5 font-mono text-[0.8rem] leading-relaxed">
-                {SURFACES.map((s, i) => (
-                  <li
-                    key={s.path}
-                    className="hv-term-line"
-                    style={{ "--i": i * 2 } as React.CSSProperties}
-                  >
+                {SURFACES.map((s) => (
+                  <li key={s.path}>
                     <a
                       href={s.path}
                       className="group inline-flex items-center gap-1.5 text-fd-foreground no-underline hover:text-fd-primary"
@@ -174,12 +162,7 @@ export function HomeModelsSection() {
                       curl microcharts.dev{s.path}
                       <ArrowUpRight className="size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
                     </a>
-                    <p
-                      className="hv-term-line mt-0.5 pl-4 text-fd-muted-foreground"
-                      style={{ "--i": i * 2 + 1 } as React.CSSProperties}
-                    >
-                      → {s.note}
-                    </p>
+                    <p className="mt-0.5 pl-4 text-fd-muted-foreground">→ {s.note}</p>
                   </li>
                 ))}
               </ul>
@@ -236,10 +219,8 @@ export function HomeModelsSection() {
               no try/catch on this page · documented edge cases, verified in the test suite
             </p>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
-              A model mid-reply can&rsquo;t promise clean numbers. <code>data</code> alone renders
-              something correct, and bad values degrade to documented behavior, never to a crash in
-              the reply. The sentence each row writes about itself is what a screen reader hears and
-              a model can quote back.
+              A model mid-reply can&rsquo;t promise clean numbers - bad values degrade to documented
+              behavior, never to a crash in the reply.
             </p>
           </Reveal>
         </div>

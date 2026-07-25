@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground } from "./status-dot";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-3">
       {(["ok", "warn", "error", "off", "busy"] as const).map((s) => (
@@ -18,7 +18,7 @@ export function PreviewLive() {
           status={s}
           summary={false}
           style={{ width: 14, height: 14 }}
-          animate
+          animate={animate}
         />
       ))}
     </span>

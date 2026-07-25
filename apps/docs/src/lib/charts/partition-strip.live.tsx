@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, TREE } from "./partition-
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <PartitionStripInteractive data={TREE} summary={false} width={140} height={24} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <PartitionStripInteractive
+      data={TREE}
+      summary={false}
+      width={140}
+      height={24}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

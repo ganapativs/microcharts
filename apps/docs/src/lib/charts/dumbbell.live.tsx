@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, BANDS } from "./dumbbell"
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

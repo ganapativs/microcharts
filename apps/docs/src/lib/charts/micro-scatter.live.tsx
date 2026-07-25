@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, CLOUD } from "./micro-sca
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <MicroScatterInteractive data={CLOUD} summary={false} width={110} height={66} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <MicroScatterInteractive
+      data={CLOUD}
+      summary={false}
+      width={110}
+      height={66}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

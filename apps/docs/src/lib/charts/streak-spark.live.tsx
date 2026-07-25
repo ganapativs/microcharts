@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, STREAK } from "./streak-s
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <StreakSparkInteractive data={STREAK} width={180} height={48} summary={false} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <StreakSparkInteractive
+      data={STREAK}
+      width={180}
+      height={48}
+      summary={false}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

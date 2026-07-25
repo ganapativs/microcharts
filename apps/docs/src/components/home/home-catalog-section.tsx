@@ -11,7 +11,7 @@ import { HERO_MODULES, POOL } from "@/components/home/hero-modules";
 import { Reveal } from "@/components/ui/reveal";
 import { CATALOG } from "@/lib/docs-facts";
 
-/** 02 · The catalog — {total} answers, word-sized. Tier chips use the
+/** 02 · The catalog — {total} chart types, word-sized. Tier chips use the
  *  library's own categorical tokens: the tiers are categories, so the
  *  category palette is the honest ink. The refusals strip closes the section:
  *  what the catalog admits and what it refuses are the same editorial
@@ -28,7 +28,7 @@ const TIERS = [
 const REFUSALS = [
   {
     name: "pie",
-    why: "angles are unreadable at word size",
+    why: "lengths stay legible at word size; angles don't",
     fix: "SegmentedBar",
     node: (
       <SegmentedBar
@@ -45,13 +45,13 @@ const REFUSALS = [
   },
   {
     name: "needle gauge",
-    why: "spends its pixels on chrome, not data",
+    why: "every pixel goes to the data, not the dial",
     fix: "Bullet",
     node: <Bullet value={72} target={80} bands={[50, 90]} width={96} height={12} summary={false} />,
   },
   {
     name: "violin",
-    why: "density curves lie at twenty pixels tall",
+    why: "a five-number summary stays honest at twenty pixels",
     fix: "MicroBox",
     node: (
       <MicroBox data={[2, 4, 5, 5, 6, 7, 7, 8, 9, 12]} width={96} height={14} summary={false} />
@@ -59,13 +59,13 @@ const REFUSALS = [
   },
   {
     name: "battery",
-    why: "reads as an icon before it reads as a value",
+    why: "reads as a value first, never as an icon",
     fix: "Progress",
     node: <Progress value={0.68} width={96} height={10} summary={false} />,
   },
   {
     name: "waffle",
-    why: "a hundred squares don't fit in a word",
+    why: "ten icons carry the share a hundred squares can't",
     fix: "IconArray",
     node: <IconArray value={0.7} total={10} width={96} height={14} summary={false} />,
   },
@@ -82,7 +82,8 @@ const TILES = POOL.map((slug) => {
 });
 
 /** The first board, server-rendered as pure SVG. Deterministic (the pool's own
- *  order) so SSR and hydration agree; the client reshuffles after mount. */
+ *  order) so SSR and hydration agree; the client upgrades the same tiles to
+ *  their interactive twins after mount — nothing re-deals. */
 const FIRST_BOARD = TILES.slice(0, 11).map((entry, i) => {
   const { Preview } = HERO_MODULES[entry.slug]!;
   return (
@@ -98,7 +99,7 @@ export function HomeCatalogSection() {
       <SectionMark n="02">the catalog</SectionMark>
       <Reveal>
         <h2 className="display max-w-xl text-[length:var(--text-fluid-h2)]">
-          {CATALOG.total} answers, word-sized.
+          {CATALOG.total} chart types, each the size of a word.
         </h2>
         <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2">
           {TIERS.map((t) => (
@@ -116,7 +117,7 @@ export function HomeCatalogSection() {
             </span>
           ))}
           <span className="mono-label ml-1 inline-flex items-center gap-2 leading-none">
-            <span aria-hidden className="hx-pulse size-1.5 shrink-0 rounded-full bg-fd-primary" />
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-fd-primary opacity-80" />
             live: every tile is interactive
           </span>
         </div>
@@ -133,8 +134,8 @@ export function HomeCatalogSection() {
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <h3 className="font-medium text-fd-foreground">Traded up, on purpose.</h3>
           <p className="text-sm text-fd-muted-foreground">
-            Five shapes that fail at word size, and the honest chart each one became. Every type
-            keeps one documented encoding channel; lie factor = 1.
+            Five familiar shapes, each with a word-sized replacement that answers the same question
+            more clearly.
           </p>
         </div>
         <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-5">

@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, REGIONS } from "./bubble-
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

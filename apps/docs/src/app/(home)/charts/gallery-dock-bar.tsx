@@ -101,8 +101,8 @@ export function GalleryDockBar({
         <div className="g2-seg" role="group" aria-label="Render mode">
           {(
             [
-              { key: "live" as const, Icon: Sparkles, label: "Live: interactive, animated" },
-              { key: "static" as const, Icon: Square, label: "Static: no motion" },
+              { key: "live" as const, Icon: Sparkles, label: "Live: hover to scrub" },
+              { key: "static" as const, Icon: Square, label: "Static: pure SVG, no interaction" },
             ] as const
           ).map(({ key, Icon, label }) => (
             <button

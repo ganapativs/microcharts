@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, DEMO, BENCH } from "./ret
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <RetentionCurveInteractive data={DEMO} summary={false} width={150} height={26} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <RetentionCurveInteractive
+      data={DEMO}
+      summary={false}
+      width={150}
+      height={26}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

@@ -277,12 +277,11 @@ export function HomeSurfacesSection() {
         <div className="grid items-start gap-4">
           <Reveal className="flex flex-col gap-3 lg:pr-6 lg:pt-1">
             <h2 className="display max-w-md text-[length:var(--text-fluid-h2)]">
-              Not a dashboard you visit. A mark inside the thing you were reading.
+              Built for the inside of an interface.
             </h2>
             <p className="max-w-md text-fd-muted-foreground">
-              Word-sized charts sit where the words already are: a product screen, a report, a table
-              cell, a KPI, a tab, a sentence. Same components, same grammar, every surface here
-              rendered live from the library.
+              The charts sit where the words already are: a product screen, a report, a table cell,
+              a KPI, a tab, a sentence. Every surface here is rendered live from the library.
             </p>
           </Reveal>
           <Reveal className="panel flex flex-col gap-3 p-4" delay={140}>

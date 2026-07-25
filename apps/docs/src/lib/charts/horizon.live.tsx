@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, LOAD } from "./horizon";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <HorizonInteractive data={LOAD} summary={false} width={130} height={16} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <HorizonInteractive data={LOAD} summary={false} width={130} height={16} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

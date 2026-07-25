@@ -39,7 +39,7 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
 
           <Reveal delay={60}>
             {/* Tighter tracking than .display — scale grows with display size. */}
-            <h1 className="display mt-5 text-balance text-[2.3rem] leading-[1.05] tracking-[-0.03em] text-fd-foreground sm:text-[3rem] lg:text-[3.65rem] xl:text-[3.9rem]">
+            <h1 className="display mt-5 text-balance text-[2.05rem] leading-[1.08] tracking-[-0.028em] text-fd-foreground sm:text-[2.65rem] lg:text-[3.2rem] xl:text-[3.45rem]">
               Small enough for a model to{" "}
               <span className="whitespace-nowrap">
                 <em className="hv-em">write</em>
@@ -61,9 +61,11 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
 
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
-              Word-sized React charts — sparklines and inline SVG microcharts. {catalogTotal} types
-              that sit inside a sentence, a table cell, or a streamed reply, where a full chart
-              library would be too heavy and too loud.
+              {/* literal ’, not &rsquo; — an entity in this text node re-triggers the
+                  SWC dropped-space bug after {catalogTotal} (see swc-ssr-spaces.test.ts) */}
+              Word-sized React charts - sparklines and inline SVG microcharts. {catalogTotal} types
+              that sit inside a sentence, a table cell, or a streamed reply, at sizes where a full
+              chart library wouldn’t fit.
             </p>
           </Reveal>
 
@@ -124,7 +126,8 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
         <Reveal delay={140} deferred>
           <StreamVignette serif startDelay={900} />
           <p className="mono-label mt-3 text-center opacity-70">
-            what a model writes <span className="text-hairline">·</span> what a person reads
+            the reply is plain text <span className="text-hairline">·</span> the charts are the
+            shipped components
           </p>
         </Reveal>
       </div>

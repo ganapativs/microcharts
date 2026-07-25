@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, RANKS } from "./bump-stri
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

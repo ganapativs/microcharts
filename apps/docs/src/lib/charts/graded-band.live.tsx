@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, DRAWS } from "./graded-ba
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <GradedBandInteractive data={DRAWS} summary={false} width={140} height={14} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <GradedBandInteractive data={DRAWS} summary={false} width={140} height={14} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

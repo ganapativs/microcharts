@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, BURSTS } from "./seismogr
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <SeismogramInteractive data={BURSTS} summary={false} width={140} height={28} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <SeismogramInteractive
+      data={BURSTS}
+      summary={false}
+      width={140}
+      height={28}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

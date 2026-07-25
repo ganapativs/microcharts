@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, DATA, TODAY } from "./fol
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <FoldedDayBandInteractive data={DATA} summary={false} width={140} height={32} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <FoldedDayBandInteractive
+      data={DATA}
+      summary={false}
+      width={140}
+      height={32}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

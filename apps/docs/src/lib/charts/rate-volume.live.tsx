@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, FRAC, PCT } from "./rate-
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <RateVolumeInteractive
       data={FRAC}
@@ -17,7 +17,7 @@ export function PreviewLive() {
       summary={false}
       width={150}
       height={26}
-      animate
+      animate={animate}
     />
   );
 }

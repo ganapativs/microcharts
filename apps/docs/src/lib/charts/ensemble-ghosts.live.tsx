@@ -9,9 +9,15 @@ import staticModule, { playground as staticPlayground, FUTURES } from "./ensembl
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
-    <EnsembleGhostsInteractive data={FUTURES} summary={false} width={120} height={28} animate />
+    <EnsembleGhostsInteractive
+      data={FUTURES}
+      summary={false}
+      width={120}
+      height={28}
+      animate={animate}
+    />
   );
 }
 

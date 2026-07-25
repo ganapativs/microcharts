@@ -9,9 +9,14 @@ import staticModule, { playground as staticPlayground, MIX } from "./micro-donut
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
-    <MicroDonutInteractive data={MIX} summary={false} style={{ width: 40, height: 40 }} animate />
+    <MicroDonutInteractive
+      data={MIX}
+      summary={false}
+      style={{ width: 40, height: 40 }}
+      animate={animate}
+    />
   );
 }
 

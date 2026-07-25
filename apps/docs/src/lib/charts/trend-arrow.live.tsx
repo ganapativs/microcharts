@@ -9,10 +9,10 @@ import staticModule, { playground as staticPlayground, PCT } from "./trend-arrow
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-3">
-      <TrendArrowInteractive value={0.3} summary={false} animate />
+      <TrendArrowInteractive value={0.3} summary={false} animate={animate} />
       <TrendArrow value={0} summary={false} />
       <TrendArrow value={-0.3} summary={false} />
     </span>

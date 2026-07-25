@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, CATDOG, THREE } from "./c
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

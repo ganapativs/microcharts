@@ -32,7 +32,7 @@ const GUARANTEES = [
   {
     icon: Ear,
     title: "Named by its data",
-    body: 'Every chart is role="img" with a generated sentence for a name — nothing to caption, nothing to drift.',
+    body: 'Every chart is role="img" with a generated sentence for a name - nothing to caption, nothing to drift.',
   },
   {
     icon: Keyboard,
@@ -52,7 +52,7 @@ const GUARANTEES = [
   {
     icon: Contrast,
     title: "System preferences, handled",
-    body: "prefers-reduced-motion, forced-colors, and prefers-contrast are all respected — no extra work from you.",
+    body: "prefers-reduced-motion, forced-colors, and prefers-contrast are all respected - no extra work from you.",
   },
 ] as const;
 
@@ -65,12 +65,11 @@ export function HomeA11ySection() {
         <div>
           <Reveal>
             <h2 className="display text-[length:var(--text-fluid-h2)]">
-              Written for a screen reader, not bolted on.
+              Every chart can say what it shows.
             </h2>
             <p className="mt-4 max-w-md text-fd-muted-foreground">
-              Not a pass you do later. Every chart is <code>role=&quot;img&quot;</code> named by a
-              sentence generated from its data, keyboard-navigable, announced through a polite live
-              region, and never reliant on color alone — by construction, nothing to wire.
+              Every chart names itself with a sentence generated from its data. It comes built in -
+              nothing to wire, nothing to retrofit.
             </p>
           </Reveal>
 

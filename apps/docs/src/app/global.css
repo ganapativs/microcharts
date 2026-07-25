@@ -13,9 +13,10 @@
   --font-mono: var(--font-mono-src), ui-monospace, "SF Mono", monospace;
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
 
-  /* Fluid type ramp for the marketing surface. */
-  --text-fluid-hero: clamp(2.75rem, 1.6rem + 5.4vw, 5.75rem);
-  --text-fluid-h2: clamp(1.8rem, 1.2rem + 2.4vw, 3rem);
+  /* Fluid type ramp for the marketing surface. Trimmed ~12% 2026-07-25 (user:
+     headings read oversized across home/charts/examples/brand). */
+  --text-fluid-hero: clamp(2.45rem, 1.4rem + 4.8vw, 5.1rem);
+  --text-fluid-h2: clamp(1.6rem, 1.05rem + 2.1vw, 2.65rem);
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -1165,14 +1166,8 @@ body {
     border-radius: 50%;
     background: var(--accent);
   }
-  /* Pulse only with motion allowed — the reduced-motion reset elsewhere keys on
-     the .hx-pulse CLASS, not this dot, so gate it here. At rest it stays a solid
-     accent dot: still a fine "live" signal. */
-  @media (prefers-reduced-motion: no-preference) {
-    .g2-live-chip-dot {
-      animation: hx-pulse 2.4s ease-in-out infinite;
-    }
-  }
+  /* No pulse — a solid accent dot is already a fine "live" signal, and ambient
+     loops were cut site-wide in the 2026-07 calm pass. */
   html[data-g2-mode="static"] .g2-live-chip {
     display: none;
   }
@@ -2529,18 +2524,17 @@ div:where(
   animation: mc-stream-in 0.42s var(--ease-out-quint) both;
 }
 
-/* Scroll-reveal: charts and panels settle in once — rise + a brief frost that
-   resolves, so glass reads as "developing". Gated on reduced-motion. */
+/* Scroll-reveal: charts and panels settle in once — a short rise + fade only.
+   (An entrance blur was shipped and cut in the 2026-07 calm pass: frosting
+   every section read as effect, not craft.) Gated on reduced-motion. */
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(16px);
-    filter: blur(6px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: blur(0);
   }
 }
 /* Scroll-reveal states.
@@ -2555,16 +2549,15 @@ div:where(
    (nothing has painted yet). `in` plays the entrance once, in view. */
 [data-reveal="pending"] {
   opacity: 0;
-  transform: translateY(16px);
-  filter: blur(6px);
+  transform: translateY(10px);
   /* No will-change here: pending is the idle rest state held (for every
      below-fold reveal) until the observer fires at the viewport edge, so the
-     hint buys ~no lead time while pinning a GPU layer per element — the blur
-     backing store worst of all. The one-shot rise-in still composites fine
-     (transform/opacity/filter are all compositor properties). */
+     hint buys ~no lead time while pinning a GPU layer per element. The
+     one-shot rise-in still composites fine (transform/opacity are both
+     compositor properties). */
 }
 [data-reveal="in"] {
-  animation: rise-in 0.72s var(--ease-out-quint) both;
+  animation: rise-in 0.55s var(--ease-out-quint) both;
 }
 
 @keyframes pop-in {
@@ -2596,30 +2589,6 @@ div:where(
 }
 .route-fade {
   animation: route-fade 0.34s var(--ease-out-expo) both;
-}
-
-/* Cost bars sweep in together when the panel reveals: a single left-to-right
-   wipe over both bars. Same duration for each, so the long recharts bar keeps
-   filling long after the tiny microcharts bar has stopped — the scale gap is
-   felt, not just read. Rest state (no motion, no JS) is the full bar. */
-@keyframes cost-wipe {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  /* Only the "in" transition animates — the rest state never clips, so the
-     comparison bars can't be left hidden if a reveal lingers at "pending".
-     The wipe plays under the panel's own opacity fade-in, so the from-frame
-     (empty) isn't a harsh flash. */
-  [data-reveal="in"] .cost-wipe {
-    /* delay ~ the panel's rise-in settle (0.72s blur) so the scale sweep lands
-       on a crisp, settled panel rather than through the entrance blur. */
-    animation: cost-wipe 1.05s var(--ease-out-quint) 0.28s both;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2871,17 +2840,6 @@ div:where(
       border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
     }
   }
-  /* one tile fading to a new chart — opacity + scale + a touch of blur (GPU) */
-  .hx-swap {
-    animation: hx-swap 0.55s var(--ease-out-expo);
-  }
-  @keyframes hx-swap {
-    from {
-      opacity: 0;
-      scale: 0.94;
-      filter: blur(3px);
-    }
-  }
   /* Surface carousel: the incoming surface rises + de-blurs, and its rows settle
      in a short hand-dealt stagger while the outgoing one fades under it. */
   .hx-surface-in {
@@ -2923,10 +2881,8 @@ div:where(
       color 0.18s var(--ease-out-quint),
       opacity 0.18s var(--ease-out-quint);
   }
-  /* the "live" heartbeat next to the count */
-  .hx-pulse {
-    animation: hx-pulse 2.4s ease-in-out infinite;
-  }
+  /* heartbeat keyframes — kept only for the (currently unused) instrument-grid
+     nodes below; no shipped surface pulses ambiently since the calm pass */
   @keyframes hx-pulse {
     0%,
     100% {
@@ -3056,8 +3012,6 @@ div:where(
 
 @media (prefers-reduced-motion: reduce) {
   .hx-morph-in,
-  .hx-swap,
-  .hx-pulse,
   .hx-cross-v::after,
   .hx-cross-h::after,
   .hx-cross-node {
@@ -3126,9 +3080,13 @@ div:where(
   .hv-reply-floor {
     transition: min-height 0.52s var(--ease-out-quint);
   }
+  /* Live floor sits just above the ghost-reserved tour height (~231px): long
+     Nano answers scroll in place, so a taller reservation only buys dead space
+     under a settled reply and pushes the panel past the left column's height
+     (user feedback 2026-07-25 — was 297px). */
   .hv-reply-floor[data-live],
   [data-mc-live="1"] .hv-reply-floor {
-    min-height: 297px;
+    min-height: 240px;
   }
 
   .hv-composer {
@@ -3212,53 +3170,21 @@ div:where(
   .hv-tok-num {
     color: var(--mc-negative);
   }
-  .hv-code-caret {
-    display: inline-block;
-    width: 0.55ch;
-    height: 1.05em;
-    margin-left: 1px;
-    vertical-align: text-bottom;
-    background: var(--accent);
-    border-radius: 1px;
-    animation: mc-caret-blink 1.1s steps(1) infinite;
-  }
-
-  /* 05 · machine-surfaces terminal: lines land one by one on reveal. */
-  [data-reveal="pending"] .hv-term-line {
-    opacity: 0;
-  }
-  [data-reveal="in"] .hv-term-line {
-    animation: hv-term 0.4s var(--ease-out-quint) both;
-    animation-delay: calc(var(--i, 0) * 160ms);
-  }
-  @keyframes hv-term {
-    from {
-      opacity: 0;
-      translate: 0 5px;
-    }
-  }
-
   /* 04 · the refusals — struck through, dashed, quietly confident. */
   .hv-refusal {
     border: 1px dashed color-mix(in oklab, var(--hairline) 85%, transparent);
     border-radius: var(--radius-panel);
   }
+  /* Quiet strikethrough — muted ink, not the negative red (read as aggressive). */
   .hv-refusal-name {
     text-decoration: line-through;
-    text-decoration-thickness: 1.5px;
-    text-decoration-color: color-mix(in oklab, var(--mc-negative) 70%, transparent);
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in oklab, var(--color-fd-muted-foreground) 55%, transparent);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hv-code-caret {
-    animation: none;
-  }
   .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
     transition: none;
-  }
-  [data-reveal] .hv-term-line {
-    animation: none;
-    opacity: 1;
   }
 }

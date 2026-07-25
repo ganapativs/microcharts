@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, YEAR } from "./spiral-yea
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

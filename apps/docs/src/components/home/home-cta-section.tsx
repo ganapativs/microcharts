@@ -10,7 +10,7 @@ export function HomeCtaSection() {
       <div className="mx-auto max-w-shell px-4 sm:px-6">
         <div className="panel grid-paper flex flex-col items-center gap-6 px-6 pb-20 pt-16 text-center sm:pb-24">
           <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
-            Give your interface a quieter voice.
+            Start with one chart in one sentence.
           </h2>
           <div className="flex flex-col items-center gap-4">
             <div className="flex flex-wrap items-center justify-center gap-3">

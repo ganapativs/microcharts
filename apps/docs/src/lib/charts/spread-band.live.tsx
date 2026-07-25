@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, PAIRS, LABELS } from "./s
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <SpreadBandInteractive
       data={PAIRS}
@@ -17,7 +17,7 @@ export function PreviewLive() {
       summary={false}
       width={140}
       height={26}
-      animate
+      animate={animate}
     />
   );
 }

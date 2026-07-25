@@ -73,12 +73,8 @@ function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?:
       }
     >
       <span className="wild-chrome">
-        {/* one live-pulse per section (the marquee); the small cards keep a
-            static dot so seven pulses don't compete */}
-        <span
-          aria-hidden
-          className={`size-1.5 shrink-0 rounded-full bg-fd-primary ${wide ? "hx-pulse" : "opacity-80"}`}
-        />
+        {/* static dot on every card — the pulse read as noise, not signal */}
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-fd-primary opacity-80" />
         {/* not .mono-label on compact cards — that class is unlayered CSS, so
             its 0.68rem/0.14em beats layered Tailwind utilities and the long
             pages.dev hosts truncate at 4-up width. */}
@@ -150,10 +146,9 @@ export function HomeWildSection() {
           The catalog, put to work.
         </h2>
         <p className="mt-4 max-w-2xl text-fd-muted-foreground">
-          {cardinal(SHOWCASE.length)} example apps, each built with{" "}
-          <code className="text-fd-foreground">@microcharts/react</code> installed from npm: a
-          trading terminal, a print magazine, an eval console. Between them they exercise all{" "}
-          {CATALOG.total} chart types. Every card opens the live example — or{" "}
+          {cardinal(SHOWCASE.length)} example apps built with{" "}
+          <code className="text-fd-foreground">@microcharts/react</code> from npm, together
+          exercising all {CATALOG.total} chart types. Every card opens the live example - or{" "}
           <Link
             prefetch={false}
             href="/examples"
@@ -193,9 +188,6 @@ export function HomeWildSection() {
               </span>
               <span className="mono-label mt-2 inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.12em] text-fd-primary">
                 the quickstart <ArrowRight aria-hidden className="size-3" />
-              </span>
-              <span className="mono-label mt-5 text-[0.58rem] tracking-[0.1em] opacity-70">
-                {SHOWCASE.length} examples · {CATALOG.total} types · 0 dependencies
               </span>
             </Link>
           </Reveal>

@@ -25,7 +25,7 @@ export const COLLECTIONS: readonly CollectionDef[] = [
     description: `Everyday word-sized React charts — sparklines, bars, bullets, deltas, and the marks you reach for first. ${CATALOG.collections.core} core types in @microcharts/react.`,
     intro:
       "Core is the everyday shelf: trends, magnitudes, change, attainment, and the small comparisons that sit in a sentence, a table cell, or a KPI. Start here when you know the shape of the answer and just need the mark.",
-    goodFor: "Sparklines, bars, bullets, deltas, heat strips, calendars — the common inline jobs.",
+    goodFor: "Sparklines, bars, bullets, deltas, heat strips, calendars - the common inline jobs.",
     notFor:
       "One-question decision instruments (Decision) or unusual encodings (Expressive / Frontier).",
   },
@@ -48,8 +48,8 @@ export const COLLECTIONS: readonly CollectionDef[] = [
     title: "Expressive React microcharts",
     description: `Unusual, apt word-sized encodings for React — when a familiar sparkline is the wrong metaphor. ${CATALOG.collections.expressive} expressive types in @microcharts/react.`,
     intro:
-      "Expressive charts use an uncommon shape on purpose: the encoding fits the story better than a line or bar would. Still word-sized, still honest — just not the default shelf.",
-    goodFor: "Metaphors that earn their keep — when the form matches the domain.",
+      "Expressive charts use an uncommon shape on purpose: the encoding fits the story better than a line or bar would. Still word-sized, still honest - just not the default shelf.",
+    goodFor: "Metaphors that earn their keep - when the form matches the domain.",
     notFor: "Default KPI trends (Core) or single-question ops instruments (Decision).",
   },
   {
@@ -61,7 +61,7 @@ export const COLLECTIONS: readonly CollectionDef[] = [
     intro:
       "Frontier is the newer shelf: forms that passed the admission bar and are still proving themselves in real UIs. Same grammar and size budgets as the rest of the catalog.",
     goodFor: "Calibration, trace folds, dual windows, and other recent word-sized instruments.",
-    notFor: "If a Core or Decision chart already answers the question — prefer the calmer shelf.",
+    notFor: "If a Core or Decision chart already answers the question - prefer the calmer shelf.",
   },
 ] as const;
 

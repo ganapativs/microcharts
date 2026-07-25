@@ -9,12 +9,12 @@ import staticModule, { playground as staticPlayground } from "./thermometer";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-end gap-3">
-      <ThermometerInteractive value={72} target={80} summary={false} animate />
-      <ThermometerInteractive value={40} summary={false} animate />
-      <ThermometerInteractive value={95} summary={false} animate />
+      <ThermometerInteractive value={72} target={80} summary={false} animate={animate} />
+      <ThermometerInteractive value={40} summary={false} animate={animate} />
+      <ThermometerInteractive value={95} summary={false} animate={animate} />
     </span>
   );
 }

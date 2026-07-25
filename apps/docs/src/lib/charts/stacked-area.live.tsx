@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, MIX } from "./stacked-are
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} animate />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <StackedAreaInteractive data={MIX} summary={false} width={130} height={22} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {
