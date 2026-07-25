@@ -1,5 +1,17 @@
 # @microcharts/mcp
 
+## 0.1.3
+
+### Patch Changes
+
+- [#74](https://github.com/ganapativs/microcharts/pull/74)
+  [`273e771`](https://github.com/ganapativs/microcharts/commit/273e7713f140f7f4969aa0a15e9de77a5952a042) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Declare a real JSON Schema type for `render_microchart`'s `data`
+  parameter. It was `z.any()`, which emits `{}` with no `type` — clients that build a form or a prompt from the schema
+  (Glama's inspector among them) read that as an unknown field type, and a model learns nothing about what to pass. It
+  is now the union the catalog actually uses: an array for ordered series, or an object for the few charts whose data is
+  keyed. Scalar charts still omit it. Per-chart shapes are unchanged and still validated at render time.
+
 ## 0.1.2
 
 ### Patch Changes
