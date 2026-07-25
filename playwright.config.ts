@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Visual-regression runner (separate from Vitest — see plan/09 §1).
+// Visual-regression runner (separate from Vitest).
 // Baselines are generated inside the pinned Playwright Docker image so they
 // match CI byte-for-byte; PR review + diffs go through Argos.
 //

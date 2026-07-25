@@ -11,8 +11,8 @@ packages:
 
 # pnpm 11 reads project settings from here (not .npmrc).
 #
-# This repo deliberately tracks bleeding-edge tooling (oxc, vitest, tsdown) that
-# is freshness-vetted by hand per plan/12-research-audit.md, so pnpm 11's
+# This repo deliberately tracks bleeding-edge tooling (oxc, vitest, tsdown), and
+# every dependency is freshness-vetted by hand before adoption, so pnpm 11's
 # minimum-release-age supply-chain gate is disabled here only. Global and other
 # repos keep their own policy.
 minimumReleaseAge: 0

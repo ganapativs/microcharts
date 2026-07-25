@@ -612,7 +612,7 @@
 
   New `EN_FORECAST` summary module (`forecast`, `forecastClearance`, `forecastAtHistory`, `forecastAtForecast`). The
   interactive entry is region-aware (history value vs forecast median + interval). The `softEdge`/`curve` cosmetic
-  variants are deferred (plan/12).
+  variants are deferred.
 
 - 425f933: Batch 2 wave 2 — `NetFlow` (`./net-flow`), static + `/interactive` entries:
 
@@ -635,7 +635,7 @@
     interactive entry is the probe: hovering / arrowing moves a live threshold and the count past it recomputes purely.
 
   New `EN_FREQ` keys `quantileDots` / `quantileDotsRange` (shares the frequency-framing module with IconArray). **Audit
-  flag (plan/12):** the studied dotplot (Kay 2016 / Fernandes 2018) used 50 dots; the 15–20 default is a micro-scale
+  flag:** the studied dotplot (Kay 2016 / Fernandes 2018) used 50 dots; the 15–20 default is a micro-scale
   countability judgment, not a validated equivalence.
 
 - 425f933: Batch 2 wave 2 — `RateVolume` (`./rate-volume`), static + `/interactive` entries:
@@ -764,7 +764,7 @@
 
   New `EN_SHIFT` summary module (`shift`, `shiftHeld`, `shiftSamples`, `shiftOneSide`, `shiftBin`). Median computed
   inline (not via `core/quantile`) to keep the histogram bundle under the 3 kB static hard cap. Side tags dropped — they
-  collided with the bars at every micro size; position + color + summary carry identity (plan/12).
+  collided with the bars at every micro size; position + color + summary carry identity.
 
 - 01b6e7f: Batch 3 (expressive) — `BalanceBeam` (`./balance-beam`), static + `/interactive` entries:
 
@@ -878,7 +878,7 @@
     no layout shift, and announces value + tier through a polite region.
 
   New `EN_FAT` summary module (`fatDigits`, `fatDigitsPlain`) + one motion-layer CSS rule for the weight transition
-  (tspans are inside `.mc-root`, so the reduced-motion block gates it). **Deviation from FatFonts (plan/12):** the
+  (tspans are inside `.mc-root`, so the reduced-motion block gates it). **Deviation from FatFonts:** the
   source encodes magnitude as glyph ink _area_ via a custom font; shipping a font would break zero-dep (non-negotiable
   #1), so we map to discrete `font-weight` tiers on the inherited font — ordinal, never continuous; the numeral is
   always exact. Static budget 1.6 kB (the cached `makeFormatter` for grouped numerals is needed) — above the 1.5 kB
@@ -1058,7 +1058,7 @@
     there is no cursor to move.
 
   New `EN_TALLY` summary module (`tally`). Naming note: the spec named the pen variant `style`, but every chart already
-  exposes `style?: CSSProperties`; the knob ships as `pen` to keep that passthrough intact (recorded in plan/12).
+  exposes `style?: CSSProperties`; the knob ships as `pen` to keep that passthrough intact.
 
 - 01b6e7f: Batch 3 (expressive) — `Thermometer` (`./thermometer`), static + `/interactive` entries:
 
@@ -1086,5 +1086,5 @@
     interactive entry steps rings from the centre out with ←/→ (radial pointer lookup).
 
   New `EN_TREE` summary module (`treeRings`, `treeRingAt`). The full-annulus path is inlined (evenodd fill) rather than
-  importing `core/arc`, keeping the static entry at 1.78 kB. **Naming note (plan/12):** the spec's `style` render
+  importing `core/arc`, keeping the static entry at 1.78 kB. **Naming note:** the spec's `style` render
   variant collides with the universal `style?: CSSProperties`, so it ships as `rings`. Node budget n + 1.

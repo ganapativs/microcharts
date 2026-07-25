@@ -20,14 +20,13 @@ TODO
 apps/docs/public/vcheck.html
 
 # Internal / local-only — not for the public repo.
-# AI tooling (skills, launch config), planning docs, and the pre-launch audit
-# trail live locally only; they're untracked so a clean, professional tree ships.
+# AI tooling (skills, launch config) and the pre-launch audit trail live locally
+# only; they're untracked so a clean, professional tree ships.
 .claude/
 .agents/
 agent/
 .cursor/
 .windsurf/
-plan/
 audit/
 # private-workspace changelogs (the published package keeps its root CHANGELOG.md)
 apps/docs/CHANGELOG.md

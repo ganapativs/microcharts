@@ -1,4 +1,4 @@
-// Checkpoint 1 gate (plan/09 §1, plan/10): the static export must contain the
+// Checkpoint 1 gate: the static export must contain the
 // server-rendered chart, and NO client JS chunk may reference chart code.
 // Run after `next build`. Exits non-zero on any violation.
 import { readFileSync, readdirSync, statSync } from "node:fs";

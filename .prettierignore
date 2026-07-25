@@ -3,7 +3,6 @@
 # stay code-formatter-free while prettier owns the docs prose.
 *.html
 dist/
-plan/
 pnpm-lock.yaml
 
 # Generated / vendored markdown — keep prettier off these

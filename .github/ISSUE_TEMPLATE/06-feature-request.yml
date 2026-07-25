@@ -1,0 +1,95 @@
+name: Feature / capability request
+description: A prop, theme token, MCP capability, docs improvement, or tooling change. (New chart types have their own form.)
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a **new chart type**, use the
+        [chart proposal form](https://github.com/ganapativs/microcharts/issues/new?template=05-chart-proposal.yml)
+        instead.
+
+        Two constraints shape almost every answer here, so it's worth stating them up front:
+
+        - **One grammar.** The same prop name means the same thing on every chart (`domain`, `color`, `title`,
+          `summary`, `label`, `dots`, `format`, `positive`). Variants are props; a new data shape is a new
+          component. No option-bag objects on the common path.
+        - **Budgets are CI gates.** Zero runtime dependencies, forever. Per-subpath gzip ceilings are enforced in
+          CI, so "just add a small option" is never free.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface?
+      options:
+        - Chart API — a prop or behaviour on an existing chart
+        - Shared grammar — something every chart should take
+        - Annotations (`<Threshold>`, `<Marker>`, `<TargetZone>`, `<Callout>`)
+        - Theming — a `--mc-*` token, a preset, or `defineTheme`
+        - Motion / animation
+        - Accessibility — summaries, `SummaryStrings`, i18n
+        - Formatting / locale
+        - "`@microcharts/mcp` — a tool, or its output shape"
+        - Docs site or machine surfaces (`/llms.txt`, `/catalog.json`)
+        - Packaging / exports / types
+        - Repo tooling, tests, CI
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you're trying to do and where it breaks down today. Lead with the use case, not the solution.
+      placeholder: |
+        I render 40 sparklines in a table and want them to share one y-domain so rows are comparable, but computing
+        the union domain in app code means every cell re-renders when one series updates.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: Concrete API, as you'd want to write it.
+      render: tsx
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: What you do today
+      description: The current workaround, and what it costs you. "Nothing works" is a valid answer.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Especially any that need no new API — a doc example, a recipe, an existing prop used differently.
+
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints check
+      description: Tick what you've thought about. Unticked boxes aren't disqualifying — they just tell us where to look.
+      options:
+        - label: Works with a **static, hook-free, RSC-safe** component (or is explicitly interactive-only)
+        - label: Reuses an existing prop name with its existing meaning — or introduces a genuinely new concept
+        - label: Adds no runtime dependency
+        - label: Plausible within the per-subpath gzip budget
+        - label: Doesn't require axes, legends, or gridlines to be understood
+        - label: This would be a breaking change
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Prior art in other libraries, links, screenshots.
+
+  - type: checkboxes
+    id: implement
+    attributes:
+      label: Implementation
+      options:
+        - label: I'd like to implement this if it's accepted

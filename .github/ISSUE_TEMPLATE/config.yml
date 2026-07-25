@@ -1,5 +1,14 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Question / discussion
+  - name: Question or idea
     url: https://github.com/ganapativs/microcharts/discussions
-    about: Ask questions and share ideas here rather than opening an issue.
+    about: '"Which chart should I use?", "how do I…?", or a half-formed idea — start in Discussions, not an issue.'
+  - name: Security vulnerability
+    url: https://github.com/ganapativs/microcharts/security/advisories/new
+    about: Report privately. Never open a public issue for a security problem.
+  - name: Documentation
+    url: https://microcharts.dev/docs
+    about: Chart catalog, props reference, theming, and the AI/MCP guides. Machine surfaces at /llms.txt and /catalog.json.
+  - name: Contributing guide
+    url: https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md
+    about: Setup, the non-negotiables, commit style, and the per-chart Definition of Done.
