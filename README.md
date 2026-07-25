@@ -188,7 +188,8 @@ library: **find** the chart type that answers a question, **get** its exact prop
 
 Works in Claude Desktop, Claude Code, Cursor, and VS Code; nothing is hosted and no key is involved. The same three
 capabilities ship as Vercel AI SDK tools on the `@microcharts/mcp/ai-sdk` subpath. Full reference:
-[microcharts.dev/docs/mcp](https://microcharts.dev/docs/mcp).
+[microcharts.dev/docs/mcp](https://microcharts.dev/docs/mcp). Also listed in the
+[Glama MCP registry](https://glama.ai/mcp/servers/ganapativs/microcharts).
 
 ## Compatibility
 
