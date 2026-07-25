@@ -4,6 +4,8 @@
     "screenshots/",
     "tests/visual/__screenshots__/",
     "bench/results.json",
+    "**/*.generated.ts",
+    "**/*.generated.json",
     "**/*.md",
     "**/*.mdx",
     "**/*.html"

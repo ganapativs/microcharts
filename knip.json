@@ -5,6 +5,9 @@
     ".": {
       "entry": ["src/charts/*/index.tsx", "src/charts/*/client.tsx", "src/test/**/*.ts"],
       "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/mcp": {
+      "ignoreDependencies": ["@microcharts/react"]
     }
   },
   "ignoreDependencies": ["fast-check", "@axe-core/playwright"],
