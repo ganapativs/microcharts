@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, BUDGET } from "./paired-b
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <PairedBarsInteractive data={BUDGET} summary={false} width={120} height={40} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <PairedBarsInteractive
+      data={BUDGET}
+      summary={false}
+      width={120}
+      height={40}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

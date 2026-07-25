@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, WAVE } from "./waveform";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <WaveformInteractive data={WAVE} summary={false} width={130} height={26} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <WaveformInteractive data={WAVE} summary={false} width={130} height={26} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

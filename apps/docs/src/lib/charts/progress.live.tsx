@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground } from "./progress";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <ProgressInteractive value={0.68} summary={false} width={120} height={20} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

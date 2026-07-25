@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, FOCAL, FIELD, AXES } from
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <QuadrantDotInteractive
       data={FOCAL}
@@ -18,6 +18,7 @@ export function PreviewLive() {
       summary={false}
       width={72}
       height={72}
+      animate={animate}
     />
   );
 }

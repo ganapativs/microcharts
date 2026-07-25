@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, TRAIL, m } from "./grade-
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <GradeProfileInteractive data={TRAIL} summary={false} width={150} height={44} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <GradeProfileInteractive
+      data={TRAIL}
+      summary={false}
+      width={150}
+      height={44}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

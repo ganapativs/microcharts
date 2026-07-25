@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, COVERAGE } from "./covera
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <CoverageStripInteractive data={[...COVERAGE]} summary={false} width={130} height={12} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <CoverageStripInteractive
+      data={[...COVERAGE]}
+      summary={false}
+      width={130}
+      height={12}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

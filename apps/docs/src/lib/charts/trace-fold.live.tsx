@@ -9,8 +9,17 @@ import staticModule, { playground as staticPlayground, TRACE, ms } from "./trace
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <TraceFoldInteractive data={TRACE} format={ms} summary={false} width={180} height={48} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <TraceFoldInteractive
+      data={TRACE}
+      format={ms}
+      summary={false}
+      width={180}
+      height={48}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

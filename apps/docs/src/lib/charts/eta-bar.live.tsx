@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, min } from "./eta-bar";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <EtaBarInteractive
       progress={0.64}
@@ -19,6 +19,7 @@ export function PreviewLive() {
       summary={false}
       width={130}
       height={14}
+      animate={animate}
     />
   );
 }

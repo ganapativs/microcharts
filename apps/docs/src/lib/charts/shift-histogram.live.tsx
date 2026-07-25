@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, BEFORE, AFTER, MS } from 
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ShiftHistogramInteractive
       data={{ before: BEFORE, after: AFTER }}
@@ -17,6 +17,7 @@ export function PreviewLive() {
       summary={false}
       width={160}
       height={24}
+      animate={animate}
     />
   );
 }

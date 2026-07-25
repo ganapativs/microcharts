@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, RASTER } from "./event-ra
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <EventRasterInteractive data={RASTER} summary={false} width={220} height={56} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <EventRasterInteractive
+      data={RASTER}
+      summary={false}
+      width={220}
+      height={56}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

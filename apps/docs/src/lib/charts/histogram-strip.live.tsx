@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, TIMES } from "./histogram
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <HistogramStripInteractive data={TIMES} summary={false} width={130} height={34} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <HistogramStripInteractive
+      data={TIMES}
+      summary={false}
+      width={130}
+      height={34}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

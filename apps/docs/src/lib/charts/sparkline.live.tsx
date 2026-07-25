@@ -9,9 +9,16 @@ import staticModule, { entry, playground as staticPlayground } from "./sparkline
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
-    <SparklineInteractive data={entry.demo} width={180} height={48} dots="minmax" summary={false} />
+    <SparklineInteractive
+      data={entry.demo}
+      width={180}
+      height={48}
+      dots="minmax"
+      summary={false}
+      animate={animate}
+    />
   );
 }
 

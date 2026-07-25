@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, OBS } from "./station-gly
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <StationGlyphInteractive {...OBS} summary={false} size={48} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <StationGlyphInteractive {...OBS} summary={false} size={48} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

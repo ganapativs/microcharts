@@ -9,9 +9,16 @@ import staticModule, { playground as staticPlayground, PEERS } from "./benchmark
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
-    <BenchmarkStripInteractive data={PEERS} value={312} summary={false} width={140} height={14} />
+    <BenchmarkStripInteractive
+      data={PEERS}
+      value={312}
+      summary={false}
+      width={140}
+      height={14}
+      animate={animate}
+    />
   );
 }
 

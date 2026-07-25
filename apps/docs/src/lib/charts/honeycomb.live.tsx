@@ -9,8 +9,17 @@ import staticModule, { playground as staticPlayground } from "./honeycomb";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <HoneycombInteractive value={34} total={40} unit="seats" summary={false} cell={4} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <HoneycombInteractive
+      value={34}
+      total={40}
+      unit="seats"
+      summary={false}
+      cell={4}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

@@ -9,8 +9,8 @@ import staticModule, { playground as staticPlayground, YEARS } from "./tree-ring
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <TreeRingsInteractive data={YEARS} summary={false} size={28} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return <TreeRingsInteractive data={YEARS} summary={false} size={28} animate={animate} />;
 }
 
 export const playground: PlaygroundSpec = {

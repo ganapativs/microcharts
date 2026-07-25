@@ -9,8 +9,15 @@ import staticModule, { playground as staticPlayground } from "./progress-ring";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <ProgressRingInteractive value={0.68} summary={false} style={{ width: 40, height: 40 }} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <ProgressRingInteractive
+      value={0.68}
+      summary={false}
+      style={{ width: 40, height: 40 }}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

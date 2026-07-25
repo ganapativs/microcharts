@@ -9,7 +9,7 @@ import staticModule, { playground as staticPlayground, LOUDNESS } from "./dual-w
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <DualWindowMeterInteractive
       data={LOUDNESS}
@@ -18,6 +18,7 @@ export function PreviewLive() {
       summary={false}
       width={130}
       height={24}
+      animate={animate}
     />
   );
 }

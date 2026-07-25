@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, BOOK } from "./depth-wedg
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <DepthWedgeInteractive data={BOOK} summary={false} width={130} height={24} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

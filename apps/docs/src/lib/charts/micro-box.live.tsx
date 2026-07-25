@@ -9,8 +9,10 @@ import staticModule, { playground as staticPlayground, RAW } from "./micro-box";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <MicroBoxInteractive data={RAW} summary={false} width={130} height={22} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <MicroBoxInteractive data={RAW} summary={false} width={130} height={22} animate={animate} />
+  );
 }
 
 export const playground: PlaygroundSpec = {

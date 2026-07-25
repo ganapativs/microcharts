@@ -9,8 +9,16 @@ import staticModule, { playground as staticPlayground, COHORTS } from "./cohort-
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <CohortTriangleInteractive data={COHORTS} cell={10} labels={false} summary={false} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <CohortTriangleInteractive
+      data={COHORTS}
+      cell={10}
+      labels={false}
+      summary={false}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {

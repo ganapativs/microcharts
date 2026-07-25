@@ -9,10 +9,10 @@ import staticModule, { playground as staticPlayground } from "./delta";
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="text-2xl">
-      <DeltaInteractive value={0.184} summary={false} />
+      <DeltaInteractive value={0.184} summary={false} animate={animate} />
     </span>
   );
 }

@@ -9,8 +9,17 @@ import staticModule, { playground as staticPlayground, LOAD, D } from "./heat-st
  *  106 interactive twins into eager client references. Reached exclusively
  *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
 
-export function PreviewLive() {
-  return <HeatStripInteractive data={LOAD} domain={D} summary={false} width={130} height={18} />;
+export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  return (
+    <HeatStripInteractive
+      data={LOAD}
+      domain={D}
+      summary={false}
+      width={130}
+      height={18}
+      animate={animate}
+    />
+  );
 }
 
 export const playground: PlaygroundSpec = {
