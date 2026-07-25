@@ -3,6 +3,7 @@ import { z } from "zod";
 import { findChart } from "./tools/find";
 import { getChart } from "./tools/get";
 import { renderChart } from "./render-core";
+import { dataParam } from "./schema";
 
 /**
  * The same three capabilities as the MCP server, packaged as Vercel AI-SDK
@@ -47,7 +48,7 @@ export const microchartsTools: ToolSet = {
       "width) in `props`; check get_microchart for the exact shape.",
     inputSchema: z.object({
       type: z.string().describe('Chart slug, e.g. "sparkline".'),
-      data: z.any().optional().describe("Primary series; omit for scalar charts."),
+      data: dataParam,
       props: z
         .record(z.string(), z.any())
         .optional()

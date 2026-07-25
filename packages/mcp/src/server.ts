@@ -4,6 +4,7 @@ import { findChart } from "./tools/find";
 import { getChart } from "./tools/get";
 import { renderChart } from "./render-core";
 import { catalog, LIBRARY_VERSION } from "./catalog";
+import { dataParam } from "./schema";
 import { AGENT_SETUP } from "./assets.generated";
 import { MCP_VERSION } from "./version";
 
@@ -140,7 +141,7 @@ export function createServer(): McpServer {
         "chart takes its own data shape — get_microchart returns a valid `sample` to adapt.",
       inputSchema: {
         type: z.string().describe('Chart slug, e.g. "sparkline".'),
-        data: z.any().optional().describe("Primary series; omit for scalar charts."),
+        data: dataParam,
         props: z
           .record(z.string(), z.any())
           .optional()
