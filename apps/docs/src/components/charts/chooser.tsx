@@ -20,7 +20,7 @@ const JOBS: Job[] = [
   {
     id: "trend",
     q: "A trend over time",
-    when: "Values in sequence — read direction, shape, and where it turned.",
+    when: "Values in sequence - read direction, shape, and where it turned.",
     slugs: [
       "sparkline",
       "dual-sparkline",
@@ -43,7 +43,7 @@ const JOBS: Job[] = [
   {
     id: "compare",
     q: "Compare & rank",
-    when: "Several things on one scale — which leads, and by how much.",
+    when: "Several things on one scale - which leads, and by how much.",
     slugs: [
       "mini-bar",
       "sparkbar",
@@ -68,7 +68,7 @@ const JOBS: Job[] = [
   {
     id: "parts",
     q: "Parts of a whole",
-    when: "One quantity split into pieces — read the mix and the biggest slice.",
+    when: "One quantity split into pieces - read the mix and the biggest slice.",
     slugs: [
       "segmented-bar",
       "micro-donut",
@@ -81,7 +81,7 @@ const JOBS: Job[] = [
   {
     id: "target",
     q: "On track?",
-    when: "A value against a target, budget, or deadline — the gap and the pace.",
+    when: "A value against a target, budget, or deadline - the gap and the pace.",
     slugs: [
       "bullet",
       "progress",
@@ -102,7 +102,7 @@ const JOBS: Job[] = [
   {
     id: "state",
     q: "State right now",
-    when: "One current condition, glanceable — often before any number.",
+    when: "One current condition, glanceable - often before any number.",
     slugs: [
       "status-dot",
       "delta",
@@ -161,7 +161,7 @@ const JOBS: Job[] = [
   {
     id: "special",
     q: "Specialized instruments",
-    when: "Uncommon questions — relationships, models, ops — each an unusually apt encoding.",
+    when: "Uncommon questions - relationships, models, ops - each an unusually apt encoding.",
     slugs: [
       "micro-scatter",
       "quadrant-dot",

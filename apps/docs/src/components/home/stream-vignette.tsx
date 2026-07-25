@@ -17,9 +17,12 @@ import { LIVE_SAMPLES, parseLiveReply, speakLiveReply, type ChartSpec } from "@/
 import { useLiveModel } from "@/components/home/use-live-model";
 
 /**
- * Hero stream: grammar → real charts mid-sentence. Three rotating scenarios;
- * valence charts keep their own colors, others use the site accent. Ghost
- * replies stack to reserve max height.
+ * Hero stream: grammar → real charts mid-sentence. The stream plays ONCE and
+ * settles — a finished reply is the product; a fold that keeps re-typing under
+ * the reader's eyes is not (that looping version shipped and drew "everything
+ * is constantly moving" feedback). The replay control steps through the three
+ * scenarios for whoever wants more. Valence charts keep their own colors,
+ * others use the site accent. Ghost replies stack to reserve max height.
  * Live mode (Prompt API `available`) adds chips + input; tour remains default.
  */
 
@@ -514,18 +517,8 @@ export function StreamVignette({
     return () => window.clearTimeout(t);
   }, [running, pos, total, active, mode]);
 
-  // When a reply finishes, hold a beat, then roll to the next scenario. Reduced
-  // motion stays on the first finished reply — no cycling.
-  useEffect(() => {
-    if (mode !== "tour" || reduced.current || !started.current || running || pos < total) return;
-    const t = window.setTimeout(() => {
-      setIdx((i) => (i + 1) % SCENARIOS.length);
-      setPos(0);
-      setRunning(true);
-    }, 2600);
-    return () => window.clearTimeout(t);
-  }, [running, pos, total, mode]);
-
+  // A finished reply stays finished — no auto-advance. The replay button steps
+  // to the next scenario on demand.
   const replay = () => {
     if (mode === "live") {
       // back to the scripted tour
@@ -536,7 +529,12 @@ export function StreamVignette({
       setRunning(true);
       return;
     }
-    if (reduced.current) return;
+    setIdx((i) => (i + 1) % SCENARIOS.length);
+    if (reduced.current) {
+      // settled view of the next scenario; Infinity ≥ any scenario's total
+      setPos(Number.POSITIVE_INFINITY);
+      return;
+    }
     setPos(0);
     setRunning(true);
   };
@@ -606,8 +604,8 @@ export function StreamVignette({
         </span>
         <button
           type="button"
-          aria-label={mode === "live" ? "Back to the tour" : "Replay the stream"}
-          title={mode === "live" ? "Back to the tour" : "Replay"}
+          aria-label={mode === "live" ? "Back to the tour" : "Play the next example"}
+          title={mode === "live" ? "Back to the tour" : "Next example"}
           onClick={replay}
           className="ghost-ctrl size-8"
         >
@@ -628,9 +626,14 @@ export function StreamVignette({
           ))}
         </div>
         {mode === "tour" && (
-          <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
-            {view}
-            {streaming && started.current && <span className="mc-caret" aria-hidden />}
+          // inset-y + justify-center: the settled reply sits optically centered
+          // in the ghost-reserved area instead of leaving a hole under it. The
+          // ghosts bound the overlay's height, so centering can never clip.
+          <div className="absolute inset-x-5 inset-y-5 flex flex-col justify-center text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
+            <div>
+              {view}
+              {streaming && started.current && <span className="mc-caret" aria-hidden />}
+            </div>
           </div>
         )}
         {mode === "live" && (

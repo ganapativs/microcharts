@@ -133,7 +133,7 @@ export function ExampleView({ app }: { app: ShowcaseApp }) {
               <h2 className="display text-xl text-fd-foreground">The marks it uses</h2>
               <p className="max-w-md text-sm text-fd-muted-foreground">
                 Every chart type {app.name} imports, live and linked. Same components, same grammar
-                — tap one for its page.
+                - tap one for its page.
               </p>
             </div>
           </Reveal>

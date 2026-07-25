@@ -13,17 +13,16 @@ export function HomeThemingSection() {
       <div className="grid items-start gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">
-            One accent in, a matched palette out.
+            One brand color becomes a whole palette.
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            <code className="text-sm">defineTheme</code> derives a color-blind-safe categorical
-            palette and hand-tuned-style dark twins from a single brand color, in OKLCH, with zero
-            dependencies. Pick a swatch: every chart in the panel re-themes through the same two
-            dozen CSS custom properties your app would use.
+            <code className="text-sm">defineTheme</code> derives a color-blind-safe palette and
+            matched dark variants from one brand color. Pick a swatch: every chart re-themes through
+            the same CSS custom properties your app would use.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
-            The one thing a theme can never do is change what the data means: positive stays green,
-            negative stays vermillion, on every accent and every preset.
+            A theme never changes what the data means: positive stays green, negative stays
+            vermillion.
           </p>
           <Link
             prefetch={false}

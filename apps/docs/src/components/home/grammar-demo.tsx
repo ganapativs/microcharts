@@ -8,19 +8,20 @@ import { BumpStrip } from "@microcharts/react/bump-strip/interactive";
 import { Threshold, Marker } from "@microcharts/react/annotations";
 
 /**
- * 01 · The grammar, live: the JSX types itself in (~10 ms/char), the real
- * component draws, and the sentence under it is read back OUT OF THE DOM —
- * the actual generated aria-label of the mounted chart, never a hardcoded
- * quote. Each tab's code string mirrors its rendered element exactly.
- * Reduced motion: full code, settled chart, sentence — no typing.
+ * 01 · The grammar, settled: the full JSX is readable at once, the real
+ * component draws with the library's own entrance (viewport- and
+ * reduced-motion-gated by the motion engine), and the sentence under it is
+ * read back OUT OF THE DOM — the actual generated aria-label of the mounted
+ * chart, never a hardcoded quote. Each tab's code string mirrors its rendered
+ * element exactly. (A typewriter effect was shipped and cut: it made the
+ * reader wait a second per tab to see what the code already said.)
  */
 
 interface Tab {
   id: string;
   label: string;
   code: string;
-  /** remount with `animate` when `drawn` flips */
-  node: (drawn: boolean) => ReactNode;
+  node: ReactNode;
 }
 
 const REVENUE = [132, 148, 141, 165, 159, 182, 176, 203];
@@ -42,15 +43,14 @@ const TABS: Tab[] = [
   data={[132, 148, 141, 165, 159, 182, 176, 203]}
   curve="smooth"
 />`,
-    node: (drawn) => (
+    node: (
       <Sparkline
-        key={String(drawn)}
         title="Weekly revenue"
         data={REVENUE}
         curve="smooth"
         width={150}
         height={36}
-        animate={drawn}
+        animate
       />
     ),
   },
@@ -63,16 +63,15 @@ const TABS: Tab[] = [
   target={80}
   bands={[50, 90]}
 />`,
-    node: (drawn) => (
+    node: (
       <Bullet
-        key={String(drawn)}
         title="Progress to target"
         value={72}
         target={80}
         bands={[50, 90]}
         width={150}
         height={20}
-        animate={drawn}
+        animate
       />
     ),
   },
@@ -83,16 +82,7 @@ const TABS: Tab[] = [
   title="Category rank"
   data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]}
 />`,
-    node: (drawn) => (
-      <BumpStrip
-        key={String(drawn)}
-        title="Category rank"
-        data={RANKS}
-        width={150}
-        height={26}
-        animate={drawn}
-      />
-    ),
+    node: <BumpStrip title="Category rank" data={RANKS} width={150} height={26} animate />,
   },
   {
     id: "segmented",
@@ -106,16 +96,7 @@ const TABS: Tab[] = [
     { label: "Edge", value: 30 },
   ]}
 />`,
-    node: (drawn) => (
-      <SegmentedBar
-        key={String(drawn)}
-        title="Browser share"
-        data={MIX}
-        width={150}
-        height={14}
-        animate={drawn}
-      />
-    ),
+    node: <SegmentedBar title="Browser share" data={MIX} width={150} height={14} animate />,
   },
   {
     id: "annotations",
@@ -124,15 +105,8 @@ const TABS: Tab[] = [
   <Threshold y={200} label="SLO" />
   <Marker x={4} label="deploy" celebrate />
 </Sparkline>`,
-    node: (drawn) => (
-      <Sparkline
-        key={String(drawn)}
-        title="p95 latency (ms)"
-        data={LATENCY}
-        width={150}
-        height={36}
-        animate={drawn}
-      >
+    node: (
+      <Sparkline title="p95 latency (ms)" data={LATENCY} width={150} height={36} animate>
         <Threshold y={200} label="SLO" />
         <Marker x={4} label="deploy" celebrate />
       </Sparkline>
@@ -167,86 +141,38 @@ function lex(code: string): Tok[] {
 
 const TAB_TOKENS = TABS.map((t) => lex(t.code));
 
-/** Render the first `n` characters of a token stream, colors intact. */
-function TypedCode({ tokens, n }: { tokens: Tok[]; n: number }) {
-  const out: React.ReactNode[] = [];
-  let used = 0;
-  for (let i = 0; i < tokens.length && used < n; i++) {
-    const t = tokens[i];
-    const take = Math.min(t.text.length, n - used);
-    const text = take === t.text.length ? t.text : t.text.slice(0, take);
-    out.push(
-      t.cls ? (
-        <span key={i} className={t.cls}>
-          {text}
-        </span>
-      ) : (
-        text
-      ),
-    );
-    used += take;
-  }
-  return <>{out}</>;
+function Code({ tokens }: { tokens: Tok[] }) {
+  return (
+    <>
+      {tokens.map((t, i) =>
+        t.cls ? (
+          <span key={i} className={t.cls}>
+            {t.text}
+          </span>
+        ) : (
+          t.text
+        ),
+      )}
+    </>
+  );
 }
 
 export function GrammarDemo() {
   const [tab, setTab] = useState(0);
-  const [chars, setChars] = useState(0);
-  const [reduced, setReduced] = useState(false);
-  const [started, setStarted] = useState(false);
   const [sentence, setSentence] = useState("");
-  const hostRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<HTMLDivElement>(null);
 
   const active = TABS[tab];
-  const done = reduced || chars >= active.code.length;
-
-  // Start typing on viewport entry; reduced motion shows everything settled.
-  useEffect(() => {
-    const host = hostRef.current;
-    if (!host) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setReduced(true);
-      setStarted(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setStarted(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    io.observe(host);
-    return () => io.disconnect();
-  }, []);
-
-  // ~10 ms/char typewriter.
-  useEffect(() => {
-    if (!started || reduced || chars >= active.code.length) return;
-    const t = window.setTimeout(() => setChars((c) => c + 1), 10);
-    return () => window.clearTimeout(t);
-  }, [started, reduced, chars, active.code.length]);
 
   // The sentence is the real thing: read the generated accessible name off the
-  // mounted chart's DOM node once it has drawn.
+  // mounted chart's DOM node.
   useEffect(() => {
-    if (!done) return;
     const el = chartRef.current?.querySelector('[role="img"]');
     setSentence(el?.getAttribute("aria-label") ?? "");
-  }, [done, tab]);
-
-  const pick = (i: number) => {
-    if (i === tab) return;
-    setTab(i);
-    setSentence("");
-    setChars(0);
-  };
+  }, [tab]);
 
   return (
-    <div ref={hostRef} className="panel overflow-hidden">
+    <div className="panel overflow-hidden">
       <div
         role="tablist"
         aria-label="Chart grammar examples"
@@ -258,7 +184,7 @@ export function GrammarDemo() {
             role="tab"
             type="button"
             aria-selected={i === tab}
-            onClick={() => pick(i)}
+            onClick={() => setTab(i)}
             className={`seg-opt rounded-[10px] px-3 py-1.5 font-mono text-[0.72rem] tracking-wide transition-colors ${
               i === tab
                 ? "bg-fd-card text-fd-foreground shadow-sm ring-1 ring-hairline"
@@ -273,15 +199,9 @@ export function GrammarDemo() {
       <div className="grid gap-0 sm:grid-cols-2">
         <div className="border-b border-hairline p-5 sm:border-b-0 sm:border-r">
           <p className="mono-label mb-3 opacity-60">a model writes</p>
-          {/* Animated type is aria-hidden; sr-only twin below. */}
-          <pre
-            aria-hidden
-            className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground"
-          >
-            <TypedCode tokens={TAB_TOKENS[tab]} n={reduced ? active.code.length : chars} />
-            {!done && started && <span className="hv-code-caret" />}
+          <pre className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground">
+            <Code tokens={TAB_TOKENS[tab]} />
           </pre>
-          <pre className="sr-only">{active.code}</pre>
         </div>
         <div className="flex flex-col p-5">
           <p className="mono-label mb-3 opacity-60">a person gets</p>
@@ -289,7 +209,8 @@ export function GrammarDemo() {
             ref={chartRef}
             className="flex min-h-[6rem] flex-1 items-center justify-center [&_svg]:max-w-full"
           >
-            {done && <span className="hx-morph-in">{active.node(!reduced)}</span>}
+            {/* keyed so switching tabs replays the library entrance */}
+            <span key={active.id}>{active.node}</span>
           </div>
         </div>
       </div>

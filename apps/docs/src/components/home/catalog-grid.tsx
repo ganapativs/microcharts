@@ -1,17 +1,18 @@
 "use client";
 import "@microcharts/react/motion"; // tiles draw with the library's own entrance
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { ChartModule } from "@/lib/charts/types";
 import { useClickableCard } from "@/lib/use-clickable-card";
 
-/** Live catalog board. SSR first paint; interactive modules load after mount.
- *  Shuffles; one tile rotates (paused on hover/hidden). `tiles` = name/tagline
- *  only so the full catalog stays off the client. */
+/** Live catalog board. SSR first paint; interactive modules load after mount
+ *  and upgrade each tile IN PLACE — same slugs, same order, same keys, so the
+ *  swap is invisible. The board itself holds still: a rotating tile was
+ *  shipped and cut (readers reported the page "constantly moving"). Breadth
+ *  lives in /charts; this board is a taste, not the catalog. */
 
 // 11 charts + the "+N more" tile = a 12-cell board — fills 2/3/4
-// columns exactly and keeps the section to three rows on desktop (breadth
-// lives in /charts; this board is a taste, not the catalog).
+// columns exactly and keeps the section to three rows on desktop.
 const COUNT = 11;
 
 /** The only chart metadata a board cell needs — resolved on the server. */
@@ -20,13 +21,6 @@ export interface TileMeta {
   name: string;
   tagline: string;
   cat: number;
-}
-
-type Cell = { slug: string; nonce: number };
-
-function pickSlug(pool: string[], exclude: Set<string>): string {
-  const choices = pool.filter((s) => !exclude.has(s));
-  return choices[Math.floor(Math.random() * choices.length)] ?? pool[0]!;
 }
 
 export function CatalogGrid({
@@ -39,82 +33,36 @@ export function CatalogGrid({
   children: ReactNode;
 }) {
   const [modules, setModules] = useState<Record<string, ChartModule> | null>(null);
-  const [board, setBoard] = useState<Cell[] | null>(null);
-  const nonce = useRef(COUNT);
-  const paused = useRef(false);
 
   useEffect(() => {
-    const pool = tiles.map((t) => t.slug);
     let cancelled = false;
-    let timer = 0;
-
     // Deferred to after mount: the server already painted a full board, so this
-    // chunk only has to land before the first deal — never before first paint.
-    // Live modules carry PreviewLive (interactive entries); static hero-modules
-    // stay on the SSR path so first paint ships zero interactive chart JS.
+    // chunk never gates first paint. Live modules carry PreviewLive
+    // (interactive entries); static hero-modules stay on the SSR path so first
+    // paint ships zero interactive chart JS.
     void import("@/components/home/hero-modules-live").then(({ HERO_MODULES_LIVE }) => {
-      if (cancelled) return;
-      setModules(HERO_MODULES_LIVE);
-      setBoard(() => {
-        const used = new Set<string>();
-        return Array.from({ length: COUNT }, () => {
-          const slug = pickSlug(pool, used);
-          used.add(slug);
-          return { slug, nonce: (nonce.current += 1) };
-        });
-      });
-
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-      const tick = () => {
-        if (document.visibilityState === "visible" && !paused.current) {
-          setBoard((prev) => {
-            if (!prev) return prev;
-            const used = new Set(prev.map((c) => c.slug));
-            const i = Math.floor(Math.random() * prev.length);
-            used.delete(prev[i]!.slug);
-            const next = prev.slice();
-            next[i] = { slug: pickSlug(pool, used), nonce: (nonce.current += 1) };
-            return next;
-          });
-        }
-        timer = window.setTimeout(tick, 2100 + Math.random() * 1200);
-      };
-      timer = window.setTimeout(tick, 2000);
+      if (!cancelled) setModules(HERO_MODULES_LIVE);
     });
-
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
     };
-  }, [tiles]);
+  }, []);
 
-  const hold = () => {
-    paused.current = true;
-  };
-  const release = () => {
-    paused.current = false;
-  };
+  const board = tiles.slice(0, COUNT);
 
   return (
-    <ul
-      className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4"
-      onMouseEnter={hold}
-      onMouseLeave={release}
-      onFocusCapture={hold}
-      onBlurCapture={release}
-    >
-      {/* SSR board keeps layout until client modules hydrate (same box). */}
-      {board && modules
-        ? board.map((cell, i) => {
-            const mod = modules[cell.slug];
-            const entry = tiles.find((t) => t.slug === cell.slug);
-            if (!mod || !entry) return <li key={cell.nonce} aria-hidden />;
+    <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+      {/* SSR board keeps layout until client modules land (same slugs/keys, so
+          the static→interactive upgrade never re-deals the board). */}
+      {modules
+        ? board.map((entry, i) => {
+            const mod = modules[entry.slug];
+            if (!mod) return <li key={entry.slug} aria-hidden />;
             // Interactive twin whenever it exists — pointer reaches the chart
             // (tile link lives on the name row, not around the mark).
             const Preview = mod.PreviewLive ?? mod.Preview;
             return (
-              <CatalogTile key={cell.nonce} i={i} entry={entry}>
+              <CatalogTile key={entry.slug} i={i} entry={entry}>
                 <Preview />
               </CatalogTile>
             );
@@ -178,7 +126,7 @@ export function CatalogTile({
           className="hx-tile-link"
           aria-label={`${entry.name}: ${entry.tagline}`}
         />
-        <div className="hx-slot hx-swap flex min-h-[4.25rem] w-full items-center justify-center">
+        <div className="hx-slot flex min-h-[4.25rem] w-full items-center justify-center">
           {children}
         </div>
         <span className="flex max-w-full items-center gap-1.5">

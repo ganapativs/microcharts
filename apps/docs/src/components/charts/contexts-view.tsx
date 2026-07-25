@@ -104,7 +104,7 @@ export function FourContextsView({ mod }: { mod: ChartModule }) {
       ) : null}
       <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">
         Preview uses the public chart API only. When an interactive twin exists, it swaps in with
-        the same props and no entrance motion — code samples stay on the static import. Placement
+        the same props and no entrance motion - code samples stay on the static import. Placement
         recipes:{" "}
         <a href="/docs/composition" className="underline underline-offset-2">
           Composition

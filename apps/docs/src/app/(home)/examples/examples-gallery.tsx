@@ -29,10 +29,7 @@ function ExampleCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wid
       }
     >
       <span className="wild-chrome">
-        <span
-          aria-hidden
-          className={`size-1.5 shrink-0 rounded-full bg-fd-primary ${wide ? "hx-pulse" : "opacity-80"}`}
-        />
+        <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-fd-primary opacity-80" />
         <span
           className={
             wide
@@ -120,7 +117,7 @@ export function ExamplesGallery() {
         </h1>
         <p className="mt-3 max-w-3xl text-fd-muted-foreground">
           {SHOWCASE.length} independent apps, each built with{" "}
-          <code className="text-fd-foreground">@microcharts/react</code> installed from npm — a
+          <code className="text-fd-foreground">@microcharts/react</code> installed from npm - a
           trading terminal, a print magazine, an eval console. Between them they exercise every one
           of the {CATALOG.total} chart types. Each card opens a walk-through; the walk-through opens
           the live app.
@@ -137,7 +134,7 @@ export function ExamplesGallery() {
               big: `${covered}`,
               label:
                 covered === CATALOG.total
-                  ? "chart types — all of them"
+                  ? "chart types - all of them"
                   : `of ${CATALOG.total} chart types`,
             },
             { big: "0", label: "runtime dependencies" },

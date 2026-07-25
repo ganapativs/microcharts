@@ -109,6 +109,25 @@ lives inside that band, demoted to a half-width card. The receipts are the evide
 close 05. The size pitch originally opened the page (old problem→solution arc); it moved below because the hero already
 sells the solution and interrupting the demo context with a bundle-size lecture broke the read._
 
+## 2026-07-25 — the calm pass
+
+Launch feedback was consistent: people liked the product and found the homepage exhausting — "everything is constantly
+moving out from under my eyes," and the relentless motion + aphoristic copy read as generated. The fix is a page that
+moves **once, where the motion is the argument**, and is otherwise still:
+
+- **Ambient loops are gone.** The hero reply streams ONCE and settles (the replay control steps through the three
+  scenarios on demand); the catalog board no longer rotates a tile (modules upgrade in place — same slugs, same keys);
+  every "live" dot is a static dot; the /charts live-chip pulse is off.
+- **One-shot theatrics are gone where they delayed information.** The grammar demo shows its full code instantly (no
+  typewriter); the cost bars and figures render settled (no wipe, no count-up); the terminal panels don't deal their
+  lines one by one.
+- **What stays animated:** the hero stream (the thesis, played once), chart draw entrances via the library's own
+  `animate` (dogfooding, viewport- and reduced-motion-gated by the motion engine), scroll reveals (softened: 10px rise +
+  fade, 0.55s, the entrance blur cut), and interaction feedback (hover, the theming demo's re-theme).
+- **Copy:** the "Not X. Y." / "X in, Y out" aphorism cadence was appearing in almost every heading — an LLM tell.
+  Headings are now plain and concrete (the cost section's headline is the measured kB range itself); the hero H1 and
+  01's "Plain text in, shipped components out" keep their parallelism as the two earned uses.
+
 All numbers flow from `docs-facts.ts` / `stats.ts` (measured, CI-checked) — the page cannot quote a size the build
 didn't measure. The one external figure (recharts) is pinned to a version and dated: package size from bundlephobia
 2026-07-15; one-chart client cost from an esbuild tree-shake measurement 2026-07-21 (recharts ships `sideEffects: false`

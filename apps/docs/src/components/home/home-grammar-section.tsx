@@ -17,12 +17,7 @@ export function HomeGrammarSection({ catalogTotal }: { catalogTotal: number }) {
           <p className="mt-4 max-w-md text-fd-muted-foreground">
             One grammar across all {catalogTotal} types: <code className="text-sm">data</code> alone
             renders something correct, and the same prop means the same thing on every chart. A
-            model that has seen one chart can write them all, and annotations are children, so
-            thresholds and milestones read like markup, not configuration.
-          </p>
-          <p className="mt-3 max-w-md text-fd-muted-foreground">
-            Every chart ships with its own words: the accessible sentence below the demo is
-            generated from the data, live. Nothing to caption, nothing to drift.
+            model that has seen one chart can write them all.
           </p>
         </Reveal>
         <Reveal delay={80}>

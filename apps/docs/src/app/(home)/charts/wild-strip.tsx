@@ -23,7 +23,7 @@ export function WildStrip() {
         <div className="flex min-w-0 flex-col gap-1">
           <span className="mono-label text-fd-primary">the examples</span>
           <p className="text-fd-foreground">
-            The same catalog, carrying seven real products — a trading terminal, a print magazine,
+            The same catalog, carrying seven real products - a trading terminal, a print magazine,
             an eval console.
           </p>
           <span className="mono-label opacity-70">

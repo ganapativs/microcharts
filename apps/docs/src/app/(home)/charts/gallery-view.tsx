@@ -73,7 +73,7 @@ export function GalleryView({
             ) : (
               <>
                 Every chart at the size it lives (in a sentence, a table cell, a KPI card), beside
-                the decision it answers. Browse by collection or search. Live by default — hover a
+                the decision it answers. Browse by collection or search. Live by default - hover a
                 mark to scrub; switch to Static in the dock if you want stillness.
               </>
             )}
