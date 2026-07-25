@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@/components/analytics";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
 import {
@@ -150,6 +151,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareApplicationJsonLd())}</script>
+        <Analytics />
         <Provider>{children}</Provider>
       </body>
     </html>
