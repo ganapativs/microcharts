@@ -36,7 +36,7 @@ export const playground: PlaygroundSpec = {
       width={300}
       height={28}
       className="w-full max-w-md"
-      title="Playground"
+      title="Quota attainment"
     />
   ),
   codeInteractive: (s, _data, ui) =>

@@ -32,7 +32,7 @@ export const playground: PlaygroundSpec = {
       width={340}
       height={92}
       className="w-full max-w-md"
-      title="Playground"
+      title="Deploy streak"
     />
   ),
   codeInteractive: (s, data, ui) =>

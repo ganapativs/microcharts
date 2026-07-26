@@ -48,7 +48,7 @@ export const GRAMMAR_PROPS: ChartProp[] = [
     type: "string | false",
     required: false,
     description:
-      "Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative.",
+      "Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title`, that marks the chart decorative (hidden from assistive tech).",
   },
   {
     name: "format",

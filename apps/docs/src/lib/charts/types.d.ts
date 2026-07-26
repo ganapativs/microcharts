@@ -45,6 +45,15 @@ export interface ChartEntry {
    * `interactiveImport` at all (`wind-barb`) are outside the split entirely.
    */
   picker?: false;
+  /**
+   * `false` ⇒ the interactive entry paints NO readout chip, because the value
+   * is already on the glyph (`delta`, `fat-digits`, `trend-arrow`) or the mark
+   * is a count you read by counting (`dice-pips`, `tally-marks`) or a named
+   * state rather than a number (`status-dot`). Every other interactive chart
+   * shows its reading on hover/focus — enforced library-side by
+   * `src/test/readout-presence.test.ts`.
+   */
+  readout?: false;
   dataShape: string;
   /** Primary encoding channel + precision rating. */
   encoding: {
@@ -198,7 +207,9 @@ export interface ChartModule extends ChartModuleStatic {
    * once, and a hundred simultaneous entrances read as noise. The chart-doc hero
    * (`EntryDemoDual`) passes `animate` because it renders exactly one.
    */
-  PreviewLive?: ComponentType<{ animate?: boolean }>;
+  PreviewLive?: ComponentType<{
+    animate?: boolean;
+  }>;
   /**
    * Static chart component identity used inside authored `contexts` JSX — paired
    * with `ChartLive` so four-homes can swap to the interactive twin in place.

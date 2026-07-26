@@ -38,7 +38,7 @@ export const playground: PlaygroundSpec = {
         locale={s.locale as string}
         animate={ui.animate}
         className="w-full max-w-md"
-        title="Playground"
+        title="Deploys per day"
       />
     );
   },

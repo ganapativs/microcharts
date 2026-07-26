@@ -34,7 +34,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "eta" | "percent" | "none"}
       etaFormat={min}
       animate={ui.animate}
-      title="Playground"
+      title="Export progress"
       width={300}
       height={16}
     />

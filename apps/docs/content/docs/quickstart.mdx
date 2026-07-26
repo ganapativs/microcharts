@@ -176,17 +176,17 @@ One idea runs through the whole catalog: **the same prop name means the same thi
 and they transfer everywhere — a new chart type is a new data shape, never a new vocabulary. The data prop alone always
 renders something correct; everything else is opt-in.
 
-| Prop       | Type                                        | What it does                                                                                                                                    |
-| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`     | `(number \| null)[] \| per-chart shape`     | The series. `null` / `NaN` are gaps, never zeros. The one required prop; each chart documents its own shape when it isn't a plain number array. |
-| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                             |
-| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).                 |
-| `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                  |
-| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative — see [Accessibility](/docs/accessibility).       |
-| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                        |
-| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                  |
-| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                          |
-| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                               |
+| Prop       | Type                                        | What it does                                                                                                                                                              |
+| ---------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`     | `(number \| null)[] \| per-chart shape`     | The series. `null` / `NaN` are gaps, never zeros. The one required prop; each chart documents its own shape when it isn't a plain number array.                           |
+| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                                                       |
+| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).                                           |
+| `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                                            |
+| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title` that marks the chart decorative — see [Accessibility](/docs/accessibility). |
+| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                                                  |
+| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                                            |
+| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                                                    |
+| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                                                         |
 
 Not every prop applies to every chart — a bar chart has no `dots`, and the single-value charts take `value` rather than
 `data` — but wherever a concept exists, its prop name and meaning are always these. Each one has a deeper home:

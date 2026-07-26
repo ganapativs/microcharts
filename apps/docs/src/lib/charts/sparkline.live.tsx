@@ -36,7 +36,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "none" | "last" | "minmax"}
       animate={ui.animate}
       className="w-full max-w-md"
-      title="Playground"
+      title="Weekly revenue"
     />
   ),
   codeInteractive: (s, data, ui) =>

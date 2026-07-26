@@ -94,7 +94,7 @@ export const playground: PlaygroundSpec = {
       height={28}
       className="w-full max-w-md"
       style={{ height: "auto" }}
-      title="Playground"
+      title="Quota attainment"
     />
   ),
   code: (s) =>

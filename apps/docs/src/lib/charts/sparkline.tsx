@@ -108,7 +108,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "none" | "last" | "minmax"}
       className="w-full max-w-md"
       style={{ height: "auto" }}
-      title="Playground"
+      title="Weekly revenue"
     />
   ),
   code: (s, data) =>

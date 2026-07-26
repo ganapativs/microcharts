@@ -11,6 +11,7 @@
     "gen:entries": "node scripts/gen-entries.mjs",
     "gen:docs-code": "node scripts/gen-docs-code.mjs",
     "gen:preview-live": "node scripts/gen-preview-live.mjs",
+    "gen:playground-caps": "node scripts/gen-playground-caps.mjs",
     "gen:chart-modules": "node scripts/gen-chart-modules.mjs",
     "prebuild": "node scripts/gen-md.ts",
     "build": "next build",

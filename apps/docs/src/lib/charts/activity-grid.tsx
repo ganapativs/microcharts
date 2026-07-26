@@ -155,7 +155,7 @@ export const playground: PlaygroundSpec = {
       anchor={s.align !== "none" ? ALIGN_DATE : undefined}
       weekStart={s.align === "sunday" ? 0 : 1}
       domain={s.domain ? DOMAIN : undefined}
-      title="Playground"
+      title="Commits this month"
     />
   ),
   code: (s, data) =>

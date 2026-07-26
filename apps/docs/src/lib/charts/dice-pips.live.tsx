@@ -25,7 +25,7 @@ export const playground: PlaygroundSpec = {
     <DicePipsInteractive
       value={s.value as number}
       face={s.face as boolean}
-      title="Playground"
+      title="Severity"
       size={44}
     />
   ),

@@ -62,8 +62,12 @@ function sharedInteractiveFor(c: ChartEntry): string[] | undefined {
   if (/\blive\??\s*:/.test(src)) names.push("live");
   if (c.picker !== false) {
     names.push("onActive", "onSelect", "selectedIndex", "defaultSelectedIndex");
-  } else if (/\bonSelect\??\s*:/.test(src)) {
-    names.push("onSelect");
+  } else {
+    // Lean scalars (and the two contract exceptions) — list only what the
+    // client actually declares. Most scalars take both; MinimapStrip takes
+    // neither (it has `onWindowChange` on the chart-specific props).
+    if (/\bonActive\??\s*:/.test(src)) names.push("onActive");
+    if (/\bonSelect\??\s*:/.test(src)) names.push("onSelect");
   }
   // `readout` applies to any entry that paints the floating value chip. The
   // registry's `readout: false` flag is the authority (6 entries set it, because

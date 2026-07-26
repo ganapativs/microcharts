@@ -103,7 +103,7 @@ export const playground: PlaygroundSpec = {
       height={92}
       className="w-full max-w-md"
       style={{ height: "auto" }}
-      title="Playground"
+      title="Deploy streak"
     />
   ),
   code: (s, data) =>

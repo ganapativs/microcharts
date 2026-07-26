@@ -72,6 +72,10 @@ no `<title>` or `<desc>` is emitted. On an `/interactive` entry the same call re
 announce, the wrapper drops `role="img"` and `tabIndex={0}` and takes `aria-hidden="true"` instead — so there's nothing
 to tab to or activate, and the static and interactive entries tell one story.
 
+`summary={false}` drops the generated _sentence_; the chart leaves the tree when that leaves it with no name at all. So
+`summary={false}` alongside a `title` is not decorative — the chart keeps `role="img"` and is announced as its title,
+because a name you wrote by hand is not redundancy. Drop the `title` too when you want silence.
+
 ## One interaction contract
 
 The `/interactive` entries share a single contract across the catalog: learn it on a Sparkline and it already holds on

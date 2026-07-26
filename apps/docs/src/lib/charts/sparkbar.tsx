@@ -129,7 +129,7 @@ export const playground: PlaygroundSpec = {
         locale={s.locale as string}
         className="w-full max-w-md"
         style={{ height: "auto" }}
-        title="Playground"
+        title="Deploys per day"
       />
     );
   },

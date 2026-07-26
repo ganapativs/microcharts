@@ -19,7 +19,7 @@ export const playground: PlaygroundSpec = {
     <BreathingDotInteractive
       value={(s.value as number) / 100}
       label={s.label as "none" | "value"}
-      title="Playground"
+      title="Load"
       size={64}
     />
   ),

@@ -25,7 +25,7 @@ export const playground: PlaygroundSpec = {
     <MoonPhaseInteractive
       value={(s.value as number) / 100}
       mode={s.mode as "progress" | "cycle"}
-      title="Playground"
+      title="Sprint"
       size={44}
     />
   ),

@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
       latencyDomain={LD}
       rateDomain={RD}
       threshold={s.threshold === "on" ? 300 : undefined}
-      title="Playground"
+      title="Payments API"
       size={120}
     />
   ),

@@ -125,7 +125,7 @@ describe("catalog shared + interactive props", () => {
 
     const delta = catalog.charts.find((c) => c.slug === "delta")!;
     expect(delta.picker).toBe(false);
-    expect(delta.sharedInteractive).toEqual(["animate", "live", "onSelect"]);
+    expect(delta.sharedInteractive).toEqual(["animate", "live", "onActive", "onSelect"]);
 
     // No picker (it is a slider), but it does paint a chip — the window range.
     const minimap = catalog.charts.find((c) => c.slug === "minimap-strip")!;

@@ -30,7 +30,7 @@ export const playground: PlaygroundSpec = {
       weekStart={s.align === "sunday" ? 0 : 1}
       domain={s.domain ? DOMAIN : undefined}
       animate={ui.animate}
-      title="Playground"
+      title="Commits this month"
     />
   ),
   codeInteractive: (s, data, ui) =>

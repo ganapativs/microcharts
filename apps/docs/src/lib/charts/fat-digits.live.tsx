@@ -34,7 +34,7 @@ export const playground: PlaygroundSpec = {
       domain={DOMAIN}
       encode={s.encode as "value" | "digit"}
       tiers={Number(s.tiers) as 3 | 5}
-      title="Playground"
+      title="Revenue"
       animate={ui.animate}
       fontSize={28}
     />

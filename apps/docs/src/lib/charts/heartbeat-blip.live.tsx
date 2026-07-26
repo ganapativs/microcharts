@@ -20,7 +20,7 @@ export const playground: PlaygroundSpec = {
       events={Array.from({ length: s.count as number }, (_, k) => NOW - k * 4200 - 2000)}
       now={NOW}
       label={s.label as "none" | "count"}
-      title="Playground"
+      title="Liveness"
       width={160}
     />
   ),

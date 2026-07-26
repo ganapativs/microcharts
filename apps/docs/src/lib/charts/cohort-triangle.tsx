@@ -137,7 +137,7 @@ export const playground: PlaygroundSpec = {
       highlight={s.highlight === "none" ? undefined : (s.highlight as string)}
       cell={Number(s.cell)}
       unit="month"
-      title="Playground"
+      title="Monthly retention cohorts"
     />
   ),
   code: (s) =>

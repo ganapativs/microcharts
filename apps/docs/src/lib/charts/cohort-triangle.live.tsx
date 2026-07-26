@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
       cell={Number(s.cell)}
       unit="month"
       animate={ui.animate}
-      title="Playground"
+      title="Monthly retention cohorts"
     />
   ),
   codeInteractive: (s, _data, ui) =>
