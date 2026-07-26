@@ -811,6 +811,57 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  /* Row form — for a datum that IS a composition (StackedArea's bands), where a
+     readout naming one member answers a different question than the chart asks.
+     Listing members on the single nowrap line above is what made the chip grow
+     without bound; as rows, the chip's width is its widest ROW instead of the
+     sum of its members, and the name column is capped so a long label
+     ellipsizes inside the chip rather than widening it. Worst case is
+     0.5em swatch + 7em name + gaps + share ≈ 11em, inside the 14em ceiling for
+     any label and any series count. */
+  :where(.mc-readout-rows) {
+    display: grid;
+    /* All three columns size to content. NOT `minmax(0, auto)` on the name: a
+       zero minimum lets the grid's min-content collapse, and because the chip is
+       absolutely positioned its shrink-to-fit width then follows the space left
+       of the crosshair — so hovering the right half of a 130px chart squeezed
+       "Mobile" down to "Mo…". The 7em cap below is the only thing allowed to
+       truncate a name, and it does so on the LABEL's length, not the pointer's
+       position. */
+    grid-template-columns: auto auto auto;
+    /* …and the box itself sizes to its CONTENT, not to the room left beside the
+       crosshair. An absolutely-positioned box is shrink-to-fit, and a grid item
+       with `overflow: hidden` (the ellipsis cell below) contributes a zero
+       automatic minimum — so without this the chip collapsed toward the right
+       edge of the chart and truncated names that fit perfectly well. `max-width`
+       above still bounds it. */
+    inline-size: max-content;
+    align-items: center;
+    gap: 0 0.4em;
+    text-align: start;
+  }
+  :where(.mc-readout-rows > .mc-readout-key) {
+    inline-size: 0.5em;
+    block-size: 0.5em;
+    border-radius: 0.15em;
+    /* The chip is HTML outside `.mc-root`, so the `[data-mc-cat]` role rules
+       (which paint `fill`, for SVG) can't reach it — the swatch carries its
+       colour as an inline `background` instead, and keeps `data-mc-cat` for
+       parity with the mark it mirrors. Mirroring a mark that keeps its palette
+       under forced-colors (`.mc-root` sets `forced-color-adjust: none`), it
+       keeps its own. The row is NAMED either way — the swatch never carries
+       meaning alone. */
+    forced-color-adjust: none;
+  }
+  :where(.mc-readout-rows > .mc-readout-name) {
+    max-inline-size: 7em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  :where(.mc-readout-rows > .mc-readout-val) {
+    justify-self: end;
+  }
 }
 
 @layer microcharts.motion {

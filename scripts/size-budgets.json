@@ -26,7 +26,7 @@
     },
     "activity-grid": {
       "static": "2.42 kB",
-      "interactive": "5.17 kB"
+      "interactive": "5.42 kB"
     },
     "trend-arrow": {
       "static": "1.94 kB",
@@ -135,7 +135,7 @@
     },
     "stacked-area": {
       "static": "3.25 kB",
-      "interactive": "5.91 kB"
+      "interactive": "6.05 kB"
     },
     "ohlc": {
       "static": "2.80 kB",
@@ -374,7 +374,7 @@
     },
     "partition-strip": {
       "static": "2.26 kB",
-      "interactive": "4.85 kB"
+      "interactive": "5.17 kB"
     },
     "calibration-strip": {
       "static": "2.71 kB",
@@ -444,5 +444,6 @@
   "$labelsize": "LABEL-SIZE PIN (2026-07-19): `styles.css` sets `font-size` on `.mc-root text`, and a CSS declaration outranks an SVG presentation attribute, so a chart's `fontSize={n}` was inert unless it also pinned `--mc-label-size`. 22 charts did not, and painted labels at 1.3-2.4x the size their gutters were computed for — measured spills up to 17.5 viewBox units past the viewBox, at default size, with the catalog's own sample data (src/test/label-containment.browser.test.tsx reproduces it). Pinning the var costs ~30 B gzip per affected subpath (+1.35 kB across the catalog). Twelve budgets are raised here to absorb it, each to ~60 B of headroom. Sparkline static 3.7 -> 3.8 kB touches the USER-APPROVED flagship exception above and needs the same sign-off. The alternative to paying these bytes is shipping charts whose labels paint into the page, so the bytes are not optional. STREAK-SPARK LABEL BAND (same pass): its geometry reserved no room above the runs, so the DEFAULT label=\"current\" rendered nothing below ~48 units against a default height of 20 — a documented prop that did nothing at word size. Reserving the band costs ~50 B static / ~20 B interactive; both budgets raised here.",
   "$readout": "READOUT-SEAT HOIST (2026-07-19). The .mc-spark-readout chip is positioned against the interactive WRAPPER, but .mc-inline seated the mark by translating .mc-root — a visual-only move — so the chip floated a full seat away from its mark (measured 28 px on cohort-triangle, 40 px on activity-grid). Fix hoists the seat vars from the SVG up to the wrapper (useSeatHoist in shared/live-region.tsx) so one element seats the whole box. Cost: ~140 B gzip on each interactive entry, plus ~130 B on the 7 entries that ship no LiveRegion (bullet, likert-strip, coverage-strip, music-staff, tally-marks, dice-pips, hourglass) and therefore call useSeatHoist directly; statics unchanged (0 over). Chosen over threading a seat prop through all 86 readout-bearing clients, which would have cost bytes AND churn.",
   "$robust": "RENDER-ROBUSTNESS RE-BASELINE (2026-07-20, tests/craft/robust.mjs): balance-beam, fat-digits, forecast-cone and tape-gauge crashed or leaked NaN/undefined into markup and into aria-labels on degenerate input (empty/short pair, null pan, non-finite domain, short interval pair, malformed zone). The fixes validate each number where it ENTERS geometry (isFiniteValue guards on the pan values, the tier domain, the p80/p50 bounds and the zone bounds), degrade the summaries to the shared `noData` wording, and give TapeGauge a visible no-reading rail so an empty gauge cannot read as a reading of zero. Cost: +4 B (fat-digits) to +134 B (balance-beam) static. NOTE: ~95 B of each INTERACTIVE bump here is pre-existing tree-wide drift shared by all 105 interactive entries (see $ceilings), not this change. FINAL 7 (2026-07-20, same harness, suite now 0): calibration-strip leaked <rect y=\"NaN\"> from an ∞/∞ support-lane scale, minimap-strip THREW in makeFormatter on a short/null `window` (and leaked NaN from a non-finite one), spread-band put `undefined` in an aria-label from a series-label pair shorter than two. Same discipline: guard where the number enters geometry, resolve the pair once, fall back to each chart's existing `noData` string, and give MinimapStrip a hollow dashed rail when the window is unmeasurable (empty ≠ a window at zero). Cost, static: calibration-strip 2.58→2.59, spread-band 3.22→3.25 (still inside the $seat exception list), minimap-strip 2.52→2.70 — the largest, being a window resolver + known-extent filter + `domain`-prop validator. Interactive budgets here add ONLY each chart's own delta; the residual ~95 B is the same tree-wide drift noted above.",
+  "$readoutvalue": "READOUT VALUE-VISIBILITY PASS (2026-07-26): a readout may not drop a number the caller passed in. Chips and announcements now carry the magnitude behind every derived share (confusion-grid the cell tally, partition-strip/likert-strip/volume-profile the value behind the share, segmented-bar/micro-donut the rolled-up Other total), StackedArea names every band instead of the leading one, ActivityGrid names the day when `anchor` dates the grid, and a measured zero stopped rendering as \"no data\" (seismogram) while an empty bucket stopped rendering as zero (waveform). Where a richer chip would have ellipsized at the chart's own width, it became ROWS (`.mc-readout-rows`, one row per member, name column capped at 7em) rather than a longer line — readout-containment.browser.test.tsx still gates verbosity, and readout-value-visibility.browser.test.tsx now gates the other direction. Only 3 subpaths moved past their budget, all interactive: activity-grid 5.17→5.42 (UTC day math + date formatter), stacked-area 5.91→6.05 (row chip), partition-strip 4.85→5.17 (row chip + value formatter + the new format/locale props). Statics unchanged; measured + max(50 B, 2%) per $rebaseline.",
   "$rebaseline": "SIZE RE-BASELINE (2026-07-20, scripts/rebaseline-sizes.mjs): every budget reset to measured + max(50 B, 2%) headroom after the release hardening pass (fillFor sizing fix ~90 B/interactive entry, per-chart degradation label-drop gates ~42–119 B/static, null/NaN geometry guards). 149 budgets raised, 65 tightened — subpaths that shrank were pulled DOWN to lock the win in, which the old ~10 B-above-actual policy would have missed. The 2% band absorbs shared-kernel byte churn instead of firing all 106 interactive entries on a one-line helper edit."
 }

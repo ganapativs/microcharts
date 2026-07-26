@@ -61,7 +61,7 @@
   {
     "name": "@microcharts/react/activity-grid/interactive",
     "path": "dist/charts/activity-grid/client.js",
-    "limit": "5.17 kB",
+    "limit": "5.42 kB",
     "gzip": true
   },
   {
@@ -361,7 +361,7 @@
   {
     "name": "@microcharts/react/stacked-area/interactive",
     "path": "dist/charts/stacked-area/client.js",
-    "limit": "5.91 kB",
+    "limit": "6.05 kB",
     "gzip": true
   },
   {
@@ -1075,7 +1075,7 @@
   {
     "name": "@microcharts/react/partition-strip/interactive",
     "path": "dist/charts/partition-strip/client.js",
-    "limit": "4.85 kB",
+    "limit": "5.17 kB",
     "gzip": true
   },
   {

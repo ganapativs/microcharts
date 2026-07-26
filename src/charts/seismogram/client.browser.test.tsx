@@ -6,18 +6,18 @@ import { Seismogram } from "./client.js";
 const DATA = [0, 3, 0, 8, 0];
 
 describe("interactive <Seismogram>", () => {
-  it("arrow keys step slots; quiet slots announce no data", async () => {
+  it('arrow keys step slots; a quiet slot announces its zero, not "no data"', async () => {
     const screen = await render(<Seismogram data={DATA} title="Bursts" />);
     const wrap = screen.container.querySelector(".mc-seismo-live") as HTMLElement;
     wrap.focus();
     const live = document.querySelector('[aria-live="polite"]')!;
     // First Arrow now focuses unit 0 (the old skip-to-1 quirk was removed).
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => live.textContent).toBe("Point 1 of 5: no data.");
+    await expect.poll(() => live.textContent).toBe("Point 1 of 5: 0.");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
     await expect.poll(() => live.textContent).toBe("Point 2 of 5: 3.");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-    await expect.poll(() => live.textContent).toBe("Point 3 of 5: no data.");
+    await expect.poll(() => live.textContent).toBe("Point 3 of 5: 0.");
   });
 
   it("Home/End jump to the first/last EVENT", async () => {

@@ -6211,6 +6211,10 @@
       {
         "name": "cohorts",
         "code": "// Five monthly vintages, decaying then flattening — ragged because newer\n// cohorts have been observed for fewer months. March leaks worst by month 1.\nconst cohorts = [\n  { label: \"Jan\", values: [1, 0.62, 0.48, 0.41, 0.38, 0.37] },\n  { label: \"Feb\", values: [1, 0.58, 0.44, 0.38, 0.35] },\n  { label: \"Mar\", values: [1, 0.47, 0.36, 0.31] },\n  { label: \"Apr\", values: [1, 0.55, 0.42] },\n  { label: \"May\", values: [1, 0.52] },\n];"
+      },
+      {
+        "name": "jan",
+        "code": "// One vintage on its own — what the triangle narrows to at inline sizes.\nconst jan = [{ label: \"Jan\", values: [1, 0.72, 0.58, 0.48, 0.41, 0.37] }];"
       }
     ]
   },

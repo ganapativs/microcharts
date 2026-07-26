@@ -148,7 +148,9 @@ The accessible name states accuracy and the worst confusion, with the row-normal
 classifier reads **"Accuracy 100%. No confusion."**, and a class with no samples is named rather than hidden — the
 `cat`/`dog` example above reads **"Accuracy 80%. Most confused: cat predicted as dog (20% of cats). No dog samples."**
 The interactive entry roves the cells with the arrow keys (Home and End jump to the two ends of the diagonal),
-announcing each cell's actual and predicted class as a share of the actual class.
+announcing each cell's actual and predicted class as a share of the actual class, with the tally it was computed from
+(**"Actual cat, predicted dog: 12% of cats (12)."**) — a row percentage cannot be inverted back to a count without the
+row total.
 
 <InteractionNote slug="confusion-grid" />
 

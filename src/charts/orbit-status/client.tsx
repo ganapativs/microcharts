@@ -98,7 +98,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       index: 0,
       value: geo.unknown ? null : Math.max(0, latency),
       label: title,
-      formatted: geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`,
+      formatted: geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency))),
     });
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
@@ -106,7 +106,9 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   // percentage of the wrapper must divide by the FULL width, not the square
   // (mirrors the static entry's reservation, verbatim).
   const labelText =
-    rest.label === "latency" && !geo.unknown ? `${fmt(Math.max(0, latency))}ms` : null;
+    rest.label === "latency" && !geo.unknown
+      ? strings.orbitLatency(fmt(Math.max(0, latency)))
+      : null;
   const vbWidth =
     geo.size +
     (labelText ? Math.ceil(labelText.length * 0.7 * (rest.fontSize ?? labelFont(size)) + 2) : 0);
@@ -173,7 +175,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       <LiveRegion>{announced}</LiveRegion>
       {readout && open ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(geo.size / 2, vbWidth)}>
-          {geo.unknown ? "—" : `${fmt(Math.max(0, latency))}ms`}
+          {geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency)))}
         </span>
       ) : null}
     </span>

@@ -185,6 +185,9 @@ export interface SummaryStrings {
   orbitAlert: (latency: string) => string;
   /** Unknown state, e.g. "Latency unknown." (orbit-status). */
   orbitUnknown: string;
+  /** Bare latency with its unit, e.g. "240ms" — the in-chart label, the readout
+   *  chip and `datum.formatted` (orbit-status). */
+  orbitLatency: (latency: string) => string;
   /** S2 composition, e.g. "4 categories. Highest East 940, lowest North 120." */
   categories: (
     count: number,
@@ -250,8 +253,10 @@ export interface SummaryStrings {
   shares: (list: string) => string;
   /** Share announcement, e.g. "Safari: 24%, 1,204." */
   shareAt: (label: string, pct: string, value: string) => string;
-  /** Rollup announcement, e.g. "Other: 5%, 3 categories." */
-  shareOther: (label: string, pct: string, members: number) => string;
+  /** Rollup announcement, e.g. "Other: 5%, 402 over 3 categories." `value` is
+   *  the rolled-up total — the members count alone said how MANY were folded in
+   *  but never how much they came to. */
+  shareOther: (label: string, pct: string, members: number, value: string) => string;
   /** The rollup label ("Other"). */
   otherLabel: string;
   /** Funnel summary, e.g. "4 stages, 12,400 to 1,116 — overall 9%." */
@@ -264,8 +269,10 @@ export interface SummaryStrings {
   likert: (agreePct: string, disagreePct: string, neutralPct: string | null) => string;
   /** Lean clause, e.g. "Leans positive." */
   likertLean: (direction: "positive" | "negative" | "balanced") => string;
-  /** Interactive level announcement, e.g. "Agree: 34%, level 4 of 5." */
-  likertAt: (label: string, pct: string, level: number, total: number) => string;
+  /** Interactive level announcement, e.g. "Agree: 34% (68), level 4 of 5."
+   *  `value` is the level's own count — the number the caller passed. A share
+   *  alone cannot be turned back into it, so both travel. */
+  likertAt: (label: string, pct: string, level: number, total: number, value: string) => string;
   /** All-neutral / empty likert rows. */
   allNeutral: string;
   noResponses: string;
@@ -751,8 +758,10 @@ export interface SummaryStrings {
   partition: (groups: number, parts: number, parent: string, child: string, pct: string) => string;
   /** Single-level partition, e.g. "3 groups; largest JS (44% of the whole)." */
   partitionFlat: (groups: number, parent: string, pct: string) => string;
-  /** Interactive node announce, e.g. "react: 28% of the whole, 63% of JS." */
-  partitionAt: (label: string, pct: string, parentClause: string) => string;
+  /** Interactive node announce, e.g. "react: 120, 28% of the whole, 63% of JS."
+   *  `value` is the node's own magnitude; shares are derived from it and cannot
+   *  be inverted back to it without the total. */
+  partitionAt: (label: string, pct: string, parentClause: string, value: string) => string;
   /** Parent clause appended for a child node, e.g. ", 63% of JS". */
   partitionParent: (pct: string, parent: string) => string;
   /** CalibrationStrip overview, e.g.
@@ -771,8 +780,10 @@ export interface SummaryStrings {
   confusion: (acc: string, actual: string, predicted: string, pct: string) => string;
   /** Perfect diagonal, e.g. "Accuracy 100%. No confusion." (confusion-grid). */
   confusionPerfect: (acc: string) => string;
-  /** Interactive cell announce, e.g. "Actual cat, predicted dog: 12% of cats." */
-  confusionAt: (actual: string, predicted: string, pct: string) => string;
+  /** Interactive cell announce, e.g. "Actual cat, predicted dog: 12% of cats (8)."
+   *  `count` is the cell's own tally — the number the caller passed. The row
+   *  percentage hides it, and no other surface carries it. */
+  confusionAt: (actual: string, predicted: string, pct: string, count: string) => string;
   /** Empty-row note, e.g. "no dog samples" appended to the summary. */
   confusionEmpty: (cls: string) => string;
   /** FoldedDayBand overview, e.g. "Median peaks at 14 (82)." (+ today clause). */
@@ -785,8 +796,9 @@ export interface SummaryStrings {
   volumeProfile: (poc: string, va: string, lo: string, hi: string) => string;
   /** Uniform distribution, e.g. "Activity is evenly spread." (volume-profile). */
   volumeEven: string;
-  /** Interactive level announce, e.g. "level 142: 18% of activity (POC)." */
-  volumeAt: (level: string, pct: string, pocClause: string) => string;
+  /** Interactive level announce, e.g. "level 142: 3,400, 18% of activity (POC)."
+   *  `mass` is the level's own activity magnitude behind the share. */
+  volumeAt: (level: string, pct: string, pocClause: string, mass: string) => string;
   /** POC clause appended to a level announce, e.g. " (POC)". */
   volumePoc: string;
   /** PhaseTrace overview, e.g. "Latency vs CPU: now 62, 130; heading up-right." */

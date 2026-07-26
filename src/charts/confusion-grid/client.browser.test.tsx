@@ -17,19 +17,19 @@ const mount = async (ui: React.ReactNode) => {
 };
 
 describe("interactive <ConfusionGrid>", () => {
-  it("→ roves cells; announces actual/predicted with row-share phrasing", async () => {
+  it("→ roves cells; announces actual/predicted with row share AND the tally", async () => {
     const fig = await mount(<ConfusionGrid data={CATDOG} title="Classifier" size={80} />);
     fig.focus();
     // first arrow from nothing lands on cell 0 (kernel contract), then walks
     await userEvent.keyboard("{ArrowRight}");
     const live = fig.querySelector('[aria-live="polite"]')!;
-    await expect.poll(() => live.textContent).toBe("Actual cat, predicted cat: 88% of cats.");
+    await expect.poll(() => live.textContent).toBe("Actual cat, predicted cat: 88% of cats (88).");
     await userEvent.keyboard("{ArrowRight}");
-    await expect.poll(() => live.textContent).toBe("Actual cat, predicted dog: 12% of cats.");
+    await expect.poll(() => live.textContent).toBe("Actual cat, predicted dog: 12% of cats (12).");
     await userEvent.keyboard("{ArrowDown}");
-    await expect.poll(() => live.textContent).toBe("Actual dog, predicted dog: 86% of dogs.");
+    await expect.poll(() => live.textContent).toBe("Actual dog, predicted dog: 86% of dogs (59).");
     await userEvent.keyboard("{ArrowRight}"); // right edge → consumed, no move
-    await expect.poll(() => live.textContent).toBe("Actual dog, predicted dog: 86% of dogs.");
+    await expect.poll(() => live.textContent).toBe("Actual dog, predicted dog: 86% of dogs (59).");
     await userEvent.keyboard("{Escape}");
     await expect.poll(() => live.textContent).toBe("");
   });

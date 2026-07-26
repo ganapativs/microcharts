@@ -95,6 +95,11 @@ const cohorts = [
   { label: "May", values: [1, 0.52] },
 ];`,
     },
+    {
+      name: "jan",
+      code: `// One vintage on its own — what the triangle narrows to at inline sizes.
+const jan = [{ label: "Jan", values: [1, 0.72, 0.58, 0.48, 0.41, 0.37] }];`,
+    },
   ],
 };
 
@@ -111,7 +116,13 @@ export const playground: PlaygroundSpec = {
       options: ["none", "Mar", "May"],
       init: "none",
     },
-    { kind: "segmented", key: "cell", label: "cell", options: ["9", "12", "15"], init: "12" },
+    {
+      kind: "segmented",
+      key: "cell",
+      label: "cell",
+      options: ["9", "12", "15"],
+      init: "12",
+    },
   ],
   render: (s) => (
     <CohortTriangle
@@ -177,16 +188,27 @@ const CTX_ROWS = [
 
 export const contexts: ChartContexts = {
   sentence: {
+    // ONE vintage, not the whole triangle. A 5-cohort triangle is ~60 viewBox
+    // units tall; inline in a 0.95rem line it overhangs the line box and paints
+    // over the words after it. A single vintage is one row tall — the same
+    // shape the table-cell and KPI contexts use — so it seats on the baseline
+    // like a word. The full triangle needs the card scale the caption asks for.
     render: () => (
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
-        Monthly retention cohorts{" "}
+        January retention{" "}
         <span className="mc-inline">
-          <CohortTriangle data={COHORTS} labels={false} cell={10} unit="month" summary={false} />
+          <CohortTriangle
+            data={CTX_ROWS[0]!.data}
+            labels={false}
+            cell={10}
+            unit="month"
+            summary={false}
+          />
         </span>{" "}
-        — January vintage retains 37% at month 5.
+        — the January vintage retains 37% at month 5.
       </p>
     ),
-    code: '<p>\n  Monthly retention cohorts{" "}\n  <span className="mc-inline">\n    <CohortTriangle data={cohorts} labels={false} cell={7} summary={false} />\n  </span>{" "}\n  — January vintage retains 37% at month 5.\n</p>',
+    code: '<p>\n  January retention{" "}\n  <span className="mc-inline">\n    <CohortTriangle data={jan} labels={false} cell={10} unit="month" summary={false} />\n  </span>{" "}\n  — the January vintage retains 37% at month 5.\n</p>',
   },
   cell: {
     render: () => (
@@ -210,7 +232,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <CohortTriangle data={cohorts} labels={false} cell={7} />\n</td>",
+    code: '<td>\n  <CohortTriangle data={jan} labels={false} cell={12} unit="month" summary={false} />\n</td>',
   },
   kpi: {
     render: () => (
@@ -231,7 +253,7 @@ export const contexts: ChartContexts = {
         />
       </>
     ),
-    code: '<div className="kpi">\n  <span className="figure">37%</span>\n  <span className="unit">M5 retention</span>\n  <CohortTriangle data={cohorts} labels={false} cell={7} />\n</div>',
+    code: '<div className="kpi">\n  <span className="figure">37%</span>\n  <span className="unit">M5 retention</span>\n  <CohortTriangle data={jan} labels={false} cell={12} unit="month" summary={false} />\n</div>',
   },
   tab: {
     render: () => (
@@ -247,7 +269,7 @@ export const contexts: ChartContexts = {
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Jan <CohortTriangle data={cohorts} labels={false} cell={7} />\n</button>',
+    code: '<button className="tab">\n  Jan <CohortTriangle data={jan} labels={false} cell={10} unit="month" summary={false} />\n</button>',
   },
   note: "Best at KPI/card scale — cohort cells need room to resolve.",
 };

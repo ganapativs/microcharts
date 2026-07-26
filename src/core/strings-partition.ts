@@ -14,6 +14,7 @@ export const EN_PARTITION: PartitionStrings = {
     `${groups} groups, ${parts} parts; largest ${parent} → ${child} (${pct} of the whole).`,
   partitionFlat: (groups, parent, pct) =>
     `${groups} groups; largest ${parent} (${pct} of the whole).`,
-  partitionAt: (label, pct, parentClause) => `${label}: ${pct} of the whole${parentClause}.`,
+  partitionAt: (label, pct, parentClause, value) =>
+    `${label}: ${value}, ${pct} of the whole${parentClause}.`,
   partitionParent: (pct, parent) => `, ${pct} of ${parent}`,
 };

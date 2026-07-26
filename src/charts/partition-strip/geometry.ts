@@ -18,6 +18,10 @@ export interface PartitionSegment {
   width: number;
   /** Share of the whole (2-dp). */
   share: number;
+  /** The node's own magnitude — a parent's value (or its children's sum), a
+   *  child's value. Shares are derived from it and can't be inverted back to it
+   *  without the total, so the readout needs it carried through. */
+  value: number;
   /** For a child: its share of its parent; null for parents. */
   parentShare: number | null;
   parent: string | null;
@@ -67,6 +71,7 @@ export function partitionStripGeometry(opts: {
         x: round2(x),
         width: w,
         share: round2(share),
+        value: pv,
         parentShare: null,
         parent: null,
         group: gi,
@@ -90,6 +95,7 @@ export function partitionStripGeometry(opts: {
           x: round2(cx),
           width: cw,
           share: round2(c.value / total),
+          value: c.value,
           parentShare: round2(cShare),
           parent: p.label,
           group: gi,

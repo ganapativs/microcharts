@@ -14,16 +14,18 @@ const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
 
 describe("interactive <LikertStrip>", () => {
-  it("←/→ step levels in data order with share announcements", async () => {
+  it("←/→ step levels in data order, announcing each share AND its count", async () => {
     const screen = await render(<LikertStrip data={SURVEY} title="Q1" />);
     const wrap = screen.container.querySelector(".mc-likert-live") as HTMLElement;
     wrap.focus();
     // First arrow lands on unit 0 (the kernel's shared convention).
     key(wrap, "ArrowRight");
     const live = document.querySelector('[aria-live="polite"]')!;
-    await expect.poll(() => live.textContent).toMatch(/^Strongly disagree: 10%, level 1 of 5\.$/);
+    await expect
+      .poll(() => live.textContent)
+      .toMatch(/^Strongly disagree: 10% \(10\), level 1 of 5\.$/);
     key(wrap, "ArrowRight");
-    await expect.poll(() => live.textContent).toMatch(/^Disagree: 14%, level 2 of 5\.$/);
+    await expect.poll(() => live.textContent).toMatch(/^Disagree: 14% \(14\), level 2 of 5\.$/);
   });
 
   it("onActive reports the focused segment; null once cleared", async () => {

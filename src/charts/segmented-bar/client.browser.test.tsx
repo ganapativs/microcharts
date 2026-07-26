@@ -15,7 +15,7 @@ const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
 
 describe("interactive <SegmentedBar>", () => {
-  it("←/→ rove segments from the first; Other announces its member count", async () => {
+  it("←/→ rove segments from the first; Other announces its rolled-up total and member count", async () => {
     const screen = await render(<SegmentedBar data={MIX} title="Share" />);
     const wrap = screen.container.querySelector(".mc-segbar-live") as HTMLElement;
     wrap.focus();
@@ -23,7 +23,7 @@ describe("interactive <SegmentedBar>", () => {
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toBe("Chrome: 62%, 620.");
     key(wrap, "End");
-    await expect.poll(() => live.textContent).toBe("Other: 2%, 2 categories.");
+    await expect.poll(() => live.textContent).toBe("Other: 2%, 20 over 2 categories.");
   });
 
   it("Enter selects the active segment: fires onSelect + pins an outline", async () => {

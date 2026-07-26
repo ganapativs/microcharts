@@ -26,8 +26,12 @@ export const INTERACTIVE_READOUT_CLAIMS: Record<string, readonly string[]> = {
   "bump-strip": ["Week 7 of 12: #2."],
   // client.tsx → strings.dayAt / strings.dayEmpty — EN_CALENDAR.
   "calendar-strip": ["Thursday, June 11: 0.", "Tuesday, June 23: no data."],
-  // index.tsx confusionPerfect — the zero-off-diagonal branch.
-  "confusion-grid": ["Accuracy 100%. No confusion."],
+  // index.tsx confusionPerfect — the zero-off-diagonal branch; client.tsx →
+  // strings.confusionAt(actual, predicted, pct, count).
+  "confusion-grid": [
+    "Accuracy 100%. No confusion.",
+    "Actual cat, predicted dog: 12% of cats (12).",
+  ],
   // client.tsx → strings.category(label, value, rank, of) — EN_CATEGORY.category.
   "dot-plot": ["Ada: 96 — 1st of 3."],
   // client.tsx → strings.vsAt(pos, total, v, ref) — EN_VS.vsAt.
@@ -50,8 +54,8 @@ export const INTERACTIVE_READOUT_CLAIMS: Record<string, readonly string[]> = {
   hypnogram: ["Light, from 8 to 22."],
   // client.tsx → strings.iconArrayUnit(pos, n, filled, k).
   "icon-array": ["Unit 1 of 20 — filled. 3 of 20 filled."],
-  // client.tsx → strings.likertAt(label, share, level + 1, levels).
-  "likert-strip": ["Disagree: 14%, level 2 of 5."],
+  // client.tsx → strings.likertAt(label, share, level + 1, levels, count).
+  "likert-strip": ["Disagree: 14% (14), level 2 of 5."],
   // client.tsx → strings.boxStat("median", fmt(v)) — EN_DIST.boxStat.
   "micro-box": ["Median: 42."],
   // client.tsx → strings.category(label, value, rank, of), ranks descending.
@@ -68,8 +72,8 @@ export const INTERACTIVE_READOUT_CLAIMS: Record<string, readonly string[]> = {
   "rubric-strip": ["Coverage: 0.78, weight 29% of total."],
   // client.tsx → strings.observation(value, rank, count) — EN_DIST.observation.
   "rug-strip": ["48 — 2nd of 17."],
-  // client.tsx → strings.shareOther(label, pct, members).
-  "segmented-bar": ["Other: 2%, 2 categories."],
+  // client.tsx → strings.shareOther(label, pct, members, value).
+  "segmented-bar": ["Other: 2%, 20 over 2 categories."],
   // client.tsx → strings.slopeAt(label, from, to, dir, pct) — EN_PAIRED.slopeAt.
   slope: ["East: 40 to 47, up 18%."],
   // client.tsx → strings.spreadBandAt(pos, total, leader, gap, other).
