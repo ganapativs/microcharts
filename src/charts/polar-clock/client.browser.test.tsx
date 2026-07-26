@@ -12,12 +12,13 @@ describe("interactive <PolarClock>", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Sunday: 120.");
+    await expect.poll(() => live.textContent).toBe("Sunday: 120.");
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Monday: 200.");
+    await expect.poll(() => live.textContent).toBe("Monday: 200.");
     await userEvent.keyboard("{ArrowLeft}");
+    await expect.poll(() => live.textContent).toBe("Sunday: 120.");
     await userEvent.keyboard("{ArrowLeft}");
-    expect(live.textContent).toBe("Saturday: 60.");
+    await expect.poll(() => live.textContent).toBe("Saturday: 60.");
   });
 
   it("wrapper owns naming; static chart is decorative", async () => {
