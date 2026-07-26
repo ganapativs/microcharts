@@ -112,11 +112,14 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
         </div>
 
-        {/* deferred: the panel server-renders as an empty frame (the scenario
-            ghosts are stacked to reserve height, not to be read) and only fills
-            once the stream starts. Painting that frame early would just pop. */}
-        <Reveal delay={140} deferred>
-          <StreamVignette serif startDelay={900} />
+        {/* The panel paints with the rest of the fold. It used to be `deferred`
+            — hidden in the server HTML, faded in on hydration — which cost the
+            whole JS download before the frame existed and read as a section
+            arriving late. The server markup IS the panel at its final size
+            (chrome + ghost-reserved height); only the reply text needs JS, and
+            it starts typing the moment hydration lands. */}
+        <Reveal>
+          <StreamVignette serif />
         </Reveal>
       </div>
     </section>

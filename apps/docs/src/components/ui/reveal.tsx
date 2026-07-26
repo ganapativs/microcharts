@@ -1,41 +1,27 @@
-"use client";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
- * Once a scroll-into-view fade, now a passthrough: sections render at rest,
- * server HTML is the finished page (2026-07 de-slop pass — entrance
+ * Once a scroll-into-view fade, now a plain wrapper element: sections render at
+ * rest, server HTML is the finished page (2026-07 de-slop pass — entrance
  * choreography read as generated, not crafted).
  *
- * The one behavior kept is `deferred`, for a subtree whose content arrives
- * with JS (a client component that server-renders an empty shell). Painting
- * that shell instantly buys the reader nothing and then visibly pops when
- * hydration fills it, so a short opacity fade *covers* the arrival instead of
- * delaying content. Opt in only when the server markup is not worth reading.
+ * Nothing here hides anything, ever, and it is deliberately NOT a client
+ * component: a wrapper that waits for hydration to become visible gates first
+ * paint on the JS download. The last holdout was the hero's stream panel
+ * (`deferred`), removed 2026-07-26 — its server markup is the panel frame at
+ * its final size, which is worth painting immediately even though the reply
+ * types in after hydration.
  */
 export function Reveal({
   children,
   className,
   as: Tag = "div",
-  deferred = false,
 }: {
   children: ReactNode;
   className?: string;
   /** Kept for call-site compatibility; entrance delays no longer exist. */
   delay?: number;
   as?: "div" | "li" | "section";
-  deferred?: boolean;
 }) {
-  // "pending" is server-rendered only for deferred subtrees; everything else
-  // is born visible with no reveal state at all.
-  const [state, setState] = useState<"pending" | "in" | null>(deferred ? "pending" : null);
-
-  useEffect(() => {
-    if (deferred) setState("in");
-  }, [deferred]);
-
-  return (
-    <Tag data-reveal={state ?? undefined} className={className}>
-      {children}
-    </Tag>
-  );
+  return <Tag className={className}>{children}</Tag>;
 }

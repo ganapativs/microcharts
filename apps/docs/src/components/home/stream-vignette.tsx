@@ -437,12 +437,9 @@ function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
 
 export function StreamVignette({
   serif = false,
-  startDelay = 0,
 }: {
   /** Reading-serif reply text (the hero treatment). */
   serif?: boolean;
-  /** ms after viewport entry before the first token — lets the headline finish. */
-  startDelay?: number;
 } = {}) {
   const [idx, setIdx] = useState(0);
   const active = SCENARIOS[idx];
@@ -493,23 +490,23 @@ export function StreamVignette({
       setPos(total);
       return;
     }
-    let delayTimer = 0;
+    // No start delay: the panel is server-rendered, so hydration is already the
+    // late moment — a hold on top of it was dead air the reader read as the
+    // section being broken (there used to be a 900ms one here, sized to a
+    // headline animation that no longer exists).
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting) && !started.current) {
           started.current = true;
-          delayTimer = window.setTimeout(() => setRunning(true), startDelay);
+          setRunning(true);
           io.disconnect();
         }
       },
       { threshold: 0.3 },
     );
     io.observe(host);
-    return () => {
-      io.disconnect();
-      window.clearTimeout(delayTimer);
-    };
-  }, [total, startDelay]);
+    return () => io.disconnect();
+  }, [total]);
 
   // Advance one atom at a time, at a fixed cadence (see the delay below).
   useEffect(() => {

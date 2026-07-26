@@ -25,10 +25,11 @@ const srcFiles = () =>
 /**
  * Two contracts in one suite.
  *
- * First paint is never gated on JS: server HTML renders the finished state;
- * the only thing ever hidden is a `deferred` subtree whose content does not
- * exist until hydration. Breaking that puts a slow connection back to a blank
- * screen for the length of the JS download.
+ * First paint is never gated on JS: server HTML renders the finished state and
+ * NOTHING is hidden waiting for hydration. The last exception — the hero stream
+ * panel's `deferred` fade — was removed 2026-07-26 because it did exactly what
+ * this suite exists to prevent: the right half of the fold arrived a JS
+ * download late, visibly after everything around it.
  *
  * And entrance choreography stays dead: scroll-into-view fades, staggered
  * settles, and route fades were removed in the 2026-07 de-slop pass — the page
@@ -36,32 +37,41 @@ const srcFiles = () =>
  * not a drive-by.
  */
 describe("first paint is never gated on JS, and entrance choreography stays dead", () => {
-  it("Reveal is a passthrough: only deferred subtrees ever hide", () => {
-    expect(reveal).toMatch(/deferred \? "pending" : null/);
-    // No observer, no scroll coupling — the fade covers hydration, not scroll.
-    expect(reveal).not.toMatch(/IntersectionObserver/);
+  it("Reveal is a plain server-rendered wrapper", () => {
+    // No client boundary, no state, no observer: a wrapper that needs hydration
+    // to become visible is the bug this file guards against.
+    expect(reveal).not.toMatch(/"use client"/);
+    expect(reveal).not.toMatch(/useState|useEffect|IntersectionObserver/);
   });
 
-  it("deferred stays a rare, deliberate opt-out", () => {
-    // `deferred` hides in the server HTML and is only honest where the markup
-    // holds nothing worth reading. Sprinkled widely it rebuilds exactly the
-    // blank-first-paint this all replaced.
+  it("the deferred opt-out stays gone", () => {
+    // `deferred` hid its subtree in the server HTML. Nothing may re-adopt it.
+    // Prose may explain why it's gone; a prop, default, or type may not.
+    expect(reveal).not.toMatch(/deferred\s*[?:=]/);
     const callSites = srcFiles()
       .filter((f) => f.endsWith(".tsx") && !f.endsWith("reveal.tsx"))
       .filter((file) => /<Reveal[^>]*\sdeferred[\s/>]/.test(readFileSync(file, "utf8")))
       .map((f) => f.replace(/^.*\/src\//, "src/"))
       .sort();
-    expect(callSites).toEqual(["src/components/home/home-hero.tsx"]);
+    expect(callSites).toEqual([]);
   });
 
-  it("only the client-applied pending state hides anything", () => {
-    // Every rule that hides a reveal must be scoped to `pending` — the state
-    // the server only emits for deferred subtrees. A bare `[data-reveal]` hide
-    // would ship blank HTML.
+  it("no CSS rule hides a reveal", () => {
+    // A `[data-reveal]` opacity:0 anywhere means blank server HTML for the
+    // length of the JS download.
     const hidingSelectors = [...css.matchAll(/^(\[data-reveal[^\]]*\][^{]*)\{([^}]*)\}/gm)]
       .filter(([, , body]) => /opacity:\s*0(?!\.)/.test(body))
       .map(([, selector]) => selector.trim());
-    expect(hidingSelectors).toEqual(['[data-reveal="pending"]']);
+    expect(hidingSelectors).toEqual([]);
+  });
+
+  it("the hero stream starts on hydration, with no added hold", () => {
+    // The panel is server-rendered; hydration is already the late moment. A
+    // startDelay on top of it (900ms, sized to a headline animation that no
+    // longer exists) read as the section being broken.
+    const vignette = read("../home/stream-vignette.tsx");
+    expect(vignette).not.toMatch(/startDelay/);
+    expect(read("../home/home-hero.tsx")).toMatch(/<StreamVignette serif \/>/);
   });
 
   it("route fades and gallery entrances stay removed", () => {
