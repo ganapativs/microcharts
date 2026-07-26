@@ -22,7 +22,6 @@ import {
   techArticleJsonLd,
 } from "@/lib/jsonld";
 import { docLastModified } from "@/lib/doc-dates";
-import { RouteTransition } from "@/components/route-transition";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
@@ -68,10 +67,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
       {isIntro ? (
         <script type="application/ld+json">{jsonLdScript(faqJsonLd(DOCS_INTRO_FAQS))}</script>
       ) : null}
-      {/* Calm fade + lift on navigation. Wraps only the article content — never
-          the DocsPage grid-area siblings (toc/sidebar), which must stay direct
-          grid children of the layout. Keyed on pathname; reduced-motion gated. */}
-      <RouteTransition className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-4">
         <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
           {page.data.title}
         </DocsTitle>
@@ -89,7 +85,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
         <DocsBody>
           <MDX components={getGuideMDXComponents({ a: createRelativeLink(source, page) })} />
         </DocsBody>
-      </RouteTransition>
+      </div>
     </DocsPage>
   );
 }

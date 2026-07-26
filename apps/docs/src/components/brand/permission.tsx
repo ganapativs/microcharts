@@ -4,17 +4,18 @@ import { SITE } from "@/lib/site";
 export function BrandPermission() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <div className="panel relative flex flex-col gap-4 overflow-hidden px-6 py-12 sm:px-10">
+      <div className="panel-soft relative flex flex-col gap-4 overflow-hidden px-6 py-12 sm:px-10">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 -z-10 grid-paper opacity-40"
         />
         <h2 className="display relative max-w-2xl text-[length:var(--text-fluid-h2)] text-fd-foreground">
-          Use it to point at the work.
+          What the kit is for
         </h2>
         <p className="relative max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
-          Link to or reference microcharts: a “built with,” a talk slide, an integration. Don’t
-          modify the mark, use it as your own product’s mark, or imply endorsement. The code is{" "}
+          Use it to link to or reference microcharts: a “built with” badge, a talk slide, an
+          integration. Don’t modify the mark, use it as your own product’s mark, or imply
+          endorsement. The code is{" "}
           <a
             href={SITE.repo}
             target="_blank"

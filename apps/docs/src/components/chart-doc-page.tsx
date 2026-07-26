@@ -16,7 +16,6 @@ import { docsMeta } from "@/lib/metadata";
 import { abs } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdScript, techArticleJsonLd } from "@/lib/jsonld";
 import { docLastModified } from "@/lib/doc-dates";
-import { RouteTransition } from "@/components/route-transition";
 import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
 import { RelatedCharts } from "@/components/charts/related-charts";
 import { getChart } from "@/lib/charts/entries";
@@ -71,8 +70,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           }),
         )}
       </script>
-      {/* Transition on article only — toc/sidebar must stay layout grid kids. */}
-      <RouteTransition className="flex flex-1 flex-col gap-4">
+      <div className="flex flex-1 flex-col gap-4">
         <DocsTitle className="font-display text-[2.15em] font-medium tracking-[-0.025em]">
           {page.data.title}
         </DocsTitle>
@@ -94,7 +92,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
         {/* Per-chart pages only — deterministic cross-links (SEO + discovery);
             the index page is the catalog itself. */}
         {chartSlug ? <RelatedCharts slug={chartSlug} /> : null}
-      </RouteTransition>
+      </div>
     </DocsPage>
   );
 }

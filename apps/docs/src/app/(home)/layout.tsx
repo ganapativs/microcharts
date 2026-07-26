@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
-import { Newsreader } from "next/font/google";
+import { Source_Serif_4 } from "next/font/google";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
-import { RouteTransition } from "@/components/route-transition";
 
 // The reading serif — the streamed reply demo and the headline's italic
-// emphasis. Marketing surface only; docs never load it.
+// emphasis. Marketing surface only; docs never load it. Source Serif 4 is the
+// closest open face to the serif the streaming assistants themselves set
+// replies in, so the demo reads like the surface it depicts.
 // Variable axes (no weight list) — two files (roman + italic), not four.
 // preload:false keeps the serif out of the critical font path: nothing it
 // styles paints before ~1.9 s (reply stream, italic emphasis mid-settle).
-const serif = Newsreader({
+const serif = Source_Serif_4({
   subsets: ["latin"],
   style: ["normal", "italic"],
   variable: "--font-serif-src",
@@ -24,7 +25,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     >
       <SiteNav />
       <main id="main-content" className="flex-1">
-        <RouteTransition>{children}</RouteTransition>
+        {children}
       </main>
       <SiteFooter />
     </div>

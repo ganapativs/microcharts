@@ -16,27 +16,37 @@ function* findFiles(dir: URL): Generator<string> {
 }
 
 const reveal = read("./reveal.tsx");
-const routeTransition = read("../route-transition.tsx");
 const css = read("../../app/global.css");
+const srcFiles = () =>
+  [...findFiles(new URL("../../", import.meta.url))].filter(
+    (f) => /\.(tsx|ts|css)$/.test(f) && !f.includes(".test."),
+  );
 
 /**
- * The first-paint contract: nothing an entrance animation does may stand
- * between a cold visitor and the content. Server HTML renders the finished
- * state; the hidden state is applied later, by the client, only where the
- * reader cannot see it happen. Breaking any of these puts the site back to a
- * blank screen for the length of the JS download on a slow connection.
+ * Two contracts in one suite.
+ *
+ * First paint is never gated on JS: server HTML renders the finished state;
+ * the only thing ever hidden is a `deferred` subtree whose content does not
+ * exist until hydration. Breaking that puts a slow connection back to a blank
+ * screen for the length of the JS download.
+ *
+ * And entrance choreography stays dead: scroll-into-view fades, staggered
+ * settles, and route fades were removed in the 2026-07 de-slop pass — the page
+ * renders at rest and stays there. Reintroducing any of them is a decision,
+ * not a drive-by.
  */
-describe("first paint is never gated on JS", () => {
-  it("Reveal's server-rendered state is the visible one", () => {
-    expect(reveal).toMatch(/deferred \? "pending" : "static"/);
+describe("first paint is never gated on JS, and entrance choreography stays dead", () => {
+  it("Reveal is a passthrough: only deferred subtrees ever hide", () => {
+    expect(reveal).toMatch(/deferred \? "pending" : null/);
+    // No observer, no scroll coupling — the fade covers hydration, not scroll.
+    expect(reveal).not.toMatch(/IntersectionObserver/);
   });
 
   it("deferred stays a rare, deliberate opt-out", () => {
-    // `deferred` re-arms the old behaviour (hidden in the server HTML) and is
-    // only honest where the markup holds nothing worth reading. Sprinkled
-    // widely it rebuilds exactly the blank-first-paint this all replaced, so
-    // each new call site is a decision someone has to make on purpose.
-    const callSites = [...findFiles(new URL("../..", import.meta.url))]
+    // `deferred` hides in the server HTML and is only honest where the markup
+    // holds nothing worth reading. Sprinkled widely it rebuilds exactly the
+    // blank-first-paint this all replaced.
+    const callSites = srcFiles()
       .filter((f) => f.endsWith(".tsx") && !f.endsWith("reveal.tsx"))
       .filter((file) => /<Reveal[^>]*\sdeferred[\s/>]/.test(readFileSync(file, "utf8")))
       .map((f) => f.replace(/^.*\/src\//, "src/"))
@@ -44,36 +54,32 @@ describe("first paint is never gated on JS", () => {
     expect(callSites).toEqual(["src/components/home/home-hero.tsx"]);
   });
 
-  it("only the client-applied state hides anything", () => {
+  it("only the client-applied pending state hides anything", () => {
     // Every rule that hides a reveal must be scoped to `pending` — the state
-    // the server never emits. A bare `[data-reveal]` hide would ship blank HTML.
+    // the server only emits for deferred subtrees. A bare `[data-reveal]` hide
+    // would ship blank HTML.
     const hidingSelectors = [...css.matchAll(/^(\[data-reveal[^\]]*\][^{]*)\{([^}]*)\}/gm)]
       .filter(([, , body]) => /opacity:\s*0(?!\.)/.test(body))
       .map(([, selector]) => selector.trim());
     expect(hidingSelectors).toEqual(['[data-reveal="pending"]']);
   });
 
-  it("the route fade is opt-in per navigation, not a class on every page", () => {
-    // A `route-fade` baked into the markup holds the whole page at opacity 0
-    // for its duration on a cold load, delaying LCP by exactly that much.
-    expect(routeTransition).not.toMatch(/className=\{?["'`][^"'`]*route-fade/);
-    expect(routeTransition).toMatch(/navigated/);
+  it("route fades and gallery entrances stay removed", () => {
+    for (const file of srcFiles()) {
+      const text = readFileSync(file, "utf8");
+      expect(text, file).not.toMatch(/route-fade/);
+      expect(text, file).not.toMatch(/data-enter\b/);
+    }
   });
 
-  it("the cold-boot flag starts cold in server-rendered HTML", () => {
-    expect(read("../../app/layout.tsx")).toMatch(/data-boot="cold"/);
-  });
-
-  it("the /charts entrance is opt-in too", () => {
-    // Same failure as `route-fade`, reached through CSS instead of React: as
-    // `.g2:not([data-entered])` the fade applied on first paint with no JS
-    // involved, and `backwards` fill held the grid at opacity 0 through its
-    // delay. It has to be a positive selector that only the client sets.
-    expect(css).not.toMatch(/\.g2:not\(\[data-entered\]\)/);
-    expect(css).toMatch(/\.g2\[data-enter\] \.g2-grid/);
-    // …and the marker is only set once boot has gone warm.
-    const dock = read("../../app/(home)/charts/use-gallery-dock.ts");
-    expect(dock).toMatch(/dataset\.boot !== "warm"/);
+  it("scroll-reveal machinery stays removed", () => {
+    // The old entrance: a transform-carrying rise, staggered by --i ladders.
+    expect(css).not.toMatch(/rise-in/);
+    expect(css).not.toMatch(/hx-stagger/);
+    for (const file of srcFiles()) {
+      if (!file.endsWith(".tsx")) continue;
+      expect(readFileSync(file, "utf8"), file).not.toMatch(/hx-stagger/);
+    }
   });
 
   it("live mode's late arrival is predicted, not just animated", () => {

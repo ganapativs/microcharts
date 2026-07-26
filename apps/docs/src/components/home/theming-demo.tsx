@@ -59,7 +59,7 @@ export function ThemingDemo() {
   const vars = mounted && resolvedTheme === "dark" ? theme.darkVars : theme.vars;
 
   return (
-    <div className="panel overflow-hidden">
+    <div className="panel-soft overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-hairline px-5 py-3.5">
         <code className="font-mono text-[0.8rem] text-fd-foreground">
           defineTheme({"{"}{" "}

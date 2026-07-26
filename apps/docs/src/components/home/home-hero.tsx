@@ -28,6 +28,8 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
       />
       <div className="relative mx-auto grid max-w-shell items-center gap-10 px-4 pb-14 pt-16 sm:px-6 sm:pt-18 lg:grid-cols-[1.06fr_0.94fr] lg:gap-14">
         <div>
+          {/* The four claims, above the headline. Load-bearing — a visitor who
+              reads nothing else gets the whole pitch from this line. Keep it. */}
           <Reveal className="flex flex-wrap items-center gap-x-2 gap-y-1">
             {["Zero dependencies", "AI-native", "Accessible by default", "RSC-safe"].map((t, i) => (
               <span key={t} className="mono-label">
@@ -38,8 +40,13 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
           </Reveal>
 
           <Reveal delay={60}>
-            {/* Tighter tracking than .display — scale grows with display size. */}
-            <h1 className="display mt-5 text-balance text-[2.05rem] leading-[1.08] tracking-[-0.028em] text-fd-foreground sm:text-[2.65rem] lg:text-[3.2rem] xl:text-[3.45rem]">
+            {/* Tighter tracking than .display — tracking follows display size.
+                Tops out at 3rem, between the old 3.45 (shouted) and a first
+                pass at 2.6 (went thin against the reply panel): the fold is
+                still the loudest thing on the site, by a step and a half rather
+                than three. The inline charts follow on their own — .hx-word
+                sizes them in em. */}
+            <h1 className="display mt-5 text-balance text-[2.05rem] leading-[1.1] tracking-[-0.022em] text-fd-foreground sm:text-[2.45rem] lg:text-[2.8rem] xl:text-[3rem]">
               Small enough for a model to{" "}
               <span className="whitespace-nowrap">
                 <em className="hv-em">write</em>
@@ -61,11 +68,8 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
 
           <Reveal delay={120}>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
-              {/* literal ’, not &rsquo; — an entity in this text node re-triggers the
-                  SWC dropped-space bug after {catalogTotal} (see swc-ssr-spaces.test.ts) */}
-              Word-sized React charts - sparklines and inline SVG microcharts. {catalogTotal} types
-              that sit inside a sentence, a table cell, or a streamed reply, at sizes where a full
-              chart library wouldn’t fit.
+              Word-sized React charts. {catalogTotal} types that fit inside a sentence, a table
+              cell, or a streamed reply.
             </p>
           </Reveal>
 
@@ -104,18 +108,6 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
                 tone="muted"
                 className="text-[0.72rem] uppercase tracking-[0.08em]"
               />
-              <span className="select-none text-sm text-fd-muted-foreground/40" aria-hidden>
-                /
-              </span>
-              <a
-                href="#examples"
-                className="group inline-flex items-center gap-1 text-[0.72rem] font-medium tracking-[0.08em] text-fd-muted-foreground uppercase transition-colors hover:text-fd-foreground"
-              >
-                <span className="underline decoration-1 underline-offset-[5px] [text-decoration-color:color-mix(in_oklab,var(--accent)_45%,transparent)] transition-[text-decoration-color] group-hover:[text-decoration-color:var(--accent)]">
-                  examples
-                </span>
-                <ArrowRight className="size-3.5 text-fd-primary transition-transform group-hover:translate-x-0.5" />
-              </a>
             </div>
           </Reveal>
         </div>
@@ -125,10 +117,6 @@ export function HomeHero({ catalogTotal }: { catalogTotal: number }) {
             once the stream starts. Painting that frame early would just pop. */}
         <Reveal delay={140} deferred>
           <StreamVignette serif startDelay={900} />
-          <p className="mono-label mt-3 text-center opacity-70">
-            the reply is plain text <span className="text-hairline">·</span> the charts are the
-            shipped components
-          </p>
         </Reveal>
       </div>
     </section>

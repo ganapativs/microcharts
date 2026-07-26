@@ -278,6 +278,16 @@ function partial(s: Seg, n: number): string {
   return s.raw.slice(0, n);
 }
 
+/** Split a partially-revealed text run into the settled head and the word that
+ *  just landed, so only that last word gets the fade. Keying the tail span on
+ *  its own index replays the animation once per word — key it on the text and
+ *  a repeated word ("the … the") would silently skip its fade. */
+function splitTail(p: string): [head: string, tail: string] {
+  const end = p.endsWith(" ") ? p.length - 1 : p.length;
+  const cut = p.lastIndexOf(" ", end - 1);
+  return cut === -1 ? ["", p] : [p.slice(0, cut + 1), p.slice(cut + 1)];
+}
+
 /** A fully-settled reply — used for the height-reserving ghosts. A block chart
  *  renders a <figure> (flow content), so the container must be a <div>, never
  *  a <p> (which auto-closes on block descendants → hydration mismatch). */
@@ -377,10 +387,25 @@ const RAW_CODE = "font-mono text-[0.82em] text-fd-muted-foreground";
  *  hx-morph-in plays as in the scripted tour. */
 function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
   const segs = parseLiveReply(text);
+  const tailIdx = streaming ? segs.length - 1 : -1;
   return (
     <div className="whitespace-pre-wrap">
       {segs.map((s, i) => {
-        if (s.kind === "text") return <span key={i}>{s.text}</span>;
+        if (s.kind === "text") {
+          // Same tail fade as the scripted tour. Nano emits multi-word chunks,
+          // so this fades the arriving chunk rather than a single word — which
+          // is what actually landed, so it stays honest.
+          if (i !== tailIdx) return <span key={i}>{s.text}</span>;
+          const [head, tail] = splitTail(s.text);
+          return (
+            <span key={i}>
+              {head}
+              <span key={text.length} className="mc-tok">
+                {tail}
+              </span>
+            </span>
+          );
+        }
         if (s.kind === "code")
           return (
             <code key={i} className={RAW_CODE}>
@@ -406,7 +431,6 @@ function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
           </span>
         );
       })}
-      {streaming && <span className="mc-caret" aria-hidden />}
     </div>
   );
 }
@@ -487,7 +511,7 @@ export function StreamVignette({
     };
   }, [total, startDelay]);
 
-  // Advance one atom at a time.
+  // Advance one atom at a time, at a fixed cadence (see the delay below).
   useEffect(() => {
     if (mode !== "tour") return;
     if (!running || pos >= total) {
@@ -506,13 +530,24 @@ export function StreamVignette({
       }
       acc += n;
     }
+    // Even cadence, not simulated typing. The hero used to jitter each word
+    // (26 + random*42) to imitate a real token stream; on a fold the reader
+    // only ever sees once, that stutter reads as lag rather than realism.
+    // Fixed rates instead — the reveal glides. Two rates, not one: a text atom
+    // is a whole word and a grammar atom is a single character, so one shared
+    // rate would either strobe the prose or crawl through the backticks.
+    // /docs/ai keeps the realistic pacing; that page is about the stream
+    // itself, so the texture is the content there.
+    //
+    // These were once cut to 34/4/200 chasing a "stuck" feeling. That was the
+    // wrong lever twice over: it overshot into too-fast-to-perceive, and the
+    // stall was never the typing — it was the dead hold plus a from-zero
+    // blurred fade at the hand-off (both fixed in .hx-morph-in). 52ms/word is
+    // ~20 words a second: quick, but visibly arriving. `closing` is only the
+    // beat between the fence completing and the chart replacing it; the morph
+    // is the transition, so anything longer here is just dead air before it.
     const closing = inSeg === atomCount(seg) - 1;
-    const delay =
-      seg.kind === "chart"
-        ? closing
-          ? 360 // morph hold
-          : 9
-        : 26 + Math.random() * 42;
+    const delay = seg.kind === "chart" ? (closing ? 140 : 7) : 52;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);
     return () => window.clearTimeout(t);
   }, [running, pos, total, active, mode]);
@@ -573,8 +608,19 @@ export function StreamVignette({
     } else if (pos > acc) {
       // in-flight segment — raw text, typed
       const p = partial(s, pos - acc);
-      if (s.kind === "text") view.push(<span key={s.id}>{p}</span>);
-      else
+      if (s.kind === "text") {
+        // Only the word that just landed fades; the settled head stays put, so
+        // the animation never re-runs over text the reader has already read.
+        const [head, tail] = splitTail(p);
+        view.push(
+          <span key={s.id}>
+            {head}
+            <span key={pos} className="mc-tok">
+              {tail}
+            </span>
+          </span>,
+        );
+      } else
         view.push(
           <code
             key={s.id}
@@ -591,10 +637,8 @@ export function StreamVignette({
     acc += n;
   }
 
-  const streaming = pos < total;
-
   return (
-    <div ref={hostRef} className="panel overflow-hidden">
+    <div ref={hostRef} className="panel-soft overflow-hidden">
       <div className="flex min-h-11 items-center justify-between border-b border-hairline py-1.5 pl-4 pr-2">
         <span className="flex items-baseline gap-2 leading-none">
           <span className="mono-label leading-none">assistant reply</span>
@@ -632,7 +676,6 @@ export function StreamVignette({
           // reply leaves some room beneath it; that stillness is worth it.
           <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
             {view}
-            {streaming && started.current && <span className="mc-caret" aria-hidden />}
           </div>
         )}
         {mode === "live" && (

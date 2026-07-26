@@ -48,8 +48,15 @@ the brief explicitly sanctions this graft. The fold becomes one continuous chore
 3. **1.9 s →** — the assistant reply card starts streaming: plain chart grammar types out in a reading serif and morphs
    into shipped components mid-sentence. Three scenarios rotate.
 
-Ambient afterwards: the caret blinks at the full stop, the "write" sparkline quietly re-plots every ~7 s, the reply card
-cycles. Nothing else on the fold moves.
+Ambient afterwards: the "write" sparkline quietly re-plots every ~7 s, the reply card cycles. Nothing else on the fold
+moves.
+
+> **Amended 2026-07-26 — no blinking caret.** The fold and `/docs/ai` both used to end the stream with a `steps(1)`
+> block cursor. It snapped a full-height accent bar on and off twice a second exactly where the reader's eye rested,
+> which read as flicker rather than liveness, and a hard cursor block isn't what a real assistant surface shows. The
+> arriving word now carries the signal instead: the last token of the in-flight text run is split off and faded in
+> (`.mc-tok`, 0.2 s from opacity 0.15). Softer, and it draws the eye to the thing that actually changed. The split also
+> costs less per token — the settled head stops growing, so only the one-word tail re-renders.
 
 No shader, no field. The ground is what charts have always lived on: paper with a faint grid, masked to the top of the
 fold. Every mark on the page is a real `@microcharts/react` component — decoration that couldn't come from the library
@@ -60,12 +67,32 @@ scenario. Designed, not disabled.
 
 ## Type
 
-| Role          | Face                                            | Why                                                                                                                                                                                                                                                                              |
-| ------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Display       | **Bricolage Grotesque** (variable, optical)     | The established site voice — expressive grotesque, not the AI-serif pack. Unchanged.                                                                                                                                                                                             |
-| UI / body     | **Hanken Grotesk**                              | Established; compact humanist. Unchanged.                                                                                                                                                                                                                                        |
-| Reading serif | **Newsreader** (italic + regular, latin subset) | New, one job: the streamed reply and the italic emphasis words (`write`, `trust`). The demo is about _reading_ an AI answer; a serif sells reading. Bricolage has no italic, so emphasis needed a second voice anyway. Subset + `display=swap`; loaded only by the home surface. |
-| Mono          | **JetBrains Mono**                              | Established; grammar, eyebrows, machine surfaces. Unchanged.                                                                                                                                                                                                                     |
+| Role          | Face                                           | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Display       | **Mona Sans** (variable, optical, self-hosted) | Replaced Bricolage Grotesque 2026-07-26. Rounds 1–7 all searched Google Fonts and found nothing better; round 8 dropped that constraint and went to the libre foundries. Mona Sans (GitHub × Degarism, SIL OFL) is an industrial-era grotesque — narrower and more upright than Bricolage, sheared terminals, a drawn single-storey `a` — so it holds authority at 3rem / 500 where Bricolage needed 3.45rem / 600. Latin subset, `wght` clipped to 400–800, `opsz` kept: 66 kB against Bricolage's 121 kB. |
+| UI / body     | **Hanken Grotesk**                             | Established; compact humanist. Unchanged.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Reading serif | **Source Serif 4** (italic + regular, latin)   | One job: the streamed reply and the italic emphasis words (`write`, `trust`). It is the closest open face to the serif streaming assistants set replies in, so the demo reads like the surface it depicts. `display=swap`; loaded only by the home surface.                                                                                                                                                                                                                                                 |
+| Mono          | **JetBrains Mono**                             | Established; grammar, eyebrows, machine surfaces. Unchanged.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+
+### Scale (2026-07-26)
+
+The weight came down and stayed down; the size came down and then went back up part way. Weight was the actual problem —
+600 on a grotesque this sturdy shouts, and the old sizes were partly compensating for Bricolage's width.
+
+| Token                             | Was                                     | Now                                        |
+| --------------------------------- | --------------------------------------- | ------------------------------------------ |
+| `.display` weight / tracking / lh | 600 / -0.021em / 0.98                   | **500 / -0.016em / 1.06**                  |
+| Hero `h1` (base→xl)               | 2.05 / 2.65 / 3.2 / 3.45rem             | **2.05 / 2.45 / 2.8 / 3rem**               |
+| `--text-fluid-h2`                 | clamp(1.6rem, 1.05rem + 2.1vw, 2.65rem) | **clamp(1.5rem, 1.12rem + 1.5vw, 2.2rem)** |
+| `--text-fluid-hero`               | clamp(2.45rem, 1.4rem + 4.8vw, 5.1rem)  | **clamp(2.1rem, 1.4rem + 2.9vw, 3.2rem)**  |
+| `.prose h2` weight                | 560                                     | **500**                                    |
+
+A first pass took the hero to 2.6rem and the h2 ceiling to 1.95rem to sit level with the docs. That went too far: at
+2.6rem the headline lost against the reply panel and the fold read thin. The landing point is roughly halfway back — the
+fold is still the loudest thing on the site, by a step and a half rather than three.
+
+Every marketing heading routes through `--text-fluid-h2` or the hero `h1`, so this is the whole ramp — there is no third
+place to change.
 
 ## Color
 

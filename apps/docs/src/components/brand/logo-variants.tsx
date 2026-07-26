@@ -7,9 +7,9 @@ import { ASSETS, readAsset, SectionMark } from "@/components/brand/shared";
 export function BrandLogoVariants() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="02">Logo variants</SectionMark>
+      <SectionMark>Logo variants</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">Six SVGs. Copy or download.</h2>
+        <h2 className="display text-[length:var(--text-fluid-h2)]">Every version of the mark</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
           Primary Ember, adaptive for light/dark hosts, mono inks, and two accent siblings. Each
           file is the shipped asset under{" "}
@@ -20,7 +20,11 @@ export function BrandLogoVariants() {
         {ASSETS.map((a, i) => {
           const { src, bytes } = readAsset(a.file);
           return (
-            <Reveal key={a.file} delay={i * 40} className="glass flex flex-col overflow-hidden">
+            <Reveal
+              key={a.file}
+              delay={i * 40}
+              className="panel-soft flex flex-col overflow-hidden"
+            >
               <div className="bk-stage" data-tile={a.tile}>
                 <Image
                   src={`/brand/${a.file}`}

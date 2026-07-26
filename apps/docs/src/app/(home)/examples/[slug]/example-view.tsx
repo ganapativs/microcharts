@@ -130,10 +130,10 @@ export function ExampleView({ app }: { app: ShowcaseApp }) {
         <section className="mt-14 border-t border-hairline pt-8">
           <Reveal>
             <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="display text-xl text-fd-foreground">The marks it uses</h2>
+              <h2 className="display text-xl text-fd-foreground">The charts it uses</h2>
               <p className="max-w-md text-sm text-fd-muted-foreground">
-                Every chart type {app.name} imports, live and linked. Same components, same grammar
-                - tap one for its page.
+                Each chart type {app.name} imports, rendered live here. Tap one to open its docs
+                page.
               </p>
             </div>
           </Reveal>

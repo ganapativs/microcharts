@@ -6,7 +6,7 @@ import { SHOWCASE, type ShowcaseApp } from "@/lib/showcase";
 import { CATALOG } from "@/lib/docs-facts";
 
 /**
- * 06 · the examples — seven independent example apps that install the package
+ * The examples section — independent example apps that install the package
  * from npm and, between them, exercise the whole catalog. Cards are pinned
  * field specimens: a slight resting tilt, the app's hero screenshot
  * (theme-swapped), squaring up on hover. Pure server markup — zero client JS.
@@ -137,18 +137,18 @@ function WildCard({ app, tilt, wide }: { app: ShowcaseApp; tilt?: string; wide?:
 }
 
 export function HomeWildSection() {
-  const [featured, ...rest] = SHOWCASE;
   return (
-    <section id="examples" className="mx-auto max-w-shell scroll-mt-20 px-4 py-14 sm:px-6">
-      <SectionMark n="08">the examples</SectionMark>
+    <section id="examples" className="mx-auto max-w-shell scroll-mt-20 px-4 pb-20 pt-16 sm:px-6">
+      <SectionMark>the examples</SectionMark>
       <Reveal>
         <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
-          The catalog, put to work.
+          {cardinal(SHOWCASE.length)} real apps, all {CATALOG.total} charts
         </h2>
         <p className="mt-4 max-w-2xl text-fd-muted-foreground">
-          {cardinal(SHOWCASE.length)} example apps built with{" "}
-          <code className="text-fd-foreground">@microcharts/react</code> from npm, together
-          exercising all {CATALOG.total} chart types. Every card opens the live example - or{" "}
+          We built {SHOWCASE.length} example apps with{" "}
+          <code className="text-fd-foreground">@microcharts/react</code> installed from npm, and
+          between them they use every chart type in the catalog. Each card opens the live app, or
+          you can{" "}
           <Link
             prefetch={false}
             href="/examples"
@@ -160,38 +160,32 @@ export function HomeWildSection() {
         </p>
       </Reveal>
 
-      <div className="mt-8 grid gap-4">
-        <Reveal>
-          <WildCard app={featured} wide />
-        </Reveal>
-        {/* Full-bleed; 4-up keeps cards small.
-            6 apps leave the last row ragged on lg — the dashed "yours next"
-            door closes it on purpose (2 cells wide, the reader's slot). */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {rest.map((app, i) => (
-            <Reveal key={app.slug} delay={i * 60} className="h-full">
-              <WildCard app={app} tilt={TILTS[i % TILTS.length]} />
-            </Reveal>
-          ))}
-          <Reveal delay={120} className="h-full sm:col-span-2">
-            <Link
-              prefetch={false}
-              href="/docs/quickstart"
-              className="wild-card wild-door items-center justify-center gap-2 border-dashed !bg-transparent p-8 text-center no-underline"
-              style={{ "--tilt": "0.5deg" } as React.CSSProperties}
-            >
-              <span className="display text-[1.5rem] leading-none text-fd-foreground">
-                The {ordinal(SHOWCASE.length + 1)} is yours.
-              </span>
-              <span className="max-w-xs text-sm leading-relaxed text-fd-muted-foreground">
-                Install from npm, pick a chart, ship it inside a sentence.
-              </span>
-              <span className="mono-label mt-2 inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.12em] text-fd-primary">
-                the quickstart <ArrowRight aria-hidden className="size-3" />
-              </span>
-            </Link>
+      {/* One even grid — the wide featured card went in the 2026-07 density
+          pass. 7 apps + the reader's dashed door = 8 cells, two clean rows. */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {SHOWCASE.map((app, i) => (
+          <Reveal key={app.slug} className="h-full">
+            <WildCard app={app} tilt={TILTS[i % TILTS.length]} />
           </Reveal>
-        </div>
+        ))}
+        <Reveal className="h-full">
+          <Link
+            prefetch={false}
+            href="/docs/quickstart"
+            className="wild-card wild-door h-full items-center justify-center gap-2 border-dashed !bg-transparent p-6 text-center no-underline"
+            style={{ "--tilt": "0.5deg" } as React.CSSProperties}
+          >
+            <span className="display text-[1.35rem] leading-tight text-fd-foreground">
+              Build the {ordinal(SHOWCASE.length + 1)}
+            </span>
+            <span className="max-w-xs text-sm leading-relaxed text-fd-muted-foreground">
+              Install from npm and put a chart in a sentence of your own.
+            </span>
+            <span className="mono-label mt-2 inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.12em] text-fd-primary">
+              the quickstart <ArrowRight aria-hidden className="size-3" />
+            </span>
+          </Link>
+        </Reveal>
       </div>
     </section>
   );

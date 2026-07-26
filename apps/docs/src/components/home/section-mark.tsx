@@ -1,12 +1,11 @@
-import { Reveal } from "@/components/ui/reveal";
-
-/** Numbered section rule — `01 ───── the problem`. One definition, every section. */
-export function SectionMark({ n, children }: { n: string; children: React.ReactNode }) {
+/** Quiet section rule — a hairline with a small label at its end. The old
+ *  numbered `01 ─────` eyebrow went in the 2026-07 de-slop pass: a counter on
+ *  every section read as generated scaffolding, not editing. */
+export function SectionMark({ children }: { children: React.ReactNode }) {
   return (
-    <Reveal className="mb-8 flex items-center gap-3">
-      <span className="mono-label text-fd-primary">{n}</span>
+    <div className="mb-8 flex items-center gap-3">
       <span className="h-px flex-1 bg-hairline" />
       <span className="mono-label">{children}</span>
-    </Reveal>
+    </div>
   );
 }

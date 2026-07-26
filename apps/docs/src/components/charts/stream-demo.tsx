@@ -476,8 +476,17 @@ function Inline({ text }: { text: string }) {
   );
 }
 
+// Split a text run into the settled head and the word that just landed.
+function splitTail(v: string): [head: string, tail: string] {
+  const end = /\s$/.test(v) ? v.length - 1 : v.length;
+  const cut = v.lastIndexOf(" ", end - 1);
+  return cut === -1 ? ["", v] : [v.slice(0, cut + 1), v.slice(cut + 1)];
+}
+
 // One rendered message body. `animate` adds the settle on block charts; the ghost
-// copy passes false. `caret` shows the typing cursor at the tail.
+// copy passes false. While `streaming`, the final text node's last word is split
+// out and faded in — that replaced the blinking block caret, which snapped on and
+// off twice a second at the tail and read as flicker.
 //
 // Nodes are keyed by POSITION (index), never by content. parse() only ever
 // extends the last node or appends a new one as the stream grows, so index i
@@ -487,41 +496,101 @@ function Inline({ text }: { text: string }) {
 // their entrance animation on every tick (the visible flicker). A fenced block
 // flipping open→closed does change the element type at its index, so THAT node
 // remounts once and morphs in — which is exactly what we want.
-function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; caret: boolean }) {
+function Message({
+  nodes,
+  animate,
+  streaming = false,
+  tick = 0,
+}: {
+  nodes: Node[];
+  animate: boolean;
+  streaming?: boolean;
+  /** WORD counter (not token) — keys the fading tail so it replays exactly once
+   *  per word. Pass the raw token count and every word fades twice, because the
+   *  trailing-whitespace token bumps the key while the tail is still that same
+   *  word. Keying on the tail's text instead would skip the fade whenever a
+   *  word repeats. */
+  tick?: number;
+}) {
+  const lastText = streaming && nodes.length > 0 && nodes[nodes.length - 1]?.t === "text";
   return (
     <div className="max-w-xl text-[0.98rem] leading-relaxed text-fd-foreground/85">
       {nodes.map((n, i) =>
         n.t === "text" ? (
           <span key={i} className="whitespace-pre-wrap">
-            <Inline text={n.v} />
+            {lastText && i === nodes.length - 1 ? (
+              // Splitting here also SHRINKS the work per token: the head stops
+              // growing, so Inline's content-derived keys stop churning and
+              // only the one-word tail remounts.
+              (() => {
+                const [head, tail] = splitTail(n.v);
+                return (
+                  <>
+                    <Inline text={head} />
+                    <span key={tick} className="mc-tok">
+                      {tail}
+                    </span>
+                  </>
+                );
+              })()
+            ) : (
+              <Inline text={n.v} />
+            )}
           </span>
         ) : n.closed ? (
           <span key={i} className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
             <BlockChart info={n.type} body={n.body} />
           </span>
         ) : (
+          // Bare, like the hero's raw fence — no `.code-inset`. That class
+          // fills with `--glass-surface-strong`, which on light is a near-white
+          // frost, so a slab appeared behind the grammar and then vanished when
+          // the chart replaced it. A model emitting a fence is mid-sentence, not
+          // presenting a code sample; it should read as text until it becomes a
+          // chart. Padding goes with it, or the block would still shift as the
+          // panel dissolved.
           <code
             key={i}
-            className="code-inset my-3 block whitespace-pre px-4 py-3 font-mono text-[0.8rem] text-fd-muted-foreground"
+            className="my-3 block whitespace-pre font-mono text-[0.8rem] text-fd-muted-foreground"
           >
             {"```microchart " + n.type + "\n" + n.body}
           </code>
         ),
       )}
-      {caret && <span className="mc-caret" aria-hidden />}
     </div>
   );
 }
 
 // Delay after revealing `last` before the next token.
+//
+// Matched to the hero (stream-vignette.tsx) — one stream speed across the site.
+//
+// The hero advances one WHOLE WORD per tick at a flat 52ms. This page tokenises
+// with /\s+|\S+/g, so a word costs two ticks (the word, then its trailing
+// whitespace) — 38 + 14 lands the same 52ms per word. Both fixed, no jitter:
+// simulated typing noise reads as lag, and it was also half of why the two
+// pages felt like different animations.
+//
+// The clause/comma pauses that used to live here are gone with it. They were
+// defensible when this page ran its own slower cadence, but they are the other
+// half of the mismatch, and the hero proved the reply reads fine without them.
+//
+// History worth keeping: a first attempt at "it feels slow" cut every rate to
+// ~55% of the clock and fixed nothing, because the part that read as *stuck*
+// was the fence hand-off, not the typing. Don't reach for these numbers again
+// for a stall — check the morph first.
 function nextDelay(last: string | null, next: string): number {
-  if (last === null) return 450; // a beat of "thinking" before the first token
-  if (last.includes("\n\n")) return 300; // paragraph break
-  if (last === "```") return 560; // a chart just closed → let it morph in
-  if (/[.:;!?]$/.test(last)) return 200 + Math.random() * 150; // end of a clause
-  if (last.endsWith(",")) return 140 + Math.random() * 90;
-  if (/^\s+$/.test(next)) return 20 + Math.random() * 30; // whitespace flicks by
-  return 55 + Math.random() * 85; // a word
+  if (last === null) return 380; // a beat of "thinking" before the first token
+  if (last.includes("\n\n")) return 140; // paragraph break
+  // A chart just closed. This used to be 560ms of nothing, and .mc-stream-chart
+  // then faded the chart up from opacity 0 through a 3px blur over another
+  // 0.42s — nearly a second where the code had vanished and the chart had not
+  // arrived. The morph is now a 0.26s settle from part-visible, so this only
+  // needs to be the beat that lets the reader see the fence complete. Same
+  // 140ms the hero holds at its own fences.
+  if (last === "```") return 140;
+  if (/^\s+$/.test(next)) return 14; // whitespace
+  return 38; // a word
 }
 
 export function StreamDemo() {
@@ -601,12 +670,18 @@ export function StreamDemo() {
 
   const revealed = useMemo(() => tokens.slice(0, count).join(""), [tokens, count]);
   const nodes = useMemo(() => parse(revealed), [revealed]);
+  // Words revealed, not tokens — this keys the tail fade. Tokens alternate
+  // word / whitespace, so keying on `count` re-mounted the fading span twice
+  // per word: once when the word landed, then again ~14ms later when its
+  // trailing space did (splitTail looks past a trailing space, so the tail is
+  // still that same word). Two fades a few frames apart is the flicker.
+  const wordTick = useMemo(
+    () => tokens.slice(0, count).reduce((n, t) => n + (/\S/.test(t) ? 1 : 0), 0),
+    [tokens, count],
+  );
   const done = count >= total;
   const status = done ? "streamed" : running && count === 0 ? "thinking…" : "streaming…";
-  const ghost = useMemo(
-    () => <Message nodes={fullNodes} animate={false} caret={false} />,
-    [fullNodes],
-  );
+  const ghost = useMemo(() => <Message nodes={fullNodes} animate={false} />, [fullNodes]);
 
   return (
     <div ref={rootRef} className="panel not-prose overflow-hidden">
@@ -658,7 +733,7 @@ export function StreamDemo() {
             {ghost}
           </div>
           <div className="absolute inset-0">
-            <Message nodes={nodes} animate caret={!done} />
+            <Message nodes={nodes} animate streaming={!done} tick={wordTick} />
           </div>
         </div>
       </div>

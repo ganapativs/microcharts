@@ -113,14 +113,14 @@ export function ExamplesGallery() {
       <header className="g2-head">
         <span className="mono-label text-fd-primary">The examples</span>
         <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
-          The catalog, put to work.
+          What it looks like in a real app
         </h1>
         <p className="mt-3 max-w-3xl text-fd-muted-foreground">
           {SHOWCASE.length} independent apps, each built with{" "}
-          <code className="text-fd-foreground">@microcharts/react</code> installed from npm - a
-          trading terminal, a print magazine, an eval console. Between them they exercise every one
-          of the {CATALOG.total} chart types. Each card opens a walk-through; the walk-through opens
-          the live app.
+          <code className="text-fd-foreground">@microcharts/react</code> installed from npm. There
+          is a trading terminal in here, a print magazine, an eval console, and between them they
+          use every one of the {CATALOG.total} chart types. Each card opens a walk-through, and the
+          walk-through opens the live app.
         </p>
       </header>
 
@@ -134,7 +134,7 @@ export function ExamplesGallery() {
               big: `${covered}`,
               label:
                 covered === CATALOG.total
-                  ? "chart types - all of them"
+                  ? "chart types, all of them"
                   : `of ${CATALOG.total} chart types`,
             },
             { big: "0", label: "runtime dependencies" },
@@ -163,7 +163,7 @@ export function ExamplesGallery() {
       <Reveal delay={80}>
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-8">
           <p className="max-w-md text-sm text-fd-muted-foreground">
-            The eighth is yours. Install from npm, pick a mark, ship it inside a sentence.
+            The quickstart gets a first chart into one of your sentences.
           </p>
           <Link
             prefetch={false}

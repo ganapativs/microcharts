@@ -1,15 +1,13 @@
 import { Progress } from "@microcharts/react/progress";
-import { Sparkline } from "@microcharts/react/sparkline";
 import { SectionMark } from "@/components/home/section-mark";
-import { ReceiptsSizeHistogram } from "@/components/home/receipts-size-histogram";
 import { Reveal } from "@/components/ui/reveal";
 import { SIZE } from "@/lib/docs-facts";
 import { RECHARTS } from "@/lib/competitor-facts";
 
-/** 05 · Size. Weight bar is linear (library vs one Recharts chart). Receipts
- *  below are the measured numbers from docs-facts.ts. Bars and figures render
- *  settled — a size comparison is evidence, and evidence doesn't need a
- *  count-up (the animated version read as showmanship). */
+/** The cost section. Weight bar is linear (library vs one Recharts chart).
+ *  Receipts below are the measured numbers from docs-facts.ts. Bars and
+ *  figures render settled — a size comparison is evidence, and evidence
+ *  doesn't need a count-up (the animated version read as showmanship). */
 
 const RECHARTS_ONE_CHART_KB = RECHARTS.oneChartGzipKb;
 const RECHARTS_PACKAGE_KB = RECHARTS.packageGzipKb;
@@ -22,55 +20,48 @@ export function HomeCostSection() {
       big: `${SIZE.interactiveMin}–${SIZE.interactiveMax} kB`,
       label: "gzip per interactive chart",
       note: `median ${SIZE.interactiveMedian} kB · static ${SIZE.min}–${SIZE.max} kB (median ${SIZE.median})`,
-      source: ".size-limit.json · CI-enforced",
-      chart: <ReceiptsSizeHistogram />,
     },
     {
       big: "0",
       label: "runtime dependencies",
-      note: "dependencies: {} forever; React is a peer",
-      source: "package.json · CI-enforced",
-      chart: (
-        <Sparkline
-          data={[0, 0, 0, 0, 0, 0, 0, 0]}
-          width={150}
-          height={30}
-          summary="Runtime dependency count over time: a flat line at zero."
-        />
+      // The literal is set in mono: `{}` in the body sans reads as a typo, and
+      // it IS code — package.json's own field. 0.9em because JetBrains Mono's
+      // x-height runs taller than Hanken's, so 1em would look oversized beside
+      // the two plain-sans notes either side of it.
+      note: (
+        <>
+          {/* mr nudge: the mono space inside the literal is wider than the sans
+              space that follows it, so the braces looked lopsided without it. */}
+          <code className="font-mono text-[0.9em] text-fd-foreground/70 mr-[0.08em]">
+            dependencies: {"{}"}
+          </code>{" "}
+          forever; React is a peer
+        </>
       ),
     },
     {
       big: "0 kB",
       label: "client JS for static charts",
       note: "pure SVG out of an RSC; nothing hydrates",
-      source: "static entries are hook-free by contract",
-      chart: (
-        <Progress
-          value={0}
-          width={150}
-          height={12}
-          summary="Client JavaScript required by a static chart: zero percent of anything."
-        />
-      ),
     },
   ];
 
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="06">the cost</SectionMark>
+      <SectionMark>the cost</SectionMark>
       <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
         <Reveal>
           <h2 className="display text-[length:var(--text-fluid-h2)]">
-            {SIZE.interactiveMin}–{SIZE.interactiveMax} kB per interactive chart, enforced in CI.
+            {SIZE.interactiveMin}–{SIZE.interactiveMax} kB per interactive chart, enforced in CI
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            This isn&rsquo;t a head-to-head. Recharts is a full charting toolkit - axes, legends,
-            tooltips, every chart type - and it costs about {RECHARTS_ONE_CHART_KB} kB gzip and
+            Recharts is a full charting toolkit, and its bill is fair for what it carries: one
+            tree-shaken LineChart still costs about {RECHARTS_ONE_CHART_KB} kB gzip and
             {/* template literal: SWC drops the leading space of an entity-bearing
                 multiline text node after an expression — see swc-ssr-spaces.test.ts */}
-            {` ${RECHARTS_DEPS} dependencies `}for one tree-shaken LineChart. That bill is fine on a
-            page that&nbsp;is mostly chart. Inside a sentence or a table cell, you want something
-            smaller.
+            {` ${RECHARTS_DEPS} dependencies`}, because the shared kernel comes along. On a page
+            that&nbsp;is mostly chart, that&rsquo;s fine. Inside a sentence or a table cell,
+            it&rsquo;s most of your budget.
           </p>
           <p className="mt-3 max-w-md text-fd-muted-foreground">
             microcharts covers the other job: you already know the shape of the answer and just need
@@ -79,7 +70,7 @@ export function HomeCostSection() {
         </Reveal>
 
         <Reveal delay={80}>
-          <div className="panel p-6">
+          <div className="panel-soft p-6">
             <p className="mono-label mb-4">what it costs to draw one chart, to scale</p>
             {/* minmax(0,1fr) + a shrink-to-fill bar wrapper: the Progress SVG
                 carries a fixed viewBox width, so without this the grid can't
@@ -122,9 +113,9 @@ export function HomeCostSection() {
               </div>
             </div>
             <p className="mt-3 text-[0.8rem] text-fd-muted-foreground">
-              Same scale, different jobs. Tree-shaking drops unused chart types, but one LineChart
-              still ships the shared Redux/d3 kernel; microcharts is one subpath for the inlined
-              mark - static from {SIZE.min} kB.
+              Both bars share one scale. Tree-shaking drops Recharts&rsquo; unused chart types, but
+              a single LineChart still ships the shared Redux/d3 kernel; a microcharts subpath is
+              just the inlined mark, static from {SIZE.min} kB.
             </p>
             <p className="mono-label mt-4 opacity-60">
               recharts {RECHARTS_VERSION} one-chart: esbuild tree-shake, 2026-07 · package{" "}
@@ -142,14 +133,9 @@ export function HomeCostSection() {
               <p className="display text-[1.75rem] leading-none text-fd-foreground">{s.big}</p>
               <p className="mt-1.5 text-sm font-medium text-fd-foreground">{s.label}</p>
               <p className="mt-1 text-sm leading-snug text-fd-muted-foreground">{s.note}</p>
-              <div className="mt-3 flex flex-1 items-end">{s.chart}</div>
-              <p className="mono-label mt-2.5 opacity-60">{s.source}</p>
             </div>
           ))}
         </div>
-        <p className="mono-label mt-6 opacity-60">
-          numbers the build measured, drawn by the library they describe
-        </p>
       </Reveal>
     </section>
   );

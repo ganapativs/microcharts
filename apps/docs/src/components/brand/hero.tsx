@@ -13,7 +13,7 @@ export function BrandHero() {
         <div>
           <span className="mono-label text-fd-primary">Brand kit</span>
           <h1 className="display mt-3 text-balance text-[length:var(--text-fluid-h2)] text-fd-foreground">
-            The mark, and how to use it.
+            The mark, and how to use it
           </h1>
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-fd-muted-foreground">
             Logo variants, colors, and type: the same small instrument that sits in the nav. Three
@@ -41,7 +41,7 @@ export function BrandHero() {
           </div>
         </div>
 
-        <div className="panel relative flex min-h-[16rem] items-center justify-center overflow-hidden px-6 py-14 sm:min-h-[18rem]">
+        <div className="panel-soft relative flex min-h-[16rem] items-center justify-center overflow-hidden px-6 py-14 sm:min-h-[18rem]">
           <div aria-hidden className="pointer-events-none absolute inset-0 grid-paper opacity-50" />
           <Brandmark size={148} className="relative drop-shadow-sm" />
         </div>
