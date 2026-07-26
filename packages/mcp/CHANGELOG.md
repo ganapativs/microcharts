@@ -1,5 +1,30 @@
 # @microcharts/mcp
 
+## 0.1.5
+
+### Patch Changes
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-snapshot the embedded catalog and stylesheet after the consistency
+  pass in `@microcharts/react`.
+
+  The server ships both as committed snapshots, so an unreleased regeneration means npm keeps serving a stale one. What
+  moved: `ActivityGrid.steps` and `RetentionCurve.compare` are new props an agent can now discover and set; `onActive`
+  now appears on the scalar entries that only advertised `onSelect`; `summary`'s description now states the actual rule
+  (`false` drops the generated sentence, and only a chart left with no `title` becomes decorative); and the embedded
+  `styles.css` carries the label-contrast fixes, the achromatic `mono`/`eink` categorical ramp and the forced-colors
+  mappings, so a chart rendered through `render()` reads the same as one rendered in an app.
+
+- Updated dependencies
+  [[`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c),
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c),
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c),
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c),
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c),
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c)]:
+  - @microcharts/react@0.10.0
+
 ## 0.1.4
 
 ### Patch Changes

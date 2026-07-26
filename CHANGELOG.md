@@ -1,5 +1,276 @@
 # @microcharts/react
 
+## 0.10.0
+
+### Minor Changes
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - The systemic tier of the consistency audit: nine rules the library
+  already stated, none of which anything checked. Every fix ships with the guard that would have caught it, and each
+  guard was confirmed to fail against the old behaviour first.
+
+  **Annotation labels were laid out at one size and painted at another, on every host.** `annotationFontSize` drives the
+  truncation budget, the `edgeFlip` anchor and every top clamp in `shared/annotations.tsx` — but the `<text fontSize>`
+  attribute it wrote is inert, because `:where(.mc-root text)` sets `font-size` as a CSS declaration and a declaration
+  outranks a presentation attribute. The painted size was the HOST's `--mc-label-size`: a different number on each of
+  the 27 hosts, conditional on an unrelated prop on six of them, and on the three that render no text of their own
+  (`PairedBars`, `ControlStrip`, `CyclePlot`) not a viewBox-relative number at all — the `0.75em` default resolves
+  against the surrounding prose, so the same annotation painted at one size in a table cell and another in a heading.
+  The layer now sets `--mc-label-size` on the label itself, so one ramp reaches every host unconditionally.
+
+  Fixing that made two faults underneath it measurable. Annotation labels clamped their top with a 0.78-ascent model
+  that real faces exceed, so the top label painted ~0.1em above the frame — 1.0 viewBox unit on every host, the same
+  defect and the same fix (`dominant-baseline: central` plus a half-em clamp) that `Sparkline label="minmax"` just
+  landed. And `Marker` was the one label in the file that never went through the truncator: a long label at x = 0
+  start-anchored and ran the whole width and out of the frame. The containment suite now measures annotation labels on
+  both axes across six hosts, and asserts the other half of the rule — that a label which cannot fit is dropped rather
+  than painted over the edge.
+
+  **On-fill label ink failed WCAG AA on most of the fills it lands on.** `--mc-on-fill` was a fixed light ink, and one
+  rule spelled its value out instead of reading the token. Measured: 2.1–3.7:1 on the mid-tone categorical fills in
+  either theme, and 2.7–3.0:1 on `--mc-accent`/`--mc-positive` in dark mode, where the palette is deliberately LIFTED
+  and those fills are the lighter of the two. So the ink now flips with the theme, categorical fills take their own
+  `--mc-on-cat` (mid-tone fills want the opposite ink from deep ones), and light-mode sapphire — the one deep cat — is a
+  scoped, documented exception. `TraceFold`'s dim span labels stop borrowing `--mc-surface`, which painted them in the
+  page colour at 1.4:1: not receding, disappearing. `defineTheme` derives `--mc-on-cat` from its own generated palette,
+  so the measurement travels with a custom accent instead of being silently voided by one.
+
+  **`mono` and `eink` shipped six jewel tones.** Neither preset remapped `--mc-cat-1…6`, so nine categorical charts kept
+  full colour inside a preset whose own comment says "no chroma (the panel can't show it)". Both now derive six tints
+  from `--mc-stroke`. The range is deliberately narrow: a wider ramp puts the middle steps at mid-grey, where NO single
+  label ink clears 4.5:1, and keeping every step light means the ordinary label ink stays legible on all six in both
+  themes. `print` keeps its chroma on purpose — it is a colour-output context — and that decision is now asserted too.
+
+  **High Contrast Mode could turn missing data into a value.** A hollow mark says so with a literal `fill="none"`, and
+  the forced-colors ink mappings painted straight over it: `HeatStrip`'s muted rect is its MISSING-DATA cell, and it
+  filled solid `GrayText`. One blanket rule now keeps a hollow mark hollow, expressed once so the role added next cannot
+  forget it. Separately, the categorical channel had no forced-colors mapping at all — `.mc-root` sets
+  `forced-color-adjust: none`, which PRESERVES authored hues rather than mapping them, so `--mc-cat-4` shipped
+  near-invisible on a black forced background. Six lightness steps on the system ink now carry the encoding, with a
+  `Canvas` hairline between segments doing the separating that the narrow ramp cannot.
+
+  **Thirty inline stroke widths opted out of `--mc-density`.** `--mc-sw` is `--mc-stroke-width × --mc-density`, and it
+  was referenced only inside the stylesheet; twenty charts wrote the base token directly and so held their PRIMARY mark
+  at a fixed weight while every stroke around it scaled. Six primary marks were also missing
+  `vector-effect: non-scaling-stroke`, with no CSS default to catch them, so they thickened with their container — and
+  every interactive entry spreads `width: 100%`. Both are now swept and guarded.
+
+  **A render-phase ref write in the one module all 84 picker charts share.** `useActivePicker` mirrored `selected` into
+  a ref during render, so a render that concurrent React discards (Offscreen, a suspended sibling, StrictMode's double
+  invoke) left the ref holding a value that was never committed and the next tap cleared the wrong selection. The ref is
+  gone: `selected` only changes from discrete events, which React flushes synchronously, so the handler closures are
+  never stale. `react-hooks/rules-of-hooks` is now enforced — verified against a probe file with a conditionally-called
+  `useState` that passed silently until it was pinned — and it immediately caught two missing dependency arrays in this
+  pass.
+
+  **Inline seats froze at mount.** `useSeatHoist` read the seat once while `Chart` recomputes it every render, and
+  `styles.css` cancels the SVG's own translate as soon as the wrapper is seated — so a post-mount seat change
+  (`SparkBar` flipping bar↔win-loss) left the wrapper at a stale offset with no fallback. It re-reads now, and clears
+  the hoisted copy when a chart stops emitting a seat.
+
+  **Percent formatting was en-US everywhere.** A literal `` `${Math.round(x * 100)}%` `` is not a percent, it is an
+  en-US percent: most of Europe wants a NBSP before the sign, `tr-TR` puts the sign first, several locales use their own
+  digits. Roughly forty sites across the catalog — painted labels, readout chips, live-region announcements and summary
+  sentences alike — now go through one `makePercentFormatter`, so a `locale` that localised every other number on a
+  chart no longer leaves its percentages in English. `FillWord`, `Hourglass`, `MoonPhase`, `ParetoStrip` and
+  `TimeInRange` gain the `locale` prop they needed to make that reachable. Five more rendered strings that no bundle
+  could translate moved into `SummaryStrings` (`paretoCount`, `biasStripLabel`, `changePointRegime`, `dirNames`, and the
+  quantile band level, which was handed to the bundle as a bare number with `%` baked into the template).
+
+  **This is the one part of the release that can break you, and only if you supply your own `strings` bundle** — a
+  default `EN` bundle needs no changes. Two things moved:
+
+  - `SummaryStrings` gained four REQUIRED members. A custom bundle for ParetoStrip, BiasStrip, ChangePoint or Dumbbell
+    will not typecheck until it adds `paretoCount`, `biasStripLabel`, `changePointRegime` or `dirNames` respectively.
+    Copy the EN template from `src/core/strings-*.ts` and translate it.
+  - `bandClause` and `bandEdge` (GradedBand) now receive the interval level as an already-formatted percent STRING
+    rather than a bare number, because the level was the one number on that chart a `locale` could not reach. This one
+    is a runtime change, not just a type error: a template that read `` `${level}% within …` `` now renders `80%%`. Drop
+    the literal `%` from yours.
+
+  Pre-1.0, so this rides a minor rather than a major — a `1.0.0` here would signal an API stability the library has not
+  claimed yet.
+
+  **Prose gutters at the digits rate.** `textGutter`'s 0.62 per character is calibrated for the tabular figures the
+  library formats itself; caller-supplied and translated text measures up to 0.95, which is why `textGutterProse` exists
+  — and only two call sites used it. `Hypnogram`, `EventRaster`, `DataDiff`, `SproutRow` and `EventTimeline` reserved
+  room for author text or translated keywords at the figures rate. `DataDiff` also had no horizontal degradation at all,
+  so a long key drove its plot width negative; it gains the drop gate its siblings have. Two charts the audit flagged
+  turned out to be correct — they format their own numbers — and only re-derived the shared estimate inline instead of
+  calling it.
+
+  Also: `PairedBars` emits `data-mc-origin`, so a negative bar grows out of the baseline instead of inward from the box
+  edge. `StatusDot`'s pulse halo scaled 1.9× from r = 3 in an 8-unit box and painted 1.7 units into the page for the
+  whole animation; the end scale is now pinned by containment, and the looping animation is recorded as the catalog's
+  one documented exemption (the loop is the reading — a monitoring dot holding still says the feed stopped) rather than
+  contradicting the design notes. `MC_EASE_ENTER` had drifted from `--mc-easing`, so a chart's CSS transitions and its
+  scripted entrance eased on different curves; they are pinned equal by a test. (`MC_DUR`/`MC_EASE_MOVE` are kept, not
+  removed — the audit read "no consumers" as dead code, but they are published vocabulary for the UI _around_ a chart,
+  the same category as `PALETTE`/`CATEGORICAL`. They now say so, and say why they are coarser than the engine's
+  per-archetype tables.)
+
+  **New props, all additive.** Every interactive entry now declares `onActive` as well as `onSelect` — the 19 non-picker
+  scalars implemented only the latter while the shared contract and the quickstart documented both. `ActivityGrid` gains
+  `steps`, a knob its geometry always accepted but its Props never exposed, spelled the way its six siblings spell it.
+  `IconArray` gains `format`, the one chart that took `locale` without it. `RetentionCurve` gains `compare`, with
+  `benchmark` kept as a deprecated alias that still wins when both are passed: `compare` is the catalog word for a
+  second series to read the first against, and `DualSparkline`'s own `compare` JSDoc calls it "the benchmark series",
+  which is how the two names drifted apart.
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Every interactive chart now shows the reading it already announces.
+
+  Three pickers — `CometTrail`, `IconArray`, `PictogramRow` — lit a hover ring and announced the unit through their live
+  region but painted no readout chip, so a sighted mouse reader got strictly less than a screen-reader user (and less
+  than the documented interaction contract promised). They now paint the chip every other picker does, and `IconArray`
+  finally supplies `datum.formatted`, so its `readout={false}` escape hatch has a string to render.
+
+  `EtaBar`'s chip was wired to focus only — hovering the bar with a mouse revealed nothing. It now reveals on hover as
+  well as focus, like every other reveal-on-hover scalar.
+
+  Nine more charts reveal a reading that used to be unreachable with a pointer: `Progress`, `ProgressRing`, `Hourglass`,
+  `BreathingDot`, `HeartbeatBlip`, `FillWord` and `TapeGauge` float their number on hover/focus whenever the mark isn't
+  already printing it (`label="none"`, or a gauge too small for its numeral); `MinimapStrip` floats the window range it
+  was only reporting through `aria-valuetext`; and `TokenConfidence` floats a flagged token's tier and confidence.
+
+  Empty units read out instead of going silent: `DotPlot`, `MiniBar`, `PairedBars` and `Funnel` show an em dash for a
+  unit with no value — matching `ActivityGrid`, `CalendarStrip`, `RubricStrip` and `StarSpoke` — rather than rendering
+  nothing while the live region announced "no data". Their `datum.formatted` mirrors the chip, per the shared contract.
+
+  New string tokens (English defaults ship; a custom `strings` bundle can translate them): `iconArrayChip`,
+  `pictogramChip`, `tokenChip`, `heartbeatChip`. `PictogramRow`'s `datum.formatted` now mirrors its chip
+  (`"6 of 8 — 40%"`) rather than the bare percentage.
+
+  Chip text is the shortest _useful_ reading — never a duplicate of a permanent `label` already on the glyph. Bare
+  counts name their unit (`HeartbeatBlip` → `"3 events"`); `BreathingDot` adds the load band the pulse encodes
+  (`"62% · elevated"`); `EtaBar` floats only what the gutter is not already printing; `Bullet` with `label="both"`
+  floats only the signed gap. `OrbitStatus` / `Thermometer` / `HeatCell` suppress the chip when their permanent label
+  already shows the same number.
+
+  `readout={false}` suppresses each of these chips and nothing else (playground exposes it for every chip chart), and a
+  new `readout-presence` gate fails the build if an interactive chart ships a picker or a hover reveal without one.
+
+### Patch Changes
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Eight defects found by a catalog-wide consistency audit — each one a
+  rule the library already states and nothing checked.
+
+  **Labels painted at the wrong size.** `Sparkline label="minmax"` pinned `--mc-label-size` only in `label="last"` mode,
+  so its two extremum labels were laid out at 5–9 viewBox units and painted at the inherited `0.75em` — measured 1 unit
+  outside the viewBox top and bottom, and `.mc-root` is `overflow: visible`, so that is a spill into the page. Both
+  labels now share one baseline (`central`) and one clamp. `TapeGauge` had the same class of bug in reverse: the root
+  pins the _tick_ size, so the hero readout's `fontSize` attribute was inert and the number painted at 7 units while its
+  clearance was reserved for up to 13.
+
+  **The branded focus ring never applied to anything.** `.mc-root:focus-visible` styles the `<svg>`, but no static sets
+  `tabIndex` — the tab stop is the wrapper. Every focusable chart fell back to the UA outline. The rule now targets
+  `[data-mc-host]`.
+
+  **`Bullet` had no announcement channel** — the only interactive entry with neither a live region nor `aria-live`. Its
+  readout carries the signed gap to target, which the accessible name does not, so a screen-reader user could not reach
+  that number at all.
+
+  **`TokenConfidence` ignored the decorative opt-out**: `summary={false}` with no `title` still produced a named
+  `role="img"` with roving tab stops inside it. It now goes `aria-hidden` and drops the tab stops with it. Its per-token
+  `onFocus`/`onBlur`/`onPointerEnter` handlers and inline ref callbacks are gone too — focus and hover are delegated to
+  the host, which matters because a streamed reply re-renders once per token.
+
+  **Entrance motion ran off-screen.** The engine's failsafe timeout called the entrance rather than releasing the
+  opacity hold, so a chart mounted below the fold played its whole animation unseen 400 ms after mount and the reader
+  who scrolled to it later found a static chart. The failsafe now only reveals; the observer still plays the entrance
+  when the chart is actually seen.
+
+  **`PolarClock` swallowed ↑/↓** — unhandled, so they scrolled the page while a keyboard reader was roving the dial.
+  They now alias forward/back like every other radial chart.
+
+  **`CalendarStrip` reads the wall clock in a static render** (`end` defaults to today, UTC). The default stays — it is
+  the useful one — but rendering on the server without `end` now dev-warns, because a render that straddles UTC midnight
+  will not match hydration.
+
+  Guards added with the fixes: vertical (top/bottom) label-containment measurement, a focus-ring assertion that resolves
+  `--mc-accent` through the cascade, an off-screen entrance test, and per-chart tests for the rest. Each was confirmed
+  to fail against the old behaviour before the fix landed.
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - An interactive chart now paints exactly what its static twin paints
+  when nothing is hovered. Two entries drew a different box at rest, so any surface that swaps one for the other in
+  place — a gallery upgrading to the live twin, a docs playground toggling modes — visibly jumped on mount even with
+  `animate` off.
+
+  **`QuantileDots` shrank by its own gutter.** The static entry reserves room to the right of the plot for the "N in 20"
+  odds label and reports that in its `viewBox`; the interactive entry passed `label="none"` to the composed static and
+  re-drew the odds as an HTML span beside the SVG, so the same props produced a 218-unit box static and a 150-unit box
+  interactive. That workaround existed because the reserve was sized off the CURRENT count, and a count that changes
+  under the cursor resized the chart mid-scrub. The gutter is now sized off the widest string the dotplot can ever print
+  (`count in count`), which makes it a constant: the label goes back inside the SVG, tracks the live threshold, and the
+  box never moves. `oddsGutter` is exported from the chart's geometry so the interactive entry maps the pointer and
+  anchors the readout chip across the same box it paints, gutter included.
+
+  **The interactive wrapper's width defaults left the inline style.** `width: fit-content` and `max-width: 100%` were
+  inline on the wrapper span, and an inline declaration beats a consumer class: `className="w-full max-w-md"` sized the
+  static entry's `<svg>` to its container while the interactive twin stayed shrink-wrapped — one component, two layouts.
+  Both declarations now live in `styles.css` under `:where([data-mc-host])`, so they still shrink-wrap the mark inside a
+  flex or grid parent, and any consumer rule wins. Inline `style` on the chart is unaffected. Every interactive subpath
+  lost a few bytes with them.
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Four consistency defects found reviewing the readout pass — three of
+  them the same rule the pass itself was enforcing, one file over.
+
+  **Eight charts ignored `summary`.** `BalanceBeam`, `DicePips`, `FatDigits`, `FillWord`, `MoonPhase`, `PictogramRow`,
+  `TallyMarks` and `Thermometer` shadowed the `summary` PROP with the generated sentence
+  (`const summary = fooSummary(…)`) and named the wrapper from that. So `summary={false}` — the decorative opt-out —
+  reached the static child and stopped there: the wrapper stayed a named, focusable `role="img"`, which is exactly the
+  state `TokenConfidence` was just fixed for. A caller's `summary="…"` string was dropped the same way. The wrapper
+  reads `props.summary` now, and `decorative-naming.browser.test.tsx` covers all eleven interactive entries in it, both
+  directions (`false` hides, a string names).
+
+  **Two rendered strings were English no bundle could translate.** `HeatCell`'s new chip built `"42 — level 3 of 5"`
+  inline instead of going through `strings` (its own `levelChip` token now, beside the pass's `heartbeatChip` /
+  `tokenChip` / `iconArrayChip` / `pictogramChip`), and `IconArray`'s painted ratio label — `"3 in 20"`, its DEFAULT
+  label mode, not a chip — had been an inline template since it shipped (`iconArrayRatio`). Twelve more charts joined
+  `i18n-strings.browser.test.tsx`, which is what caught the second one.
+
+  **`TokenConfidence`'s chip hung over unrelated words.** It cleared on `pointerleave` of the host — but the host is a
+  paragraph, so the pointer leaves a flagged token onto ordinary prose long before it leaves the host, and the chip sat
+  there naming a token the reader was no longer pointing at. Moving off any flagged token clears it.
+
+  Also: `eta-bar/interactive`'s budget sat 2 B under the built entry, so `pnpm size` was red on the branch (3.62 → 3.63
+  kB), and `performance.mdx` quoted a stale interactive floor (2.02 → 2.03 kB) that its own guard rejects.
+
+- [#81](https://github.com/ganapativs/microcharts/pull/81)
+  [`e6ccfdb`](https://github.com/ganapativs/microcharts/commit/e6ccfdb4edaef65f329595c94d20090e76d6fa6c) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - `summary={false}` no longer discards an explicit `title` — and the two
+  entries of a chart now agree on what it means.
+
+  The static and interactive entries resolved the decorative opt-out differently. `accessibleNaming` (static) returned
+  `aria-hidden="true"` for `summary === false` unconditionally, so
+  `<Sparkline title="Weekly revenue" summary={false} />` rendered `<svg aria-hidden="true">` with no `<title>` — the
+  only name the author wrote, dropped on the floor. Every interactive wrapper resolved the same props to
+  `role="img" aria-label="Weekly revenue"`. Same component, same props, one of them in the accessibility tree and one of
+  them not.
+
+  The rule is now one rule, applied on both sides: **`summary={false}` drops the generated sentence, and the chart
+  leaves the accessibility tree only when that leaves it with no name at all.** With no `title` — the common inline case
+  the opt-out exists for — nothing changes: `aria-hidden="true"`, no `<title>`/`<desc>`, and on an `/interactive` entry
+  no tab stop. With a `title`, the chart is now exposed on both sides and announced as its title alone. To silence a
+  titled chart, drop the title.
+
+  Fixed in `shared/a11y.ts` (every chart drawn through `<Chart>`) and by hand in `Delta` and `TokenConfidence`, which
+  render inline HTML; `TokenConfidence`'s client entry already applied it. `Delta` also stopped falling back to its
+  generated sentence when a titled caller had opted out of it. `SpreadBand` and `StationGlyph` forwarded `title` into
+  the static child they compose, which would now name that child too — a second `role="img"` inside the wrapper's; the
+  child is named by the wrapper, as in every other entry.
+
+  The static/interactive matrix (`summary={false}` × `title`, role + `aria-hidden` + accessible name) is now a shared
+  test rather than a convention.
+
 ## 0.9.0
 
 ### Minor Changes
