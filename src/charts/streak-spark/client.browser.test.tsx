@@ -22,13 +22,13 @@ describe("interactive <StreakSpark>", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(live.textContent).toBe("Run 1 of 3: 2 passing, record.");
+    await expect.poll(() => live.textContent).toBe("Run 1 of 3: 2 passing, record.");
     // active run gets an accent focus outline
     expect(fig.querySelectorAll('rect[stroke="var(--mc-accent)"]').length).toBe(1);
     await userEvent.keyboard("{End}");
-    expect(live.textContent).toBe("Run 3 of 3: 1 passing.");
+    await expect.poll(() => live.textContent).toBe("Run 3 of 3: 1 passing.");
     await userEvent.keyboard("{Escape}");
-    expect(live.textContent).toBe("");
+    await expect.poll(() => live.textContent).toBe("");
   });
 
   it("a break run announces the failing outcome", async () => {
@@ -36,8 +36,9 @@ describe("interactive <StreakSpark>", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{Home}");
+    await expect.poll(() => live.textContent).toBe("Run 1 of 3: 2 passing, record.");
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Run 2 of 3: 1 failing.");
+    await expect.poll(() => live.textContent).toBe("Run 2 of 3: 1 failing.");
   });
 
   it("onActive reports the focused run datum (run index + length); null on clear", async () => {

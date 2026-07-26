@@ -222,18 +222,28 @@ export function Sparkline(props: SparklineProps): ReactNode {
             const kind = i ? "min" : "max";
             const text = fmt(m.value);
             const half = (text.length * mmFont * 0.62) / 2;
-            /* `central` on BOTH labels (the min used `hanging`, whose box grows
-               a whole em downward from y): one baseline means one containment
-               rule — the line straddles y by half a font each way — so the same
-               clamp holds it inside the box top and bottom. The 3-unit offset
-               off the mark is a preference; staying in the viewBox is not. */
+            /* `central` + a y-clamp keeps both labels inside the box (hanging on
+               the min grew a full em past the floor). Prefer above/below the
+               mark; when the clamp erases that clearance — a peak parked on
+               the top edge — sit beside so we don't paint on the endpoint dot. */
             const halfLine = mmFont / 2 + 0.5;
+            const clear = halfLine + 2;
+            const prefer = i ? m.y + clear : m.y - clear;
+            let y = Math.min(Math.max(prefer, halfLine), height - halfLine);
+            let x = Math.min(Math.max(m.x, half + 1), width - half - 1);
+            if (Math.abs(y - m.y) < clear) {
+              const right = m.x + half + clear;
+              x = Math.min(
+                Math.max(right + half <= width - 1 ? right : m.x - half - clear, half + 1),
+                width - half - 1,
+              );
+              y = Math.min(Math.max(m.y, halfLine), height - halfLine);
+            }
             return (
               <text
                 key={kind}
-                /* centered on the mark, clamped inside the viewBox (containment) */
-                x={Math.min(Math.max(m.x, half + 1), width - half - 1)}
-                y={Math.min(Math.max(i ? m.y + 3 : m.y - 3, halfLine), height - halfLine)}
+                x={x}
+                y={y}
                 fontSize={mmFont}
                 textAnchor="middle"
                 dominantBaseline="central"
