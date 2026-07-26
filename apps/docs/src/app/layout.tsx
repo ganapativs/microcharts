@@ -60,9 +60,7 @@ const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem
 // availability answer, so an uninstalled model self-heals on the next load.
 const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.getItem("mc-live")==="1")document.documentElement.dataset.mcLive="1"}catch(e){}`;
 
-// The leading glyph is the hero's own sparkline data ([3,5,4,8,6,9,7,11])
-// rendered in unicode blocks — a chart small enough to sit in a console.log,
-// which is exactly the tagline. Delight that doesn't lie: it's the real series.
+// Console easter egg — unicode blocks of the hero sparkline series [3,5,4,8,6,9,7,11].
 const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
 
 export const metadata: Metadata = {

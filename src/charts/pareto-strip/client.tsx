@@ -1,9 +1,8 @@
 "use client";
 // Interactive <ParetoStrip>. useActivePicker owns interaction: one pointer
-// listener + nearest-bar-by-x lookup, ←/→/Home/End rove bars, T jumps to the
+// listener + nearest-bar-by-x lookup, ←/→/Home/End rove bars, T jumps to
 // threshold-crossing bar, click / Enter / Space selects (onSelect). The live
-// region states each bar's share + cumulative. Composes the static component
-// (canon); the crosshair + persistent pin + readout chip are overlay children.
+// region states each bar's share + cumulative.
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";

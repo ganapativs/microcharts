@@ -1,4 +1,4 @@
-// MicroScatter geometry — pure, React-free. 2-D position
+// MicroScatter: 2-D position
 // on common scales — the highest-precision correlation display. Least-squares
 // trend (linear ONLY, never smoothed) + Pearson r live here, property-tested:
 // r ∈ [−1, 1], trend within bounds, non-finite pairs dropped. Coords 2-dp.

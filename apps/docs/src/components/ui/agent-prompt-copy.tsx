@@ -4,18 +4,11 @@ import { useRef, useState } from "react";
 import { Check, Copy, Link2 } from "lucide-react";
 import { SITE } from "@/lib/site";
 
-/** The compact, web-first alternative: one line that points a fetch-capable
- *  agent at the canonical prompt. The full prompt at `/agent-setup.md` is
- *  itself self-contained, so this path still ends at the robust instructions. */
 const SHORT_PROMPT = `Set up ${SITE.pkg} in this repo — follow ${SITE.url}/agent-setup.md and complete every step in order.`;
 
 type Copied = "full" | "short" | null;
 
-/** Two-mode copy for the setup prompt. Primary copies the full, self-contained
- * block (works on any agent, offline included) — the default. Secondary copies
- * a one-line pointer to `/agent-setup.md` for agents that can fetch. The full
- * text is read from the sibling code block at click time, so there's no
- * duplicated prompt string to drift. */
+/** Full prompt from sibling code block; short = fetch pointer to /agent-setup.md. */
 export function AgentPromptCopy() {
   const ref = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState<Copied>(null);

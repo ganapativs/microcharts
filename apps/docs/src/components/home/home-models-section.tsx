@@ -117,10 +117,7 @@ export function HomeModelsSection() {
                     <p className="mt-0.5 pl-4 text-fd-muted-foreground">→ {s.note}</p>
                   </li>
                 ))}
-                {/* The MCP server rides the same $-command idiom instead of
-                    getting its own sub-section (2026-07 density pass). The
-                    tool names stay literal — mcp-docs.test.ts holds this row
-                    to the server's real registrations. */}
+                {/* Tool names must match server registrations (mcp-docs.test.ts). */}
                 <li>
                   <a
                     href="/docs/mcp"

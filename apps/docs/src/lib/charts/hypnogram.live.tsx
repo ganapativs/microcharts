@@ -3,12 +3,6 @@ import { Hypnogram } from "@microcharts/react/hypnogram";
 import { Hypnogram as HypnogramInteractive } from "@microcharts/react/hypnogram/interactive";
 import staticModule, { playground as staticPlayground, SLEEP, STATES, DOM } from "./hypnogram";
 
-/** Interactive half of the hypnogram chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./hypnogram`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <HypnogramInteractive

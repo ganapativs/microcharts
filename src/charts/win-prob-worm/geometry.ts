@@ -1,6 +1,6 @@
-// WinProbWorm geometry — pure, React-free. Who's winning, and when
+// WinProbWorm: Who's winning, and when
 // did it flip? A single win-probability series clamped to 0–100 on a FIXED
-// 0–100 axis (never truncated — the honesty rule for a probability), split at
+// 0–100 axis (never truncated — the honesty rule for a probability). split at
 // every 50% crossing: the leading stretches (>50) read accent, the trailing
 // stretches (<50) read neutral. Crossings are the lead changes; the largest
 // |Δ| between adjacent points is the momentum swing. Coords 2-dp.

@@ -1,9 +1,8 @@
 "use client";
 // Interactive <PercentileLadder>. useActivePicker owns interaction: one pointer
 // listener + pure nearest-tick math, ←/→ step ticks, click / Enter / Space
-// selects (onSelect). Each rung announces its value and its multiple of the
-// median ("p99: 2.1 s — 17× the median."). Composes the static component
-// (canon); the probe line is an overlay child re-using geometry.
+// selects (onSelect). Each rung announces its value and its multiple of
+// median ("p99: 2.1 s — 17× the median.").
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {

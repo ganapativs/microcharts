@@ -1,8 +1,8 @@
 "use client";
 // Interactive <PartitionStrip>. useActivePicker owns interaction: one pointer
 // listener + segment lookup by row (y) then x, a custom 2-D `step` (←/→ within
-// a row, ↑/↓ between a parent and its first child — ActivityGrid model), click /
-// Enter / Space selects (onSelect). Composes the static component (canon).
+// a row, ↑/↓ between a parent and its first child — ActivityGrid model). click /
+// Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {

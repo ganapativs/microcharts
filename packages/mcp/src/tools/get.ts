@@ -13,23 +13,12 @@ export interface GetResult {
   bestFor: string[];
   avoidFor: string[];
   props: ChartProp[];
-  /** Grammar / layout / i18n props every chart accepts, in addition to `props`. */
   sharedProps: ChartProp[];
-  /** Copy-runnable example: sample-data defs prepended to the snippet. */
   example: { title: string; code: string };
-  /**
-   * The same example as a JSON prop bag — exactly what `render_microchart`
-   * takes. `example.code` is JSX for a human to paste; this is for a model to
-   * adapt. Absent only if the example is not fully serializable.
-   */
+  /** Same example as JSON props for `render_microchart` when serializable. */
   sample?: Record<string, unknown>;
 }
 
-/**
- * Full wiring detail for one chart: import paths, its own props + the shared
- * props, dataShape, best/avoid, and a copy-runnable example. Pure over the
- * snapshot. Returns undefined for an unknown slug.
- */
 export function getChart(slug: string): GetResult | undefined {
   const c = getEntry(slug);
   if (!c) return undefined;

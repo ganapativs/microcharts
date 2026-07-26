@@ -1,7 +1,7 @@
 // <GardenGrid> — the rhythm of activity over time, legible in grayscale and
 // print. ActivityGrid's sibling: dot AREA (single ink)
 // carries a 5-step ordinal instead of color. Zero renders a hairline ring
-// (present, quiet); null renders nothing (missing ≠ zero). Static, hook-free.
+// (present, quiet); null renders nothing (missing ≠ zero).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_GARDEN, type GardenStrings } from "../../core/strings-garden.js";

@@ -1,7 +1,7 @@
-// Thermometer geometry — pure, React-free. A calibrated linear
+// Thermometer: A calibrated linear
 // tube: fill anchors at domain[0], never re-zeroed, never log — ticks calibrate
 // the read (that's what buys the high precision). The bulb is instrument chrome
-// (always full), never data. The fill rect width == the tube inner width, so no
+// (always full). never data. The fill rect width == the tube inner width, so no
 // clipPath/id is needed. Works vertical (default) or horizontal. All coords 2-dp.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";

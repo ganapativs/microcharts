@@ -1,7 +1,6 @@
 // <ControlStrip> — is the process in control, or did something leave the band?
 // A Shewhart individuals control chart: the band is center ± 3σ̂
-// (σ̂ = mean moving range / 1.128, stated — never a vague "±3 sigma"). Static,
-// hook-free, RSC-safe. In-control points are bare vertices; only out-of-control
+// (σ̂ = mean moving range / 1.128, stated — never a vague "±3 sigma"). In-control points are bare vertices; only out-of-control
 // points are marked (ringed, negative — the ring is a shape cue, not
 // color-alone). An in-control process should look boring.
 import type { CSSProperties, ReactNode } from "react";

@@ -1,7 +1,7 @@
 // <ConfusionGrid> — where do the errors go, the one thing accuracy-as-a-number
-// hides. Static, hook-free, RSC-safe. A k×k agreement
+// hides. A k×k agreement
 // matrix (rows = actual, columns = predicted); cell ink = row-normalized share,
-// the diagonal accented by SHAPE (an inset stroke), never color-alone. Accuracy
+// the diagonal accented by SHAPE (an inset stroke). never color-alone. Accuracy
 // is off by default and never leaves the grid.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

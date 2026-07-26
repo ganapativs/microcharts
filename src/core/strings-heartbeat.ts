@@ -1,7 +1,6 @@
-// HeartbeatBlip summary templates (heartbeat-blip) — its OWN module. Event
-// liveness over a recent window; the summary states the count, the window, and
-// how long since the last event. Duration wording lives here (canon) so it stays
-// translatable. Aggregate: core/strings.ts `EN`.
+// HeartbeatBlip summary templates (heartbeat-blip). Event liveness over a recent window;
+// the summary states the count, the window, and how long since the last event. Duration
+// wording lives here (canon) so it stays translatable. Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
 export type HeartbeatStrings = Pick<

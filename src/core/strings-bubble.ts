@@ -1,7 +1,5 @@
-// BubbleRow summary templates (bubble-row) — its OWN module. Area comparison is
-// LOW precision; the summary names the extremes and the docs steer precise reads
-// to MiniBar. English lives only in core string modules (canon). Aggregate:
-// core/strings.ts `EN`.
+// BubbleRow summary templates (bubble-row). Area comparison is LOW precision; the summary
+// names the extremes and the docs steer precise reads to MiniBar.
 import type { SummaryStrings } from "./summary.js";
 
 export type BubbleStrings = Pick<

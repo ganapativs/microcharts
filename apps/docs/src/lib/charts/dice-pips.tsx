@@ -16,7 +16,6 @@ export const entry: ChartEntry = {
   // chart has no `animate` prop at all.
   animates: false,
   picker: false,
-  // The glyph prints (or IS) its own reading — a hover chip would duplicate it.
   readout: false,
   dataShape: "{ value: number }",
   encoding: { channel: "canonical pip pattern 1–6 (subitized)", precision: "high" },

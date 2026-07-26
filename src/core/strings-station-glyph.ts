@@ -1,6 +1,6 @@
-// StationGlyph strings. A meteorological station model
-// at word scale: sky-cover disc + wind barb + corner numerals. Reuses the wind
-// compass. No hardcoded English outside EN (i18n contract).
+// StationGlyph strings. A meteorological station model at word scale: sky-cover disc +
+// wind barb + corner numerals. Reuses the wind compass. No hardcoded English outside EN
+// (i18n contract).
 import type { SummaryStrings } from "./summary.js";
 
 export type StationGlyphStrings = Pick<

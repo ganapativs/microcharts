@@ -3,12 +3,6 @@ import { DualWindowMeter } from "@microcharts/react/dual-window-meter";
 import { DualWindowMeter as DualWindowMeterInteractive } from "@microcharts/react/dual-window-meter/interactive";
 import staticModule, { playground as staticPlayground, LOUDNESS } from "./dual-window-meter";
 
-/** Interactive half of the dual-window-meter chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./dual-window-meter`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <DualWindowMeterInteractive

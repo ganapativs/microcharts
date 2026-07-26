@@ -1,4 +1,4 @@
-// TallyMarks geometry — pure, React-free. Counts the way a
+// TallyMarks: Counts the way a
 // human counts: four verticals struck through by a fifth per cluster of five,
 // then the remainder. Every stroke lands in ONE path (node budget 2 with the
 // overflow numeral). The `drawn` pen perturbs stroke RENDERING only via seeded

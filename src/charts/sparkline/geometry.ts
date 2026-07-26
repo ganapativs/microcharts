@@ -1,4 +1,3 @@
-// Sparkline geometry — pure, React-free, measurement-free.
 // Maps a series into viewBox pixel space so the static component is a thin
 // render over this. Kept here (not inline) so it is property/edge-tested in the
 // node project without a browser. Coords are 2-dp via the kernel.

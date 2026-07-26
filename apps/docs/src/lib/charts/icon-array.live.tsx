@@ -3,12 +3,6 @@ import { IconArray } from "@microcharts/react/icon-array";
 import { IconArray as IconArrayInteractive } from "@microcharts/react/icon-array/interactive";
 import staticModule, { playground as staticPlayground } from "./icon-array";
 
-/** Interactive half of the icon-array chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./icon-array`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <IconArrayInteractive

@@ -1,6 +1,6 @@
 // <IconArray> — how likely is this, really? A
 // stated rate made countable: filled units in a fixed N-unit grid with the
-// denominator visible. Static, hook-free, RSC-safe. Two moves kill denominator
+// denominator visible. Two moves kill denominator
 // neglect: the ratio label and the fixed grid. No partial-unit fills ever;
 // fill order is contiguous reading-order (scattered is harder to count).
 import type { CSSProperties, ReactNode } from "react";

@@ -1,8 +1,8 @@
 "use client";
 // Interactive <FatDigits>. Announces the value + tier through a
 // polite region on change; the weight eases via CSS on variable fonts (snaps
-// otherwise), with no layout shift (tabular-nums). Wrapper focus only — the
-// numeral is one value. Composes the static component.
+// otherwise). with no layout shift (tabular-nums). Wrapper focus only —
+// numeral is one value.
 import { useEffect, useRef, useState } from "react";
 import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";

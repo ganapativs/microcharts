@@ -1,8 +1,8 @@
 // <RetentionCurve> — do they stay, and does the curve plateau?
 // A step line on a domain LOCKED to [0,1] (the full range is the honest frame
-// for a share), an optional dashed benchmark ghost behind, and a plateau marker
-// that appears only when the documented criterion holds. Static, hook-free,
-// RSC-safe. Non-monotone bumps render as-is (never sorted/smoothed away).
+// for a share). an optional dashed benchmark ghost behind, and a plateau marker
+// that appears only when the documented criterion holds.
+// Non-monotone bumps render as-is (never sorted/smoothed away).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

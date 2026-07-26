@@ -79,9 +79,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         ? `${fmt(value)} / ${fmt(target)}${gap ? ` · ${gap}` : ""}`
         : fmt(value);
 
-  // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
-  // qualitative bands are context, not the datum. One builder, so `onActive` and
-  // `onSelect` can never report a different number or string than the chip.
+  // Measure only (target/bands are context). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(value) ? value : null,

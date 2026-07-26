@@ -3,7 +3,7 @@
 // listener + nearest-half lookup, ←/→ focus a PAN, click / Enter / Space
 // selects it (onSelect); the beam eases to a new tilt on data change (CSS
 // geometry transition, reduced-motion-gated) and announces when the heavier
-// side flips. Composes the static component (canon).
+// side flips.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

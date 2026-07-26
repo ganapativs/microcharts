@@ -3,12 +3,6 @@ import { PictogramRow } from "@microcharts/react/pictogram-row";
 import { PictogramRow as PictogramRowInteractive } from "@microcharts/react/pictogram-row/interactive";
 import staticModule, { playground as staticPlayground } from "./pictogram-row";
 
-/** Interactive half of the pictogram-row chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./pictogram-row`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <PictogramRowInteractive

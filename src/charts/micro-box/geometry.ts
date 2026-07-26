@@ -1,4 +1,4 @@
-// MicroBox geometry — pure, React-free. Box =
+// MicroBox: Box =
 // IQR span, tick = median; whiskers min-max (honest default for small n) or
 // tukey (1.5×IQR fences, outliers as dots, ≤ 3 rendered per side). Never a box
 // from fewer than 5 observations — degenerate honesty handled by the caller.

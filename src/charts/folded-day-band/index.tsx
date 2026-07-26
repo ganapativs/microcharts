@@ -1,5 +1,5 @@
 // <FoldedDayBand> — what does a typical period look like, and is the current one
-// typical. Static, hook-free, RSC-safe. Folds many
+// typical. Folds many
 // periods onto one axis: 25–75 and 5–95 percentile envelopes + a median line,
 // with an optional "today" overlay. Envelopes are real per-bin quantiles.
 import type { CSSProperties, ReactNode } from "react";

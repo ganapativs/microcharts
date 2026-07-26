@@ -3,12 +3,6 @@ import { BubbleRow } from "@microcharts/react/bubble-row";
 import { BubbleRow as BubbleRowInteractive } from "@microcharts/react/bubble-row/interactive";
 import staticModule, { playground as staticPlayground, REGIONS } from "./bubble-row";
 
-/** Interactive half of the bubble-row chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./bubble-row`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <BubbleRowInteractive data={REGIONS} summary={false} height={30} animate={animate} />;
 }

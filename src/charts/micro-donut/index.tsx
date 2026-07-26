@@ -1,8 +1,7 @@
 // <MicroDonut> — roughly what is this made of, at icon size.
 // An honest, capped concession to a ubiquitous demand: the docs' first
 // paragraph steers to SegmentedBar for any comparative read. Wedge cap +
-// labeled rollup are non-optional; never explode, tilt, or shadow. Static,
-// hook-free, RSC-safe. `decorative` marks it as redundant ornament for an
+// labeled rollup are non-optional; never explode, tilt, or shadow. `decorative` marks it as redundant ornament for an
 // adjacent printed value (aria-hidden) — the only sanctioned decorative use.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

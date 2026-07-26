@@ -1,9 +1,8 @@
 // <ParetoStrip> — what should we fix first? Descending bars + a
 // cumulative-share line on a FIXED 0–100% scale (never rescaled to steepen the
-// curve). Bars up to the threshold crossing are accent ("vital few"), the rest
+// curve). Bars up to the threshold crossing are accent ("vital few"). the rest
 // muted — the chart's one job is to say where to stop reading. 80% is a working
-// REFERENCE, never a law; `Other` never participates in ranking. Static,
-// hook-free, RSC-safe.
+// REFERENCE, never a law; `Other` never participates in ranking.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";

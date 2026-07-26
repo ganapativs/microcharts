@@ -1,9 +1,8 @@
 // <QuantileDots> — what are the odds, in COUNTABLE form? A
 // quantile dotplot: `count` dots at equal-probability quantiles, stacked into
 // columns. Each dot ≈ a 1-in-count chance — NOT a raw observation. Past a
-// threshold, dots are re-inked accent AND ringed (never color-alone), and the
-// summary uses frequency framing ("4 in 20"), never a bare percentage. Static,
-// hook-free, RSC-safe.
+// threshold, dots are re-inked accent AND ringed (never color-alone). and the
+// summary uses frequency framing ("4 in 20"). never a bare percentage.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";

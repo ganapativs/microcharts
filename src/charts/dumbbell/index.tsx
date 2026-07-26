@@ -1,5 +1,5 @@
 // <Dumbbell> — where each row started and ended.
-// Static, hook-free, RSC-safe. Hollow → filled reads as before → after without
+// Hollow → filled reads as before → after without
 // a legend; with `positive` the connector takes the valence token by direction.
 // For RANGES (min→max) docs require dropping `positive` — a range has no
 // valence and coloring it would invent one.

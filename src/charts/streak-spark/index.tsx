@@ -1,5 +1,5 @@
 // <StreakSpark> — the current run against the record, with run texture.
-// Static, hook-free, RSC-safe. A pass/fail sequence collapses to RUNS: ok
+// A pass/fail sequence collapses to RUNS: ok
 // runs sit low and translucent, break (fail) runs sit thin and saturated, and
 // the CURRENT run is the loud accent bar at the right. The record streak wears a
 // small triangle tick. Direction is encoded by height + opacity AND color, never

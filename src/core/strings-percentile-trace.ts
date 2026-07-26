@@ -1,8 +1,5 @@
-// PercentileTrace summary templates (percentile-trace) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). The series is a percentile rank,
-// so "p81" is locale-neutral positional notation; the number inside is still
-// formatted. English lives only in core string modules (canon). Aggregate:
-// core/strings.ts `EN`.
+// PercentileTrace summary templates (percentile-trace). The series is a percentile rank, so
+// "p81" is locale-neutral positional notation; the number inside is still formatted.
 import type { SummaryStrings } from "./summary.js";
 
 export type PercentileTraceStrings = Pick<

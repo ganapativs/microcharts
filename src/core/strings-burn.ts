@@ -1,6 +1,4 @@
-// BurnChart summary templates (burn-chart) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// BurnChart summary templates (burn-chart)
 import type { SummaryStrings } from "./summary.js";
 
 export type BurnStrings = Pick<

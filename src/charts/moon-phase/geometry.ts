@@ -1,4 +1,4 @@
-// MoonPhase geometry — pure, React-free. The lit
+// MoonPhase: The lit
 // AREA equals the value exactly (not the phase-angle approximation, which
 // under-lights mid-cycle). Closed form: the terminator is a semi-ellipse with
 // rx = r·|2f−1|; lit area = right semicircle ± semi-ellipse = f·πr² exactly.

@@ -1,4 +1,4 @@
-// BalanceBeam geometry — pure, React-free. Which
+// BalanceBeam: Which
 // side outweighs, and roughly by how much. Tilt direction is instant; tilt angle
 // SATURATES at maxTilt (read direction + rough magnitude, not an exact ratio).
 // Weights are area-true (half = k·√value). Endpoints are pre-rotated HERE (no SVG

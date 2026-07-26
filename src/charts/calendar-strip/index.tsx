@@ -2,8 +2,7 @@
 // Real calendar position (weekday rhythm) is the point — for
 // longer ordinal histories use ActivityGrid. Honesty: a day with no record
 // renders visibly different from a day with value 0, and future days are
-// blank, never extrapolated. All date math UTC (core/calendar). Static,
-// hook-free, RSC-safe.
+// blank, never extrapolated. All date math UTC (core/calendar).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

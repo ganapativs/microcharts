@@ -1,5 +1,5 @@
 // <MicroScatter> — are these two variables related?
-// Static, hook-free, RSC-safe. Dots at 75% opacity so overplot reads as
+// Dots at 75% opacity so overplot reads as
 // density instead of lying by occlusion; duplicates are never jittered —
 // position IS the encoding. Whenever the summary uses a relationship word it
 // states r beside it (claim and evidence travel together).

@@ -8,12 +8,7 @@ import { dataParam } from "./schema";
 import { AGENT_SETUP } from "./assets.generated";
 import { MCP_VERSION } from "./version";
 
-/**
- * Output schemas. Declaring these is what lets a client type-check and validate
- * `structuredContent` instead of re-parsing the text block — the SDK checks
- * every result against them, so a drift between a tool's return type and what
- * it advertises fails here rather than in a host.
- */
+/** Output schemas — SDK validates `structuredContent` against these. */
 const chartProp = z.object({
   name: z.string(),
   type: z.string(),
@@ -63,12 +58,6 @@ const renderOutput = {
   library: z.string(),
 };
 
-/**
- * Build the microcharts MCP server: three tools (find / get / render) + two
- * resources (the catalog, the agent-setup prompt). Transport-agnostic — `cli.ts`
- * wires it to stdio; a remote host could wire the same server to Streamable HTTP
- * without changing anything here.
- */
 export function createServer(): McpServer {
   const server = new McpServer(
     { name: "microcharts", version: MCP_VERSION },

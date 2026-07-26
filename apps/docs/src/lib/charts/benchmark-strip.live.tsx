@@ -3,12 +3,6 @@ import { BenchmarkStrip } from "@microcharts/react/benchmark-strip";
 import { BenchmarkStrip as BenchmarkStripInteractive } from "@microcharts/react/benchmark-strip/interactive";
 import staticModule, { playground as staticPlayground, PEERS } from "./benchmark-strip";
 
-/** Interactive half of the benchmark-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./benchmark-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <BenchmarkStripInteractive

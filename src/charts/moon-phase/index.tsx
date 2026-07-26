@@ -1,8 +1,7 @@
 // <MoonPhase> — how far through a cycle/period, readable across cultures (S4,
 // flagship). The lit AREA equals the value exactly (closed-form
 // terminator, not the phase-angle approximation). progress mode is monotonic
-// (0 new → 0.5 half → 1 full); cycle mode maps the real lunar cycle. Static,
-// hook-free, RSC-safe.
+// (0 new → 0.5 half → 1 full); cycle mode maps the real lunar cycle.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makePercentFormatter } from "../../core/format.js";

@@ -2,8 +2,7 @@
 // Interactive <RateVolume>. useActivePicker owns interaction: one pointer
 // listener + nearest-period math, ←/→ rove periods, click / Enter / Space
 // selects (onSelect). The live region ALWAYS pairs both numbers — a rate is
-// never announced without its volume. Composes the static component (canon); the
-// crosshair + rate ring + pin are overlay children re-using geometry.
+// never announced without its volume.// crosshair + rate ring + pin are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

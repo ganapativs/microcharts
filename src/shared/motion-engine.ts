@@ -1,18 +1,5 @@
-// Entrance-motion engine — `import "@microcharts/react/motion"` once,
-// client-side, to enable the `animate` prop on every interactive entry (the
-// same import-once shape as styles.css). Registers itself into motion-gate;
-// charts that never animate never carry it. One WAAPI implementation per
-// entrance archetype so every chart's motion is the same system: one easing,
-// one duration scale, one stagger rule.
-//
-// Rules enforced here:
-//   - transform / opacity / stroke-dashoffset only (GPU-friendly; no layout).
-//   - Starts only when the chart is on screen (one shared IntersectionObserver;
-//     off-screen charts hold their first frame and never run work).
-//   - Interruption-safe: marks keep their pointer events the whole time (the
-//     interactive wrapper owns the single listener), data re-renders mutate
-//     attributes underneath running transform/opacity tracks without a reset,
-//     and unmount/`beforeprint` resolve instantly to the finished frame.
+// Opt-in entrance engine (`import "@microcharts/react/motion"` once). Registers into motion-gate.
+// transform/opacity/stroke-dashoffset only; one shared IO; interruption-safe; beforeprint → final frame.
 import { maxOf, minOf } from "../core/scale.js";
 import {
   registerMotionEngine,
@@ -21,11 +8,6 @@ import {
   type EntranceOptions,
 } from "./motion-gate.js";
 
-// The motion vocabulary is public API here so consumer UI around a chart can
-// speak the same language (chips, readouts, toolbars that move with a chart).
-// Deliberately COARSER than the engine's own per-archetype `DUR`/`EASE` tables
-// below — a consumer matching a chart's feel should not have to reproduce its
-// choreography, and `--mc-duration`/`--mc-easing` remain the overridable pair.
 export { MC_DUR, MC_EASE_ENTER, MC_EASE_MOVE } from "./motion-gate.js";
 export type { EntranceArchetype, EntranceOptions } from "./motion-gate.js";
 

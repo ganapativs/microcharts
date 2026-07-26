@@ -1,13 +1,11 @@
 "use client";
 // Interactive <EnsembleGhosts> — the HOP loop. On hover/focus, cycle members
 // one at a time at full opacity (~400 ms/frame ≈ 2.5 Hz, the studied
-// Hypothetical-Outcome-Plots cadence), looping until the pointer leaves.
+// Hypothetical-Outcome-Plots cadence). looping until the pointer leaves.
 // Reduced-motion: NO loop — ←/→ step members discretely (same information, no
-// motion). A readout chip names the active/hopped member's endpoint so the
+// motion). A readout chip names the active/hopped member's endpoint so
 // cycle is readable frame by frame. The live region announces only on a
-// keyboard step or when the loop stops — never per frame. Composes the static
-// component (canon).
-//
+// keyboard step or when the loop stops — never per frame.
 // useActivePicker owns the DISCRETE side of the interaction (roving keyboard,
 // tap/click selection, the onActive/onSelect contract); the ambient loop stays
 // bespoke, so `bind.onPointerMove` is deliberately NOT spread — pointer POSITION

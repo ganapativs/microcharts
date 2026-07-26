@@ -3,9 +3,8 @@
 // the count past it recomputes purely; ←/→ step it one quantile bin, Enter /
 // Space / click pins a bin, Esc returns to the prop threshold. useActivePicker
 // owns interaction.
-//
 // Layout is frozen: the composed static uses `label="none"` so the viewBox
-// never grows/shrinks with the live "N in count" string (that reflow was the
+// never grows/shrinks with the live "N in count" string (that reflow was
 // gallery bug — hit targets drifted and the plate shifted under the cursor).
 // Idle odds sit in an HTML gutter beside the SVG; the probe chip covers hover.
 import { useCallback, useMemo, useRef } from "react";

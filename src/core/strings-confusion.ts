@@ -1,6 +1,5 @@
-// ConfusionGrid summary templates (confusion-grid) — its OWN module. Row-
-// normalization is stated in the phrasing ("% of cats") so the denominator
-// travels with every number. English lives only in core string modules (canon).
+// ConfusionGrid summary templates (confusion-grid). Row- normalization is stated in the
+// phrasing ("% of cats") so the denominator travels with every number.
 import type { SummaryStrings } from "./summary.js";
 
 export type ConfusionStrings = Pick<

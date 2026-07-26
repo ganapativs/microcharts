@@ -1,5 +1,5 @@
-// Constellation geometry — pure, React-free. Sparse
-// events on a time axis: x = time (sacred, never jittered), y = value, optional
+// Constellation: Sparse
+// events on a time axis: x = time (sacred, never jittered). y = value, optional
 // magnitude → area-true dot size (r ∝ √m). When no point carries a value, the
 // vertical position is deterministic seeded jitter (core/jitter) that ENCODES
 // NOTHING — the connector's slope is then meaningless, and the summary never

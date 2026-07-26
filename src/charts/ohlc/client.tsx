@@ -1,9 +1,8 @@
 "use client";
 // Interactive <Ohlc>. useActivePicker owns interaction: one pointer listener +
 // nearest-x lookup over the rendered periods, ←/→ (Home/End) rove them
-// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20."),
-// click / Enter / Space selects (onSelect). Composes the static component
-// (canon) — the SVG is never re-implemented.
+// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20.").
+// click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

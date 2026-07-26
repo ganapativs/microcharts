@@ -1,10 +1,9 @@
 "use client";
 // Interactive <IconArray>. useActivePicker owns interaction: one pointer
-// listener + pure grid lookup, ←/→/↑/↓ 2-D roving (row-major), click / Enter /
+// listener + pure grid lookup, ←/→/↑/↓ 2-D roving (row-major). click / Enter /
 // Space selects (onSelect). Each unit announces the running count — genuinely
 // useful for a SR user counting — and shows the terse chip form of that same
-// reading (`readout={false}` suppresses only the chip). Composes the static
-// component (canon); the focus ring + persistent pin are overlay children
+// reading (`readout={false}` suppresses only the chip).
 // re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

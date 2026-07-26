@@ -1,4 +1,4 @@
-// TimeInRange geometry — pure, React-free. Time-in-band
+// TimeInRange: Time-in-band
 // stacked strip with a FIXED semantic zone order (severe-low → below → in →
 // above → severe-high); the order is positional grammar, never sorted by size.
 // Counts or fractions in, normalized shares out. 2-dp. Uses core/stack shares.

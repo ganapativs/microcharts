@@ -1,6 +1,5 @@
-// PhaseTrace summary templates (phase-trace) — its OWN module. Axes are named
-// and stated (linear domains); time direction stays recoverable in the reading.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// PhaseTrace summary templates (phase-trace). Axes are named and stated (linear domains);
+// time direction stays recoverable in the reading.
 import type { SummaryStrings } from "./summary.js";
 
 export type PhaseTraceStrings = Pick<

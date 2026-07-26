@@ -1,6 +1,5 @@
-// TapeGauge summary templates (tape-gauge) — its OWN module. The scale scrolls,
-// the value doesn't; rate is a separate channel from level. English lives only in
-// core string modules (canon). Aggregate: core/strings.ts.
+// TapeGauge summary templates (tape-gauge). The scale scrolls, the value doesn't; rate is a
+// separate channel from level.
 import type { SummaryStrings } from "./summary.js";
 
 export type TapeGaugeStrings = Pick<

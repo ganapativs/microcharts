@@ -4,7 +4,7 @@
 // stretches read accent and trailing stretches read neutral, a dot at each lead
 // change, an endpoint "now" dot + label, and a seat-gated marker on the biggest
 // momentum swing. A modelled read, so the summary says "per the supplied
-// model". Static, hook-free, RSC-safe.
+// model".
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

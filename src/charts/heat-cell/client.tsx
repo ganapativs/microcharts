@@ -1,7 +1,7 @@
 "use client";
 // Interactive <HeatCell>. One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
-// announcement parity ("42 — level 3 of 5."). Composes the static entry.
+// announcement parity ("42 — level 3 of 5.").
 import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -73,9 +73,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   // Suppressed when `label="value"` already prints the number on the cell.
   const chip = geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, steps) : fmt(value);
 
-  // Drill-down: the cell's own value (the number the readout shows). One builder,
-  // so `onActive` and `onSelect` can never report a different number or a
-  // different string than the chip paints.
+  // Cell value (readout number). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(value) ? value : null,

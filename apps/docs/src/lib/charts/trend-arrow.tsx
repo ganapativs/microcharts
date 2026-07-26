@@ -24,7 +24,6 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/trend-arrow`,
   interactiveImport: `${PKG}/trend-arrow/interactive`,
   picker: false,
-  // The glyph prints (or IS) its own reading — a hover chip would duplicate it.
   readout: false,
   dataShape: "number (signed change)",
   encoding: {

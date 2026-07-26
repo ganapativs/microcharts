@@ -1,4 +1,3 @@
-/** Chart registry — one module per slug; drives catalog, gallery, and docs shells. */
 import type { ChartEntry, ChartModule } from "./types";
 import sparkline from "./sparkline";
 import sparkbar from "./sparkbar";

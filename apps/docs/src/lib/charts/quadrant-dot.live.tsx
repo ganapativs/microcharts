@@ -3,12 +3,6 @@ import { QuadrantDot } from "@microcharts/react/quadrant-dot";
 import { QuadrantDot as QuadrantDotInteractive } from "@microcharts/react/quadrant-dot/interactive";
 import staticModule, { playground as staticPlayground, FOCAL, FIELD, AXES } from "./quadrant-dot";
 
-/** Interactive half of the quadrant-dot chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./quadrant-dot`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <QuadrantDotInteractive

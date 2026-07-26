@@ -1,9 +1,8 @@
 // <ChangePoint> — when did the behaviour change level? Regime
 // shading (neutral identity, not valence) + per-regime mean hairlines + the
 // series line + break markers (hairline + top triangle). The detector is a
-// documented HEURISTIC (geometry.ts), and explicit `breaks` is the recommended
-// production path. A spike means nothing without the regime it broke. Static,
-// hook-free, RSC-safe.
+// documented HEURISTIC (geometry.ts). and explicit `breaks` is the recommended
+// production path. A spike means nothing without the regime it broke.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

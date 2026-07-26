@@ -1,10 +1,10 @@
 "use client";
 // Interactive <TapeGauge>. `live` mode: the readout + chevron
-// update as `value`/`rate` change, and a polite live region re-announces the
-// full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series —
+// update as `value`/`rate` change, and a polite live region re-announces
+// full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series
 // but hover/focus reveals the reading whenever the gauge is too small (or too
 // unlabelled) to paint its own hero number.
-// Composes the static entry (canon); the scale window stays centered on value.
+// ; the scale window stays centered on value.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -123,9 +123,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
       vertical: orientation !== "horizontal",
     }) !== null;
 
-  // Drill-down: the reading under the fixed pointer — the number the tape shows.
-  // One builder, so `onActive` and `onSelect` can never report a different
-  // reading or a different string than the chip paints.
+  // Tape reading under the pointer. One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(value) ? value : null,

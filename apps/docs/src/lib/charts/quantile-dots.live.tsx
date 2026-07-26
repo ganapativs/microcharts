@@ -3,12 +3,6 @@ import { QuantileDots } from "@microcharts/react/quantile-dots";
 import { QuantileDots as QuantileDotsInteractive } from "@microcharts/react/quantile-dots/interactive";
 import staticModule, { playground as staticPlayground, WAITS, MIN_FMT } from "./quantile-dots";
 
-/** Interactive half of the quantile-dots chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./quantile-dots`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <QuantileDotsInteractive

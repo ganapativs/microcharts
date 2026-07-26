@@ -3,7 +3,6 @@
 // polite region on change; newly added marks draw in via a one-shot
 // stroke-dashoffset sweep (≤200 ms, reduced-motion → instant). No pointer or
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
-// Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";

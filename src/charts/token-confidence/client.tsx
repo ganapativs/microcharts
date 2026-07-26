@@ -3,7 +3,7 @@
 // tokens (confident tokens are skipped — they carry no mark); focus announces
 // the tier + confidence, and hover OR focus floats that same reading as a chip
 // over the token (the underline says "flagged"; only the chip says how badly).
-// HTML host (the documented SVG exception); shares the pure tiering with the
+// HTML host (the documented SVG exception); shares the pure tiering with
 // static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";

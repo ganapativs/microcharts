@@ -1,6 +1,5 @@
-// CitySkyline summary templates (city-skyline) — its OWN module. Height is the
-// headline; the lit fraction is a secondary low-precision channel. English lives
-// only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// CitySkyline summary templates (city-skyline). Height is the headline; the lit fraction is
+// a secondary low-precision channel.
 import type { SummaryStrings } from "./summary.js";
 
 export type SkylineStrings = Pick<

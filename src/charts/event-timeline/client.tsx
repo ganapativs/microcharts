@@ -1,9 +1,8 @@
 "use client";
 // Interactive <EventTimeline>. useActivePicker owns interaction: one pointer
 // listener + nearest-item-by-x math (span hit = containment, else nearest
-// edge/point), ←/→ cycle items chronologically, click / Enter / Space selects
+// edge/point). ←/→ cycle items chronologically, click / Enter / Space selects
 // (onSelect); announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
-// Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

@@ -1,5 +1,5 @@
-// <SparkBar> — discrete periods as bars. Static, hook-free,
-// RSC-safe. Zero-anchored bars; `mode="winloss"` collapses magnitude to a
+// <SparkBar> — discrete periods as bars.
+// Zero-anchored bars; `mode="winloss"` collapses magnitude to a
 // three-state streak: win above the mid-line, loss below, tie (0) a thin
 // neutral dash on it. Negative bars take the negative token so direction is encoded
 // by position AND color. Endpoint bar gets accent emphasis.

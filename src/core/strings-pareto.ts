@@ -1,6 +1,4 @@
-// ParetoStrip summary templates (pareto-strip) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ParetoStrip summary templates (pareto-strip)
 import type { SummaryStrings } from "./summary.js";
 
 export type ParetoStrings = Pick<

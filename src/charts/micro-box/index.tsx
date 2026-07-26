@@ -1,5 +1,5 @@
 // <MicroBox> — p50 and spread in a table row. Whisker →
-// IQR box → median tick. Static, hook-free, RSC-safe. Never renders a box from
+// IQR box → median tick. Never renders a box from
 // fewer than 5 observations (dots at the raw values instead); precomputed
 // `stats` with non-monotonic values are a dev ERROR — garbage in must not
 // render a plausible-looking lie. Violin stays unshipped; this is its

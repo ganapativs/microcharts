@@ -1,5 +1,5 @@
 // <Slope> — who rose and who fell between two moments (S2-paired, time on x).
-// Static, hook-free, RSC-safe. Neutral ink until `positive` is
+// Neutral ink until `positive` is
 // declared — a rank change is not automatically good or bad. Both columns
 // share one y-domain; a two-point line implies nothing about the path between
 // (docs steer to Sparkline for the path).

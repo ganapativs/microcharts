@@ -1,8 +1,8 @@
 "use client";
 // Interactive <TrendArrow>. No pointer math — there is nothing to
 // point at. `live` mode announces direction changes through a polite region and
-// gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard: the
-// wrapper is focusable, nothing more. Composes the static component (canon).
+// gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard:
+// wrapper is focusable, nothing more.
 import { useEffect, useRef, useState } from "react";
 import { named, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";

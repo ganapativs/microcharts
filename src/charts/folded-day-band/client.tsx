@@ -2,8 +2,7 @@
 // Interactive <FoldedDayBand>. useActivePicker owns interaction: one pointer
 // listener + nearest-bin-by-x math, ←/→ (and ↑/↓) rove fold bins, click /
 // Enter / Space selects (onSelect). The fold collapses every period onto ONE
-// axis, so the navigable space is 1-D (bins), not day × time-of-day.
-// Composes the static component (canon) — the SVG is never re-implemented.
+// axis, so the navigable space is 1-D (bins). not day × time-of-day.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

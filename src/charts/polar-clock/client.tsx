@@ -1,8 +1,7 @@
 "use client";
 // Interactive <PolarClock>. useActivePicker owns interaction: one pointer
-// listener + cursor-angle→segment lookup (atan2, 12 o'clock clockwise), ←/→ step
-// segments circularly, click / Enter / Space selects (onSelect). Composes the
-// static component (canon) — the SVG is never re-implemented.
+// listener + cursor-angle→segment lookup (atan2, 12 o'clock clockwise). ←/→ step
+// segments circularly, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

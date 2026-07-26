@@ -1,8 +1,8 @@
 // <ErrorBudget> — are we burning the error budget too fast to survive the
 // window? Budget remaining vs the steady-burn diagonal (the pace
-// that exactly spends the window), with faster burn-rate reference lines (the
+// that exactly spends the window). with faster burn-rate reference lines (the
 // Google-SRE 1×/6×/14.4× CONVENTION — policy, not physics, so configurable and
-// rendered as faint region context, never data ink). Static, hook-free, RSC-safe.
+// rendered as faint region context, never data ink).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

@@ -1,7 +1,7 @@
-// RugStrip geometry — pure, React-free. Every
+// RugStrip: Every
 // tick is one real observation: no jitter, no smoothing, no thinning. Density
 // reads by ink accumulation — and because SVG paints ONE path's stroke as a
-// single operation (overlaps inside a path never composite), multiplicity is
+// single operation (overlaps inside a path never composite). multiplicity is
 // bucketed into opacity TIERS, one path per tier (≤ 3 paths + highlight, never
 // one node per tick). Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";

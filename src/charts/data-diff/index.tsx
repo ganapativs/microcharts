@@ -1,8 +1,7 @@
 // <DataDiff> — what changed between two versions? One diverging
-// bar per key: removed leftward (--mc-neg), added rightward (--mc-pos), both
+// bar per key: removed leftward (--mc-neg). added rightward (--mc-pos). both
 // ALWAYS drawn on one symmetric shared scale. Net is a summary tick, never a
 // replacement for the two bars (a +500/−480 churn must never look like +20/−0).
-// Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";

@@ -1,18 +1,5 @@
 "use client";
-// Interactive <Sparkline>. Opt-in entry:
-//   import { Sparkline } from '@microcharts/react/sparkline/interactive'
-//
-//   1. COMPOSE the static component (`summary={false}`) — never re-implement
-//      the visual; it cannot drift. Overlay marks are painted into the SVG via
-//      a UI layer so scrubbing does not rebuild static geometry (memo + stable
-//      children). Marks stay inside the SVG so `.mc-inline` seat transforms
-//      still apply.
-//   2. useActivePicker owns interaction: ONE pointer listener + nearest-stop
-//      math, roving keyboard, touch tap-to-pin, and the onActive/onSelect
-//      contract — never a DOM node per point (500 rows × 30 pts stays cheap).
-//   3. The wrapper owns the accessible name (role=img + aria-label) and the
-//      roving keyboard; announcements go through a polite live region using
-//      the i18n-able SummaryStrings.
+// Interactive <Sparkline> — compose static + useActivePicker overlays; wrapper owns naming/live region.
 import { memo, useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

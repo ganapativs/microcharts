@@ -1,4 +1,4 @@
-// MinimapStrip geometry — pure, React-free. Content
+// MinimapStrip: Content
 // thumbnail + viewport window + annotation-tick lane, plus fog-of-war over
 // UNKNOWN regions (absence ≠ zero). The window maps linearly to the domain (no
 // fisheye); the unknown share is disclosed in the summary. 2-dp.

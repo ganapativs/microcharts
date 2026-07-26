@@ -4,7 +4,7 @@
 // value + the now-value numeral. Opacity encodes AGE only; the y position does
 // value, so `trail` length is context, never data. The interactive entry eases
 // the head to each new value and decays the old head into the trail (motion only
-// on data change — no idle loop). Static, hook-free, RSC-safe.
+// on data change — no idle loop).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";

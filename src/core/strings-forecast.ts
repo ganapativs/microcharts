@@ -1,6 +1,4 @@
-// ForecastCone summary templates (forecast-cone) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ForecastCone summary templates (forecast-cone)
 import type { SummaryStrings } from "./summary.js";
 
 export type ForecastStrings = Pick<

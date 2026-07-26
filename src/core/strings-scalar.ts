@@ -1,7 +1,5 @@
-// Scalar-chart summary templates (S3/S4 glyphs) — a separate MODULE, not just a
-// separate export: bundlers keep whole chunks, so scalar templates must never
-// share a chunk with the series templates (and vice versa). English lives only
-// in core string modules (canon). Aggregate dictionary: core/strings.ts `EN`.
+// Scalar-chart summary templates (S3/S4) — separate module so bundlers
+// don't chunk them with series templates. Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
 export type ScalarStrings = Pick<

@@ -2,7 +2,7 @@
 // Interactive <CalendarStrip>. Hover a day or walk the grid in
 // 2-D (←/→ day, ↑/↓ week — ActivityGrid parity); click / Enter / Space selects
 // a day (onSelect). Announces the real calendar day: "Tuesday, June 24: 12."
-// useActivePicker owns interaction; the SVG is the composed static component.
+// useActivePicker owns interaction; the composed static component.
 import { useCallback, useMemo, useRef } from "react";
 import {
   makeFormatter,

@@ -4,7 +4,7 @@
 // an empty baseline IS the down signal (shape, never color). The interactive entry
 // sweeps the trace left in real time and blips each arriving event. Every spike is
 // ONE real event — never a synthesized heartbeat on a timer. `now` is passed in so
-// SSR is deterministic (never Date.now here). Static, hook-free, RSC-safe.
+// SSR is deterministic (never Date.now here).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";

@@ -1,5 +1,4 @@
-// OHLC summary templates — a separate MODULE (see strings-scalar.ts for the
-// chunk rationale).
+// OHLC summary templates
 import type { SummaryStrings } from "./summary.js";
 
 export type OhlcStrings = Pick<SummaryStrings, "noData" | "ohlcAt" | "ohlcRun">;

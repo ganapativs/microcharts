@@ -1,6 +1,6 @@
-// StationGlyph geometry — pure, React-free. A
+// StationGlyph: A
 // meteorological station model at word scale: a sky-cover disc (fraction filled
-// as a pie sector), a wind barb reused from ../wind-barb, and corner numerals
+// as a pie sector). a wind barb reused from ../wind-barb, and corner numerals
 // placed by the component. All coordinates are ABSOLUTE in the viewBox (the
 // component supplies the disc center after reserving numeral gutters) — no group
 // transform, so containment is honest at generation time. The barb starts at the

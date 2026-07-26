@@ -1,5 +1,4 @@
 // <Sparkline> — the load-bearing default.
-// Static, hook-free, listener-free → RSC-safe, SSR-static, zero client JS
 // Line / smooth / step, optional area fill, normal-range band,
 // endpoint / min-max dots, direct endpoint label, and an annotation-child
 // layer. Interactivity lives in the separate `./interactive` entry.

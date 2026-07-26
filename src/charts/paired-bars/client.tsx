@@ -2,7 +2,6 @@
 // Interactive <PairedBars>. useActivePicker owns interaction: one pointer
 // listener + pair-by-category-band lookup — ←/→ (or ↑/↓) rove pairs, announcing
 // each ("East: 940 vs 1,200."); click / Enter / Space selects a pair (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";

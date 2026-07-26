@@ -1,5 +1,4 @@
-// Event-timeline summary templates — a separate MODULE (see strings-scalar.ts
-// for the chunk rationale).
+// Event-timeline summary templates
 import type { SummaryStrings } from "./summary.js";
 
 export type TimelineStrings = Pick<

@@ -1,6 +1,5 @@
-// SpreadBand summary templates (spread-band) — its OWN module. The read is a
-// lead: who is ahead, by how much, and since when it last flipped. English lives
-// only in core string modules (canon). Aggregate: strings.ts.
+// SpreadBand summary templates (spread-band). The read is a lead: who is ahead, by how
+// much, and since when it last flipped.
 import type { SummaryStrings } from "./summary.js";
 
 export type SpreadBandStrings = Pick<

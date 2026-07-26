@@ -3,12 +3,6 @@ import { ControlStrip } from "@microcharts/react/control-strip";
 import { ControlStrip as ControlStripInteractive } from "@microcharts/react/control-strip/interactive";
 import staticModule, { playground as staticPlayground, DEMO } from "./control-strip";
 
-/** Interactive half of the control-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./control-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ControlStripInteractive

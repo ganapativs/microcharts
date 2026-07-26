@@ -1,8 +1,8 @@
 "use client";
 // Interactive <DualSparkline>. useActivePicker owns interaction: one pointer
 // listener + nearest-x lookup announcing BOTH series ("Point 9 of 12: 17 vs
-// 15."), ←/→ step x, click / Enter / Space selects (onSelect). The crosshair
-// touches both lines. Composes the static component (canon).
+// 15."). ←/→ step x, click / Enter / Space selects (onSelect). The crosshair
+// touches both lines.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

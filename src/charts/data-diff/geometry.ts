@@ -1,6 +1,6 @@
-// DataDiff geometry — pure, React-free. What changed between two
-// versions? One diverging bar per key: removed leftward (--mc-neg), added
-// rightward (--mc-pos), both ALWAYS drawn on ONE symmetric shared scale
+// DataDiff: What changed between two
+// versions? One diverging bar per key: removed leftward (--mc-neg). added
+// rightward (--mc-pos). both ALWAYS drawn on ONE symmetric shared scale
 // (max(added,removed) across all rows) so a +500/−480 churn never looks like a
 // +20/−0 trickle. Added/removed are MAGNITUDES — negatives are clamped to 0.
 // Coords 2-dp, integer viewBox.

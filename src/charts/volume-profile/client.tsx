@@ -1,8 +1,7 @@
 "use client";
 // Interactive <VolumeProfile>. useActivePicker owns interaction: one pointer
 // listener + the level band containing y, ↑/↓ rove bins (bottom-up index
-// order), click / Enter / Space selects (onSelect). Composes the static
-// component (canon) — the SVG is never re-implemented.
+// order). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";

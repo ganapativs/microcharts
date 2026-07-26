@@ -38,10 +38,6 @@ import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
 import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
 
-/* ── shared control primitives ─────────────────────────────────────────── */
-
-/** Readout destinations, in the order the reader meets them: the chart's own
- *  chip, the callback panel beside it, then both at once. */
 const READOUT_DESTINATIONS = ["chart", "panel", "both"] as const;
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -147,29 +143,12 @@ function Range({
   );
 }
 
-/** A compact styled dropdown — the requested "pick where the value goes" control. */
-
-/* ── the callback readout — the value, rendered OUTSIDE the chart ──────────── */
-
-/** The payload every `onActive` / `onSelect` hands back (mirrors `MicroDatum`). */
 type Datum = { index: number; value: number | null; label?: string; formatted?: string };
-
-/** One logged callback firing. `d === null` is a clear (`onActive(null)` etc.). */
 type Ev = { id: number; kind: "active" | "select" | "window"; d: Datum | null };
 
-/** The display string for a datum — its `formatted`, falling back to the raw value. */
 const showDatum = (d: Datum): string => d.formatted ?? (d.value === null ? "—" : String(d.value));
 
-/**
- * The external readout — a compact HUD overlay fed purely by the chart's
- * callbacks. This is the whole point of `readout={false}`: the value leaves the
- * chart and is rendered wherever the product wants it.
- *
- * Absolutely positioned top-right so it never shifts the plot container. Body
- * stays `pointer-events-none` (hover passes through to the chart); only the
- * collapse control is clickable. Open by default; collapse to a chip when the
- * panel covers the mark. Value is sticky (last reading dims to `idle`).
- */
+/** External `readout={false}` HUD — sticky last value; body is pointer-events-none. */
 function ReadoutTile({
   active,
   selected,
@@ -318,9 +297,6 @@ function ReadoutTile({
     </div>
   );
 }
-
-/** Rewrite a chart's JSX snippet to render its value in an external node — the
-    copy-paste form of what the "In the panel" / "Chart + panel" modes show. */
 function withCallback(jsx: string, hideChip: boolean, scalar: boolean): string {
   const withProps = injectProps(jsx, [
     hideChip ? "  readout={false}" : null,
@@ -343,23 +319,11 @@ function withCallback(jsx: string, hideChip: boolean, scalar: boolean): string {
     "</>",
   ].join("\n");
 }
-
-/** Pin `readout={false}` onto a self-closing chart snippet. */
 function withReadoutOff(jsx: string): string {
   return injectProps(jsx, ["  readout={false}"]);
 }
 
-/* ── shell ──────────────────────────────────────────────────────────────── */
-
-/**
- * Catches a throw from the chart under an edge-case fixture.
- *
- * The Data drawer feeds charts empty series, single points, all-nulls and 300
- * points on purpose — that's the documented contract. If one ever throws, the
- * honest outcome is a visible report in the frame, not a blank route: the
- * playground is where that contract is demonstrated, so a break must be legible
- * rather than fatal.
- */
+/** Surface fixture throws in-frame (don't blank the route). */
 class PreviewBoundary extends Component<
   { resetKey?: string | undefined; children: ReactNode },
   { error: Error | null; seen: string | undefined }
@@ -372,8 +336,6 @@ class PreviewBoundary extends Component<
   static getDerivedStateFromError(error: Error): { error: Error } {
     return { error };
   }
-
-  /** A new `resetKey` means new props on the chart — give it another go. */
   static getDerivedStateFromProps(
     props: { resetKey?: string | undefined },
     state: { error: Error | null; seen: string | undefined },
@@ -394,21 +356,12 @@ class PreviewBoundary extends Component<
   }
 }
 
-/**
- * One collapsed axis of the playground. Everything past the chart's own knobs
- * lives in these — a reader meets the chart, its props and its code first, and
- * opens data shape / formatting / theme / the screen reader only when that's
- * the question they came with.
- */
 export interface Drawer {
   key: string;
   label: string;
-  /** Shown on the closed chip when this axis is off its default. */
   badge?: string | undefined;
   content: ReactNode;
 }
-
-/** A note under a drawer's controls — what the option actually proves. */
 function DrawerNote({ children }: { children: ReactNode }) {
   return (
     <p className="mt-2.5 max-w-prose text-[0.72rem] leading-snug text-fd-muted-foreground">
@@ -489,28 +442,20 @@ function Shell({
   onReset,
 }: {
   onShuffle?: () => void;
-  /** Present ⇒ a replay control re-runs the entrance motion. */
   onReplay?: () => void;
-  /** Present ⇒ the static ↔ interactive mode switch. */
   mode?: "static" | "interactive";
   onMode?: (m: "static" | "interactive") => void;
   preview: ReactNode;
-  /** Present ⇒ a panel beside the chart (the external callback readout). */
   aside?: ReactNode;
   hint?: string;
   controls: ReactNode;
-  /** Collapsed axes — data shape, formatting, theme, screen reader. */
   drawers?: Drawer[];
   code: string;
   sampleData?: SampleData[];
-  /** Replays a gentle morph when this changes — pass only discrete props, never
-      slider values, so dragging doesn't strobe. */
+  /** Discrete props only — never slider values (avoids morph strobe). */
   morphKey?: string;
-  /** Host the a11y probe observes; wraps the rendered chart only. */
   previewRef?: React.RefObject<HTMLDivElement | null>;
-  /** `data-mc-theme` value for the preview scope; omitted for the default preset. */
   themeScope?: string | undefined;
-  /** Puts every drawer axis back to the chart's documented defaults. */
   onReset?: () => void;
 }) {
   return (
@@ -611,8 +556,6 @@ function Shell({
   );
 }
 
-/* ── the engine — interprets a chart module's declarative PlaygroundSpec ── */
-
 function KnobControl({
   knob,
   value,
@@ -649,18 +592,8 @@ function KnobControl({
   }
 }
 
-/**
- * The unified live playground for any chart: props, static ↔ interactive mode,
- * opt-in entrance motion with replay, and a copy-complete snippet that tracks
- * every toggle. `<Playground chart="bullet" />`
- *
- * The module resolves LAZILY, one chunk per chart — every knob's initial state
- * is derived from `mod.playground`, so the view only mounts once that has landed
- * (the loader keys it by slug, so the initializers re-run on a chart change).
- */
 export function Playground({ chart }: { chart: string }) {
   const mod = useChartModule(chart);
-  // Reserve the playground's resolved height so the swap causes no layout shift.
   if (!mod) return <div className="not-prose my-6 min-h-[26rem]" aria-hidden />;
   return <PlaygroundView key={chart} mod={mod} />;
 }
@@ -678,25 +611,16 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   );
   const [animate, setAnimate] = useState(false);
   const [take, setTake] = useState(0);
-  // The chart's callbacks, surfaced live in the tile beside it, plus a rolling
-  // log of the last few firings so the stream stays readable after mouse-out.
   const [active, setActive] = useState<Datum | null>(null);
   const [selected, setSelected] = useState<Datum | null>(null);
   const [events, setEvents] = useState<Ev[]>([]);
   const evId = useRef(0);
-  // Where the value is shown: on the chart's own chip, in the external tile, or both.
   const [dest, setDest] = useState<"chart" | "panel" | "both">("chart");
-  // Scalar chip on/off (pickers use `dest` instead).
   const [chipOn, setChipOn] = useState(true);
-  // Naming knobs — how the chart is announced (see the screen-reader pane).
   const [summaryMode, setSummaryMode] = useState<SummaryMode>("auto");
-  // Default OFF. The snippet a reader copies has to be the chart's own; a
-  // `title` the playground injected by default put a prop in every code block
-  // that nobody asked for. Switching it on injects a real title AND prints it.
+  // Title default OFF — don't inject a prop into every copied snippet.
   const [named, setNamed] = useState(false);
   const [byId, setById] = useState(false);
-  // The three collapsed axes: the shape of the data, how numbers read, and
-  // which token bundle paints the marks.
   const [fixture, setFixture] = useState(DEFAULT_FIXTURE);
   const [formatKey, setFormatKey] = useState(FORMATS[0]!.key);
   const [locale, setLocale] = useState<string>(DEFAULT_LOCALE);
@@ -718,17 +642,12 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const interactive = mode === "interactive" && !!spec.renderInteractive;
   const canAnimate = interactive && spec.animates !== false;
   const ui = { animate: canAnimate && animate };
-  // Match the published interaction contract: pickers stream `onActive` + pin
-  // via `onSelect`; lean scalars fire both on the single unit (hover/focus →
-  // `onActive`, click/Enter → `onSelect`). TokenConfidence has no callback tile;
-  // MinimapStrip surfaces `onWindowChange` instead of the shared picker props.
+  // Pickers: onActive + onSelect; scalars: both on one unit; minimap: onWindowChange.
   const kind = interactionKind(entry);
   const isMinimap = entry.slug === "minimap-strip";
   const scalar = kind === "single";
   const isPicker = kind === "picker";
   const showCallbacks = isPicker || scalar || isMinimap;
-  // Any chart that paints `.mc-spark-readout` exposes a control to hide it.
-  // Pickers get chart/panel/both; scalars + exceptions get an on/off toggle.
   const hasChip = entry.readout !== false;
   const showReadoutPicker = interactive && hasChip && isPicker;
   const showReadoutToggle = interactive && hasChip && !isPicker;
@@ -745,24 +664,10 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     logEvent("window", d);
   };
 
-  // The series the chart actually renders.
-  //
-  // Two routes to a fixture. Specs that thread `data` get it through `render`
-  // (the snippet then prints it for free). Specs that hard-code their series
-  // still take one IF the chart's data is a plain numeric array — the fixture
-  // rides in as a real `data` prop and the snippet's literal is rewritten to
-  // match. Everything else (paired arms, `{label,value}[]`, OHLC candles, …) has
-  // no honest generic reshape, so those charts show no Data drawer; their page's
-  // own "Edge cases" section carries the contract instead.
-  //
-  // WHICH options are offered is not guessed here: `playground-caps.generated`
-  // is produced by rendering every chart with every option and keeping only the
-  // ones that provably changed its markup (scripts/gen-playground-caps.mjs). A
-  // control that would do nothing on this chart is never drawn.
+  // Fixtures: threaded `data`, or inject into plain numeric demos only.
+  // Caps come from gen-playground-caps (options that actually change markup).
   const caps = PLAYGROUND_CAPS[entry.slug];
-  // A chart whose own knobs already drive `format`/`locale` must not get a
-  // second control for the same prop — two widgets writing one prop is the
-  // playground lying about which one won.
+  // Don't double-control format/locale when knobs already own them.
   const knobKeys = new Set(spec.knobs.map((k) => k.key));
   const offerFormat = !!caps?.format && !knobKeys.has("format");
   const offerLocale = !!caps?.locale && !knobKeys.has("locale");
@@ -800,9 +705,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     ? (entry.interactiveImport ?? entry.staticImport)
     : entry.staticImport;
 
-  // Inject live callbacks (+ readout/naming) onto the chart element — not a
-  // host wrapper. Delta (and any future sized wrapper) nests the chart in a
-  // `<span>`; shallow clone would leave onSelect hanging on the span.
+  // Clone onto the chart node (not a host span) — Delta wraps in `<span>`.
   const showChip = dest !== "panel";
   const rawPreview = interactive
     ? spec.renderInteractive!(state, shown, ui)
@@ -857,11 +760,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
       ].join("\n")
     : external
       ? withCallback(chartJsx, dest === "panel", false)
-      : // The callback pattern is a PRODUCT feature — "render the reading in my
-        // own UI" — not something every consumer needs, so it only appears once
-        // the reader turns the in-chart chip off. Printing `useState` +
-        // `<output>` in the default snippet put wiring nobody asked for into the
-        // code a reader copies.
+      : // External-callback snippet only when the in-chart chip is off.
         showReadoutToggle && !chipOn
         ? scalar && interactive
           ? withCallback(chartJsx, true, true)
@@ -945,8 +844,6 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
         </>
       }
       drawers={[
-        // The chart's own knobs stay above; these four are the axes every chart
-        // shares, collapsed so the default view is the chart and its code.
         ...(canFixture
           ? [
               {

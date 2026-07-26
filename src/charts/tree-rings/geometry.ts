@@ -1,7 +1,7 @@
-// TreeRings geometry — pure, React-free. The channel
+// TreeRings: The channel
 // is radial ring THICKNESS (spacing between consecutive boundaries) ∝ per-period
 // value — oldest at the centre, newest outermost. NOT area: equal thickness at a
-// larger radius spans more area (the ring illusion), so the docs say "compare
+// larger radius spans more area (the ring illusion). so the docs say "compare
 // thicknesses". Never a minimum visual thickness — a near-zero period looks
 // near-zero. `total` scales the disc to Σdata/total of the radius. All coords 2-dp.
 import { isFiniteValue, round2 } from "../../core/types.js";

@@ -4,7 +4,7 @@
 // level read. The interactive entry adds a pulse whose rate encodes the level.
 // Band color is always doubled — by ring offset here, by pulse rate in motion —
 // so it never stands alone. Boundary rule: continuous level → BreathingDot;
-// discrete events → HeartbeatBlip. Static, hook-free, RSC-safe.
+// discrete events → HeartbeatBlip.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";

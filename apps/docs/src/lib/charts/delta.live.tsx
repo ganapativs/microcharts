@@ -3,12 +3,6 @@ import { Delta } from "@microcharts/react/delta";
 import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
 import staticModule, { playground as staticPlayground } from "./delta";
 
-/** Interactive half of the delta chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./delta`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <DeltaInteractive value={0.184} summary={false} animate={animate} />;
 }

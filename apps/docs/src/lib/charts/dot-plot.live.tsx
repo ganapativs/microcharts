@@ -3,12 +3,6 @@ import { DotPlot } from "@microcharts/react/dot-plot";
 import { DotPlot as DotPlotInteractive } from "@microcharts/react/dot-plot/interactive";
 import staticModule, { playground as staticPlayground, TEAM } from "./dot-plot";
 
-/** Interactive half of the dot-plot chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./dot-plot`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <DotPlotInteractive data={TEAM} summary={false} width={130} height={70} animate={animate} />

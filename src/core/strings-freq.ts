@@ -1,7 +1,5 @@
-// Frequency-framing summary templates (icon-array; quantile-dots later) — a
-// separate MODULE (see strings-scalar.ts for why). "3 in 20" reads better than
-// "15%" for lay audiences. English lives only in core string
-// modules (canon). Aggregate dictionary: core/strings.ts `EN`.
+// Frequency-framing summary templates (icon-array; quantile-dots later) "3 in 20" reads
+// better than "15%" for lay audiences.
 import type { SummaryStrings } from "./summary.js";
 
 export type FreqStrings = Pick<

@@ -1,8 +1,7 @@
 "use client";
 // Interactive <LikertStrip>. useActivePicker owns interaction: one pointer
 // listener + segment-by-x-band lookup, ←/→ step levels in DATA order
-// ("Agree: 34%, level 4 of 5."), click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
+// ("Agree: 34%, level 4 of 5."). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

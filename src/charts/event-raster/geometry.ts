@@ -1,4 +1,4 @@
-// EventRaster geometry — pure, React-free. One lane
+// EventRaster: One lane
 // per source, one tick per event. Vertical banding = synchronization, diagonals
 // = propagation, sparse rows = silence. One tick = one event, always — the only
 // exception is the honest `overflow="bin"` mode, which switches an aliasing lane

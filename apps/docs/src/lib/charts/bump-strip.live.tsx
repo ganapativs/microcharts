@@ -3,12 +3,6 @@ import { BumpStrip } from "@microcharts/react/bump-strip";
 import { BumpStrip as BumpStripInteractive } from "@microcharts/react/bump-strip/interactive";
 import staticModule, { playground as staticPlayground, RANKS } from "./bump-strip";
 
-/** Interactive half of the bump-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./bump-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <BumpStripInteractive data={RANKS} summary={false} width={130} height={20} animate={animate} />

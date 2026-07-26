@@ -6,23 +6,15 @@ export interface FindResult {
   name: string;
   tagline: string;
   dataShape: string;
-  /** Why this chart matched — the bestFor phrase or tagline that hit. */
   why: string;
 }
 
 export interface FindOptions {
-  /** Filter to charts whose dataShape contains this substring (e.g. "number[]"). */
   dataShape?: string;
-  /** Max results (default 6). */
   limit?: number;
 }
 
-/**
- * Rank the catalog against a natural-language question ("is it trending?",
- * "error budget", "part to whole"). Pure over the committed snapshot — no
- * rendering, no library import. Returns only stable charts (the wireable set),
- * best first; empty when nothing scores.
- */
+/** Rank stable charts against a question — pure over the snapshot, no render. */
 export function findChart(question: string, opts: FindOptions = {}): FindResult[] {
   const terms = tokenize(question);
   const limit = Math.min(Math.max(opts.limit ?? 6, 1), 20);

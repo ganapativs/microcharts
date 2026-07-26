@@ -3,12 +3,6 @@ import { Hourglass } from "@microcharts/react/hourglass";
 import { Hourglass as HourglassInteractive } from "@microcharts/react/hourglass/interactive";
 import staticModule, { playground as staticPlayground } from "./hourglass";
 
-/** Interactive half of the hourglass chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./hourglass`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-3">

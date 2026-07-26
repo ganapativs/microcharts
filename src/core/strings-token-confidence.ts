@@ -1,6 +1,5 @@
-// TokenConfidence summary templates (token-confidence) — its OWN module. Three
-// discrete tiers, never a gradient: people calibrate categorically. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts.
+// TokenConfidence summary templates (token-confidence). Three discrete tiers, never a
+// gradient: people calibrate categorically.
 import type { SummaryStrings } from "./summary.js";
 
 export type TokenConfidenceStrings = Pick<

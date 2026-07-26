@@ -56,9 +56,7 @@ describe("interactive <Hourglass>", () => {
     expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
 
-  // The shared interaction contract (shared/interactive.ts): `onActive` reports
-  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
-  // hover-then-focus is one announcement, not two.
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
   it("onActive reports the glyph once, then null when the active state clears", async () => {
     const seen: unknown[] = [];
     const screen = await render(<Hourglass value={0.42} onActive={(d) => seen.push(d)} />);
@@ -70,10 +68,7 @@ describe("interactive <Hourglass>", () => {
     expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.42, formatted: chip() });
     wrap.focus(); // already active — must not re-announce
     expect(seen.length).toBe(1);
-    // Leave the mark BEFORE dropping focus. Blurring while the pointer is
-    // still over it leaves a hovered-but-unfocused state, and the move away
-    // then re-enters — two extra edges, order-dependent, the CI-only
-    // `expected 4 to be 2` this file has flaked with twice.
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
     await pointerAway();
     await expect.poll(() => seen.at(-1)).toBeNull();
     wrap.blur(); // already cleared — must not re-announce

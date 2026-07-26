@@ -1,8 +1,6 @@
-// Quantile-family summary templates (benchmark-strip, percentile-ladder,
-// graded-band) — a separate MODULE (see strings-scalar.ts for why). These
-// charts derive nested intervals / percentiles from a sample, so they share one
-// phrasing family. English lives only in core string modules (canon).
-// Aggregate dictionary: core/strings.ts `EN`.
+// Quantile-family summary templates (benchmark-strip, percentile-ladder, graded-band)
+// These charts derive nested intervals / percentiles from a sample, so they share one
+// phrasing family.
 import type { SummaryStrings } from "./summary.js";
 
 /** English ordinal ("68th"). Shared by the percentile phrasing. Duplicated in

@@ -1,6 +1,6 @@
 // <GradedBand> — how sure are we about one number? Nested
-// central intervals graded by opacity, with a median tick. Static, hook-free,
-// RSC-safe. NEVER a bar from zero and no variant may add one (bar-plus-error-bar
+// central intervals graded by opacity, with a median tick.
+// NEVER a bar from zero and no variant may add one (bar-plus-error-bar
 // induces edge-literalism bias); opacity maps to probability level and nothing
 // else.
 import type { CSSProperties, ReactNode } from "react";

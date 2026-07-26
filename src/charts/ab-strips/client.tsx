@@ -1,9 +1,9 @@
 "use client";
 // Interactive <ABStrips>. useActivePicker owns interaction: y picks the row,
-// x snaps to the nearest quantile edge; ↑/↓ switch rows (keeping the edge), ←/→
+// x snaps to the nearest quantile edge; ↑/↓ switch rows (keeping the edge). ←/→
 // step edges; click / Enter / Space selects (onSelect). The median edge
-// announces the row median + delta vs the other arm; other edges announce the
-// percentile. Composes the static component (canon).
+// announces the row median + delta vs the other arm; other edges announce
+// percentile.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {

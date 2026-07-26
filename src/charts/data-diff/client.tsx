@@ -1,8 +1,8 @@
 "use client";
 // Interactive <DataDiff>. useActivePicker owns interaction: one pointer
-// listener + grid lookup (pointer y → row), ↑/↓ (and ←/→) step rows, Home/End
+// listener + grid lookup (pointer y → row). ↑/↓ (and ←/→) step rows, Home/End
 // jump, click / Enter / Space selects (onSelect). The live region states each
-// row's added / removed / net. Composes the static component (canon); the focus
+// row's added / removed / net.focus
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";

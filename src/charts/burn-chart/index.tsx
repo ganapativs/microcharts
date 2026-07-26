@@ -1,7 +1,7 @@
 // <BurnChart> — will we finish on time? A dashed plan line, the
 // solid actual line to today, and a dotted projection whose slope is a linear
 // fit over the last k actual points — provisional by construction, never a
-// smoothed or optimistic curve. Static, hook-free, RSC-safe. Y zero-anchored.
+// smoothed or optimistic curve. Y zero-anchored.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

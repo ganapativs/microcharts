@@ -3,7 +3,6 @@
 // listener maps x → the segment under the cursor, ←/→ step segments, click /
 // Enter / Space selects (onSelect). Each unit announces the distance, grade,
 // and cumulative climb — the readout gives the TRUE grade, not the bin.
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

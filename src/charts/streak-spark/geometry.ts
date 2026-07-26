@@ -1,7 +1,7 @@
-// StreakSpark geometry — pure, React-free. Collapse a pass/fail/gap
+// StreakSpark: Collapse a pass/fail/gap
 // sequence into RUNS of equal outcome; each run is a bar whose width ∝ its length
 // on one shared scale (the runs tile the strip, so a wide bar is a genuinely long
-// run). Height + opacity encode run TYPE — streak (ok), break (fail), or the
+// run). Height + opacity encode run TYPE — streak (ok). break (fail). or the
 // current run — never magnitude. The record streak carries a triangle tick. A
 // null (or NaN) is a gap: it breaks the current run and starts a fresh one. 2-dp.
 import { labelFont } from "../../core/labels.js";

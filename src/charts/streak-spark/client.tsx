@@ -1,10 +1,8 @@
 "use client";
 // Interactive <StreakSpark>. useActivePicker owns interaction: ONE pointer
 // listener + nearest-run-by-x, ←/→ rove runs, click / Enter / Space selects
-// (onSelect). COMPOSES the static entry (component canon): the static renders
-// the run bars, triangle tick and count labels; the client only overlays a
-// transient focus outline, a persistent pin and a readout — the SVG is never
-// re-implemented here.
+// (onSelect).
+// transient focus outline, a persistent pin and a readout — here.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";

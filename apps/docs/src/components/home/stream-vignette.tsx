@@ -527,22 +527,8 @@ export function StreamVignette({
       }
       acc += n;
     }
-    // Even cadence, not simulated typing. The hero used to jitter each word
-    // (26 + random*42) to imitate a real token stream; on a fold the reader
-    // only ever sees once, that stutter reads as lag rather than realism.
-    // Fixed rates instead — the reveal glides. Two rates, not one: a text atom
-    // is a whole word and a grammar atom is a single character, so one shared
-    // rate would either strobe the prose or crawl through the backticks.
-    // /docs/ai keeps the realistic pacing; that page is about the stream
-    // itself, so the texture is the content there.
-    //
-    // These were once cut to 34/4/200 chasing a "stuck" feeling. That was the
-    // wrong lever twice over: it overshot into too-fast-to-perceive, and the
-    // stall was never the typing — it was the dead hold plus a from-zero
-    // blurred fade at the hand-off (both fixed in .hx-morph-in). 52ms/word is
-    // ~20 words a second: quick, but visibly arriving. `closing` is only the
-    // beat between the fence completing and the chart replacing it; the morph
-    // is the transition, so anything longer here is just dead air before it.
+    // Fixed cadence (no typing jitter — reads as lag on a one-shot fold).
+    // Words 52ms; grammar chars faster; 140ms only at fence→chart (morph does the rest).
     const closing = inSeg === atomCount(seg) - 1;
     const delay = seg.kind === "chart" ? (closing ? 140 : 7) : 52;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);

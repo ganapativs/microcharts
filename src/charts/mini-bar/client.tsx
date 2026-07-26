@@ -1,8 +1,7 @@
 "use client";
 // Interactive <MiniBar>. useActivePicker owns interaction: one pointer listener
-// + bar-by-band lookup, ←/→ rove bars ("East: 940 — 1st of 4."), click / Enter /
-// Space selects (onSelect). Composes the static component (canon) — the SVG is
-// never re-implemented.
+// + bar-by-band lookup, ←/→ rove bars ("East: 940 — 1st of 4."). click / Enter /
+// Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";

@@ -3,7 +3,6 @@
 // width transitions (CSS, reduced-motion → snap) and a polite live region
 // re-announces at most every 10 s. No pointer scrub — there is no series — but
 // hover OR focus reveals the forecast chip, the reveal-on-hover scalar pattern.
-// Composes the static entry (canon).
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -125,9 +124,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
-  // Drill-down: the clamped progress fraction the done bar encodes. One builder,
-  // so `onActive` and `onSelect` can never report a different number or a
-  // different string than the chip paints.
+  // Clamped progress fraction. One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,

@@ -1,8 +1,6 @@
-// <Progress> — "how far along is this, exactly?". Static,
-// hook-free, RSC-safe. The percent label is the datum — a bare bar is
-// decoration — so `label="percent"` is the default. The bar is always
-// zero-anchored and clamps at 100%; past that, the LABEL carries the truth
-// ("112%") — the number and the bar only disagree in that documented case.
+// <Progress> — "how far along is this, exactly?".
+// Percent label is the datum (`label="percent"` default). Bar is zero-anchored and
+// clamps at 100%; past that the LABEL carries the truth ("112%").
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";

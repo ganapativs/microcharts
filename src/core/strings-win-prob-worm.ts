@@ -1,8 +1,6 @@
-// WinProbWorm summary templates (win-prob-worm) — its OWN module. A win-
-// probability worm is a modelled read, so every summary is framed "per the
-// supplied model" — the chart states who leads and when it flipped, never
-// endorses the forecast. English lives only in core string modules (canon).
-// Aggregate: strings.ts.
+// WinProbWorm summary templates (win-prob-worm). A win- probability worm is a modelled
+// read, so every summary is framed "per the supplied model" — the chart states who leads
+// and when it flipped, never endorses the forecast.
 import type { SummaryStrings } from "./summary.js";
 
 export type WinProbWormStrings = Pick<

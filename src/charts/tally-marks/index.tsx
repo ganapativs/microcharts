@@ -1,9 +1,8 @@
 // <TallyMarks> — how many, counted the way a human counts.
 // Four-and-strike clusters of five, then the remainder; the count reads back
 // exactly up to `total`, after which a `+N` numeral tells the truth (marks are
-// never resized to fit — width grows, honesty holds). Static, hook-free,
-// RSC-safe. `pen="drawn"` perturbs stroke rendering only; the count is unchanged.
-//
+// never resized to fit — width grows, honesty holds).
+// `pen="drawn"` perturbs stroke rendering only; the count is unchanged.
 // NOTE: the spec named this variant `style`, but every chart
 // exposes `style?: CSSProperties`; the knob is `pen` here to keep that passthrough.
 import type { CSSProperties, ReactNode } from "react";

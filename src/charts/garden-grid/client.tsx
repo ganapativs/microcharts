@@ -1,9 +1,9 @@
 "use client";
 // Interactive <GardenGrid>. Same model as ActivityGrid: useActivePicker owns
-// interaction (one wrapper listener + pure grid math), 2-D roving keyboard, a
+// interaction (one wrapper listener + pure grid math). 2-D roving keyboard, a
 // ring on the focused cell and a pinned ring on the selected one; click / Enter
 // / Space selects (onSelect). Announces the ordinal step, not a false-precise
-// value. Composes the static component (canon) — the SVG never drifts.
+// value.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

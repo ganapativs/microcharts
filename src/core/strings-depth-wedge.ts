@@ -1,6 +1,5 @@
-// DepthWedge summary templates (depth-wedge) — its OWN module. The visible range
-// is part of the claim, so the summary always carries "within the shown range".
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// DepthWedge summary templates (depth-wedge). The visible range is part of the claim, so
+// the summary always carries "within the shown range".
 import type { SummaryStrings } from "./summary.js";
 
 export type DepthWedgeStrings = Pick<

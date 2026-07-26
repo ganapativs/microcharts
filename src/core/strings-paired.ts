@@ -1,6 +1,4 @@
-// Paired / referenced S2 summary templates (dumbbell, slope, paired-bars) — a
-// separate MODULE (see strings-scalar.ts for the chunk rationale). English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// Paired / referenced S2 summary templates (dumbbell, slope, paired-bars)
 import type { SummaryStrings } from "./summary.js";
 
 export type PairedStrings = Pick<

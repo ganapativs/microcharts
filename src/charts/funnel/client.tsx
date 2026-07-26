@@ -1,8 +1,7 @@
 "use client";
 // Interactive <Funnel>. useActivePicker owns interaction: one pointer listener +
-// stage-by-x-band lookup, ←/→ rove stages ("Checkout: 2,730 — 22% of visitors."),
-// click / Enter / Space selects (onSelect). Composes the static component (canon)
-// — the SVG is never re-implemented.
+// stage-by-x-band lookup, ←/→ rove stages ("Checkout: 2,730 — 22% of visitors.").
+// click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";

@@ -1,7 +1,7 @@
-// QuadrantDot geometry — pure, React-free. Where does this item
+// QuadrantDot: Where does this item
 // sit in the 2×2, against the field? A focal dot placed by 2-D position, a
 // hairline cross at the split (default = domain midpoints, always overridable
-// but never hidden), and tiny muted ghost dots for the peer field. The read is
+// but never hidden). and tiny muted ghost dots for the peer field. The read is
 // quadrant MEMBERSHIP first; exact position second. Boundary rule: ≥ split ⇒
 // right/top (deterministic). Glyph scale (24×24). Coords 2-dp.
 import { scaleLinear, extent } from "../../core/scale.js";

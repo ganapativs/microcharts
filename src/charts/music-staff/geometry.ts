@@ -1,5 +1,5 @@
-// MusicStaff geometry — pure, React-free. Pitch = value on a
-// 5-line staff (position quantized), order = time. Pitch is the ONLY channel —
+// MusicStaff: Pitch = value on a
+// 5-line staff (position quantized). order = time. Pitch is the ONLY channel —
 // no clefs, stems, beams or bar lines (every other notation convention is decor).
 // Coincident equal values are spaced along the time axis, never dodged vertically
 // (that would change pitch = lie). All coords 2-dp.

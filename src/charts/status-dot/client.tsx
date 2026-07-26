@@ -2,7 +2,7 @@
 // Interactive <StatusDot>. `live` announces state changes through
 // a polite region ("Deploys: warning."). No pointer math — a single 8-px state
 // mark has nothing to reveal on hover that the summary doesn't already say
-// (documented skip). Composes the static component (canon).
+// (documented skip).
 import { useEffect, useRef, useState } from "react";
 import { named, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";

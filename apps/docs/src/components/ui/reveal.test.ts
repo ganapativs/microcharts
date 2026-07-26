@@ -22,20 +22,7 @@ const srcFiles = () =>
     (f) => /\.(tsx|ts|css)$/.test(f) && !f.includes(".test."),
   );
 
-/**
- * Two contracts in one suite.
- *
- * First paint is never gated on JS: server HTML renders the finished state and
- * NOTHING is hidden waiting for hydration. The last exception — the hero stream
- * panel's `deferred` fade — was removed 2026-07-26 because it did exactly what
- * this suite exists to prevent: the right half of the fold arrived a JS
- * download late, visibly after everything around it.
- *
- * And entrance choreography stays dead: scroll-into-view fades, staggered
- * settles, and route fades were removed in the 2026-07 de-slop pass — the page
- * renders at rest and stays there. Reintroducing any of them is a decision,
- * not a drive-by.
- */
+/** First paint ungated on JS; no scroll/route entrance choreography. */
 describe("first paint is never gated on JS, and entrance choreography stays dead", () => {
   it("Reveal is a plain server-rendered wrapper", () => {
     // No client boundary, no state, no observer: a wrapper that needs hydration

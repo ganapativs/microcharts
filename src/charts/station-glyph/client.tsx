@@ -3,16 +3,12 @@
 // the interactive entry makes each FIELD a navigable unit (station, wind, sky,
 // temp, dew point, pressure) so a reader can step or point at them one at a time
 // instead of hearing one long string.
-//
-// The unit is the sub-metric, NOT a data point: `index` is the position in the
+// The unit is the sub-metric, NOT a data point: `index` is the position in
 // PRESENT fields (absent props are not units — a glyph with no dew point has no
-// dew unit), `value` is that field's encoded number (`null` for the station
-// name, which encodes nothing), `label` is its announced phrase.
-//
-// useActivePicker owns interaction: one pointer listener + nearest-field math
-// over the anchors the STATIC entry draws at (both entries read the same pure
-// `stationLayout`, so the hit boxes cannot drift from the marks). Composes the
-// static entry (canon) — no re-implemented SVG.
+// dew unit). `value` is that field's encoded number (`null` for the station
+// name, which encodes nothing). `label` is its announced phrase.
+// useActivePicker: nearest-field math over the same `stationLayout` anchors the
+// static entry draws — hit boxes cannot drift from the marks.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { textGutter } from "../../core/labels.js";

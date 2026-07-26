@@ -1,4 +1,4 @@
-// BumpStrip geometry — pure, React-free. Rank bands,
+// BumpStrip: Rank bands,
 // #1 at the TOP (inverted y, stated in docs and self-keyed by "#" end labels).
 // Step line only — a rank cannot be 2.4, and skipped periods stay gaps, never
 // diagonal interpolation. 2-dp.

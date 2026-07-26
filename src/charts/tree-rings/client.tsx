@@ -1,8 +1,7 @@
 "use client";
 // Interactive <TreeRings>. useActivePicker owns interaction: one pointer
-// listener + radial lookup (distance from centre → ring index), ←/→ (and ↑/↓)
-// step inner→outer, click / Enter / Space selects (onSelect). Composes the
-// static component (canon) — the SVG is never re-implemented.
+// listener + radial lookup (distance from centre → ring index). ←/→ (and ↑/↓)
+// step inner→outer, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

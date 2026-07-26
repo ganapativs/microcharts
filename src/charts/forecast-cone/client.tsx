@@ -1,9 +1,8 @@
 "use client";
 // Interactive <ForecastCone>. useActivePicker owns interaction: one pointer
 // listener + region-aware nearest-x (history points announce a value, forecast
-// points the median + 80% interval), ←/→ (Home/End) rove, click / Enter /
-// Space selects (onSelect). Composes the static component (canon); the
-// crosshair + readout chip are overlay children.
+// points the median + 80% interval). ←/→ (Home/End) rove, click / Enter /
+// Space selects (onSelect).// crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

@@ -2,7 +2,6 @@
 // Interactive <ActivityGrid>. The GitHub interaction: hover/tap a cell for its
 // value, or roving-focus the grid and walk it in 2-D with the arrow keys; click
 // / Enter / Space selects a cell (onSelect). useActivePicker owns interaction
-// (one wrapper listener + pure grid math), composing the static component
 // (summary={false}, focus + pin rings as its children) — the SVG never drifts.
 import { useCallback, useMemo, useRef } from "react";
 import { makeDateFormatter, makeFormatter } from "../../core/format.js";

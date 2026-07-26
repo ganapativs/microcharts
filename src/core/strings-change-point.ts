@@ -1,6 +1,4 @@
-// ChangePoint summary templates (change-point) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ChangePoint summary templates (change-point)
 import type { SummaryStrings } from "./summary.js";
 
 export type ChangePointStrings = Pick<

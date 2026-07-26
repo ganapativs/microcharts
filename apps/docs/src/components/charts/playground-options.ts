@@ -1,18 +1,8 @@
-/**
- * The playground's three on-demand axes — data shape, number formatting, and
- * theme — kept pure so the rendered chart and the snippet below it are driven by
- * the same values. Everything here is a real prop (or a real `data-mc-theme`
- * scope), never a docs-only trick.
- */
-
-/* ── data fixtures ────────────────────────────────────────────────────────── */
-
 /** A series a chart must survive. These are the shipped edge-case contract. */
 export interface Fixture {
   key: string;
   /** Muted one-liner shown under the picker — what this case proves. */
   note: string;
-  /** Derive the case from the playground's current series. */
   apply: (data: number[]) => (number | null)[];
 }
 
@@ -63,8 +53,6 @@ export const DEFAULT_FIXTURE = "typical";
 export function applyFixture(key: string, data: number[]): (number | null)[] {
   return (FIXTURES.find((f) => f.key === key) ?? FIXTURES[0]!).apply(data);
 }
-
-/** Serialise a fixture series the way a chart's own snippet prints one. */
 export const seriesLiteral = (series: readonly (number | null)[]): string =>
   `[${series.map((v) => (v === null ? "null" : String(v))).join(", ")}]`;
 
@@ -91,8 +79,6 @@ export function replaceDataLiteral(jsx: string, series: readonly (number | null)
  * changed, so a false positive here can never reach the UI.
  */
 export const PLAIN_SERIES = /^\(?number(\s*\|\s*null)?\)?\[\](?!\[)/;
-
-/* ── number formatting ────────────────────────────────────────────────────── */
 
 export interface FormatOption {
   key: string;
@@ -128,8 +114,6 @@ export const DEFAULT_LOCALE = "en-US";
 export const formatOption = (key: string): FormatOption =>
   FORMATS.find((f) => f.key === key) ?? FORMATS[0]!;
 
-/* ── theme presets ────────────────────────────────────────────────────────── */
-
 /**
  * Token bundles that ship in `styles.css`. `modern` is the default and sets no
  * attribute; the rest are applied by scoping `data-mc-theme` — exactly what
@@ -138,11 +122,7 @@ export const formatOption = (key: string): FormatOption =>
 export const THEMES = ["modern", "editorial", "mono", "vivid", "dark", "print", "eink"] as const;
 export type Theme = (typeof THEMES)[number];
 export const DEFAULT_THEME: Theme = "modern";
-
-/** The attribute value for a preset — `undefined` for the default. */
 export const themeAttr = (t: Theme): string | undefined => (t === "modern" ? undefined : t);
-
-/* ── snippet assembly ─────────────────────────────────────────────────────── */
 
 /** Prop lines for the format/locale axis, skipping anything already in the JSX. */
 export function formatLines(formatKey: string, locale: string, jsx: string): (string | null)[] {

@@ -1,6 +1,5 @@
-// Part-to-whole / staged composition templates (segmented-bar, micro-donut,
-// funnel, likert-strip) — a separate MODULE (see strings-scalar.ts for the
-// chunk rationale). English lives only in core string modules (canon).
+// Part-to-whole / staged composition templates (segmented-bar, micro-donut, funnel,
+// likert-strip)
 import type { SummaryStrings } from "./summary.js";
 
 export type CompositionStrings = Pick<

@@ -1,8 +1,7 @@
 "use client";
 // Interactive <QuadrantDot>. useActivePicker owns interaction: one pointer
 // listener + nearest-point (2-D) lookup, ←/→/Home/End cycle focal then peers
-// nearest-first, click / Enter / Space selects (onSelect). Composes the static
-// component (canon); the focus ring + persistent pin + readout chip are overlay
+// nearest-first, click / Enter / Space selects (onSelect).
 // children. Index 0 is the focal; 1…n are peers in nearest-first order.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

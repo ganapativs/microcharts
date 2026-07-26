@@ -1,9 +1,9 @@
 "use client";
 // Interactive <Constellation>. useActivePicker owns interaction: one pointer
 // listener + nearest-star math (squared 2-D distance over the precomputed
-// stars), ←/→ (and ↑/↓) step chronologically, click / Enter / Space selects.
+// stars). ←/→ (and ↑/↓) step chronologically, click / Enter / Space selects.
 // Focus ring on the active event, persistent ring on the pinned one; the readout
-// names the time, value, and magnitude. Composes the static component (canon).
+// names the time, value, and magnitude.
 // Vertical jitter (value-less data) stays layout-only — the readout never
 // presents it as data.
 import { useCallback, useMemo, useRef } from "react";

@@ -1,7 +1,7 @@
 // <PercentileLadder> — what does the tail look like, not just the median?
 // Ticks at chosen percentiles on a zero-anchored track;
-// graduated height + accent make the tail read strongest. Static, hook-free,
-// RSC-safe. The origin is never cropped (tick distances are the story); a log
+// graduated height + accent make the tail read strongest.
+// The origin is never cropped (tick distances are the story); a log
 // transform is never silent — an in-chart `log` tag renders when it applies.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

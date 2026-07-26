@@ -1,9 +1,8 @@
 "use client";
 // Interactive <MicroDonut>. useActivePicker owns interaction: one pointer
-// listener + wedge-by-atan2 angle lookup (pure), ←/→ rove wedges, click / Enter
+// listener + wedge-by-atan2 angle lookup (pure). ←/→ rove wedges, click / Enter
 // / Space selects (onSelect). Disabled entirely when `decorative` — an
-// aria-hidden chart must not be a tab stop. Composes the static component
-// (canon) — the SVG is never re-implemented.
+// aria-hidden chart must not be a tab stop.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import {

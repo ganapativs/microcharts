@@ -1,8 +1,8 @@
 "use client";
 // Interactive <Waveform>. useActivePicker owns interaction: ONE pointer listener
 // + nearest-bucket-by-x, ←/→ rove buckets, click / Enter / Space selects
-// (onSelect). Composes the static component (canon) — the merged bar path is
-// never re-implemented; the client only overlays a transient crosshair, a
+// (onSelect).the merged bar path is
+// ; the client only overlays a transient crosshair, a
 // persistent pin and a readout.
 import { useCallback, useMemo, useRef } from "react";
 import { maxPerBucket } from "../../core/downsample.js";

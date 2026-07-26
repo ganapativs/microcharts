@@ -1,7 +1,5 @@
-// NetFlow summary templates (net-flow) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). The net value always carries its
-// sign in TEXT (direction is never color-alone). English lives only in core
-// string modules (canon). Aggregate: core/strings.ts `EN`.
+// NetFlow summary templates (net-flow). The net value always carries its sign in TEXT
+// (direction is never color-alone).
 import type { SummaryStrings } from "./summary.js";
 
 export type NetFlowStrings = Pick<

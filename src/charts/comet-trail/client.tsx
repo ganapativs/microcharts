@@ -6,9 +6,9 @@
 // never simulated between updates. Reduced-motion → instant reposition (the static
 // encoding is already complete). useActivePicker owns interaction: one pointer
 // listener + nearest-point-by-x math, ←/→ walk the trail (left = older, right =
-// newer), click / Enter / Space selects (onSelect). The shown point's value
-// rides in a floating chip over its dot (`readout={false}` suppresses only the
-// chip). Composes the static component (canon).
+// newer). click / Enter / Space selects (onSelect). The shown point's value
+// rides in a floating chip over its dot (`readout={false}` suppresses only
+// chip).
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import {

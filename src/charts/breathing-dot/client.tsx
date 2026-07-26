@@ -4,8 +4,8 @@
 // strained) so the motion states are nameable, not vibes. The loop is allowed
 // because the loop parameter (rate) is the datum. Gated on BOTH
 // reduced-motion (→ the static frame) and on-screen (→ paused off-viewport).
-// Composes the static component (canon); a polite live region announces BAND
-// changes only, never per tick, and hover/focus reveals the level itself —
+// ; a polite live region announces BAND
+// changes only, never per tick, and hover/focus reveals the level itself
 // which the glyph alone never shows.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
@@ -129,9 +129,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
   );
   const readoutText = geo.unknown ? "—" : `${pct(geo.level)} · ${strings.loadBands[geo.band]}`;
 
-  // Drill-down: the level the ring + pulse encode, named by its load band. One
-  // builder, so `onActive` and `onSelect` can never report different numbers or
-  // a different string than the chip paints.
+  // Load level + band label. One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: geo.unknown ? null : geo.level,

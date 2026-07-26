@@ -1,4 +1,4 @@
-// Funnel geometry — pure, React-free. Rectangles
+// Funnel: Rectangles
 // only: heights ∝ value, zero-anchored — the smooth tapered silhouette
 // interpolates data that doesn't exist. `rate` normalizes every stage to the
 // FIRST stage (never the previous — that hides compounding loss). 2-dp.

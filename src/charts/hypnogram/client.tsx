@@ -1,8 +1,7 @@
 "use client";
 // Interactive <Hypnogram>. useActivePicker owns interaction: one pointer
 // listener + run-by-x lookup, ←/→ rove runs, Home/End jump, click / Enter /
-// Space selects (onSelect). Composes the static component (canon) — the SVG is
-// never re-implemented.
+// Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

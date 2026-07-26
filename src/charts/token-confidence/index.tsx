@@ -1,6 +1,6 @@
 // <TokenConfidence> — which parts of generated text you should double-check
 // The documented exception to the SVG Chart root:
-// THE TEXT IS THE CHART. Static, hook-free, RSC-safe. Confidence maps to three
+// THE TEXT IS THE CHART. Confidence maps to three
 // discrete tiers as typographic underlines (color + thickness + stroke style —
 // never color-alone); confident tokens get NO mark so reading stays primary.
 import type { CSSProperties, ReactNode } from "react";

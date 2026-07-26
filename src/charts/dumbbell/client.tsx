@@ -2,7 +2,7 @@
 // Interactive <Dumbbell>. useActivePicker owns interaction: one pointer listener
 // + row-by-y-band lookup — ↑/↓ (or ←/→) rove rows, announcing each pair's change
 // ("From 62,000 to 84,000, up 35%."); click / Enter / Space selects a row
-// (onSelect). Composes the static component (canon) — the SVG never drifts.
+// (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {

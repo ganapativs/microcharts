@@ -1,6 +1,6 @@
 // <PartitionStrip> — what the whole is made of, and what the big parts are made
-// of, with parentage visible. Static, hook-free,
-// RSC-safe. Two aligned rows beat a treemap because alignment is the comparison
+// of, with parentage visible.
+// Two aligned rows beat a treemap because alignment is the comparison
 // channel. Two levels max — grandchildren are ignored with a dev warning.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

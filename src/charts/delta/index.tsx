@@ -1,20 +1,15 @@
-// <Delta> — change vs prior. The most common SaaS KPI element:
-// a direction glyph + signed value. Static, hook-free, RSC-safe. Rendered as
-// accessible inline HTML (not a tiny SVG viewBox) so the number flows and wraps
-// like text; the glyph is an inline SVG. Direction is ALWAYS double-encoded —
-// triangle shape (up/down/flat) AND color — never color alone.
+// <Delta> — change vs prior: direction glyph + signed value.
+// Inline HTML (not a tiny SVG) so the number flows like text; glyph is inline SVG.
+// Direction is always double-encoded — triangle shape AND color — never color alone.
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import type { CSSProperties, ReactNode } from "react";
 
-// viewBox is 0 0 10 10 (y grows downward). Each mark is vertically CENTERED in
-// the box (symmetric 2u top/bottom margin) so the glyph's optical centre lands
-// on the digits' centre — no drift beside the number. Apex is the lone vertex:
-// top (small y) for up ▲, bottom (large y) for down ▼.
+// Glyphs centred in 10×10 viewBox so optical centre aligns with digits (y↓).
 const GLYPH = {
-  up: "M5 2.4 L8.6 7.6 L1.4 7.6 Z", // ▲ apex top, centred
-  down: "M1.4 2.4 L8.6 2.4 L5 7.6 Z", // ▼ apex bottom, centred
-  flat: "M1.4 4.2 H8.6 V5.8 H1.4 Z", // ▬ centred bar
+  up: "M5 2.4 L8.6 7.6 L1.4 7.6 Z",
+  down: "M1.4 2.4 L8.6 2.4 L5 7.6 Z",
+  flat: "M1.4 4.2 H8.6 V5.8 H1.4 Z",
 } as const;
 
 /** Resolved Delta model — shared by the static entry and the interactive one. */

@@ -3,7 +3,7 @@
 // fraction of the word's OWN inked extent (percentage inset → 50% bisects the
 // word, never a hidden wider track). No <clipPath> element → no generated id
 // (canon-safe). font-size is an SVG attribute; textLength pins the
-// glyph extent so containment is provable server-side. Static, hook-free, RSC-safe.
+// glyph extent so containment is provable server-side.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makePercentFormatter } from "../../core/format.js";

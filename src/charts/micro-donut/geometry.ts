@@ -1,6 +1,6 @@
-// MicroDonut geometry — pure, React-free. ≤ 4 category
+// MicroDonut: ≤ 4 category
 // wedges + "Other" rollup, 2° gaps, 12-o'clock start. Each wedge is a STROKED
-// open centerline at mid-radius (stroke-width = ring weight), not a filled
+// open centerline at mid-radius (stroke-width = ring weight). not a filled
 // annulus sector — the same mechanism as ProgressRing: a stroked arc's length
 // is drawable, so the entrance builds the wheel wedge-by-wedge around the clock
 // via stroke-dashoffset, and at rest the butt-capped band fills the same radial

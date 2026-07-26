@@ -3,12 +3,6 @@ import { Waveform } from "@microcharts/react/waveform";
 import { Waveform as WaveformInteractive } from "@microcharts/react/waveform/interactive";
 import staticModule, { playground as staticPlayground, WAVE } from "./waveform";
 
-/** Interactive half of the waveform chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./waveform`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <WaveformInteractive data={WAVE} summary={false} width={130} height={26} animate={animate} />

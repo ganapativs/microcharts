@@ -1,13 +1,5 @@
-// @microcharts/react/theme — a token builder for the `--mc-*` contract.
-//
-//   const brand = defineTheme({ accent: "#6d28d9" });
-//   <MicroProvider style={brand.style}>…</MicroProvider>   // one instance
-//   brand.css(":root")                                     // or a global sheet
-//
-// Give it a single brand accent and it derives a harmonized, CVD-safe
-// categorical palette and hand-tuned-looking dark twins in OKLCH — all
-// overridable, and it never moves the positive/negative hues off the
-// colorblind-safe green/vermillion split. Zero dependencies; pure functions.
+// @microcharts/react/theme — `defineTheme({ accent })` → `--mc-*` vars/style/css().
+// CVD-safe cats + dark twins in OKLCH; valence hues fixed. Zero dependencies.
 
 // The shipped default accent (= SEMANTIC.accent in core/color.ts). Inlined so
 // this opt-in module pulls in nothing else; theme.test.ts guards the match.
@@ -104,7 +96,7 @@ export interface Theme {
   toString(): string;
 }
 
-// ── Preset bundles (mirror styles.css; kept honest by theme.test.ts) ──────────
+// Preset bundles (mirror styles.css; theme.test.ts keeps them honest).
 const PRESETS: Record<ThemePreset, Vars> = {
   modern: {},
   editorial: { "--mc-accent": "#a32236", "--mc-stroke-width": "1" },
@@ -138,7 +130,7 @@ const PRESETS: Record<ThemePreset, Vars> = {
   },
 };
 
-// ── sRGB ↔ OKLab (Björn Ottosson) ────────────────────────────────────────────
+// sRGB ↔ OKLab (Björn Ottosson).
 function toLinear(c: number): number {
   return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
 }

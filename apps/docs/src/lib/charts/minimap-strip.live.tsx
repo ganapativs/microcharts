@@ -3,12 +3,6 @@ import { MinimapStrip } from "@microcharts/react/minimap-strip";
 import { MinimapStrip as MinimapStripInteractive } from "@microcharts/react/minimap-strip/interactive";
 import staticModule, { playground as staticPlayground, DATA } from "./minimap-strip";
 
-/** Interactive half of the minimap-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./minimap-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <MinimapStripInteractive

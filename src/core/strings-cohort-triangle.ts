@@ -1,6 +1,5 @@
-// CohortTriangle summary templates (cohort-triangle) — its OWN module. Rows are
-// vintages, columns are age; the equal-maturity comparison is the decision read.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// CohortTriangle summary templates (cohort-triangle). Rows are vintages, columns are age;
+// the equal-maturity comparison is the decision read.
 import type { SummaryStrings } from "./summary.js";
 
 export type CohortTriangleStrings = Pick<

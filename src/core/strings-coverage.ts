@@ -1,6 +1,4 @@
-// Coverage / presence summary templates (coverage-strip) — a separate MODULE
-// (see strings-scalar.ts for why bundlers keep whole chunks). English lives
-// only in core string modules (canon). Aggregate dictionary: core/strings.ts `EN`.
+// Coverage / presence summary templates (coverage-strip)
 import type { SummaryStrings } from "./summary.js";
 
 export type CoverageStrings = Pick<SummaryStrings, "noData" | "coverage" | "coverageSlot">;

@@ -1,7 +1,7 @@
 "use client";
 // Interactive <RubricStrip>. useActivePicker owns interaction: one pointer
 // listener + row-by-y lookup, ↑/↓ rove criteria, click / Enter / Space selects
-// (onSelect). Composes the static component (canon) — never re-implemented.
+// (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

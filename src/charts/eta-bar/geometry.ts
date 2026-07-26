@@ -1,7 +1,7 @@
-// EtaBar geometry — pure, React-free. The x-axis is
+// EtaBar: The x-axis is
 // TIME, not fraction: the remainder is sized by the OBSERVED rate, never linear
 // interpolation. When the rate drops, the remainder visibly grows — that is the
-// feature. Rate ≤ 0 / absent → indeterminate (stalled), never a fake countdown.
+// feature. Rate ≤ 0 / absent → indeterminate (stalled). never a fake countdown.
 import { round2 } from "../../core/types.js";
 
 export interface Rect {

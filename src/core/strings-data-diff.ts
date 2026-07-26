@@ -1,6 +1,4 @@
-// DataDiff summary templates (data-diff) — its OWN module (see strings-scalar.ts
-// for the chunk rationale). English lives only in core string modules (canon).
-// Aggregate: core/strings.ts `EN`.
+// DataDiff summary templates (data-diff)
 import type { SummaryStrings } from "./summary.js";
 
 export type DataDiffStrings = Pick<

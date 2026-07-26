@@ -3,12 +3,6 @@ import { TraceFold } from "@microcharts/react/trace-fold";
 import { TraceFold as TraceFoldInteractive } from "@microcharts/react/trace-fold/interactive";
 import staticModule, { playground as staticPlayground, TRACE, ms } from "./trace-fold";
 
-/** Interactive half of the trace-fold chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./trace-fold`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <TraceFoldInteractive

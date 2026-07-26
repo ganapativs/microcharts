@@ -1,39 +1,11 @@
-// Entrance-motion gate. The opt-in
-// `animate` prop on every `…/interactive` entry routes through this hook.
-//
-// Contract:
-//   - OFF (default) and on the server this is inert: no markup, no styles, no
-//     animation artifacts — the rendered output is byte-identical.
-//   - The engine ships separately: `import "@microcharts/react/motion"` once,
-//     client-side — the same import-once shape as `styles.css` and
-//     `./annotations`. Charts that never animate never carry the engine; the
-//     gate itself costs each interactive entry almost nothing.
-//   - SSR-hydrated mounts NEVER animate. The server frame is already on
-//     screen; replaying an entrance over painted content is a flash, not a
-//     delight. Only fresh client-side mounts (streamed AI UIs, route changes,
-//     toggles) get the entrance — progressive enhancement, zero layout shift.
-//   - `prefers-reduced-motion` wins unconditionally.
+// Opt-in `animate` gate: inert on SSR/default; engine is a separate import.
+// SSR-hydrated first paint must not replay entrance (flash over painted HTML) —
+// only fresh client mounts animate. `prefers-reduced-motion` wins.
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 
 /**
- * The shared motion vocabulary, re-exported from `@microcharts/react/motion` so
- * the UI AROUND a chart — a chip, a readout, a toolbar that moves with it — can
- * speak the same language. Consumer-facing by design, which is why nothing inside
- * the library imports the duration table: like `PALETTE` and `CATEGORICAL` in
- * `core/color.ts`, these are a published contract, not dead code.
- *
- * They are NOT the engine's timing tables. The engine tunes duration and easing
- * PER ARCHETYPE (`DUR`/`EASE` in motion-engine.ts) — a draw is not a pop — and a
- * flat three-value table could never express that. These are the coarse beats a
- * consumer needs to match a chart's feel without reproducing its choreography.
- *
- * `MC_EASE_ENTER` must stay equal to `--mc-easing` in `styles.css`, which is the
- * same curve for the CSS side and the token a consumer overrides. The two had
- * drifted — `cubic-bezier(0.23, 1, 0.32, 1)` here against
- * `cubic-bezier(0.22, 1, 0.36, 1)` there — so a chart's CSS transitions and its
- * scripted entrance eased on different curves. WAAPI cannot read a custom
- * property, so the literal has to be duplicated;
- * `src/test/theming-contract.test.ts` asserts the two copies match.
+ * Published motion tokens for consumer UI — not the per-archetype engine tables.
+ * WAAPI can't read `--mc-easing`, so the literal is duplicated; theming-contract.test.ts guards drift.
  */
 export const MC_EASE_ENTER = "cubic-bezier(0.22, 1, 0.36, 1)";
 /** On-screen morphs (a value updating in place), for consumer UI.

@@ -1,5 +1,5 @@
 // <DualWindowMeter> — is the level compliant against its target both right now
-// and on average. Static, hook-free, RSC-safe. Two
+// and on average. Two
 // rolling means of one raw series: fast window thin, slow window thick, against
 // a target line. The window sizes are part of the reading and appear in docs.
 import type { CSSProperties, ReactNode } from "react";

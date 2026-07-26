@@ -1,8 +1,6 @@
-// <VolumeProfile> — at which LEVEL did activity concentrate, not when (
-// §16, F15). Static, hook-free, RSC-safe. A histogram perpendicular to
-// the trend axis: y = level, bars extend horizontally by activity mass. The
-// modal bin (POC) is accented and the value area is shaded — a stated 70%
-// convention, never an implied confidence interval.
+// <VolumeProfile> — at which LEVEL did activity concentrate (not when).
+// Histogram perpendicular to the trend axis: y = level, bars extend by mass.
+// Modal bin (POC) accented; value area shaded (stated 70% convention, not a CI).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";

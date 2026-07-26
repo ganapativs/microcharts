@@ -3,12 +3,6 @@ import { ParetoStrip } from "@microcharts/react/pareto-strip";
 import { ParetoStrip as ParetoStripInteractive } from "@microcharts/react/pareto-strip/interactive";
 import staticModule, { playground as staticPlayground, CAUSES } from "./pareto-strip";
 
-/** Interactive half of the pareto-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./pareto-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ParetoStripInteractive

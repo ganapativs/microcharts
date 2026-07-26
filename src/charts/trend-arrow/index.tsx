@@ -1,6 +1,6 @@
 // <TrendArrow> — direction at glyph size. "Which way is this
-// moving?" before any number. Static, hook-free, RSC-safe. Direction is never
-// color-alone: the glyph shape IS the direction (up / down / flat), color
+// moving?" before any number. Direction is never
+// color-alone: the glyph shape IS the direction (up / down / flat). color
 // reinforces valence per the `positive` polarity. Magnitude is only spoken by
 // `showValue` and the summary — the glyph never scales with it.
 import type { CSSProperties, ReactNode } from "react";

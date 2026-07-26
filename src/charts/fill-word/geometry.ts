@@ -1,4 +1,4 @@
-// FillWord geometry — pure, React-free. The label IS the bar:
+// FillWord: The label IS the bar:
 // a muted word with an accent copy clipped to the value fraction of its own
 // glyph extent (percentage inset → 50% visually bisects the word, never a
 // hidden wider track). Glyph extent is estimated deterministically (0.62

@@ -1,6 +1,5 @@
-// CalibrationStrip summary templates (calibration-strip) — its OWN module. The
-// support disclosure is not optional: a reliability read without it is the exact
-// failure this chart prevents. English lives only in core string modules (canon).
+// CalibrationStrip summary templates (calibration-strip). The support disclosure is not
+// optional: a reliability read without it is the exact failure this chart prevents.
 import type { SummaryStrings } from "./summary.js";
 
 export type CalibrationStrings = Pick<

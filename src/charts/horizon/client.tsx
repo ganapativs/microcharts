@@ -3,8 +3,7 @@
 // learned: the nearest-x crosshair announces the TRUE value, not the band, and
 // raises a value dot at the folded position. useActivePicker owns interaction:
 // one pointer listener + nearest-x math, roving keyboard (←/→ step x, Home/End
-// ends), touch tap-to-pin, and the onActive/onSelect contract. Composes the
-// static component (canon).
+// ends). touch tap-to-pin, and the onActive/onSelect contract.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

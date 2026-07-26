@@ -1,6 +1,5 @@
 // <RubricStrip> — how a thing scored per criterion, with each criterion's weight
-// visible, without a fake composite number. Static,
-// hook-free, RSC-safe. Bar length = score, bar thickness = weight share. There
+// visible, without a fake composite number. Bar length = score, bar thickness = weight share. There
 // is NO total bar and none may be added — that is the whole point.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

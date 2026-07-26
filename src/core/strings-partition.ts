@@ -1,6 +1,5 @@
-// PartitionStrip summary templates (partition-strip) — its OWN module. Two
-// levels max; alignment is the comparison channel. English lives only in core
-// string modules (canon). Aggregate: core/strings.ts.
+// PartitionStrip summary templates (partition-strip). Two levels max; alignment is the
+// comparison channel.
 import type { SummaryStrings } from "./summary.js";
 
 export type PartitionStrings = Pick<

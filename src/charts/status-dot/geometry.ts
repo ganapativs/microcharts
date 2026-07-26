@@ -1,6 +1,6 @@
-// StatusDot geometry — pure, React-free. Five
+// StatusDot: Five
 // distinct silhouettes paired with semantic tokens: the shape+color pairing is
-// the a11y contract (never color-alone by construction), so the glyphs must
+// the a11y contract (never color-alone by construction). so the glyphs must
 // survive grayscale, print, and forced-colors on silhouette alone.
 import { round2 } from "../../core/types.js";
 

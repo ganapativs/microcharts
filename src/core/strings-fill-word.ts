@@ -1,7 +1,5 @@
-// FillWord summary templates (fill-word) — its OWN module. The word names the
-// task; the percent is of the word's own inked extent (fill-mode = complete,
-// drain-mode = remaining). English lives only in core string modules (canon).
-// Aggregate: core/strings.ts `EN`.
+// FillWord summary templates (fill-word). The word names the task; the percent is of the
+// word's own inked extent (fill-mode = complete, drain-mode = remaining).
 import type { SummaryStrings } from "./summary.js";
 
 export type FillWordStrings = Pick<SummaryStrings, "noData" | "fillWord" | "fillWordRemaining">;

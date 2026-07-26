@@ -1,8 +1,8 @@
 // <CohortTriangle> — which vintage retains worst, compared at equal maturity
-// Rows are cohorts (input order top→bottom), columns are age; each
+// Rows are cohorts (input order top→bottom). columns are age; each
 // cell is shaded by a discrete retention level. The ragged trailing edge is the
 // classic retention triangle: newer cohorts have simply been observed for fewer
-// ages. Static, hook-free, RSC-safe. Color is approximate by design, so the
+// ages. Color is approximate by design, so the
 // per-cell number lives in the accessible summary + interactive readout, never
 // on the static cell (unmeasurable + too dense).
 import type { CSSProperties, ReactNode } from "react";

@@ -1,5 +1,5 @@
 // <WindBarb> — which way it's flowing and roughly how hard, in one character
-// Static, hook-free, RSC-safe. Direction is the shaft
+// Direction is the shaft
 // angle; magnitude is QUANTIZED into WMO barbs (that quantization is the honesty
 // — the per-barb quantum is stated next to every example). No interactive entry:
 // a single glyph has no meaningful pointer/keyboard interaction (the a11y name

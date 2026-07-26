@@ -3,7 +3,7 @@
 // length ∝ value, growing from an inner baseline. 0 at 12 o'clock, clockwise.
 // The channel is radial LENGTH from r0 (not sector area — r0 > 0 curbs the
 // outer-area distortion); `mode="opacity"` switches the channel to a 5-step fill
-// for very small sizes. Static, hook-free, RSC-safe.
+// for very small sizes.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";

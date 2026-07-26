@@ -1,5 +1,4 @@
-// Calendar-day summary templates — a separate MODULE (see strings-scalar.ts
-// for the chunk rationale). English lives only in core string modules (canon).
+// Calendar-day summary templates
 import type { SummaryStrings } from "./summary.js";
 
 export type CalendarStrings = Pick<SummaryStrings, "noData" | "dayAt" | "dayEmpty" | "calendar">;

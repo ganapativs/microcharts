@@ -1,6 +1,5 @@
-// Thermometer summary templates (thermometer) — its OWN module. States the
-// value against the calibrated scale, and the goal when a target is set. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// Thermometer summary templates (thermometer). States the value against the calibrated
+// scale, and the goal when a target is set.
 import type { SummaryStrings } from "./summary.js";
 
 export type ThermometerStrings = Pick<

@@ -1,8 +1,7 @@
-// BreathingDot summary templates (breathing-dot) — its OWN module. An ambient
-// load level; the summary states the percent and the band word (calm / elevated /
-// strained). Motion (pulse rate) and the static ring offset both double the band
-// color, so the words here are never the only signal. English lives only in core
-// string modules (canon). Aggregate: core/strings.ts `EN`.
+// BreathingDot summary templates (breathing-dot). An ambient load level; the summary states
+// the percent and the band word (calm / elevated / strained). Motion (pulse rate) and the
+// static ring offset both double the band color, so the words here are never the only
+// signal.
 import type { SummaryStrings } from "./summary.js";
 
 export type BreathingDotStrings = Pick<

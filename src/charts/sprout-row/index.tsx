@@ -1,8 +1,7 @@
 // <SproutRow> — how mature/healthy is each item in a small set (S2 ordinal).
 // Four discrete growth stages (seed → sprout → leaf → bloom); glyph
 // height is strictly monotonic so the ordering reads untrained (taller = further
-// along). No half-stages — a growth metaphor must not fake continuity. Static,
-// hook-free, RSC-safe.
+// along). No half-stages — a growth metaphor must not fake continuity.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";

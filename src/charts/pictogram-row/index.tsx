@@ -1,6 +1,6 @@
 // <PictogramRow> — counts a human can verify by counting.
 // ●●●○○ — filled vs hollow is a SHAPE difference too, never opacity-alone.
-// Static, hook-free, RSC-safe. One row only (wrapped grids are ActivityGrid
+// One row only (wrapped grids are ActivityGrid
 // territory); unit size is constant — never scaled by value.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

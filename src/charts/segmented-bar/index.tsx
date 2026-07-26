@@ -1,5 +1,5 @@
 // <SegmentedBar> — what is this made of, and in what proportions (S3).
-// Static, hook-free, RSC-safe. Segments always sum to the full bar; past
+// Segments always sum to the full bar; past
 // `maxSegments` the tail rolls into a labeled "Other" — nothing is silently
 // dropped. A flat bar beats a donut of the same data at every size we ship.
 import type { CSSProperties, ReactNode } from "react";

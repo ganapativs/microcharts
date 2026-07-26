@@ -1,6 +1,5 @@
-// StreakSpark summary templates (streak-spark) — its OWN module. A run of equal
-// outcomes; the current run is read against the record streak with a break
-// count. English lives only in core string modules (canon). Aggregate: strings.ts.
+// StreakSpark summary templates (streak-spark). A run of equal outcomes; the current run is
+// read against the record streak with a break count.
 import type { SummaryStrings } from "./summary.js";
 
 export type StreakSparkStrings = Pick<

@@ -3,12 +3,6 @@ import { SpiralYear } from "@microcharts/react/spiral-year";
 import { SpiralYear as SpiralYearInteractive } from "@microcharts/react/spiral-year/interactive";
 import staticModule, { playground as staticPlayground, YEAR } from "./spiral-year";
 
-/** Interactive half of the spiral-year chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./spiral-year`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <SpiralYearInteractive data={YEAR} summary={false} size={40} animate={animate} />;
 }

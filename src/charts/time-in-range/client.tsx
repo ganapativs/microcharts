@@ -1,9 +1,8 @@
 "use client";
 // Interactive <TimeInRange>. useActivePicker owns interaction: one pointer
 // listener + zone-by-x/y lookup, roving keyboard (←/→ horizontal, ↑/↓
-// vertical, Home/End ends), touch tap-to-pin, and the onActive/onSelect
-// contract. Each zone announces "{zone}: {pct}". Composes the static component
-// (canon) — overlays ride as children.
+// vertical, Home/End ends). touch tap-to-pin, and the onActive/onSelect
+// contract. Each zone announces "{zone}: {pct}".
 import { useCallback, useMemo, useRef } from "react";
 import type { ZoneKey } from "./geometry.js";
 import {

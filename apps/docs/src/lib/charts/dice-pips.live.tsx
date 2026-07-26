@@ -3,12 +3,6 @@ import { DicePips } from "@microcharts/react/dice-pips";
 import { DicePips as DicePipsInteractive } from "@microcharts/react/dice-pips/interactive";
 import staticModule, { playground as staticPlayground } from "./dice-pips";
 
-/** Interactive half of the dice-pips chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./dice-pips`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-3">

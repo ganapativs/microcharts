@@ -1,5 +1,5 @@
 // <MiniBar> — which category is biggest, and by roughly how much (S2).
-// Static, hook-free, RSC-safe. Bars are always zero-anchored; the data's
+// Bars are always zero-anchored; the data's
 // own order is the default truth (`order` never silently defaults to ranking —
 // weekday order, funnel order carry meaning sorting would destroy). No
 // category text at cell size: labels live in the summary + interactive readout.

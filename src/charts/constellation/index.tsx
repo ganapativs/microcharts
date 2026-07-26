@@ -3,7 +3,6 @@
 // area-true dot size. A hairline chronology line connects the events in time
 // order. When no values are given, vertical position is deterministic jitter that
 // encodes NOTHING (the docs and this file say so; the summary never reads it).
-// Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";

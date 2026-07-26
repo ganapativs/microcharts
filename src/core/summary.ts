@@ -344,8 +344,6 @@ export interface SummaryStrings {
    *  region and the visible chip, so it can never be composed inline. */
   timelineFallback: (index: number, kind: "span" | "point") => string;
 
-  /* ── Batch 2 — decision micrographs ──────────────────────────────────── */
-
   /** Coverage summary, e.g. "18 of 24 slots measured (75%); longest gap 4 slots." */
   coverage: (measured: number, expected: number, coveragePct: string, longestGap: number) => string;
   /** Coverage slot announcement, e.g. "Slot 14: 3.2." / "Slot 14: no measurement." */

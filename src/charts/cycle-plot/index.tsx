@@ -3,7 +3,7 @@
 // own raw values across cycles as a muted polyline (time order, never smoothed,
 // never joined across a slot boundary) plus a mean/median tick, and the accent
 // spine connects the slot centers. Seasonality and drift are different questions
-// of one dataset, kept visually separate. Static, hook-free, RSC-safe.
+// of one dataset, kept visually separate.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

@@ -1,4 +1,3 @@
-// BreathingDot geometry — pure, React-free.
 // An ambient load read. The STATIC frame is a real chart: a core dot (colored by
 // threshold band) plus a level ring whose distance from the core encodes the
 // level. The interactive entry adds a pulse whose rate is the level (motion IS

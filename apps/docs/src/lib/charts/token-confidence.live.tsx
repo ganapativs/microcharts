@@ -3,12 +3,6 @@ import { TokenConfidence } from "@microcharts/react/token-confidence";
 import { TokenConfidence as TokenConfidenceInteractive } from "@microcharts/react/token-confidence/interactive";
 import staticModule, { playground as staticPlayground, ANSWER } from "./token-confidence";
 
-/** Interactive half of the token-confidence chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./token-confidence`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive() {
   return (
     <TokenConfidenceInteractive data={ANSWER} summary={false} style={{ fontSize: "0.8rem" }} />

@@ -1,8 +1,8 @@
 "use client";
 // Interactive <WinProbWorm>. useActivePicker owns interaction: one pointer
 // listener + nearest-x lookup, ←/→ (Home/End) rove the points (each announcing
-// the current leader + probability), click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the crosshair + readout chip are
+// the current leader + probability). click / Enter / Space selects (onSelect).
+// the crosshair + readout chip are
 // overlay children, the worm/midline/dots come from the static so the two
 // entries can never drift.
 import { useCallback, useMemo, useRef } from "react";

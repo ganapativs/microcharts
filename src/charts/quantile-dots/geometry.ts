@@ -1,6 +1,6 @@
-// QuantileDots geometry — pure, React-free. What are the odds, in
+// QuantileDots: What are the odds, in
 // COUNTABLE form? A quantile dotplot: `count` dots at equal-probability
-// quantiles (Kay/Fernandes binning from core/quantile), stacked bottom-up. Each
+// quantiles (Kay/Fernandes binning from core/quantile). stacked bottom-up. Each
 // dot ≈ a 1-in-count chance — NOT a raw observation — so "N past a threshold" is
 // counted on the true quantile value, never the bin. Coords 2-dp, integer viewBox.
 import { quantileDotplot } from "../../core/quantile.js";

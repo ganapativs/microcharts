@@ -1,5 +1,5 @@
-// BurnChart geometry — pure, React-free. Will we finish on time?
-// A plan line (dashed, full length), the actual line to today, and a dotted
+// BurnChart: Will we finish on time?
+// A plan line (dashed, full length). the actual line to today, and a dotted
 // projection whose slope is a linear fit over the last k actual points (never a
 // smoothed or optimistic curve). History is precise; the projection is dotted
 // and provisional by construction. Y zero-anchored. Coords 2-dp.

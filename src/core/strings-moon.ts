@@ -1,6 +1,5 @@
-// MoonPhase summary templates (moon-phase) — its OWN module. Progress mode reads
-// as completion; cycle mode as position through a period. English lives only in
-// core string modules (canon). Aggregate: core/strings.ts `EN`.
+// MoonPhase summary templates (moon-phase). Progress mode reads as completion; cycle mode
+// as position through a period.
 import type { SummaryStrings } from "./summary.js";
 
 export type MoonStrings = Pick<SummaryStrings, "moonPhase" | "moonPhaseCycle">;

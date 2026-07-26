@@ -1,7 +1,7 @@
 "use client";
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
-// No sub-part navigation — the pips are one value. Composes the static component.
+// No sub-part navigation — the pips are one value.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";

@@ -3,12 +3,6 @@ import { ShiftHistogram } from "@microcharts/react/shift-histogram";
 import { ShiftHistogram as ShiftHistogramInteractive } from "@microcharts/react/shift-histogram/interactive";
 import staticModule, { playground as staticPlayground, BEFORE, AFTER, MS } from "./shift-histogram";
 
-/** Interactive half of the shift-histogram chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./shift-histogram`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ShiftHistogramInteractive

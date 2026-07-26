@@ -1,9 +1,8 @@
 "use client";
 // Interactive <MinimapStrip>. Drag or click to move the viewport
 // window; ←/→ nudge 5% (Shift 20%). The window maps linearly to the domain — no
-// fisheye. Hover/focus/drag floats the window's own range as a chip, so the
-// edges the slider reports to assistive tech are visible too. Composes the
-// static component (canon).
+// fisheye. Hover/focus/drag floats the window's own range as a chip, so
+// edges the slider reports to assistive tech are visible too.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { crosshairReadoutStyle, fillFor, wrap } from "../../shared/interactive.js";

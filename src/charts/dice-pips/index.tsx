@@ -1,7 +1,7 @@
 // <DicePips> — a small count/severity read instantly as a die face (S4).
 // Canonical pip patterns 1–6 only; 0 is an empty face (zero, not
-// missing), and > 6 shows a centered numeral rather than inventing a 7/8/9
-// pattern — the face never pretends. Static, hook-free, RSC-safe.
+// missing). and > 6 shows a centered numeral rather than inventing a 7/8/9
+// pattern — the face never pretends.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";

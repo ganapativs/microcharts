@@ -1,6 +1,5 @@
-// Waveform summary templates (waveform) — its OWN module. The peak is always
-// disclosed (honest peak-normalization); silence is a real state, not blank.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// Waveform summary templates (waveform). The peak is always disclosed (honest
+// peak-normalization); silence is a real state, not blank.
 import type { SummaryStrings } from "./summary.js";
 
 export type WaveformStrings = Pick<

@@ -1,6 +1,6 @@
 // <HeatStrip> — how did intensity evolve, glanceably. The 1×N
 // sibling of ActivityGrid: discrete color steps per time cell, shared step
-// scale + cell vocabulary. Static, hook-free, RSC-safe. Empty ≠ zero: a slot
+// scale + cell vocabulary. Empty ≠ zero: a slot
 // with no record renders a hairline outline, visibly different from value 0.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

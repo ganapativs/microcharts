@@ -1,8 +1,7 @@
 "use client";
 // Interactive <GradedBand>. One pointer listener + pure nearest-edge math. ←/→
 // step levels outward/inward from the median; each announces its interval ("80%
-// interval: 17 to 26."). Enter/Space/click pins a level (onSelect). Composes the
-// static component (canon); the edge ticks are overlay children re-using geometry.
+// interval: 17 to 26."). Enter/Space/click pins a level (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";

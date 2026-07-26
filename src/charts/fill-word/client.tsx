@@ -3,7 +3,7 @@
 // CSS clip-path transition (styles.css, reduced-motion-gated). Announces changes
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
 // Wrapper focus only (one value) — but hover/focus reveals the percent, which
-// the fill edge alone only approximates. Composes the static component.
+// the fill edge alone only approximates.
 import { useEffect, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
@@ -110,9 +110,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // Drill-down: the clamped fraction the ink clips to, named by the word itself.
-  // One builder, so `onActive` and `onSelect` can never report a different
-  // number or a different string than the chip paints.
+  // Clamped fill fraction (word label). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,

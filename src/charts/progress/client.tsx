@@ -3,7 +3,7 @@
 // region, throttled to whole-percent changes (no spam while a value streams).
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark) — hover/focus is a reveal of the reading, for the `label="none"` bar
-// that prints nothing. Composes the static component (canon).
+// that prints nothing.
 import { useEffect, useRef, useState } from "react";
 import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";

@@ -1,4 +1,4 @@
-// GardenGrid geometry — pure, React-free. ActivityGrid's
+// GardenGrid: ActivityGrid's
 // grayscale sibling: dot AREA (not color) carries a 5-step ordinal, so it reads
 // in print and monochrome. Radius is √-quantized (r = rMax·√(k/S)) so perceived
 // AREA steps evenly — a linear radius map would exaggerate highs quadratically.

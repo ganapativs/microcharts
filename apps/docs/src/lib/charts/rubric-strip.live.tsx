@@ -3,12 +3,6 @@ import { RubricStrip } from "@microcharts/react/rubric-strip";
 import { RubricStrip as RubricStripInteractive } from "@microcharts/react/rubric-strip/interactive";
 import staticModule, { playground as staticPlayground, RUBRIC } from "./rubric-strip";
 
-/** Interactive half of the rubric-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./rubric-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <RubricStripInteractive

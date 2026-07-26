@@ -1,8 +1,8 @@
 "use client";
 // Interactive <TraceFold>. useActivePicker owns interaction: one pointer
 // listener + pure span-by-(row, x) lookup, ←/→ within a depth row and ↑/↓
-// between depths (2-D roving), touch tap-to-pin, and the onActive/onSelect
-// contract. Composes the static component (canon).
+// between depths (2-D roving). touch tap-to-pin, and the onActive/onSelect
+// contract.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {

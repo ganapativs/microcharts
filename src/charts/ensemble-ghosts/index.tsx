@@ -3,7 +3,7 @@
 // hides that futures disagree in SHAPE, not just endpoint. Ghost
 // selection + emphasis are DETERMINISTIC (endpoint-rank quantiles) — nothing
 // varies between renders of the same data. A static frame is NOT a HOP (the loop
-// lives only in the interactive entry). Static, hook-free, RSC-safe.
+// lives only in the interactive entry).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";

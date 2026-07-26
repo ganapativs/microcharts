@@ -1,10 +1,10 @@
 "use client";
 // Interactive <HeartbeatBlip>. Motion IS the encoding: the trace
-// advances in real time so old spikes drift left and new events enter at the
+// advances in real time so old spikes drift left and new events enter at
 // right — the blip frequency IS the event rate. Every spike is ONE real event;
 // nothing is synthesized on a timer (a fake pulse on a dead service is the one
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
-// on data change) and on-screen (paused off-viewport). Composes the static (canon).
+// on data change) and on-screen (paused off-viewport).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
@@ -136,10 +136,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   // `label="count"` stays the tight numeral (space beside the glyph).
   const readoutText = strings.heartbeatChip(count);
 
-  // Drill-down: the rate read the trace encodes — how many events are in the
-  // window at the frame currently on screen — named by that window. One builder,
-  // so `onActive` and `onSelect` can never report a different count or a
-  // different string than the chip paints.
+  // Window event rate the trace encodes. One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: count,

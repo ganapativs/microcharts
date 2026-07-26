@@ -1,7 +1,4 @@
 "use client";
-// The playground's screen-reader pane: what assistive tech is handed for the
-// props currently on screen, read live out of the rendered DOM (see
-// `a11y-probe.ts`) and optionally spoken aloud.
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -19,14 +16,7 @@ import {
   type SpeechStatus,
 } from "./a11y-probe";
 
-/**
- * Watch the chart inside `ref` and report its accessibility surface.
- *
- * One MutationObserver over the subtree catches everything that matters: the
- * live region's text (characterData + childList) and the wrapper's naming
- * attributes. `key` re-reads when the playground remounts the chart with new
- * props but no mutation follows (e.g. a knob that only changes the summary).
- */
+/** MutationObserver + `key` re-read when remount changes props without DOM mutation. */
 function useA11yProbe(
   ref: React.RefObject<HTMLElement | null>,
   key: string,
@@ -34,9 +24,7 @@ function useA11yProbe(
   const [snapshot, setSnapshot] = useState<A11ySnapshot>(EMPTY_SNAPSHOT);
   const [log, setLog] = useState<Announcement[]>([]);
   const idRef = useRef(0);
-  // The region's last raw text, CLEARS INCLUDED. One mutation can fire several
-  // records, and `"Point 3"` → `""` → `"Point 3"` is genuinely two utterances,
-  // so the transition — not the text — decides what counts as new.
+  // Last raw live text (clears included) — transition detects re-utterances.
   const rawRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -61,8 +49,6 @@ function useA11yProbe(
     return () => mo.disconnect();
   }, [ref, key]);
 
-  // A remount (new props) starts a new reading — the old chart's announcements
-  // aren't this chart's.
   useEffect(() => {
     rawRef.current = null;
     setLog([]);
@@ -86,17 +72,7 @@ function Badge({ children, tone = "muted" }: { children: React.ReactNode; tone?:
   );
 }
 
-/**
- * What makes THIS chart speak.
- *
- * `rove` — a multi-unit picker: every unit you hover or arrow to is announced.
- *
- * `scalar` — one value, nothing to rove between. These entries announce on
- * CHANGE (the live region is fed by a value-changed effect, not by the pointer),
- * so pointing at them is silent by design and Shuffle is what makes them talk.
- *
- * `none` — no interactive entry, or no per-unit reading at all.
- */
+/** `rove` = per-unit; `scalar` = announce on value change; `none` = name only. */
 export type AnnounceMode = "rove" | "scalar" | "none";
 
 const WAITING: Record<AnnounceMode, string> = {
@@ -115,20 +91,15 @@ export function A11yPane({
   controls,
 }: {
   chartRef: React.RefObject<HTMLElement | null>;
-  /** Changes whenever the chart is remounted with different props. */
   probeKey: string;
   interactive: boolean;
   announce?: AnnounceMode;
-  /** Per-chart affordance line, e.g. "focus it and walk points with ← →". */
   hint?: string;
-  /** The naming knobs (`summary` / `title` / `id`) — they belong to this pane. */
   controls?: ReactNode;
 }) {
   const { snapshot, log } = useA11yProbe(chartRef, probeKey);
   const [voice, setVoice] = useState(false);
   const [status, setStatus] = useState<SpeechStatus>({ kind: "off" });
-  // Keyed by utterance id, not text: re-entering the same point is a second
-  // announcement, and a screen reader speaks it again.
   const spokenRef = useRef<number>(-1);
   const saidNameRef = useRef<string>("");
 
@@ -137,11 +108,7 @@ export function A11yPane({
     speak(`${name}. Image.`, { onStatus: setStatus });
   };
 
-  // Voice each new announcement. When nothing is speaking it goes out at once —
-  // a reader who hovers one point must hear it immediately. When the engine is
-  // already mid-sentence, wait for the stream to settle instead: a mouse scrub
-  // fires one announcement per unit crossed, and voicing every one means each is
-  // cut off ~40 ms in, so the reader hears a stutter and never a value.
+  // Speak promptly when idle; debounce ~140ms while mid-utterance (scrub stutter).
   useEffect(() => {
     if (!voice) return;
     const head = log[0];
@@ -158,10 +125,7 @@ export function A11yPane({
     return () => clearTimeout(t);
   }, [voice, log]);
 
-  // The name is re-spoken when the chart takes focus, and when a naming knob
-  // changes what the name IS. Switching the voice on says it too — but from the
-  // CLICK HANDLER, not here: Safari only starts speech inside a user gesture,
-  // and a passive effect runs after that gesture has ended.
+  // Re-speak name on focus / rename. Voice-on speak is in the click handler (Safari gesture).
   useEffect(() => {
     if (!voice || !snapshot.name) return;
     const name = snapshot.name;
@@ -174,8 +138,7 @@ export function A11yPane({
 
   useEffect(() => () => stopSpeaking(), []);
 
-  // Side effects stay OUT of the updater — React double-invokes it in
-  // StrictMode, which spoke the name twice.
+  // Don't speak inside setState updaters — StrictMode double-invoke.
   const toggleVoice = (): void => {
     if (voice) {
       stopSpeaking();
@@ -222,10 +185,6 @@ export function A11yPane({
               {snapshot.focusable && <Badge>focusable</Badge>}
             </>
           )}
-          {/* Speech fails silently in browsers more often than it should — no
-              voices installed, an engine that refuses without a gesture, a muted
-              output. Report what the engine said back, so "I hear nothing" is
-              always answerable. */}
           {voice && speechNote && (
             <span
               className={cn(

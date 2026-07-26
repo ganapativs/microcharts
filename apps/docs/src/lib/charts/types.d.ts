@@ -19,9 +19,7 @@ export interface ChartEntry {
   status: ChartStatus;
   /** Catalog collection — metadata only, never an import-path boundary. */
   collection: ChartCollection;
-  /** Set when this catalog entry is a mode of a parent component. */
   variantOf?: string;
-  /** One line — what decision it answers. */
   tagline: string;
   staticImport: string;
   interactiveImport?: string;
@@ -31,41 +29,26 @@ export interface ChartEntry {
    */
   animates?: boolean;
   /**
-   * `false` ⇒ the interactive entry has NO unit picker: no `onActive`,
-   * `selectedIndex`, `defaultSelectedIndex`, or roving keyboard navigation.
-   * Two reasons a chart is marked `false`:
-   *  - **lean scalar charts** — one value, nothing to rove between (`delta`,
-   *    `status-dot`, `progress`, `orbit-status`, …). They still take whole-chart
-   *    `onSelect` (click / Enter / Space); no selection stays pinned.
-   *  - **deliberate exceptions** — `minimap-strip` is a range/slider primitive
-   *    (`onWindowChange`) and `token-confidence` flows inline in text; both keep
-   *    their own interaction props instead of the shared picker set.
-   *
-   * Omitted (⇒ `true`) on every multi-unit chart. Charts with no
-   * `interactiveImport` at all (`wind-barb`) are outside the split entirely.
+   * `false` ⇒ no unit picker (`onActive`, `selectedIndex`, roving keyboard).
+   * Lean scalars still take whole-chart `onSelect`; `minimap-strip` and
+   * `token-confidence` are deliberate exceptions with their own props.
+   * Omitted ⇒ picker. No `interactiveImport` ⇒ outside the split (`wind-barb`).
    */
   picker?: false;
   /**
-   * `false` ⇒ the interactive entry paints NO readout chip, because the value
-   * is already on the glyph (`delta`, `fat-digits`, `trend-arrow`) or the mark
-   * is a count you read by counting (`dice-pips`, `tally-marks`) or a named
-   * state rather than a number (`status-dot`). Every other interactive chart
-   * shows its reading on hover/focus — enforced library-side by
-   * `src/test/readout-presence.test.ts`.
+   * `false` ⇒ no readout chip — value on the glyph, count-by-counting marks,
+   * or named state. Enforced by `src/test/readout-presence.test.ts`.
    */
   readout?: false;
   dataShape: string;
-  /** Primary encoding channel + precision rating. */
   encoding: {
     channel: string;
     precision: string;
   };
-  /** Documented SVG node budget for a typical render, e.g. "≤ 6" or "1 per cell". */
   nodeBudget: string;
   bestFor: string[];
   avoidFor: string[];
   props: ChartProp[];
-  /** Representative series for live demos + OG + summary quoting. */
   demo: number[];
   example: {
     title: string;
@@ -100,7 +83,6 @@ export type Knob =
     };
 export interface PlaygroundSpec {
   knobs: Knob[];
-  /** Initial demo series (charts whose knobs are the whole story omit it). */
   data?: number[];
   /** Present ⇒ the shell shows a shuffle button; returns the next series. */
   shuffle?: (seed: number) => number[];
@@ -117,7 +99,6 @@ export interface PlaygroundSpec {
       animate: boolean;
     },
   ) => ReactNode;
-  /** JSX mirroring `renderInteractive` (includes `animate` when on). */
   codeInteractive?: (
     state: Record<string, KnobValue>,
     data: number[],
@@ -125,21 +106,15 @@ export interface PlaygroundSpec {
       animate: boolean;
     },
   ) => string;
-  /** Affordance hint under the interactive preview. */
   interactiveHint?: string;
-  /**
-   * `false` ⇒ no entrance motion — playground hides the animate toggle.
-   */
+  /** `false` ⇒ no entrance motion — playground hides the animate toggle. */
   animates?: boolean;
 }
 /** Named sample-data literal referenced by snippets (`data={accounts}`). */
 export interface SampleData {
-  /** Variable name, e.g. `"accounts"`. */
   name: string;
-  /** Full definition, e.g. `const accounts = […]`. */
   code: string;
 }
-/** One placement: sentence, cell, KPI, or tab. */
 export interface ContextHome {
   render: () => ReactNode;
   /** Copy-complete JSX; vars resolve via `sampleData`. */
@@ -157,67 +132,49 @@ export interface Recipe {
   label: string;
   code: string;
   node: ReactNode;
-  /** Render inside the visibly-constrained fluid frame. */
   fluid?: boolean;
 }
 /**
- * Static half of a chart module — everything the SERVER needs (gallery
- * `Preview`, `sizing` recipes, the four-contexts `Mark`).
+ * Static half — gallery `Preview`, sizing recipes, four-contexts `Mark`.
  *
  * Lives in `lib/charts/<slug>.tsx` and MUST NOT import any `…/interactive`
- * entry. Those are `'use client'` modules: Next registers every one reachable
- * from a server component's import graph as an eager client reference for that
- * route — importing is enough, it never has to render, and tree-shaking does
- * not cross the boundary. `registry.ts` pulls all 106 of these, so a single
- * interactive import here puts the whole catalog's interactive code on the
- * critical path of `/charts` and every chart doc page (~100 kB gzip, measured).
- * The interactive half lives in `<slug>.live.tsx`.
+ * entry. Those are `'use client'`: Next registers every reachable import as an
+ * eager client reference for that route — tree-shaking does not cross the boundary.
+ * `registry.ts` pulls all 106 static halves; one interactive import here puts
+ * ~100 kB gzip of interactive code on `/charts` and every chart doc page.
+ * Interactive half: `<slug>.live.tsx`.
  */
 export interface ChartModuleStatic {
   entry: ChartEntry;
-  /** Static render for the gallery card. */
   Preview: ComponentType;
   playground: PlaygroundSpec;
   recipes: Recipe[];
-  /** Chart at context scale, for the four-contexts grid. */
   Mark: ComponentType<{
     data: number[];
     width?: number;
     height?: number;
   }>;
-  /** JSX string mirroring `Mark` at a given size. */
   markCode: (width?: number, height?: number) => string;
-  /** Authored placements; absent ⇒ generic fallback. */
   contexts?: ChartContexts;
 }
 /**
- * Full chart module — the static half plus its interactive twin. Composed in
- * `lib/charts/<slug>.live.tsx` and reachable ONLY through the lazy maps
- * (`modules.generated`, `preview-live.generated`, `home/hero-modules`), so the
- * interactive entries land in async chunks instead of a route's eager graph.
+ * Static half plus interactive twin. Composed in `<slug>.live.tsx`; reachable
+ * ONLY via lazy maps (`modules.generated`, `preview-live.generated`, hero-modules)
+ * so interactive entries land in async chunks, not the route's eager graph.
  */
 export interface ChartModule extends ChartModuleStatic {
   /**
-   * Interactive-entry twin of `Preview` at the SAME size/props. Gallery +
-   * homepage hero prefer it unless the visitor chooses static or prefers reduced
-   * motion (then they stay on `Preview`).
+   * Interactive twin of `Preview` at the same size/props. Gallery/hero prefer it
+   * unless the visitor chooses static or prefers reduced motion.
    *
-   * The entrance is OPT-IN (`animate` defaults to false): the boards that render
-   * these — the /charts gallery, the homepage catalog tiles — show many charts at
-   * once, and a hundred simultaneous entrances read as noise. The chart-doc hero
-   * (`EntryDemoDual`) passes `animate` because it renders exactly one.
+   * Entrance is opt-in (`animate` defaults false): boards show many charts at
+   * once; doc hero (`EntryDemoDual`) passes `animate` for exactly one.
    */
   PreviewLive?: ComponentType<{
     animate?: boolean;
   }>;
-  /**
-   * Static chart component identity used inside authored `contexts` JSX — paired
-   * with `ChartLive` so four-homes can swap to the interactive twin in place.
-   */
+  /** Static component in authored `contexts` JSX — paired with `ChartLive`. */
   Chart?: ElementType;
-  /**
-   * Interactive twin of `Chart` (same props). Four-homes prefer this when set;
-   * at rest it must match the static footprint (library fill/seat parity).
-   */
+  /** Interactive twin of `Chart`; at rest must match static fill/seat parity. */
   ChartLive?: ElementType;
 }

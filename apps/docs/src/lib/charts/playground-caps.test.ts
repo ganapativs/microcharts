@@ -3,12 +3,7 @@ import { FIXTURES } from "@/components/charts/playground-options";
 import { PLAYGROUND_CAPS } from "./playground-caps.generated";
 import { STABLE_CHARTS } from "./registry";
 
-// The playground draws a control only when this map says the chart responds to
-// it (the map is produced by rendering every chart with every option — see
-// scripts/gen-playground-caps.mjs). A chart missing from the map silently loses
-// its Data / Numbers / naming controls, and a phantom slug means the map was
-// generated against a different catalog. Regenerate with
-// `pnpm gen:playground-caps`.
+// Map from `pnpm gen:playground-caps` — drift ⇒ missing controls or bogus slugs.
 describe("playground capability map", () => {
   const slugs = STABLE_CHARTS.map((c) => c.slug);
 
@@ -47,9 +42,7 @@ describe("playground capability map", () => {
   });
 
   it("marks the two inline-HTML charts as having no id-naming mode", () => {
-    // Delta and TokenConfidence render inline HTML instead of <Chart>, so they
-    // have no <title>/<desc> pair for `aria-labelledby` to point at (CLAUDE.md
-    // documents both as the standing exceptions).
+    // Delta / TokenConfidence — inline HTML, no <title>/<desc> for aria-labelledby.
     const noId = Object.entries(PLAYGROUND_CAPS)
       .filter(([, c]) => !c.idNaming)
       .map(([slug]) => slug)

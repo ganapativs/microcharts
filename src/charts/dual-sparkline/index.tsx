@@ -1,8 +1,7 @@
 // <DualSparkline> — how is this series doing against its benchmark
 // Exactly 2 series, ever: 3+ overlapped lines at 16 px are
 // unreadable (SparkGroup for that). The reference whispers: dashed + thinner +
-// neutral, never color-alone. One shared domain — no dual axes. Static,
-// hook-free, RSC-safe.
+// neutral, never color-alone. One shared domain — no dual axes.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

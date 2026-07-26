@@ -2,7 +2,7 @@
 // Interactive <SproutRow>. useActivePicker owns interaction: one pointer
 // listener + slot lookup, ←/→ (and ↑/↓) rove the row, click / Enter / Space
 // selects (onSelect). Announces each item's stage; a focus ring lifts the active
-// glyph. Composes the static component (overlay rings as children).
+// glyph.
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";

@@ -1,4 +1,3 @@
-// HeartbeatBlip geometry — pure, React-free.
 // Is it alive, and how busy? A baseline with an ECG-style spike at each event's
 // position across the recent window (x = how long ago). Zero events → an empty
 // spike path and the flat baseline IS the down signal (shape, not color). The

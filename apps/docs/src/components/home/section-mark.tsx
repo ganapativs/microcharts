@@ -1,6 +1,4 @@
-/** Quiet section rule — a hairline with a small label at its end. The old
- *  numbered `01 ─────` eyebrow went in the 2026-07 de-slop pass: a counter on
- *  every section read as generated scaffolding, not editing. */
+/** Hairline + small end label. */
 export function SectionMark({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-8 flex items-center gap-3">

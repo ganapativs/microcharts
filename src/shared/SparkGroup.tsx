@@ -1,11 +1,5 @@
-// <SparkGroup> — shared-scale small multiples. Kills the #1
-// sparkline correctness bug: per-row auto-scaling, where each mini-chart fits
-// its own domain so rows are visually incomparable. Computes ONE domain across
-// all children and enforces ONE physical size.
-//
-// Hook-free and Context-free → RSC-safe (React Context is client-only in RSC).
-// It reads each child's `data` prop, computes the union domain, and injects
-// `domain`/`width`/`height` via cloneElement — a child's own explicit prop wins.
+// Shared-scale small multiples: one union domain + one size (hook/Context-free → RSC-safe).
+// Injects `domain`/`width`/`height` via cloneElement; explicit child props win.
 import { Children, cloneElement, isValidElement, type CSSProperties, type ReactNode } from "react";
 import { niceDomain } from "../core/scale.js";
 import { isFiniteValue, type Value } from "../core/types.js";

@@ -3,12 +3,6 @@ import { Funnel } from "@microcharts/react/funnel";
 import { Funnel as FunnelInteractive } from "@microcharts/react/funnel/interactive";
 import staticModule, { playground as staticPlayground, PIPE } from "./funnel";
 
-/** Interactive half of the funnel chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./funnel`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <FunnelInteractive data={PIPE} summary={false} width={130} height={40} animate={animate} />

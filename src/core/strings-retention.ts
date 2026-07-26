@@ -1,6 +1,4 @@
-// RetentionCurve summary templates (retention-curve) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// RetentionCurve summary templates (retention-curve)
 import type { SummaryStrings } from "./summary.js";
 
 export type RetentionStrings = Pick<

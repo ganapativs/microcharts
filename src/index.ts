@@ -32,12 +32,7 @@ export { makeFormatter, type Format } from "./core/format.js";
 import type { CSSProperties } from "react";
 
 /**
- * The shared prop grammar — one meaning per name across every chart. Each chart
- * declares the subset it supports inline (kept per-file for tree-shaking and
- * clarity), but a prop that appears here carries this exact type wherever a
- * chart uses it — held to the contract by `grammar-conformance.test.ts` so the
- * grammar can't drift one chart at a time. Categorical charts also take a
- * `colors` array; a new data shape is a new component, not a variant here.
+ * Shared prop grammar — one meaning per name (`grammar-conformance.test.ts`).
  */
 export interface MicrochartCommonProps {
   /** The series. `null`/`NaN` are gaps; `data` alone always renders. Charts with

@@ -2,7 +2,7 @@
 // ≤ 3 series hard cap (thickness reading degrades combinatorially); the total
 // is always zero-anchored. `style="ridge"` = identical stacking math rendered
 // with smooth, opaque, crest-lit silhouettes — editorial texture, zero
-// semantic change. Static, hook-free, RSC-safe.
+// semantic change.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

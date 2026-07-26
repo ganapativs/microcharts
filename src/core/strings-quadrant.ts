@@ -1,6 +1,4 @@
-// QuadrantDot summary templates (quadrant-dot) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// QuadrantDot summary templates (quadrant-dot)
 import type { SummaryStrings } from "./summary.js";
 
 export type QuadrantStrings = Pick<

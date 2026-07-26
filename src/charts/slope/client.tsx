@@ -2,8 +2,7 @@
 // Interactive <Slope>. useActivePicker owns interaction: one pointer listener +
 // nearest-line hit-test (point-to-segment math over ≤ 7 lines) — ↑/↓ (or ←/→)
 // rove categories ordered by their `to` value, announcing each slope; click /
-// Enter / Space selects a line (onSelect). Composes the static component
-// (canon) — the SVG is never re-implemented.
+// Enter / Space selects a line (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

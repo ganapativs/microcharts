@@ -1,6 +1,5 @@
-// MinimapStrip summary templates (minimap-strip) — its OWN module. Fog-of-war
-// is a first-class state: the unknown share is disclosed, never rendered blank.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// MinimapStrip summary templates (minimap-strip). Fog-of-war is a first-class state: the
+// unknown share is disclosed, never rendered blank.
 import type { SummaryStrings } from "./summary.js";
 
 export type MinimapStrings = Pick<

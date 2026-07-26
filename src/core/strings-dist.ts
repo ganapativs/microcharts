@@ -1,6 +1,4 @@
-// Distribution / event summary templates (rug-strip, seismogram, histogram,
-// micro-box…) — a separate MODULE (see strings-scalar.ts for why). English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// Distribution / event summary templates (rug-strip, seismogram, histogram, micro-box…)
 import type { SummaryStrings } from "./summary.js";
 
 // Duplicated in strings-category/strings-quantile by design — each string module

@@ -1,5 +1,5 @@
 // <Hypnogram> — which discrete state the system was in over time, and how choppy
-// the transitions were. Static, hook-free, RSC-safe.
+// the transitions were.
 // A categorical step strip that REFUSES interpolation: no diagonals, no curves,
 // ever — a state is a fact, not a sample of a continuum (the anti-line-chart).
 import type { CSSProperties, ReactNode } from "react";

@@ -1,8 +1,8 @@
 "use client";
 // Interactive <EventRaster>. useActivePicker owns interaction: one pointer
-// listener (lane from y, nearest event from x), 2-D roving keyboard (↑/↓ lanes,
-// ←/→ events within a lane — ActivityGrid model), click / Enter / Space selects
-// (onSelect). Composes the static component (canon).
+// listener (lane from y, nearest event from x). 2-D roving keyboard (↑/↓ lanes,
+// ←/→ events within a lane — ActivityGrid model). click / Enter / Space selects
+// (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
 import {

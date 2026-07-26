@@ -1,8 +1,7 @@
 "use client";
 // Interactive <SegmentedBar>. useActivePicker owns interaction: one pointer
 // listener + segment-by-x lookup, ←/→ rove segments incl. "Other" (which
-// announces its member count), click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
+// announces its member count). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

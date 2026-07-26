@@ -1,9 +1,8 @@
 "use client";
 // Interactive <ChangePoint>. useActivePicker owns interaction: one pointer
-// listener + nearest-x lookup, ←/→ (Home/End) step points (value + regime),
-// Tab cycles the breaks as first-class stops (each announcing the mean shift),
-// click / Enter / Space selects (onSelect). Composes the static component
-// (canon); the crosshair + readout chip are overlay children.
+// listener + nearest-x lookup, ←/→ (Home/End) step points (value + regime).
+// Tab cycles the breaks as first-class stops (each announcing the mean shift).
+// click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

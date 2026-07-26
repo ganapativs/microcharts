@@ -3,12 +3,6 @@ import { MicroBox } from "@microcharts/react/micro-box";
 import { MicroBox as MicroBoxInteractive } from "@microcharts/react/micro-box/interactive";
 import staticModule, { playground as staticPlayground, RAW } from "./micro-box";
 
-/** Interactive half of the micro-box chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./micro-box`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <MicroBoxInteractive data={RAW} summary={false} width={130} height={22} animate={animate} />

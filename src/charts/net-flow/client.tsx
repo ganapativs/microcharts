@@ -2,7 +2,7 @@
 // Interactive <NetFlow>. useActivePicker owns interaction: one pointer listener
 // + nearest-period math, ←/→ rove periods, click / Enter / Space selects
 // (onSelect). The live region states in, out, AND signed net — the full
-// picture, never a net without its gross. Composes the static component (canon);
+// picture, never a net without its gross.;
 // the crosshair + in/out/net ticks + pinned net ring are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

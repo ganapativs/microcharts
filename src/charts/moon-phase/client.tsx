@@ -2,7 +2,6 @@
 // Interactive <MoonPhase>. Hover/focus reveals the percent; on
 // change the lit region cross-fades (opacity, NOT d: interpolation — no Safari);
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
-// Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";

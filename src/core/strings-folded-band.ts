@@ -1,6 +1,5 @@
-// FoldedDayBand summary templates (folded-day-band) — its OWN module. Envelopes
-// come from real per-bin quantiles; the number of folded periods backs the claim
-// and is disclosed when thin. English lives only in core string modules (canon).
+// FoldedDayBand summary templates (folded-day-band). Envelopes come from real per-bin
+// quantiles; the number of folded periods backs the claim and is disclosed when thin.
 import type { SummaryStrings } from "./summary.js";
 
 export type FoldedBandStrings = Pick<

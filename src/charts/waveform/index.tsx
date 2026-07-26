@@ -1,5 +1,5 @@
 // <Waveform> — the shape of a high-frequency signal at word width: where the
-// spikes and silences are. Static, hook-free, RSC-safe.
+// spikes and silences are.
 // Compressed by MAX-PER-BUCKET so a spike can never be averaged away, and
 // peak-normalized honestly (the peak is disclosed in the summary).
 import type { CSSProperties, ReactNode } from "react";

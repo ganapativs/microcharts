@@ -3,12 +3,6 @@ import { StationGlyph } from "@microcharts/react/station-glyph";
 import { StationGlyph as StationGlyphInteractive } from "@microcharts/react/station-glyph/interactive";
 import staticModule, { playground as staticPlayground, OBS } from "./station-glyph";
 
-/** Interactive half of the station-glyph chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./station-glyph`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <StationGlyphInteractive {...OBS} summary={false} size={48} animate={animate} />;
 }

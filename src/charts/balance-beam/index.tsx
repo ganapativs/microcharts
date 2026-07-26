@@ -2,7 +2,7 @@
 // two). Tilt direction is instant; the angle SATURATES at maxTilt (read
 // direction + rough magnitude, not an exact ratio — docs steer precise ratios to
 // PairedBars/Delta). Weights are area-true. Endpoints are pre-rotated in geometry
-// (no SVG transform → containment provable). Static, hook-free, RSC-safe.
+// (no SVG transform → containment provable).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";

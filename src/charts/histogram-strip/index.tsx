@@ -1,7 +1,7 @@
 // <HistogramStrip> — what does the distribution look like.
 // Mode, spread, skew in a cell: ≤ 12 uniform bins, zero-anchored counts, never
 // density-smoothed. Contract: RAW observations in — pre-aggregated counts are
-// not supported (docs steer to SparkBar). Static, hook-free, RSC-safe.
+// not supported (docs steer to SparkBar).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";

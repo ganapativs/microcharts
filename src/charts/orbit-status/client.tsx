@@ -1,10 +1,10 @@
 "use client";
 // Interactive <OrbitStatus>. Motion IS the encoding: the satellite
-// orbits the service, angular period snapped to the same 5 rate steps as the
+// orbits the service, angular period snapped to the same 5 rate steps as
 // static dash density — so motion and static frames decode identically. The loop
 // is allowed because the loop rate IS the call rate. Gated on
 // reduced-motion (→ the static frame; dash density already carries rate) and
-// on-screen (paused off-viewport). Composes the static component (canon); a polite
+// on-screen (paused off-viewport).; a polite
 // live region announces threshold crossings only. ONE unit (the dependency
 // itself) → the lean scalar contract: `onSelect` for drill-down, no picker
 // kernel, no roving, no selection state to rove between.

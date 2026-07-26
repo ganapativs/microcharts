@@ -33,7 +33,6 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/status-dot`,
   interactiveImport: `${PKG}/status-dot/interactive`,
   picker: false,
-  // The glyph prints (or IS) its own reading — a hover chip would duplicate it.
   readout: false,
   dataShape: '"ok" | "warn" | "error" | "off" | "busy" (extensible)',
   encoding: { channel: "paired glyph shape + semantic color", precision: "n/a — categorical" },

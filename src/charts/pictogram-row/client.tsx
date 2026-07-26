@@ -1,15 +1,14 @@
 "use client";
 // Interactive <PictogramRow>. Two independent behaviours:
-//   1. `live` announces value CHANGES ("6 of 8.") — the row's one datum.
-//   2. useActivePicker owns unit-level interaction: one pointer listener +
-//      nearest-unit lookup, ←/→ (and ↑/↓) rove the units, click / Enter / Space
-//      selects (onSelect) — the star-rating gesture, and the reason the units
-//      are navigable at all. Roving SPEAKS: each unit announces its position and
-//      fullness via `pictogramUnit`, which (unlike the boolean `iconArrayUnit`)
-//      can describe a partly-filled unit honestly. With no unit active the live
-//      region falls back to (1)'s value-change text. The same reading is painted
-//      as a chip over the unit (`readout={false}` suppresses only the chip).
-// Composes the static component (canon) — the SVG is never re-implemented.
+// 1. `live` announces value CHANGES ("6 of 8.") — the row's one datum.
+// 2. useActivePicker owns unit-level interaction: one pointer listener +
+// nearest-unit lookup, ←/→ (and ↑/↓) rove the units, click / Enter / Space
+// selects (onSelect) — the star-rating gesture, and the reason the units
+// are navigable at all. Roving SPEAKS: each unit announces its position and
+// fullness via `pictogramUnit`, which (unlike the boolean `iconArrayUnit`)
+// can describe a partly-filled unit honestly. With no unit active the live
+// region falls back to (1)'s value-change text. The same reading is painted
+// as a chip over the unit (`readout={false}` suppresses only the chip).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

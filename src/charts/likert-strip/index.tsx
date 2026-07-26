@@ -1,6 +1,6 @@
 // <LikertStrip> — does the response lean agree or disagree (S2-ordinal
 // diverging). The center line is the question; everything else is
-// the answer. Static, hook-free, RSC-safe. Neutral is NEVER hidden: `omit`
+// the answer. Neutral is NEVER hidden: `omit`
 // removes it from the bar but the labels/summary always carry it.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

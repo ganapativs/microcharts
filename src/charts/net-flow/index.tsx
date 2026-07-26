@@ -1,6 +1,6 @@
 // <NetFlow> — in versus out, and where that leaves us net. Inflow
 // area above a zero baseline, outflow mirrored below on ONE shared magnitude
-// scale, with the net line (in − out) on top. Static, hook-free, RSC-safe.
+// scale, with the net line (in − out) on top.
 // Both directions share one scale (never independently balanced); areas anchor
 // at zero both ways; the net sign is stated in TEXT (never color-alone).
 import type { CSSProperties, ReactNode } from "react";

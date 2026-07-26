@@ -2,7 +2,7 @@
 // Interactive <CitySkyline>. useActivePicker owns interaction: one pointer
 // listener + x-band lookup → highlight the building + announce it, ←/→ roving,
 // click / Enter / Space selects (onSelect). The lit fraction is announced as a
-// percent (secondary channel). Composes the static component.
+// percent (secondary channel).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

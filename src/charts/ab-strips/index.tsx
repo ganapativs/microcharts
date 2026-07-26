@@ -2,7 +2,7 @@
 // quantile strips on ONE shared scale: p5–95 outer, p25–75 inner, a median dot,
 // row A muted, row B accent. The visible overlap of the middle halves is the
 // answer, and the overlap number is always in the summary. Never a bare mean
-// bar. Static, hook-free, RSC-safe.
+// bar.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, withPlus, type Format } from "../../core/format.js";

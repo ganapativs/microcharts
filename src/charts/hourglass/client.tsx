@@ -1,8 +1,8 @@
 "use client";
 // Interactive <Hourglass>. Sand levels cross-fade on change (opacity
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
-// 100%), not on every tick. Hover/focus reveals the elapsed percent the sand
-// only approximates. Composes the static component.
+// 100%). not on every tick. Hover/focus reveals the elapsed percent the sand
+// only approximates.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -106,10 +106,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
 
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // Drill-down: the one interaction a single-value glyph needs. The payload
-  // carries the SAME clamped elapsed fraction the sand encodes. One builder, so
-  // `onActive` and `onSelect` can never report a different number or a different
-  // string than the chip paints.
+  // Clamped elapsed fraction the sand encodes. One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
     index: 0,
     value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,

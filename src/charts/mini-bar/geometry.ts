@@ -1,4 +1,4 @@
-// MiniBar geometry — pure, React-free. Bar length from a zero-anchored domain
+// MiniBar: Bar length from a zero-anchored domain
 // (length lies unless anchored). Null values keep their slot (gap — alignment
 // survives). Coords 2-dp.
 import { clamp, niceDomain, scaleLinear } from "../../core/scale.js";

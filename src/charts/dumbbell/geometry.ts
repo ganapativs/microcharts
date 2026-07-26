@@ -1,6 +1,6 @@
-// Dumbbell geometry — pure, React-free. Two dot
+// Dumbbell: Two dot
 // positions + connecting span per row on one shared scale. Direction is
-// shape-coded (hollow from → filled to), never color-alone. Coords 2-dp.
+// shape-coded (hollow from → filled to). never color-alone. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { textGutterProse } from "../../core/labels.js";

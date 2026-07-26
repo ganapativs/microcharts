@@ -1,6 +1,5 @@
-// TimeInRange summary templates (time-in-range) — its OWN module. Zone order is
-// semantic, never sorted; the summary always leads with the in-range headline.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// TimeInRange summary templates (time-in-range). Zone order is semantic, never sorted; the
+// summary always leads with the in-range headline.
 import type { SummaryStrings } from "./summary.js";
 
 export type TimeInRangeStrings = Pick<

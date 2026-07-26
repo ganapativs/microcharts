@@ -1,6 +1,6 @@
 // <TapeGauge> — the level right now, which zone it's in, and how fast it's moving,
-// with the eye parked in one place. Static, hook-free,
-// RSC-safe. The scale scrolls, the value doesn't; the chevron encodes rate, the
+// with the eye parked in one place.
+// The scale scrolls, the value doesn't; the chevron encodes rate, the
 // position encodes level, and the two never blend. NASA-studied instrument.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

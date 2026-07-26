@@ -1,11 +1,8 @@
 "use client";
 // Interactive <CalibrationStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest-bin-by-x math, ←/→ (and ↑/↓) rove bins, click / Enter /
-// Space selects (onSelect). Composes the static component (canon) — the SVG is
-// never re-implemented.
-//
-// Unit = a calibration BIN, so `datum.index` is the bin's position among the
-// PLOTTED bins (the geometry drops empty ones, `count === 0`), which is the data
+// Space selects (onSelect). // Unit = a calibration BIN, so `datum.index` is the bin's position among
+// PLOTTED bins (the geometry drops empty ones, `count === 0`). which is the data
 // row index whenever every bin has support. `value` is the OBSERVED rate (what
 // actually happened); the bin's predicted rate travels as `label`.
 import { useCallback, useMemo, useRef } from "react";

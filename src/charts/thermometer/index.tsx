@@ -1,7 +1,7 @@
 // <Thermometer> — where a value sits on a calibrated range, and how close to a
 // goal. A linear ticked tube; fill anchors at domain[0], never
 // re-zeroed or log — the ticks calibrate the read. The bulb is instrument chrome
-// (always full), never data. Static, hook-free, RSC-safe.
+// (always full). never data.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";

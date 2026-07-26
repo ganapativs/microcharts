@@ -1,6 +1,6 @@
 // <PairedBars> — actual vs expected, category by category (,
-// S2-referenced). Static, hook-free, RSC-safe. The reference is muted by TWO
-// structural cues (opacity AND width), never color alone; value and ref always
+// S2-referenced). The reference is muted by TWO
+// structural cues (opacity AND width). never color alone; value and ref always
 // share one zero-anchored domain. Grouped by default — overlay hides small
 // over-shoots (documented).
 import type { CSSProperties, ReactNode } from "react";

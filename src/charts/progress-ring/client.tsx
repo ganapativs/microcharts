@@ -2,7 +2,6 @@
 // Interactive <ProgressRing>. `live` announces at 25/50/75/100%
 // threshold crossings only (documented anti-spam rule). No pointer lookup
 // (single mark) — hover/focus is a reveal of the percent, not a lookup.
-// Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";

@@ -1,6 +1,4 @@
-// Hourglass summary templates (hourglass) — its OWN module. Both sides of the
-// story: elapsed and remaining. English lives only in core string modules
-// (canon). Aggregate: core/strings.ts `EN`.
+// Hourglass summary templates (hourglass). Both sides of the story: elapsed and remaining.
 import type { SummaryStrings } from "./summary.js";
 
 export type HourglassStrings = Pick<SummaryStrings, "hourglass">;

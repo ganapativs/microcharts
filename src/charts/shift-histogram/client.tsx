@@ -1,8 +1,8 @@
 "use client";
 // Interactive <ShiftHistogram>. useActivePicker owns interaction: one pointer
-// listener + grid lookup (pointer x → bin), ←/→ step bins, M jumps to the two
+// listener + grid lookup (pointer x → bin). ←/→ step bins, M jumps to the two
 // median bins, click / Enter / Space pins one (onSelect). The live region states
-// each bin's before/after proportions. Composes the static component (canon);
+// each bin's before/after proportions.;
 // the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";

@@ -2,12 +2,10 @@
 // Interactive <BiasStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest-pair-by-squared-Euclidean-distance math, ←/→ (and ↑/↓)
 // step pairs ordered by mean, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
-//
 // Unit = a plotted pair, so `datum.index` is the DOT POSITION in the displayed
 // cloud — the geometry drops non-finite pairs and down-samples to ≤ 40 dots, so
 // this equals the data index only for small, all-finite inputs (the pair's own
-// data index stays in the announcement). `value` is the DIFFERENCE (a − b), the
+// data index stays in the announcement). `value` is the DIFFERENCE (a − b).
 // encoded y channel; the pair's mean travels as `label`.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";

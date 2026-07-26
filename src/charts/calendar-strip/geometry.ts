@@ -1,4 +1,4 @@
-// CalendarStrip geometry — pure, React-free. Real calendar days
+// CalendarStrip: Real calendar days
 // on a weeks × 7 grid (core/calendar, UTC only): value days step the shared
 // intensity ramp, zero days show the track, days absent from the data render
 // empty, days after `end` are future — blank, never extrapolated (empty ≠ zero,
