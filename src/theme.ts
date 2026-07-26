@@ -67,6 +67,19 @@ export interface ThemeSpec {
   surfaceEdge?: string;
   /** Ink for labels painted on top of saturated data fills. */
   onFill?: string;
+  /**
+   * Ink for labels painted on top of a CATEGORICAL fill (PartitionStrip). A
+   * separate token from `onFill` because the categorical family is mid-tone by
+   * construction where the semantic fills are deep, so the two want opposite
+   * inks — see `--mc-on-cat` in styles.css.
+   *
+   * Left unset with a derived palette, the better of the two default inks is
+   * chosen from the derived cats' own lightness. Set it explicitly if your
+   * palette sits near the middle of the lightness range, where NEITHER ink
+   * clears 4.5:1 on a label-bearing fill and the honest fix is a lighter or
+   * darker categorical family rather than a different ink.
+   */
+  onCat?: string;
   /** Turn accent-seeded derivation on/off (defaults on when `accent` is set). */
   derive?: boolean;
   /** Dark-mode overrides. Defaults to `"auto"` — derived twins of every hex token. */
@@ -234,6 +247,30 @@ function deriveCats(accent: string, n: number, dark: boolean): string[] {
   return out;
 }
 
+/** The two default categorical inks, mirroring `--mc-on-cat` / `--mc-on-fill`. */
+const INK_DARK = "rgba(0, 0, 0, 0.9)";
+const INK_LIGHT = "rgba(255, 255, 255, 0.96)";
+
+/**
+ * Which of the two inks reads better on `cats`, judged on the DARKEST one (the
+ * worst case for a light ink is the lightest fill and vice versa, so the darkest
+ * decides whether the dark ink is viable at all).
+ *
+ * OKLCH `L` is perceptual lightness, so it is the right axis and needs no second
+ * luminance model: the crossover where a light and a dark ink contrast equally
+ * sits at L ≈ 0.62. `deriveCats` places its family at L 0.53–0.63 (light) and
+ * 0.67–0.77 (dark), which straddles that line — hence the choice, rather than a
+ * constant.
+ */
+function onCatInk(cats: readonly string[]): string {
+  let darkest = 1;
+  for (const c of cats) {
+    const oklch = hexToOklch(c);
+    if (oklch && oklch.L < darkest) darkest = oklch.L;
+  }
+  return darkest >= 0.62 ? INK_DARK : INK_LIGHT;
+}
+
 const num = (v: number | string): string => (typeof v === "number" ? String(v) : v);
 
 /** Map a spec's colour/typography fields onto their `--mc-*` names (no derivation). */
@@ -262,6 +299,7 @@ function directVars(spec: ThemeSpec): Vars {
   set("--mc-surface-ink", spec.surfaceInk);
   set("--mc-surface-edge", spec.surfaceEdge);
   set("--mc-on-fill", spec.onFill);
+  set("--mc-on-cat", spec.onCat);
   return v;
 }
 
@@ -286,7 +324,9 @@ function build(spec: ThemeSpec): Theme {
   if (Array.isArray(spec.cat)) {
     spec.cat.forEach((c, i) => (vars[`--mc-cat-${i + 1}`] = c));
   } else if (deriveCatsWanted) {
-    deriveCats(seedAccent, catCount, false).forEach((c, i) => (vars[`--mc-cat-${i + 1}`] = c));
+    const cats = deriveCats(seedAccent, catCount, false);
+    cats.forEach((c, i) => (vars[`--mc-cat-${i + 1}`] = c));
+    vars["--mc-on-cat"] = onCatInk(cats);
   }
   Object.assign(vars, directVars(spec));
 
@@ -297,7 +337,9 @@ function build(spec: ThemeSpec): Theme {
       if (isHex(val)) darkVars[k] = darkTwin(val);
     }
     if (deriveCatsWanted) {
-      deriveCats(seedAccent, catCount, true).forEach((c, i) => (darkVars[`--mc-cat-${i + 1}`] = c));
+      const cats = deriveCats(seedAccent, catCount, true);
+      cats.forEach((c, i) => (darkVars[`--mc-cat-${i + 1}`] = c));
+      darkVars["--mc-on-cat"] = onCatInk(cats);
     }
     if (spec.dark && spec.dark !== "auto") Object.assign(darkVars, directVars(spec.dark));
   }

@@ -18,16 +18,17 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
-import { dataDiffGeometry } from "./geometry.js";
+import { dataDiffGeometry, dataDiffGutter } from "./geometry.js";
 import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from "./index.js";
 import { maxOf } from "../../core/scale.js";
 
 export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
   strings?: DataDiffStrings;
   /**
-   * Opt-in entrance motion (default `false`): rows pop in top-to-bottom
-   * sequence when the chart first mounts client-side. Inert on the server
-   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): each row's bars sweep out from the
+   * zero line — removed leftward, added rightward — row by row, top to bottom,
+   * when the chart first mounts client-side. Inert on the server and on hydrated
+   * server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -83,7 +84,12 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
     const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
     const footer = label === "totals" && height >= 34 ? font + 3 : 0;
     const rowH = nRows > 0 ? (height - 4 - footer) / nRows : 0;
-    const tags = labels && rowH >= 10;
+    const keyChars = maxOf(
+      data.map((d) => d.key.length),
+      0,
+    );
+    const fitFont = Math.max(5, Math.min(font, Math.floor(rowH * 0.5)));
+    const tags = labels && rowH >= 10 && dataDiffGutter(keyChars, fitFont, width) > 0;
     return dataDiffGeometry({
       width,
       height,
@@ -91,13 +97,8 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       order,
       domain,
       maxItems,
-      gutterCh: tags
-        ? maxOf(
-            data.map((d) => d.key.length),
-            0,
-          )
-        : 0,
-      fontSize: tags ? Math.max(5, Math.min(font, Math.floor(rowH * 0.5))) : font,
+      gutterCh: tags ? keyChars : 0,
+      fontSize: tags ? fitFont : font,
       footer,
     });
   }, [width, height, data, order, domain, maxItems, labels, label]);

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { FatDigits } from "./client.js";
 
 const key = (el: HTMLElement, k: string) =>
@@ -40,5 +41,24 @@ describe("interactive <FatDigits>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 200 }]);
+  });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the numeral once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <FatDigits value={1204} domain={[0, 1500]} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-fat-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 1204 });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
   });
 });

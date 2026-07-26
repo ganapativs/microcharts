@@ -42,7 +42,8 @@ export interface InteractiveRetentionCurveProps extends RetentionCurveProps, Pic
 export function RetentionCurve(props: InteractiveRetentionCurveProps): React.ReactNode {
   const {
     data,
-    benchmark,
+    compare,
+    benchmark = compare,
     plateau = true,
     curve = "step",
     unit = "period",

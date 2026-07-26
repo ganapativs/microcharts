@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "unicorn"],
+  "plugins": ["react", "react-hooks", "typescript", "unicorn"],
   "env": {
     "browser": true,
     "es2023": true
@@ -12,6 +12,15 @@
   },
   "rules": {
     "react/react-in-jsx-scope": "off",
+    // `exhaustive-deps` already errors via the `correctness` category, but
+    // `rules-of-hooks` does NOT — verified against a probe file with a
+    // conditionally-called `useState`, which passed silently until this line.
+    // That is the costlier of the two in a library whose hooks all live in
+    // shared entries: a hook behind a prop-dependent branch desyncs the hook
+    // order for every chart that composes it. Both are pinned explicitly so
+    // neither depends on which category oxlint files them under next.
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
     "unicorn/no-array-sort": "off",
     "unicorn/no-array-reverse": "off"
   },

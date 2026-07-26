@@ -41,6 +41,20 @@ describe("relatedCharts", () => {
     expect(relatedCharts("dice-pips").map((c) => c.slug)).toContain("tally-marks");
   });
 
+  // Rails are a two-way surface: a chart nobody links to gets no inbound
+  // internal links at all. The `bestFor` term used to compare whole free-text
+  // phrases, so it almost never fired and the fourth slot fell back to registry
+  // order — 17 charts were unreachable from every rail. Tokenised overlap cut
+  // that to 8. Ratchet the ceiling down if it improves; never let it climb.
+  it("leaves few charts out of every other chart's rail", () => {
+    const linked = new Set<string>();
+    for (const chart of STABLE_CHARTS) {
+      for (const c of relatedCharts(chart.slug)) linked.add(c.slug);
+    }
+    const orphans = STABLE_CHARTS.filter((c) => !linked.has(c.slug)).map((c) => c.slug);
+    expect(orphans.length, `unlinked charts: ${orphans.join(", ")}`).toBeLessThanOrEqual(8);
+  });
+
   it("returns [] for an unknown slug", () => {
     expect(relatedCharts("not-a-chart")).toEqual([]);
   });

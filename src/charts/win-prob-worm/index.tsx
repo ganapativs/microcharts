@@ -11,10 +11,10 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 import { round2, isFiniteValue } from "../../core/types.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_WIN_PROB_WORM, type WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
-import { PAD, resolveWormGeo, swingMark, winProbWormSummary } from "./geometry.js";
+import { PAD, resolveWormGeo, swingMark, winProbWormSummary, wormCustomPct } from "./geometry.js";
 
 export { winProbWormSummary, wormGutter } from "./geometry.js";
 
@@ -63,6 +63,12 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
 
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
+  // Probabilities go through `Intl`'s own percent style so the sign follows
+  // `locale`. Three fraction digits keeps the pre-`Intl` output byte-identical
+  // for a fractional probability ("52.5%"). A caller-supplied `format` still
+  // wins outright — it is the documented escape hatch, and it commonly already
+  // writes its own `%`.
+  const pctFmt = format === undefined ? makePercentFormatter(locale, 3) : wormCustomPct(fmt);
   const cls = className ? `mc-win-prob-worm ${className}` : "mc-win-prob-worm";
 
   for (const v of data)
@@ -71,12 +77,20 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
       break;
     }
 
-  const { geo, gutter, lastText } = resolveWormGeo({ width, height, data, label, font: FONT, fmt });
+  const { geo, gutter, lastText } = resolveWormGeo({
+    width,
+    height,
+    data,
+    label,
+    font: FONT,
+    pctFmt,
+  });
   const empty = geo === null || geo.end === null;
   const accName =
     summary === false
       ? false
-      : (summary ?? (empty ? strings.noData : winProbWormSummary(geo!, fmt, strings, sides)));
+      : (summary ??
+        (empty ? strings.noData : winProbWormSummary(geo!, fmt, strings, sides, pctFmt)));
 
   if (empty) {
     return (

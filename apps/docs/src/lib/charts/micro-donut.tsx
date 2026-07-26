@@ -72,6 +72,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Per-wedge colours, cycled; overrides --mc-cat-N. Other stays neutral.",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Donut square edge in viewBox units (default 24).",
+    },
   ],
   demo: MIX.map((d) => d.value),
   example: {

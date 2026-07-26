@@ -190,7 +190,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
                 cy={geo.center.cy}
                 r={accentRing.rOuter}
                 fill="none"
-                style={{ stroke: paint, strokeWidth: "calc(var(--mc-stroke-width) * 1.5)" }}
+                style={{ stroke: paint, strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
               />
             ) : null,
           ]}

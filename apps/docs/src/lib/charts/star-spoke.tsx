@@ -54,6 +54,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Spoke labels at the tips (default true; drop out below size 44).",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Star box edge in viewBox units (default 80).",
+    },
   ],
   demo: [90, 60, 50, 30, 70],
   example: {

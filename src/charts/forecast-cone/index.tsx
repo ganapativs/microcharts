@@ -207,7 +207,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         fill="none"
         strokeDasharray="2.5 2.5"
         vectorEffect="non-scaling-stroke"
-        style={{ stroke: accent, strokeWidth: "var(--mc-stroke-width)" }}
+        style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
       />
       {geo.target ? (
         <line

@@ -112,10 +112,14 @@
         "name",
         "slug",
         "status",
+        "collection",
+        "tagline",
         "docs",
         "staticImport",
         "dataShape",
         "primaryEncoding",
+        "precision",
+        "nodeBudget",
         "bestFor",
         "avoidFor",
         "props",
@@ -135,6 +139,15 @@
         "status": {
           "enum": ["stable", "planned"],
           "description": "`stable` ships today; `planned` is catalogued but not yet released."
+        },
+        "collection": {
+          "enum": ["core", "decision", "expressive", "frontier"],
+          "description": "Catalog collection — metadata for browsing, never an import-path boundary."
+        },
+        "tagline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One line: the decision this chart answers."
         },
         "docs": {
           "type": "string",
@@ -182,6 +195,16 @@
         "primaryEncoding": {
           "type": "string",
           "description": "The one documented primary encoding channel."
+        },
+        "precision": {
+          "type": "string",
+          "minLength": 1,
+          "description": "How precisely that channel can be read — `high`, `medium`, `low`, often with the chart to steer to when an exact read matters."
+        },
+        "nodeBudget": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SVG nodes a typical render emits, e.g. `≤ 6` or `1 per cell`."
         },
         "bestFor": {
           "type": "array",

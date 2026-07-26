@@ -41,6 +41,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     shape = "square",
     width = 140,
     height = 28,
+    format,
     locale,
     strings = EN_FREQ,
     title,
@@ -84,8 +85,8 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     [width, height, value, total, shape, gutterCh, FONT],
   );
   const pctFmt = useMemo(
-    () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),
-    [locale],
+    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [format, locale],
   );
 
   // Navigable units are the icons; datum.index is the unit index (0…n-1 in
@@ -208,6 +209,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
         shape={shape}
         width={width}
         height={height}
+        format={format}
         locale={locale}
         strings={strings}
         summary={false}

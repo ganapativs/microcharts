@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { winProbWormGeometry, resolveWormGeo, swingMark, PAD } from "./geometry.js";
+import { winProbWormGeometry, resolveWormGeo, swingMark, wormCustomPct, PAD } from "./geometry.js";
 import { labelFont } from "../../core/labels.js";
 
 const base = { width: 80, height: 16 };
@@ -9,6 +9,10 @@ const GAME = [50, 48, 45, 52, 60, 58, 42, 38, 55, 68, 82, 90, 88, 94, 98];
 // a tight see-saw that keeps swapping the lead right on the midline
 const TIGHT = [50, 53, 49, 52, 48, 51, 47, 50, 46, 49, 45, 48, 52];
 const num = (n: number): string => String(n);
+// `resolveWormGeo` now takes a percent formatter (FRACTION in) for the endpoint
+// label rather than a value formatter; wrapping `num` reproduces the previous
+// "98%" string exactly, so the reserved gutter this suite measures is unchanged.
+const numPct = wormCustomPct(num);
 
 describe("winProbWormGeometry", () => {
   it("splits at 50 crossings and counts the lead changes", () => {
@@ -90,7 +94,7 @@ describe("winProbWormGeometry", () => {
     // resolve geometry exactly as the component renders it (label gutter reserved)
     const placed = (data: readonly number[], width: number, height: number) => {
       const font = labelFont(height);
-      const { geo } = resolveWormGeo({ width, height, data, label: "last", font, fmt: num });
+      const { geo } = resolveWormGeo({ width, height, data, label: "last", font, pctFmt: numPct });
       return { mark: swingMark(geo!, true, font, num), font, geo: geo! };
     };
     // the audit's 0.62·fontSize text box (text-anchor middle, non-central baseline)

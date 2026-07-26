@@ -151,7 +151,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           style={{
             fill: "none",
             stroke: spikeColor,
-            strokeWidth: "var(--mc-stroke-width)",
+            strokeWidth: "var(--mc-sw)",
             strokeLinejoin: "round",
             strokeLinecap: "round",
           }}

@@ -5,6 +5,9 @@ import { MoonPhase } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
 
 describe("<MoonPhase>", () => {
   it("progress summary is the real string", () => {
@@ -37,6 +40,14 @@ describe("<MoonPhase>", () => {
     const { container } = draw(<MoonPhase value={1.4} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "100% of the cycle complete.",
+    );
+  });
+
+  // The disc paints no numeral, so the summary is where `locale` shows.
+  it("locale spells the percent (de-DE puts a NBSP before the sign)", () => {
+    const { container } = draw(<MoonPhase value={0.68} locale="de-DE" />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `68${NBSP}% of the cycle complete.`,
     );
   });
 

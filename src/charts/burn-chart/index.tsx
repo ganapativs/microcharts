@@ -214,7 +214,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           strokeDasharray="1 2"
           strokeOpacity={0.65}
           vectorEffect="non-scaling-stroke"
-          style={{ stroke: lineColor, strokeWidth: "var(--mc-stroke-width)" }}
+          style={{ stroke: lineColor, strokeWidth: "var(--mc-sw)" }}
         />
       ) : null}
       {geo.actual.d ? (

@@ -26,6 +26,13 @@ export interface InteractiveProgressRingProps extends ProgressRingProps {
    * suppresses only the chip. Inert when `label="percent"` already prints it.
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One arc = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the ring, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -40,6 +47,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     title,
     summary,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -89,23 +97,35 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       ? pctFmt(Math.max(0, 1 - fraction))
       : pctFmt(fraction);
 
-  // One arc, one selectable unit (index 0): the fraction it sweeps.
-  const pick = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(fraction) ? fraction : null,
-      formatted: readoutText,
-    });
+  // One arc, one selectable unit (index 0): the fraction it sweeps. One builder,
+  // so `onActive` and `onSelect` can never report a different number or a
+  // different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(fraction) ? fraction : null,
+    formatted: readoutText,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-ring-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

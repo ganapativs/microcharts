@@ -200,9 +200,10 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.slowPath}
         data-mc-ink="data"
         fill="none"
+        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.3)" }}
+        style={{ strokeWidth: "calc(var(--mc-sw) * 1.3)" }}
       />
       <path
         d={geo.fastPath}
@@ -210,7 +211,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         fill="none"
         strokeLinejoin="round"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 0.7)" }}
+        style={{ strokeWidth: "calc(var(--mc-sw) * 0.7)" }}
       />
       {showLabels && geo.slowLast != null ? (
         <text

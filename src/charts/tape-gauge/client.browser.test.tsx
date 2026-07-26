@@ -79,4 +79,26 @@ describe("interactive <TapeGauge>", () => {
     const px = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
     expect(px(hero)).toBeGreaterThan(px(tick));
   });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the reading once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <TapeGauge value={142} span={25} width={16} height={22} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-tape-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("142");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 142, formatted: chip() });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
+  });
 });

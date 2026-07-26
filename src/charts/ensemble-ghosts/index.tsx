@@ -164,7 +164,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         d={geo.emphasisPath.d}
         data-mc-ink="data"
         fill="none"
-        style={{ stroke: accent, strokeWidth: "var(--mc-stroke-width)" }}
+        style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
         strokeLinejoin="round"
         strokeLinecap="round"
         vectorEffect="non-scaling-stroke"

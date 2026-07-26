@@ -65,10 +65,12 @@ function sharedInteractiveFor(c: ChartEntry): string[] | undefined {
   } else if (/\bonSelect\??\s*:/.test(src)) {
     names.push("onSelect");
   }
-  // `readout` applies to any entry that paints the floating value chip — keyed
-  // off the shared chip class rather than the picker flag, since chip-carrying
-  // scalars (Bullet, Thermometer…) have it too.
-  if (/mc-spark-readout/.test(src)) names.push("readout");
+  // `readout` applies to any entry that paints the floating value chip. The
+  // registry's `readout: false` flag is the authority (6 entries set it, because
+  // the value is already on the glyph or the mark is a count you read by
+  // counting); every other interactive entry paints a chip, including the
+  // chip-carrying scalars (Bullet, Thermometer…) that have no picker.
+  if (c.readout !== false) names.push("readout");
   return names;
 }
 
@@ -106,6 +108,8 @@ export function buildCatalog() {
         name: c.name,
         slug: c.slug,
         status: c.status === "stable" ? ("stable" as const) : ("planned" as const),
+        collection: c.collection,
+        tagline: c.tagline,
         docs: abs(`/docs/charts/${c.slug}`),
         staticImport: c.staticImport,
         ...(c.interactiveImport ? { interactiveImport: c.interactiveImport } : {}),
@@ -118,6 +122,8 @@ export function buildCatalog() {
           : {}),
         dataShape: c.dataShape,
         primaryEncoding: c.encoding.channel,
+        precision: c.encoding.precision,
+        nodeBudget: c.nodeBudget,
         bestFor: c.bestFor,
         avoidFor: c.avoidFor,
         props: c.props.map(toCatalogProp),

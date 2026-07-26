@@ -12,6 +12,10 @@ import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/type
 
 /* ── shared control primitives ─────────────────────────────────────────── */
 
+/** Readout destinations, in the order the reader meets them: the chart's own
+ *  chip, the callback panel beside it, then both at once. */
+const READOUT_DESTINATIONS = ["chart", "panel", "both"] as const;
+
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
@@ -116,37 +120,6 @@ function Range({
 }
 
 /** A compact styled dropdown — the requested "pick where the value goes" control. */
-function Select({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: readonly { value: string; label: string }[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <Field label={label}>
-      <div className="relative w-max">
-        <select
-          value={value}
-          aria-label={label}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-8 cursor-pointer appearance-none rounded-md border border-fd-border bg-fd-background py-0 pl-2.5 pr-7 text-[0.8rem] text-fd-foreground transition-colors hover:border-fd-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-primary/40"
-        >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 opacity-60" />
-      </div>
-    </Field>
-  );
-}
 
 /* ── the callback readout — the value, rendered OUTSIDE the chart ──────────── */
 
@@ -695,15 +668,17 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
               onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
             />
           ))}
+          {/* Where the value is read out. A segmented control, not a select:
+              every other knob in this row is one, and the three destinations are
+              short enough to show at once — which also makes the choice visible
+              instead of hidden behind a closed dropdown. `showReadoutToggle` is
+              the mutually-exclusive branch, so "readout" cannot label two
+              controls at the same time. */}
           {showReadoutPicker && (
-            <Select
-              label="value readout"
+            <Segmented
+              label="readout"
               value={dest}
-              options={[
-                { value: "chart", label: "On the chart" },
-                { value: "panel", label: "In the panel" },
-                { value: "both", label: "Chart + panel" },
-              ]}
+              options={READOUT_DESTINATIONS}
               onChange={(v) => setDest(v as "chart" | "panel" | "both")}
             />
           )}

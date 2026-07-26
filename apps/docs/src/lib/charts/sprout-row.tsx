@@ -49,6 +49,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Horizontal spacing between glyph slots (default 16; widens for labels).",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description:
+        "Type size of the value and stage labels, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: [3, 2, 3, 1, 0, 2],
   example: {

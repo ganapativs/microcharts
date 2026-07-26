@@ -49,6 +49,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "value (default), both, or none.",
     },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between bubbles in viewBox units (default 2).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the value numerals, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: [1240, 890, 560, 210],
   example: {

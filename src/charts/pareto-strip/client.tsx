@@ -19,7 +19,12 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { paretoGeometry } from "./geometry.js";
-import { ParetoStrip as StaticParetoStrip, paretoSummary, type ParetoStripProps } from "./index.js";
+import {
+  ParetoStrip as StaticParetoStrip,
+  paretoPercent,
+  paretoSummary,
+  type ParetoStripProps,
+} from "./index.js";
 
 export interface InteractiveParetoStripProps extends ParetoStripProps, PickerProps {
   strings?: ParetoStrings;
@@ -32,8 +37,6 @@ export interface InteractiveParetoStripProps extends ParetoStripProps, PickerPro
   animate?: boolean;
 }
 
-const pct = (frac: number): string => `${Math.round(frac * 100)}%`;
-
 export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode {
   const {
     data,
@@ -43,6 +46,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     metric = "the total",
     width = 80,
     height = 20,
+    locale,
     strings = EN_PARETO,
     title,
     summary,
@@ -56,6 +60,10 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The same percent formatter the static renders with — the label gutter is
+  // measured off its output, so the two entries must widen identically.
+  const pct = useMemo(() => paretoPercent(locale), [locale]);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The cumulative line carries "muted" ink, not data/accent, so it's not a
@@ -77,8 +85,10 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   const geo = useMemo(() => {
     const base = paretoGeometry({ width, height, data, threshold, maxItems });
     const showLabel = (props.label ?? "count") === "count" && base != null && base.crossing != null;
+    // Measure the string `strings` will actually paint — a translated caption is
+    // a different length, and the gutter is reserved from this count.
     const gutterCh = showLabel
-      ? `${base!.vitalCount} of ${base!.n} → ${pct(base!.cumAtCrossing)}`.length
+      ? strings.paretoCount(base!.vitalCount, base!.n, pct(base!.cumAtCrossing)).length
       : 0;
     return paretoGeometry({
       width,
@@ -89,7 +99,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       gutterCh,
       fontSize: labelFont(height),
     });
-  }, [width, height, data, threshold, maxItems, props.label]);
+  }, [width, height, data, threshold, maxItems, props.label, pct, strings]);
 
   // Only bars that PAINT are navigable — a zero-magnitude category (or an
   // all-zero dataset, which draws nothing at all) must not answer the pointer
@@ -139,7 +149,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         formatted: b ? `${b.label} ${pct(b.share)} · ${pct(b.cum)}` : "",
       };
     },
-    [geo],
+    [geo, pct],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -162,7 +172,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         ? summary
         : geo === null
           ? strings.noData
-          : paretoSummary(geo, { unit, metric }, strings);
+          : paretoSummary(geo, { unit, metric }, strings, pct);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // A bar is addressable only while it paints — a controlled `selectedIndex`
@@ -210,6 +220,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         metric={metric}
         width={width}
         height={height}
+        locale={locale}
         strings={strings}
         summary={false}
       >

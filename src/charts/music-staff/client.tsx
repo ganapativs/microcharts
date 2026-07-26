@@ -26,8 +26,9 @@ import { MusicStaff as StaticMusicStaff, type MusicStaffProps } from "./index.js
 export interface InteractiveMusicStaffProps extends MusicStaffProps, PickerProps {
   strings?: SeriesStrings;
   /**
-   * Opt-in entrance motion (default `false`): the note heads settle onto the
-   * staff on first client-side mount. Inert on the server and on hydrated
+   * Opt-in entrance motion (default `false`): the note heads pop onto the staff
+   * one after another, left to right, and the melody line draws on behind them,
+   * on first client-side mount. Inert on the server and on hydrated
    * server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;

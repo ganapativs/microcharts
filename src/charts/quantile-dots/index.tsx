@@ -86,7 +86,12 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
   // the static path may never measure text.
   const showLabel =
     label === "count" && hasThreshold && probe != null && labelFitsY(height / 2, FONT, height);
-  const labelText = showLabel ? `${probe!.past} in ${probe!.count}` : "";
+  // The frequency framing comes from the strings bundle — the interactive entry
+  // already renders this exact label through `quantileDotsOdds`, while the
+  // static spelled "N in count" out in English, so a translated `strings` moved
+  // the announcement and left the painted label behind. Gutter off the produced
+  // string, so a longer translation reserves the room it needs.
+  const labelText = showLabel ? strings.quantileDotsOdds(probe!.past, probe!.count) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
   const geo = quantileDotsGeometry({

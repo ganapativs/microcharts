@@ -29,9 +29,9 @@ import {
 export interface InteractiveSpiralYearProps extends SpiralYearProps, PickerProps {
   strings?: SpiralYearStrings;
   /**
-   * Opt-in entrance motion (default `false`): the rings fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
-   * `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the coil grows outward from its
+   * centre as it fades in, on first client-side mount. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

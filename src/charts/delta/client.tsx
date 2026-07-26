@@ -28,6 +28,13 @@ export interface InteractiveDeltaProps extends DeltaProps {
    * and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One value = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space on the glyph — `{ index: 0, value: the signed change }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -35,6 +42,7 @@ export interface InteractiveDeltaProps extends DeltaProps {
 export function Delta({
   live = true,
   animate = false,
+  onActive,
   onSelect,
   ...props
 }: InteractiveDeltaProps): React.ReactNode {
@@ -62,13 +70,21 @@ export function Delta({
     return () => clearTimeout(t);
   }, [props.value, live]);
 
-  // One value, one selectable unit (index 0) — no roving, no hover callback.
-  // The decorative form (`summary={false}`) stays inert: nothing to name, so
-  // nothing to focus or activate either.
-  const pick =
-    onSelect && props.summary !== false
-      ? (): void => onSelect({ index: 0, value: shown, formatted: display })
-      : undefined;
+  // One value, one selectable unit (index 0) — no roving. The decorative form
+  // (`summary={false}`) stays inert: nothing to name, so nothing to focus,
+  // activate or report.
+  const inert = props.summary === false;
+  const datum = (): MicroDatum => ({ index: 0, value: shown, formatted: display });
+  const pick = onSelect && !inert ? (): void => onSelect(datum()) : undefined;
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice.
+  const report = onActive && !inert ? onActive : undefined;
+  const shownActive = useRef(false);
+  const activate = (on: boolean): void => {
+    if (!report || shownActive.current === on) return;
+    shownActive.current = on;
+    report(on ? datum() : null);
+  };
 
   return (
     <span
@@ -76,7 +92,11 @@ export function Delta({
       className="mc-delta-live"
       data-pulse={pulse ? "1" : undefined}
       data-enter={enter ? "1" : undefined}
-      tabIndex={pick ? 0 : undefined}
+      tabIndex={pick || report ? 0 : undefined}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={
         pick

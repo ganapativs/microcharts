@@ -250,8 +250,11 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
         );
       })}
       {legend ? (
+        // Tier names from the strings bundle, same as the static entry — see the
+        // note there for why the glyphs stay literal and the key stays
+        // `aria-hidden`.
         <span className="mc-tc-legend" aria-hidden="true">
-          {" ― unsure · ⋯ guessing"}
+          {` ― ${strings.tokenTierNames[1]} · ⋯ ${strings.tokenTierNames[2]}`}
         </span>
       ) : null}
       {children}

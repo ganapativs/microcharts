@@ -22,6 +22,13 @@ export interface InteractiveDicePipsProps extends DicePipsProps {
    * always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. The pips are ONE face,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the face count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -33,6 +40,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     title,
     value,
     animate = false,
+    onActive,
     onSelect,
     className,
     style,
@@ -83,15 +91,32 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The pips are ONE face, not six navigable marks: a single selectable unit
-  // (index 0) carrying the rounded count the face renders.
-  const pick = (): void =>
-    onSelect?.({ index: 0, value: Number.isFinite(value) ? Math.round(value) : null });
+  // (index 0) carrying the rounded count the face renders. One builder, so
+  // `onActive` and `onSelect` can never report a different face.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? Math.round(value) : null,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // face paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-dice-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

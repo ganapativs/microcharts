@@ -5,7 +5,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type ParetoStrings = Pick<
   SummaryStrings,
-  "noData" | "pareto" | "paretoTop" | "paretoEmpty" | "paretoAt"
+  "noData" | "pareto" | "paretoTop" | "paretoEmpty" | "paretoAt" | "paretoCount"
 >;
 
 export const EN_PARETO: ParetoStrings = {
@@ -15,4 +15,5 @@ export const EN_PARETO: ParetoStrings = {
   paretoTop: (topLabel, topPct) => `${topLabel} leads at ${topPct}.`,
   paretoEmpty: (metric) => `No recorded ${metric}.`,
   paretoAt: (label, sharePct, cumPct) => `${label}: ${sharePct} of total, cumulative ${cumPct}.`,
+  paretoCount: (k, n, cumPct) => `${k} of ${n} → ${cumPct}`,
 };

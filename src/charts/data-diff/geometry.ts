@@ -6,6 +6,28 @@
 // Coords 2-dp, integer viewBox.
 import { round2 } from "../../core/types.js";
 import { maxOf } from "../../core/scale.js";
+import { textGutterProse } from "../../core/labels.js";
+
+/**
+ * Left gutter for the key tags — the ONE place geometry and both entries agree on
+ * it, because it is the plot's x origin and a second-guessed copy walks every bar
+ * (and the interactive focus ring) sideways by its width.
+ *
+ * A key is caller text — a column name, a schema field, often upper-case — never
+ * a figure this chart formatted, so it reserves at the PROSE per-char rate
+ * (`textGutterProse`); the digits rate would leave an all-caps key painting into
+ * the bars, and `.mc-root` is `overflow: visible`, so it spills rather than clips.
+ * Unknown text also means the reserve can outgrow the sensible share of the box:
+ * past 45% the diverging pair has no room left to encode anything, so the tags
+ * DROP and hand the whole width back to the bars — the data never degrades for
+ * the sake of a scaffold. Returns 0 in that case, so the caller drops the tags
+ * and the gutter in the same branch.
+ */
+export function dataDiffGutter(chars: number, fontSize: number, width: number): number {
+  if (chars <= 0) return 0;
+  const gutter = textGutterProse(chars, fontSize, 4);
+  return gutter <= width * 0.45 ? gutter : 0;
+}
 
 interface DataDiffRow {
   key: string;
@@ -60,7 +82,7 @@ export function dataDiffGeometry(opts: {
   const pad = opts.pad ?? 2;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
+  const gutter = dataDiffGutter(gutterCh, fontSize, width);
   const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 12)));
 
   // order is a VIEW concern — never mutate the caller's order semantics silently;

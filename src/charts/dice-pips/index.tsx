@@ -73,7 +73,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
           height={geo.face.height}
           rx={geo.face.rx}
           data-mc-ink="muted"
-          style={{ strokeWidth: "var(--mc-stroke-width)" }}
+          style={{ strokeWidth: "var(--mc-sw)" }}
         />
       ) : null}
       {geo.pips.map((p) => (

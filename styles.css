@@ -88,8 +88,27 @@
     --mc-surface: Canvas;
     --mc-surface-ink: CanvasText;
     --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
-    /* Label ink on saturated data fills (heat cells, progress fill, …). */
+    /* Label ink on a SATURATED SEMANTIC fill (heat cells, progress fill, event
+       spans) — the deep accent/positive/stroke end of the palette, where a light
+       ink is the legible one. Measured against the default light tokens:
+       accent 6.3:1, positive 5.0:1, stroke 16.2:1. It gets a dark twin below,
+       because the dark palette is deliberately LIFTED — the same fills are the
+       LIGHTER of the two there and white text drops to 2.7–3.0:1. */
     --mc-on-fill: rgba(255, 255, 255, 0.96);
+    /* Label ink on a CATEGORICAL fill. A different token because the cats are
+       MID-tone by construction (gold, azure, terracotta), not deep: the light
+       ink that works on `--mc-accent` reads 2.1–3.7:1 on them in either theme,
+       while this dark ink clears 4.5:1 on eleven of the twelve default cats
+       (5.0–8.6:1). The twelfth — light-mode sapphire, the one deep cat — is
+       exempted where it is used. Not theme-flipped: dark-mode cats are lifted
+       further, so the dark ink only gets safer. */
+    --mc-on-cat: rgba(0, 0, 0, 0.9);
+    /* Label ink for a label that STEPS BACK from the on-fill treatment
+       (TraceFold's non-critical spans). Its own token rather than the
+       `--mc-surface` those rules used to borrow — that one is documented as the
+       readout chip's backing plane, so retargeting the chip repainted in-chart
+       text as a side effect. */
+    --mc-on-fill-dim: var(--mc-stroke);
 
     /* motion */
     --mc-duration: 300ms;
@@ -114,6 +133,9 @@
       --mc-cat-4: #6e9bd1;
       --mc-cat-5: #e07e5e;
       --mc-cat-6: #c486b0;
+      /* Lifted fills flip the on-fill ink: white-on-accent falls to 2.7:1 here
+         (2.96:1 on positive), while this dark ink reads 6.8:1 / 6.3:1. */
+      --mc-on-fill: rgba(0, 0, 0, 0.9);
     }
   }
   :where([data-mc-theme="dark"]) {
@@ -129,6 +151,7 @@
     --mc-cat-4: #6e9bd1;
     --mc-cat-5: #e07e5e;
     --mc-cat-6: #c486b0;
+    --mc-on-fill: rgba(0, 0, 0, 0.9);
   }
   /* Presets = token bundles. Visual only. */
   /* "editorial" — hairline, sharp, a single restrained red endpoint accent.
@@ -181,6 +204,40 @@
     --mc-moon: #000000;
     --mc-band: color-mix(in oklab, #000000 14%, transparent);
     --mc-stroke-width: 2;
+  }
+  /* mono + eink are the two ACHROMATIC presets: mono collapses every semantic
+     token onto `--mc-stroke`, and eink's own comment says "no chroma (the panel
+     can't show it)". Neither remapped `--mc-cat-*`, so the nine categorical
+     charts kept full jewel-tone colour inside a preset that had just declared it
+     unavailable — a SegmentedBar in `eink` shipped six hues to a grayscale panel.
+     Both now ride one lever, `--mc-stroke`, since each already pins that: six
+     tints, lightness-ordered, so the series order survives.
+
+     The range is deliberately narrow (16% → 5%). A tint of the ink over the page
+     is mid-grey in the middle of a wider ramp, and there is then NO single label
+     ink that clears 4.5:1 on every step — the light ink fails the dark steps and
+     the dark ink fails the light ones. Keeping every step light means the
+     ordinary `--mc-stroke` label ink stays legible on all six in both themes
+     (measured: 4.6:1 on the darkest step against a dark page, 12:1 against a
+     light one), which is why these presets take no `--mc-on-cat` override. A
+     whisper of ordering is the honest reading anyway: in a one-ink preset the
+     label is the identifier and colour is explicitly not carrying meaning.
+
+     `print` keeps the chromatic palette on purpose — it is a COLOUR-output
+     context (it only deepens valence for CMYK), not an achromatic one. */
+  :where(
+    [data-mc-theme="mono"],
+    [data-mc-preset="mono"],
+    [data-mc-theme="eink"],
+    [data-mc-preset="eink"]
+  ) {
+    --mc-cat-1: color-mix(in oklab, var(--mc-stroke) 16%, transparent);
+    --mc-cat-2: color-mix(in oklab, var(--mc-stroke) 13%, transparent);
+    --mc-cat-3: color-mix(in oklab, var(--mc-stroke) 11%, transparent);
+    --mc-cat-4: color-mix(in oklab, var(--mc-stroke) 9%, transparent);
+    --mc-cat-5: color-mix(in oklab, var(--mc-stroke) 7%, transparent);
+    --mc-cat-6: color-mix(in oklab, var(--mc-stroke) 5%, transparent);
+    --mc-on-cat: var(--mc-stroke);
   }
   /* print/eink pin a fixed light-surface ink — right for paper, but on a dark
      viewer that ink sinks into the field. Give them hand-tuned dark twins: eink
@@ -239,7 +296,13 @@
     overflow: visible;
     font: var(--mc-font);
     /* density-scaled stroke weight consumed by the ink + width roles below, so
-       one --mc-density retunes every stroke without touching the base token. */
+       one --mc-density retunes every stroke without touching the base token.
+       This is the token a MARK reads, in the stylesheet and in an inline
+       `strokeWidth` alike — thirty inline declarations across twenty charts used
+       to reach for the base `--mc-stroke-width` directly and so opted their
+       primary mark out of `--mc-density` while every stroke around it scaled. A
+       chart wants `--mc-stroke-width` only to declare a DELIBERATE exemption,
+       and then it should say so (see the annotation hairlines). */
     --mc-sw: calc(var(--mc-stroke-width) * var(--mc-density));
   }
   /* Chart-only table cells: kill the font strut so a lone SVG seats the row
@@ -698,14 +761,49 @@
     rx: 0.5;
   }
   /* anchor/baseline stay SVG attributes on the marks — the craft gate computes
-     text extents from raw attributes; only paint moves here */
+     text extents from raw attributes; only paint moves here.
+     `--mc-on-fill` rather than the literal it used to repeat: the token gained a
+     dark twin (see the tokens layer) precisely because these labels were the
+     charts that needed it, and a rule that spells the value out cannot follow. */
   :where(.mc-trace, .mc-partition) :where(text) {
     font-weight: 600;
-    fill: rgba(255, 255, 255, 0.96);
+    fill: var(--mc-on-fill);
   }
-  /* a label on a muted (non-critical) span recedes to the page surface */
+  /* PartitionStrip labels sit on a CATEGORICAL fill, not a deep semantic one, so
+     they take the categorical ink: the light ink reads 2.1–3.7:1 on the mid-tone
+     cats in either theme. A label lands on a rect and is its next sibling (the
+     chart emits `[rect, text]` per segment), so the fill it sits on is exactly
+     what the selector can name.
+
+     Two steps are deep enough to keep the light ink: an `emphasis` segment, which
+     paints `--mc-accent` (6.3:1 light / 6.8:1 dark on the light ink), and
+     light-mode sapphire `--mc-cat-4` — the one deep cat, where the dark ink is
+     3.0:1 and the light ink 5.5:1. Dark-mode cat-4 is the lifted twin (5.7:1 on
+     the dark ink), so that half of the exception is scoped to light. */
+  :where(.mc-partition) :where(text) {
+    fill: var(--mc-on-cat);
+  }
+  :where(.mc-partition) :where(rect[data-mc-ink="accent"] + text, rect[data-mc-cat="4"] + text) {
+    fill: var(--mc-on-fill);
+  }
+  @media (prefers-color-scheme: dark) {
+    :where(.mc-partition) :where(rect[data-mc-cat="4"] + text) {
+      fill: var(--mc-on-cat);
+    }
+  }
+  :where([data-mc-theme="dark"]) :where(.mc-partition) :where(rect[data-mc-cat="4"] + text) {
+    fill: var(--mc-on-cat);
+  }
+  /* A label on a non-critical TraceFold span steps back to the ORDINARY label
+     ink instead of the bold on-fill ink — its own token, not the borrowed
+     `--mc-surface` these rules used to reach for. That borrow painted the label
+     in the page colour, which on a 0.62-opacity neutral span is 1.4:1: not
+     receding, disappearing. The stroke ink reads 8.7:1 light / 4.6:1 dark on the
+     same span, and the weight drop (600 → the base label weight) is what carries
+     "this one is context". */
   :where(.mc-trace) :where(text[data-mc-dim]) {
-    fill: var(--mc-surface, Canvas);
+    fill: var(--mc-on-fill-dim);
+    font-weight: var(--mc-label-weight);
   }
 
   /* @mc-chart sparkline */
@@ -937,14 +1035,25 @@
   }
 
   /* StatusDot "live now" halo — expands + fades from the mark. This is a state
-     cue (monitoring), not decoration; it dies under reduced-motion below. */
+     cue (monitoring), not decoration; it dies under reduced-motion below.
+     Documented exemption from "no looping animation": the loop IS the reading.
+     A monitoring dot that pulses says "this is live"; the same dot holding still
+     says the feed stopped, which is the state a reader most needs to see. It is
+     opt-in per instance (`pulse`, default off) and state-independent.
+
+     The end scale is pinned by CONTAINMENT, not taste. The halo is r = 3 at the
+     centre of an 8-unit box, so a scale of 4/3 lands its edge exactly on the
+     viewBox and anything more paints into the page — `.mc-root` is
+     `overflow: visible`, so there is nothing to clip it. The old 1.9 reached
+     r = 5.7 and spilled 1.7 units on every side for the whole animation. The
+     opacity fade carries the motion; the travel only has to start it. */
   @keyframes mc-status-pulse {
     0% {
       transform: scale(1);
       opacity: 0.5;
     }
     100% {
-      transform: scale(1.9);
+      transform: scale(1.333);
       opacity: 0;
     }
   }
@@ -1064,6 +1173,55 @@
     :where(.mc-root :is(path, line, polyline)[data-mc-ink="ghost"]) {
       stroke: GrayText;
     }
+    /* Categorical series. `data-mc-cat` is kept on the mark for exactly two
+       reasons — motion and this rule — and this rule was missing, so nine
+       categorical charts sailed through High Contrast Mode painting their own
+       hues (`.mc-root` sets `forced-color-adjust: none`, which PRESERVES them
+       rather than mapping them). On a black forced background, `--mc-cat-4`
+       (#285788) is all but invisible.
+
+       Collapsing all six to one system ink would destroy the encoding instead —
+       six segments reading identical — so the hue ramp becomes a LIGHTNESS ramp
+       on the system ink, the same move `mono`/`eink` make with chroma they cannot
+       show. Fill only: `[data-mc-cat]` already sets `stroke: none` in the charts
+       layer, so a cat mark is always a closed shape.
+
+       Two constraints pin the ramp's range from both ends, and they conflict. The
+       LABELS that sit on these fills have to stay readable, and their only
+       available ink here is a `Canvas` knockout, which needs the fill to stay
+       dark — 0.62 is the floor at which knockout text still clears 4.5:1. That
+       leaves too little room for six steps to separate from each other by fill
+       alone, so separation is carried by a `Canvas` hairline between segments
+       instead: a visible gap makes adjacent units distinct whatever their fills
+       do. That is the honest trade — High Contrast Mode's contract is legibility
+       against the system background, not categorical richness, and the direct
+       labels are what identify a series. */
+    :where(.mc-root [data-mc-cat]) {
+      fill: CanvasText;
+      stroke: Canvas;
+      stroke-width: 0.5;
+    }
+    :where(.mc-root [data-mc-cat="2"]) {
+      fill-opacity: 0.92;
+    }
+    :where(.mc-root [data-mc-cat="3"]) {
+      fill-opacity: 0.85;
+    }
+    :where(.mc-root [data-mc-cat="4"]) {
+      fill-opacity: 0.77;
+    }
+    :where(.mc-root [data-mc-cat="5"]) {
+      fill-opacity: 0.7;
+    }
+    :where(.mc-root [data-mc-cat="6"]) {
+      fill-opacity: 0.62;
+    }
+    :where(.mc-trace, .mc-partition) :where(text) {
+      fill: Canvas;
+    }
+    :where(.mc-trace) :where(text[data-mc-dim]) {
+      fill: CanvasText;
+    }
     /* quadrant tint is purely decorative → drop it entirely in high contrast */
     :where(.mc-root [data-mc-ink="region"]) {
       fill: transparent;
@@ -1090,6 +1248,21 @@
     :where(.mc-root circle[data-mc-status="half"]) {
       fill: none;
       stroke: CanvasText;
+    }
+    /* LAST, and the reason the mappings above can stay one line each: a mark
+       that DECLARED itself hollow stays hollow, whatever role fill it inherited.
+       An ink role covers closed shapes and outlines alike, and an outline says so
+       with a literal `fill="none"` attribute — the only signal CSS can read.
+       Forcing a fill onto one is not a contrast adjustment, it is a change of
+       meaning: `heat-strip`'s muted rect is its MISSING-DATA cell (`fill="none"`
+       plus a 0.4 stroke) and it filled solid GrayText in High Contrast Mode,
+       reading as a value that was never recorded. Expressed once here rather than
+       as a `:not([fill="none"])` on nine fill mappings, so the role added next
+       cannot forget it. (`unit-off`/`gap` still say `fill: Canvas` explicitly —
+       those are FILLED with the background on purpose, an empty slot that has to
+       stay visible as a slot.) */
+    :where(.mc-root [fill="none"]) {
+      fill: none;
     }
   }
 }

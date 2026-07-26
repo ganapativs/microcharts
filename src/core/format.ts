@@ -47,6 +47,28 @@ export function makeFormatter(
   return (n) => nf.format(clean(n));
 }
 
+/**
+ * The one way a chart may render a percent.
+ *
+ * A literal `` `${Math.round(x * 100)}%` `` is not a percent, it is an
+ * en-US percent: `fr-FR` and most of Europe put a NBSP before the sign, `tr-TR`
+ * puts the sign in front of the number, and several locales use their own digits.
+ * Charts were spelling it out inline in chip text, live-region announcements and
+ * painted labels alike, so a `locale` prop that correctly localised every other
+ * number on the chart left its percentages in English.
+ *
+ * Takes a FRACTION (0.42 → "42%"), matching `Intl`'s own `style: "percent"`
+ * contract, so a caller can never be unsure whether to pre-multiply. Routed
+ * through `makeFormatter` for the same shared cache — one `Intl.NumberFormat` per
+ * locale × digit count across the whole catalog, not one per chart instance.
+ */
+export function makePercentFormatter(
+  locale: string | string[] | undefined,
+  maximumFractionDigits = 0,
+): (fraction: number) => string {
+  return makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits });
+}
+
 /** Prepend `+` for positive values only when `fmt` did not already emit a sign.
  *  Guards `++1.3%` when callers pass signed percent formatters. */
 export function withPlus(n: number, fmt: (n: number) => string): string {

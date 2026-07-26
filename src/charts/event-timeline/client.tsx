@@ -33,9 +33,9 @@ export interface InteractiveEventTimelineProps extends EventTimelineProps, Picke
   /** Announced instant label (defaults to "Jun 3, 11:12" UTC). */
   dateFormat?: DateFormat;
   /**
-   * Opt-in entrance motion (default `false`): spans and events fade in on
-   * first client-side mount. Inert on the server and on hydrated server
-   * HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): spans and events pop in one after
+   * another along the axis, earliest first, on first client-side mount. Inert on
+   * the server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

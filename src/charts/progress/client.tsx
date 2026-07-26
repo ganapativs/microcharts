@@ -30,6 +30,13 @@ export interface InteractiveProgressProps extends ProgressProps {
    * only when the bar prints no label of its own (`label="none"`).
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One bar = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the mark, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -42,6 +49,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     title,
     summary,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -69,23 +77,41 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
   // the label already tells the truth past 100%).
   // `label="none"` is the only mode with nothing painted; every other mode
   // already renders `model.display`, so the chip would just duplicate it.
-  const chipText = rest.label === "none" ? (wholePct === null ? "—" : `${wholePct}%`) : undefined;
-  const pick = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(model.fraction) ? model.fraction : null,
-      formatted: model.display ?? chipText,
-    });
+  // The chip is the percent the bar WOULD have printed, resolved by the same
+  // model — never `${wholePct}%`, which hardcoded an en-US percent and ignored
+  // `locale` (and `format`) that every other number here honours.
+  const chipText =
+    rest.label === "none"
+      ? progressModel({ ...rest, strings, label: "percent" }).display
+      : undefined;
+  // One builder, so `onActive` and `onSelect` can never report a different
+  // number or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(model.fraction) ? model.fraction : null,
+    formatted: model.display ?? chipText,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-progress-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

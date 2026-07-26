@@ -146,7 +146,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 data-mc-ink="accent"
                 strokeOpacity={p.lowSupport ? 0.4 : 1}
                 style={{
-                  strokeWidth: "var(--mc-stroke-width)",
+                  strokeWidth: "var(--mc-sw)",
                   ...(color ? { stroke: color } : null),
                 }}
                 vectorEffect="non-scaling-stroke"

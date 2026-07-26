@@ -21,6 +21,7 @@ import { timeInRangeGeometry } from "./geometry.js";
 import {
   TimeInRange as StaticTimeInRange,
   timeInRangeSummary,
+  tirPercent,
   zonePercentMap,
   type TimeInRangeProps,
 } from "./index.js";
@@ -40,6 +41,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     orientation = "horizontal",
     width = 80,
     height = 12,
+    locale,
     strings = EN_TIME_IN_RANGE,
     title,
     summary,
@@ -70,13 +72,16 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     [data, width, height, orientation],
   );
   const pct = useMemo(() => zonePercentMap(data), [data]);
+  // The same percent formatter the static paints its in-zone label with, so the
+  // chip, the announcement and the painted label can never disagree.
+  const pctFmt = useMemo(() => tirPercent(locale), [locale]);
 
   const accName =
     summary === false
       ? undefined
       : typeof summary === "string"
         ? summary
-        : timeInRangeSummary(data, strings);
+        : timeInRangeSummary(data, strings, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const nameByKey = useMemo<Record<ZoneKey, string>>(
@@ -134,10 +139,10 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         index: i,
         value: z ? (pct[z.key] ?? null) : null,
         label: z ? nameByKey[z.key] : undefined,
-        formatted: z ? `${nameByKey[z.key]} ${pct[z.key]}%` : undefined,
+        formatted: z ? `${nameByKey[z.key]} ${pctFmt(pct[z.key]!)}` : undefined,
       };
     },
-    [geo, pct, nameByKey],
+    [geo, pct, pctFmt, nameByKey],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -172,7 +177,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
 
   const shown = active ?? selected;
   const zone = shown !== null ? geo.zones[shown] : undefined;
-  const announced = zone ? strings.tirZone(nameByKey[zone.key]!, `${pct[zone.key]}%`) : "";
+  const announced = zone ? strings.tirZone(nameByKey[zone.key]!, pctFmt(pct[zone.key]!)) : "";
   // Horizontal: clamp to the zone mid-x. Vertical: float ABOVE the column —
   // a centered chip sits inside a ~34px KPI and collides with the default
   // `bottom: 100%` rule, so the value never appears.
@@ -181,7 +186,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
       ? crosshairReadoutStyle(zone.x + zone.width / 2, width)
       : { left: "50%", bottom: "100%", top: "auto", transform: "translateX(-50%)" }
     : undefined;
-  const chipText = zone ? `${nameByKey[zone.key]} ${pct[zone.key]}%` : "";
+  const chipText = zone ? `${nameByKey[zone.key]} ${pctFmt(pct[zone.key]!)}` : "";
 
   return (
     <span ref={hostRef} {...wrap("mc-tir-live", className, style)} {...named(label)} {...bind}>
@@ -191,6 +196,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         orientation={orientation}
         width={width}
         height={height}
+        locale={locale}
         strings={strings}
         summary={false}
         style={fillFor(style)}

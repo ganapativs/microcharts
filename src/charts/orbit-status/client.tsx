@@ -39,6 +39,13 @@ export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
    * suppresses only the chip. Inert when `label="latency"` already prints it.
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. The dependency is ONE
+   * unit, so this fires once with `{ index: 0, … }` on pointer enter or focus and
+   * once with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -63,6 +70,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     readout = true,
     className,
     style,
+    onActive,
     onSelect,
     ...rest
   } = props;
@@ -96,13 +104,25 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   // value = latency, the chart's primary encoded number (orbit RADIUS). Rate is
   // the second channel (dash density / orbital speed) and stays in the summary
   // rather than inventing a second numeric field.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: geo.unknown ? null : Math.max(0, latency),
-      label: title,
-      formatted: geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency))),
-    });
+  // One builder, so `onActive` and `onSelect` can never report a different
+  // latency or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: geo.unknown ? null : Math.max(0, latency),
+    label: title,
+    formatted: geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency))),
+  });
+  const select = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only. `open` alone can't gate it —
+  // pointer-enter then focus both set it `true`, which would announce the same
+  // unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setOpen(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
   // the orbit still sits in the left square, so anything positioned as a
@@ -149,10 +169,10 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       ref={wrapRef}
       {...wrap("mc-orbit-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => setOpen(true)}
-      onPointerLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

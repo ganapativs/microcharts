@@ -8,6 +8,9 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 import type { Value } from "../../core/types.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
 
 describe("<TimeInRange>", () => {
   it("renders one rect per present zone summary + label", () => {
@@ -42,6 +45,27 @@ describe("<TimeInRange>", () => {
     const { container } = draw(<TimeInRange data={{ below: 0, in: 0, above: 0 }} />);
     expect(container.querySelectorAll("rect").length).toBe(0);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+  });
+
+  it("locale spells the zone percents, and the fit is measured off that string", () => {
+    const { container } = draw(
+      <TimeInRange data={{ below: 9, in: 72, above: 19 }} locale="de-DE" />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `72${NBSP}% in range, 9${NBSP}% below, 19${NBSP}% above.`,
+    );
+    // painted label and summary read the SAME localized string
+    expect(container.querySelector("text")!.textContent).toBe(`72${NBSP}%`);
+
+    // The in-zone label has to clear its own rect, and the clearance is computed
+    // from the FORMATTED string: at 24 units the 3-char en-US percent seats and
+    // the 4-char de-DE one does not, so it DROPS rather than spilling the zone.
+    const data = { below: 9, in: 72, above: 19 };
+    const en = draw(<TimeInRange data={data} width={24} />).container;
+    const de = draw(<TimeInRange data={data} width={24} locale="de-DE" />).container;
+    expect(en.querySelector("text")).not.toBeNull();
+    expect(de.querySelector("text")).toBeNull();
+    expect(de.querySelectorAll("rect").length).toBe(3);
   });
 
   it("is axe-clean", async () => {

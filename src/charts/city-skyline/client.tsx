@@ -4,7 +4,7 @@
 // click / Enter / Space selects (onSelect). The lit fraction is announced as a
 // percent (secondary channel). Composes the static component.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
@@ -92,6 +92,10 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     [data, bw, gap, domain, height, groundY, label, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The lit fraction is a share of its own windows, so it takes `locale` but
+  // never the value `format` (which carries the height channel's units). A
+  // literal `${Math.round(x*100)}%` left this one number in en-US.
+  const litFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   // One building per datum, so the unit index IS the DATA index.
   const locate = useCallback(
@@ -117,11 +121,11 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
               ? strings.citySkylineEmpty(d.label)
               : b.lit === null
                 ? strings.citySkylineAt(d.label, fmt(d.value))
-                : strings.citySkylineAtLit(d.label, fmt(d.value), `${Math.round(b.lit * 100)}%`)
+                : strings.citySkylineAtLit(d.label, fmt(d.value), litFmt(b.lit))
             : "",
       };
     },
-    [data, geo, fmt, strings],
+    [data, geo, fmt, litFmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -174,7 +178,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         ? strings.citySkylineEmpty(d.label)
         : b.lit === null
           ? strings.citySkylineAt(d.label, fmt(d.value))
-          : strings.citySkylineAtLit(d.label, fmt(d.value), `${Math.round(b.lit * 100)}%`)
+          : strings.citySkylineAtLit(d.label, fmt(d.value), litFmt(b.lit))
       : "";
 
   return (

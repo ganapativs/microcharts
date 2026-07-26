@@ -118,4 +118,34 @@ describe("interactive <EtaBar>", () => {
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.3 });
     expect(screen.container.querySelector(".mc-spark-readout")).not.toBeNull();
   });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the bar once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <EtaBar
+        progress={0.64}
+        elapsed={3.6}
+        rate={0.18}
+        etaFormat={min}
+        width={160}
+        height={16}
+        onActive={(d) => seen.push(d)}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-eta-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("64%");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.64, formatted: chip() });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
+  });
 });

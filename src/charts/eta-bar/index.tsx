@@ -4,7 +4,7 @@
 // remainder is sized by the observed rate — the download bar, told truthfully.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
 import { etaBarGeometry, hatchPath } from "./geometry.js";
@@ -41,11 +41,13 @@ export function etaBarSummary(
     rate: number | null;
     etaFormat?: ((t: number) => string) | undefined;
     fmt: (n: number) => string;
+    /** Locale for the percent (`format` belongs to the ETA number, not to it). */
+    locale?: string | string[] | undefined;
   },
   strings: EtaBarStrings,
 ): string {
   const geo = etaBarGeometry({ ...opts, width: 80, height: 8 });
-  const pct = `${Math.round(Math.max(0, Math.min(1, opts.progress || 0)) * 100)}%`;
+  const pct = makePercentFormatter(opts.locale)(Math.max(0, Math.min(1, opts.progress || 0)));
   if (opts.progress >= 1) return strings.etaBarDone;
   if (geo.indeterminate || geo.remainingTime == null) return strings.etaBarStalled(pct);
   const rem = opts.etaFormat ? opts.etaFormat(geo.remainingTime) : opts.fmt(geo.remainingTime);
@@ -82,7 +84,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
     label === "none" || height < 9
       ? undefined
       : label === "percent"
-        ? `${Math.round(p * 100)}%`
+        ? makePercentFormatter(locale)(p)
         : pre.indeterminate || pre.remainingTime == null
           ? undefined
           : etaFormat
@@ -97,7 +99,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
     summary === false
       ? false
       : (summary ??
-        etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt }, strings));
+        etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt, locale }, strings));
 
   const dividerX = geo.done.x + geo.done.width;
 

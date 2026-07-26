@@ -6,7 +6,7 @@ import type { SummaryStrings } from "./summary.js";
 
 export type BiasStripStrings = Pick<
   SummaryStrings,
-  "noData" | "biasStrip" | "biasStripShort" | "biasStripAt" | "biasOutside"
+  "noData" | "biasStrip" | "biasStripShort" | "biasStripAt" | "biasOutside" | "biasStripLabel"
 >;
 
 export const EN_BIAS_STRIP: BiasStripStrings = {
@@ -17,4 +17,5 @@ export const EN_BIAS_STRIP: BiasStripStrings = {
   biasStripAt: (pos, total, mean, diff, statusClause) =>
     `Pair ${pos} of ${total}: mean ${mean}, diff ${diff}${statusClause}.`,
   biasOutside: " — outside the limits",
+  biasStripLabel: (bias) => `${bias} bias`,
 };

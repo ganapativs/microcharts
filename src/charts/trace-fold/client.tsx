@@ -4,7 +4,7 @@
 // between depths (2-D roving), touch tap-to-pin, and the onActive/onSelect
 // contract. Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -21,10 +21,10 @@ import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } f
 
 export interface InteractiveTraceFoldProps extends TraceFoldProps, PickerProps {
   /**
-   * Opt-in entrance motion (default `false`): the flame builds the way a call
-   * stack forms — each frame grows DOWN from its parent, cascading depth by
-   * depth from the root row. Inert on the server and on hydrated server HTML;
-   * `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the flame RISES depth by depth
+   * from the root row — each frame scales out of its top edge, where it meets
+   * its parent, the way a call stack unwinds. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -73,6 +73,10 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     [data, width, height],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // A span's SHARE of total time is a percent of its own, so it takes `locale`
+  // but never the duration `format` (which carries the time unit). The old
+  // `${Math.round(share * 100)}%` was an en-US percent.
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   // The navigable unit is a SPAN, and `geo.rects` is 1:1 with the rendered spans
   // (`data` truncated to the first 40), so the reported index IS the data index.
@@ -203,7 +207,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     ? strings.traceFoldAt(
         span.label,
         fmt(span.duration),
-        `${Math.round(span.share * 100)}%`,
+        pctFmt(span.share),
         span.depth,
         span.critical ? strings.traceCritical : "",
       )

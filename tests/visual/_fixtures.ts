@@ -23,6 +23,9 @@ export const test = base.extend({
           `<div class="vt-panel vt-dark" data-mc-theme="dark" style="padding:24px;background:#0c0d0e;color:var(--mc-stroke)">${html}</div>`,
         options,
       )) as typeof page.setContent;
+    // `use` is Playwright's fixture-teardown callback, not React's `use` hook —
+    // the name is the only thing the lint rule can see.
+    // oxlint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
 });

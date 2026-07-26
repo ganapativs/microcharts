@@ -3,7 +3,7 @@
   "$exception": "Sparkline 3.35/4.35 kB was USER-APPROVED (2026-07-08) as a flagship exception to the 3/4 kB hard caps (long-series guard + label=minmax; trims exhausted first). Batch 1 W4 raised it to 3.65/4.65 kB PENDING user sign-off at the batch gate: the annotations HOST contract adds the children walker + scale frame (~0.29 kB) to every S1/S2 host — the annotation MARK renderers ship in ./annotations (1.46 kB), which consumers import separately, so hosts only pay the walker. Not a precedent for other charts. ANNOTATION-HOST RETROFIT (2026-07-15, USER-APPROVED full value-series family): resolveAnnotations walker + scale frame added to 15 value-series hosts. 5 cross the 3 kB static ceiling as approved exceptions (all < Sparkline 3.65): change-point 3.45, win-prob-worm 3.4, forecast-cone/dual-sparkline 3.35, burn-chart 3.25. The other 10 stay < 3 kB.",
   "$interaction": "INTERACTION-CONTRACT RE-BASELINE (2026-07-18, USER-APPROVED): the shared useActivePicker kernel (shared/interactive.ts) adds the standardized onActive/onSelect callbacks + controlled selection (selectedIndex/defaultSelectedIndex) + touch tap-select to every MULTI-UNIT interactive entry. Because size-limit bundles shared code standalone per subpath, the kernel costs ~0.49–0.53 kB gzip on each such interactive entry (static entries unchanged). Multi-unit interactive budgets are raised by ~0.5 kB to absorb it; pure-scalar charts (delta, status-dot, trend-arrow, moon-phase, thermometer, progress, progress-ring, fat-digits, dice-pips, tally-marks, hourglass, breathing-dot, eta-bar, heartbeat-blip, fill-word, tape-gauge) keep the lean whole-chart onSelect and stay at their current budgets.",
   "$seat": "INLINE-SEAT RE-BASELINE (2026-07-19, USER-APPROVED). Every chart now emits a `Seat` (mode + plot box) from its geometry so `.mc-inline` can sit the mark on the text line — see `Seat` in src/shared/Chart.tsx. Measured cost by controlled experiment (removed one chart's seat, rebuilt): 25 B gzip per subpath. All 211 chart budgets were re-measured from the built dist and rewritten to the next 10 B above actual. CAVEAT, recorded deliberately: this re-baseline could NOT isolate the seat from the concurrent interaction-contract migration, which was still mid-flight in the same working tree — total drift absorbed was 13,002 B across 183 subpaths (median 70 B), of which only ~25 B/subpath is attributable to the seat. Re-verify these numbers once the interaction-contract migration finishes. NEW 3 kB STATIC EXCEPTIONS (11, beyond the 6 already listed in $exception): station-glyph 3.28, slope 3.25, spread-band 3.21, control-strip 3.13, retention-curve 3.13, percentile-ladder 3.10, queue-depth 3.09, shift-histogram 3.08, sparkbar 3.08, polar-clock 3.06, stacked-area 3.05. Each is < 0.3 kB over the ceiling and none is a precedent for a new chart, which still must land under 3 kB.",
-  "$ceilings": "STALE-RULE NOTE (updated 2026-07-26): CLAUDE.md's `static ≤ 3 kB` and `interactive ≤ static + 1 kB` no longer describe the shipped budgets and are not enforced per-entry (each subpath carries its own measured limit). 25 statics sit above 3 kB (max sparkline 4.01), up from 22 — the 2026-07-22 robustness pass (finite guards, saturation caps, maxOf/minOf folds) pushed cycle-plot, dumbbell and waterfall over. All interactive entries remain ~1.8–2.3 kB above their static twin because size-limit bundles the shared picker kernel standalone into every subpath (101 of 105 interactive entries exceed static+1 kB). A NEW chart is still held to 3 kB / +1 kB; these are not a precedent.",
+  "$ceilings": "STALE-RULE NOTE (updated 2026-07-26): CLAUDE.md's `static ≤ 3 kB` and `interactive ≤ static + 1 kB` no longer describe the shipped budgets and are not enforced per-entry (each subpath carries its own measured limit). 27 statics sit above 3 kB (max sparkline 4.01), up from 22 — the 2026-07-22 robustness pass (finite guards, saturation caps, maxOf/minOf folds) pushed cycle-plot, dumbbell and waterfall over. All interactive entries remain ~1.8–2.3 kB above their static twin because size-limit bundles the shared picker kernel standalone into every subpath (101 of 105 interactive entries exceed static+1 kB). A NEW chart is still held to 3 kB / +1 kB; these are not a precedent.",
   "$polish": "CHART-POLISH PASS (2026-07-21): P0/P1 labelFont/fontWeight/motion-safety + sibling API parity (annotations hosts, optional labels, glyph pop entrances). Measured cost after one-pass gutter math on ensemble/net-flow/forecast-cone and gated label work: ensemble-ghosts +0.74 kB static (annotations walker + end label), bullet/micro-donut/honeycomb optional labels +0.24–0.35 kB even at default none (feature ships in the entry), annotation hosts ~+0.21–0.29 kB each, glyph useEntrance ~+0.22–0.31 kB interactive. Budgets re-measured with max(50 B, 2%) headroom. NEW charts still held to 3 kB / +1 kB.",
   "$hover": "HOVER-INDEX CORRECTNESS (2026-07-19): four charts emitted or consumed the wrong index space on hover — ohlc read a filtered position back against the unfiltered periods, retention-curve emitted a period but consumed a position, pareto-strip/percentile-ladder made unpainted marks navigable, polar-clock inverted a raw `start`. The fixes carry a source index through geometry and switch the sparse spaces to `navOrder`, costing: ohlc 2.64→2.65 / 4.61→4.73, retention-curve interactive 5.14→5.24, pareto-strip 2.45→2.49 / 4.51→4.62, polar-clock 3.07→3.09 / 5.12→5.15. percentile-ladder was unchanged. polar-clock's static exception listed in $seat moves 3.06→3.09; it stays under the other approved statics and is not a precedent.",
   "styles": "12 kB",
@@ -18,11 +18,11 @@
     },
     "delta": {
       "static": "1.17 kB",
-      "interactive": "2.08 kB"
+      "interactive": "2.22 kB"
     },
     "bullet": {
       "static": "2.36 kB",
-      "interactive": "3.66 kB"
+      "interactive": "3.77 kB"
     },
     "activity-grid": {
       "static": "2.42 kB",
@@ -30,19 +30,19 @@
     },
     "trend-arrow": {
       "static": "1.94 kB",
-      "interactive": "2.89 kB"
+      "interactive": "3.01 kB"
     },
     "status-dot": {
       "static": "1.75 kB",
-      "interactive": "2.65 kB"
+      "interactive": "2.77 kB"
     },
     "heat-cell": {
       "static": "2.08 kB",
-      "interactive": "3.33 kB"
+      "interactive": "3.44 kB"
     },
     "progress": {
       "static": "2.16 kB",
-      "interactive": "3.45 kB"
+      "interactive": "3.57 kB"
     },
     "rug-strip": {
       "static": "2.50 kB",
@@ -54,7 +54,7 @@
     },
     "pictogram-row": {
       "static": "2.18 kB",
-      "interactive": "4.72 kB"
+      "interactive": "4.82 kB"
     },
     "seismogram": {
       "static": "2.63 kB",
@@ -70,7 +70,7 @@
     },
     "dumbbell": {
       "static": "3.10 kB",
-      "interactive": "5.73 kB"
+      "interactive": "5.87 kB"
     },
     "paired-bars": {
       "static": "2.86 kB",
@@ -85,10 +85,10 @@
       "interactive": "4.85 kB"
     },
     "annotations": {
-      "static": "1.58 kB"
+      "static": "1.67 kB"
     },
     "theme": {
-      "static": "2.13 kB"
+      "static": "2.22 kB"
     },
     "motion": {
       "static": "3.16 kB"
@@ -107,10 +107,10 @@
     },
     "progress-ring": {
       "static": "2.53 kB",
-      "interactive": "3.95 kB"
+      "interactive": "4.06 kB"
     },
     "micro-donut": {
-      "static": "2.90 kB",
+      "static": "2.97 kB",
       "interactive": "5.32 kB"
     },
     "funnel": {
@@ -147,7 +147,7 @@
     },
     "calendar-strip": {
       "static": "2.65 kB",
-      "interactive": "5.37 kB"
+      "interactive": "5.52 kB"
     },
     "event-timeline": {
       "static": "2.95 kB",
@@ -214,8 +214,8 @@
       "interactive": "5.83 kB"
     },
     "pareto-strip": {
-      "static": "2.64 kB",
-      "interactive": "5.18 kB"
+      "static": "2.84 kB",
+      "interactive": "5.43 kB"
     },
     "data-diff": {
       "static": "2.80 kB",
@@ -230,8 +230,8 @@
       "interactive": "5.96 kB"
     },
     "change-point": {
-      "static": "3.62 kB",
-      "interactive": "6.35 kB"
+      "static": "3.71 kB",
+      "interactive": "6.50 kB"
     },
     "ensemble-ghosts": {
       "static": "3.35 kB",
@@ -239,39 +239,39 @@
     },
     "tally-marks": {
       "static": "1.66 kB",
-      "interactive": "3.04 kB"
+      "interactive": "3.20 kB"
     },
     "dice-pips": {
       "static": "1.58 kB",
-      "interactive": "2.91 kB"
+      "interactive": "3.03 kB"
     },
     "fill-word": {
-      "static": "1.62 kB",
-      "interactive": "3.00 kB"
+      "static": "1.85 kB",
+      "interactive": "3.35 kB"
     },
     "fat-digits": {
       "static": "1.84 kB",
-      "interactive": "3.01 kB"
+      "interactive": "3.16 kB"
     },
     "thermometer": {
       "static": "2.53 kB",
-      "interactive": "3.89 kB"
+      "interactive": "4.01 kB"
     },
     "moon-phase": {
-      "static": "1.46 kB",
-      "interactive": "2.97 kB"
+      "static": "1.66 kB",
+      "interactive": "3.30 kB"
     },
     "hourglass": {
-      "static": "1.88 kB",
-      "interactive": "3.40 kB"
+      "static": "2.09 kB",
+      "interactive": "3.71 kB"
     },
     "balance-beam": {
       "static": "2.40 kB",
       "interactive": "4.89 kB"
     },
     "sprout-row": {
-      "static": "2.08 kB",
-      "interactive": "4.58 kB"
+      "static": "2.14 kB",
+      "interactive": "4.69 kB"
     },
     "garden-grid": {
       "static": "2.00 kB",
@@ -311,11 +311,11 @@
     },
     "breathing-dot": {
       "static": "1.82 kB",
-      "interactive": "3.37 kB"
+      "interactive": "3.52 kB"
     },
     "heartbeat-blip": {
       "static": "2.24 kB",
-      "interactive": "3.79 kB"
+      "interactive": "3.87 kB"
     },
     "comet-trail": {
       "static": "2.31 kB",
@@ -323,11 +323,11 @@
     },
     "orbit-status": {
       "static": "2.31 kB",
-      "interactive": "4.23 kB"
+      "interactive": "4.32 kB"
     },
     "time-in-range": {
-      "static": "2.26 kB",
-      "interactive": "4.75 kB"
+      "static": "2.49 kB",
+      "interactive": "5.04 kB"
     },
     "hypnogram": {
       "static": "2.84 kB",
@@ -335,11 +335,11 @@
     },
     "eta-bar": {
       "static": "2.23 kB",
-      "interactive": "3.63 kB"
+      "interactive": "3.80 kB"
     },
     "waveform": {
       "static": "2.57 kB",
-      "interactive": "5.07 kB"
+      "interactive": "5.18 kB"
     },
     "event-raster": {
       "static": "2.70 kB",
@@ -373,8 +373,8 @@
       "interactive": "4.81 kB"
     },
     "partition-strip": {
-      "static": "2.26 kB",
-      "interactive": "5.17 kB"
+      "static": "2.46 kB",
+      "interactive": "5.31 kB"
     },
     "calibration-strip": {
       "static": "2.71 kB",
@@ -390,7 +390,7 @@
     },
     "volume-profile": {
       "static": "2.91 kB",
-      "interactive": "5.34 kB"
+      "interactive": "5.48 kB"
     },
     "phase-trace": {
       "static": "2.52 kB",
@@ -402,7 +402,7 @@
     },
     "tape-gauge": {
       "static": "3.27 kB",
-      "interactive": "4.75 kB"
+      "interactive": "4.88 kB"
     },
     "station-glyph": {
       "static": "3.36 kB",
@@ -421,8 +421,8 @@
       "interactive": "4.93 kB"
     },
     "win-prob-worm": {
-      "static": "3.62 kB",
-      "interactive": "5.97 kB"
+      "static": "3.70 kB",
+      "interactive": "6.10 kB"
     },
     "queue-depth": {
       "static": "3.39 kB",
@@ -433,8 +433,8 @@
       "interactive": "5.92 kB"
     },
     "bias-strip": {
-      "static": "2.69 kB",
-      "interactive": "5.23 kB"
+      "static": "2.75 kB",
+      "interactive": "5.35 kB"
     },
     "percentile-trace": {
       "static": "2.95 kB",
@@ -445,5 +445,6 @@
   "$readout": "READOUT-PARITY RE-BASELINE (2026-07-26, USER-APPROVED): every interactive entry now PAINTS the reading it already announced. Three pickers (comet-trail, icon-array, pictogram-row) shipped a hover ring + live-region announcement and no chip at all; nine scalars (progress, progress-ring, hourglass, breathing-dot, heartbeat-blip, fill-word, tape-gauge, minimap-strip, token-confidence) hid their number whenever the static label was off or dropped. Cost is the chip JSX plus, on the scalars, a hover/focus state pair: +20 B (comet-trail) to +220 B (token-confidence, which must MEASURE its token to place the chip over flowing text). Budgets re-measured from the built dist with ~2% headroom. Guarded by src/test/readout-presence.test.ts, so a new chart cannot ship interaction without a readout. P0 FOLLOW-UP (2026-07-26): bullet +50 B (it was the one interactive entry with no announcement channel — a LiveRegion, which also replaces its hand-rolled useSeatHoist), calendar-strip static +60 B (dev-only SSR warning for the clock-reading `end` default), token-confidence +70 B (delegated focus/hover handlers + the decorative opt-out). REVIEW FOLLOW-UP: eta-bar interactive 3.62→3.63 kB — the staged budget sat 2 B BELOW the built entry (the hover-reveal rewrite landed after that measurement), so `pnpm size` was red on the branch before this bump; heat-cell and icon-array picked up new `strings` tokens (levelChip, iconArrayRatio) inside their existing headroom.",
   "$robust": "RENDER-ROBUSTNESS RE-BASELINE (2026-07-20, tests/craft/robust.mjs): balance-beam, fat-digits, forecast-cone and tape-gauge crashed or leaked NaN/undefined into markup and into aria-labels on degenerate input (empty/short pair, null pan, non-finite domain, short interval pair, malformed zone). The fixes validate each number where it ENTERS geometry (isFiniteValue guards on the pan values, the tier domain, the p80/p50 bounds and the zone bounds), degrade the summaries to the shared `noData` wording, and give TapeGauge a visible no-reading rail so an empty gauge cannot read as a reading of zero. Cost: +4 B (fat-digits) to +134 B (balance-beam) static. NOTE: ~95 B of each INTERACTIVE bump here is pre-existing tree-wide drift shared by all 105 interactive entries (see $ceilings), not this change. FINAL 7 (2026-07-20, same harness, suite now 0): calibration-strip leaked <rect y=\"NaN\"> from an ∞/∞ support-lane scale, minimap-strip THREW in makeFormatter on a short/null `window` (and leaked NaN from a non-finite one), spread-band put `undefined` in an aria-label from a series-label pair shorter than two. Same discipline: guard where the number enters geometry, resolve the pair once, fall back to each chart's existing `noData` string, and give MinimapStrip a hollow dashed rail when the window is unmeasurable (empty ≠ a window at zero). Cost, static: calibration-strip 2.58→2.59, spread-band 3.22→3.25 (still inside the $seat exception list), minimap-strip 2.52→2.70 — the largest, being a window resolver + known-extent filter + `domain`-prop validator. Interactive budgets here add ONLY each chart's own delta; the residual ~95 B is the same tree-wide drift noted above.",
   "$readoutvalue": "READOUT VALUE-VISIBILITY PASS (2026-07-26): a readout may not drop a number the caller passed in. Chips and announcements now carry the magnitude behind every derived share (confusion-grid the cell tally, partition-strip/likert-strip/volume-profile the value behind the share, segmented-bar/micro-donut the rolled-up Other total), StackedArea names every band instead of the leading one, ActivityGrid names the day when `anchor` dates the grid, and a measured zero stopped rendering as \"no data\" (seismogram) while an empty bucket stopped rendering as zero (waveform). Where a richer chip would have ellipsized at the chart's own width, it became ROWS (`.mc-readout-rows`, one row per member, name column capped at 7em) rather than a longer line — readout-containment.browser.test.tsx still gates verbosity, and readout-value-visibility.browser.test.tsx now gates the other direction. Only 3 subpaths moved past their budget, all interactive: activity-grid 5.17→5.42 (UTC day math + date formatter), stacked-area 5.91→6.05 (row chip), partition-strip 4.85→5.17 (row chip + value formatter + the new format/locale props). Statics unchanged; measured + max(50 B, 2%) per $rebaseline.",
-  "$rebaseline": "SIZE RE-BASELINE (2026-07-20, scripts/rebaseline-sizes.mjs): every budget reset to measured + max(50 B, 2%) headroom after the release hardening pass (fillFor sizing fix ~90 B/interactive entry, per-chart degradation label-drop gates ~42–119 B/static, null/NaN geometry guards). 149 budgets raised, 65 tightened — subpaths that shrank were pulled DOWN to lock the win in, which the old ~10 B-above-actual policy would have missed. The 2% band absorbs shared-kernel byte churn instead of firing all 106 interactive entries on a one-line helper edit."
+  "$rebaseline": "SIZE RE-BASELINE (2026-07-20, scripts/rebaseline-sizes.mjs): every budget reset to measured + max(50 B, 2%) headroom after the release hardening pass (fillFor sizing fix ~90 B/interactive entry, per-chart degradation label-drop gates ~42–119 B/static, null/NaN geometry guards). 149 budgets raised, 65 tightened — subpaths that shrank were pulled DOWN to lock the win in, which the old ~10 B-above-actual policy would have missed. The 2% band absorbs shared-kernel byte churn instead of firing all 106 interactive entries on a one-line helper edit.",
+  "$systemic": "SYSTEMIC-AUDIT RE-BASELINE (2026-07-26): 44 budgets raised to measured + max(50 B, 2%) per $rebaseline. Only the entries that went over are touched — a full re-baseline would tighten ~170 others in the same commit and bury the deltas that need reading. Four causes, all of them things the library already claimed and nothing checked. (1) `onActive` on the 19 NON-PICKER scalars (+2 B pictogram-row to +91 B delta): the shared interaction contract and the quickstart both documented `onActive` as universal while those entries implemented `onSelect` alone, so the `readout={false}` + `datum.formatted` KPI pattern worked on 84 charts and not on 19. Cost is one datum builder shared by both callbacks plus an edge-gate ref, because pointer-enter and focus both mean 'active' and would otherwise fire twice. (2) The percent-formatter sweep (+3 B micro-donut static to +280 B fill-word interactive): every hardcoded `${n}%` now goes through one `makePercentFormatter`, and the five charts that had no `locale` to thread gained one. The biggest movers are the charts where the percent is the ONLY number and there was no formatter to share — fill-word, moon-phase, hourglass, time-in-range, pareto-strip pay for the Intl plumbing on a ~1.5-2.5 kB base, which is why a 200 B delta reads as 12-18% there and under 2% on a figure-scale chart. (3) `annotations` +39 B: the label layer sets `--mc-label-size` (its `fontSize` attribute was inert), seats labels on a clamped central baseline, and runs Marker's label through the truncator every other annotation already used. (4) `theme` +41 B: `defineTheme` derives `--mc-on-cat` from its own generated palette, so the measured 4.5:1 label contrast travels with a custom accent instead of being silently voided by one. The rest (calendar-strip, heartbeat-blip, orbit-status, sprout-row, waveform, win-prob-worm, bias-strip, change-point) is per-chart work plus the shared-kernel byte churn the 2% band exists to absorb. No NEW chart is admitted under these numbers: the 3 kB / +1 kB ceiling still applies to one."
 }

@@ -145,8 +145,10 @@ export const I18N_PROPS: ChartProp[] = [
  * still — only the entries whose value can change under a static cursor
  * declare it. The four picker props
  * (`onActive`, `onSelect`, `selectedIndex`, `defaultSelectedIndex`) come from
- * `PickerProps` and exist only on charts with more than one navigable unit —
- * `entry.picker === false` marks the ones without (see `types.ts`).
+ * `PickerProps`. `onActive`/`onSelect` are on EVERY interactive entry — a chart
+ * with one unit still has that unit hovered, focused and activated. The two index
+ * props are the roving half and exist only on charts with more than one navigable
+ * unit; `entry.picker === false` marks the ones without (see `types.ts`).
  */
 export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
   {
@@ -216,9 +218,18 @@ export const SHARED_PROPS: ChartProp[] = [
 ];
 
 /**
- * Static-side shared prop names the per-chart guard/table may omit. Superset of
- * the documented grammar: also covers structural props (`children`, `ref`,
- * `key`) and sizing-ish universal knobs treated as layout, not chart-specific.
+ * Static-side shared prop names the per-chart guard/table may omit — the
+ * documented grammar (each name means the same thing everywhere, so it is listed
+ * once above) plus the structural React props.
+ *
+ * `size`, `fontSize`, `gap` and `cell` used to sit here as "sizing-ish universal
+ * knobs treated as layout". They are not universal: only 31 charts accept any of
+ * them, and they do not mean the same thing across those 31 (`size` is a glyph's
+ * square edge, `cell` exists only on the grids, `gap` is viewBox units on most
+ * charts but an empty *fraction* of the slot on SparkBar). Nothing here can be
+ * documented centrally without lying, and being here excused every chart from
+ * documenting them at all — so they left the shared set, and each chart now
+ * carries its own row, which the `prop-parity` guard enforces.
  */
 export const SHARED_PROP_NAMES: ReadonlySet<string> = new Set([
   ...GRAMMAR_PROPS.map((p) => p.name),
@@ -228,11 +239,6 @@ export const SHARED_PROP_NAMES: ReadonlySet<string> = new Set([
   "children",
   "ref",
   "key",
-  // sizing-ish universal knobs treated as layout, not chart-specific
-  "size",
-  "fontSize",
-  "gap",
-  "cell",
 ]);
 
 /** Interactive-only shared prop names — documented once, omitted per chart. */

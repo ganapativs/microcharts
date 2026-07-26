@@ -6,6 +6,7 @@ import type { SummaryStrings } from "./summary.js";
 export type PairedStrings = Pick<
   SummaryStrings,
   | "noData"
+  | "dirNames"
   | "fromTo"
   | "flatPair"
   | "rows"
@@ -20,6 +21,7 @@ export type PairedStrings = Pick<
 
 export const EN_PAIRED: PairedStrings = {
   noData: "No data.",
+  dirNames: ["up", "down"],
   fromTo: (from, to, direction, pct) => `From ${from} to ${to}, ${direction} ${pct}.`,
   flatPair: (value) => `No change at ${value}.`,
   rows: (count, topLabel, topDirection, topPct) =>

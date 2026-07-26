@@ -163,7 +163,7 @@ export function Bullet(props: BulletProps): ReactNode {
           y2={geo.tick.y1}
           data-mc-ink="data"
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.33)" }}
+          style={{ strokeWidth: "calc(var(--mc-sw) * 1.33)" }}
         />
       ) : null}
       {labelText !== undefined ? (

@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { StatusDot } from "./client.js";
 
 const key = (el: HTMLElement, k: string) =>
@@ -45,5 +46,23 @@ describe("interactive <StatusDot>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: null, label: "ok" }]);
+  });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two. The dot paints no chip, so
+  // this is the only channel a consumer has for a hover reading.
+  it("onActive reports the state once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<StatusDot status="warn" onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-status-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: null, label: "warning" });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
   });
 });

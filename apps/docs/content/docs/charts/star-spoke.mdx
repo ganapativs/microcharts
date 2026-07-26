@@ -98,19 +98,6 @@ the extremes named in the accessible summary:
   />
 </LiveDemo>
 
-## Why this default
-
-Contour-free is the point: a connecting polygon is decoration that changes the read, exaggerating area for high-variance
-profiles and hiding the individual spoke lengths that actually matter for comparison. One shared domain governs every
-spoke in a glyph — mixed-domain metrics are the caller's normalization to state, so a set of small multiples stays
-honestly comparable.
-
-Every spoke sits at a fixed clock position (first at 12 o'clock, clockwise), so the axis order never shifts between
-instances — that fixed order, plus the default-on guide spokes, is what keeps a profile readable even where a metric's
-label doesn't seat. Tip labels seat at the rim, not the value tip, so a low-value spoke never drags its label into the
-hub. A label is dropped only when its estimated width exceeds the whole glyph; anything narrower is clamped into the
-reserved label ring instead, which keeps rim labels at distinct angles rather than dropping them.
-
 ## Edge cases
 
 <LiveDemo
@@ -142,6 +129,19 @@ reserved label ring instead, which keeps rim labels at distinct angles rather th
 ## Four homes
 
 <FourContexts slug="star-spoke" />
+
+## Why this default
+
+Contour-free is the point: a connecting polygon is decoration that changes the read, exaggerating area for high-variance
+profiles and hiding the individual spoke lengths that actually matter for comparison. One shared domain governs every
+spoke in a glyph — mixed-domain metrics are the caller's normalization to state, so a set of small multiples stays
+honestly comparable.
+
+Every spoke sits at a fixed clock position (first at 12 o'clock, clockwise), so the axis order never shifts between
+instances — that fixed order, plus the default-on guide spokes, is what keeps a profile readable even where a metric's
+label doesn't seat. Tip labels seat at the rim, not the value tip, so a low-value spoke never drags its label into the
+hub. A label is dropped only when its estimated width exceeds the whole glyph; anything narrower is clamped into the
+reserved label ring instead, which keeps rim labels at distinct angles rather than dropping them.
 
 ## Accessibility
 

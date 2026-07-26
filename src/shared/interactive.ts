@@ -314,12 +314,25 @@ export function useActivePicker(opts: PickerOptions): Picker {
   const selected = controlled ? (opts.selectedIndex ?? null) : selInternal;
   const [active, setActive] = useState<number | null>(null);
 
-  // Refs mirror state so handlers read fresh values and callbacks fire exactly
-  // on change — no effect, no stale closure, no memoisation needed (the handlers
-  // land on one DOM span; re-attach is free).
+  // `active` lives in a ref as well as state so `act` can compare against the
+  // value the LAST POINTER EVENT set rather than the last render: pointermove is
+  // a continuous event, so React batches it and a dozen moves can fire between
+  // two renders. Reading state there would re-fire `onActive` for every move
+  // across one unit. No effect, no stale closure, no memoisation needed (the
+  // handlers land on one DOM span; re-attach is free).
+  //
+  // `selected` deliberately does NOT get the same treatment. It only ever
+  // changes from `onClick`/`onKeyDown`, which are DISCRETE events — React
+  // flushes those synchronously, so the next one always runs against a committed
+  // render and the closures below are never stale. Mirroring it meant writing a
+  // ref DURING RENDER, in the one module all 84 picker charts share: a render
+  // that concurrent React discards (Offscreen, a suspended sibling, StrictMode's
+  // double invoke) left the ref holding a value that was never committed, and
+  // the next tap then cleared the wrong selection.
   const activeRef = useRef<number | null>(null);
-  const selRef = useRef(selected);
-  selRef.current = selected;
+  // Did the KEYBOARD put the current unit up, rather than the pointer? See
+  // `onPointerLeave` — a boundary event must not wipe a roved unit.
+  const byKey = useRef(false);
   const down = useRef<[number, number] | null>(null);
   // Cache the painted SVG across a scrub — skip querySelector on every move.
   // Still measure getBoundingClientRect each move (scroll/resize while hovering
@@ -334,7 +347,7 @@ export function useActivePicker(opts: PickerOptions): Picker {
     onActive?.(i === null ? null : dat(i));
   };
   const select = (i: number | null): void => {
-    const next = i === null || selRef.current === i ? null : i; // re-tap clears
+    const next = i === null || selected === i ? null : i; // re-tap clears
     if (!controlled) setSel(next);
     onSelect?.(next === null ? null : dat(next));
   };
@@ -375,10 +388,14 @@ export function useActivePicker(opts: PickerOptions): Picker {
         } catch {
           /* setPointerCapture can throw if the element isn't in the tree */
         }
+        byKey.current = false;
         act(at(e));
       }
     },
-    onPointerMove: (e) => act(at(e)),
+    onPointerMove: (e) => {
+      byKey.current = false;
+      act(at(e));
+    },
     // Touch/pen have no hover: drop the transient active on lift so a pinned
     // selection is what stays visible. Mouse keeps its hover.
     onPointerUp: (e) => {
@@ -408,7 +425,20 @@ export function useActivePicker(opts: PickerOptions): Picker {
     },
     onPointerLeave: () => {
       svgRef.current = null;
-      act(null);
+      // A pointer boundary event must never wipe a unit the reader roved to with
+      // the KEYBOARD. `pointerleave` does not imply the reader moved a mouse off
+      // the chart: the browser re-runs hit-testing whenever layout changes under
+      // a parked cursor, and this chart changes its own layout on every step (the
+      // readout chip appears and moves with the active unit). So a reader roving
+      // with ←/→ while the cursor happens to rest near the mark had the highlight,
+      // the readout and the announcement cleared out from under them mid-sequence
+      // — reproduced as a cross-file flake in the browser suite, where a cursor
+      // parked by an earlier test fired `pointerleave` ~7 ms after the third
+      // arrow key with no pointer event of any kind before it.
+      //
+      // Hover state still clears on leave, as it must; only the keyboard's claim
+      // survives. Escape and `onBlur` are what end a keyboard rove.
+      if (!byKey.current) act(null);
     },
     onClick: (e) => {
       const d = down.current;
@@ -422,20 +452,23 @@ export function useActivePicker(opts: PickerOptions): Picker {
       const cur = activeRef.current ?? -1;
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        return select(cur < 0 ? selRef.current : cur);
+        return select(cur < 0 ? selected : cur);
       }
       if (e.key === "Escape") {
+        byKey.current = false;
         act(null);
-        if (selRef.current !== null) select(null);
+        if (selected !== null) select(null);
         return;
       }
       const next = step ? step(cur, e.key, e) : nav1d(cur, count, e.key);
       if (next === null) return;
       e.preventDefault();
+      byKey.current = true;
       act(next);
     },
     onBlur: () => {
       svgRef.current = null;
+      byKey.current = false;
       act(null);
     },
   };

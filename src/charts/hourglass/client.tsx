@@ -10,7 +10,12 @@ import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglas
 import { LiveRegion } from "../../shared/live-region.js";
 import { named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
-import { Hourglass as StaticHourglass, hourglassSummary, type HourglassProps } from "./index.js";
+import {
+  Hourglass as StaticHourglass,
+  hourglassPct,
+  hourglassSummary,
+  type HourglassProps,
+} from "./index.js";
 
 export interface InteractiveHourglassProps extends HourglassProps {
   live?: boolean;
@@ -28,6 +33,13 @@ export interface InteractiveHourglassProps extends HourglassProps {
    * suppresses only the chip. Inert when `label` already prints a percent.
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One glyph = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The glyph was activated (click, tap, Enter or Space): `{ index: 0, value }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -40,15 +52,17 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     strings = EN_HOURGLASS,
     title,
     value,
+    locale,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     summary,
     className,
     style,
     ...rest
   } = props;
-  const generated = hourglassSummary(value, strings);
+  const generated = hourglassSummary(value, strings, locale);
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : generated;
   const wrap = useRef<HTMLSpanElement>(null);
   // seat the wrapper, not just the SVG, so the click target stays on the
@@ -63,7 +77,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   const elapsedPct = Number.isFinite(value)
     ? Math.round(Math.min(1, Math.max(0, value)) * 100)
     : null;
-  const readoutText = elapsedPct === null ? "—" : `${elapsedPct}%`;
+  const readoutText = elapsedPct === null ? "—" : hourglassPct(elapsedPct, locale);
 
   useEffect(() => {
     const before = prev.current;
@@ -93,23 +107,35 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Drill-down: the one interaction a single-value glyph needs. The payload
-  // carries the SAME clamped elapsed fraction the sand encodes.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
-      formatted: readoutText,
-    });
+  // carries the SAME clamped elapsed fraction the sand encodes. One builder, so
+  // `onActive` and `onSelect` can never report a different number or a different
+  // string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
+    formatted: readoutText,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-hourglass-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -122,6 +148,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
         {...rest}
         style={fillFor(style)}
         value={value}
+        locale={locale}
         strings={strings}
         summary={false}
       />

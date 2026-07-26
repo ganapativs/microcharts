@@ -251,13 +251,14 @@ const [spend, setSpend] = useState("$0.53");
 <Sparkline data={cost} format="$,.2f" readout={false} onActive={(d) => d && setSpend(d.formatted!)} />;
 ```
 
-Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onSelect` only; there's
-nothing to rove between. Fifteen of them also take `live` (default `true`): as the value updates, the new reading is
-announced through a polite live region, throttled so a streaming number never spams a screen reader. Not all of them do
-— Bullet's only interaction prop is `onSelect` — so check the chart's own page. Two charts opt out of the picker on
-purpose: `MinimapStrip` is a range slider with its own `onWindowChange([lo, hi])`, and `TokenConfidence` moves real
-focus through inline text spans. Full detail, including the live-region behavior, is on
-[Accessibility](/docs/accessibility#one-interaction-contract).
+Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onActive` and `onSelect` too:
+the one unit is still hovered, focused and activated, so the `readout={false}` pattern above works there as well. What
+they don't take is `selectedIndex`/`defaultSelectedIndex` — there's no cursor to move and no index to point it at.
+Fifteen of them also take `live` (default `true`): as the value updates, the new reading is announced through a polite
+live region, throttled so a streaming number never spams a screen reader. Not all of them do — Bullet's only interaction
+prop is `onSelect` — so check the chart's own page. Two charts opt out of the picker on purpose: `MinimapStrip` is a
+range slider with its own `onWindowChange([lo, hi])`, and `TokenConfidence` moves real focus through inline text spans.
+Full detail, including the live-region behavior, is on [Accessibility](/docs/accessibility#one-interaction-contract).
 
 ## Animate on mount (optional)
 

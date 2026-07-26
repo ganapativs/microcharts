@@ -15,9 +15,33 @@
 //   - `prefers-reduced-motion` wins unconditionally.
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 
-/** One shared motion vocabulary — every entrance and interaction speaks it. */
-export const MC_EASE_ENTER = "cubic-bezier(0.23, 1, 0.32, 1)"; // strong ease-out
-export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)"; // on-screen morphs
+/**
+ * The shared motion vocabulary, re-exported from `@microcharts/react/motion` so
+ * the UI AROUND a chart — a chip, a readout, a toolbar that moves with it — can
+ * speak the same language. Consumer-facing by design, which is why nothing inside
+ * the library imports the duration table: like `PALETTE` and `CATEGORICAL` in
+ * `core/color.ts`, these are a published contract, not dead code.
+ *
+ * They are NOT the engine's timing tables. The engine tunes duration and easing
+ * PER ARCHETYPE (`DUR`/`EASE` in motion-engine.ts) — a draw is not a pop — and a
+ * flat three-value table could never express that. These are the coarse beats a
+ * consumer needs to match a chart's feel without reproducing its choreography.
+ *
+ * `MC_EASE_ENTER` must stay equal to `--mc-easing` in `styles.css`, which is the
+ * same curve for the CSS side and the token a consumer overrides. The two had
+ * drifted — `cubic-bezier(0.23, 1, 0.32, 1)` here against
+ * `cubic-bezier(0.22, 1, 0.36, 1)` there — so a chart's CSS transitions and its
+ * scripted entrance eased on different curves. WAAPI cannot read a custom
+ * property, so the literal has to be duplicated;
+ * `src/test/theming-contract.test.ts` asserts the two copies match.
+ */
+export const MC_EASE_ENTER = "cubic-bezier(0.22, 1, 0.36, 1)";
+/** On-screen morphs (a value updating in place), for consumer UI.
+ *  @knipignore — published vocabulary; nothing in the library imports it. */
+export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
+/** Coarse beats for consumer UI around a chart.
+ *  @knipignore — published vocabulary; the engine's own per-archetype `DUR`
+ *  table is what the entrances use. */
 export const MC_DUR = {
   /** press / hover / focus feedback */ interact: 120,
   /** value + state updates */ update: 240,

@@ -49,6 +49,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Percent numeral beside the dot.",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Dot box edge in viewBox units (default 16).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the percent numeral, in viewBox units. Defaults from `size`.",
+    },
   ],
   demo: [0.42],
   example: {

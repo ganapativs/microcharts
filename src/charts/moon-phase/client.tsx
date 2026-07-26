@@ -8,7 +8,12 @@ import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { MoonPhase as StaticMoonPhase, moonPhaseSummary, type MoonPhaseProps } from "./index.js";
+import {
+  MoonPhase as StaticMoonPhase,
+  moonPct,
+  moonPhaseSummary,
+  type MoonPhaseProps,
+} from "./index.js";
 
 export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
   live?: boolean;
@@ -23,6 +28,13 @@ export interface InteractiveMoonPhaseProps extends MoonPhaseProps {
   animate?: boolean;
   /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One disc = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the disc, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the clamped 0–1 fraction }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -34,18 +46,25 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     title,
     value,
     mode = "progress",
+    locale,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
     ...rest
   } = props;
-  const text = moonPhaseSummary(value, mode, strings);
+  const text = moonPhaseSummary(value, mode, strings, locale);
   const wrap = useRef<HTMLSpanElement>(null);
   useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
-  const last = useRef(0);
+  // -Infinity, not 0: `performance.now()` counts from THIS document's time
+  // origin, so 0 reads as "announced at page load" and defers the leading edge
+  // by up to a full second for any change in the page's first second — the
+  // exact window a chart streamed into a reply lands in. -Infinity means "never
+  // announced", so the first change emits at once and only repeats throttle.
+  const last = useRef(-Infinity);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
@@ -102,19 +121,35 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   // The lit AREA is the datum, so the clamped fraction is what both the readout
   // and `onSelect` report — one disc, one selectable unit (index 0).
   const frac = Math.min(1, Math.max(0, value));
-  const pct = `${Math.round((Number.isFinite(frac) ? frac : 0) * 100)}%`;
-  const pick = (): void =>
-    onSelect?.({ index: 0, value: Number.isFinite(frac) ? frac : null, formatted: pct });
+  const pct = moonPct(value, locale);
+  // One builder, so `onActive` and `onSelect` can never report a different
+  // number or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(frac) ? frac : null,
+    formatted: pct,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-moon-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -127,6 +162,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
         style={fillFor(style)}
         value={value}
         mode={mode}
+        locale={locale}
         strings={strings}
         summary={false}
       />

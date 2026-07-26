@@ -25,6 +25,13 @@ export interface InteractiveHeartbeatBlipProps extends HeartbeatBlipProps {
    * suppresses only the chip. Inert when `label="count"` already prints it.
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One trace = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the trace, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The trace was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — the in-window event count. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -52,6 +59,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     title,
     summary,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -129,24 +137,38 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   const readoutText = strings.heartbeatChip(count);
 
   // Drill-down: the rate read the trace encodes — how many events are in the
-  // window at the frame currently on screen — named by that window.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: count,
-      label: strings.heartbeatWindow(win),
-      formatted: readoutText,
-    });
+  // window at the frame currently on screen — named by that window. One builder,
+  // so `onActive` and `onSelect` can never report a different count or a
+  // different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: count,
+    label: strings.heartbeatWindow(win),
+    formatted: readoutText,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here. (The count
+  // keeps drifting with the clock; that is a value change, not a unit change, so
+  // it never re-fires.)
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrapRef}
       {...wrap("mc-heartbeat-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

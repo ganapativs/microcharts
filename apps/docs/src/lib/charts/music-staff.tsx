@@ -44,6 +44,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Print the final value after the last note.",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the last-note label, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: MELODY,
   example: {

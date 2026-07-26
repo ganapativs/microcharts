@@ -180,7 +180,7 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         data-mc-ink="data"
         vectorEffect="non-scaling-stroke"
         style={{
-          strokeWidth: "calc(var(--mc-stroke-width) * 1.33)",
+          strokeWidth: "calc(var(--mc-sw) * 1.33)",
           ...(color ? { stroke: color } : null),
         }}
       />

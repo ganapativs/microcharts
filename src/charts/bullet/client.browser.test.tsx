@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Bullet } from "./client.js";
 
 const mount = async (ui: React.ReactNode) => {
@@ -54,5 +55,24 @@ describe("interactive <Bullet>", () => {
       .toBe(live.textContent);
     fig.blur();
     await expect.poll(() => live.textContent).toBe("");
+  });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the measure once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const fig = await mount(<Bullet value={72} target={80} onActive={(d) => seen.push(d)} />);
+    await userEvent.hover(fig);
+    const chip = () => fig.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("72 / 80 · −8");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 72, formatted: chip() });
+    fig.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    fig.blur();
+    await userEvent.unhover(fig); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
   });
 });

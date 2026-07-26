@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { TrendArrow } from "./client.js";
 
 const key = (el: HTMLElement, k: string) =>
@@ -49,5 +50,23 @@ describe("interactive <TrendArrow>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 0.12, label: "up" }]);
+  });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two. The glyph paints no chip, so
+  // this is the only channel a consumer has for a hover reading.
+  it("onActive reports the change once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<TrendArrow value={-0.05} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-trend-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: -0.05, label: "down" });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
   });
 });

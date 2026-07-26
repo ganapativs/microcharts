@@ -142,6 +142,22 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
               ? "positive"
               : "negative"
             : "bar";
+        // Growth edge for the entrance, from the value's true sign — the same
+        // model as MiniBar. The domain here is zero-anchored, so a negative value
+        // hangs on the far side of the baseline and has to grow OUT of it; with
+        // no `data-mc-origin` the engine used its per-archetype default (bottom
+        // for `rise`, left for `sweep`) and a negative bar animated inward from
+        // the box edge toward zero — motion that reads as the value shrinking to
+        // its magnitude rather than growing from nothing.
+        const origin = !isFiniteValue(d.value)
+          ? undefined
+          : orientation === "vertical"
+            ? d.value < 0
+              ? "top"
+              : "bottom"
+            : d.value < 0
+              ? "right"
+              : "left";
         return (
           <g key={p.index}>
             {p.refRect ? (
@@ -163,6 +179,7 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
                 height={p.valueRect.h}
                 shapeRendering="crispEdges"
                 data-mc-ink={valueInk}
+                data-mc-origin={origin}
                 style={color ? { fill: color } : undefined}
               />
             ) : null}

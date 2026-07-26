@@ -4,7 +4,7 @@
 // unknown regions (absence ≠ zero) and the unknown share disclosed in the name.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_MINIMAP, type MinimapStrings } from "../../core/strings-minimap.js";
 import {
   hatchPath,
@@ -44,6 +44,10 @@ export function minimapSummary(
   unknownShare: number,
   strings: MinimapStrings,
   fmt: (n: number) => string,
+  /** Percent formatter (FRACTION in) for the viewed + unknown shares. Both were
+   *  hand-rolled `${Math.round(x*100)}%`, i.e. en-US percents, so `locale`
+   *  localized the domain numbers beside them but not these two. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   // No measurable window = no position to report. Saying "viewing 0%" would be
   // a claim about a viewport that isn't there.
@@ -51,12 +55,11 @@ export function minimapSummary(
   if (!win) return strings.noData;
   const span = domain[1] - domain[0] || 1;
   const viewSpan = Math.abs(win[1] - win[0]);
-  const pct = `${Math.round((viewSpan / span) * 100)}%`;
+  const viewPct = pct(viewSpan / span);
   // Count the marks that are actually placed, not the holes between them.
   const marks = (data.marks ?? []).filter(isFiniteValue).length;
-  const unknownClause =
-    unknownShare > 0.004 ? strings.minimapUnknown(`${Math.round(unknownShare * 100)}%`) : "";
-  return strings.minimap(pct, fmt(win[0]), fmt(win[1]), fmt(span), marks, unknownClause);
+  const unknownClause = unknownShare > 0.004 ? strings.minimapUnknown(pct(unknownShare)) : "";
+  return strings.minimap(viewPct, fmt(win[0]), fmt(win[1]), fmt(span), marks, unknownClause);
 }
 
 export function MinimapStrip(props: MinimapStripProps): ReactNode {
@@ -79,6 +82,8 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
+  // Position + fog shares — percents of their own, so `locale` but never `format`.
+  const pctFmt = makePercentFormatter(locale);
   const domain = minimapDomain(data, domainProp);
   const geo = minimapGeometry({
     content: data.content,
@@ -92,7 +97,7 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
   const accName =
     summary === false
       ? false
-      : (summary ?? minimapSummary(data, domain, geo.unknownShare, strings, fmt));
+      : (summary ?? minimapSummary(data, domain, geo.unknownShare, strings, fmt, pctFmt));
   const { contentTop, contentBottom } = geo;
 
   return (

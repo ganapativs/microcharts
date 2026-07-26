@@ -78,6 +78,13 @@ export const entry: ChartEntry = {
       description: "Cell edge length in viewBox units.",
     },
     {
+      name: "steps",
+      type: "number",
+      required: false,
+      description:
+        "Intensity steps including the zero track (default 5, GitHub-like). Same knob, same name, as CalendarStrip, CoverageStrip, GardenGrid, HeatCell, HeatStrip and SpiralYear.",
+    },
+    {
       name: "domain",
       type: "[number, number]",
       required: false,
@@ -94,6 +101,12 @@ export const entry: ChartEntry = {
       type: "string | false",
       required: false,
       description: "Override or disable the auto summary.",
+    },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between cells in viewBox units (default 2).",
     },
   ],
   demo: [0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 1, 3],

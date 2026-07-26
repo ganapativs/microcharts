@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -21,11 +21,19 @@ import { resolveSummary } from "../../core/summary.js";
 export type SegmentedBarDatum = MiniBarDatum;
 
 /** Shared composition summary — largest-remainder percents, joined clauses. */
-export function sharesSummary(rolled: readonly RolledDatum[], strings: CompositionStrings): string {
+export function sharesSummary(
+  rolled: readonly RolledDatum[],
+  strings: CompositionStrings,
+  /** Percent formatter (FRACTION in) — the largest-remainder integers still sum
+   *  to 100, they just stop being spelled out as an en-US percent. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
+): string {
   if (rolled.length === 0) return strings.noData;
   const total = rolled.reduce((s, d) => s + d.value, 0);
   const pcts = largestRemainderPercents(rolled.map((d) => d.value / total));
-  const list = rolled.map((d, i) => strings.shareClause(d.label, `${pcts[i]}%`)).join(", ");
+  const list = rolled
+    .map((d, i) => strings.shareClause(d.label, pct((pcts[i] ?? 0) / 100)))
+    .join(", ");
   return strings.shares(list);
 }
 
@@ -97,7 +105,9 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   const fmt = label === "none" ? null : makeFormatter(format, locale);
   const pcts =
     label === "percent" ? largestRemainderPercents(geo.segments.map((s) => s.share)) : null;
-  const accName = resolveSummary(summary, () => sharesSummary(rolled, strings));
+  // Shares take `locale` but never the value `format` (which carries the units).
+  const pctFmt = makePercentFormatter(locale);
+  const accName = resolveSummary(summary, () => sharesSummary(rolled, strings, pctFmt));
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
@@ -123,8 +133,15 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       {geo.segments.map((seg, i) => {
         const d = rolled[seg.index]!;
         const isOther = d.members > 1;
+        // The in-segment label is the FORMATTED percent, and the fit test below
+        // reads that string's own length — a locale that writes "62 %" needs the
+        // extra character to count against the segment's width.
         const text =
-          label === "percent" ? `${pcts![i]}%` : label === "value" ? fmt!(d.value) : undefined;
+          label === "percent"
+            ? pctFmt((pcts![i] ?? 0) / 100)
+            : label === "value"
+              ? fmt!(d.value)
+              : undefined;
         return (
           <g key={seg.index}>
             <rect

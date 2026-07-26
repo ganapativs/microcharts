@@ -5,7 +5,7 @@
 // edges the slider reports to assistive tech are visible too. Composes the
 // static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { crosshairReadoutStyle, fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
@@ -57,6 +57,8 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
 
   const domain = useMemo(() => minimapDomain(data, domainProp), [domainProp, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Viewed share — a percent of its own, so `locale` but never `format`.
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   // A slider always has a position: an unmeasurable window starts as the whole
   // domain, so drag/keys have something real to move.
   const [win, setWin] = useState<[number, number]>(
@@ -109,7 +111,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : minimapSummary(liveData, domain, 0, strings, fmt);
+        : minimapSummary(liveData, domain, 0, strings, fmt, pctFmt);
   // `label` doubles as the aria-label fallback below: a slider must always have
   // a name, even when the summary is opted out and no title is given.
   const label = [title, strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))]

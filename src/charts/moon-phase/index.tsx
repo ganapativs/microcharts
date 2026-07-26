@@ -5,6 +5,7 @@
 // hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { makePercentFormatter } from "../../core/format.js";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
 import { moonGeometry, type MoonMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -17,6 +18,7 @@ export interface MoonPhaseProps {
   /** Override the lit color (default --mc-stroke). */
   color?: string | undefined;
   size?: number | undefined;
+  locale?: string | string[] | undefined;
   strings?: MoonStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -28,13 +30,27 @@ export interface MoonPhaseProps {
 
 const PAD = 0.5;
 
+/**
+ * The lit fraction as rendered text — a real `Intl` percent, not `${n}%`, which
+ * is an en-US percent (fr-FR wants a NBSP before the sign, tr-TR puts the sign
+ * first). Clamps and coerces, so a non-finite value reads 0 rather than "NaN%".
+ *
+ * `locale` comes from the chart's own prop, so a server render and its client
+ * hydration produce the same string instead of each resolving its host default.
+ * Trailing and optional: callers that never localized keep compiling. Exported
+ * so the interactive entry's hover chip reads the SAME string the summary speaks.
+ */
+export function moonPct(value: number, locale?: string | string[] | undefined): string {
+  return makePercentFormatter(locale)(Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0);
+}
+
 export function moonPhaseSummary(
   value: number,
   mode: MoonMode = "progress",
   strings: MoonStrings = EN_MOON,
+  locale?: string | string[] | undefined,
 ): string {
-  const v = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
-  const pct = `${Math.round(v * 100)}%`;
+  const pct = moonPct(value, locale);
   return mode === "cycle" ? strings.moonPhaseCycle(pct) : strings.moonPhase(pct);
 }
 
@@ -44,6 +60,7 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
     mode = "progress",
     color,
     size = 16,
+    locale,
     strings = EN_MOON,
     title,
     summary,
@@ -54,7 +71,7 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
   } = props;
 
   const geo = moonGeometry({ value, mode, size, pad: PAD });
-  const accName = resolveSummary(summary, () => moonPhaseSummary(value, mode, strings));
+  const accName = resolveSummary(summary, () => moonPhaseSummary(value, mode, strings, locale));
 
   return (
     <Chart

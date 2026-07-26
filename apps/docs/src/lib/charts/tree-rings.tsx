@@ -58,6 +58,18 @@ export const entry: ChartEntry = {
       required: false,
       description: 'Plural period noun for the summary (default "periods").',
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Rings box edge in viewBox units (default 24).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the gutter label, in viewBox units. Defaults from `size`.",
+    },
   ],
   demo: YEARS,
   example: {

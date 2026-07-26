@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
+import { makePercentFormatter } from "../../core/format.js";
 
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -37,6 +38,7 @@ export interface TimeInRangeProps {
   label?: "in" | "all" | "none" | undefined;
   width?: number | undefined;
   height?: number | undefined;
+  locale?: string | string[] | undefined;
   strings?: TimeInRangeStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -58,8 +60,25 @@ export function zonePercentMap(data: TimeInRangeDatum): Partial<Record<ZoneKey, 
   return out;
 }
 
+/** The one way this chart writes a zone share. Zone percents are integers that
+ *  must still sum to 100, so only their SPELLING is localized: `${n}%` is an
+ *  en-US percent (fr-FR wants a NBSP before the sign, tr-TR puts it first).
+ *  `locale` is the chart's own prop, threaded so a server render and its client
+ *  hydration resolve the same string instead of each taking its host default.
+ *  Trailing and optional: callers that never localized keep compiling. */
+export const tirPercent = (
+  locale?: string | string[] | undefined,
+): ((zonePct: number) => string) => {
+  const fmt = makePercentFormatter(locale);
+  return (zonePct) => fmt(zonePct / 100);
+};
+
 /** Shared summary — leads with the in-range headline, then the misses. */
-export function timeInRangeSummary(data: TimeInRangeDatum, strings: TimeInRangeStrings): string {
+export function timeInRangeSummary(
+  data: TimeInRangeDatum,
+  strings: TimeInRangeStrings,
+  pctFmt: (zonePct: number) => string = tirPercent(),
+): string {
   const pct = zonePercentMap(data);
   if (Object.keys(pct).length === 0) return strings.noData;
   // summary order: in, below, above, severe-low, severe-high (only present ones)
@@ -73,7 +92,7 @@ export function timeInRangeSummary(data: TimeInRangeDatum, strings: TimeInRangeS
   };
   const clauses = order
     .filter((k) => pct[k] !== undefined)
-    .map((k) => strings.tirClause(`${pct[k]}%`, nameByKey[k]));
+    .map((k) => strings.tirClause(pctFmt(pct[k]!), nameByKey[k]));
   return strings.timeInRange(clauses.join(", "));
 }
 
@@ -84,6 +103,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
     label = "in",
     width = 80,
     height = 12,
+    locale,
     strings = EN_TIME_IN_RANGE,
     title,
     summary,
@@ -95,8 +115,9 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
 
   const geo = timeInRangeGeometry({ data, width, height, orientation });
   const pct = zonePercentMap(data);
+  const pctFmt = tirPercent(locale);
   const fontSize = labelFont(Math.min(width, height), 0.55);
-  const accName = resolveSummary(summary, () => timeInRangeSummary(data, strings));
+  const accName = resolveSummary(summary, () => timeInRangeSummary(data, strings, pctFmt));
   const horizontal = orientation !== "vertical";
 
   return (
@@ -119,7 +140,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
         const showLabel =
           label === "all" || (label === "in" && z.key === "in") ? pct[z.key] : undefined;
         const span = horizontal ? z.width : z.height;
-        const text = showLabel !== undefined ? `${showLabel}%` : undefined;
+        const text = showLabel !== undefined ? pctFmt(showLabel) : undefined;
         // The percent lives INSIDE its zone rect, so it has to clear the rect on
         // BOTH axes: `span` along the strip, and — the part a short strip broke —
         // a full line of text across it. `labelFont` floors at 7 viewBox units,

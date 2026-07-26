@@ -105,8 +105,16 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
         ];
       })}
       {legend ? (
+        // The tier NAMES come from the strings bundle (`tokenTierNames`, the same
+        // three the announcement and the summary use) — they were spelled out in
+        // English here, so a translated `strings` left the key untranslated. Only
+        // the two rule glyphs and the separator are literal, and those are
+        // typography, not language. Still `aria-hidden`: it maps a MARK to a
+        // tier, which is meaningless read aloud, and the tier vocabulary already
+        // reaches assistive tech through the accessible name (`tokenConfidence`)
+        // and the per-token announcement (`tokenAt`).
         <span className="mc-tc-legend" aria-hidden="true">
-          {" ― unsure · ⋯ guessing"}
+          {` ― ${strings.tokenTierNames[1]} · ⋯ ${strings.tokenTierNames[2]}`}
         </span>
       ) : null}
       {children}

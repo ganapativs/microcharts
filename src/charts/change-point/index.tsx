@@ -9,20 +9,25 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear, extent } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
 import { CHANGE_POINT_PAD, changePointGeometry, type ChangePointGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-// signed=false for the summary, where the direction word already carries the sign
-const pct = (frac: number, signed = true): string =>
-  `${signed && frac > 0 ? "+" : signed && frac < 0 ? "−" : ""}${Math.round(Math.abs(frac) * 100)}%`;
+/** The signed level-shift label ("+50%"). `pct` takes a FRACTION and must be a
+ *  real percent formatter — the old hand-rolled `${Math.round(x*100)}%` fixed
+ *  both the sign and its spacing in en-US, so `locale` never reached it.
+ *  `withPlus` adds the leading `+` only when the formatter emitted no sign. */
+export const changePointDelta = (frac: number, pct: (fraction: number) => string): string =>
+  withPlus(frac, pct);
 
 export function changePointSummary(
   geo: ChangePointGeometry,
   fmt: (v: number) => string,
   strings: ChangePointStrings,
+  /** Percent formatter (FRACTION in) for the shift magnitude. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   if (geo.breaks.length === 0) return strings.changePointNone(geo.n);
   // headline = the largest-magnitude break
@@ -31,7 +36,8 @@ export function changePointSummary(
   const isLast = lead.index === geo.breaks[geo.breaks.length - 1]!.index;
   return strings.changePoint(
     lead.delta >= 0 ? "up" : "down",
-    pct(lead.delta, false),
+    // unsigned — the direction word already carries the sign
+    pct(Math.abs(lead.delta)),
     lead.index,
     fmt(lead.before),
     fmt(lead.after),
@@ -89,12 +95,19 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
 
   const FONT = labelFont(height, 0.55);
   const fmt = makeFormatter(format, locale);
+  // The shift is a relative change, not a measurement — it takes `locale` but
+  // never the value `format` (which carries the series' units).
+  const pctFmt = makePercentFormatter(locale);
   const cls = className ? `mc-change-point ${className}` : "mc-change-point";
 
   const probe = changePointGeometry({ width, height, data, breaks, maxItems, domain });
   const showLabel = label === "delta" && probe != null && probe.breaks.length > 0;
-  const labelText = showLabel ? pct(probe!.breaks[probe!.breaks.length - 1]!.delta) : "";
-  // 0.72·em/char (not 0.62) — the delta label always carries the wide `%` glyph
+  const labelText = showLabel
+    ? changePointDelta(probe!.breaks[probe!.breaks.length - 1]!.delta, pctFmt)
+    : "";
+  // 0.72·em/char (not 0.62) — the delta label always carries the wide `%` glyph.
+  // Measured off the FORMATTED string, so a locale that writes "+50 %" reserves
+  // the extra character instead of spilling past the viewBox.
   const gutter = showLabel ? Math.ceil(labelText.length * FONT * 0.72) + 4 : 0;
 
   const geo = probe;
@@ -117,7 +130,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => changePointSummary(geo, fmt, strings));
+  const accName = resolveSummary(summary, () => changePointSummary(geo, fmt, strings, pctFmt));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
   const totalWidth = width + gutter;
@@ -193,7 +206,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           d={geo.line.d}
           data-mc-ink="data"
           fill="none"
-          style={{ stroke: accent, strokeWidth: "var(--mc-stroke-width)" }}
+          style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
           strokeLinejoin="round"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"

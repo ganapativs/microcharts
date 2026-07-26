@@ -67,6 +67,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Dots (default) or short arc segments.",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Spiral box edge in viewBox units (default 24).",
+    },
   ],
   demo: YEAR,
   example: {

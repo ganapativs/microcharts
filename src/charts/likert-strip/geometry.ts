@@ -29,12 +29,19 @@ export function likertFont(height: number): number {
 }
 
 /**
- * End-label gutter reserved on BOTH sides before geometry runs ("100%" worst
- * case = 4 chars). Shared so the static frame and the interactive overlay/
- * hit-test always resolve against the same plot box.
+ * End-label gutter reserved on BOTH sides before geometry runs. Shared so the
+ * static frame and the interactive overlay/hit-test always resolve against the
+ * same plot box.
+ *
+ * `widest` is the longest string the chart's own percent formatter can produce,
+ * so the caller passes what it will actually PAINT. It used to be a hardcoded 4
+ * ("100%"), which is one character short the moment the formatter is not en-US —
+ * `fr-FR` renders "100 %" with a non-breaking space — and arbitrarily wrong for a
+ * caller-supplied `format` function, which may return anything at all. Falls back
+ * to 4 so an existing caller keeps its exact reservation.
  */
-export function likertGutter(labelled: boolean, fontSize: number): number {
-  return labelled ? textGutter(4, fontSize, 4) : 0;
+export function likertGutter(labelled: boolean, fontSize: number, widest = 4): number {
+  return labelled ? textGutter(Math.max(4, widest), fontSize, 4) : 0;
 }
 
 export function likertStripGeometry(opts: {

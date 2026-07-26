@@ -55,6 +55,18 @@ import { IconArray } from "../charts/icon-array/index.js";
 import { CoverageStrip } from "../charts/coverage-strip/index.js";
 import { Thermometer } from "../charts/thermometer/index.js";
 
+// Annotation hosts. Their annotation labels are laid out by `annotationFontSize`
+// in shared/annotations-host.tsx and were painted at whatever the HOST's
+// `--mc-label-size` resolved to — a different number per host, conditional on an
+// unrelated prop on six of them, and on the three that render no text of their
+// own not a viewBox-relative number at all.
+import { Marker, TargetZone, Threshold } from "../shared/annotations.js";
+import { ControlStrip } from "../charts/control-strip/index.js";
+import { CyclePlot } from "../charts/cycle-plot/index.js";
+import { ForecastCone } from "../charts/forecast-cone/index.js";
+import { NetFlow } from "../charts/net-flow/index.js";
+import { PairedBars } from "../charts/paired-bars/index.js";
+
 /**
  * Labels are the point of this suite, so every case renders in its most
  * label-heavy mode. Category strings are deliberately wide — uppercase Latin
@@ -115,6 +127,11 @@ const CASES: Record<string, () => ReactElement> = {
         { start: 4, end: 9, label: "ROLLBACK" },
       ]}
       label="spans"
+      // Wide enough for a span label to SEAT at the prose per-char rate. These
+      // are caller-supplied all-caps strings measured at 0.95 units/char, not
+      // the 0.62 digits rate the fit test used to use, so at the 80-unit default
+      // both labels now drop and the non-vacuity guard below (correctly) fires.
+      width={220}
       title="Timeline"
     />
   ),
@@ -403,6 +420,163 @@ describe("label containment (real browser + real stylesheet)", () => {
       ).toEqual([]);
     });
   }
+
+  // ANNOTATION labels, on both axes. `annotationFontSize(height)` drives the
+  // truncation budget in `fit()`, the `edgeFlip` anchor, and every top clamp in
+  // shared/annotations.tsx — but the `<text fontSize>` attribute it wrote was
+  // inert, so the painted size was the host's `--mc-label-size`. The three hosts
+  // below that render no text of their own never pinned it at all, which left the
+  // `0.75em` default resolving against the SURROUNDING PROSE: the same annotation
+  // painted at a different size in a heading than in a table cell, and nothing in
+  // the chart's own geometry could know. The labels here are deliberately long
+  // and hard against both edges, which is where a mismatched size escapes.
+  const LONG = "Committed baseline";
+  const ANNOTATED: Record<string, () => ReactElement> = {
+    // no pin at all — the three hosts that render no text themselves
+    "paired-bars + annotations": () => (
+      <PairedBars
+        data={[
+          { label: "East", value: 940, ref: 1200 },
+          { label: "West", value: 410, ref: 400 },
+        ]}
+        title="Paired"
+      >
+        <Threshold y={1200} label={LONG} />
+        <Marker x={0} label={LONG} />
+      </PairedBars>
+    ),
+    "control-strip + annotations": () => (
+      <ControlStrip data={[10, 11, 9, 10, 11, 9, 10, 10, 11, 9, 10, 16]} title="Control">
+        <Threshold y={16} label={LONG} />
+        <TargetZone y={[9, 11]} label={LONG} />
+      </ControlStrip>
+    ),
+    "cycle-plot + annotations": () => (
+      <CyclePlot
+        data={[3, 6, 2, 8, 5, 4, 7, 3, 6, 2, 8, 5, 4, 7]}
+        period={7}
+        slots={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+        title="Cycle"
+      >
+        <Threshold y={8} label={LONG} />
+        <Marker x={0} label={LONG} />
+      </CyclePlot>
+    ),
+    // pinned only when their own label prop is on — so the annotation size
+    // depended on a prop that has nothing to do with annotations
+    "net-flow + annotations (label off)": () => (
+      <NetFlow
+        data={[
+          { in: 4, out: 3 },
+          { in: 5, out: 4 },
+          { in: 6, out: 4 },
+        ]}
+        label="none"
+        title="Flow"
+      >
+        <Threshold y={6} label={LONG} />
+      </NetFlow>
+    ),
+    "forecast-cone + annotations (label off)": () => (
+      <ForecastCone
+        data={[3, 5, 4, 6]}
+        forecast={{ mid: [7, 8], p80: [[5, 9] as const, [4, 11] as const] }}
+        label="none"
+        title="Cone"
+      >
+        <Threshold y={9} label={LONG} />
+        <Marker x={0} label={LONG} />
+      </ForecastCone>
+    ),
+    // A Marker label with nowhere to go. Marker was the one label in
+    // shared/annotations.tsx that never went through the truncator, so on a
+    // word-sized host a long label start-anchored at x = 0 ran the whole width
+    // and straight out of the frame. Narrow box + a label far longer than it.
+    "marker label on a word-sized host": () => (
+      <PairedBars
+        data={[
+          { label: "E", value: 940, ref: 1200 },
+          { label: "W", value: 410, ref: 400 },
+        ]}
+        width={60}
+        height={20}
+        title="Narrow"
+      >
+        <Marker x={0} label="Committed baseline, revised upward" />
+      </PairedBars>
+    ),
+    "threshold label on a word-sized host": () => (
+      <ControlStrip data={[10, 11, 9, 10, 11, 9]} width={60} height={20} title="Narrow">
+        <Threshold y={11} label="Committed baseline, revised upward" />
+      </ControlStrip>
+    ),
+    // control: a host with an UNCONDITIONAL pin. It must pass too, or a green
+    // suite would only prove the assertion is toothless.
+    "waterfall + annotations (control)": () => (
+      <Waterfall
+        data={[
+          { label: "Start", value: 100 },
+          { label: "Up", value: 40 },
+          { label: "Down", value: -30 },
+        ]}
+        title="Waterfall"
+      >
+        <Threshold y={110} label={LONG} />
+      </Waterfall>
+    ),
+  };
+
+  for (const [name, renderChart] of Object.entries(ANNOTATED)) {
+    it(`${name} — annotation labels stay inside the viewBox`, async () => {
+      const screen = await render(renderChart());
+      // Non-vacuity: the host must actually be drawing the annotation text.
+      const drawn = [...screen.container.querySelectorAll("svg.mc-root text")].map((t) =>
+        (t.textContent ?? "").trim(),
+      );
+      expect(
+        drawn.some((t) => t.length > 0 && LONG.startsWith(t.replace(/…$/, ""))),
+        `host draws no annotation label (drew: ${JSON.stringify(drawn)})`,
+      ).toBe(true);
+
+      const worst = [...measureSpill(screen.container), ...measureSpillY(screen.container)].filter(
+        (s) => s.spill > VERTICAL_TOLERANCE,
+      );
+      expect(
+        worst,
+        `${name}: ${worst.map((w) => `"${w.label}" by ${w.spill.toFixed(1)}u`).join(", ")}`,
+      ).toEqual([]);
+    });
+  }
+
+  // A label that cannot fit is DROPPED, not painted over the edge — the other
+  // half of the containment contract, and the half a "no spill" assertion over a
+  // label-bearing fixture cannot reach (it needs a case where the right answer is
+  // zero labels, which the non-vacuity guard above forbids).
+  //
+  // EventTimeline's span labels are caller text drawn INSIDE the span, so the fit
+  // test has to measure them at the prose rate. `labels.ts` measured `WWWW…` at
+  // 0.95 units/char — the bound that estimator exists for — against 0.62 for the
+  // figures the library formats itself. An all-caps word is only ~0.64/char and
+  // fits either way, so it proves nothing; these two are seated by the digits
+  // rate and then paint 3.5 units past the viewBox (arithmetic: an 8-char label
+  // at font 7 needs 53.2 units and the span is 42.2, but 0.62 asks for only 34.7).
+  it("event-timeline drops a span label it cannot seat", async () => {
+    const screen = await render(
+      <EventTimeline
+        data={[
+          { start: 0, end: 3, label: "WWWWWW" },
+          { start: 4, end: 9, label: "WWWWWWWW" },
+        ]}
+        label="spans"
+        title="Timeline"
+      />,
+    );
+    const painted = [...screen.container.querySelectorAll("svg.mc-root text")]
+      .map((t) => (t.textContent ?? "").trim())
+      .filter(Boolean);
+    expect(painted, "neither label can seat at this width, so neither may paint").toEqual([]);
+    expect(measureSpill(screen.container).filter((x) => x.spill > TOLERANCE_UNITS)).toEqual([]);
+  });
 
   it("the stylesheet is actually loaded (guards the whole suite)", async () => {
     const screen = await render(<Sparkline data={[1, 2, 3]} title="Guard" />);

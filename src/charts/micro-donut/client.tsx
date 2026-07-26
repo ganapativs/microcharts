@@ -5,7 +5,7 @@
 // aria-hidden chart must not be a tab stop. Composes the static component
 // (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -28,9 +28,11 @@ export interface InteractiveMicroDonutProps extends MicroDonutProps, PickerProps
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   /**
-   * Opt-in entrance motion (default `false`): the wedges fade in, staggered,
-   * when the chart first mounts client-side. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins. Skipped when
+   * Opt-in entrance motion (default `false`): the ring DRAWS itself on first
+   * client-side mount — one clockwise sweep from 12 o'clock, each wedge's
+   * stroke unrolling for a span proportional to its own arc. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Skipped when
    * `decorative` (an aria-hidden ornament renders through the static entry
    * directly, before any hook that could wire it runs).
    */
@@ -83,12 +85,11 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pcts = useMemo(() => largestRemainderPercents(geo.wedges.map((w) => w.share)), [geo]);
-  // Largest-remainder integers (they must still sum to 100) through a real
-  // percent formatter — the old `${n}%` hardcoded the sign and its spacing.
-  const pctFmt = useMemo(
-    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [locale],
-  );
+  // Largest-remainder integers (they must still sum to 100) through the one
+  // sanctioned percent formatter — the old `${n}%` hardcoded the sign and its
+  // spacing. Threaded into `sharesSummary` too, so the accessible name and the
+  // chip can never disagree about how a percent is written.
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const pctAt = useCallback((i: number) => pctFmt((pcts[i] ?? 0) / 100), [pctFmt, pcts]);
 
   // Pointer (viewBox space) → wedge index by atan2 angle lookup (0 at 12
@@ -154,7 +155,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : sharesSummary(rolled, strings);
+        : sharesSummary(rolled, strings, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const mark = (i: number, pinned: boolean) => {

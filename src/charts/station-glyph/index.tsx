@@ -164,6 +164,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
             data-mc-ink="data"
             fill="none"
             strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
           />
           {barb.pennants.map((p, i) => (
             <path key={i} d={p} data-mc-ink="point" />

@@ -34,9 +34,14 @@ export interface InteractiveActivityGridProps extends ActivityGridProps, PickerP
   /** Swappable announcement strings (defaults to EN). Interactive adds series/slot templates. */
   strings?: ActivityStrings & Partial<SeriesStrings & SlotStrings>;
   /**
-   * Opt-in entrance motion (default `false`): cells fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
-   * `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): cells fade in, staggered, on first
+   * client-side mount. Past 80 cells the grid reveals with one left-to-right
+   * wipe instead — a year of days is 365 cells, so that is what the DEFAULT
+   * `weeks` renders, and a short `layout="strip"` is what gets the per-cell
+   * cascade. The cap is the engine's, and deliberate: 365 simultaneous animation
+   * tracks cost more than the cascade is worth, and at that density a per-cell
+   * stagger reads as noise rather than as counting. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -53,6 +58,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     weekStart = 1,
     cell = 10,
     gap = 2,
+    steps = LEVELS,
     domain,
     format,
     locale,
@@ -81,8 +87,8 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
   const rows = layout === "strip" ? 1 : 7;
   const offset = layout === "grid" ? calendarOffset(anchor, weekStart) : 0;
   const geo = useMemo(
-    () => activityGridGeometry(data, { rows, cell, gap, levels: LEVELS, domain, offset }),
-    [data, rows, cell, gap, domain, offset],
+    () => activityGridGeometry(data, { rows, cell, gap, levels: steps, domain, offset }),
+    [data, rows, cell, gap, steps, domain, offset],
   );
   const stepPx = cell + gap;
   const w = Math.max(geo.width, 1);
@@ -241,6 +247,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         weekStart={weekStart}
         cell={cell}
         gap={gap}
+        steps={steps}
         domain={domain}
         format={format}
         locale={locale}

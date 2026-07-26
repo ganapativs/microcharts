@@ -50,6 +50,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "ratio = share-of-whole; difference = absolute, scaled by domain.",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the weight numerals, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: [620, 480],
   example: {

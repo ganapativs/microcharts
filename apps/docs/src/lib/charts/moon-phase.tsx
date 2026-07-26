@@ -34,6 +34,12 @@ export const entry: ChartEntry = {
       description:
         "progress = monotonic fill; cycle = true lunar mapping (0 new → 0.5 full → 1 new).",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Disc box edge in viewBox units (default 16).",
+    },
   ],
   demo: [68],
   example: {

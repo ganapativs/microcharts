@@ -4,7 +4,7 @@
 // peak-normalized honestly (the peak is disclosed in the summary).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_WAVEFORM, type WaveformStrings } from "../../core/strings-waveform.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { barsPath, bucketCount, envelopePath, waveformGeometry } from "./geometry.js";
@@ -38,6 +38,9 @@ export function waveformSummary(
   data: readonly Value[],
   strings: WaveformStrings,
   fmt: (n: number) => string,
+  /** Percent formatter (FRACTION in) for "how far through". A position in the
+   *  signal, not an amplitude, so it takes `locale` but never `format`. */
+  posFmt: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   const finite = data.filter(isFiniteValue) as number[];
   if (finite.length === 0) return strings.noData;
@@ -50,7 +53,7 @@ export function waveformSummary(
     }
   });
   if (peak === 0) return strings.waveformSilent;
-  const pct = `${Math.round((peakIdx / Math.max(1, finite.length - 1)) * 100)}%`;
+  const pct = posFmt(peakIdx / Math.max(1, finite.length - 1));
   return strings.waveform(fmt(peak), pct, fmt(finite.length));
 }
 
@@ -75,10 +78,12 @@ export function Waveform(props: WaveformProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
+  // Position through the signal — a percent of its own, so `locale`, never `format`.
+  const posFmt = makePercentFormatter(locale);
   const buckets = bucketCount(width, Math.max(1, data.length));
   const geo = waveformGeometry({ data, width, height, buckets, domain: domain ?? null, mirror });
   const cy = height / 2;
-  const accName = resolveSummary(summary, () => waveformSummary(data, strings, fmt));
+  const accName = resolveSummary(summary, () => waveformSummary(data, strings, fmt, posFmt));
 
   const hasProgress = progress != null && Number.isFinite(progress);
   const playedIdx = hasProgress ? Math.round(Math.max(0, Math.min(1, progress)) * buckets) : 0;

@@ -41,6 +41,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Centered figure (≥ 20 px rendered).",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Ring box edge in viewBox units (default 24).",
+    },
   ],
   demo: [0.68],
   example: {

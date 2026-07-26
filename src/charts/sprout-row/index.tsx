@@ -6,9 +6,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
-import { labelFont, labelFitsY } from "../../core/labels.js";
+import { labelFont, labelFitsY, textGutterProse } from "../../core/labels.js";
 import { sproutRowGeometry, stageGlyph } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { maxOf } from "../../core/scale.js";
 
 export interface SproutDatum {
   label: string;
@@ -60,8 +61,12 @@ export function sproutRowSummary(
  * Category labels render at the library-standard size and never shrink to an
  * illegible caption. To keep the row compact they STAGGER onto two tiers below
  * the soil (even slots near, odd slots far), so same-tier neighbours sit two
- * steps apart — a name only needs to clear 2·step, not one. 0.72 em/char real
- * extent + a half-em gutter; the row still widens if even 2·step is too tight.
+ * steps apart — a name only needs to clear 2·step, not one. The extent is the
+ * shared PROSE estimate (`textGutterProse`, 0.95 em/char) plus a half-em gutter:
+ * these are caller names, not figures this chart formatted, and the digits rate
+ * it used to assume (0.72) is under the measured advance of an upper-case name,
+ * which put "FOXTROT" on top of its neighbour and past the row's edge. The row
+ * still widens if even 2·step is too tight.
  */
 export function sproutLayout(
   data: readonly SproutDatum[],
@@ -70,7 +75,10 @@ export function sproutLayout(
   step?: number | undefined,
 ): { step: number; padX: number; labelBand: number; twoTier: boolean } {
   const catExtent = labels
-    ? Math.max(0, ...data.map((d) => d.label.length * 0.72 * fontSize + fontSize * 0.5))
+    ? maxOf(
+        data.map((d) => textGutterProse(d.label.length, fontSize, fontSize * 0.5)),
+        0,
+      )
     : 0;
   const s = Math.max(step ?? 16, Math.ceil(catExtent / 2));
   // Side gutter so the outermost name (half its extent past its centre) never

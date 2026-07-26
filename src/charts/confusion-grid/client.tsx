@@ -175,7 +175,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : confusionSummary(data, strings);
+        : confusionSummary(data, strings, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const ring = (i: number, pinned: boolean) => {

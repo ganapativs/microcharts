@@ -6,7 +6,7 @@
 // overlay children, the worm/midline/dots come from the static so the two
 // entries can never drift.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
@@ -21,7 +21,14 @@ import { isFiniteValue } from "../../core/types.js";
 import { clamp } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_WIN_PROB_WORM, type WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
-import { PAD, leaderProb, resolveWormGeo, winProbWormSummary } from "./geometry.js";
+import {
+  PAD,
+  leaderProb,
+  resolveWormGeo,
+  winProbWormSummary,
+  wormCustomPct,
+  wormPct,
+} from "./geometry.js";
 import { WinProbWorm as StaticWinProbWorm, type WinProbWormProps } from "./index.js";
 
 export interface InteractiveWinProbWormProps extends WinProbWormProps, PickerProps {
@@ -33,11 +40,6 @@ export interface InteractiveWinProbWormProps extends WinProbWormProps, PickerPro
    */
   animate?: boolean;
 }
-
-const pct = (v: number, fmt: (n: number) => string): string => {
-  const s = fmt(v);
-  return s.endsWith("%") ? s : `${s}%`;
-};
 
 export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode {
   const {
@@ -72,13 +74,19 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Same percent formatter the static builds (see index.tsx): `Intl` percent
+  // style unless the caller supplied their own `format`, which still wins.
+  const pctFmt = useMemo(
+    () => (format === undefined ? makePercentFormatter(locale, 3) : wormCustomPct(fmt)),
+    [format, locale, fmt],
+  );
   const FONT = labelFont(height);
 
   // Geometry must match the static entry EXACTLY (same shared resolve), so the
   // overlay + pointer math never drift.
   const geo = useMemo(
-    () => resolveWormGeo({ width, height, data, label, font: FONT, fmt }),
-    [width, height, data, label, FONT, fmt],
+    () => resolveWormGeo({ width, height, data, label, font: FONT, pctFmt }),
+    [width, height, data, label, FONT, pctFmt],
   );
 
   const plotW = Math.max(0, width - 2 * PAD - geo.gutter);
@@ -91,7 +99,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         ? summary
         : geo.geo === null
           ? strings.noData
-          : winProbWormSummary(geo.geo, fmt, strings, sides);
+          : winProbWormSummary(geo.geo, fmt, strings, sides, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const locate = useCallback(
@@ -111,10 +119,12 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         index: i,
         value: cv,
         formatted:
-          cv === null ? undefined : `${cv >= 50 ? sides[0] : sides[1]} ${pct(leaderProb(cv), fmt)}`,
+          cv === null
+            ? undefined
+            : `${cv >= 50 ? sides[0] : sides[1]} ${wormPct(leaderProb(cv), pctFmt)}`,
       };
     },
-    [data, sides, fmt],
+    [data, sides, pctFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -157,7 +167,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
       : strings.winProbWormAt(
           shown! + 1,
           clampedShown >= 50 ? sides[0] : sides[1],
-          pct(leaderProb(clampedShown), fmt),
+          wormPct(leaderProb(clampedShown), pctFmt),
         );
   const px = shown !== null ? PAD + (shown / lastX) * plotW : 0;
 
@@ -187,7 +197,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
       </StaticWinProbWorm>
       {readout && clampedShown !== null ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(px, width)}>
-          {`${clampedShown >= 50 ? sides[0] : sides[1]} ${pct(leaderProb(clampedShown), fmt)}`}
+          {`${clampedShown >= 50 ? sides[0] : sides[1]} ${wormPct(leaderProb(clampedShown), pctFmt)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

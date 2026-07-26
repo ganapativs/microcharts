@@ -30,6 +30,15 @@ export interface RetentionCurveProps {
   /** Fraction retained per period (period 0 typically 1.0); 0–1 or 0–100. */
   data: readonly number[];
   /** Peer/industry curve, rendered as a subordinate dashed ghost. */
+  compare?: readonly number[] | undefined;
+  /**
+   * @deprecated Use `compare`. The catalog word for "a second series to read
+   * this one against" is `compare` (DualSparkline, StarSpoke) — this chart was
+   * the only one calling it `benchmark`, and DualSparkline's own `compare` JSDoc
+   * calls it "the benchmark series", which is how the two names drifted. Still
+   * accepted, and it still wins over `compare` when both are passed, so no
+   * existing caller changes behaviour by upgrading.
+   */
   benchmark?: readonly number[] | undefined;
   /** Detect + mark a plateau (default true). */
   plateau?: boolean | undefined;
@@ -61,7 +70,9 @@ export const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFraction
 export function RetentionCurve(props: RetentionCurveProps): ReactNode {
   const {
     data,
-    benchmark,
+    compare,
+    // `benchmark` is the deprecated spelling and wins when both are given.
+    benchmark = compare,
     plateau = true,
     curve = "step",
     unit = "period",

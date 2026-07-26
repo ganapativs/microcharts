@@ -20,6 +20,13 @@ export interface InteractiveFatDigitsProps extends FatDigitsProps {
    * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One numeral = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the numeral, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the numeral }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -29,6 +36,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     live = true,
     strings = EN_FAT,
     animate = false,
+    onActive,
     onSelect,
     title,
     value,
@@ -61,14 +69,29 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
     props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // One numeral, one selectable unit (index 0): the value it prints.
-  const pick = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });
+  // One numeral, one selectable unit (index 0): the value it prints. One
+  // builder, so `onActive` and `onSelect` can never report different numbers.
+  const datum = (): MicroDatum => ({ index: 0, value: Number.isFinite(value) ? value : null });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // numeral paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-fat-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

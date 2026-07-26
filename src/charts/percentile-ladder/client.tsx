@@ -5,7 +5,7 @@
 // median ("p99: 2.1 s — 17× the median."). Composes the static component
 // (canon); the probe line is an overlay child re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -81,6 +81,8 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const ratioFmt = useMemo(() => makeFormatter({ maximumFractionDigits: 1 }, locale), [locale]);
+  // Tail share — a percent of the sample, so `locale` but never `format`.
+  const tailFmt = useMemo(() => makePercentFormatter(locale, 2), [locale]);
 
   // A collapsed ladder (every percentile identical) paints ONE rung, so it
   // offers one navigable unit — roving the hidden rungs would cycle the chip
@@ -149,7 +151,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         ? summary
         : geo === null
           ? strings.noData
-          : ladderSummary(geo, fmt, ratioFmt, strings);
+          : ladderSummary(geo, fmt, ratioFmt, strings, tailFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const probe = (i: number, pinned: boolean) => {

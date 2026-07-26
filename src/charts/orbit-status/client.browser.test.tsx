@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { OrbitStatus } from "./client.js";
 
 describe("interactive <OrbitStatus>", () => {
@@ -89,5 +90,33 @@ describe("interactive <OrbitStatus>", () => {
     const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
     fig.focus();
     expect(fig.querySelector(".mc-spark-readout")).toBeNull();
+  });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the dependency once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <OrbitStatus
+        latency={240}
+        rate={12}
+        latencyDomain={[0, 500]}
+        title="API"
+        onActive={(d) => seen.push(d)}
+      />,
+    );
+    const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
+    await userEvent.hover(fig);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("240ms");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 240, label: "API", formatted: chip() });
+    fig.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    fig.blur();
+    await userEvent.unhover(fig); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
   });
 });

@@ -26,6 +26,13 @@ export interface InteractiveBulletProps extends BulletProps {
   animate?: boolean;
   /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One measure = one
+   * unit, so this fires once with `{ index: 0, … }` on pointer enter or focus
+   * and once with `null` when that clears — never repeatedly while the pointer
+   * moves inside the mark, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The bullet was activated (click, tap, Enter or Space): `{ index: 0, value }` — the measure (never the target or a band). */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -41,6 +48,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     summary,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -72,23 +80,34 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         : fmt(value);
 
   // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
-  // qualitative bands are context, not the datum.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? value : null,
-      formatted: readoutText,
-    });
+  // qualitative bands are context, not the datum. One builder, so `onActive` and
+  // `onSelect` can never report a different number or string than the chip.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? value : null,
+    formatted: readoutText,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `open` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setOpen(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-bullet-interactive", className, style)}
       {...named(label)}
-      onPointerEnter={() => setOpen(true)}
-      onPointerLeave={() => setOpen(false)}
-      onFocus={() => setOpen(true)}
-      onBlur={() => setOpen(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

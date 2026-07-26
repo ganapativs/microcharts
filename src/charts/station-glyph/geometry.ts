@@ -6,7 +6,7 @@
 // transform, so containment is honest at generation time. The barb starts at the
 // disc rim, per the real station model. 2-dp.
 import { round2 } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { windBarbGeometry, type Seg, type WindBarbGeometry } from "../wind-barb/geometry.js";
 
 const TAU = Math.PI * 2;
@@ -53,6 +53,12 @@ export interface StationLayout {
 /**
  * Reserve a gutter per side sized to the widest numeral on it (the static path
  * never measures text — a per-char over-estimate), then place the disc center.
+ *
+ * The three numerals are figures this chart formatted itself (`makeFormatter`),
+ * so `textGutter`'s digits rate is the right estimator — the shared one, never a
+ * re-derived `* 0.62` (see core/labels.ts). Caller PROSE would need
+ * `textGutterProse`; the only prose the glyph draws is the `station` id, which
+ * reserves nothing at all (top-left corner, outside these gutters).
  */
 export function stationLayout(opts: {
   size: number;
@@ -63,7 +69,7 @@ export function stationLayout(opts: {
   const { size } = opts;
   const font = labelFont(size, 0.24);
   const gap = 3;
-  const gutW = (s: string | null): number => (s ? 0.62 * font * s.length + gap : 1);
+  const gutW = (s: string | null): number => (s ? textGutter(s.length, font, gap) : 1);
   const padXL = round2(Math.max(gutW(opts.temp), gutW(opts.dew)) + 0.5);
   const padXR = round2(gutW(opts.pressure) + 0.5);
   const padY = round2(font + 2);

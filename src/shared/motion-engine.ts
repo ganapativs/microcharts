@@ -23,6 +23,9 @@ import {
 
 // The motion vocabulary is public API here so consumer UI around a chart can
 // speak the same language (chips, readouts, toolbars that move with a chart).
+// Deliberately COARSER than the engine's own per-archetype `DUR`/`EASE` tables
+// below — a consumer matching a chart's feel should not have to reproduce its
+// choreography, and `--mc-duration`/`--mc-easing` remain the overridable pair.
 export { MC_DUR, MC_EASE_ENTER, MC_EASE_MOVE } from "./motion-gate.js";
 export type { EntranceArchetype, EntranceOptions } from "./motion-gate.js";
 

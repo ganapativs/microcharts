@@ -65,4 +65,31 @@ describe("interactive <FillWord>", () => {
     await userEvent.hover(lw);
     expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
+
+  // The shared interaction contract (shared/interactive.ts): `onActive` reports
+  // the hovered/focused unit and `null` when that clears — on the EDGE only, so
+  // hover-then-focus is one announcement, not two.
+  it("onActive reports the word once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <FillWord word="Deploy" value={0.42} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-fillword-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("42%");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({
+      index: 0,
+      value: 0.42,
+      label: "Deploy",
+      formatted: chip(),
+    });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    wrap.blur();
+    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    expect(seen.length).toBe(2);
+  });
 });

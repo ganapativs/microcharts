@@ -5,7 +5,7 @@
 // click / Enter / Space selects (onSelect). Composes the static component
 // (canon); the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
   named,
@@ -22,6 +22,7 @@ import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-cha
 import { changePointGeometry } from "./geometry.js";
 import {
   ChangePoint as StaticChangePoint,
+  changePointDelta,
   changePointSummary,
   type ChangePointProps,
 } from "./index.js";
@@ -35,9 +36,6 @@ export interface InteractiveChangePointProps extends ChangePointProps, PickerPro
    */
   animate?: boolean;
 }
-
-const pct = (frac: number): string =>
-  `${frac > 0 ? "+" : frac < 0 ? "−" : ""}${Math.round(Math.abs(frac) * 100)}%`;
 
 export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode {
   const {
@@ -71,6 +69,11 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     [width, height, data, breaks, maxItems, domain],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Same percent formatter the static builds — the gutter is measured off its
+  // output, so both entries must widen identically under a locale that writes
+  // "+50 %" or the pointer map runs short of the rendered viewBox.
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
+  const pct = useCallback((frac: number) => changePointDelta(frac, pctFmt), [pctFmt]);
 
   // Mirror the static's delta gutter: geometry is laid out in `width`, but the
   // rendered viewBox is `width + gutter`. Mapping the pointer over `width`
@@ -90,7 +93,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         ? summary
         : geo === null
           ? strings.noData
-          : changePointSummary(geo, fmt, strings);
+          : changePointSummary(geo, fmt, strings, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // regime index for a given point (0-based), plus its mean. Memoised on `geo`
@@ -129,7 +132,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         const brk = geo.breaks.find((b) => b.index === i);
         formatted = brk
           ? `${fmt(brk.before)}→${fmt(brk.after)} (${pct(brk.delta)})`
-          : `regime ${regimeOf(i).regime}/${geo.segments.length}`;
+          : strings.changePointRegime(regimeOf(i).regime, geo.segments.length);
       }
       return {
         index: i,
@@ -137,7 +140,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         formatted,
       };
     },
-    [data, geo, fmt, regimeOf],
+    [data, geo, fmt, pct, regimeOf, strings],
   );
 
   // The kernel's `step` sees only (current, key), but Shift+Tab must cycle the

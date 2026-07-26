@@ -34,6 +34,13 @@ export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One reading = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the instrument, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The gauge was activated (click, tap, Enter or Space): `{ index: 0, value }` — the current reading. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -57,6 +64,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     animate = false,
     label = "value",
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -116,22 +124,34 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     }) !== null;
 
   // Drill-down: the reading under the fixed pointer — the number the tape shows.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? value : null,
-      formatted: valueText || undefined,
-    });
+  // One builder, so `onActive` and `onSelect` can never report a different
+  // reading or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? value : null,
+    formatted: valueText || undefined,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-tape-live", className, style)}
       {...named(name)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

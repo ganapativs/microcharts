@@ -166,9 +166,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 stroke={stroke}
                 data-mc-ink="data"
                 style={{
-                  strokeWidth: isHl
-                    ? "calc(var(--mc-stroke-width) * 1.5)"
-                    : "var(--mc-stroke-width)",
+                  strokeWidth: isHl ? "calc(var(--mc-sw) * 1.5)" : "var(--mc-sw)",
                 }}
                 vectorEffect="non-scaling-stroke"
               />
@@ -181,7 +179,7 @@ export function Slope(props: SlopeProps): ReactNode {
                 y2={(line.y0 ?? line.y1)!}
                 stroke={stroke}
                 data-mc-ink="data"
-                style={{ strokeWidth: "var(--mc-stroke-width)" }}
+                style={{ strokeWidth: "var(--mc-sw)" }}
                 strokeDasharray="1.5 1.5"
                 vectorEffect="non-scaling-stroke"
               />

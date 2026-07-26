@@ -127,7 +127,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         el.setAttribute("stroke-linecap", "round");
         el.setAttribute("vector-effect", "non-scaling-stroke");
         el.style.stroke = "var(--mc-accent)";
-        el.style.strokeWidth = "var(--mc-stroke-width)";
+        el.style.strokeWidth = "var(--mc-sw)";
         g.appendChild(el);
       }
       el.setAttribute("d", src.d);
@@ -295,7 +295,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         vectorEffect="non-scaling-stroke"
         style={{
           stroke: "var(--mc-accent)",
-          strokeWidth: pinned ? undefined : "var(--mc-stroke-width)",
+          strokeWidth: pinned ? undefined : "var(--mc-sw)",
         }}
       />
     );

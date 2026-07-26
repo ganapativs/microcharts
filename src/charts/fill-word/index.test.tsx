@@ -5,6 +5,9 @@ import { FillWord } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
 
 describe("<FillWord>", () => {
   it("summary is the real string: '{word}: {pct} complete.'", () => {
@@ -34,6 +37,17 @@ describe("<FillWord>", () => {
     const texts = [...container.querySelectorAll("text")];
     expect(texts.length).toBe(3);
     expect(texts[2]!.textContent).toBe("40%");
+  });
+
+  it("locale spells the percent (de-DE puts a NBSP before the sign)", () => {
+    const { container } = draw(
+      <FillWord word="storage" value={0.4} label="value" locale="de-DE" />,
+    );
+    // painted numeral and generated summary read the SAME localized string
+    expect([...container.querySelectorAll("text")][2]!.textContent).toBe(`40${NBSP}%`);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `storage: 40${NBSP}% complete.`,
+    );
   });
 
   it("empty word → nothing, 'No data.'", () => {

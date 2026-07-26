@@ -40,6 +40,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Draw the die outline (default true).",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Die square edge in viewBox units (default 16).",
+    },
   ],
   demo: [4],
   example: {

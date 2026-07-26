@@ -35,8 +35,9 @@ export interface InteractiveEventRasterProps extends EventRasterProps, PickerPro
   format?: Format;
   locale?: string | string[];
   /**
-   * Opt-in entrance motion (default `false`): lanes fade in top-to-bottom on
-   * first client-side mount. Inert on the server and on hydrated server
+   * Opt-in entrance motion (default `false`): the raster wipes in left-to-right
+   * on first client-side mount — one clip reveal across every lane at once, so
+   * ticks arrive in time order. Inert on the server and on hydrated server
    * HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;

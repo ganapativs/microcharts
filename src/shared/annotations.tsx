@@ -58,6 +58,33 @@ function pin(v: number, max: number): { v: number; off: boolean } {
   return { v: round2(v), off: false };
 }
 
+/**
+ * The annotation layer's own label size, as a CSS custom property.
+ *
+ * `annotationFontSize` is what `fit`, `edgeFlip` and every top clamp in this file
+ * are computed against — but an SVG `font-size` ATTRIBUTE on `<text>` is inert
+ * here: `:where(.mc-root text)` in styles.css sets `font-size` as a CSS
+ * declaration, and a declaration outranks a presentation attribute. So the
+ * painted size was the HOST's `--mc-label-size` — a different number on every
+ * host, conditional on an unrelated prop on six of them, and on the three hosts
+ * that render no text of their own (PairedBars, ControlStrip, CyclePlot) not a
+ * viewBox-relative number at all: the `0.75em` default resolves against the
+ * surrounding prose, so the same annotation painted at a different size in a
+ * table cell than in a heading. Labels were laid out at one size and painted at
+ * another, which makes both the truncation budget and the top clamp wrong.
+ *
+ * Setting the variable rather than an inline `fontSize` keeps annotation text
+ * inside the one cascade that owns in-chart type, so `--mc-density` scaling and
+ * the `forced-colors` rules that key off `.mc-root text` still reach it exactly
+ * as they reach a chart's own labels. The inert `fontSize` attribute STAYS
+ * beside it: the craft gate (`tests/craft/audit.mjs`) and the containment
+ * estimators read text extents off raw attributes, and without it they fall back
+ * to a hardcoded 10.
+ */
+function labelSize(fontSize: number): CSSProperties {
+  return { "--mc-label-size": `${fontSize}px` } as CSSProperties;
+}
+
 /** Label anchor with deterministic edge flip (estChars × 0.31em each side). */
 function edgeFlip(
   x: number,
@@ -81,6 +108,25 @@ function fit(label: string, fontSize: number, avail: number): string {
   const maxChars = Math.floor(avail / (fontSize * 0.62));
   if (label.length <= maxChars) return label;
   return maxChars <= 1 ? "…" : `${label.slice(0, maxChars - 1)}…`;
+}
+
+/**
+ * Vertical seat for an annotation label: `dominant-baseline: central` plus a
+ * clamp that keeps the whole em-box inside the frame.
+ *
+ * These labels used to sit on the ALPHABETIC baseline and clamp with
+ * `Math.max(fontSize * 0.8, …)` — a 0.78-ascent model, which is what the craft
+ * audit and `labelFitsY` assume. Real faces exceed it (a Times ascender is
+ * ~0.89em), so the top label painted ~0.1em above the frame: measured at 1.0
+ * viewBox unit on every host once the painted size finally matched the laid-out
+ * one. `central` makes the box straddle `y` symmetrically, which is the same
+ * model `labelFitsY(…, mid = true)` uses, so a half em-box each side is the
+ * exact clamp — no per-face tuning, and it is the fix `Sparkline label="minmax"`
+ * already landed for the same reason.
+ */
+function seatY(y: number, fontSize: number, height: number): number {
+  const half = fontSize * 0.5;
+  return round2(Math.min(Math.max(y, half), Math.max(half, height - half)));
 }
 
 type Branded = { [ANNOTATION]: AnnotationBrand };
@@ -111,9 +157,11 @@ export function Threshold(_props: ThresholdProps): ReactNode {
         {p.label ? (
           <text
             x={width - 1}
-            y={round2(Math.max(fontSize * 0.8, y - 1.5))}
+            y={seatY(y - 1.5 - fontSize * 0.3, fontSize, height)}
             fontSize={fontSize}
+            style={labelSize(fontSize)}
             textAnchor="end"
+            dominantBaseline="central"
             data-mc-ink="label"
           >
             {fit(p.label, fontSize, width - 1)}
@@ -152,9 +200,11 @@ export function TargetZone(_props: TargetZoneProps): ReactNode {
           // no longer collide mid-band at the same (width-1, midY) point.
           <text
             x={1}
-            y={round2(Math.min(height - 1, Math.max(fontSize * 0.8, top + h - fontSize * 0.2)))}
+            y={seatY(top + h - fontSize * 0.6, fontSize, height)}
             fontSize={fontSize}
+            style={labelSize(fontSize)}
             textAnchor="start"
+            dominantBaseline="central"
             data-mc-ink="label"
           >
             {fit(p.label, fontSize, width - 2)}
@@ -187,17 +237,34 @@ export function Marker(_props: MarkerProps): ReactNode {
           // reference hairline: fixed 1-unit ink, deliberately exempt from --mc-density
           style={{ strokeWidth: 1 }}
         />
-        {p.label ? (
-          <text
-            x={x}
-            y={round2(fontSize * 0.8)}
-            fontSize={fontSize}
-            textAnchor={edgeFlip(x, p.label.length, fontSize, width)}
-            data-mc-ink="label"
-          >
-            {p.label}
-          </text>
-        ) : null}
+        {p.label
+          ? (() => {
+              // Marker was the ONE label in this file that never went through
+              // `fit()`: a long label at x = 0 start-anchors and then runs the
+              // whole width and out of the frame, with no truncation and no
+              // gutter to stop it (the others all truncate). The run available
+              // depends on the anchor `edgeFlip` picked, so resolve that first.
+              // A `middle` anchor needs no bound: that is precisely the case
+              // `edgeFlip` returns when the centred label already fits, and
+              // second-guessing it here truncated a one-character label sitting
+              // near the left edge down to a bare ellipsis.
+              const anchor = edgeFlip(x, p.label.length, fontSize, width);
+              const avail = anchor === "start" ? width - x : anchor === "end" ? x : width;
+              return (
+                <text
+                  x={x}
+                  y={seatY(fontSize * 0.5, fontSize, height)}
+                  fontSize={fontSize}
+                  style={labelSize(fontSize)}
+                  textAnchor={anchor}
+                  dominantBaseline="central"
+                  data-mc-ink="label"
+                >
+                  {fit(p.label, fontSize, avail - 1)}
+                </text>
+              );
+            })()
+          : null}
         {p.celebrate
           ? (() => {
               // 6 deterministic particles seeded by x + host size — never
@@ -248,7 +315,7 @@ export function Callout(_props: CalloutProps): ReactNode {
     const goRight = x < width / 2;
     const elbow = Math.min(5, fontSize);
     const ex = round2(x + (goRight ? elbow : -elbow));
-    const ey = round2(Math.max(fontSize * 0.8, y - elbow));
+    const ey = seatY(y - elbow, fontSize, height);
     // label anchors at `tx` and runs toward the wider half; truncate if it would
     // overrun that side's remaining width (author labels can't reserve a gutter)
     const tx = round2(ex + (goRight ? 1 : -1));
@@ -276,7 +343,9 @@ export function Callout(_props: CalloutProps): ReactNode {
           x={tx}
           y={ey}
           fontSize={fontSize}
+          style={labelSize(fontSize)}
           textAnchor={goRight ? "start" : "end"}
+          dominantBaseline="central"
           data-mc-ink="label"
         >
           {label}

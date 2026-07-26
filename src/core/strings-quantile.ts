@@ -45,7 +45,7 @@ export const EN_QUANTILE: QuantileStrings = {
   ladderProbe: (p, value, ratio) => `p${p}: ${value} — ${ratio} the median.`,
   ladderFlat: (value) => `All percentiles equal at ${value}.`,
   gradedBand: (median, clauses) => `Median ${median}; ${clauses}.`,
-  bandClause: (level, lo, hi) => `${level}% within ${lo}–${hi}`,
-  bandEdge: (level, lo, hi) => `${level}% interval: ${lo} to ${hi}.`,
+  bandClause: (level, lo, hi) => `${level} within ${lo}–${hi}`,
+  bandEdge: (level, lo, hi) => `${level} interval: ${lo} to ${hi}.`,
   bandPoint: (value) => `Point value ${value}, no interval.`,
 };

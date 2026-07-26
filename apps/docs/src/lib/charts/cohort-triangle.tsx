@@ -76,6 +76,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Override or disable the auto summary.",
     },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between cells in viewBox units (default 2).",
+    },
   ],
   demo: [100, 62, 48, 41, 38, 37],
   example: {

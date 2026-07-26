@@ -23,6 +23,13 @@ export interface InteractiveTrendArrowProps extends TrendArrowProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One glyph = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the signed change, label: direction }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -34,6 +41,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
     strings = EN_SCALAR,
     title,
     summary,
+    onActive,
     onSelect,
     ...rest
   } = props;
@@ -57,13 +65,23 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // One glyph, one selectable unit (index 0): the signed change it encodes,
-  // with the resolved direction as its name. No roving — nothing to rove.
-  const pick = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(rest.value) ? rest.value : null,
-      label: model.direction,
-    });
+  // with the resolved direction as its name. No roving — nothing to rove. One
+  // builder, so `onActive` and `onSelect` can never report a different change.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(rest.value) ? rest.value : null,
+    label: model.direction,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // glyph paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
@@ -72,6 +90,10 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       data-mc-host=""
       data-pulse={pulse ? "1" : undefined}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

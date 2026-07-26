@@ -24,6 +24,13 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. The strokes are ONE
+   * count, so this fires once with `{ index: 0, … }` on pointer enter or focus and
+   * once with `null` when that clears — never repeatedly while the pointer moves
+   * across the marks, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -36,6 +43,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     value,
     pen,
     animate = false,
+    onActive,
     onSelect,
     className,
     style,
@@ -98,18 +106,32 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The strokes are ONE count, not N navigable marks: a single selectable unit
-  // (index 0) carrying the integer the tally reads back (floored, ≥ 0).
-  const pick = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
-    });
+  // (index 0) carrying the integer the tally reads back (floored, ≥ 0). One
+  // builder, so `onActive` and `onSelect` can never report a different count.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // tally paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-tally-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

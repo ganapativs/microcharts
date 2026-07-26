@@ -5,18 +5,25 @@
 // bar. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, withPlus, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, withPlus, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
 import { abStripsGeometry, abTagsFit, type ABStripsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-/** Signed percent (or absolute when the base is 0) delta of B vs A. */
-export function abDelta(geo: ABStripsGeometry, fmt: (n: number) => string): string {
+/** Signed percent (or absolute when the base is 0) delta of B vs A.
+ *  `pct` takes a FRACTION and is the chart's percent formatter — a literal
+ *  `${n}%` would leave the delta in en-US while `locale` localized every other
+ *  number here. `withPlus` supplies the leading `+`, and skips it when the
+ *  formatter already emitted a sign. */
+export function abDelta(
+  geo: ABStripsGeometry,
+  fmt: (n: number) => string,
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
+): string {
   if (geo.aMedian === 0) return withPlus(geo.deltaMedian, fmt);
-  const pct = Math.round((geo.deltaMedian / Math.abs(geo.aMedian)) * 100);
-  return `${pct > 0 ? "+" : ""}${pct}%`;
+  return withPlus(geo.deltaMedian / Math.abs(geo.aMedian), pct);
 }
 
 export function abSummary(
@@ -24,14 +31,15 @@ export function abSummary(
   fmt: (n: number) => string,
   seriesLabels: readonly [string, string],
   strings: ABStrings,
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   const base = strings.ab(
     seriesLabels[1],
     fmt(geo.bMedian),
     seriesLabels[0],
     fmt(geo.aMedian),
-    abDelta(geo, fmt),
-    `${Math.round(geo.overlap * 100)}%`,
+    abDelta(geo, fmt, pct),
+    pct(geo.overlap),
   );
   if (geo.overlap >= 1) return base + strings.abNoDiff;
   if (geo.overlap <= 0) return base + strings.abSeparated;
@@ -88,6 +96,9 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   // safely under that (real-browser getBBox verified at 80×20, not just craft)
   const FONT = labelFont(height, 0.3);
   const fmt = makeFormatter(format, locale);
+  // The delta + overlap are shares of their own, so they take `locale` but never
+  // the value `format` (which carries the metric's units).
+  const pctFmt = makePercentFormatter(locale);
   const cls = className ? `mc-ab-strips ${className}` : "mc-ab-strips";
   // Row tags are seat-gated — they drop, and give their lead gutter back to the
   // strips, once the two rows are pitched closer than one em (see `abTagsFit`).
@@ -105,7 +116,9 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   });
   // the delta rides the box's own midline, so it needs one em of box height
   const showLabel = label === "delta" && probe != null && labelFitsBand(height, FONT);
-  const labelText = showLabel ? abDelta(probe!, fmt) : "";
+  // Gutter off the FORMATTED string, not a digit count: a locale that writes
+  // "+15 %" needs the extra character reserved or the label spills the viewBox.
+  const labelText = showLabel ? abDelta(probe!, fmt, pctFmt) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
   const geo = abStripsGeometry({
@@ -137,7 +150,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => abSummary(geo, fmt, seriesLabels, strings));
+  const accName = resolveSummary(summary, () => abSummary(geo, fmt, seriesLabels, strings, pctFmt));
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   // delta valence: which direction is good (sign is also in the text) — B always

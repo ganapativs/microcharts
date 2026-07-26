@@ -57,6 +57,12 @@ export const entry: ChartEntry = {
       required: false,
       description: 'Centered readout when the comb has room (default "none").',
     },
+    {
+      name: "cell",
+      type: "number",
+      required: false,
+      description: "Hex cell radius in viewBox units (default 4).",
+    },
   ],
   demo: [34],
   example: {

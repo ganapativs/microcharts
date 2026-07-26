@@ -27,8 +27,9 @@ import {
 export interface InteractiveGardenGridProps extends GardenGridProps, PickerProps {
   strings?: GardenStrings;
   /**
-   * Opt-in entrance motion (default `false`): dots settle into place on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): the dots pop in one after another,
+   * in cell order — the plot plants itself in a wave — on first client-side
+   * mount. Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;

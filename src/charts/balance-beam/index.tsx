@@ -186,6 +186,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         x2={geo.beam.x2}
         y2={geo.beam.y2}
         data-mc-ink="data"
+        vectorEffect="non-scaling-stroke"
       />
       {/* Heavier pan = accent. Unknown pan: no weight mark (missing ≠ zero). */}
       {geo.known[0] ? weightMark(geo.weights[0], "wl", geo.heavier === -1) : null}

@@ -69,9 +69,16 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   });
 
   const fontSize = likertFont(height);
+  const pctFmt = useMemo(
+    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [format, locale],
+  );
+  // Same reservation as the static entry, measured off the same widest string —
+  // a gutter that disagreed between the two would walk the hit box off the bars.
   const gutter = likertGutter(
     label !== "none" && labelFitsY(height / 2, fontSize, height),
     fontSize,
+    pctFmt(1).length,
   );
   const geo = useMemo(
     () =>
@@ -84,10 +91,6 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         gutterR: gutter,
       }),
     [width, height, data, neutral, gutter],
-  );
-  const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [format, locale],
   );
   // Response counts are cardinal, not shares — grouped by the locale, never run
   // through the percent `format` the shares use.

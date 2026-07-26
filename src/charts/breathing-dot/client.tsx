@@ -30,6 +30,13 @@ export interface InteractiveBreathingDotProps extends BreathingDotProps {
    * Chip text is `62% · elevated` — percent plus the band the pulse encodes.
    */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One dot = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the mark, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The dot was activated (click, tap, Enter or Space): `{ index: 0, value, label }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -49,6 +56,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     title,
     summary,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -112,30 +120,45 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
   }, [reduced, inView, geo.band, geo.unknown, wrapRef]);
 
   // Percent + band: the permanent `label="value"` only has room for the
-  // percent, so the chip adds the band name the pulse already encodes.
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const readoutText = geo.unknown
-    ? "—"
-    : `${fmt(Math.round(geo.level * 100))}% · ${strings.loadBands[geo.band]}`;
+  // percent, so the chip adds the band name the pulse already encodes. The
+  // percent is a real `Intl` percent (see index.tsx) — `${n}%` was an en-US
+  // percent that ignored `locale`.
+  const pct = useMemo(
+    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [format, locale],
+  );
+  const readoutText = geo.unknown ? "—" : `${pct(geo.level)} · ${strings.loadBands[geo.band]}`;
 
-  // Drill-down: the level the ring + pulse encode, named by its load band.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: geo.unknown ? null : geo.level,
-      label: geo.unknown ? undefined : strings.loadBands[geo.band],
-      formatted: readoutText,
-    });
+  // Drill-down: the level the ring + pulse encode, named by its load band. One
+  // builder, so `onActive` and `onSelect` can never report different numbers or
+  // a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: geo.unknown ? null : geo.level,
+    label: geo.unknown ? undefined : strings.loadBands[geo.band],
+    formatted: readoutText,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone
+  // can't gate it — pointer-enter then focus both set it `true`, which would
+  // announce the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrapRef}
       {...wrap("mc-breathing-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {

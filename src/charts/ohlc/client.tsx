@@ -25,9 +25,9 @@ import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
   strings?: OhlcStrings;
   /**
-   * Opt-in entrance motion (default `false`): periods reveal left-to-right
-   * when the chart first mounts client-side. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the periods pop in one candle at a
+   * time, oldest to newest, when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

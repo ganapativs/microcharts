@@ -69,6 +69,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Accent fill override.",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description:
+        "Grid square edge in viewBox units. Defaults to a size that grows with the class count.",
+    },
   ],
   demo: [87, 12],
   example: {

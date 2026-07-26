@@ -6,6 +6,7 @@
 // glyph extent so containment is provable server-side. Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { makePercentFormatter } from "../../core/format.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
 import { fillWordGeometry, type FillMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -20,6 +21,7 @@ export interface FillWordProps {
   /** `value` appends the percent numeral after the word. */
   label?: "none" | "value" | undefined;
   fontSize?: number | undefined;
+  locale?: string | string[] | undefined;
   strings?: FillWordStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -32,12 +34,30 @@ export interface FillWordProps {
 const PAD = 2;
 
 /** Whole-percent shown for the context (fill = complete, drain = remaining).
- *  Exported so the interactive entry's hover chip reads the SAME number the
- *  `label="value"` numeral would print. */
+ *  The raw number; `shownPctText` is the rendered form, which is what the
+ *  interactive entry's hover chip and the `label="value"` numeral both use so
+ *  they can never disagree about the reading. */
 export function shownPct(value: number, mode: FillMode): number {
   const v = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   const pct = Math.round(v * 100);
   return mode === "drain" ? 100 - pct : pct;
+}
+
+/**
+ * `shownPct` as rendered text — a real `Intl` percent, not `${n}%`, which is an
+ * en-US percent (fr-FR wants a NBSP before the sign, tr-TR puts the sign first).
+ * The whole percent is computed first so fill and drain still sum to 100.
+ *
+ * `locale` comes from the chart's own prop, so a server render and its client
+ * hydration produce the same string instead of each resolving its host default.
+ * Trailing and optional: callers that never localized keep compiling.
+ */
+export function shownPctText(
+  value: number,
+  mode: FillMode,
+  locale?: string | string[] | undefined,
+): string {
+  return makePercentFormatter(locale)(shownPct(value, mode) / 100);
 }
 
 export function fillWordSummary(
@@ -45,9 +65,10 @@ export function fillWordSummary(
   word: string,
   mode: FillMode = "fill",
   strings: FillWordStrings = EN_FILL_WORD,
+  locale?: string | string[] | undefined,
 ): string {
   if (word.length === 0) return strings.noData;
-  const pct = `${shownPct(value, mode)}%`;
+  const pct = shownPctText(value, mode, locale);
   return mode === "drain" ? strings.fillWordRemaining(word, pct) : strings.fillWord(word, pct);
 }
 
@@ -58,6 +79,7 @@ export function FillWord(props: FillWordProps): ReactNode {
     mode = "fill",
     label = "none",
     fontSize = 12,
+    locale,
     strings = EN_FILL_WORD,
     title,
     summary,
@@ -67,8 +89,21 @@ export function FillWord(props: FillWordProps): ReactNode {
     children,
   } = props;
 
-  const geo = fillWordGeometry({ value, word, fontSize, pad: PAD, mode, label: label === "value" });
-  const accName = resolveSummary(summary, () => fillWordSummary(value, word, mode, strings));
+  // The numeral is resolved BEFORE geometry so the gutter is reserved from the
+  // string that actually gets painted, not from a fixed digit count.
+  const numeral = shownPctText(value, mode, locale);
+  const geo = fillWordGeometry({
+    value,
+    word,
+    fontSize,
+    pad: PAD,
+    mode,
+    label: label === "value",
+    numeralChars: numeral.length,
+  });
+  const accName = resolveSummary(summary, () =>
+    fillWordSummary(value, word, mode, strings, locale),
+  );
   // The word renders at its NATURAL width — no textLength/lengthAdjust, which
   // distort the glyphs (the 0.62 estimate never matches a proportional font, so
   // pinning the extent stretches or squeezes the letters). The estimate still
@@ -120,7 +155,7 @@ export function FillWord(props: FillWordProps): ReactNode {
           textAnchor="start"
           data-mc-ink="label"
         >
-          {`${shownPct(value, mode)}%`}
+          {numeral}
         </text>
       ) : null}
       {children}

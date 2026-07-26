@@ -4,7 +4,7 @@
 // interval: 17 to 26."). Enter/Space/click pins a level (onSelect). Composes the
 // static component (canon); the edge ticks are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
   named,
@@ -27,8 +27,9 @@ import {
 export interface InteractiveGradedBandProps extends GradedBandProps, PickerProps {
   strings?: QuantileStrings;
   /**
-   * Opt-in entrance motion (default `false`): the nested bands wipe on when
-   * the chart first mounts client-side. Inert on the server and on hydrated
+   * Opt-in entrance motion (default `false`): the nested bands GROW outward
+   * from the median when the chart first mounts client-side. Inert on the
+   * server and on hydrated
    * server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
@@ -65,6 +66,10 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   useEntrance(hostRef, "grow", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The interval LEVEL is a probability, not a measurement — it takes `locale`
+  // but never the value `format`. `${b.p}%` was an en-US percent in a visible
+  // chip; fr-FR writes "80 %".
+  const levelFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const geo = useMemo(() => {
     const bare = gradedBandGeometry({ width, height, data, levels, value, domain: props.domain });
     if (bare === null) return null;
@@ -113,10 +118,10 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
       return {
         index: i,
         value: b?.p ?? null,
-        formatted: b ? `${b.p}% ${fmt(b.lo)}–${fmt(b.hi)}` : undefined,
+        formatted: b ? `${levelFmt(b.p / 100)} ${fmt(b.lo)}–${fmt(b.hi)}` : undefined,
       };
     },
-    [stops, fmt],
+    [stops, fmt, levelFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -138,7 +143,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         ? summary
         : geo === null
           ? strings.noData
-          : gradedBandSummary(geo, fmt, strings);
+          : gradedBandSummary(geo, fmt, strings, levelFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const edges = (i: number, pinned: boolean) => {
@@ -173,7 +178,9 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
   // pinned selection when the pointer has left.
   const shown = active ?? selected;
   const band = shown !== null ? stops[shown] : undefined;
-  const announced = band ? strings.bandEdge(band.p, fmt(band.lo), fmt(band.hi)) : "";
+  const announced = band
+    ? strings.bandEdge(levelFmt(band.p / 100), fmt(band.lo), fmt(band.hi))
+    : "";
 
   return (
     <span
@@ -205,7 +212,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
           className="mc-graded-band-readout mc-spark-readout"
           style={crosshairReadoutStyle(band.x + band.width / 2, geo.totalWidth)}
         >
-          {`${band.p}% ${fmt(band.lo)}–${fmt(band.hi)}`}
+          {`${levelFmt(band.p / 100)} ${fmt(band.lo)}–${fmt(band.hi)}`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

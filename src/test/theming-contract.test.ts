@@ -1,0 +1,351 @@
+// Theming invariants that live in `styles.css` and can only be checked against
+// the stylesheet's own token VALUES: label ink contrast on the fills it lands on,
+// achromatic presets actually being achromatic, the forced-colors mappings, and
+// the one easing literal that is duplicated in JS because WAAPI cannot read a
+// custom property.
+//
+// These are arithmetic, not rendering, so they belong in the node project: the
+// numbers come out of the same hex literals a browser would resolve, and a
+// palette edit that quietly drops a label below 4.5:1 fails here instead of in a
+// screenshot nobody re-reads.
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
+import { MC_EASE_ENTER } from "../shared/motion-gate.js";
+
+const root = resolve(import.meta.dirname, "../..");
+const css = readFileSync(resolve(root, "styles.css"), "utf8");
+
+// ---------------------------------------------------------------- colour maths
+
+type RGB = readonly [number, number, number];
+
+function hex(h: string): RGB {
+  const s = h.trim().replace("#", "");
+  const full = s.length === 3 ? [...s].map((c) => c + c).join("") : s;
+  return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16)) as unknown as RGB;
+}
+
+/** `rgba(r, g, b, a)` → premultiplied composite over `bg`. */
+function rgbaOver(decl: string, bg: RGB): RGB {
+  const m = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,/\s]+([\d.]+))?\s*\)/.exec(decl);
+  if (!m) throw new Error(`not an rgba() colour: ${decl}`);
+  const a = m[4] === undefined ? 1 : Number(m[4]);
+  return [0, 1, 2].map((i) => Number(m[i + 1]) * a + bg[i]! * (1 - a)) as unknown as RGB;
+}
+
+/** Composite an opaque colour at `alpha` over `bg` — what `fill-opacity` does. */
+function over(fg: RGB, alpha: number, bg: RGB): RGB {
+  return [0, 1, 2].map((i) => fg[i]! * alpha + bg[i]! * (1 - alpha)) as unknown as RGB;
+}
+
+function luminance(c: RGB): number {
+  const ch = c.map((v) => {
+    const s = v / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  }) as unknown as RGB;
+  return 0.2126 * ch[0]! + 0.7152 * ch[1]! + 0.0722 * ch[2]!;
+}
+
+function contrast(a: RGB, b: RGB): number {
+  const [x, y] = [luminance(a), luminance(b)];
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/** WCAG 1.4.3 for body-size text. In-chart labels are 7–11 viewBox units, which
+ *  is never "large text" at any rendered size the catalog targets. */
+const AA = 4.5;
+
+// ------------------------------------------------------------- token extraction
+
+/** The declarations inside the first `{…}` after `marker`. */
+function block(marker: string): string {
+  const at = css.indexOf(marker);
+  expect(at, `styles.css no longer contains ${marker}`).toBeGreaterThan(-1);
+  const open = css.indexOf("{", at);
+  return css.slice(open + 1, css.indexOf("}", open));
+}
+
+function tokenIn(scope: string, name: string): string {
+  const m = new RegExp(`${name}:\\s*([^;]+);`).exec(scope);
+  expect(m, `${name} not declared in that block`).not.toBeNull();
+  return m![1]!.trim();
+}
+
+// The light tokens sit in the first `:where(:root)`; the dark twins in the
+// `[data-mc-theme="dark"]` scope (identical to the prefers-color-scheme copy,
+// which the third test below pins).
+const LIGHT = block(":where(:root)");
+const DARK = block(':where([data-mc-theme="dark"])');
+
+// A chart never paints its own background, so "the page" is the surface the ink
+// composites over. These are the surfaces the catalog is designed and reviewed
+// on: paper white, and the near-black the docs and the visual suite use.
+const PAGE = { light: hex("#ffffff"), dark: hex("#161616") } as const;
+
+const CATS = [1, 2, 3, 4, 5, 6] as const;
+
+/** The fill opacities PartitionStrip paints a LABELLED segment at (row 0). */
+const LABELLED_OPACITIES = [0.9, 0.85] as const;
+
+describe("on-fill label ink clears AA on the fills it lands on", () => {
+  // Deep semantic fills: HeatCell's upper steps, TimeInRange zones,
+  // EventTimeline spans, TraceFold's critical/bar spans. `--mc-on-fill` is the
+  // ink for these, and it flips between themes because the dark palette is
+  // deliberately LIFTED — the same role is the lighter of the two there.
+  for (const theme of ["light", "dark"] as const) {
+    const scope = theme === "light" ? LIGHT : DARK;
+    const ink = tokenIn(scope, "--mc-on-fill");
+    for (const role of ["--mc-accent", "--mc-positive", "--mc-stroke"] as const) {
+      it(`${theme}: --mc-on-fill on ${role}`, () => {
+        // `--mc-stroke` is only re-declared in the dark scope for some roles;
+        // fall back to the light value the same way the cascade does.
+        const fill = hex(scope.includes(role) ? tokenIn(scope, role) : tokenIn(LIGHT, role));
+        expect(contrast(rgbaOver(ink, fill), fill)).toBeGreaterThanOrEqual(AA);
+      });
+    }
+  }
+
+  // Categorical fills are MID-tone by construction, so they take a different
+  // ink. Light-mode sapphire (cat-4) is the one deep cat and the one documented
+  // exception — styles.css hands that single step back to `--mc-on-fill`.
+  for (const theme of ["light", "dark"] as const) {
+    const scope = theme === "light" ? LIGHT : DARK;
+    const onCat = tokenIn(scope.includes("--mc-on-cat") ? scope : LIGHT, "--mc-on-cat");
+    const onFill = tokenIn(scope, "--mc-on-fill");
+    for (const n of CATS) {
+      const exempt = theme === "light" && n === 4;
+      it(`${theme}: cat-${n} label ink${exempt ? " (sapphire exception)" : ""}`, () => {
+        const cat = hex(tokenIn(scope, `--mc-cat-${n}`));
+        for (const fo of LABELLED_OPACITIES) {
+          const bg = over(cat, fo, PAGE[theme]);
+          const ink = exempt ? onFill : onCat;
+          expect(
+            contrast(rgbaOver(ink, bg), bg),
+            `cat-${n} at fill-opacity ${fo} in ${theme}`,
+          ).toBeGreaterThanOrEqual(AA);
+        }
+      });
+    }
+  }
+
+  it("the sapphire exception is scoped to light — dark cat-4 takes the cat ink", () => {
+    // If a future palette lifts light cat-4 enough for the cat ink, the
+    // exception (and these three rules in styles.css) should GO, not linger.
+    const cat4 = hex(tokenIn(LIGHT, "--mc-cat-4"));
+    const bg = over(cat4, 0.9, PAGE.light);
+    const onCat = rgbaOver(tokenIn(LIGHT, "--mc-on-cat"), bg);
+    expect(
+      contrast(onCat, bg),
+      "light cat-4 now clears AA on --mc-on-cat: delete the exception rules",
+    ).toBeLessThan(AA);
+    expect(css).toMatch(/rect\[data-mc-cat="4"\] \+ text/);
+  });
+
+  it("the rules reach for the tokens, not for the literals", () => {
+    // The whole point of a token with a dark twin is that the RULE follows the
+    // theme. These two rules used to spell `rgba(255, 255, 255, 0.96)` out, so
+    // they could not.
+    const strip = css.slice(css.indexOf(":where(.mc-trace, .mc-partition) :where(text)"));
+    expect(strip.slice(0, 160)).toContain("var(--mc-on-fill)");
+    expect(css).toMatch(
+      /:where\(\.mc-partition\) :where\(text\)\s*\{\s*fill:\s*var\(--mc-on-cat\)/,
+    );
+    // No rule outside the tokens layer may hardcode the on-fill literal.
+    const charts = css.slice(css.indexOf("@layer microcharts.charts"));
+    expect(charts).not.toContain("rgba(255, 255, 255, 0.96)");
+  });
+
+  it("the dim TraceFold label is legible, not invisible", () => {
+    // It used to borrow `--mc-surface` (the readout chip's plane, i.e. the page
+    // colour), which on a 0.62-opacity neutral span is ~1.4:1.
+    const dim = tokenIn(LIGHT, "--mc-on-fill-dim");
+    expect(dim).toContain("--mc-stroke");
+    for (const theme of ["light", "dark"] as const) {
+      const scope = theme === "light" ? LIGHT : DARK;
+      const neutral = hex(tokenIn(scope, "--mc-neutral"));
+      const strokeInk = hex(tokenIn(scope, "--mc-stroke"));
+      const bg = over(neutral, 0.62, PAGE[theme]);
+      expect(contrast(strokeInk, bg), `dim label in ${theme}`).toBeGreaterThanOrEqual(AA);
+    }
+  });
+});
+
+describe("achromatic presets remap the categorical ramp", () => {
+  // `mono` collapses every semantic token onto one ink and `eink`'s own comment
+  // says "no chroma (the panel can't show it)". Neither remapped `--mc-cat-*`,
+  // so nine categorical charts kept full jewel-tone colour inside a preset that
+  // had just declared colour unavailable.
+  for (const preset of ["mono", "eink"] as const) {
+    it(`${preset} derives all six cats from --mc-stroke`, () => {
+      const at = css.indexOf(`[data-mc-theme="${preset}"]`);
+      expect(at).toBeGreaterThan(-1);
+      // The shared achromatic block comes after each preset's own block.
+      const shared = css.slice(css.indexOf(`[data-mc-preset="${preset}"]`, at));
+      for (const n of CATS) {
+        const m = new RegExp(`--mc-cat-${n}:\\s*([^;]+);`).exec(shared);
+        expect(m, `${preset} does not remap --mc-cat-${n}`).not.toBeNull();
+        expect(m![1], `${preset} cat-${n} is not derived from the ink`).toContain("--mc-stroke");
+      }
+    });
+  }
+
+  it("print keeps its chroma on purpose (it is a colour-output context)", () => {
+    // Guards the DECISION, so a future sweep does not "fix" print by accident.
+    const printBlock = block(':where([data-mc-theme="print"], [data-mc-preset="print"])');
+    expect(printBlock).not.toContain("--mc-cat-");
+  });
+});
+
+describe("forced-colors mappings", () => {
+  const fc = css.slice(css.indexOf("@media (forced-colors: active)"));
+
+  it("a hollow mark stays hollow, and that rule comes last", () => {
+    // A role covers closed AND hollow marks, and a hollow one says so with a
+    // literal `fill="none"`. Forcing a fill onto it turns an outline into a
+    // solid, which changes MEANING: heat-strip's muted rect is its missing-data
+    // cell and read as a recorded value in High Contrast Mode. One blanket rule
+    // covers every role, present and future — but only if it is the LAST fill
+    // declaration in the block, since these all sit at zero specificity.
+    const hollow = fc.indexOf(':where(.mc-root [fill="none"])');
+    expect(hollow, "the hollow-mark invariant is gone").toBeGreaterThan(-1);
+    const after = fc.slice(hollow + 1);
+    const strays = [...after.matchAll(/fill:\s*(?!none)([A-Za-z(][^;]*);/g)].map((m) => m[1]);
+    expect(strays, "a fill mapping was added AFTER the hollow-mark rule").toEqual([]);
+  });
+
+  it("the categorical channel is mapped at all", () => {
+    // `.mc-root` sets `forced-color-adjust: none`, which PRESERVES authored
+    // hues rather than mapping them — so an unmapped cat ships its own colour
+    // into High Contrast Mode (`--mc-cat-4` is near-invisible on black).
+    expect(fc).toMatch(/\[data-mc-cat\]\)\s*\{[^}]*fill:\s*CanvasText/);
+    for (const n of [2, 3, 4, 5, 6] as const) {
+      expect(fc, `cat-${n} has no lightness step`).toMatch(
+        new RegExp(`\\[data-mc-cat="${n}"\\]\\)\\s*\\{[^}]*fill-opacity`),
+      );
+    }
+  });
+
+  it("labels on those fills knock out to Canvas", () => {
+    const partition = fc.slice(fc.indexOf(".mc-trace, .mc-partition"));
+    expect(partition).toMatch(/fill:\s*Canvas;/);
+  });
+});
+
+describe("one source of truth for the shared vocabulary", () => {
+  it("MC_EASE_ENTER matches --mc-easing", () => {
+    // WAAPI cannot read a custom property, so the curve is duplicated in JS.
+    // The two copies had drifted (0.23/0.32 against 0.22/0.36), which eased a
+    // chart's CSS transitions and its scripted entrance on different curves.
+    expect(tokenIn(LIGHT, "--mc-easing")).toBe(MC_EASE_ENTER);
+  });
+
+  it("the dark twins are declared for BOTH dark signals", () => {
+    // @media(prefers-color-scheme) and an explicit [data-mc-theme="dark"] scope
+    // — a token added to one and not the other is a half-themed chart.
+    const media = block("@media (prefers-color-scheme: dark)");
+    for (const name of ["--mc-on-fill", ...CATS.map((n) => `--mc-cat-${n}`)]) {
+      expect(media, `${name} missing from the media-query twin`).toContain(name);
+      expect(DARK, `${name} missing from the [data-mc-theme="dark"] twin`).toContain(name);
+    }
+  });
+});
+
+describe("charts read the density-scaled stroke token", () => {
+  it("no component hardcodes var(--mc-stroke-width)", () => {
+    // `--mc-sw` is `--mc-stroke-width * --mc-density`. Thirty inline
+    // declarations across twenty charts reached for the base token and so opted
+    // their PRIMARY mark out of `--mc-density` while every stroke around it
+    // scaled. A deliberate exemption reaches for the base token AND says why —
+    // the two annotation hairlines are the only ones, and they carry a comment.
+    const offenders: string[] = [];
+    for (const file of chartSources()) {
+      if (file.text.includes("var(--mc-stroke-width)")) offenders.push(file.path);
+    }
+    expect(offenders).toEqual([]);
+  });
+});
+
+describe("animated marks stay inside the viewBox", () => {
+  it("the StatusDot halo's end scale keeps it in the box", () => {
+    // Containment is a hard rule and a TRANSFORM does not escape it: `.mc-root`
+    // is `overflow: visible`, so a mark that scales past the viewBox paints into
+    // the page for as long as the animation runs. The halo is r = 3 centred in an
+    // 8-unit box, so its end scale may not exceed 8 / 2 / 3.
+    const halo = css.slice(css.indexOf("@keyframes mc-status-pulse"));
+    const m = /transform:\s*scale\(([\d.]+)\)/g;
+    const scales = [...halo.slice(0, 400).matchAll(m)].map((x) => Number(x[1]));
+    expect(scales.length, "the pulse keyframe no longer scales").toBeGreaterThan(0);
+    const HALO_R = 3;
+    const BOX = 8;
+    expect(Math.max(...scales)).toBeLessThanOrEqual(BOX / 2 / HALO_R);
+  });
+});
+
+describe("primary stroked marks are scale-invariant", () => {
+  it('every stroked [data-mc-ink="data"] mark carries non-scaling-stroke', () => {
+    // The responsiveness model is `viewBox` + `preserveAspectRatio` +
+    // `vector-effect: non-scaling-stroke` — there is no `ResizeObserver` and no
+    // CSS default for the vector-effect, so a mark that omits the attribute
+    // THICKENS with its container. Every interactive entry spreads `FILL`
+    // (`width: 100%`), so those charts thicken with the host, and the same chart
+    // reads at two different weights in a table cell and in a figure.
+    const offenders: string[] = [];
+    for (const { path, text } of chartSources()) {
+      if (!path.endsWith(".tsx")) continue;
+      for (const el of jsxElements(text, /<(path|line|polyline|polygon)\b/g)) {
+        if (!el.source.includes('data-mc-ink="data"')) continue;
+        if (!el.source.includes("non-scaling-stroke")) {
+          offenders.push(`${path}:${el.line} <${el.tag}>`);
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});
+
+// --------------------------------------------------------------------- helpers
+
+/** Opening JSX tags matching `pattern`, sliced to their closing `>`. Brace-aware
+ *  so an expression container holding a `>` does not end the tag early. */
+function jsxElements(
+  text: string,
+  pattern: RegExp,
+): { tag: string; line: number; source: string }[] {
+  const out: { tag: string; line: number; source: string }[] = [];
+  for (const m of text.matchAll(pattern)) {
+    let i = m.index + m[0].length;
+    let depth = 0;
+    while (i < text.length) {
+      const c = text[i];
+      if (c === "{") depth++;
+      else if (c === "}") depth--;
+      else if (depth === 0 && c === ">") break;
+      i++;
+    }
+    out.push({
+      tag: m[1]!,
+      line: text.slice(0, m.index).split("\n").length,
+      source: text.slice(m.index, i + 1),
+    });
+  }
+  return out;
+}
+
+function chartSources(): { path: string; text: string }[] {
+  const { readdirSync } = require("node:fs") as typeof import("node:fs");
+  const dir = resolve(root, "src/charts");
+  const out: { path: string; text: string }[] = [];
+  for (const name of readdirSync(dir)) {
+    for (const entry of ["index.tsx", "client.tsx", "geometry.ts"]) {
+      const path = resolve(dir, name, entry);
+      try {
+        out.push({ path: `src/charts/${name}/${entry}`, text: readFileSync(path, "utf8") });
+      } catch {
+        /* not every chart ships every entry */
+      }
+    }
+  }
+  expect(out.length).toBeGreaterThan(200);
+  return out;
+}

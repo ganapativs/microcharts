@@ -23,6 +23,13 @@ export interface InteractiveStatusDotProps extends StatusDotProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One state mark = one
+   * unit, so this fires once with `{ index: 0, … }` on pointer enter or focus and
+   * once with `null` when that clears — never repeatedly while the pointer moves
+   * inside the dot, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space on the dot — `{ index: 0, value: null, label: state }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -34,6 +41,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
     strings = EN_SCALAR,
     title,
     summary,
+    onActive,
     onSelect,
     ...rest
   } = props;
@@ -58,8 +66,19 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   }, [state.label, generated, live]);
 
   // One state mark, one selectable unit (index 0). A status encodes no number,
-  // so `value` is null and the state's name rides in `label`.
-  const pick = (): void => onSelect?.({ index: 0, value: null, label: state.label });
+  // so `value` is null and the state's name rides in `label`. One builder, so
+  // `onActive` and `onSelect` can never report a different state.
+  const datum = (): MicroDatum => ({ index: 0, value: null, label: state.label });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // dot paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
@@ -67,6 +86,10 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
       className="mc-status-live"
       data-mc-host=""
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

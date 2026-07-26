@@ -5,7 +5,7 @@
 // else.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
@@ -16,6 +16,15 @@ export function gradedBandSummary(
   geo: GradedBandGeometry,
   fmt: (n: number) => string,
   strings: QuantileStrings,
+  /**
+   * Formatter for the interval LEVEL (a percent), separate from `fmt` (the
+   * value). The strings bundle used to receive the level as a bare number and
+   * bake `%` into its own template, which made the level the one number on this
+   * chart that a `locale` could not reach — and left the announcement and the
+   * visible chip disagreeing once the chip started formatting properly.
+   * Defaults to the host locale so existing callers keep working.
+   */
+  levelFmt: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   if (geo.degenerate || geo.bands.length === 0) {
     return strings.bandPoint(fmt(geo.median.value));
@@ -23,7 +32,9 @@ export function gradedBandSummary(
   // narrowest (most certain) + widest, in ascending level order — brief but honest
   const asc = [...geo.bands].sort((a, b) => a.p - b.p);
   const picked = asc.length > 2 ? [asc[0]!, asc[asc.length - 1]!] : asc;
-  const clauses = picked.map((b) => strings.bandClause(b.p, fmt(b.lo), fmt(b.hi))).join(", ");
+  const clauses = picked
+    .map((b) => strings.bandClause(levelFmt(b.p / 100), fmt(b.lo), fmt(b.hi)))
+    .join(", ");
   return strings.gradedBand(fmt(geo.median.value), clauses);
 }
 
@@ -125,7 +136,8 @@ export function GradedBand(props: GradedBandProps): ReactNode {
       })!
     : bare;
 
-  const accName = resolveSummary(summary, () => gradedBandSummary(geo, fmt, strings));
+  const levelFmt = makePercentFormatter(locale);
+  const accName = resolveSummary(summary, () => gradedBandSummary(geo, fmt, strings, levelFmt));
   const k = geo.bands.length;
   const outer = geo.bands[0];
   // pin the label size to viewBox units (see coverage-strip)

@@ -46,8 +46,11 @@ export interface InteractiveCalendarStripProps extends CalendarStripProps, Picke
    *  for the same reason as `format`. */
   locale?: string | string[];
   /**
-   * Opt-in entrance motion (default `false`): cells fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): cells fade in, staggered, on first
+   * client-side mount. Past 80 cells — about twelve `weeks` — the strip reveals
+   * with one left-to-right wipe instead. The cap is the engine's and deliberate:
+   * a per-cell stagger over hundreds of days costs more in animation tracks than
+   * it returns in legibility. Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
