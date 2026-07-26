@@ -356,7 +356,7 @@
   },
   "partition-strip": {
     "static": 2.22,
-    "interactive": 5.06
+    "interactive": 5.15
   },
   "calibration-strip": {
     "static": 2.66,
