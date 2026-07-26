@@ -155,8 +155,10 @@ export function rowReadoutStyle(
  * A name of `undefined` means the chart is decorative — the consumer passed
  * `summary={false}` and no `title`. It must then NOT be a tab stop carrying
  * `role="img"` with nothing to announce: assistive tech lands on an unnamed
- * image and reads nothing (WCAG 4.1.2). The static entry already renders
- * `aria-hidden` for that case, so this keeps both entries telling one story.
+ * image and reads nothing (WCAG 4.1.2). The static entry hides exactly the same
+ * case (`shared/a11y.ts`), so both entries tell one story — including the other
+ * half of that rule: `summary={false}` WITH a `title` keeps the name, so the
+ * chart stays exposed and focusable on both sides.
  * `Delta` did this by hand; every other entry shipped the bare tab stop.
  */
 export function named(

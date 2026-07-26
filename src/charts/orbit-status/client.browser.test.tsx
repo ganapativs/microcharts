@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { OrbitStatus } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 describe("interactive <OrbitStatus>", () => {
   it("wrapper owns naming; static chart is decorative", async () => {
@@ -114,9 +115,13 @@ describe("interactive <OrbitStatus>", () => {
     expect(seen.at(-1)).toMatchObject({ index: 0, value: 240, label: "API", formatted: chip() });
     fig.focus(); // already active — must not re-announce
     expect(seen.length).toBe(1);
-    fig.blur();
-    await userEvent.unhover(fig); // already cleared — must not re-announce
+    // Leave the mark BEFORE dropping focus. Blurring while the pointer is
+    // still over it leaves a hovered-but-unfocused state, and the move away
+    // then re-enters — two extra edges, order-dependent, the CI-only
+    // `expected 4 to be 2` this file has flaked with twice.
+    await pointerAway();
     await expect.poll(() => seen.at(-1)).toBeNull();
+    fig.blur(); // already cleared — must not re-announce
     expect(seen.length).toBe(2);
   });
 });

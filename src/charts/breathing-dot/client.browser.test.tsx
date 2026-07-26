@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { BreathingDot } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 describe("interactive <BreathingDot>", () => {
   it("pulses the core dot (motion IS the encoding)", async () => {
@@ -70,7 +71,7 @@ describe("interactive <BreathingDot>", () => {
     expect(chip()).toBeUndefined();
     await userEvent.hover(wrap);
     await expect.poll(chip).toBe("62% · elevated");
-    await userEvent.unhover(wrap);
+    await pointerAway();
     await expect.poll(chip).toBeUndefined();
 
     // The number is already beside the dot — no second copy floating over it.
@@ -99,9 +100,13 @@ describe("interactive <BreathingDot>", () => {
     });
     wrap.focus(); // already active — must not re-announce
     expect(seen.length).toBe(1);
-    wrap.blur();
-    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    // Leave the mark BEFORE dropping focus. Blurring while the pointer is
+    // still over it leaves a hovered-but-unfocused state, and the move away
+    // then re-enters — two extra edges, order-dependent, the CI-only
+    // `expected 4 to be 2` this file has flaked with twice.
+    await pointerAway();
     await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
     expect(seen.length).toBe(2);
   });
 });

@@ -250,7 +250,8 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         format={format}
         locale={locale}
         strings={strings}
-        title={title}
+        // No `title` on the child: the wrapper owns the accessible name, and a
+        // titled static is named (not hidden) even with `summary={false}`.
         summary={false}
         style={fillFor(style)}
       >

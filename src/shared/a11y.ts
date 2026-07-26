@@ -30,14 +30,24 @@ export interface AccessibleNaming {
 
 /**
  * Composes the chart's accessible naming from `title` + `summary`.
- * `summary === false` → decorative (T0, hidden from AT).
+ *
+ * `summary === false` drops the generated sentence. That is the decorative
+ * opt-out — but ONLY when it leaves the chart with no name at all: an explicit
+ * `title` IS a name, so a titled chart stays exposed and is named by its title
+ * alone. Silently swallowing an author-supplied name would be the surprise, and
+ * the interactive entries (`shared/interactive.ts` `named()`, and by hand in
+ * `token-confidence/client.tsx`) have always resolved it this way — this is the
+ * one rule both entries follow. To hide a titled chart, drop the title
+ * (`micro-donut`'s `decorative` prop does exactly that).
  */
 export function accessibleNaming(
   title: string | undefined,
   summary: string | false | undefined,
   id: string | undefined,
 ): AccessibleNaming {
-  if (summary === false) {
+  const hasTitle = typeof title === "string" && title.length > 0;
+
+  if (summary === false && !hasTitle) {
     return {
       rootAttrs: { "aria-hidden": true },
       titleId: undefined,
@@ -47,7 +57,6 @@ export function accessibleNaming(
     };
   }
 
-  const hasTitle = typeof title === "string" && title.length > 0;
   const hasDesc = typeof summary === "string" && summary.length > 0;
 
   if (id) {
@@ -67,9 +76,10 @@ export function accessibleNaming(
 
   const label = [title, hasDesc ? summary : undefined].filter(Boolean).join(". ");
   // "Chart" is the sole hardcoded-English string in a static bundle. It's the
-  // last-resort name when a chart has neither title nor summary (summary={false}
-  // + no title) — rare and decorative. Pulling it from the EN dictionary would
-  // drag the whole aggregate `strings` module into every static chart bundle
+  // last-resort name when a chart has no title and an EMPTY generated summary
+  // (`summary={false}` with no title never reaches here — it's hidden above), so
+  // the chart is never an unnamed `role="img"`. Pulling it from the EN dictionary
+  // would drag the whole aggregate `strings` module into every static bundle
   // (kilobytes, per the size budget), so this one literal stays inline.
   return {
     rootAttrs: { role: "img", "aria-label": label || "Chart" },

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { EtaBar } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const min = (t: number) => `${Math.round(t)} min`;
 
@@ -47,7 +48,7 @@ describe("interactive <EtaBar>", () => {
     expect(chip()).toBeUndefined();
     await userEvent.hover(wrap);
     await expect.poll(chip).toBe("64%");
-    await userEvent.unhover(wrap);
+    await pointerAway();
     await expect.poll(chip).toBeUndefined();
   });
 
@@ -143,9 +144,13 @@ describe("interactive <EtaBar>", () => {
     expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.64, formatted: chip() });
     wrap.focus(); // already active — must not re-announce
     expect(seen.length).toBe(1);
-    wrap.blur();
-    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    // Leave the mark BEFORE dropping focus. Blurring while the pointer is
+    // still over it leaves a hovered-but-unfocused state, and the move away
+    // then re-enters — two extra edges, order-dependent, the CI-only
+    // `expected 4 to be 2` this file has flaked with twice.
+    await pointerAway();
     await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
     expect(seen.length).toBe(2);
   });
 });

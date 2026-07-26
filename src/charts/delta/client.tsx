@@ -71,9 +71,9 @@ export function Delta({
   }, [props.value, live]);
 
   // One value, one selectable unit (index 0) — no roving. The decorative form
-  // (`summary={false}`) stays inert: nothing to name, so nothing to focus,
-  // activate or report.
-  const inert = props.summary === false;
+  // (`summary={false}` AND no `title` — a title is still a name) stays inert:
+  // nothing to name, so nothing to focus, activate or report.
+  const inert = props.summary === false && !props.title;
   const datum = (): MicroDatum => ({ index: 0, value: shown, formatted: display });
   const pick = onSelect && !inert ? (): void => onSelect(datum()) : undefined;
   // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both

@@ -5,6 +5,7 @@ import { userEvent } from "vitest/browser";
 // bare `fontSize` attribute inert, which is the bug the size assertion guards.
 import "../../../styles.css";
 import { TapeGauge } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const ZONES = [{ from: 130, to: 150, tone: "warn" as const }];
 
@@ -96,9 +97,13 @@ describe("interactive <TapeGauge>", () => {
     expect(seen.at(-1)).toMatchObject({ index: 0, value: 142, formatted: chip() });
     wrap.focus(); // already active — must not re-announce
     expect(seen.length).toBe(1);
-    wrap.blur();
-    await userEvent.unhover(wrap); // already cleared — must not re-announce
+    // Leave the mark BEFORE dropping focus. Blurring while the pointer is
+    // still over it leaves a hovered-but-unfocused state, and the move away
+    // then re-enters — two extra edges, order-dependent, the CI-only
+    // `expected 4 to be 2` this file has flaked with twice.
+    await pointerAway();
     await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
     expect(seen.length).toBe(2);
   });
 });

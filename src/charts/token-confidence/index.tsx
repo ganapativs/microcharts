@@ -73,8 +73,10 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
   const accName =
     summary === false ? undefined : (summary ?? tokenConfidenceSummary(tokens, strings));
   const rootClass = className ? `mc-token-confidence ${className}` : "mc-token-confidence";
+  // Decorative only with nothing left to name — a `title` survives the opt-out,
+  // the same rule the client entry and shared/a11y.ts apply.
   const aria =
-    summary === false
+    summary === false && !title
       ? { "aria-hidden": true as const }
       : {
           role: "img" as const,

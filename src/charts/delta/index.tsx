@@ -78,8 +78,12 @@ export function Delta(props: DeltaProps): ReactNode {
   const { summary, title, className, style } = props;
   const { display, valence, glyphKey, summary: auto } = deltaModel(props);
 
-  const decorative = summary === false;
-  const accName = decorative ? undefined : typeof summary === "string" ? summary : auto;
+  // `summary={false}` is the decorative opt-out only when it leaves nothing to
+  // announce; an explicit `title` is still a name (shared/a11y.ts).
+  const decorative = summary === false && !title;
+  // `false` suppresses the generated sentence either way — a titled Delta is
+  // named by its title alone, never by the sentence the caller opted out of.
+  const accName = summary === false ? undefined : (summary ?? auto);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   return (

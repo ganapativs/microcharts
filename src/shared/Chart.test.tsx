@@ -27,12 +27,34 @@ describe("Chart (a11y composition, )", () => {
     expect(container.querySelector("desc")).toBeNull();
   });
 
-  it("decorative (summary=false) → aria-hidden, no role, no title/desc", () => {
-    const { container } = render(<Chart width={80} height={20} title="x" summary={false} />);
+  it("decorative (summary=false, no title) → aria-hidden, no role, no title/desc", () => {
+    const { container } = render(<Chart width={80} height={20} summary={false} />);
     const svg = container.querySelector("svg")!;
     expect(svg.getAttribute("aria-hidden")).toBe("true");
     expect(svg.getAttribute("role")).toBeNull();
     expect(container.querySelector("title")).toBeNull();
+    expect(container.querySelector("desc")).toBeNull();
+  });
+
+  it("summary=false WITH a title → named by the title, not hidden", () => {
+    // `false` drops the generated sentence; it does not discard the name the
+    // author wrote. The chart leaves the tree only with nothing left to say —
+    // and the interactive wrappers resolve it the same way (`named()`).
+    const { container } = render(<Chart width={80} height={20} title="Revenue" summary={false} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-hidden")).toBeNull();
+    expect(svg.getAttribute("role")).toBe("img");
+    expect(svg.getAttribute("aria-label")).toBe("Revenue");
+    expect(container.querySelector("title")!.textContent).toBe("Revenue");
+    expect(container.querySelector("desc")).toBeNull();
+  });
+
+  it("explicit id + summary=false: aria-labelledby points at the title alone", () => {
+    const { container } = render(
+      <Chart width={10} height={10} id="fixed" title="T" summary={false} />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-labelledby")).toBe("fixed-t");
+    expect(container.querySelector("title")!.id).toBe("fixed-t");
     expect(container.querySelector("desc")).toBeNull();
   });
 
