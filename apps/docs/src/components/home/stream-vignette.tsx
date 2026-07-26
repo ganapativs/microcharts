@@ -278,6 +278,16 @@ function partial(s: Seg, n: number): string {
   return s.raw.slice(0, n);
 }
 
+/** Split a partially-revealed text run into the settled head and the word that
+ *  just landed, so only that last word gets the fade. Keying the tail span on
+ *  its own index replays the animation once per word — key it on the text and
+ *  a repeated word ("the … the") would silently skip its fade. */
+function splitTail(p: string): [head: string, tail: string] {
+  const end = p.endsWith(" ") ? p.length - 1 : p.length;
+  const cut = p.lastIndexOf(" ", end - 1);
+  return cut === -1 ? ["", p] : [p.slice(0, cut + 1), p.slice(cut + 1)];
+}
+
 /** A fully-settled reply — used for the height-reserving ghosts. A block chart
  *  renders a <figure> (flow content), so the container must be a <div>, never
  *  a <p> (which auto-closes on block descendants → hydration mismatch). */
@@ -377,10 +387,25 @@ const RAW_CODE = "font-mono text-[0.82em] text-fd-muted-foreground";
  *  hx-morph-in plays as in the scripted tour. */
 function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
   const segs = parseLiveReply(text);
+  const tailIdx = streaming ? segs.length - 1 : -1;
   return (
     <div className="whitespace-pre-wrap">
       {segs.map((s, i) => {
-        if (s.kind === "text") return <span key={i}>{s.text}</span>;
+        if (s.kind === "text") {
+          // Same tail fade as the scripted tour. Nano emits multi-word chunks,
+          // so this fades the arriving chunk rather than a single word — which
+          // is what actually landed, so it stays honest.
+          if (i !== tailIdx) return <span key={i}>{s.text}</span>;
+          const [head, tail] = splitTail(s.text);
+          return (
+            <span key={i}>
+              {head}
+              <span key={text.length} className="mc-tok">
+                {tail}
+              </span>
+            </span>
+          );
+        }
         if (s.kind === "code")
           return (
             <code key={i} className={RAW_CODE}>
@@ -406,7 +431,6 @@ function LiveReply({ text, streaming }: { text: string; streaming: boolean }) {
           </span>
         );
       })}
-      {streaming && <span className="mc-caret" aria-hidden />}
     </div>
   );
 }
@@ -584,8 +608,19 @@ export function StreamVignette({
     } else if (pos > acc) {
       // in-flight segment — raw text, typed
       const p = partial(s, pos - acc);
-      if (s.kind === "text") view.push(<span key={s.id}>{p}</span>);
-      else
+      if (s.kind === "text") {
+        // Only the word that just landed fades; the settled head stays put, so
+        // the animation never re-runs over text the reader has already read.
+        const [head, tail] = splitTail(p);
+        view.push(
+          <span key={s.id}>
+            {head}
+            <span key={pos} className="mc-tok">
+              {tail}
+            </span>
+          </span>,
+        );
+      } else
         view.push(
           <code
             key={s.id}
@@ -601,8 +636,6 @@ export function StreamVignette({
     } else break;
     acc += n;
   }
-
-  const streaming = pos < total;
 
   return (
     <div ref={hostRef} className="panel-soft overflow-hidden">
@@ -643,7 +676,6 @@ export function StreamVignette({
           // reply leaves some room beneath it; that stillness is worth it.
           <div className="absolute inset-x-5 top-5 text-[length:var(--hv-reply-size,0.95rem)] leading-relaxed text-fd-foreground">
             {view}
-            {streaming && started.current && <span className="mc-caret" aria-hidden />}
           </div>
         )}
         {mode === "live" && (

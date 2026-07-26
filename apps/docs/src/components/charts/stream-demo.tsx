@@ -476,8 +476,17 @@ function Inline({ text }: { text: string }) {
   );
 }
 
+// Split a text run into the settled head and the word that just landed.
+function splitTail(v: string): [head: string, tail: string] {
+  const end = /\s$/.test(v) ? v.length - 1 : v.length;
+  const cut = v.lastIndexOf(" ", end - 1);
+  return cut === -1 ? ["", v] : [v.slice(0, cut + 1), v.slice(cut + 1)];
+}
+
 // One rendered message body. `animate` adds the settle on block charts; the ghost
-// copy passes false. `caret` shows the typing cursor at the tail.
+// copy passes false. While `streaming`, the final text node's last word is split
+// out and faded in — that replaced the blinking block caret, which snapped on and
+// off twice a second at the tail and read as flicker.
 //
 // Nodes are keyed by POSITION (index), never by content. parse() only ever
 // extends the last node or appends a new one as the stream grows, so index i
@@ -487,13 +496,43 @@ function Inline({ text }: { text: string }) {
 // their entrance animation on every tick (the visible flicker). A fenced block
 // flipping open→closed does change the element type at its index, so THAT node
 // remounts once and morphs in — which is exactly what we want.
-function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; caret: boolean }) {
+function Message({
+  nodes,
+  animate,
+  streaming = false,
+  tick = 0,
+}: {
+  nodes: Node[];
+  animate: boolean;
+  streaming?: boolean;
+  /** Token counter — keys the fading tail so it replays once per token. Keying
+   *  on the tail's text would skip the fade whenever a word repeats. */
+  tick?: number;
+}) {
+  const lastText = streaming && nodes.length > 0 && nodes[nodes.length - 1]?.t === "text";
   return (
     <div className="max-w-xl text-[0.98rem] leading-relaxed text-fd-foreground/85">
       {nodes.map((n, i) =>
         n.t === "text" ? (
           <span key={i} className="whitespace-pre-wrap">
-            <Inline text={n.v} />
+            {lastText && i === nodes.length - 1 ? (
+              // Splitting here also SHRINKS the work per token: the head stops
+              // growing, so Inline's content-derived keys stop churning and
+              // only the one-word tail remounts.
+              (() => {
+                const [head, tail] = splitTail(n.v);
+                return (
+                  <>
+                    <Inline text={head} />
+                    <span key={tick} className="mc-tok">
+                      {tail}
+                    </span>
+                  </>
+                );
+              })()
+            ) : (
+              <Inline text={n.v} />
+            )}
           </span>
         ) : n.closed ? (
           <span key={i} className={`my-2 flex justify-start${animate ? " mc-stream-chart" : ""}`}>
@@ -508,7 +547,6 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
           </code>
         ),
       )}
-      {caret && <span className="mc-caret" aria-hidden />}
     </div>
   );
 }
@@ -618,10 +656,7 @@ export function StreamDemo() {
   const nodes = useMemo(() => parse(revealed), [revealed]);
   const done = count >= total;
   const status = done ? "streamed" : running && count === 0 ? "thinking…" : "streaming…";
-  const ghost = useMemo(
-    () => <Message nodes={fullNodes} animate={false} caret={false} />,
-    [fullNodes],
-  );
+  const ghost = useMemo(() => <Message nodes={fullNodes} animate={false} />, [fullNodes]);
 
   return (
     <div ref={rootRef} className="panel not-prose overflow-hidden">
@@ -673,7 +708,7 @@ export function StreamDemo() {
             {ghost}
           </div>
           <div className="absolute inset-0">
-            <Message nodes={nodes} animate caret={!done} />
+            <Message nodes={nodes} animate streaming={!done} tick={count} />
           </div>
         </div>
       </div>

@@ -48,8 +48,15 @@ the brief explicitly sanctions this graft. The fold becomes one continuous chore
 3. **1.9 s →** — the assistant reply card starts streaming: plain chart grammar types out in a reading serif and morphs
    into shipped components mid-sentence. Three scenarios rotate.
 
-Ambient afterwards: the caret blinks at the full stop, the "write" sparkline quietly re-plots every ~7 s, the reply card
-cycles. Nothing else on the fold moves.
+Ambient afterwards: the "write" sparkline quietly re-plots every ~7 s, the reply card cycles. Nothing else on the fold
+moves.
+
+> **Amended 2026-07-26 — no blinking caret.** The fold and `/docs/ai` both used to end the stream with a `steps(1)`
+> block cursor. It snapped a full-height accent bar on and off twice a second exactly where the reader's eye rested,
+> which read as flicker rather than liveness, and a hard cursor block isn't what a real assistant surface shows. The
+> arriving word now carries the signal instead: the last token of the in-flight text run is split off and faded in
+> (`.mc-tok`, 0.2 s from opacity 0.15). Softer, and it draws the eye to the thing that actually changed. The split also
+> costs less per token — the settled head stops growing, so only the one-word tail re-renders.
 
 No shader, no field. The ground is what charts have always lived on: paper with a faint grid, masked to the top of the
 fold. Every mark on the page is a real `@microcharts/react` component — decoration that couldn't come from the library
