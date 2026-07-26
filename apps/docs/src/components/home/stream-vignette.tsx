@@ -514,13 +514,16 @@ export function StreamVignette({
     // rate would either strobe the prose or crawl through the backticks.
     // /docs/ai keeps the realistic pacing; that page is about the stream
     // itself, so the texture is the content there.
-    // Grammar runs at 4ms/char, not 9. The fenced blocks are the long ones
-    // (the mini-bar fence is ~106 chars) and at 9ms they crawled for a full
-    // second while nothing else on the fold moved — that was the "stuck" beat,
-    // not the prose. 4ms keeps the block legible as it lands and cuts a
-    // scenario from 4.1s to 3.1s.
+    //
+    // These were once cut to 34/4/200 chasing a "stuck" feeling. That was the
+    // wrong lever twice over: it overshot into too-fast-to-perceive, and the
+    // stall was never the typing — it was the dead hold plus a from-zero
+    // blurred fade at the hand-off (both fixed in .hx-morph-in). 52ms/word is
+    // ~20 words a second: quick, but visibly arriving. `closing` is only the
+    // beat between the fence completing and the chart replacing it; the morph
+    // is the transition, so anything longer here is just dead air before it.
     const closing = inSeg === atomCount(seg) - 1;
-    const delay = seg.kind === "chart" ? (closing ? 200 : 4) : 34;
+    const delay = seg.kind === "chart" ? (closing ? 140 : 7) : 52;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);
     return () => window.clearTimeout(t);
   }, [running, pos, total, active, mode]);

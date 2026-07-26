@@ -516,20 +516,27 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
 // Delay after revealing `last` before the next token.
 //
 // This page keeps the realistic cadence — the stream IS the subject here, so
-// clause pauses and the hold on a closing fence are content, not decoration.
-// What it does not need is the *duration*: at the old rates a reply ran 14–21s
-// (measured across the five scripts), long enough that a reader who arrives
-// mid-stream reads it as hung. Every rate below is the same rhythm at roughly
-// 55% of the clock — replies now land in 8–12s. The relative proportions are
-// unchanged, so the texture survives.
+// clause pauses are content, not decoration.
+//
+// A first attempt at "it feels slow" cut every rate to ~55% of the clock. That
+// diagnosed the wrong thing: replies did run long (14–21s across the five
+// scripts), but the part that read as *stuck* was the fence hand-off, not the
+// typing, and at 55% the prose became too quick to follow. So the word rates
+// come back up to ~83% of original, and the one value that actually drops is
+// the closing-fence hold — see below.
 function nextDelay(last: string | null, next: string): number {
-  if (last === null) return 320; // a beat of "thinking" before the first token
-  if (last.includes("\n\n")) return 200; // paragraph break
-  if (last === "```") return 380; // a chart just closed → let it morph in
-  if (/[.:;!?]$/.test(last)) return 120 + Math.random() * 90; // end of a clause
-  if (last.endsWith(",")) return 90 + Math.random() * 55;
-  if (/^\s+$/.test(next)) return 10 + Math.random() * 16; // whitespace flicks by
-  return 30 + Math.random() * 45; // a word
+  if (last === null) return 380; // a beat of "thinking" before the first token
+  if (last.includes("\n\n")) return 250; // paragraph break
+  // A chart just closed. This used to be 560ms of nothing, and .mc-stream-chart
+  // then faded the chart up from opacity 0 through a 3px blur over another
+  // 0.42s — nearly a second where the code had vanished and the chart had not
+  // arrived. The morph is now a 0.26s settle from part-visible, so this only
+  // needs to be the beat that lets the reader see the fence complete.
+  if (last === "```") return 200;
+  if (/[.:;!?]$/.test(last)) return 145 + Math.random() * 110; // end of a clause
+  if (last.endsWith(",")) return 110 + Math.random() * 70;
+  if (/^\s+$/.test(next)) return 16 + Math.random() * 25; // whitespace flicks by
+  return 46 + Math.random() * 70; // a word
 }
 
 export function StreamDemo() {
