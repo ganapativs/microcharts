@@ -22,6 +22,16 @@
  * committed file does not. Without this, a regeneration produces a ~2000-line
  * diff that hides the handful of real changes. Formatting here keeps the
  * generator's output byte-identical to what is committed.
+ *
+ * WHY it formats over STDIN rather than the written path: `.oxfmtrc.json` has
+ * a `.generated.json` glob in `ignorePatterns`, so pointing oxfmt at the output
+ * file makes it exit 2 ("all matched files may have been excluded by ignore
+ * rules") — the
+ * file is written, the format pass is skipped, and `pnpm gen:entries` fails
+ * while leaving the 2000-line expansion behind. Piping through
+ * `--stdin-filepath` formats the same content under a non-ignored name, so the
+ * ignore rule keeps doing its job (no formatter churn on generated files in
+ * normal runs) and the generator still emits the committed formatting.
  */
 import { build } from "esbuild";
 import { execFileSync } from "node:child_process";
@@ -53,9 +63,13 @@ const tmp = join(docsDir, ".gen-entries-bundle.mjs");
 writeFileSync(tmp, res.outputFiles[0].text);
 try {
   const { CHARTS } = await import(`${new URL(`file://${tmp}`).href}?t=${res.outputFiles[0].hash}`);
-  writeFileSync(out, `${JSON.stringify(CHARTS, null, 2)}\n`);
   // Match the committed formatting (see note above).
-  execFileSync("pnpm", ["exec", "oxfmt", out], { cwd: docsDir, stdio: "ignore" });
+  const formatted = execFileSync("pnpm", ["exec", "oxfmt", "--stdin-filepath=entries.json"], {
+    cwd: docsDir,
+    input: `${JSON.stringify(CHARTS, null, 2)}\n`,
+    encoding: "utf8",
+  });
+  writeFileSync(out, formatted);
   console.log(`gen-entries: wrote ${CHARTS.length} chart entries to ${out}`);
 } finally {
   rmSync(tmp, { force: true });

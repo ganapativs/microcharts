@@ -83,6 +83,13 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pcts = useMemo(() => largestRemainderPercents(geo.wedges.map((w) => w.share)), [geo]);
+  // Largest-remainder integers (they must still sum to 100) through a real
+  // percent formatter — the old `${n}%` hardcoded the sign and its spacing.
+  const pctFmt = useMemo(
+    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [locale],
+  );
+  const pctAt = useCallback((i: number) => pctFmt((pcts[i] ?? 0) / 100), [pctFmt, pcts]);
 
   // Pointer (viewBox space) → wedge index by atan2 angle lookup (0 at 12
   // o'clock, clockwise — matches core/arc + geometry).
@@ -104,14 +111,10 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         index: i,
         value: d?.value ?? null,
         label: d?.label,
-        formatted: d
-          ? d.members > 1
-            ? `${d.label} ${pcts[i]}% (${d.members} ${d.members === 1 ? "category" : "categories"})`
-            : `${d.label} ${pcts[i]}% (${fmt(d.value)})`
-          : "",
+        formatted: d ? `${d.label} ${pctAt(i)} (${fmt(d.value)})` : "",
       };
     },
-    [geo, rolled, pcts, fmt],
+    [geo, rolled, pctAt, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -174,8 +177,13 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   const announced =
     shownWedge && shownDatum
       ? shownDatum.members > 1
-        ? strings.shareOther(shownDatum.label, `${pcts[shown!]}%`, shownDatum.members)
-        : strings.shareAt(shownDatum.label, `${pcts[shown!]}%`, fmt(shownDatum.value))
+        ? strings.shareOther(
+            shownDatum.label,
+            pctAt(shown!),
+            shownDatum.members,
+            fmt(shownDatum.value),
+          )
+        : strings.shareAt(shownDatum.label, pctAt(shown!), fmt(shownDatum.value))
       : "";
 
   return (

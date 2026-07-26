@@ -91,6 +91,12 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
     () => makeFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 }),
     [props.format, props.locale],
   );
+  // Cell tallies are cardinal integers, not axis values — group them with the
+  // locale but never with the value `format`, which is the percent format here.
+  const countFmt = useMemo(
+    () => makeFormatter(undefined, props.locale, { maximumFractionDigits: 0 }),
+    [props.locale],
+  );
 
   // Pointer (viewBox space) → cell index: the cell whose rect contains the
   // point, `null` on the label gutter or between cells.
@@ -144,11 +150,11 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         value: c?.share ?? null,
         label: c ? `${labels[c.row] ?? ""}→${labels[c.col] ?? ""}` : undefined,
         formatted: c
-          ? `${labels[c.row]}→${labels[c.col]} ${pctFmt(rt > 0 ? c.count / rt : 0)}`
+          ? `${labels[c.row]}→${labels[c.col]} ${pctFmt(rt > 0 ? c.count / rt : 0)} (${countFmt(c.count)})`
           : undefined,
       };
     },
-    [geo, labels, pctFmt],
+    [geo, labels, pctFmt, countFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -195,7 +201,14 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const cell = shown !== null ? geo.cells[shown] : undefined;
   const rowTotal = cell ? (geo.rowTotals[cell.row] ?? 0) : 0;
   const pct = pctFmt(cell && rowTotal > 0 ? cell.count / rowTotal : 0);
-  const announced = cell ? strings.confusionAt(labels[cell.row]!, labels[cell.col]!, pct) : "";
+  // The tally, not just its row share. `counts` IS the data the caller passed,
+  // and a row-normalized percentage cannot be inverted back to it without the
+  // row total — so "12%" alone dropped the only number the user actually gave
+  // us, from the chip AND the announcement.
+  const count = cell ? countFmt(cell.count) : "";
+  const announced = cell
+    ? strings.confusionAt(labels[cell.row]!, labels[cell.col]!, pct, count)
+    : "";
 
   return (
     <span
@@ -220,7 +233,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
       <LiveRegion>{announced}</LiveRegion>
       {readout && cell ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(cell.x + cell.w / 2, size)}>
-          {`${labels[cell.row]}→${labels[cell.col]} ${pct}`}
+          {`${labels[cell.row]}→${labels[cell.col]} ${pct} (${count})`}
         </span>
       ) : null}
     </span>

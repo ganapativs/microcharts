@@ -18,6 +18,7 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
 import { labelFitsY } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps } from "./index.js";
 
 export interface InteractiveLikertStripProps extends LikertStripProps, PickerProps {
@@ -88,6 +89,9 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
+  // Response counts are cardinal, not shares — grouped by the locale, never run
+  // through the percent `format` the shares use.
+  const countFmt = useMemo(() => makeFormatter(undefined, locale), [locale]);
 
   const locate = useCallback(
     (x: number) => {
@@ -108,10 +112,13 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         index: i,
         value: d && Number.isFinite(d.value) ? d.value : null,
         label: d?.label,
-        formatted: s && d ? `${d.label} ${pctFmt(s.share)}` : undefined,
+        formatted:
+          s && d
+            ? `${d.label} ${pctFmt(s.share)} (${isFiniteValue(d.value) ? countFmt(d.value) : "—"})`
+            : undefined,
       };
     },
-    [data, geo, pctFmt],
+    [data, geo, pctFmt, countFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -156,9 +163,12 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   const shown = active ?? selected;
   const seg = geo && shown !== null ? geo.segments[shown] : undefined;
   const segDatum = seg ? data[seg.level] : undefined;
+  // Share AND count: the strip encodes shares, but the caller passed counts, and
+  // a share can't be turned back into one without the response total.
+  const segCount = segDatum && isFiniteValue(segDatum.value) ? countFmt(segDatum.value) : "—";
   const announced =
     seg && segDatum
-      ? strings.likertAt(segDatum.label, pctFmt(seg.share), seg.level + 1, data.length)
+      ? strings.likertAt(segDatum.label, pctFmt(seg.share), seg.level + 1, data.length, segCount)
       : "";
 
   return (
@@ -203,7 +213,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
           className="mc-spark-readout"
           style={crosshairReadoutStyle(seg.x + seg.width / 2, width)}
         >
-          {`${segDatum.label} ${pctFmt(seg.share)}`}
+          {`${segDatum.label} ${pctFmt(seg.share)} (${segCount})`}
         </span>
       ) : null}
     </span>

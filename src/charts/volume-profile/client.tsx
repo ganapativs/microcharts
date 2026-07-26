@@ -68,6 +68,17 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Shares went through `Math.round(x * 100) + "%"` — a hand-rolled percent that
+  // ignores `locale` (fr-FR writes "18 %") and the mass behind it. Both fixed:
+  // real formatter, and the magnitude travels with its share.
+  const pctFmt = useMemo(
+    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [locale],
+  );
+  const massFmt = useMemo(
+    () => makeFormatter(undefined, locale, { notation: "compact" }),
+    [locale],
+  );
   // The POC label's gutter narrows every bar, so the client must reserve it on
   // the same terms the static does or its overlays anchor to unpainted bars.
   const fontSize = labelFont(height, 0.11);
@@ -107,11 +118,11 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         value: rows[i]?.mass ?? null,
         label: b ? fmt(b.level) : undefined,
         formatted: b
-          ? `${fmt(b.level)} · ${Math.round((total > 0 ? (rows[i]?.mass ?? 0) / total : 0) * 100)}%${b.poc ? strings.volumePoc : ""}`
+          ? `${fmt(b.level)} · ${massFmt(rows[i]?.mass ?? 0)} (${pctFmt(total > 0 ? (rows[i]?.mass ?? 0) / total : 0)})${b.poc ? strings.volumePoc : ""}`
           : "",
       };
     },
-    [rows, geo, fmt, total, strings],
+    [rows, geo, fmt, massFmt, pctFmt, total, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -155,12 +166,9 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   const shown = active ?? selected;
   const bar = shown != null ? geo.bars[shown] : undefined;
   const share = bar && total > 0 ? (rows[shown!]?.mass ?? 0) / total : 0;
+  const mass = massFmt(rows[shown ?? 0]?.mass ?? 0);
   const announced = bar
-    ? strings.volumeAt(
-        fmt(bar.level),
-        `${Math.round(share * 100)}%`,
-        bar.poc ? strings.volumePoc : "",
-      )
+    ? strings.volumeAt(fmt(bar.level), pctFmt(share), bar.poc ? strings.volumePoc : "", mass)
     : "";
 
   return (
@@ -203,7 +211,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
             bottom: "auto",
           }}
         >
-          {`${fmt(bar.level)} · ${Math.round(share * 100)}%${bar.poc ? strings.volumePoc : ""}`}
+          {`${fmt(bar.level)} · ${mass} (${pctFmt(share)})${bar.poc ? strings.volumePoc : ""}`}
         </span>
       ) : null}
     </span>

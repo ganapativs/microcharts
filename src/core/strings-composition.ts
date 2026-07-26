@@ -26,8 +26,8 @@ export const EN_COMPOSITION: CompositionStrings = {
   shareClause: (label, pct) => `${label} ${pct}`,
   shares: (list) => `${list}.`,
   shareAt: (label, pct, value) => `${label}: ${pct}, ${value}.`,
-  shareOther: (label, pct, members) =>
-    `${label}: ${pct}, ${members} ${members === 1 ? "category" : "categories"}.`,
+  shareOther: (label, pct, members, value) =>
+    `${label}: ${pct}, ${value} over ${members} ${members === 1 ? "category" : "categories"}.`,
   otherLabel: "Other",
   funnel: (stages, first, last, overallPct) =>
     `${stages} ${stages === 1 ? "stage" : "stages"}, ${first} to ${last} — overall ${overallPct}.`,
@@ -39,7 +39,8 @@ export const EN_COMPOSITION: CompositionStrings = {
       ? `${agree} agree, ${disagree} disagree.`
       : `${agree} agree, ${disagree} disagree, ${neutral} neutral.`,
   likertLean: (dir) => (dir === "balanced" ? "Balanced." : `Leans ${dir}.`),
-  likertAt: (label, pct, level, total) => `${label}: ${pct}, level ${level} of ${total}.`,
+  likertAt: (label, pct, level, total, value) =>
+    `${label}: ${pct} (${value}), level ${level} of ${total}.`,
   allNeutral: "All responses neutral.",
   noResponses: "No responses.",
 };

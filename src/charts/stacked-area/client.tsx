@@ -1,10 +1,11 @@
 "use client";
-// Interactive <StackedArea>. Nearest-x lookup announces ALL layers ("Point 8 of
-// 12: Mobile 45%, Web 38%, API 17%."); ←/→ step x-columns, Enter/Space/click
+// Interactive <StackedArea>. Nearest-x lookup shows ALL layers at the column —
+// as rows in the chip and as one sentence in the live region ("Point 8 of 12:
+// Mobile 45%, Web 38%, API 17%."); ←/→ step x-columns, Enter/Space/click
 // selects a column (onSelect). useActivePicker owns interaction; the static is
 // composed (summary={false}, crosshair + pin as its children) so the SVG never
 // drifts.
-import { useCallback, useMemo, useRef } from "react";
+import { Fragment, useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
@@ -46,6 +47,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     order = "data",
     curve = "linear",
     domain,
+    colors,
     width = 60,
     height = 16,
     format,
@@ -119,24 +121,32 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     },
     [geo],
   );
-  // The LEADER band at a column, not the whole stack: listing every band makes
-  // the chip grow with the series count — unbounded, and already 206px past its
-  // cap at three bands (see readout-containment tests). The full breakdown is
-  // in the live region, which is where a screen reader wants it anyway.
-  const leaderChip = useCallback(
-    (shares: readonly number[]) => {
-      let top = 0;
-      for (let i = 1; i < series.length; i++) {
-        if ((shares[i] ?? 0) > (shares[top] ?? 0)) top = i;
-      }
-      const name = series[top]?.label ?? strings.seriesFallback(top + 1);
-      return `${name} ${pctFmt(shares[top] ?? 0)}`;
-    },
-    [series, pctFmt, strings],
+  // EVERY band at the column, not just the leader. A composition chart whose
+  // readout names one series answers "who is biggest", which is not the
+  // question the chart asks — and with a monotone mix (the docs' Mobile/Web/API)
+  // the trailing series is never the leader, so its name is unreachable in the
+  // UI even though the live region announces it.
+  //
+  // Listing bands as ONE nowrap line is what blew the cap before (206px past it
+  // at three bands). Rows are the fix: the chip's width is now its widest ROW,
+  // not the sum of its bands, and `.mc-stacked-readout` caps the name column at
+  // 7em, so the whole chip is bounded by construction at ~11em — inside the 14em
+  // ceiling regardless of label length or series count. Height is bounded by the
+  // documented ≤ 3-series cap.
+  const bandRows = useCallback(
+    (shares: readonly number[], col: number) =>
+      series.map((s, i) => ({
+        name: s.label ?? strings.seriesFallback(i + 1),
+        pct: isFiniteValue(s.values[col]) ? pctFmt(shares[i] ?? 0) : "—",
+        cat: (i % 3) + 1,
+        fill: colors ? colors[i % colors.length] : `var(--mc-cat-${(i % 3) + 1})`,
+      })),
+    [series, pctFmt, strings, colors],
   );
   // index = column (x-sample) index; value = the stack total at that column
   // (series summed, negatives clamped to 0 — matching the drawn stack).
-  // `formatted` mirrors the chip (leader band).
+  // `formatted` mirrors the chip: the full breakdown, comma-joined for callers
+  // that render it as one string.
   const datum = useCallback(
     (i: number) => {
       const shares = geo.sharesAt[i];
@@ -146,10 +156,14 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
           (t, s) => t + (isFiniteValue(s.values[i]) ? Math.max(0, s.values[i] as number) : 0),
           0,
         ),
-        formatted: shares ? leaderChip(shares) : undefined,
+        formatted: shares
+          ? bandRows(shares, i)
+              .map((r) => `${r.name} ${r.pct}`)
+              .join(", ")
+          : undefined,
       };
     },
-    [series, geo, leaderChip],
+    [series, geo, bandRows],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -207,6 +221,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         order={order}
         curve={curve}
         domain={domain}
+        colors={colors}
         width={width}
         height={height}
         format={format}
@@ -242,8 +257,20 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
       </StaticStackedArea>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && shares && shownX !== undefined ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
-          {leaderChip(shares)}
+        <span
+          className="mc-spark-readout mc-readout-rows"
+          style={crosshairReadoutStyle(shownX, width)}
+        >
+          {bandRows(shares, shown).map((r, i) => (
+            // Swatch + name + share. The swatch is redundant reinforcement, not
+            // the key: the band is NAMED, so the chip never encodes by color
+            // alone (and under forced-colors the name is all that survives).
+            <Fragment key={i}>
+              <span className="mc-readout-key" data-mc-cat={r.cat} style={{ background: r.fill }} />
+              <span className="mc-readout-name">{r.name}</span>
+              <span className="mc-readout-val">{r.pct}</span>
+            </Fragment>
+          ))}
         </span>
       ) : null}
     </span>

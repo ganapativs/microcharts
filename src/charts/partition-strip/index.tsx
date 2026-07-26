@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
+import type { Format } from "../../core/format.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -23,6 +24,10 @@ export interface PartitionStripProps {
   colors?: readonly string[] | undefined;
   width?: number | undefined;
   height?: number | undefined;
+  /** Formats node values in the interactive readout + announcement (the static
+   *  strip renders no numbers). Same grammar as every other chart. */
+  format?: Format | undefined;
+  locale?: string | string[] | undefined;
   strings?: PartitionStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;

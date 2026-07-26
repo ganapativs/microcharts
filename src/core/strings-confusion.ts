@@ -13,7 +13,7 @@ export const EN_CONFUSION: ConfusionStrings = {
   confusion: (acc, actual, predicted, pct) =>
     `Accuracy ${acc}. Most confused: ${actual} predicted as ${predicted} (${pct} of ${actual}s).`,
   confusionPerfect: (acc) => `Accuracy ${acc}. No confusion.`,
-  confusionAt: (actual, predicted, pct) =>
-    `Actual ${actual}, predicted ${predicted}: ${pct} of ${actual}s.`,
+  confusionAt: (actual, predicted, pct, count) =>
+    `Actual ${actual}, predicted ${predicted}: ${pct} of ${actual}s (${count}).`,
   confusionEmpty: (cls) => `no ${cls} samples`,
 };

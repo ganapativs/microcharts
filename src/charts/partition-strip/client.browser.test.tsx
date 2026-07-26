@@ -27,7 +27,7 @@ describe("interactive <PartitionStrip>", () => {
     key(wrap, "ArrowDown");
     key(wrap, "ArrowDown");
     const live = document.querySelector('[aria-live="polite"]')!;
-    await expect.poll(() => live.textContent).toBe("react: 28% of the whole, 64% of JS.");
+    await expect.poll(() => live.textContent).toBe("react: 28, 28% of the whole, 64% of JS.");
   });
 
   it("←/→ stay inside the current row; ↑ returns to the parent", async () => {

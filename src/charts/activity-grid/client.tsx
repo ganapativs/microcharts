@@ -5,7 +5,8 @@
 // (one wrapper listener + pure grid math), composing the static component
 // (summary={false}, focus + pin rings as its children) — the SVG never drifts.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeDateFormatter, makeFormatter } from "../../core/format.js";
+import { parseUTCDay } from "../../core/calendar.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
@@ -41,6 +42,7 @@ export interface InteractiveActivityGridProps extends ActivityGridProps, PickerP
 }
 
 const ANNOUNCE_BASE = { ...EN_SERIES, ...EN_SLOTS };
+const DAY_MS = 86_400_000;
 
 export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNode {
   const {
@@ -136,12 +138,34 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     [rows, offset, geo],
   );
 
+  // When `anchor` dates the grid, every cell IS a calendar day and the day is
+  // knowable — so the readout says which one, exactly as CalendarStrip does.
+  // Undated grids stay positional: there is no date to withhold, and the
+  // crosshair already shows the reader which cell they are on.
+  const dateFmt = useMemo(
+    () => makeDateFormatter(undefined, locale, { month: "short", day: "numeric" }),
+    [locale],
+  );
+  const anchorMs = useMemo(() => (anchor === undefined ? null : parseUTCDay(anchor)), [anchor]);
+  const dayLabelAt = useCallback(
+    (i: number): string | null =>
+      anchorMs === null ? null : dateFmt(new Date(anchorMs + i * DAY_MS)),
+    [anchorMs, dateFmt],
+  );
+
   const datum = useCallback(
     (i: number) => {
       const v = geo.cells[i]?.value ?? null;
-      return { index: i, value: v, formatted: v === null ? "—" : fmt(v) };
+      const day = dayLabelAt(i);
+      const shownValue = v === null ? "—" : fmt(v);
+      return {
+        index: i,
+        value: v,
+        ...(day === null ? null : { label: day }),
+        formatted: day === null ? shownValue : `${day}: ${shownValue}`,
+      };
     },
-    [geo, fmt],
+    [geo, fmt, dayLabelAt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -188,12 +212,17 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
 
   const shown = active ?? selected;
   const shownCell = shown !== null ? geo.cells[shown] : undefined;
+  const shownDay = shown !== null ? dayLabelAt(shown) : null;
   const announced =
     shownCell === undefined
       ? ""
-      : shownCell.value === null
-        ? announce.pointEmpty(shownCell.index + 1, geo.cells.length)
-        : announce.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value));
+      : shownDay !== null
+        ? shownCell.value === null
+          ? announce.dayEmpty(shownDay)
+          : announce.dayAt(shownDay, fmt(shownCell.value))
+        : shownCell.value === null
+          ? announce.pointEmpty(shownCell.index + 1, geo.cells.length)
+          : announce.point(shownCell.index + 1, geo.cells.length, fmt(shownCell.value));
 
   return (
     <span
@@ -228,7 +257,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
           className="mc-spark-readout"
           style={crosshairReadoutStyle(shownCell.x + shownCell.size / 2, w)}
         >
-          {shownCell.value === null ? "—" : fmt(shownCell.value)}
+          {`${shownDay === null ? "" : `${shownDay}: `}${shownCell.value === null ? "—" : fmt(shownCell.value)}`}
         </span>
       ) : null}
     </span>

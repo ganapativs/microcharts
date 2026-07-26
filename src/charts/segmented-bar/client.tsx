@@ -85,6 +85,14 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pcts = useMemo(() => largestRemainderPercents(geo.segments.map((s) => s.share)), [geo]);
+  // Largest-remainder integers (they must still sum to 100) rendered through a
+  // real percent formatter — `${n}%` hardcoded the sign and its spacing, which
+  // fr-FR writes as "12 %".
+  const pctFmt = useMemo(
+    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [locale],
+  );
+  const pctAt = useCallback((i: number) => pctFmt((pcts[i] ?? 0) / 100), [pctFmt, pcts]);
 
   const locate = useCallback(
     (x: number) => {
@@ -100,14 +108,10 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         index: i,
         value: d?.value ?? null,
         label: d?.label,
-        formatted: d
-          ? d.members > 1
-            ? `${d.label} ${pcts[i]}% (${d.members} ${d.members === 1 ? "category" : "categories"})`
-            : `${d.label} ${pcts[i]}% (${fmt(d.value)})`
-          : "",
+        formatted: d ? `${d.label} ${pctAt(i)} (${fmt(d.value)})` : "",
       };
     },
-    [geo, rolled, fmt, pcts],
+    [geo, rolled, fmt, pctAt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -153,8 +157,13 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   const announced =
     shownSeg && shownDatum
       ? shownDatum.members > 1
-        ? strings.shareOther(shownDatum.label, `${pcts[shown!]}%`, shownDatum.members)
-        : strings.shareAt(shownDatum.label, `${pcts[shown!]}%`, fmt(shownDatum.value))
+        ? strings.shareOther(
+            shownDatum.label,
+            pctAt(shown!),
+            shownDatum.members,
+            fmt(shownDatum.value),
+          )
+        : strings.shareAt(shownDatum.label, pctAt(shown!), fmt(shownDatum.value))
       : "";
 
   return (
@@ -182,9 +191,14 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
           className="mc-spark-readout"
           style={crosshairReadoutStyle(shownSeg.x + shownSeg.w / 2, width)}
         >
-          {shownDatum.members > 1
-            ? `${shownDatum.label} ${pcts[shown!]}% (${shownDatum.members} ${shownDatum.members === 1 ? "category" : "categories"})`
-            : `${shownDatum.label} ${pcts[shown!]}% (${fmt(shownDatum.value)})`}
+          {/* The rolled-up branch used to spend its parenthesis on a category
+              COUNT and drop the value entirely — and it hardcoded English
+              ("categories") in a visible chip, which the i18n canon forbids and
+              which `strings.shareOther` was already carrying for the
+              announcement. Every segment now reads label · share · value; how
+              many categories were folded into "Other" stays in the
+              announcement, where a longer sentence is free. */}
+          {`${shownDatum.label} ${pctAt(shown!)} (${fmt(shownDatum.value)})`}
         </span>
       ) : null}
     </span>

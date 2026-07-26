@@ -231,7 +231,11 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(shownCell.x + cell / 2, w)}>
-          {shownCell.value === null ? "—" : fmt(shownCell.value)}
+          {/* The localized sentence minus its full stop — a bare number left the
+              reader to work out WHICH cohort at WHICH age they were pointing at,
+              while the live region beside it named both. Same text, same
+              tokens, no hand-composed English (i18n canon). */}
+          {announced.replace(/[.。]$/, "")}
         </span>
       ) : null}
     </span>

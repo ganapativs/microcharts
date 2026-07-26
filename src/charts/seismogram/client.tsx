@@ -2,9 +2,10 @@
 // Interactive <Seismogram>. useActivePicker owns interaction: ONE pointer
 // listener + slot-by-x-band over the rendered series, ←/→ step slots, Home/End
 // jump to the first/last EVENT (quiet slots are skippable context), click /
-// Enter / Space selects (onSelect). Announces via the shared point template;
-// quiet slots use the pointEmpty wording (ActivityGrid parity). Composes the
-// static component (canon) — the SVG is never re-implemented.
+// Enter / Space selects (onSelect). Announces via the shared point template; a
+// quiet slot reads as the zero it is, and only a non-finite slot takes the
+// pointEmpty wording. Composes the static component (canon) — the SVG is never
+// re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
@@ -126,7 +127,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
       return {
         index: i,
         value: isFiniteValue(v) ? v : null,
-        formatted: isFiniteValue(v) && v !== 0 ? fmt(v) : "—",
+        formatted: isFiniteValue(v) ? fmt(v) : "—",
       };
     },
     [rendered, fmt],
@@ -158,7 +159,10 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
   const announced =
     shown === null
       ? ""
-      : isFiniteValue(shownValue) && shownValue !== 0
+      : // A quiet slot reads ZERO, not "no data" — 0 is a measurement (nothing
+        // happened), null is the absence of one, and the two were announced with
+        // the same words. `pointEmpty` is now reserved for non-finite slots.
+        isFiniteValue(shownValue)
         ? seriesStrings.point(shown + 1, rendered.length, fmt(shownValue))
         : seriesStrings.pointEmpty(shown + 1, rendered.length);
 
@@ -207,7 +211,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
           className="mc-spark-readout"
           style={crosshairReadoutStyle(slotW * (shown + 0.5), width)}
         >
-          {isFiniteValue(shownValue) && shownValue !== 0 ? fmt(shownValue) : "—"}
+          {isFiniteValue(shownValue) ? fmt(shownValue) : "—"}
         </span>
       ) : null}
     </span>

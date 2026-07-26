@@ -41,6 +41,11 @@ import { CohortTriangle } from "../charts/cohort-triangle/client.js";
 import { Funnel } from "../charts/funnel/client.js";
 import { MicroScatter } from "../charts/micro-scatter/client.js";
 import { Sparkline } from "../charts/sparkline/client.js";
+import { LikertStrip } from "../charts/likert-strip/client.js";
+import { VolumeProfile } from "../charts/volume-profile/client.js";
+import { SegmentedBar } from "../charts/segmented-bar/client.js";
+import { MicroDonut } from "../charts/micro-donut/client.js";
+import { ActivityGrid } from "../charts/activity-grid/client.js";
 
 /**
  * Every chart at its OWN default size — the size the docs demo it at and the
@@ -213,6 +218,63 @@ const CASES: Record<string, () => ReactElement> = {
         { label: "Paid", value: 120 },
       ]}
       title="Funnel"
+    />
+  ),
+  // Charts whose readouts gained the magnitude behind their share (or the date
+  // behind their cell). Each one is a place where the width gate previously
+  // pushed a number out of the chip, so each has to hold the line from BOTH
+  // sides — see readout-value-visibility.browser.test.tsx for the other one.
+  "likert-strip": () => (
+    <LikertStrip
+      data={[
+        { label: "Strongly disagree", value: 10 },
+        { label: "Disagree", value: 14 },
+        { label: "Neutral", value: 14 },
+        { label: "Agree", value: 34 },
+        { label: "Strongly agree", value: 28 },
+      ]}
+      title="Q1"
+    />
+  ),
+  "volume-profile": () => (
+    <VolumeProfile
+      data={[
+        { level: 138, weight: 8 },
+        { level: 142, weight: 25 },
+        { level: 146, weight: 7 },
+      ]}
+      bins={3}
+      title="Volume"
+    />
+  ),
+  "segmented-bar": () => (
+    <SegmentedBar
+      data={[
+        { label: "Chrome", value: 620 },
+        { label: "Safari", value: 240 },
+        { label: "Firefox", value: 90 },
+        { label: "Edge", value: 30 },
+        { label: "Arc", value: 12 },
+        { label: "Brave", value: 8 },
+      ]}
+      title="Share"
+    />
+  ),
+  "micro-donut": () => (
+    <MicroDonut
+      data={[
+        { label: "Chrome", value: 620 },
+        { label: "Safari", value: 240 },
+        { label: "Firefox", value: 90 },
+      ]}
+      title="Share"
+    />
+  ),
+  "activity-grid (dated)": () => (
+    <ActivityGrid
+      data={Array.from({ length: 21 }, (_, i) => i)}
+      anchor="2026-03-02"
+      title="Commits"
     />
   ),
   // Controls: the audit found these already terse. They must stay green,

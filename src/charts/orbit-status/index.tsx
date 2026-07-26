@@ -93,7 +93,8 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       ? false
       : (summary ?? orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
-  const labelText = label === "latency" && !geo.unknown ? `${fmt(Math.max(0, latency))}ms` : null;
+  const labelText =
+    label === "latency" && !geo.unknown ? strings.orbitLatency(fmt(Math.max(0, latency))) : null;
   // Reserve the gutter from the real text extent so the ms numeral never spills
   // (0.7·em/char over-estimate — the "ms" glyphs run wider than digits).
   const labelBand = labelText ? Math.ceil(labelText.length * 0.7 * fontSize + 2) : 0;

@@ -72,6 +72,12 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   );
   const bucketVals = useMemo(() => maxPerBucket(data, buckets, { abs: true }), [data, buckets]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Position through the clip — a percentage of its own, so it takes the locale
+  // but never the amplitude `format` (which carries the signal's units).
+  const posFmt = useMemo(
+    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [locale],
+  );
 
   // The painted x of a bucket — bars and the envelope sit on different pitches,
   // so every x-aware surface here reads it from geometry rather than assuming.
@@ -108,10 +114,10 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       return {
         index: i,
         value: v == null ? null : Math.abs(v),
-        formatted: `${Math.round((i / Math.max(1, buckets - 1)) * 100)}% · ${fmt(v == null ? 0 : Math.abs(v))}`,
+        formatted: `${posFmt(i / Math.max(1, buckets - 1))} · ${v == null ? "—" : fmt(Math.abs(v))}`,
       };
     },
-    [bucketVals, fmt, buckets],
+    [bucketVals, fmt, posFmt, buckets],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -137,10 +143,12 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   const shown = active ?? selected;
   const shownBar = shown !== null ? geo.bars[shown] : undefined;
   const shownVal = shown !== null ? bucketVals[shown] : null;
-  const pct = shownBar ? `${Math.round((shownBar.index / Math.max(1, buckets - 1)) * 100)}%` : "";
-  const announced = shownBar
-    ? strings.waveformAt(pct, fmt(shownVal == null ? 0 : Math.abs(shownVal)))
-    : "";
+  const pct = shownBar ? posFmt(shownBar.index / Math.max(1, buckets - 1)) : "";
+  // An EMPTY bucket is not a silent one: `null` used to be formatted as 0, which
+  // reads as "measured, amplitude zero". Magnitude is what the mirrored envelope
+  // encodes, so |v| is the honest figure for a bucket that does have a sample.
+  const shownAmp = shownVal == null ? "—" : fmt(Math.abs(shownVal));
+  const announced = shownBar ? strings.waveformAt(pct, shownAmp) : "";
 
   const shownX = shownBar ? xOf(shownBar.index) : 0;
   // Accent outline around the pinned bucket — persists through pointer-leave.
@@ -192,7 +200,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownBar ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
-          {`${pct} · ${fmt(shownVal == null ? 0 : Math.abs(shownVal))}`}
+          {`${pct} · ${shownAmp}`}
         </span>
       ) : null}
     </span>

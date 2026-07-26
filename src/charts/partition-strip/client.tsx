@@ -4,6 +4,7 @@
 // a row, ↑/↓ between a parent and its first child — ActivityGrid model), click /
 // Enter / Space selects (onSelect). Composes the static component (canon).
 import { useCallback, useMemo, useRef } from "react";
+import { makeFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -23,6 +24,10 @@ import {
   type PartitionStripProps,
 } from "./index.js";
 
+// Mirrors the static entry's palette cycle so a chip swatch can never disagree
+// with the segment it points at.
+const CAT_N = 6;
+
 export interface InteractivePartitionStripProps extends PartitionStripProps, PickerProps {
   /**
    * Opt-in entrance motion (default `false`): both rows of segments fade in,
@@ -38,6 +43,8 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     labels = true,
     width = 120,
     height = 24,
+    format,
+    locale,
     strings = EN_PARTITION,
     title,
     summary,
@@ -68,6 +75,14 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   const segs = geo.segments;
   const inset = 0.5;
   const rowH = (height - inset * 2 - 1) / 2;
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Shares through a real percent formatter, not `${Math.round(x*100)}%` — the
+  // hand-rolled form hardcodes the sign and its spacing (fr-FR writes "12 %"),
+  // which is the same visible-chip i18n leak fixed on SegmentedBar.
+  const pctFmt = useMemo(
+    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [locale],
+  );
 
   const locate = useCallback(
     (x: number, y: number) => {
@@ -86,16 +101,16 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
       if (!s) return { index: i, value: null };
       const parent =
         s.parent && s.parentShare != null
-          ? strings.partitionParent(`${Math.round(s.parentShare * 100)}%`, s.parent)
+          ? strings.partitionParent(pctFmt(s.parentShare), s.parent)
           : "";
       return {
         index: i,
         value: s.share,
         label: s.label,
-        formatted: `${s.label} ${Math.round(s.share * 100)}%${parent}`,
+        formatted: `${s.label} ${fmt(s.value)} (${pctFmt(s.share)})${parent}`,
       };
     },
-    [segs, strings],
+    [segs, strings, fmt, pctFmt],
   );
   // 2-D nav: ←/→ stay inside the current row (the comparison channel is
   // alignment, so crossing rows sideways would be a lie); ↑/↓ walk the
@@ -168,12 +183,30 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
 
   const shown = active ?? selected;
   const seg = shown !== null ? segs[shown] : undefined;
-  const pctOf = (s: number) => `${Math.round(s * 100)}%`;
+  // The chip swatch must repaint EXACTLY what the mark paints, or it points at
+  // the wrong rectangle. Under `emphasis` the static swaps roles: the
+  // emphasised node is accent, out-of-lineage nodes are neutral, and only the
+  // lineage keeps its category colour — same branch, same emphGroup lookup.
+  const emphasis = rest.emphasis;
+  const emphGroup = emphasis ? segs.find((s) => s.label === emphasis)?.group : undefined;
+  const swatch = (s: (typeof segs)[number]): string => {
+    if (emphasis) {
+      if (s.label === emphasis) return "var(--mc-accent)";
+      if (s.group !== emphGroup) return "var(--mc-neutral)";
+    }
+    return rest.colors
+      ? (rest.colors[s.group % rest.colors.length] as string)
+      : `var(--mc-cat-${(s.group % CAT_N) + 1})`;
+  };
   const parentClause =
     seg?.parent && seg.parentShare != null
-      ? strings.partitionParent(pctOf(seg.parentShare), seg.parent)
+      ? strings.partitionParent(pctFmt(seg.parentShare), seg.parent)
       : "";
-  const announced = seg ? strings.partitionAt(seg.label, pctOf(seg.share), parentClause) : "";
+  // The node's own value leads, its share follows. A share is derived; the
+  // value is what the caller handed us, and nothing else on screen carries it.
+  const announced = seg
+    ? strings.partitionAt(seg.label, pctFmt(seg.share), parentClause, fmt(seg.value))
+    : "";
 
   return (
     <span
@@ -198,11 +231,30 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
       </StaticPartitionStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && seg ? (
+        // Rows, not one line: the node's own value + share and — for a child —
+        // its parent's share of it. As a single nowrap line that ran 28
+        // characters and ellipsized at the chart's own width (the containment
+        // suite measured 7px of overflow); stacked, the chip is only as wide as
+        // its widest row. The parent row sits under the child exactly as the
+        // parent BAR sits over it in the strip.
         <span
-          className="mc-spark-readout"
+          className="mc-spark-readout mc-readout-rows"
           style={crosshairReadoutStyle(seg.x + seg.width / 2, width)}
         >
-          {`${seg.label} ${pctOf(seg.share)}${parentClause}`}
+          <span
+            className="mc-readout-key"
+            data-mc-cat={(seg.group % CAT_N) + 1}
+            style={{ background: swatch(seg) }}
+          />
+          <span className="mc-readout-name">{seg.label}</span>
+          <span className="mc-readout-val">{`${fmt(seg.value)} (${pctFmt(seg.share)})`}</span>
+          {seg.parent !== null && seg.parentShare !== null ? (
+            <>
+              <span />
+              <span className="mc-readout-name">{seg.parent}</span>
+              <span className="mc-readout-val">{pctFmt(seg.parentShare)}</span>
+            </>
+          ) : null}
         </span>
       ) : null}
     </span>

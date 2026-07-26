@@ -16,8 +16,8 @@
     "interactive": 3.46
   },
   "activity-grid": {
-    "static": 2.36,
-    "interactive": 5.06
+    "static": 2.39,
+    "interactive": 5.31
   },
   "trend-arrow": {
     "static": 1.88,
@@ -49,7 +49,7 @@
   },
   "seismogram": {
     "static": 2.58,
-    "interactive": 5.05
+    "interactive": 5.04
   },
   "heat-strip": {
     "static": 2.5,
@@ -76,8 +76,8 @@
     "interactive": 4.75
   },
   "segmented-bar": {
-    "static": 2.59,
-    "interactive": 5
+    "static": 2.6,
+    "interactive": 5.04
   },
   "histogram-strip": {
     "static": 2.26,
@@ -92,16 +92,16 @@
     "interactive": 3.76
   },
   "micro-donut": {
-    "static": 2.84,
-    "interactive": 5.21
+    "static": 2.86,
+    "interactive": 5.26
   },
   "funnel": {
-    "static": 2.43,
-    "interactive": 4.8
+    "static": 2.44,
+    "interactive": 4.81
   },
   "likert-strip": {
-    "static": 2.98,
-    "interactive": 5.24
+    "static": 3,
+    "interactive": 5.3
   },
   "waterfall": {
     "static": 3.01,
@@ -117,7 +117,7 @@
   },
   "stacked-area": {
     "static": 3.19,
-    "interactive": 5.79
+    "interactive": 5.93
   },
   "ohlc": {
     "static": 2.74,
@@ -296,8 +296,8 @@
     "interactive": 4.71
   },
   "orbit-status": {
-    "static": 2.26,
-    "interactive": 4.14
+    "static": 2.27,
+    "interactive": 4.15
   },
   "rate-volume": {
     "static": 2.85,
@@ -321,7 +321,7 @@
   },
   "waveform": {
     "static": 2.52,
-    "interactive": 4.97
+    "interactive": 5.01
   },
   "event-raster": {
     "static": 2.65,
@@ -355,8 +355,8 @@
     "interactive": 4.72
   },
   "partition-strip": {
-    "static": 2.2,
-    "interactive": 4.75
+    "static": 2.22,
+    "interactive": 5.06
   },
   "calibration-strip": {
     "static": 2.66,
@@ -364,7 +364,7 @@
   },
   "confusion-grid": {
     "static": 2.72,
-    "interactive": 5.2
+    "interactive": 5.24
   },
   "folded-day-band": {
     "static": 2.51,
@@ -372,7 +372,7 @@
   },
   "volume-profile": {
     "static": 2.85,
-    "interactive": 5.23
+    "interactive": 5.31
   },
   "phase-trace": {
     "static": 2.46,
@@ -392,7 +392,7 @@
   },
   "cohort-triangle": {
     "static": 2.62,
-    "interactive": 5.17
+    "interactive": 5.2
   },
   "streak-spark": {
     "static": 2.72,
