@@ -74,6 +74,20 @@ leaves its percentages in English. `FillWord`, `Hourglass`, `MoonPhase`, `Pareto
 `SummaryStrings` (`paretoCount`, `biasStripLabel`, `changePointRegime`, `dirNames`, and the quantile band level, which
 was handed to the bundle as a bare number with `%` baked into the template).
 
+**This is the one part of the release that can break you, and only if you supply your own `strings` bundle** — a default
+`EN` bundle needs no changes. Two things moved:
+
+- `SummaryStrings` gained four REQUIRED members. A custom bundle for ParetoStrip, BiasStrip, ChangePoint or Dumbbell
+  will not typecheck until it adds `paretoCount`, `biasStripLabel`, `changePointRegime` or `dirNames` respectively. Copy
+  the EN template from `src/core/strings-*.ts` and translate it.
+- `bandClause` and `bandEdge` (GradedBand) now receive the interval level as an already-formatted percent STRING rather
+  than a bare number, because the level was the one number on that chart a `locale` could not reach. This one is a
+  runtime change, not just a type error: a template that read `` `${level}% within …` `` now renders `80%%`. Drop the
+  literal `%` from yours.
+
+Pre-1.0, so this rides a minor rather than a major — a `1.0.0` here would signal an API stability the library has not
+claimed yet.
+
 **Prose gutters at the digits rate.** `textGutter`'s 0.62 per character is calibrated for the tabular figures the
 library formats itself; caller-supplied and translated text measures up to 0.95, which is why `textGutterProse` exists —
 and only two call sites used it. `Hypnogram`, `EventRaster`, `DataDiff`, `SproutRow` and `EventTimeline` reserved room
