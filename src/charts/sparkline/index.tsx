@@ -219,29 +219,24 @@ export function Sparkline(props: SparklineProps): ReactNode {
       {mmFont && geo.min && geo.max
         ? /* a flat series has one extreme — labelling it twice is noise */
           (geo.min.index === geo.max.index ? [geo.max] : [geo.max, geo.min]).map((m, i) => {
-            const kind = i ? "min" : "max";
             const text = fmt(m.value);
             const half = (text.length * mmFont * 0.62) / 2;
-            /* `central` + a y-clamp keeps both labels inside the box (hanging on
-               the min grew a full em past the floor). Prefer above/below the
-               mark; when the clamp erases that clearance — a peak parked on
-               the top edge — sit beside so we don't paint on the endpoint dot. */
-            const halfLine = mmFont / 2 + 0.5;
-            const clear = halfLine + 2;
-            const prefer = i ? m.y + clear : m.y - clear;
-            let y = Math.min(Math.max(prefer, halfLine), height - halfLine);
+            // central + clamp = containment; if clamp lands on the mark, sit beside
+            const hl = mmFont / 2 + 0.5,
+              c = hl + 2;
+            let y = Math.min(Math.max(m.y + (i ? c : -c), hl), height - hl);
             let x = Math.min(Math.max(m.x, half + 1), width - half - 1);
-            if (Math.abs(y - m.y) < clear) {
-              const right = m.x + half + clear;
+            if (Math.abs(y - m.y) < c) {
+              const side = half + c;
               x = Math.min(
-                Math.max(right + half <= width - 1 ? right : m.x - half - clear, half + 1),
+                Math.max(m.x + (m.x + side <= width - 1 ? side : -side), half + 1),
                 width - half - 1,
               );
-              y = Math.min(Math.max(m.y, halfLine), height - halfLine);
+              y = Math.min(Math.max(m.y, hl), height - hl);
             }
             return (
               <text
-                key={kind}
+                key={i ? "min" : "max"}
                 x={x}
                 y={y}
                 fontSize={mmFont}
