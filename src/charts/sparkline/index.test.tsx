@@ -191,12 +191,11 @@ describe("containment", () => {
       const half = (text.textContent!.length * fontSize * 0.62) / 2;
       expect(x - half).toBeGreaterThanOrEqual(0);
       expect(x + half).toBeLessThanOrEqual(80);
+      // `central` — same half-em model as `labelFitsY` / craft.
       const y = Number(text.getAttribute("y"));
-      if (text.getAttribute("dominant-baseline") === "hanging") {
-        expect(y + fontSize).toBeLessThanOrEqual(36); // descends from y
-      } else {
-        expect(y - fontSize).toBeGreaterThanOrEqual(0); // ascends above y
-      }
+      expect(text.getAttribute("dominant-baseline")).toBe("central");
+      expect(y - fontSize * 0.5).toBeGreaterThanOrEqual(0);
+      expect(y + fontSize * 0.5).toBeLessThanOrEqual(36);
     }
   });
 
