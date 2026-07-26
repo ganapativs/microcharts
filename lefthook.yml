@@ -5,7 +5,11 @@ pre-commit:
     format:
       # oxfmt owns code (.mjs/.cjs/.mts incl.); prettier owns md/mdx (see `format-docs`)
       glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,css}"
-      run: pnpm oxfmt --check {staged_files}
+      # tolerate an all-ignored set, same as `lint` below: the glob matches
+      # `*.generated.{ts,json}`, which `.oxfmtrc.json` ignores, so a commit
+      # touching only generated output gave oxfmt zero targets and it exited 2
+      # — blocking the commit outright.
+      run: pnpm oxfmt --check --no-error-on-unmatched-pattern {staged_files}
     format-docs:
       # prettier formats markdown/mdx prose (proseWrap), auto-fixes and re-stages
       glob: "*.{md,mdx}"
