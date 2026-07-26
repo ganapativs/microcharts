@@ -1,12 +1,11 @@
-// BiasStrip summary templates (bias-strip) — its OWN module. A Bland–Altman
-// agreement read: the bias (mean difference) plus the share of pairs inside the
-// limits of agreement. English lives only in core string modules (canon).
-// Aggregate: strings.ts. Its SummaryStrings members are wired serially.
+// BiasStrip summary templates (bias-strip). A Bland–Altman agreement read: the bias (mean
+// difference) plus the share of pairs inside the limits of agreement. Its SummaryStrings
+// members are wired serially.
 import type { SummaryStrings } from "./summary.js";
 
 export type BiasStripStrings = Pick<
   SummaryStrings,
-  "noData" | "biasStrip" | "biasStripShort" | "biasStripAt" | "biasOutside"
+  "noData" | "biasStrip" | "biasStripShort" | "biasStripAt" | "biasOutside" | "biasStripLabel"
 >;
 
 export const EN_BIAS_STRIP: BiasStripStrings = {
@@ -17,4 +16,5 @@ export const EN_BIAS_STRIP: BiasStripStrings = {
   biasStripAt: (pos, total, mean, diff, statusClause) =>
     `Pair ${pos} of ${total}: mean ${mean}, diff ${diff}${statusClause}.`,
   biasOutside: " — outside the limits",
+  biasStripLabel: (bias) => `${bias} bias`,
 };

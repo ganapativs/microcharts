@@ -1,11 +1,11 @@
 "use client";
 // Interactive <ShiftHistogram>. useActivePicker owns interaction: one pointer
-// listener + grid lookup (pointer x → bin), ←/→ step bins, M jumps to the two
+// listener + grid lookup (pointer x → bin). ←/→ step bins, M jumps to the two
 // median bins, click / Enter / Space pins one (onSelect). The live region states
-// each bin's before/after proportions. Composes the static component (canon);
+// each bin's before/after proportions.;
 // the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import {
@@ -31,15 +31,13 @@ import {
 export interface InteractiveShiftHistogramProps extends ShiftHistogramProps, PickerProps {
   strings?: ShiftStrings;
   /**
-   * Opt-in entrance motion (default `false`): the mirrored bins grow out of
-   * the center axis, sweeping left-to-right, when the chart first mounts
-   * client-side. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): the mirrored bins RISE out of
+   * the shared center axis, cascading left to right, when the chart first
+   * mounts client-side. Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
-
-const pct = (share: number): string => `${Math.round(share * 100)}%`;
 
 export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.ReactNode {
   const {
@@ -77,6 +75,10 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
   useEntrance(hostRef, "rise", animate, { selector: "rect", order: "x" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Bin SHARES are percents of their own sample, so they take `locale` but never
+  // the value `format` (which carries the measurement's units). The old
+  // `${Math.round(share * 100)}%` was an en-US percent in a visible chip.
+  const pct = useMemo(() => makePercentFormatter(locale), [locale]);
   // Mirror the static's label gutter so `totalWidth` matches the rendered
   // viewBox — without it the pointer map and readout run short and the
   // crosshair drifts from the cursor.
@@ -153,7 +155,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
           : undefined,
       };
     },
-    [geo, fmt],
+    [geo, fmt, pct],
   );
 
   const medianBins = useMemo(() => {

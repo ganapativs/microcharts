@@ -1,9 +1,9 @@
 "use client";
 // Interactive <RetentionCurve>. useActivePicker owns interaction: one pointer
 // listener + nearest-period math, roving keyboard (←/→ step periods, Home/End
-// ends), touch tap-to-pin, and the onActive/onSelect contract. The live region
-// states retention and, when a benchmark is present, its value too. Composes
-// the static component (canon); the crosshair + ghost-value tick are children.
+// ends). touch tap-to-pin, and the onActive/onSelect contract. The live region
+// states retention and, when a benchmark is present, its value too.
+// the static component
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
@@ -42,7 +42,8 @@ export interface InteractiveRetentionCurveProps extends RetentionCurveProps, Pic
 export function RetentionCurve(props: InteractiveRetentionCurveProps): React.ReactNode {
   const {
     data,
-    benchmark,
+    compare,
+    benchmark = compare,
     plateau = true,
     curve = "step",
     unit = "period",

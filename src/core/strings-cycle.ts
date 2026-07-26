@@ -1,6 +1,4 @@
-// CyclePlot summary templates (cycle-plot) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// CyclePlot summary templates (cycle-plot)
 import type { SummaryStrings } from "./summary.js";
 
 export type CycleStrings = Pick<

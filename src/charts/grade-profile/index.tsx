@@ -1,12 +1,11 @@
-// <GradeProfile> — how hard is the route, and where. Static,
-// hook-free, RSC-safe. One baseline-anchored quad per segment, coloured by a
+// <GradeProfile> — how hard is the route, and where. One baseline-anchored quad per segment, coloured by a
 // QUANTIZED grade bin (gentle → brutal); the elevation ridge rides on top and a
 // seat-gated summit tick calls out the steepest pitch. Descents are always the
 // gentlest bin — climbing difficulty is the decision.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { clamp } from "../../core/scale.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_GRADE_PROFILE, type GradeProfileStrings } from "../../core/strings-grade-profile.js";
 import { gradeLayout, gradeProfileGeometry, type GradePoint } from "./geometry.js";
@@ -36,10 +35,14 @@ export interface GradeProfileProps {
 
 const DEFAULT_BINS = [3, 6, 10] as const;
 
-/** Percent formatter for grades — intrinsic units, so it ignores `format`. */
+/** Percent formatter for grades — intrinsic units, so it ignores `format`.
+ *  Takes a grade in PERCENTAGE POINTS (16 → "16%"), which is how geometry
+ *  reports it, and routes it through `Intl`'s own percent style: the old
+ *  `${nf(n)}%` hardcoded the sign's position and its spacing, so a `locale`
+ *  that localized every distance on the chart left the grades in en-US. */
 export function gradePercent(locale: string | string[] | undefined): (n: number) => string {
-  const nf = makeFormatter(undefined, locale, { maximumFractionDigits: 1 });
-  return (n) => `${nf(n)}%`;
+  const nf = makePercentFormatter(locale, 1);
+  return (n) => nf(n / 100);
 }
 
 /** Shared summary — total distance, climb gain, and the steepest pitch + where. */

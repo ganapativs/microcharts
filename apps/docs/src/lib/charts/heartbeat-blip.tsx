@@ -57,6 +57,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Event-count numeral at the right.",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the count numeral, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: BUSY,
   example: {

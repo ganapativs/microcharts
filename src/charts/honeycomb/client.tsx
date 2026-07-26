@@ -1,8 +1,8 @@
 "use client";
-// Interactive <Honeycomb>. Announces the count on change; hover reveals the
+// Interactive <Honeycomb>. Announces the count on change; hover reveals
 // "value of total" readout. useActivePicker adds per-cell picking on top: one
 // wrapper listener + nearest-hex lookup, offset-row keyboard roving, click /
-// Enter / Space selects a cell (onSelect). Composes the static component.
+// Enter / Space selects a cell (onSelect).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

@@ -1,5 +1,5 @@
 // <DualWindowMeter> — is the level compliant against its target both right now
-// and on average. Static, hook-free, RSC-safe. Two
+// and on average. Two
 // rolling means of one raw series: fast window thin, slow window thick, against
 // a target line. The window sizes are part of the reading and appear in docs.
 import type { CSSProperties, ReactNode } from "react";
@@ -200,9 +200,10 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.slowPath}
         data-mc-ink="data"
         fill="none"
+        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.3)" }}
+        style={{ strokeWidth: "calc(var(--mc-sw) * 1.3)" }}
       />
       <path
         d={geo.fastPath}
@@ -210,7 +211,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         fill="none"
         strokeLinejoin="round"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 0.7)" }}
+        style={{ strokeWidth: "calc(var(--mc-sw) * 0.7)" }}
       />
       {showLabels && geo.slowLast != null ? (
         <text

@@ -52,6 +52,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Numeral after the head (default last).",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description:
+        "Type size of the numeral after the head, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: RISING,
   example: {

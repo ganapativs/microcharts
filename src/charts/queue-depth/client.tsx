@@ -1,8 +1,8 @@
 "use client";
 // Interactive <QueueDepth>. useActivePicker owns interaction: one pointer
 // listener + nearest-x math across the finite samples (non-finite gaps are
-// skipped), ←/→ step, Home/End jump ends, click / Enter / Space selects
-// (onSelect). Composes the static component (canon); the crosshair + focus ring
+// skipped). ←/→ step, Home/End jump ends, click / Enter / Space selects
+// (onSelect).crosshair + focus ring
 // + pin are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

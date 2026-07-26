@@ -1,6 +1,4 @@
-// Waterfall / rank-run summary templates — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core
-// string modules (canon). Aggregate: strings.ts EN.
+// Waterfall / rank-run summary templates.
 import type { SummaryStrings } from "./summary.js";
 
 export type FlowStrings = Pick<

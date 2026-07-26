@@ -1,13 +1,13 @@
 // <ConfusionGrid> — where do the errors go, the one thing accuracy-as-a-number
-// hides. Static, hook-free, RSC-safe. A k×k agreement
+// hides. A k×k agreement
 // matrix (rows = actual, columns = predicted); cell ink = row-normalized share,
-// the diagonal accented by SHAPE (an inset stroke), never color-alone. Accuracy
+// the diagonal accented by SHAPE (an inset stroke). never color-alone. Accuracy
 // is off by default and never leaves the grid.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -44,12 +44,18 @@ export interface ConfusionGridProps {
  *  Clamps to the same k ≤ 4 the visual renders (see the component's `kk`) —
  *  otherwise a k > 4 matrix would announce an accuracy/confusion the grid
  * itself never shows, a real accessible-name/visual mismatch. */
-export function confusionSummary(data: ConfusionGridDatum, strings: ConfusionStrings): string {
+export function confusionSummary(
+  data: ConfusionGridDatum,
+  strings: ConfusionStrings,
+  /** Percent formatter (FRACTION in) for accuracy + the worst-confusion share.
+   *  Pass the same one the accuracy label renders with — a literal `${n}%` left
+   *  the accessible name in en-US while the painted label followed `locale`. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
+): string {
   const { labels, counts } = data;
   const k = Math.max(2, Math.min(4, labels.length));
   if (labels.length < 2 || counts.length === 0) return strings.noData;
   const geo = confusionGridGeometry({ size: 48, k, counts, normalize: "row", gutterCh: 6 });
-  const pct = (v: number) => `${Math.round(v * 100)}%`;
   const acc = pct(geo.accuracy);
   const emptyRows = geo.rowTotals
     .map((t, i) => (t === 0 ? labels[i]! : null))
@@ -115,7 +121,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     normalize,
     gutterCh,
   });
-  const accName = resolveSummary(summary, () => confusionSummary(data, strings));
+  const accName = resolveSummary(summary, () => confusionSummary(data, strings, accFmt));
 
   return (
     <Chart

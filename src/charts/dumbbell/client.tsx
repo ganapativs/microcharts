@@ -2,9 +2,9 @@
 // Interactive <Dumbbell>. useActivePicker owns interaction: one pointer listener
 // + row-by-y-band lookup — ↑/↓ (or ←/→) rove rows, announcing each pair's change
 // ("From 62,000 to 84,000, up 35%."); click / Enter / Space selects a row
-// (onSelect). Composes the static component (canon) — the SVG never drifts.
+// (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -28,12 +28,22 @@ import {
 export interface InteractiveDumbbellProps extends DumbbellProps, PickerProps {
   strings?: PairedStrings;
   /**
-   * Opt-in entrance motion (default `false`): the from/to endpoint dots settle
-   * onto each row on first client-side mount (the connectors arrive with the
-   * base fade). Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): the from/to endpoint dots TRAIL
+   * in on first client-side mount — they pop one row after the next, top to
+   * bottom, and each connector draws in as its pair lands. Inert on the server
+   * and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+}
+
+// The chip and `datum.formatted` show the direction on its OWN, with no sentence
+// around it, so neither can use the `fromTo`/`rows` templates (those take the
+// direction as an enum and word it themselves). Both were rendering the raw
+// `"up"`/`"down"` token — English no bundle could reach. Module scope, so it adds
+// no identity to any hook's dependency list.
+function dirWord(strings: PairedStrings, dir: "up" | "down"): string {
+  return strings.dirNames[dir === "up" ? 0 : 1];
 }
 
 export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
@@ -92,6 +102,8 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     [width, height, data, domain, maxLabelChars, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Relative change — takes `locale`, never the value `format` (its units).
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   // Pointer (viewBox space) → row index by pure y-band math (rows are the axis).
   const locate = useCallback(
@@ -131,17 +143,17 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
-      const c = d ? pairChange(d.from, d.to) : null;
+      const c = d ? pairChange(d.from, d.to, pctFmt) : null;
       return {
         index: i,
         value: d && Number.isFinite(d.to) ? d.to : null,
         label: d?.label,
         formatted: d
-          ? `${Number.isFinite(d.from) ? fmt(d.from) : "—"} → ${Number.isFinite(d.to) ? fmt(d.to) : "—"}${c ? ` (${c.dir} ${c.pct})` : ""}`
+          ? `${Number.isFinite(d.from) ? fmt(d.from) : "—"} → ${Number.isFinite(d.to) ? fmt(d.to) : "—"}${c ? ` (${dirWord(strings, c.dir)} ${c.pct})` : ""}`
           : undefined,
       };
     },
-    [data, fmt],
+    [data, fmt, pctFmt, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -162,7 +174,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : dumbbellSummary(data, fmt, strings);
+        : dumbbellSummary(data, fmt, strings, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Accent rings hugging the whole row (both endpoints). Transient for
@@ -204,7 +216,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const shown = active ?? selected;
   const shownRow = shown !== null ? geo.rows[shown] : undefined;
   const shownDatum = shown !== null ? data[shown] : undefined;
-  const shownChange = shownDatum ? pairChange(shownDatum.from, shownDatum.to) : null;
+  const shownChange = shownDatum ? pairChange(shownDatum.from, shownDatum.to, pctFmt) : null;
   // A pair may arrive with a null/NaN/±Infinity endpoint; never format one. Like the
   // static summary (which speaks only finite-both pairs), an incomplete pair reads as
   // "No data." rather than leaking a half-formatted endpoint. Dumbbell's voice is
@@ -214,7 +226,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const announced = (() => {
     if (!shownDatum) return "";
     if (!okFrom || !okTo) return strings.noData;
-    const c = pairChange(shownDatum.from, shownDatum.to);
+    const c = pairChange(shownDatum.from, shownDatum.to, pctFmt);
     return c
       ? strings.fromTo(fmt(shownDatum.from), fmt(shownDatum.to), c.dir, c.pct)
       : strings.flatPair(fmt(shownDatum.from));
@@ -249,7 +261,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             height,
           )}
         >
-          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${shownChange.dir} ${shownChange.pct})` : ""}`}
+          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${dirWord(strings, shownChange.dir)} ${shownChange.pct})` : ""}`}
         </span>
       ) : null}
     </span>

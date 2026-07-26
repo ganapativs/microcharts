@@ -1,5 +1,5 @@
 // <StarSpoke> — an entity's profile across a few metrics, and which entity in a
-// set is the odd one out. Static, hook-free, RSC-safe.
+// set is the odd one out.
 // Spokes only — NO contour polygon, ever (a `polygon` prop will never exist):
 // the enclosed area lies about magnitude and axis order, and contour-free wins
 // for outlier tasks. Faint guides are the read-back scaffold.
@@ -150,15 +150,16 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
           d={cmp.spokePath}
           data-mc-ink="ghost"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.4)" }}
+          style={{ strokeWidth: "calc(var(--mc-sw) * 1.4)" }}
         />
       ) : null}
       <path
         d={geo.spokePath}
         data-mc-ink="data"
         fill="none"
+        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.2)" }}
+        style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
       />
       {dots === "tips" ? (
         <path

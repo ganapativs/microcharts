@@ -1,4 +1,4 @@
-// IconArray geometry — pure, React-free. One
+// IconArray: One
 // stated rate made countable: filled units in a fixed N-unit grid, denominator
 // visible. Filled units are CONTIGUOUS from the top-left in reading order
 // (scattered fills are harder to count — medical-risk literature); the rest are

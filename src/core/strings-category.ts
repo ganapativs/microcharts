@@ -1,6 +1,4 @@
-// S2 categorical summary templates — a separate MODULE (see strings-scalar.ts:
-// bundlers keep whole chunks, so each shape's templates live alone). English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// S2 categorical summary templates
 import type { SummaryStrings } from "./summary.js";
 
 // Duplicated in strings-dist/strings-quantile by design — each string module is

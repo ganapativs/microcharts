@@ -2,7 +2,7 @@
 // (S1-with-gaps). Measured cells are filled, gaps are hollow with a hairline
 // stroke: the distinction between `null` (no measurement) and `0` (a measured
 // zero) is the whole chart, and it is carried by SHAPE so it survives
-// forced-colors and print. Static, hook-free, RSC-safe. Never interpolates
+// forced-colors and print. Never interpolates
 // across a gap; absence never renders as a zero-value cell.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

@@ -12,12 +12,13 @@ describe("interactive <PolarClock>", () => {
     const live = fig.querySelector('[aria-live="polite"]')!;
     fig.focus();
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Sunday: 120.");
+    await expect.poll(() => live.textContent).toBe("Sunday: 120.");
     await userEvent.keyboard("{ArrowRight}");
-    expect(live.textContent).toBe("Monday: 200.");
+    await expect.poll(() => live.textContent).toBe("Monday: 200.");
     await userEvent.keyboard("{ArrowLeft}");
+    await expect.poll(() => live.textContent).toBe("Sunday: 120.");
     await userEvent.keyboard("{ArrowLeft}");
-    expect(live.textContent).toBe("Saturday: 60.");
+    await expect.poll(() => live.textContent).toBe("Saturday: 60.");
   });
 
   it("wrapper owns naming; static chart is decorative", async () => {
@@ -76,5 +77,30 @@ describe("interactive <PolarClock>", () => {
     const screen = await render(<PolarClock data={WEEK} selectedIndex={3} />);
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  // ↑/↓ must MOVE (and be consumed). Unhandled, they scrolled the page while a
+  // keyboard reader was roving the dial — every other radial chart aliases them.
+  it("↑/↓ rove the cycle like ←/→, and are consumed", async () => {
+    const screen = await render(<PolarClock data={WEEK} title="Week" />);
+    const wrap = screen.getByRole("img").element() as HTMLElement;
+    const live = wrap.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    // let the Home announcement land before capturing it — React state is async
+    await expect.poll(() => live.textContent).not.toBe("");
+    const first = live.textContent;
+    const down = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      bubbles: true,
+      cancelable: true,
+    });
+    wrap.dispatchEvent(down);
+    expect(down.defaultPrevented, "ArrowDown must be consumed, not left to scroll").toBe(true);
+    await expect.poll(() => live.textContent).not.toBe(first);
+    const up = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
+    wrap.dispatchEvent(up);
+    expect(up.defaultPrevented).toBe(true);
+    await expect.poll(() => live.textContent).toBe(first);
   });
 });

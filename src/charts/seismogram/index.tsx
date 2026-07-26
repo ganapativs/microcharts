@@ -1,5 +1,5 @@
 // <Seismogram> — when did things happen, and how hard.
-// Static, hook-free, RSC-safe. Ticks-from-baseline over bars: density reads as
+// Ticks-from-baseline over bars: density reads as
 // texture, not magnitude comparison. Downsampling is max-per-bucket ONLY and
 // the summary is always computed from the RAW values, never the buckets.
 import type { CSSProperties, ReactNode } from "react";

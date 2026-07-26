@@ -1,12 +1,12 @@
 "use client";
 // Interactive <Waveform>. useActivePicker owns interaction: ONE pointer listener
 // + nearest-bucket-by-x, ←/→ rove buckets, click / Enter / Space selects
-// (onSelect). Composes the static component (canon) — the merged bar path is
-// never re-implemented; the client only overlays a transient crosshair, a
+// (onSelect).the merged bar path is
+// ; the client only overlays a transient crosshair, a
 // persistent pin and a readout.
 import { useCallback, useMemo, useRef } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -23,9 +23,12 @@ import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from 
 
 export interface InteractiveWaveformProps extends WaveformProps, PickerProps {
   /**
-   * Opt-in entrance motion (default `false`): the bars rise from the center
-   * on first client-side mount. Inert on the server and on hydrated server
-   * HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the signal SCANS in on first
+   * client-side mount — a clip window sweeps left to right like a playhead,
+   * opening from the axis the waveform hangs off (the center line when
+   * `mirror`, the baseline without it, straight across for `mode="envelope"`).
+   * Inert on the server and on hydrated server HTML; `prefers-reduced-motion`
+   * always wins.
    */
   animate?: boolean;
 }
@@ -74,10 +77,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // Position through the clip — a percentage of its own, so it takes the locale
   // but never the amplitude `format` (which carries the signal's units).
-  const posFmt = useMemo(
-    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [locale],
-  );
+  const posFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   // The painted x of a bucket — bars and the envelope sit on different pitches,
   // so every x-aware surface here reads it from geometry rather than assuming.
@@ -137,7 +137,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : waveformSummary(data, strings, fmt);
+        : waveformSummary(data, strings, fmt, posFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const shown = active ?? selected;

@@ -1,11 +1,7 @@
 "use client";
-// Interactive <SparkBar>. useActivePicker owns interaction: ONE pointer listener
-// + nearest-bar-by-x math, roving keyboard (←/→/Home/End, gaps skipped), touch
-// tap-to-pin, and the onActive/onSelect contract — never a DOM node per bar.
-// COMPOSES the static entry (component canon): the static renders the bars,
-// colors, endpoint label AND annotation children — the client only overlays a
-// focus outline + a pinned outline + readout and owns interaction. Re-implementing
-// the SVG here used to mis-color win-loss ties and drop annotations/labels.
+// Interactive <SparkBar>. useActivePicker: one pointer listener + nearest-bar-by-x,
+// roving keyboard, onActive/onSelect. Static renders bars/colors/labels/annotations;
+// client overlays focus/pin/readout only (re-implementing SVG used to mis-color ties).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";

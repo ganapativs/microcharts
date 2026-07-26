@@ -1,4 +1,4 @@
-// FillWord geometry — pure, React-free. The label IS the bar:
+// FillWord: The label IS the bar:
 // a muted word with an accent copy clipped to the value fraction of its own
 // glyph extent (percentage inset → 50% visually bisects the word, never a
 // hidden wider track). Glyph extent is estimated deterministically (0.62
@@ -32,8 +32,16 @@ export function fillWordGeometry(opts: {
   mode: FillMode;
   /** Reserve a gutter and place the "NNN%" numeral after the word. */
   label?: boolean;
+  /**
+   * Length of the numeral actually rendered. A localised percent can be one
+   * character LONGER than the "100%" this gutter was cut for (fr-FR sets a NBSP
+   * before the sign), and `.mc-root` is `overflow: visible` — the numeral would
+   * spill into the page rather than clip. 4 stays the floor, so an en-US "40%"
+   * reserves exactly what it always did.
+   */
+  numeralChars?: number;
 }): FillWordGeometry {
-  const { word, fontSize, pad, mode, label = false } = opts;
+  const { word, fontSize, pad, mode, label = false, numeralChars = 4 } = opts;
   const v = clamp(Number.isFinite(opts.value) ? opts.value : 0, 0, 1);
   const chars = word.length;
   const textLength = round2(chars * 0.62 * fontSize);
@@ -45,7 +53,7 @@ export function fillWordGeometry(opts: {
   const caps = [...word].filter((c) => c >= "A" && c <= "Z").length;
   const extentFactor = chars > 0 && caps / chars >= 0.7 ? 0.72 : 0.56;
   const wordExtent = round2(chars * extentFactor * fontSize);
-  const numeralExtent = round2(4 * 0.62 * fontSize); // "100%"
+  const numeralExtent = round2(Math.max(4, numeralChars) * 0.62 * fontSize); // ≥ "100%"
   const numeralX = label && chars > 0 ? round2(x + wordExtent + fontSize * 0.3) : null;
   const width =
     label && chars > 0

@@ -3,12 +3,6 @@ import { TreeRings } from "@microcharts/react/tree-rings";
 import { TreeRings as TreeRingsInteractive } from "@microcharts/react/tree-rings/interactive";
 import staticModule, { playground as staticPlayground, YEARS } from "./tree-rings";
 
-/** Interactive half of the tree-rings chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./tree-rings`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <TreeRingsInteractive data={YEARS} summary={false} size={28} animate={animate} />;
 }

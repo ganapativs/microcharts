@@ -3,12 +3,6 @@ import { HeatCell } from "@microcharts/react/heat-cell";
 import { HeatCell as HeatCellInteractive } from "@microcharts/react/heat-cell/interactive";
 import staticModule, { playground as staticPlayground, D } from "./heat-cell";
 
-/** Interactive half of the heat-cell chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./heat-cell`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">

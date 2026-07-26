@@ -1,10 +1,9 @@
 // <SpiralYear> — how did the year breathe? Seasonality at a glance (S1
 // calendar). A calendar series wound onto an Archimedean spiral: angle =
-// position in the year (Jan 1 at 12 o'clock, clockwise), each turn outward = the
+// position in the year (Jan 1 at 12 o'clock, clockwise). each turn outward = the
 // next year. The value is a 5-step (or 3-step) opacity — an ORDINAL channel, the
 // weakest ordered one — so this is a PATTERN instrument; point reads steer to
-// ActivityGrid/HeatStrip. Spiral radius encodes time only, never value. Static,
-// hook-free, RSC-safe.
+// ActivityGrid/HeatStrip. Spiral radius encodes time only, never value.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";

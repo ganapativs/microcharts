@@ -1,10 +1,10 @@
 "use client";
 // Interactive <HeartbeatBlip>. Motion IS the encoding: the trace
-// advances in real time so old spikes drift left and new events enter at the
+// advances in real time so old spikes drift left and new events enter at
 // right — the blip frequency IS the event rate. Every spike is ONE real event;
 // nothing is synthesized on a timer (a fake pulse on a dead service is the one
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
-// on data change) and on-screen (paused off-viewport). Composes the static (canon).
+// on data change) and on-screen (paused off-viewport).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
@@ -20,6 +20,18 @@ import {
 
 export interface InteractiveHeartbeatBlipProps extends HeartbeatBlipProps {
   strings?: HeartbeatStrings;
+  /**
+   * Show the floating count chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="count"` already prints it.
+   */
+  readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One trace = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the trace, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The trace was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — the in-window event count. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -46,6 +58,8 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     strings = EN_HEARTBEAT,
     title,
     summary,
+    readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -59,6 +73,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   // and resets to the latest whenever the data changes (new events anchor at now).
   const [liveNow, setLiveNow] = useState(baseNow);
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
   const prevLen = useRef(events.length);
   const mounted = useRef(false);
 
@@ -107,27 +122,50 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     }
   }, [events, win, now, strings, reduced, inView, wrapRef]);
 
-  // Drill-down: the rate read the trace encodes — how many events are in the
-  // window at the frame currently on screen — named by that window.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: heartbeatGeometry({
-        events,
-        window: win,
-        now: liveNow,
-        width: 60,
-        height: 16,
-        pad: 1,
-      }).count,
-      label: strings.heartbeatWindow(win),
-    });
+  // The count in the window at the frame currently on screen — the number the
+  // spike density only implies, and the number `label="count"` would print.
+  const count = heartbeatGeometry({
+    events,
+    window: win,
+    now: liveNow,
+    width: 60,
+    height: 16,
+    pad: 1,
+  }).count;
+  // Bare `3` is ambiguous at a glance; the chip names the unit. The permanent
+  // `label="count"` stays the tight numeral (space beside the glyph).
+  const readoutText = strings.heartbeatChip(count);
+
+  // Window event rate the trace encodes. One datum builder — callbacks match the chip.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: count,
+    label: strings.heartbeatWindow(win),
+    formatted: readoutText,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here. (The count
+  // keeps drifting with the clock; that is a value change, not a unit change, so
+  // it never re-fires.)
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrapRef}
       {...wrap("mc-heartbeat-live", className, style)}
       {...named(ariaLabel)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -146,6 +184,13 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
+      {/* Spike density IS the rate, but the count behind it is invisible unless
+          `label="count"` prints it. Hover/focus reveals it. */}
+      {readout && hover && props.label !== "count" ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {readoutText}
+        </span>
+      ) : null}
     </span>
   );
 }

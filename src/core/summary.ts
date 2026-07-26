@@ -30,6 +30,8 @@ export interface SummaryStrings {
   status: (stateLabel: string) => string;
   /** S4 calibrated step, e.g. "42 — level 3 of 5." (heat-cell; 1-based level). */
   level: (value: string, level: number, steps: number) => string;
+  /** Terse VISIBLE chip form of `level`, e.g. "42 — level 3 of 5" (no period). */
+  levelChip: (value: string, level: number, steps: number) => string;
   /** S3 completion, e.g. "68% complete." (progress; reused by progress-ring). */
   progress: (pct: string) => string;
   /** S3 burn-down / countdown, e.g. "32% remaining." (progress `positive="down"`). */
@@ -171,6 +173,8 @@ export interface SummaryStrings {
   heartbeatAgo: (ms: number) => string;
   /** Static empty-state in-chart label (heartbeat-blip). */
   heartbeatEmpty: string;
+  /** Terse VISIBLE chip form, e.g. "3 events" (heartbeat-blip). */
+  heartbeatChip: (n: number) => string;
   /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
   cometTrail: (last: string, trendWord: string, n: number) => string;
   /** Single point, e.g. "Now 87." (comet-trail). */
@@ -206,6 +210,11 @@ export interface SummaryStrings {
   events: (count: number, peak: string) => string;
   /** Quiet event strip (seismogram all-zero). */
   noEvents: string;
+  /** The two direction words, `[up, down]`, for a VISIBLE chip that shows the
+   *  direction on its own. The sentence templates below take the direction as an
+   *  ENUM and so can already word it themselves; a chip has no sentence to put it
+   *  in, and was rendering the raw `"up"`/`"down"` token. */
+  dirNames: readonly [up: string, down: string];
   /** S2-paired change, e.g. "From 62,000 to 84,000, up 35%." (dumbbell). */
   fromTo: (from: string, to: string, direction: "up" | "down", pct: string) => string;
   /** Degenerate pair, e.g. "No change at 62,000." */
@@ -335,8 +344,6 @@ export interface SummaryStrings {
    *  region and the visible chip, so it can never be composed inline. */
   timelineFallback: (index: number, kind: "span" | "point") => string;
 
-  /* ── Batch 2 — decision micrographs ──────────────────────────────────── */
-
   /** Coverage summary, e.g. "18 of 24 slots measured (75%); longest gap 4 slots." */
   coverage: (measured: number, expected: number, coveragePct: string, longestGap: number) => string;
   /** Coverage slot announcement, e.g. "Slot 14: 3.2." / "Slot 14: no measurement." */
@@ -358,15 +365,21 @@ export interface SummaryStrings {
   /** Graded-band summary, e.g. "Median 21; 50% within 17–26, 95% within 9–38." */
   gradedBand: (median: string, clauses: string) => string;
   /** One band clause, e.g. "50% within 17–26" — joined by the summary. */
-  bandClause: (level: number, lo: string, hi: string) => string;
+  bandClause: (level: string, lo: string, hi: string) => string;
   /** Band edge announcement, e.g. "80% interval: 17 to 26." */
-  bandEdge: (level: number, lo: string, hi: string) => string;
+  bandEdge: (level: string, lo: string, hi: string) => string;
   /** Graded band with no spread, e.g. "Point value 21, no interval." */
   bandPoint: (value: string) => string;
   /** Icon-array summary, e.g. "3 in 20. About 15%." (+ note for degenerate/sub-unit). */
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
+  /** Terse VISIBLE chip form of `tokenAt`, e.g. "guessing 0.31". */
+  tokenChip: (tier: string, confidence: string) => string;
+  /** Icon-array's PAINTED ratio label, e.g. "3 in 20" (`label="ratio"`, the default). */
+  iconArrayRatio: (k: number, n: number) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /** Terse VISIBLE chip form of `iconArrayUnit`, e.g. "7 of 20 — filled". */
+  iconArrayChip: (index: number, n: number, filled: boolean) => string;
   /**
    * Pictogram unit announcement, e.g. "Unit 7 of 8 — 40% filled." (pictogram-row).
    * Unlike `iconArrayUnit` a pictogram unit may be PARTLY filled (`fractional`),
@@ -374,6 +387,8 @@ export interface SummaryStrings {
    * (only meaningful for `"part"`).
    */
   pictogramUnit: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
+  /** Terse VISIBLE chip form of `pictogramUnit`, e.g. "7 of 8 — 40%". */
+  pictogramChip: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
   /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
   quantileDots: (past: number, count: number, side: string, threshold: string) => string;
   /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */
@@ -567,6 +582,10 @@ export interface SummaryStrings {
   paretoEmpty: (metric: string) => string;
   /** Pareto bar announcement, e.g. "Timeouts: 34% of total, cumulative 61%." */
   paretoAt: (label: string, sharePct: string, cumPct: string) => string;
+  /** Pareto's PAINTED gutter label, e.g. "3 of 12 → 61%". Rendered, not spoken,
+   *  so it needs its own token: the announcement above is a sentence and this is
+   *  a two-number caption, and the arrow is a glyph a locale may reorder. */
+  paretoCount: (k: number, n: number, cumPct: string) => string;
   /** DataDiff summary, e.g. "+512 added, −187 removed across 6 keys; largest change: users (+340)." */
   dataDiff: (added: string, removed: string, n: number, key: string, net: string) => string;
   /** DataDiff with no net change anywhere, e.g. "No changes across 6 keys." */
@@ -650,6 +669,10 @@ export interface SummaryStrings {
     regimes: number,
     mean: string,
   ) => string;
+  /** Regime tag for the VISIBLE chip, e.g. "regime 2 of 3". `changePointAt`
+   *  already carries the same words for the announcement; the chip is a caption
+   *  and needs the fragment on its own. */
+  changePointRegime: (regime: number, regimes: number) => string;
   /** Break announcement, e.g. "Break at point 34: mean 32 to 48 (+50%)." */
   changePointBreak: (i: number, before: string, after: string, signedDelta: string) => string;
   /** Ensemble summary, e.g. "24 simulated paths end between 31 and 58; typical path ends near 44." */
@@ -946,6 +969,9 @@ export interface SummaryStrings {
   ) => string;
   /** Outside-limits clause appended to a BiasStrip pair announce. */
   biasOutside: string;
+  /** BiasStrip's PAINTED caption, e.g. "+3.2 bias". The one word beside the
+   *  number, and the only English left in that chart's rendered output. */
+  biasStripLabel: (bias: string) => string;
   /** PercentileTrace value notation, e.g. "p81". (percentile-trace). */
   percentileValue: (n: string) => string;
   /** PercentileTrace summary, e.g. "p81 now, up 41 points from the first reading; moved above the middle half." */

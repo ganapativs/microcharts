@@ -1,9 +1,8 @@
 "use client";
 // Interactive <Ohlc>. useActivePicker owns interaction: one pointer listener +
 // nearest-x lookup over the rendered periods, ←/→ (Home/End) rove them
-// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20."),
-// click / Enter / Space selects (onSelect). Composes the static component
-// (canon) — the SVG is never re-implemented.
+// ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20.").
+// click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
@@ -25,9 +24,9 @@ import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
   strings?: OhlcStrings;
   /**
-   * Opt-in entrance motion (default `false`): periods reveal left-to-right
-   * when the chart first mounts client-side. Inert on the server and on
-   * hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the periods pop in one candle at a
+   * time, oldest to newest, when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

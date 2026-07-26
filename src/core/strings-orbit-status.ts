@@ -1,8 +1,7 @@
-// OrbitStatus summary templates (orbit-status) — its OWN module. Two live ambient
-// variables (latency = orbit radius, rate = orbit dash density / angular speed);
-// both are LOW-precision ordinal channels, so the docs steer exact reads to
-// Sparkline (latency) + Delta/MiniBar (rate). Units live here (canon). Aggregate:
-// core/strings.ts `EN`.
+// OrbitStatus summary templates (orbit-status). Two live ambient variables (latency = orbit
+// radius, rate = orbit dash density / angular speed); both are LOW-precision ordinal
+// channels, so the docs steer exact reads to Sparkline (latency) + Delta/MiniBar (rate).
+// Units live here (canon). Aggregate: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
 export type OrbitStatusStrings = Pick<

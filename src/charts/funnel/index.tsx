@@ -1,6 +1,6 @@
 // <Funnel> — where does the pipeline leak.
 // Stepped columns over the classic silhouette: the silhouette is a shape, not
-// a measurement. Static, hook-free, RSC-safe. Non-monotonic stages render
+// a measurement. Non-monotonic stages render
 // truthfully and the summary says so.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

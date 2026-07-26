@@ -106,9 +106,8 @@ export const playground: PlaygroundSpec = {
       fill={s.fill as boolean}
       band={s.band ? [10, 26] : undefined}
       label={s.label as "none" | "last" | "minmax"}
-      className="w-full max-w-md"
-      style={{ height: "auto" }}
-      title="Playground"
+      style={{ width: "100%", maxWidth: "28rem", height: "auto" }}
+      title="Weekly revenue"
     />
   ),
   code: (s, data) =>

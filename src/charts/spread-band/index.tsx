@@ -2,7 +2,7 @@
 // Subject (a) and reference (b) on ONE shared domain; the SIGNED gap between
 // them is filled and split at crossings, so "who is ahead" and "when it flipped"
 // read at a glance. The reference whispers (dashed, thinner, neutral); direction
-// is carried by fill sign + text, never color alone. Static, hook-free, RSC-safe.
+// is carried by fill sign + text, never color alone.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { clamp, scaleLinear } from "../../core/scale.js";

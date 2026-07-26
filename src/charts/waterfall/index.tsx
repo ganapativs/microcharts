@@ -1,8 +1,7 @@
 // <Waterfall> — how the deltas compose into the total. P&L in a
 // cell. Sign is encoded by vertical direction from the running level AND by
 // valence token — never color-alone. The zero-anchored total bar stays on by
-// default: a waterfall without a grounded total is unverifiable. Static,
-// hook-free, RSC-safe.
+// default: a waterfall without a grounded total is unverifiable.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

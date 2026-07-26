@@ -176,17 +176,17 @@ One idea runs through the whole catalog: **the same prop name means the same thi
 and they transfer everywhere — a new chart type is a new data shape, never a new vocabulary. The data prop alone always
 renders something correct; everything else is opt-in.
 
-| Prop       | Type                                        | What it does                                                                                                                                    |
-| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`     | `(number \| null)[] \| per-chart shape`     | The series. `null` / `NaN` are gaps, never zeros. The one required prop; each chart documents its own shape when it isn't a plain number array. |
-| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                             |
-| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).                 |
-| `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                  |
-| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative — see [Accessibility](/docs/accessibility).       |
-| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                        |
-| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                  |
-| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                          |
-| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                               |
+| Prop       | Type                                        | What it does                                                                                                                                                              |
+| ---------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`     | `(number \| null)[] \| per-chart shape`     | The series. `null` / `NaN` are gaps, never zeros. The one required prop; each chart documents its own shape when it isn't a plain number array.                           |
+| `domain`   | `[min, max]`                                | Fix the value range instead of auto-fitting — see [Formatting & scale](/docs/formatting#scale-the-domain-decision).                                                       |
+| `color`    | `string`                                    | Mark color: any CSS color or a token (`"var(--mc-accent)"`). Semantic tokens keep their meaning — see [Theming](/docs/theming).                                           |
+| `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                                            |
+| `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title` that marks the chart decorative — see [Accessibility](/docs/accessibility). |
+| `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                                                  |
+| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                                            |
+| `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                                                    |
+| `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                                                         |
 
 Not every prop applies to every chart — a bar chart has no `dots`, and the single-value charts take `value` rather than
 `data` — but wherever a concept exists, its prop name and meaning are always these. Each one has a deeper home:
@@ -251,13 +251,14 @@ const [spend, setSpend] = useState("$0.53");
 <Sparkline data={cost} format="$,.2f" readout={false} onActive={(d) => d && setSpend(d.formatted!)} />;
 ```
 
-Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onSelect` only; there's
-nothing to rove between. Fifteen of them also take `live` (default `true`): as the value updates, the new reading is
-announced through a polite live region, throttled so a streaming number never spams a screen reader. Not all of them do
-— Bullet's only interaction prop is `onSelect` — so check the chart's own page. Two charts opt out of the picker on
-purpose: `MinimapStrip` is a range slider with its own `onWindowChange([lo, hi])`, and `TokenConfidence` moves real
-focus through inline text spans. Full detail, including the live-region behavior, is on
-[Accessibility](/docs/accessibility#one-interaction-contract).
+Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the rest — take `onActive` and `onSelect` too:
+the one unit is still hovered, focused and activated, so the `readout={false}` pattern above works there as well. What
+they don't take is `selectedIndex`/`defaultSelectedIndex` — there's no cursor to move and no index to point it at.
+Fifteen of them also take `live` (default `true`): as the value updates, the new reading is announced through a polite
+live region, throttled so a streaming number never spams a screen reader. Not all of them do — Bullet's only interaction
+prop is `onSelect` — so check the chart's own page. Two charts opt out of the picker on purpose: `MinimapStrip` is a
+range slider with its own `onWindowChange([lo, hi])`, and `TokenConfidence` moves real focus through inline text spans.
+Full detail, including the live-region behavior, is on [Accessibility](/docs/accessibility#one-interaction-contract).
 
 ## Animate on mount (optional)
 

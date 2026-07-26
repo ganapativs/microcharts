@@ -1,8 +1,6 @@
-// <Bullet> — value vs target vs qualitative bands. Ships
-// instead of a gauge (Few). Static, hook-free, RSC-safe. Graduated neutral
-// bands sit lowest; the measure bar and target tick carry the reading. The tick
-// is a distinct shape+position from the bar, so target vs measure never relies
-// on color alone.
+// <Bullet> — value vs target vs qualitative bands (ships instead of a gauge).
+// Graduated neutral bands sit lowest; measure bar + target tick carry the reading.
+// Tick is a distinct shape+position from the bar — never color alone.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
@@ -163,7 +161,7 @@ export function Bullet(props: BulletProps): ReactNode {
           y2={geo.tick.y1}
           data-mc-ink="data"
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.33)" }}
+          style={{ strokeWidth: "calc(var(--mc-sw) * 1.33)" }}
         />
       ) : null}
       {labelText !== undefined ? (

@@ -1,4 +1,3 @@
-// DualSparkline geometry — pure, React-free.
 // Two lines, ONE shared domain (the entire point is comparability): no dual
 // axes, no per-series normalization. Length mismatch → aligned from index 0,
 // the shorter series simply ends (stretching would fake correlation). 2-dp.

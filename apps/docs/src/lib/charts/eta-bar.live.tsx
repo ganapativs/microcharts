@@ -3,12 +3,6 @@ import { EtaBar } from "@microcharts/react/eta-bar";
 import { EtaBar as EtaBarInteractive } from "@microcharts/react/eta-bar/interactive";
 import staticModule, { playground as staticPlayground, min } from "./eta-bar";
 
-/** Interactive half of the eta-bar chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./eta-bar`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <EtaBarInteractive
@@ -34,7 +28,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "eta" | "percent" | "none"}
       etaFormat={min}
       animate={ui.animate}
-      summary={false}
+      title="Export progress"
       width={300}
       height={16}
     />

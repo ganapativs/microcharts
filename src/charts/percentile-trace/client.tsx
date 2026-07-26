@@ -1,8 +1,8 @@
 "use client";
 // Interactive <PercentileTrace>. useActivePicker owns interaction: one pointer
-// listener + nearest-reading math, roving keyboard, touch tap-to-pin, and the
-// onActive/onSelect contract; the live region states the percentile at the
-// focused reading. Composes the static component (canon) — the crosshair +
+// listener + nearest-reading math, roving keyboard, touch tap-to-pin, and
+// onActive/onSelect contract; the live region states the percentile at
+// focused reading.the crosshair +
 // focus ring are overlay children, never a re-implemented SVG.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

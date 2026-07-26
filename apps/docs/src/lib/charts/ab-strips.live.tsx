@@ -3,12 +3,6 @@ import { ABStrips } from "@microcharts/react/ab-strips";
 import { ABStrips as ABStripsInteractive } from "@microcharts/react/ab-strips/interactive";
 import staticModule, { playground as staticPlayground, A, B, MS } from "./ab-strips";
 
-/** Interactive half of the ab-strips chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./ab-strips`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ABStripsInteractive

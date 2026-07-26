@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { FatDigits } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
@@ -40,5 +42,23 @@ describe("interactive <FatDigits>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 200 }]);
+  });
+
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
+  it("onActive reports the numeral once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <FatDigits value={1204} domain={[0, 1500]} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-fat-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 1204 });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
+    await pointerAway();
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
+    expect(seen.length).toBe(2);
   });
 });

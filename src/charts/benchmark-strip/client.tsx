@@ -2,8 +2,7 @@
 // Interactive <BenchmarkStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest-edge math (never a node per quantile). ←/→ step the five
 // quantile edges; each announces its name + value ("p75: 420 ms."). Click /
-// Enter / Space selects an edge (onSelect). Composes the static component
-// (canon); the crosshair tick is an overlay child re-using geometry.
+// Enter / Space selects an edge (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";

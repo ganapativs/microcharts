@@ -1,8 +1,6 @@
-// FatDigits summary templates (fat-digits) — its OWN module. The numeral is
-// always the exact value; the tier is the redundant ordinal weight channel.
-// In digit mode there is no single tier (each digit carries its own), so the
-// summary is just the number. English lives only here (canon). Aggregate:
-// core/strings.ts `EN`.
+// FatDigits summary templates (fat-digits). The numeral is always the exact value; the tier
+// is the redundant ordinal weight channel. In digit mode there is no single tier (each
+// digit carries its own), so the summary is just the number.
 import type { SummaryStrings } from "./summary.js";
 
 export type FatStrings = Pick<SummaryStrings, "noData" | "fatDigits" | "fatDigitsPlain">;

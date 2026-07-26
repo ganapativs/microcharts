@@ -16,6 +16,7 @@ export const entry: ChartEntry = {
   // chart has no `animate` prop at all.
   animates: false,
   picker: false,
+  readout: false,
   dataShape: "{ value: number }",
   encoding: { channel: "canonical pip pattern 1–6 (subitized)", precision: "high" },
   nodeBudget: "≤ 7 (face + 6 pips)",
@@ -37,6 +38,12 @@ export const entry: ChartEntry = {
       type: "boolean",
       required: false,
       description: "Draw the die outline (default true).",
+    },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Die square edge in viewBox units (default 16).",
     },
   ],
   demo: [4],

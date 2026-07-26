@@ -1,4 +1,3 @@
-// CitySkyline geometry — pure, React-free.
 // Two variables ARE the story: building HEIGHT (the
 // primary, high-precision channel, zero-anchored) + lit-window FRACTION (a
 // secondary, low-precision "mostly lit / half lit / dark"). Windows: fixed 2

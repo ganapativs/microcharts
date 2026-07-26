@@ -3,12 +3,6 @@ import { ChangePoint } from "@microcharts/react/change-point";
 import { ChangePoint as ChangePointInteractive } from "@microcharts/react/change-point/interactive";
 import staticModule, { playground as staticPlayground, ERRORS, RAMP } from "./change-point";
 
-/** Interactive half of the change-point chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./change-point`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ChangePointInteractive

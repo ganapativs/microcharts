@@ -2,7 +2,7 @@
 // canonical micro-density technique and this batch's flagship: folded opacity
 // bands, positive in accent, negative in the negative token, mirrored by
 // default. Fold count/mode never auto-switch (same series must render
-// identically across rows). Static, hook-free, RSC-safe.
+// identically across rows).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";

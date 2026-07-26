@@ -1,5 +1,4 @@
-// ActivityGrid summary templates (activity-grid) — its OWN module. English lives
-// only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// ActivityGrid summary templates (activity-grid)
 import type { SummaryStrings } from "./summary.js";
 
 export type ActivityStrings = Pick<

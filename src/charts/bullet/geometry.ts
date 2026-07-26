@@ -1,4 +1,3 @@
-// Bullet geometry — pure, React-free.
 // A measure bar against qualitative bands with a target tick. Horizontal scale
 // anchored at zero. Coords 2-dp via the kernel.
 import { clamp, scaleLinear } from "../../core/scale.js";

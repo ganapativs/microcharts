@@ -5,26 +5,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import { accessibleNaming } from "./a11y.js";
 
-/**
- * How this chart's mark should sit on a line of text when it's rendered inline
- * (`.mc-inline`). CSS cannot derive this: the seat depends on the chart's own
- * padding, which only the geometry knows, and which is sometimes a fraction of
- * the height (a centred bar) and sometimes an absolute inset (a dot radius).
- * So the chart emits it and one rule in `styles.css` consumes it.
- *
- * Coordinates are viewBox units measured from the TOP, same as everything else.
- * Give the plot box — the deterministic frame — never the data bounding box: a
- * seat derived from the data makes the mark jump vertically when values change.
- */
+/** Inline (`.mc-inline`) baseline seat — viewBox coords from the top; plot box only, never data bbox (values would bob). */
 interface Seat {
-  /**
-   * `"floor"` — the mark has a meaningful bottom (bars, areas, lines, columns).
-   * Its floor sits ON the text baseline, exactly where letters sit.
-   *
-   * `"center"` — the mark is vertically symmetric with no floor (arrows, dots,
-   * dials, rings, progress strips). Its box is centred on the cap band, so it
-   * reads like an icon set in running prose.
-   */
+  /** `"floor"`: baseline anchor; `"center"`: cap-band centre for symmetric glyphs. */
   mode: "floor" | "center";
   /** Topmost edge of the plot box. Only read in `"center"` mode. */
   top?: number | undefined;
@@ -33,16 +16,9 @@ interface Seat {
 }
 
 /**
- * Turns a Seat into the two custom properties `styles.css` reads.
- *
- * `--mc-seat` is the anchor's height above the viewBox bottom, as a fraction of
- * the height. It stays unitless so the CSS can multiply it by `100%`, which
- * resolves against the mark's OWN rendered height — the seat then survives any
- * scaling (authored px, CSS override, fluid width) without the chart knowing
- * what size it ended up.
- *
- * `--mc-seat-mid` is a 0/1 flag; the cap-band offset lives in CSS so the `cap`
- * unit can carry a fallback for browsers that lack it.
+ * Maps Seat → `--mc-seat` / `--mc-seat-mid`. `--mc-seat` is unitless so CSS can
+ * multiply by the mark's own height (survives any scale). `--mc-seat-mid` selects
+ * the cap-band center; the cap offset lives in CSS (fallback for no-`cap` UAs).
  */
 function seatVars(seat: Seat | undefined, height: number): CSSProperties | undefined {
   if (!seat || !(height > 0)) return undefined;

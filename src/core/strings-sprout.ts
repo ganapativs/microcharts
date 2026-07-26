@@ -1,6 +1,5 @@
-// SproutRow summary templates (sprout-row) — its OWN module. Four ordinal stage
-// names carry the i18n contract for the growth metaphor. English lives only in
-// core string modules (canon). Aggregate: core/strings.ts `EN`.
+// SproutRow summary templates (sprout-row). Four ordinal stage names carry the i18n
+// contract for the growth metaphor.
 import type { SummaryStrings } from "./summary.js";
 
 export type SproutStrings = Pick<

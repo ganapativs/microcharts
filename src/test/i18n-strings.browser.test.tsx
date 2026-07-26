@@ -43,6 +43,22 @@ import { PairedBars } from "../charts/paired-bars/client.js";
 import { DualSparkline } from "../charts/dual-sparkline/client.js";
 import { QueueDepth } from "../charts/queue-depth/client.js";
 import { BurnChart } from "../charts/burn-chart/client.js";
+// The scalar/glyph half of the catalog: every one of these grew a readout chip
+// in the parity pass, and a chip is rendered text — HeatCell shipped
+// `— level 3 of 5` as an inline template, which no `strings` bundle could
+// translate. Same rule, same gate.
+import { HeatCell } from "../charts/heat-cell/client.js";
+import { BreathingDot } from "../charts/breathing-dot/client.js";
+import { HeartbeatBlip } from "../charts/heartbeat-blip/client.js";
+import { IconArray } from "../charts/icon-array/client.js";
+import { PictogramRow } from "../charts/pictogram-row/client.js";
+import { CometTrail } from "../charts/comet-trail/client.js";
+import { DotPlot } from "../charts/dot-plot/client.js";
+import { MiniBar } from "../charts/mini-bar/client.js";
+import { OrbitStatus } from "../charts/orbit-status/client.js";
+import { Hourglass } from "../charts/hourglass/client.js";
+import { Bullet } from "../charts/bullet/client.js";
+import { ProgressRing } from "../charts/progress-ring/client.js";
 
 /**
  * A `strings` stand-in where every entry renders as «key».
@@ -222,6 +238,34 @@ const CASES: Record<string, () => ReactElement> = {
   "burn-chart": () => (
     <BurnChart data={{ plan: [10, 8, 6, 4, 2], actual: [10, 9, 7, 6, 3] }} strings={S} />
   ),
+  "heat-cell": () => <HeatCell value={0.62} steps={5} strings={S} />,
+  "breathing-dot": () => <BreathingDot value={0.62} strings={S} />,
+  "heartbeat-blip": () => <HeartbeatBlip events={[1, 2, 3]} now={4} window={10} strings={S} />,
+  "icon-array": () => <IconArray value={7} total={20} strings={S} />,
+  "pictogram-row": () => <PictogramRow value={5} total={8} strings={S} />,
+  "comet-trail": () => <CometTrail data={[3, 6, 2, 8, 5]} strings={S} />,
+  "dot-plot": () => (
+    <DotPlot
+      data={[
+        { label: "1", value: 62 },
+        { label: "2", value: 41 },
+      ]}
+      strings={S}
+    />
+  ),
+  "mini-bar": () => (
+    <MiniBar
+      data={[
+        { label: "1", value: 62 },
+        { label: "2", value: 41 },
+      ]}
+      strings={S}
+    />
+  ),
+  "orbit-status": () => <OrbitStatus latency={120} rate={0.4} strings={S} />,
+  hourglass: () => <Hourglass value={0.62} strings={S} />,
+  bullet: () => <Bullet value={62} target={80} strings={S} />,
+  "progress-ring": () => <ProgressRing value={62} max={100} strings={S} />,
 };
 
 const pointer = (el: Element, type: string, x: number, y: number): void => {

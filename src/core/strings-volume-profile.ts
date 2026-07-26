@@ -1,6 +1,5 @@
-// VolumeProfile summary templates (volume-profile) — its OWN module. The value
-// area is a stated convention (default 70%, visible in docs + summary), not an
-// implied confidence interval. English lives only in core string modules (canon).
+// VolumeProfile summary templates (volume-profile). The value area is a stated convention
+// (default 70%, visible in docs + summary), not an implied confidence interval.
 import type { SummaryStrings } from "./summary.js";
 
 export type VolumeProfileStrings = Pick<

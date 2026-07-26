@@ -71,6 +71,19 @@ export const entry: ChartEntry = {
       required: false,
       description: "Segment index → label (default: HH:00 for n=24, weekday for n=7, else index).",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Dial box edge in viewBox units (default 24).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description:
+        "Type size of the peak label under the dial, in viewBox units. Defaults from `size`.",
+    },
   ],
   demo: DAY,
   example: {

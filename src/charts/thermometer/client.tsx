@@ -1,8 +1,8 @@
 "use client";
 // Interactive <Thermometer>. Hover/focus reveals the value readout;
 // the fill glides to its new level (CSS, reduced-motion-gated); announces through
-// a polite region on change, and calls out a target crossing. No pointer math —
-// a single value; hover is a reveal, not a lookup. Composes the static component.
+// a polite region on change, and calls out a target crossing. No pointer math
+// a single value; hover is a reveal, not a lookup.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -34,8 +34,18 @@ export interface InteractiveThermometerProps extends ThermometerProps {
    * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
-  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  /**
+   * Show the floating value chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="value"` already prints it.
+   */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One reading = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the tube, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the reading }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -53,12 +63,13 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     locale,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
     ...rest
   } = props;
-  const summary = thermometerSummary(value, { domain, target, strings, format, locale });
+  const text = thermometerSummary(value, { domain, target, strings, format, locale });
   const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prev = useRef(value);
@@ -70,26 +81,47 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(summary);
-  }, [value, summary, live]);
+    if (live) setAnnounced(text);
+  }, [value, text, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const readoutText = isFiniteValue(value) ? fmt(value) : "";
   // One reading, one selectable unit (index 0) — the same number the readout
-  // shows, in domain units.
-  const pick = (): void =>
-    onSelect?.({ index: 0, value: isFiniteValue(value) ? value : null, formatted: readoutText });
+  // shows, in domain units. One builder, so `onActive` and `onSelect` can never
+  // report a different number or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: isFiniteValue(value) ? value : null,
+    formatted: readoutText,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-thermo-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setHover(true)}
-      onPointerLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -110,7 +142,8 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         style={fillFor(style)}
       />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
-      {readout && hover && readoutText ? (
+      {/* Skip when `label="value"` already prints the numeral beside the tube. */}
+      {readout && hover && readoutText && props.label !== "value" ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readoutText}
         </span>

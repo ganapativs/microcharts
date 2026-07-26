@@ -1,8 +1,8 @@
 "use client";
 // Interactive <RugStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest tick by binary search over the sorted positions, ←/→/↑/↓
-// step through the SORTED observations ("5.2 — 19th of 38."), click / Enter /
-// Space pins one (onSelect). Composes the static component (canon).
+// step through the SORTED observations ("5.2 — 19th of 38."). click / Enter /
+// Space pins one (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

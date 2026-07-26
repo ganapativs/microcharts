@@ -1,4 +1,3 @@
-// Waterfall geometry — pure, React-free.
 // Floating bars are the documented encoding exception to zero-anchoring: each
 // bar's LENGTH is its own delta exactly; the connectors and the zero-anchored
 // total bar are the mandatory keys back to reality. 2-dp.

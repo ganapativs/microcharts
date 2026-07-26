@@ -3,12 +3,6 @@ import { Progress } from "@microcharts/react/progress";
 import { Progress as ProgressInteractive } from "@microcharts/react/progress/interactive";
 import staticModule, { playground as staticPlayground } from "./progress";
 
-/** Interactive half of the progress chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./progress`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ProgressInteractive value={0.68} summary={false} width={120} height={20} animate={animate} />
@@ -22,7 +16,7 @@ export const playground: PlaygroundSpec = {
       value={(s.pct as number) / 100}
       segments={(s.segments as number) >= 2 ? (s.segments as number) : undefined}
       label={s.label as "percent" | "value" | "fraction" | "none"}
-      summary={false}
+      title="Onboarding"
       animate={ui.animate}
       width={200}
       height={26}

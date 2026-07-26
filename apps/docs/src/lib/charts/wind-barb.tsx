@@ -46,6 +46,12 @@ export const entry: ChartEntry = {
       required: false,
       description: '"arrow" swaps quantized barbs for a plain direction arrow + label.',
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Barb box edge in viewBox units (default 32).",
+    },
   ],
   demo: [32],
   example: {

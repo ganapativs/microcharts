@@ -2536,25 +2536,11 @@ div:where(
   animation: mc-stream-in 0.26s var(--ease-out-quint) both;
 }
 
-/* Reveal is a passthrough since the 2026-07 de-slop pass — scroll-into-view
-   fades are gone; sections render at rest, always. The one survivor is
-   `deferred` (hero stream panel): its content arrives with hydration, so a
-   short opacity-only fade covers the pop. `pending` is the state the server
-   renders for a deferred subtree only; nothing else ever hides. */
-[data-reveal="pending"] {
-  opacity: 0;
-}
-[data-reveal="in"] {
-  animation: settle-in 0.4s var(--ease-out-quint) both;
-}
-@keyframes settle-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* Reveal has no styles at all since the 2026-07 de-slop pass — scroll-into-view
+   fades are gone, sections render at rest, and the last hidden subtree (the
+   hero stream panel's `deferred` fade) went with it on 2026-07-26. Nothing on
+   this site is invisible in the server HTML; if a rule here ever sets
+   `opacity: 0` on a reveal again, first paint is gated on JS. */
 
 @keyframes pop-in {
   from {
@@ -2573,7 +2559,6 @@ div:where(
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-reveal],
   .pop-in,
   .mc-morph,
   .mc-stream-chart,
@@ -2591,13 +2576,6 @@ div:where(
   .cta-accent::after {
     display: none;
   }
-  /* No motion → no hidden rest state; show content outright (either reveal
-     phase, so a never-observed pending element can't stay invisible). */
-  [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  [data-reveal],
   .pop-in {
     filter: none;
   }

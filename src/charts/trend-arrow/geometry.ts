@@ -1,4 +1,4 @@
-// TrendArrow geometry — pure, React-free. Direction glyphs as
+// TrendArrow: Direction glyphs as
 // precomputed unit polygons scaled into the box, 2-dp. The glyph never scales
 // with magnitude (an arrow twice as long is a lie at this precision); only its
 // orientation encodes. Flat is one shared shape across glyph families — "no

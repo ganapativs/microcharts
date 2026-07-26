@@ -3,8 +3,7 @@
 // listener on the wrapper + pure grid lookup (x → slot by division) — never a
 // node per cell. ←/→ steps slots, Home/End jump, click / Enter / Space selects
 // (onSelect). The live region says exactly what each slot is: a measured value,
-// or "no measurement" (the honest distinction). Composes the static component
-// (canon); the focus ring is an overlay child re-using the same geometry.
+// or "no measurement" (the honest distinction).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

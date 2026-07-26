@@ -1,6 +1,6 @@
 // <TapeGauge> — the level right now, which zone it's in, and how fast it's moving,
-// with the eye parked in one place. Static, hook-free,
-// RSC-safe. The scale scrolls, the value doesn't; the chevron encodes rate, the
+// with the eye parked in one place.
+// The scale scrolls, the value doesn't; the chevron encodes rate, the
 // position encodes level, and the two never blend. NASA-studied instrument.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -97,6 +97,32 @@ export function tapeGaugeSummary(
 /** Text width over-estimate: 0.62 em/char at font size `f`. */
 const est = (chars: number, f: number): number => 0.62 * f * chars;
 
+/**
+ * The size the hero number is painted at — or `null` when it DROPS.
+ *
+ * The readout is sized to its gutter, then dropped below the library's 7-unit
+ * floor (see the degradation note in the component): a small gauge shows no
+ * number at all. One shared function, because the interactive entry reveals the
+ * value on hover exactly when this returns `null` — so the chip can never
+ * double up with the painted numeral, nor leave the reader with neither.
+ */
+export function tapeGaugeReadoutFont(opts: {
+  valueText: string;
+  gutter: number;
+  band: number;
+  labelY: number;
+  width: number;
+  height: number;
+  vertical: boolean;
+}): number | null {
+  const { valueText, gutter, band, labelY, width, height, vertical } = opts;
+  if (!valueText) return null;
+  const avail = (vertical ? gutter : width) - 1.6;
+  const base = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
+  const font = Math.max(5, Math.min(base, avail / est(valueText.length || 1, 1), band));
+  return font >= 7 && labelFitsY(labelY, font, height) ? font : null;
+}
+
 export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const {
     value,
@@ -134,25 +160,22 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const tier = finite ? chevronTier(rate ?? 0, tiers) : 0;
   const valueText = finite ? fmt(value) : "";
 
-  // the readout is the hero number — sized large, then clamped to fit its gutter
-  const readoutAvail = (vertical ? geo.readout.gutter : width) - 1.6;
-  const readoutBase = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
-  // containment wins over a floor at extreme narrow widths (default 46 renders ~11)
-  // — and over BOTH axes: a horizontal gauge's readout sits under the tape
-  // column with only `readout.band` units of vertical room, so sizing it by the
-  // available width alone let a wide, short gauge paint the number past the
-  // bottom of the viewBox.
-  const readoutFont = Math.max(
-    5,
-    Math.min(readoutBase, readoutAvail / est(valueText.length || 1, 1), geo.readout.band),
-  );
-  // Degradation: below the library's 7-unit floor the number would read smaller
-  // than everything else in the chart, so it DROPS instead — the tape, its
-  // ticks, the zone stripe and the pointer still say where the value sits, and
-  // nothing is reserved for text that isn't drawn. Pure arithmetic: the static
-  // path may never measure text.
-  const showReadout =
-    finite && readoutFont >= 7 && labelFitsY(geo.pointer.labelY, readoutFont, height);
+  // The readout is the hero number — sized large, clamped to fit its gutter,
+  // and DROPPED below the 7-unit floor rather than rendered unreadably small
+  // (`tapeGaugeReadoutFont` owns both rules; the interactive entry reads the
+  // same function to know when hover must reveal the value instead). Pure
+  // arithmetic: the static path may never measure text.
+  const readoutFont =
+    tapeGaugeReadoutFont({
+      valueText,
+      gutter: geo.readout.gutter,
+      band: geo.readout.band,
+      labelY: geo.pointer.labelY,
+      width,
+      height,
+      vertical,
+    }) ?? 0;
+  const showReadout = readoutFont > 0;
 
   // thin tick labels to those that fit their column and don't collide; the
   // formatted string is cached here so render never re-runs Intl per label
@@ -266,7 +289,12 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={readoutFont}
-              style={{ fontWeight: 700 }}
+              // The root pins `--mc-label-size` to the TICK size (7), and
+              // `:where(.mc-root text)` outranks the presentation attribute — so
+              // the hero number was painted at tick size while its clearance was
+              // reserved for 7–13. An inline font-size is the one thing that
+              // beats the rule (DataDiff does the same for its two-size layout).
+              style={{ fontSize: readoutFont, fontWeight: 700 }}
             >
               {valueText}
             </text>

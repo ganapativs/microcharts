@@ -1,10 +1,10 @@
 "use client";
 // Interactive <HeatStrip>. One pointer listener; cell by x-band
-// lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style — the
+// lookup. ←/→ roving cell focus with the ActivityGrid focus-ring style —
 // 1-D restriction of its 2-D nav, same wording, same overlay; click / Enter /
 // Space selects a cell (onSelect). useActivePicker owns interaction (the strip
 // is a single row of cells, so the kernel's default 1-D nav applies — no custom
-// `step`), composing the static component (canon).
+// `step`).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

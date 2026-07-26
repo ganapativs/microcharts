@@ -1,8 +1,10 @@
 "use client";
 // Interactive <TapeGauge>. `live` mode: the readout + chevron
-// update as `value`/`rate` change, and a polite live region re-announces the
-// full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series.
-// Composes the static entry (canon); the scale window stays centered on value.
+// update as `value`/`rate` change, and a polite live region re-announces
+// full reading, throttled (≥ 5 s). No pointer scrubbing — there is no series
+// but hover/focus reveals the reading whenever the gauge is too small (or too
+// unlabelled) to paint its own hero number.
+// ; the scale window stays centered on value.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -10,13 +12,19 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
-import { autoSpan } from "./index.js";
+import { autoSpan, tapeGaugeReadoutFont } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
 import { NO_ZONES, tapeGaugeGeometry } from "./geometry.js";
 
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
   announceEvery?: number;
+  /**
+   * Show the floating value chip on hover/focus (default `true`). It appears
+   * only when the gauge is NOT painting its own number — `label="none"`, or a
+   * gauge too small to fit the hero numeral.
+   */
+  readout?: boolean;
   /**
    * Opt-in entrance motion (default `false`): the instrument fades and scales
    * in when the chart first mounts client-side. A whole-glyph entrance rather
@@ -26,6 +34,13 @@ export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One reading = one unit,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the instrument, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The gauge was activated (click, tap, Enter or Space): `{ index: 0, value }` — the current reading. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -47,6 +62,9 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     summary,
     announceEvery = 5000,
     animate = false,
+    label = "value",
+    readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -72,9 +90,12 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
       : typeof summary === "string"
         ? summary
         : tapeGaugeSummary(value, rate, tiers, geo.containingZone, strings, fmt);
-  const label = [title, full].filter(Boolean).join(". ") || undefined;
+  // `label` is a PROP here (the static's numeral switch), so the accessible
+  // name gets its own binding.
+  const name = [title, full].filter(Boolean).join(". ") || undefined;
 
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
   const last = useRef(-Infinity);
   useEffect(() => {
     if (!full) return;
@@ -85,19 +106,50 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
-  // Drill-down: the reading under the fixed pointer — the number the tape shows.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? value : null,
-      formatted: Number.isFinite(value) ? fmt(value) : undefined,
-    });
+  // Does the gauge itself paint the number? `label="none"` opts out, and a
+  // small gauge DROPS it (the static's documented degradation). Whenever it
+  // doesn't, hover/focus reveals it — otherwise the reading is unavailable to a
+  // sighted reader at exactly the sizes this chart is designed for.
+  const valueText = Number.isFinite(value) ? fmt(value) : "";
+  const painted =
+    label === "value" &&
+    tapeGaugeReadoutFont({
+      valueText,
+      gutter: geo.readout.gutter,
+      band: geo.readout.band,
+      labelY: geo.pointer.labelY,
+      width,
+      height,
+      vertical: orientation !== "horizontal",
+    }) !== null;
+
+  // Tape reading under the pointer. One datum builder — callbacks match the chip.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? value : null,
+    formatted: valueText || undefined,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-tape-live", className, style)}
-      {...named(label)}
+      {...named(name)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -114,6 +166,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
         span={span}
         rateTiers={tiers}
         orientation={orientation}
+        label={label}
         width={width}
         height={height}
         format={format}
@@ -123,6 +176,11 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
         style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
+      {readout && hover && valueText && !painted ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {valueText}
+        </span>
+      ) : null}
     </span>
   );
 }

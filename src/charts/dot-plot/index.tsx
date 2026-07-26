@@ -1,6 +1,6 @@
 // <DotPlot> — a few named values on one scale. Minimum ink
 // per comparison: dots over bars when the scale doesn't start at zero —
-// position lies less than truncated length. Static, hook-free, RSC-safe.
+// position lies less than truncated length.
 // Category labels are anchor-only, truncated by character count.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";

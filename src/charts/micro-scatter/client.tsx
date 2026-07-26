@@ -2,8 +2,6 @@
 // Interactive <MicroScatter>. useActivePicker owns interaction: one pointer
 // listener + nearest-point-by-squared-Euclidean-distance math, ←/→ (and ↑/↓)
 // stepping points ordered by x, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
-//
 // Unit = a plotted dot, so `datum.index` is the DOT POSITION in the projected
 // cloud — identical to the data index whenever every pair is finite (non-finite
 // pairs are dropped by the geometry). `value` is the y channel; the x reading

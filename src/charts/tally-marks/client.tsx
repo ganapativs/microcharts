@@ -3,7 +3,6 @@
 // polite region on change; newly added marks draw in via a one-shot
 // stroke-dashoffset sweep (≤200 ms, reduced-motion → instant). No pointer or
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
-// Composes the static component (canon); geometry is never re-implemented.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -24,6 +23,13 @@ export interface InteractiveTallyMarksProps extends TallyMarksProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. The strokes are ONE
+   * count, so this fires once with `{ index: 0, … }` on pointer enter or focus and
+   * once with `null` when that clears — never repeatedly while the pointer moves
+   * across the marks, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -36,12 +42,13 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     value,
     pen,
     animate = false,
+    onActive,
     onSelect,
     className,
     style,
     ...rest
   } = props;
-  const summary = tallySummary(value, strings);
+  const text = tallySummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
@@ -58,7 +65,7 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
     if (prev.current === value) return;
     const grew = value > prev.current;
     prev.current = value;
-    if (live) setAnnounced(summary);
+    if (live) setAnnounced(text);
     const path = wrap.current?.querySelector<SVGPathElement>('path[data-mc-ink="data"]');
     const len = path ? path.getTotalLength() : 0;
     const from = prevLen.current;
@@ -87,23 +94,43 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
       anim.cancel();
       path.style.strokeDasharray = "";
     };
-  }, [value, live, summary, pen]);
+  }, [value, live, text, pen]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The strokes are ONE count, not N navigable marks: a single selectable unit
-  // (index 0) carrying the integer the tally reads back (floored, ≥ 0).
-  const pick = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
-    });
+  // (index 0) carrying the integer the tally reads back (floored, ≥ 0). One
+  // builder, so `onActive` and `onSelect` can never report a different count.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? Math.max(0, Math.floor(value)) : null,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // tally paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-tally-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

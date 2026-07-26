@@ -2,7 +2,6 @@
 // Interactive <DepthWedge>. useActivePicker owns interaction: one pointer
 // listener + nearest-level-by-x math reveals the cumulative depth on that side,
 // ←/→ walk levels across the book, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

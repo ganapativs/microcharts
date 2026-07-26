@@ -1,4 +1,4 @@
-// ChangePoint geometry — pure, React-free. When did the behaviour
+// ChangePoint: When did the behaviour
 // change level? A break marker + regime shading, over the series line. The
 // detector lives HERE, not in core and is a documented
 // HEURISTIC, not statistics: two-segment mean-shift via binary segmentation,

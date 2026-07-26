@@ -1,6 +1,6 @@
-// <PhaseTrace> — how two coupled signals move together: loops (lag/feedback),
-// clusters (regimes), and where the system is now.
-// Static, hook-free, RSC-safe. Path order carries time; the current state is a
+// <PhaseTrace> — how two coupled signals move together: loops (lag/feedback).
+// clusters (regimes). and where the system is now.
+// Path order carries time; the current state is a
 // directed endpoint. Axes are named and stated, domains always linear.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -137,7 +137,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "var(--mc-stroke-width)" }}
+          style={{ strokeWidth: "var(--mc-sw)" }}
         />
       ) : null}
       {geo.tailPath ? (
@@ -148,7 +148,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           stroke="var(--mc-accent)"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.2)" }}
+          style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
         />
       ) : null}
       {startDot && geo.start ? (
@@ -167,7 +167,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           fill="none"
           stroke="var(--mc-accent)"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.1)" }}
+          style={{ strokeWidth: "calc(var(--mc-sw) * 1.1)" }}
         />
       ) : null}
       {geo.end ? <circle cx={geo.end.x} cy={geo.end.y} r={1.6} fill="var(--mc-accent)" /> : null}

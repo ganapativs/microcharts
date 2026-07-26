@@ -2,15 +2,13 @@
 // Interactive <BiasStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest-pair-by-squared-Euclidean-distance math, ←/→ (and ↑/↓)
 // step pairs ordered by mean, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
-//
 // Unit = a plotted pair, so `datum.index` is the DOT POSITION in the displayed
 // cloud — the geometry drops non-finite pairs and down-samples to ≤ 40 dots, so
 // this equals the data index only for small, all-finite inputs (the pair's own
-// data index stays in the announcement). `value` is the DIFFERENCE (a − b), the
+// data index stays in the announcement). `value` is the DIFFERENCE (a − b).
 // encoded y channel; the pair's mean travels as `label`.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
@@ -72,6 +70,9 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     () => makeFormatter(format, locale, { signDisplay: "exceptZero" }),
     [format, locale],
   );
+  // Within-limits share — a percent of its own, so it takes `locale` but never
+  // the value `format` (which carries the measurement's units).
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   /** Dots ordered by mean (x) for ←/→ stepping. */
   const order = useMemo(() => {
@@ -136,7 +137,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : biasStripSummary(geo, strings, fmtSigned);
+        : biasStripSummary(geo, strings, fmtSigned, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const ring = (i: number, pinned: boolean) => {

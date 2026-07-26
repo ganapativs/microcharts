@@ -3,12 +3,6 @@ import { Seismogram } from "@microcharts/react/seismogram";
 import { Seismogram as SeismogramInteractive } from "@microcharts/react/seismogram/interactive";
 import staticModule, { playground as staticPlayground, BURSTS } from "./seismogram";
 
-/** Interactive half of the seismogram chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./seismogram`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <SeismogramInteractive

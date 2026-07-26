@@ -1,6 +1,4 @@
-// ShiftHistogram summary templates (shift-histogram) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ShiftHistogram summary templates (shift-histogram)
 import type { SummaryStrings } from "./summary.js";
 
 export type ShiftStrings = Pick<

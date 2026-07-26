@@ -1,5 +1,5 @@
 {
-  "library": "0.8.0",
+  "library": "0.9.0",
   "sharedProps": [
     {
       "name": "data",
@@ -29,7 +29,7 @@
       "name": "summary",
       "type": "string | false",
       "required": false,
-      "description": "Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative."
+      "description": "Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title`, that marks the chart decorative (hidden from assistive tech)."
     },
     {
       "name": "format",
@@ -129,7 +129,7 @@
       "type": "(datum: MicroDatum | null) => void",
       "required": false,
       "interactive": true,
-      "description": "A unit was activated — click, tap, `Enter` or `Space` — pinning it so it survives blur. `null` when the selection is cleared (re-activating the same unit, or `Escape`). Same `MicroDatum` payload as `onActive`."
+      "description": "A unit was activated — click, tap, `Enter` or `Space`. On multi-unit pickers this pins the unit so it survives blur (`null` when cleared by re-selecting or `Escape`). On lean scalars there is only one unit, so the callback fires with no pinned state. Same `MicroDatum` payload as `onActive`."
     },
     {
       "name": "selectedIndex",
@@ -348,6 +348,7 @@
       "staticImport": "@microcharts/react/delta",
       "interactiveImport": "@microcharts/react/delta/interactive",
       "picker": false,
+      "readout": false,
       "dataShape": "number (+ optional from)",
       "encoding": {
         "channel": "text + direction glyph (▲/▼)",
@@ -553,6 +554,12 @@
           "description": "Cell edge length in viewBox units."
         },
         {
+          "name": "steps",
+          "type": "number",
+          "required": false,
+          "description": "Intensity steps including the zero track (default 5, GitHub-like). Same knob, same name, as CalendarStrip, CoverageStrip, GardenGrid, HeatCell, HeatStrip and SpiralYear."
+        },
+        {
           "name": "domain",
           "type": "[number, number]",
           "required": false,
@@ -569,6 +576,12 @@
           "type": "string | false",
           "required": false,
           "description": "Override or disable the auto summary."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "required": false,
+          "description": "Gap between cells in viewBox units (default 2)."
         }
       ],
       "example": {
@@ -625,6 +638,7 @@
       "staticImport": "@microcharts/react/trend-arrow",
       "interactiveImport": "@microcharts/react/trend-arrow/interactive",
       "picker": false,
+      "readout": false,
       "dataShape": "number (signed change)",
       "encoding": {
         "channel": "glyph orientation (up / down / flat)",
@@ -691,6 +705,7 @@
       "staticImport": "@microcharts/react/status-dot",
       "interactiveImport": "@microcharts/react/status-dot/interactive",
       "picker": false,
+      "readout": false,
       "dataShape": "\"ok\" | \"warn\" | \"error\" | \"off\" | \"busy\" (extensible)",
       "encoding": {
         "channel": "paired glyph shape + semantic color",
@@ -2154,6 +2169,12 @@
           "type": "\"none\" | \"percent\"",
           "required": false,
           "description": "Centered figure (≥ 20 px rendered)."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Ring box edge in viewBox units (default 24)."
         }
       ],
       "example": {
@@ -2223,6 +2244,12 @@
           "type": "string[]",
           "required": false,
           "description": "Per-wedge colours, cycled; overrides --mc-cat-N. Other stays neutral."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Donut square edge in viewBox units (default 24)."
         }
       ],
       "example": {
@@ -4327,10 +4354,16 @@
           "description": "Fraction retained per period (0–1 or 0–100); period 0 is typically 1.0."
         },
         {
+          "name": "compare",
+          "type": "number[]",
+          "required": false,
+          "description": "Peer/industry curve, drawn as a subordinate dashed ghost. The catalog word for a second series to read the first against (DualSparkline, StarSpoke)."
+        },
+        {
           "name": "benchmark",
           "type": "number[]",
           "required": false,
-          "description": "Peer/industry curve, drawn as a subordinate dashed ghost."
+          "description": "Deprecated alias for `compare`, still accepted and still winning when both are passed."
         },
         {
           "name": "plateau",
@@ -6463,6 +6496,7 @@
       "interactiveImport": "@microcharts/react/tally-marks/interactive",
       "animates": false,
       "picker": false,
+      "readout": false,
       "dataShape": "{ value: number }",
       "encoding": {
         "channel": "mark count in four-and-strike clusters of five",
@@ -6524,6 +6558,7 @@
       "interactiveImport": "@microcharts/react/dice-pips/interactive",
       "animates": false,
       "picker": false,
+      "readout": false,
       "dataShape": "{ value: number }",
       "encoding": {
         "channel": "canonical pip pattern 1–6 (subitized)",
@@ -6552,6 +6587,12 @@
           "type": "boolean",
           "required": false,
           "description": "Draw the die outline (default true)."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Die square edge in viewBox units (default 16)."
         }
       ],
       "example": {
@@ -6612,6 +6653,12 @@
           "type": "\"none\" | \"value\"",
           "required": false,
           "description": "Append the percent numeral after the word."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Word type size in viewBox units (default 12) — here the word is the mark, so this sizes the chart."
         }
       ],
       "example": {
@@ -6632,6 +6679,7 @@
       "staticImport": "@microcharts/react/fat-digits",
       "interactiveImport": "@microcharts/react/fat-digits/interactive",
       "picker": false,
+      "readout": false,
       "dataShape": "{ value: number }",
       "encoding": {
         "channel": "the numeral + redundant font-weight tier",
@@ -6672,6 +6720,12 @@
           "type": "3 | 5",
           "required": false,
           "description": "Weight steps (default 5)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Numeral type size in viewBox units (default 14) — here the numeral is the mark, so this sizes the chart."
         }
       ],
       "example": {
@@ -6748,6 +6802,12 @@
           "type": "boolean",
           "required": false,
           "description": "Draw the reservoir bulb (default true)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the tick and value numerals, in viewBox units (default 8)."
         }
       ],
       "example": {
@@ -6798,6 +6858,12 @@
           "type": "\"progress\" | \"cycle\"",
           "required": false,
           "description": "progress = monotonic fill; cycle = true lunar mapping (0 new → 0.5 full → 1 new)."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Disc box edge in viewBox units (default 16)."
         }
       ],
       "example": {
@@ -6853,6 +6919,12 @@
           "type": "\"none\" | \"remaining\" | \"elapsed\"",
           "required": false,
           "description": "Print the percent that matters to the context."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the percent numeral, in viewBox units (default 8)."
         }
       ],
       "example": {
@@ -6912,6 +6984,12 @@
           "type": "\"ratio\" | \"difference\"",
           "required": false,
           "description": "ratio = share-of-whole; difference = absolute, scaled by domain."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the weight numerals, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -6979,6 +7057,12 @@
           "type": "number",
           "required": false,
           "description": "Horizontal spacing between glyph slots (default 16; widens for labels)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the value and stage labels, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7068,6 +7152,18 @@
           "type": "string",
           "required": false,
           "description": "Noun for the summary count (default \"periods\")."
+        },
+        {
+          "name": "cell",
+          "type": "number",
+          "required": false,
+          "description": "Cell edge length in viewBox units (default 10)."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "required": false,
+          "description": "Gap between cells in viewBox units (default 2)."
         }
       ],
       "example": {
@@ -7144,6 +7240,18 @@
           "type": "\"value\" | \"both\" | \"none\"",
           "required": false,
           "description": "value (default), both, or none."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "required": false,
+          "description": "Gap between bubbles in viewBox units (default 2)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the value numerals, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7214,6 +7322,12 @@
           "type": "\"none\" | \"last\"",
           "required": false,
           "description": "Print the final value after the last note."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the last-note label, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7294,6 +7408,18 @@
           "type": "string",
           "required": false,
           "description": "Plural period noun for the summary (default \"periods\")."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Rings box edge in viewBox units (default 24)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the gutter label, in viewBox units. Defaults from `size`."
         }
       ],
       "example": {
@@ -7376,6 +7502,18 @@
           "type": "number",
           "required": false,
           "description": "Building width in viewBox units (default 9)."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "required": false,
+          "description": "Gap between buildings in viewBox units (default 3)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the value numerals, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7474,6 +7612,12 @@
           "type": "\"none\" | \"count\" | \"percent\"",
           "required": false,
           "description": "Centered readout when the comb has room (default \"none\")."
+        },
+        {
+          "name": "cell",
+          "type": "number",
+          "required": false,
+          "description": "Hex cell radius in viewBox units (default 4)."
         }
       ],
       "example": {
@@ -7547,6 +7691,12 @@
           "type": "number",
           "required": false,
           "description": "Base dot radius in viewBox units (default 1.6)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the peak label, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7645,6 +7795,18 @@
           "type": "(index, n) => string",
           "required": false,
           "description": "Segment index → label (default: HH:00 for n=24, weekday for n=7, else index)."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Dial box edge in viewBox units (default 24)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the peak label under the dial, in viewBox units. Defaults from `size`."
         }
       ],
       "example": {
@@ -7742,6 +7904,12 @@
           "type": "\"dot\" | \"arc\"",
           "required": false,
           "description": "Dots (default) or short arc segments."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Spiral box edge in viewBox units (default 24)."
         }
       ],
       "example": {
@@ -7850,6 +8018,18 @@
           "type": "\"value\" | \"none\"",
           "required": false,
           "description": "Percent numeral beside the dot."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Dot box edge in viewBox units (default 16)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the percent numeral, in viewBox units. Defaults from `size`."
         }
       ],
       "example": {
@@ -7911,6 +8091,12 @@
           "type": "\"count\" | \"none\"",
           "required": false,
           "description": "Event-count numeral at the right."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the count numeral, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -7973,6 +8159,12 @@
           "type": "\"last\" | \"none\"",
           "required": false,
           "description": "Numeral after the head (default last)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the numeral after the head, in viewBox units. Defaults from `height`."
         }
       ],
       "example": {
@@ -8054,6 +8246,18 @@
           "type": "number",
           "required": false,
           "description": "Latency threshold: at/above it the satellite doubles + the summary flags it."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Orbit box edge in viewBox units (default 20)."
+        },
+        {
+          "name": "fontSize",
+          "type": "number",
+          "required": false,
+          "description": "Type size of the gutter label, in viewBox units. Defaults from `size`."
         }
       ],
       "example": {
@@ -8900,6 +9104,12 @@
           "type": "\"barb\" | \"arrow\"",
           "required": false,
           "description": "\"arrow\" swaps quantized barbs for a plain direction arrow + label."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Barb box edge in viewBox units (default 32)."
         }
       ],
       "example": {
@@ -8965,6 +9175,12 @@
           "type": "boolean",
           "required": false,
           "description": "Spoke labels at the tips (default true; drop out below size 44)."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Star box edge in viewBox units (default 80)."
         }
       ],
       "example": {
@@ -10768,6 +10984,12 @@
           "type": "string",
           "required": false,
           "description": "Accent fill override."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Grid square edge in viewBox units. Defaults to a size that grows with the class count."
         }
       ],
       "example": {
@@ -12912,6 +13134,12 @@
           "type": "string",
           "required": false,
           "description": "Top-left identifier."
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "required": false,
+          "description": "Disc + barb square edge in viewBox units (default 48)."
         }
       ],
       "example": {
@@ -12995,6 +13223,12 @@
           "type": "string | false",
           "required": false,
           "description": "Override or disable the auto summary."
+        },
+        {
+          "name": "gap",
+          "type": "number",
+          "required": false,
+          "description": "Gap between cells in viewBox units (default 2)."
         }
       ],
       "example": {

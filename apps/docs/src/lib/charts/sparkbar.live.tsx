@@ -3,12 +3,6 @@ import { SparkBar } from "@microcharts/react/sparkbar";
 import { SparkBar as SparkBarInteractive } from "@microcharts/react/sparkbar/interactive";
 import staticModule, { entry, playground as staticPlayground } from "./sparkbar";
 
-/** Interactive half of the sparkbar chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./sparkbar`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <SparkBarInteractive
@@ -37,8 +31,8 @@ export const playground: PlaygroundSpec = {
         positive={s.positive as "up" | "down"}
         locale={s.locale as string}
         animate={ui.animate}
-        className="w-full max-w-md"
-        title="Playground"
+        style={{ width: "100%", maxWidth: "28rem" }}
+        title="Deploys per day"
       />
     );
   },

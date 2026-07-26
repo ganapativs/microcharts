@@ -1,6 +1,6 @@
 // <BenchmarkStrip> — is this value normal for its peer group? A
 // focal dot on a common scale against the peers' own empirical quantile bands.
-// Static, hook-free, RSC-safe. No axis: the band is the reference frame. Bands
+// No axis: the band is the reference frame. Bands
 // are quantiles of the SUPPLIED peers, never a fitted curve; the stated
 // percentile uses the documented mid-rank rule.
 import type { CSSProperties, ReactNode } from "react";

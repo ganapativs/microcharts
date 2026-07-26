@@ -1,11 +1,11 @@
 // <PercentileLadder> — what does the tail look like, not just the median?
 // Ticks at chosen percentiles on a zero-anchored track;
-// graduated height + accent make the tail read strongest. Static, hook-free,
-// RSC-safe. The origin is never cropped (tick distances are the story); a log
+// graduated height + accent make the tail read strongest.
+// The origin is never cropped (tick distances are the story); a log
 // transform is never silent — an in-chart `log` tag renders when it applies.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
 import { round2, type Value } from "../../core/types.js";
 import { labelFitsY } from "../../core/labels.js";
@@ -17,11 +17,14 @@ export function ladderSummary(
   fmt: (n: number) => string,
   ratioFmt: (n: number) => string,
   strings: QuantileStrings,
+  /** Percent formatter (FRACTION in) for the tail share. Two fraction digits so
+   *  a p99.5 ladder still reads "0.5%"; a literal `${n}%` was an en-US percent. */
+  tailFmt: (fraction: number) => string = makePercentFormatter(undefined, 2),
 ): string {
   if (geo.collapsed) return strings.ladderFlat(fmt(geo.ticks[0]!.value));
   const list = geo.ticks.map((t) => strings.ladderTick(String(t.p), fmt(t.value))).join(", ");
   const lastP = geo.ticks[geo.ticks.length - 1]!.p;
-  const tailShare = `${round2(100 - lastP)}%`;
+  const tailShare = tailFmt((100 - lastP) / 100);
   const ratio = `${ratioFmt(geo.ratio)}×`;
   return strings.ladder(list, tailShare, ratio);
 }
@@ -132,6 +135,8 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const ratioFmt = makeFormatter({ maximumFractionDigits: 1 }, locale);
+  // The tail share is a percent of the sample, not a value — `locale`, never `format`.
+  const tailFmt = makePercentFormatter(locale, 2);
   const cls = className ? `mc-percentile-ladder ${className}` : "mc-percentile-ladder";
 
   if (geo === null) {
@@ -151,7 +156,9 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => ladderSummary(geo, fmt, ratioFmt, strings));
+  const accName = resolveSummary(summary, () =>
+    ladderSummary(geo, fmt, ratioFmt, strings, tailFmt),
+  );
 
   const k = geo.ticks.length;
   const rendered = geo.collapsed ? geo.ticks.slice(0, 1) : geo.ticks;

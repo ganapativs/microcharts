@@ -1,9 +1,9 @@
 "use client";
 // Interactive <ConfusionGrid>. One pointer listener; cell by grid
 // lookup. 2-D arrow roving (ActivityGrid model); Home/End jump the diagonal;
-// click / Enter / Space selects a cell (onSelect). The live region reuses the
+// click / Enter / Space selects a cell (onSelect). The live region reuses
 // FULL row/column labels — this entry is the full-label read-back path.
-// useActivePicker owns interaction; the SVG is the composed static component.
+// useActivePicker owns interaction; the composed static component.
 import { useCallback, useMemo, useRef } from "react";
 import {
   named,
@@ -175,7 +175,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : confusionSummary(data, strings);
+        : confusionSummary(data, strings, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const ring = (i: number, pinned: boolean) => {

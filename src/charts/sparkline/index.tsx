@@ -1,5 +1,4 @@
 // <Sparkline> — the load-bearing default.
-// Static, hook-free, listener-free → RSC-safe, SSR-static, zero client JS
 // Line / smooth / step, optional area fill, normal-range band,
 // endpoint / min-max dots, direct endpoint label, and an annotation-child
 // layer. Interactivity lives in the separate `./interactive` entry.
@@ -155,8 +154,14 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = metrics
-    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+  // …and `minmax` paints text too: pinning only the `last` size left the two
+  // extremum labels laid out at `mmFont` (5–9) but PAINTED at the inherited
+  // `0.75em` (~12 units against 16px prose), which is how they escaped the top
+  // of the viewBox. One pin, whichever mode is painting — the two are mutually
+  // exclusive (`label` is a single enum).
+  const pinFont = metrics?.fontSize ?? (mmFont || undefined);
+  const rootStyle = pinFont
+    ? { ...style, "--mc-label-size": `${pinFont}px` }
     : (style as CSSProperties);
 
   return (
@@ -213,18 +218,29 @@ export function Sparkline(props: SparklineProps): ReactNode {
       {mmFont && geo.min && geo.max
         ? /* a flat series has one extreme — labelling it twice is noise */
           (geo.min.index === geo.max.index ? [geo.max] : [geo.max, geo.min]).map((m, i) => {
-            const kind = i ? "min" : "max";
             const text = fmt(m.value);
             const half = (text.length * mmFont * 0.62) / 2;
+            // central + clamp = containment; if clamp lands on the mark, sit beside
+            const hl = mmFont / 2 + 0.5,
+              c = hl + 2;
+            let y = Math.min(Math.max(m.y + (i ? c : -c), hl), height - hl);
+            let x = Math.min(Math.max(m.x, half + 1), width - half - 1);
+            if (Math.abs(y - m.y) < c) {
+              const side = half + c;
+              x = Math.min(
+                Math.max(m.x + (m.x + side <= width - 1 ? side : -side), half + 1),
+                width - half - 1,
+              );
+              y = Math.min(Math.max(m.y, hl), height - hl);
+            }
             return (
               <text
-                key={kind}
-                /* centered on the mark, clamped inside the viewBox (containment) */
-                x={Math.min(Math.max(m.x, half + 1), width - half - 1)}
-                y={i ? m.y + 3 : m.y - 3}
+                key={i ? "min" : "max"}
+                x={x}
+                y={y}
                 fontSize={mmFont}
                 textAnchor="middle"
-                dominantBaseline={i ? "hanging" : undefined}
+                dominantBaseline="central"
                 data-mc-ink="label"
               >
                 {text}

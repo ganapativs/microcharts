@@ -1,6 +1,5 @@
-// Hypnogram summary templates (hypnogram) — its OWN module. A categorical step
-// strip: transitions + state count + the longest run are the reading. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts.
+// Hypnogram summary templates (hypnogram). A categorical step strip: transitions + state
+// count + the longest run are the reading.
 import type { SummaryStrings } from "./summary.js";
 
 export type HypnogramStrings = Pick<

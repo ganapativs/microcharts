@@ -1,5 +1,5 @@
 // <BiasStrip> — is there a systematic offset between two ways of measuring the
-// same thing? Static, hook-free, RSC-safe. A
+// same thing? A
 // word-sized Bland–Altman plot: each dot is one pair at (mean, difference); the
 // zero line is perfect agreement, the accent line is the measured bias, and the
 // faint band is the ±k·σ limits of agreement. Dots at 75% opacity so overplot
@@ -8,7 +8,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_BIAS_STRIP, type BiasStripStrings } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry, type BiasGeometry, type BiasPair } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -19,11 +19,14 @@ export function biasStripSummary(
   geo: BiasGeometry,
   strings: BiasStripStrings,
   fmtSigned: (n: number) => string,
+  /** Percent formatter (FRACTION in) for the within-limits share. A literal
+   *  `${n}%` left this one number in en-US while `locale` localized the rest. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   if (geo.bias === null) return strings.noData;
   const bias = fmtSigned(geo.bias);
   if (geo.withinPct === null) return strings.biasStripShort(bias, geo.n);
-  return strings.biasStrip(bias, geo.n, `${geo.withinPct}%`);
+  return strings.biasStrip(bias, geo.n, pct(geo.withinPct / 100));
 }
 
 export interface BiasStripProps {
@@ -74,11 +77,13 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
 
   const geo = biasStripGeometry({ width, height, data, limits, rad: outlierRad, captionPad });
   const fmtSigned = makeFormatter(format, locale, { signDisplay: "exceptZero" });
-  const accName = resolveSummary(summary, () => biasStripSummary(geo, strings, fmtSigned));
+  // A share of pairs, not a measurement — takes `locale`, never `format`.
+  const pctFmt = makePercentFormatter(locale);
+  const accName = resolveSummary(summary, () => biasStripSummary(geo, strings, fmtSigned, pctFmt));
 
   // seat-gate: the bias caption sits in the reserved top gutter (never on a dot)
   // and only when it fits horizontally beside the right edge.
-  const labelText = geo.biasY === null ? "" : `${fmtSigned(geo.bias!)} bias`;
+  const labelText = geo.biasY === null ? "" : strings.biasStripLabel(fmtSigned(geo.bias!));
   const labelFits =
     captionPad > 0 && labelText.length > 0 && labelText.length * fontSize * 0.62 + 2 <= width - 2;
   const labelY = captionPad / 2;

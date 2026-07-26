@@ -1,8 +1,6 @@
 "use client";
 // Interactive <ControlStrip>. One pointer listener + nearest-x. ←/→ step all
 // points; Home/End jump ends; Enter/Space/click pins a point (onSelect). (Tab is
-// left for focus egress.) useActivePicker owns interaction, composing the static
-// component (canon); the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

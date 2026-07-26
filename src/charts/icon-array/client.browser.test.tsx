@@ -65,4 +65,59 @@ describe("interactive <IconArray>", () => {
     const screen = await render(<IconArray value={0.15} total={20} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // Roving used to light a ring and speak the unit while showing nothing: the
+  // chip is the sighted half of that same reading, and `formatted` mirrors it.
+  it("roving paints the unit's reading as a chip; `formatted` mirrors it", async () => {
+    const seen: { formatted?: string | undefined }[] = [];
+    const screen = await render(
+      <IconArray value={0.15} total={20} onActive={(d) => d && seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("1 of 20 — filled");
+    expect(seen.at(-1)?.formatted).toBe("1 of 20 — filled");
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("20 of 20 — empty");
+  });
+
+  it("readout={false} drops the chip and keeps the ring + callback", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <IconArray value={0.15} total={20} readout={false} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    await expect.poll(() => seen.at(-1)).toMatchObject({ formatted: "1 of 20 — filled" });
+    expect(screen.container.querySelector('rect[data-mc-w="full"]')).not.toBeNull();
+    expect(screen.container.querySelector(".mc-spark-readout")).toBeNull();
+  });
+
+  it("a custom `strings` owns the chip text (no hardcoded English)", async () => {
+    const screen = await render(
+      <IconArray
+        value={0.15}
+        total={20}
+        strings={{
+          noData: "Aucune donnée.",
+          iconArray: (k, n) => `${k} sur ${n}.`,
+          iconArrayRatio: (k, n) => `${k} sur ${n}`,
+          iconArrayUnit: (i, n, filled) => `Unité ${i} sur ${n} — ${filled ? "plein" : "vide"}.`,
+          iconArrayChip: (i, n, filled) => `${i}/${n} ${filled ? "plein" : "vide"}`,
+        }}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("1/20 plein");
+  });
 });

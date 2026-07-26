@@ -1,9 +1,8 @@
 // <QuantileDots> — what are the odds, in COUNTABLE form? A
 // quantile dotplot: `count` dots at equal-probability quantiles, stacked into
 // columns. Each dot ≈ a 1-in-count chance — NOT a raw observation. Past a
-// threshold, dots are re-inked accent AND ringed (never color-alone), and the
-// summary uses frequency framing ("4 in 20"), never a bare percentage. Static,
-// hook-free, RSC-safe.
+// threshold, dots are re-inked accent AND ringed (never color-alone). and the
+// summary uses frequency framing ("4 in 20"). never a bare percentage.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
@@ -86,8 +85,18 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
   // the static path may never measure text.
   const showLabel =
     label === "count" && hasThreshold && probe != null && labelFitsY(height / 2, FONT, height);
-  const labelText = showLabel ? `${probe!.past} in ${probe!.count}` : "";
-  const gutterCh = showLabel ? labelText.length : 0;
+  // The frequency framing comes from the strings bundle — the interactive entry
+  // already renders this exact label through `quantileDotsOdds`, while the
+  // static spelled "N in count" out in English, so a translated `strings` moved
+  // the announcement and left the painted label behind. Gutter off the produced
+  // string, so a longer translation reserves the room it needs.
+  const labelText = showLabel ? strings.quantileDotsOdds(probe!.past, probe!.count) : "";
+  // Reserve the WIDEST odds string this dotplot can print (`count in count`),
+  // never the current one. The interactive entry drives `threshold` from the
+  // pointer, so a gutter sized to today's digits would grow and shrink the
+  // viewBox under the cursor — and the same props would paint a different box
+  // static vs interactive.
+  const gutterCh = showLabel ? strings.quantileDotsOdds(probe!.count, probe!.count).length : 0;
 
   const geo = quantileDotsGeometry({
     width,

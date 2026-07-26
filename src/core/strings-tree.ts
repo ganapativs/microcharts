@@ -1,6 +1,5 @@
-// TreeRings summary templates (tree-rings) — its OWN module. Radial thickness =
-// per-period value; the summary names the latest and biggest period. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// TreeRings summary templates (tree-rings). Radial thickness = per-period value; the
+// summary names the latest and biggest period.
 import type { SummaryStrings } from "./summary.js";
 
 export type TreeStrings = Pick<SummaryStrings, "noData" | "treeRings" | "treeRingAt">;

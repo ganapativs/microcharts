@@ -1,4 +1,4 @@
-// PictogramRow geometry — pure, React-free. N constant-size
+// PictogramRow: N constant-size
 // units on one row; unit size NEVER scales with value (the classic pictogram
 // lie). A fractional last unit is a circular-segment / partial-rect PATH — not
 // a <clipPath>, which would need a generated id (canon: static components

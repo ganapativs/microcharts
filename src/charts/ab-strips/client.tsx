@@ -1,11 +1,11 @@
 "use client";
 // Interactive <ABStrips>. useActivePicker owns interaction: y picks the row,
-// x snaps to the nearest quantile edge; ↑/↓ switch rows (keeping the edge), ←/→
+// x snaps to the nearest quantile edge; ↑/↓ switch rows (keeping the edge). ←/→
 // step edges; click / Enter / Space selects (onSelect). The median edge
-// announces the row median + delta vs the other arm; other edges announce the
-// percentile. Composes the static component (canon).
+// announces the row median + delta vs the other arm; other edges announce
+// percentile.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -68,6 +68,10 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     ? Math.max(seriesLabels[0].length, seriesLabels[1].length)
     : 0;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Same percent formatter the static builds — the gutter is measured off its
+  // output, so a locale that widens it (fr-FR "+15 %") must widen it identically
+  // in both entries or the pointer map runs short of the rendered viewBox.
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   // Mirror the static's label gutter so `totalWidth` matches the rendered
   // viewBox — without it the pointer map and readout run short and the
   // crosshair drifts from the cursor.
@@ -82,7 +86,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
     });
     const showLabel =
       (props.label ?? "delta") === "delta" && base != null && labelFitsBand(height, FONT);
-    const gutterCh = showLabel ? abDelta(base!, fmt).length : 0;
+    const gutterCh = showLabel ? abDelta(base!, fmt, pctFmt).length : 0;
     return abStripsGeometry({
       width,
       height,
@@ -93,7 +97,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       gutterCh,
       fontSize: FONT,
     });
-  }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt, FONT]);
+  }, [width, height, data.a, data.b, labelChars, props.domain, props.label, fmt, pctFmt, FONT]);
 
   // Navigable unit = one quantile edge of one row: index `row * 5 + edge`
   // (row 0 = arm A, row 1 = arm B; edge 0…4 = p5/p25/p50/p75/p95). The chart
@@ -186,7 +190,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         ? summary
         : geo === null
           ? strings.noData
-          : abSummary(geo, fmt, seriesLabels, strings);
+          : abSummary(geo, fmt, seriesLabels, strings, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const dot = (i: number, pinned: boolean) => {

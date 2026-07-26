@@ -1,4 +1,4 @@
-// GradedBand geometry — pure, React-free. How sure are we
+// GradedBand: How sure are we
 // about ONE number? Nested central intervals graded by opacity, never a bar
 // from zero (bar-plus-error-bar induces within-the-bar bias — Correll &
 // Gleicher 2014). Opacity maps to probability level and nothing else. Inner

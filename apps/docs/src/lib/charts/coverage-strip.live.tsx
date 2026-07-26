@@ -3,12 +3,6 @@ import { CoverageStrip } from "@microcharts/react/coverage-strip";
 import { CoverageStrip as CoverageStripInteractive } from "@microcharts/react/coverage-strip/interactive";
 import staticModule, { playground as staticPlayground, COVERAGE } from "./coverage-strip";
 
-/** Interactive half of the coverage-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./coverage-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <CoverageStripInteractive

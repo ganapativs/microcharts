@@ -1,6 +1,6 @@
 // <TokenConfidence> — which parts of generated text you should double-check
 // The documented exception to the SVG Chart root:
-// THE TEXT IS THE CHART. Static, hook-free, RSC-safe. Confidence maps to three
+// THE TEXT IS THE CHART. Confidence maps to three
 // discrete tiers as typographic underlines (color + thickness + stroke style —
 // never color-alone); confident tokens get NO mark so reading stays primary.
 import type { CSSProperties, ReactNode } from "react";
@@ -73,8 +73,10 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
   const accName =
     summary === false ? undefined : (summary ?? tokenConfidenceSummary(tokens, strings));
   const rootClass = className ? `mc-token-confidence ${className}` : "mc-token-confidence";
+  // Decorative only with nothing left to name — a `title` survives the opt-out,
+  // the same rule the client entry and shared/a11y.ts apply.
   const aria =
-    summary === false
+    summary === false && !title
       ? { "aria-hidden": true as const }
       : {
           role: "img" as const,
@@ -105,8 +107,16 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
         ];
       })}
       {legend ? (
+        // The tier NAMES come from the strings bundle (`tokenTierNames`, the same
+        // three the announcement and the summary use) — they were spelled out in
+        // English here, so a translated `strings` left the key untranslated. Only
+        // the two rule glyphs and the separator are literal, and those are
+        // typography, not language. Still `aria-hidden`: it maps a MARK to a
+        // tier, which is meaningless read aloud, and the tier vocabulary already
+        // reaches assistive tech through the accessible name (`tokenConfidence`)
+        // and the per-token announcement (`tokenAt`).
         <span className="mc-tc-legend" aria-hidden="true">
-          {" ― unsure · ⋯ guessing"}
+          {` ― ${strings.tokenTierNames[1]} · ⋯ ${strings.tokenTierNames[2]}`}
         </span>
       ) : null}
       {children}

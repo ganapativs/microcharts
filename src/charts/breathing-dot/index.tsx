@@ -4,12 +4,12 @@
 // level read. The interactive entry adds a pulse whose rate encodes the level.
 // Band color is always doubled — by ring offset here, by pulse rate in motion —
 // so it never stands alone. Boundary rule: continuous level → BreathingDot;
-// discrete events → HeartbeatBlip. Static, hook-free, RSC-safe.
+// discrete events → HeartbeatBlip.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
 import { breathingDotGeometry } from "./geometry.js";
 
 const BAND_INK = ["positive", "neutral", "negative"] as const;
@@ -35,6 +35,13 @@ export interface BreathingDotProps {
 
 const PAD = 1;
 
+// The load percent is the only number this chart renders, so the consumer's
+// `format` still tunes it — but it resolves through `Intl`'s own percent style,
+// never `${Math.round(v * 100)}%`: that template is an en-US percent (fr-FR
+// wants a NBSP before the sign, tr-TR puts the sign first, some locales use
+// their own digits), so a `locale` prop left the percentage in English.
+const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFractionDigits: 0 };
+
 export function breathingDotSummary(
   value: number | null,
   opts: {
@@ -48,8 +55,7 @@ export function breathingDotSummary(
   if (!(typeof value === "number" && Number.isFinite(value))) return strings.breathingDotUnknown;
   const v = Math.min(1, Math.max(0, value));
   const band = v < thresholds[0] ? 0 : v < thresholds[1] ? 1 : 2;
-  const fmt = makeFormatter(format, locale);
-  return strings.breathingDot(`${fmt(Math.round(v * 100))}%`, strings.loadBands[band]);
+  return strings.breathingDot(makeFormatter(format, locale, PCT)(v), strings.loadBands[band]);
 }
 
 export function BreathingDot(props: BreathingDotProps): ReactNode {
@@ -70,14 +76,22 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
   } = props;
   const fontSize = props.fontSize ?? labelFont(size);
 
-  const labelBand = label === "value" ? fontSize * 2.6 : 0;
   const geo = breathingDotGeometry({ value, size, thresholds, pad: PAD });
   const accName =
     summary === false
       ? false
       : (summary ?? breathingDotSummary(value, { thresholds, strings, format, locale }));
-  const fmt = makeFormatter(format, locale);
-  const pctText = label === "value" && !geo.unknown ? `${fmt(Math.round(geo.level * 100))}%` : null;
+  const pctText =
+    label === "value" && !geo.unknown ? makeFormatter(format, locale, PCT)(geo.level) : null;
+  // Reserve from the ACTUAL numeral, not a fixed digit count: a locale that puts
+  // a NBSP before the sign ("100 %") is one character wider than the "100%" the
+  // 2.6 em band was cut for, and `.mc-root` is `overflow: visible` — the numeral
+  // would spill into the page rather than clip. The band stays the floor so
+  // en-US output is byte-identical.
+  const labelBand =
+    label === "value"
+      ? Math.max(fontSize * 2.6, pctText ? textGutter(pctText.length, fontSize, 1) : 0)
+      : 0;
 
   return (
     <Chart

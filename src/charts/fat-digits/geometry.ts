@@ -1,4 +1,4 @@
-// FatDigits geometry — pure, React-free. The numeral itself is
+// FatDigits: The numeral itself is
 // the exact channel; font-WEIGHT is a redundant preattentive tier (5 or 3
 // ordinal steps) so big numbers in a dense column pop before you read them.
 // DEVIATION from FatFonts: the source encodes magnitude as glyph ink

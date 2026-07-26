@@ -53,6 +53,18 @@ export const entry: ChartEntry = {
       required: false,
       description: 'Noun for the summary count (default "periods").',
     },
+    {
+      name: "cell",
+      type: "number",
+      required: false,
+      description: "Cell edge length in viewBox units (default 10).",
+    },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between cells in viewBox units (default 2).",
+    },
   ],
   demo: WEEKS,
   example: {

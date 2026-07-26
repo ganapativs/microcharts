@@ -70,6 +70,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Base dot radius in viewBox units (default 1.6).",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the peak label, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: [40, 90, 30, 65],
   example: {

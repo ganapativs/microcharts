@@ -16,6 +16,7 @@ export const entry: ChartEntry = {
   // so this chart has no `animate` prop at all.
   animates: false,
   picker: false,
+  readout: false,
   dataShape: "{ value: number }",
   encoding: { channel: "mark count in four-and-strike clusters of five", precision: "high" },
   nodeBudget: "2 (strokes + overflow numeral)",

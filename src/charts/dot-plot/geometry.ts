@@ -1,4 +1,4 @@
-// DotPlot geometry — pure, React-free. Dot position on one
+// DotPlot: Dot position on one
 // common scale: minimum ink per comparison. Without `stem` the domain may be
 // data-fit (position read); WITH `stem` the domain is forced through zero
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.

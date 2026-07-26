@@ -3,7 +3,7 @@
 // listener + nearest-half lookup, ←/→ focus a PAN, click / Enter / Space
 // selects it (onSelect); the beam eases to a new tilt on data change (CSS
 // geometry transition, reduced-motion-gated) and announces when the heavier
-// side flips. Composes the static component (canon).
+// side flips.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -60,7 +60,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     defaultSelectedIndex,
     ...rest
   } = props;
-  const summary = balanceBeamSummary(data, { mode, domain, strings, format, locale });
+  const text = balanceBeamSummary(data, { mode, domain, strings, format, locale });
   // Data-driven announcement: fires only when the heavier side flips (a prop
   // change), independent of keyboard/pointer focus — see `panSpoken` below for
   // the roving announcement, which takes priority whenever a pan is shown.
@@ -93,10 +93,16 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   useEffect(() => {
     if (geo.heavier === prevHeavier.current) return;
     prevHeavier.current = geo.heavier;
-    if (live) setChanged(summary);
-  }, [geo, summary, live]);
+    if (live) setChanged(text);
+  }, [geo, text, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // The navigable unit is the PAN (a side of the beam), 1:1 with `data`:

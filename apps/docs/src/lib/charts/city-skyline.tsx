@@ -68,6 +68,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Building width in viewBox units (default 9).",
     },
+    {
+      name: "gap",
+      type: "number",
+      required: false,
+      description: "Gap between buildings in viewBox units (default 3).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the value numerals, in viewBox units. Defaults from `height`.",
+    },
   ],
   demo: [46, 32, 28, 40, 18],
   example: {

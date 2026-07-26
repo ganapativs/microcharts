@@ -1,10 +1,10 @@
 "use client";
 // Interactive <PartitionStrip>. useActivePicker owns interaction: one pointer
 // listener + segment lookup by row (y) then x, a custom 2-D `step` (←/→ within
-// a row, ↑/↓ between a parent and its first child — ActivityGrid model), click /
-// Enter / Space selects (onSelect). Composes the static component (canon).
+// a row, ↑/↓ between a parent and its first child — ActivityGrid model). click /
+// Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -79,10 +79,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   // Shares through a real percent formatter, not `${Math.round(x*100)}%` — the
   // hand-rolled form hardcodes the sign and its spacing (fr-FR writes "12 %"),
   // which is the same visible-chip i18n leak fixed on SegmentedBar.
-  const pctFmt = useMemo(
-    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [locale],
-  );
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
 
   const locate = useCallback(
     (x: number, y: number) => {
@@ -160,7 +157,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
       ? undefined
       : typeof summary === "string"
         ? summary
-        : partitionStripSummary(data, strings);
+        : partitionStripSummary(data, strings, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const outline = (i: number, pinned: boolean) => {

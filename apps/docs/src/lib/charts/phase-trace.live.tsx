@@ -3,12 +3,6 @@ import { PhaseTrace } from "@microcharts/react/phase-trace";
 import { PhaseTrace as PhaseTraceInteractive } from "@microcharts/react/phase-trace/interactive";
 import staticModule, { playground as staticPlayground, TRAJ } from "./phase-trace";
 
-/** Interactive half of the phase-trace chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./phase-trace`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <PhaseTraceInteractive

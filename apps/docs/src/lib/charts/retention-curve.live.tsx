@@ -3,12 +3,6 @@ import { RetentionCurve } from "@microcharts/react/retention-curve";
 import { RetentionCurve as RetentionCurveInteractive } from "@microcharts/react/retention-curve/interactive";
 import staticModule, { playground as staticPlayground, DEMO, BENCH } from "./retention-curve";
 
-/** Interactive half of the retention-curve chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./retention-curve`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <RetentionCurveInteractive

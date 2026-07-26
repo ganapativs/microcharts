@@ -3,12 +3,6 @@ import { EventRaster } from "@microcharts/react/event-raster";
 import { EventRaster as EventRasterInteractive } from "@microcharts/react/event-raster/interactive";
 import staticModule, { playground as staticPlayground, RASTER } from "./event-raster";
 
-/** Interactive half of the event-raster chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./event-raster`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <EventRasterInteractive

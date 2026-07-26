@@ -1,5 +1,5 @@
 // <Hypnogram> — which discrete state the system was in over time, and how choppy
-// the transitions were. Static, hook-free, RSC-safe.
+// the transitions were.
 // A categorical step strip that REFUSES interpolation: no diagonals, no curves,
 // ever — a state is a fact, not a sample of a continuum (the anti-line-chart).
 import type { CSSProperties, ReactNode } from "react";
@@ -236,7 +236,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.35)" }}
+            style={{ strokeWidth: "calc(var(--mc-sw) * 1.35)" }}
           />
           {emphasis && emphRuns.length > 0 ? (
             <path
@@ -244,7 +244,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               fill="none"
               stroke="var(--mc-accent)"
               strokeLinecap="round"
-              style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.4)" }}
+              style={{ strokeWidth: "calc(var(--mc-sw) * 1.4)" }}
             />
           ) : null}
         </>

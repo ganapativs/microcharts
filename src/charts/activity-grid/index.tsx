@@ -1,6 +1,6 @@
 // <ActivityGrid> — intensity calendar. GitHub's
-// contribution graph, the proof that color-encodes-a-variable. Static, hook-free,
-// RSC-safe. Discrete levels (not a continuous ramp). The per-cell reading is the
+// contribution graph, the proof that color-encodes-a-variable.
+// Discrete levels (not a continuous ramp). The per-cell reading is the
 // accessible summary + (opt-in) interactive tooltip; the static grid never shows
 // per-cell numbers (unmeasurable + too dense) — a documented limitation.
 import type { CSSProperties, ReactNode } from "react";
@@ -14,10 +14,13 @@ import { cellMetrics, stepOpacity, type CellShape } from "../../shared/cell.js";
 import { activityGridGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
+/** Default intensity steps, including the zero track — GitHub-like. */
 export const LEVELS = 5;
 
 /** Opacity ramp per discrete level — the shared stepped-color ramp
- *  (shared/cell.ts), fixed to this chart's LEVELS. */
+ *  (shared/cell.ts), at the DEFAULT step count. A chart instance that sets
+ *  `steps` calls `stepOpacity(level, steps)` directly; this stays for the
+ *  callers (docs previews, the registry) that paint at the default. */
 export const levelOpacity = (level: number): number => stepOpacity(level, LEVELS);
 
 export { cellMetrics, type CellShape } from "../../shared/cell.js";
@@ -56,6 +59,8 @@ export interface ActivityGridProps {
   /** Cell edge length in viewBox units. */
   cell?: number | undefined;
   gap?: number | undefined;
+  /** Intensity steps including the zero track. */
+  steps?: number | undefined;
   /** Explicit `[min, max]` for level bucketing; auto-fit when omitted. */
   domain?: readonly [number, number] | undefined;
   color?: string | undefined;
@@ -79,6 +84,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     weekStart = 1,
     cell = 10,
     gap = 2,
+    steps = LEVELS,
     domain,
     color,
     format,
@@ -96,7 +102,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     rows: layout === "strip" ? 1 : 7,
     cell,
     gap,
-    levels: LEVELS,
+    levels: steps,
     domain,
     offset: layout === "grid" ? calendarOffset(anchor, weekStart) : 0,
   });
@@ -132,7 +138,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
           rx={mark.rx}
           shapeRendering={mark.crisp ? "crispEdges" : undefined}
           data-mc-ink="cell"
-          fillOpacity={levelOpacity(c.level)}
+          fillOpacity={stepOpacity(c.level, steps)}
           style={cellFill}
         />
       ))}

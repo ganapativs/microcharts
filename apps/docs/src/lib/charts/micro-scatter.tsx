@@ -88,11 +88,9 @@ export const entry: ChartEntry = {
 
 export function Preview() {
   return <MicroScatter data={CLOUD} summary={false} width={110} height={66} />;
-} // data: the whole point cloud, no shuffle button (a scatter's shape only
-// reads at n ≈ 24 — a per-click reshuffle would defeat "read it once, trust
-// it"). color, format, locale, id, className, style, children: styling/
-// formatting escape hatches, not chart-shape knobs — no interactive control
+}
 
+// No shuffle — scatter shape needs a fixed cloud; reshuffle defeats a single read.
 export const playground: PlaygroundSpec = {
   knobs: [
     { kind: "toggle", key: "trend", label: "trend line", init: false },

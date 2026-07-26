@@ -1,12 +1,12 @@
 // <Dumbbell> — where each row started and ended.
-// Static, hook-free, RSC-safe. Hollow → filled reads as before → after without
+// Hollow → filled reads as before → after without
 // a legend; with `positive` the connector takes the valence token by direction.
 // For RANGES (min→max) docs require dropping `positive` — a range has no
 // valence and coloring it would invent one.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { labelFitsY, labelFont, proseCharsThatFit } from "../../core/labels.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -20,11 +20,18 @@ export interface DumbbellDatum {
   to: number;
 }
 
-/** Percent-change clause for a pair (shared with the interactive entry). */
-export function pairChange(from: number, to: number): { dir: "up" | "down"; pct: string } | null {
+/** Percent-change clause for a pair (shared with the interactive entry).
+ *  `pctFmt` takes a FRACTION and must be a real percent formatter — the old
+ *  `${Math.round(x*100)}%` was an en-US percent, so `locale` reached every other
+ *  number on the chart but not this one. Unsigned: `dir` carries the sign. */
+export function pairChange(
+  from: number,
+  to: number,
+  pctFmt: (fraction: number) => string = makePercentFormatter(undefined),
+): { dir: "up" | "down"; pct: string } | null {
   if (!Number.isFinite(from) || !Number.isFinite(to) || from === to) return null;
   const dir = to > from ? "up" : "down";
-  const pct = from === 0 ? "" : `${Math.round(Math.abs((to - from) / Math.abs(from)) * 100)}%`;
+  const pct = from === 0 ? "" : pctFmt(Math.abs((to - from) / Math.abs(from)));
   return { dir, pct };
 }
 
@@ -33,12 +40,13 @@ export function dumbbellSummary(
   data: readonly DumbbellDatum[],
   fmt: (n: number) => string,
   strings: PairedStrings,
+  pctFmt: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   const finite = data.filter((d) => Number.isFinite(d.from) && Number.isFinite(d.to));
   if (finite.length === 0) return strings.noData;
   if (finite.length === 1) {
     const d = finite[0]!;
-    const c = pairChange(d.from, d.to);
+    const c = pairChange(d.from, d.to, pctFmt);
     return c ? strings.fromTo(fmt(d.from), fmt(d.to), c.dir, c.pct) : strings.flatPair(fmt(d.from));
   }
   let top = finite[0]!;
@@ -50,7 +58,7 @@ export function dumbbellSummary(
       topDelta = delta;
     }
   });
-  const c = pairChange(top.from, top.to);
+  const c = pairChange(top.from, top.to, pctFmt);
   if (!c) return strings.flatPair(fmt(top.from));
   return strings.rows(finite.length, top.label ?? "", c.dir, c.pct);
 }
@@ -129,7 +137,9 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
     fontSize,
   });
   const fmt = makeFormatter(format, locale);
-  const accName = resolveSummary(summary, () => dumbbellSummary(data, fmt, strings));
+  // Relative change — takes `locale`, never the value `format` (its units).
+  const pctFmt = makePercentFormatter(locale);
+  const accName = resolveSummary(summary, () => dumbbellSummary(data, fmt, strings, pctFmt));
 
   const goodDir = positive === "down" ? -1 : 1;
 

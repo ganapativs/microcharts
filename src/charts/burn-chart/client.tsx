@@ -1,9 +1,8 @@
 "use client";
 // Interactive <BurnChart>. useActivePicker owns interaction: one pointer
 // listener + nearest-period math across history AND the projection region,
-// roving keyboard (←/→ step days, Home/End jump start/deadline), touch
-// tap-to-pin, and the onActive/onSelect contract. Composes the static
-// component (canon); the crosshair + marker are overlay children.
+// roving keyboard (←/→ step days, Home/End jump start/deadline). touch
+// tap-to-pin, and the onActive/onSelect contract.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";

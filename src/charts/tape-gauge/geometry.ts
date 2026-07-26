@@ -1,4 +1,4 @@
-// TapeGauge geometry — pure, React-free. Inverts the
+// TapeGauge: Inverts the
 // sparkline: the value is fixed at a pointer and the scale scrolls past it. A
 // window `span` units tall/wide, centered on `value`: a thin zone stripe beside
 // the pointer, tick marks + a few candidate labels in their own column, a fixed

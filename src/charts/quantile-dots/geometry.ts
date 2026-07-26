@@ -1,6 +1,6 @@
-// QuantileDots geometry — pure, React-free. What are the odds, in
+// QuantileDots: What are the odds, in
 // COUNTABLE form? A quantile dotplot: `count` dots at equal-probability
-// quantiles (Kay/Fernandes binning from core/quantile), stacked bottom-up. Each
+// quantiles (Kay/Fernandes binning from core/quantile). stacked bottom-up. Each
 // dot ≈ a 1-in-count chance — NOT a raw observation — so "N past a threshold" is
 // counted on the true quantile value, never the bin. Coords 2-dp, integer viewBox.
 import { quantileDotplot } from "../../core/quantile.js";
@@ -31,6 +31,15 @@ export interface QuantileDotsGeometry {
 
 const FLOOR_R = 1.25;
 
+/**
+ * Width reserved to the right of the plot for the "N in count" odds label.
+ * Shared with the interactive entry, which must map the pointer across the same
+ * box the static paints — a re-derived formula there would drift by the gutter.
+ */
+export function oddsGutter(gutterCh: number, fontSize: number): number {
+  return gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
+}
+
 export function quantileDotsGeometry(opts: {
   width: number;
   height: number;
@@ -49,9 +58,7 @@ export function quantileDotsGeometry(opts: {
 
   const { width, height } = opts;
   const pad = opts.pad ?? 2;
-  const gutterCh = opts.gutterCh ?? 0;
-  const fontSize = opts.fontSize ?? 0;
-  const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
+  const gutter = oddsGutter(opts.gutterCh ?? 0, opts.fontSize ?? 0);
   const side = opts.side ?? "above";
 
   const plotW = width - 2 * pad;

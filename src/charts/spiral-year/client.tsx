@@ -1,9 +1,9 @@
 "use client";
 // Interactive <SpiralYear>. useActivePicker owns interaction: one pointer
 // listener + nearest-mark lookup (squared 2-D distance over the precomputed
-// spiral marks), ←/→ step chronologically along the finite marks, click / Enter
-// / Space selects (onSelect). Composes the static component (canon) — the SVG
-// is never re-implemented.
+// spiral marks). ←/→ step chronologically along the finite marks, click / Enter
+// / Space selects (onSelect).the SVG
+// is
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
@@ -29,9 +29,9 @@ import {
 export interface InteractiveSpiralYearProps extends SpiralYearProps, PickerProps {
   strings?: SpiralYearStrings;
   /**
-   * Opt-in entrance motion (default `false`): the rings fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
-   * `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the coil grows outward from its
+   * centre as it fades in, on first client-side mount. Inert on the server and on
+   * hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

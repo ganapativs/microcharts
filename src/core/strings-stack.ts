@@ -1,5 +1,4 @@
-// Stacked-composition summary templates — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale).
+// Stacked-composition summary templates
 import type { SummaryStrings } from "./summary.js";
 
 export type StackStrings = Pick<

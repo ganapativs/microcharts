@@ -160,8 +160,6 @@ export function HomeWildSection() {
         </p>
       </Reveal>
 
-      {/* One even grid — the wide featured card went in the 2026-07 density
-          pass. 7 apps + the reader's dashed door = 8 cells, two clean rows. */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SHOWCASE.map((app, i) => (
           <Reveal key={app.slug} className="h-full">

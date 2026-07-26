@@ -1,6 +1,6 @@
 // <HeatCell> — one calibrated color step. The building block
 // for host-owned grids: "how intense is this value against a known scale?"
-// Static, hook-free, RSC-safe. Discrete steps only, and every cell in one host
+// Discrete steps only, and every cell in one host
 // grid must share one `domain` — per-cell auto-scaling is the lie SparkGroup
 // exists to kill, so a lone cell defaults to [0, 1] (documented loudly).
 import type { CSSProperties, ReactNode } from "react";

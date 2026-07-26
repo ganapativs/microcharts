@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Bullet } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const mount = async (ui: React.ReactNode) => {
   const screen = await render(ui);
@@ -38,5 +40,39 @@ describe("interactive <Bullet>", () => {
     fig.focus();
     fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 72 });
+  });
+
+  // The chip states the SIGNED GAP to target; the accessible name states only
+  // value and target. Without a live region a screen-reader user never got the
+  // gap — Bullet was the one interactive entry with no announcement channel.
+  it("announces the same reading the chip shows", async () => {
+    const fig = await mount(<Bullet value={72} target={80} title="Sales" />);
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("");
+    fig.focus();
+    await expect.poll(() => live.textContent).toBe("72 / 80 · −8");
+    await expect
+      .poll(() => fig.querySelector(".mc-spark-readout")?.textContent)
+      .toBe(live.textContent);
+    fig.blur();
+    await expect.poll(() => live.textContent).toBe("");
+  });
+
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
+  it("onActive reports the measure once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const fig = await mount(<Bullet value={72} target={80} onActive={(d) => seen.push(d)} />);
+    await userEvent.hover(fig);
+    const chip = () => fig.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("72 / 80 · −8");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 72, formatted: chip() });
+    fig.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
+    await pointerAway();
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    fig.blur(); // already cleared — must not re-announce
+    expect(seen.length).toBe(2);
   });
 });

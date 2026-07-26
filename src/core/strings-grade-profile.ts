@@ -1,7 +1,6 @@
-// GradeProfile summary templates (grade-profile) — its OWN module. Grade is
-// rise ÷ run as a percent, quantized into difficulty bins; the decision read is
-// "how hard, and where". English lives only in core string modules (canon).
-// Aggregate: strings.ts. SummaryStrings members are wired serially, not here.
+// GradeProfile summary templates (grade-profile). Grade is rise ÷ run as a percent,
+// quantized into difficulty bins; the decision read is "how hard, and where".
+// SummaryStrings members are wired serially, not here.
 import type { SummaryStrings } from "./summary.js";
 
 export type GradeProfileStrings = Pick<

@@ -1,8 +1,8 @@
 // <RetentionCurve> — do they stay, and does the curve plateau?
 // A step line on a domain LOCKED to [0,1] (the full range is the honest frame
-// for a share), an optional dashed benchmark ghost behind, and a plateau marker
-// that appears only when the documented criterion holds. Static, hook-free,
-// RSC-safe. Non-monotone bumps render as-is (never sorted/smoothed away).
+// for a share). an optional dashed benchmark ghost behind, and a plateau marker
+// that appears only when the documented criterion holds.
+// Non-monotone bumps render as-is (never sorted/smoothed away).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
@@ -30,6 +30,15 @@ export interface RetentionCurveProps {
   /** Fraction retained per period (period 0 typically 1.0); 0–1 or 0–100. */
   data: readonly number[];
   /** Peer/industry curve, rendered as a subordinate dashed ghost. */
+  compare?: readonly number[] | undefined;
+  /**
+   * @deprecated Use `compare`. The catalog word for "a second series to read
+   * this one against" is `compare` (DualSparkline, StarSpoke) — this chart was
+   * the only one calling it `benchmark`, and DualSparkline's own `compare` JSDoc
+   * calls it "the benchmark series", which is how the two names drifted. Still
+   * accepted, and it still wins over `compare` when both are passed, so no
+   * existing caller changes behaviour by upgrading.
+   */
   benchmark?: readonly number[] | undefined;
   /** Detect + mark a plateau (default true). */
   plateau?: boolean | undefined;
@@ -61,7 +70,9 @@ export const PCT: Intl.NumberFormatOptions = { style: "percent", maximumFraction
 export function RetentionCurve(props: RetentionCurveProps): ReactNode {
   const {
     data,
-    benchmark,
+    compare,
+    // `benchmark` is the deprecated spelling and wins when both are given.
+    benchmark = compare,
     plateau = true,
     curve = "step",
     unit = "period",

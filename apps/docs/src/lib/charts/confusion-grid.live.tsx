@@ -3,12 +3,6 @@ import { ConfusionGrid } from "@microcharts/react/confusion-grid";
 import { ConfusionGrid as ConfusionGridInteractive } from "@microcharts/react/confusion-grid/interactive";
 import staticModule, { playground as staticPlayground, CATDOG, THREE } from "./confusion-grid";
 
-/** Interactive half of the confusion-grid chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./confusion-grid`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return <ConfusionGridInteractive data={CATDOG} summary={false} size={48} animate={animate} />;
 }

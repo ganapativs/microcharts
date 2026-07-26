@@ -2,8 +2,7 @@
 // Mirrored bins over SHARED edges (before up muted, after down accent) with the
 // median shift as the precise takeaway. Heights are per-side proportions on one
 // shared scale, so unequal sample sizes cannot fake a shift. Mirror orientation
-// carries IDENTITY (up ≠ good), which is why the side tags exist. Static,
-// hook-free, RSC-safe.
+// carries IDENTITY (up ≠ good). which is why the side tags exist.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, withPlus, type Format } from "../../core/format.js";

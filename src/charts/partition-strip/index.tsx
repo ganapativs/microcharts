@@ -1,12 +1,12 @@
 // <PartitionStrip> — what the whole is made of, and what the big parts are made
-// of, with parentage visible. Static, hook-free,
-// RSC-safe. Two aligned rows beat a treemap because alignment is the comparison
+// of, with parentage visible.
+// Two aligned rows beat a treemap because alignment is the comparison
 // channel. Two levels max — grandchildren are ignored with a dev warning.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import type { Format } from "../../core/format.js";
+import { makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -43,6 +43,10 @@ const CAT_N = 6; // --mc-cat-1 … --mc-cat-6 via data-mc-cat roles
 export function partitionStripSummary(
   data: readonly PartitionStripDatum[],
   strings: PartitionStrings,
+  /** Percent formatter (FRACTION in). The old `${Math.round(s * 100)}%` was an
+   *  en-US percent, so `locale` reached the interactive chip's shares but not
+   *  the accessible name's. */
+  pctOf: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   const parents = data.filter((p) => parentValue(p) > 0);
   if (parents.length === 0) return strings.noData;
@@ -61,7 +65,6 @@ export function partitionStripSummary(
         bestChild = { label: c.label, parent: p.label, share };
     }
   }
-  const pctOf = (s: number) => `${Math.round(s * 100)}%`;
   if (bestChild) {
     return strings.partition(
       parents.length,
@@ -100,7 +103,9 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
   const fontSize = labelFont(height, 0.42);
   const inset = 0.5;
   const rowH = (height - inset * 2 - 1) / 2;
-  const accName = resolveSummary(summary, () => partitionStripSummary(data, strings));
+  // Shares take `locale` but never the value `format` (which carries units).
+  const pctFmt = makePercentFormatter(props.locale);
+  const accName = resolveSummary(summary, () => partitionStripSummary(data, strings, pctFmt));
 
   const emphGroup = emphasis ? geo.segments.find((s) => s.label === emphasis)?.group : undefined;
 

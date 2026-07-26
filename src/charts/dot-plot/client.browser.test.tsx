@@ -73,4 +73,22 @@ describe("interactive <DotPlot>", () => {
     const wrap = screen.container.querySelector(".mc-dotplot-live") as HTMLElement;
     expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // An empty row stays navigable and announces "no data", so it must read out
+  // too — a silent hover is indistinguishable from a broken chart.
+  it("an empty row reads out as an em dash", async () => {
+    const screen = await render(
+      <DotPlot
+        data={[
+          { label: "Ada", value: 96 },
+          { label: "Grace", value: null },
+        ]}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-dotplot-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("Grace: —");
+    expect(wrap.querySelector('[aria-live="polite"]')?.textContent).toBe("Grace: No data.");
+  });
 });

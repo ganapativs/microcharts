@@ -51,6 +51,12 @@ export const entry: ChartEntry = {
     { name: "dewpoint", type: "number", required: false, description: "Lower-left numeral." },
     { name: "pressure", type: "number", required: false, description: "Upper-right numeral." },
     { name: "station", type: "string", required: false, description: "Top-left identifier." },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Disc + barb square edge in viewBox units (default 48).",
+    },
   ],
   demo: [16],
   example: {

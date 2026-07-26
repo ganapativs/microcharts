@@ -11,12 +11,7 @@ import { HERO_MODULES, POOL } from "@/components/home/hero-modules";
 import { Reveal } from "@/components/ui/reveal";
 import { CATALOG } from "@/lib/docs-facts";
 
-/** 02 · The catalog — {total} chart types, word-sized. Tier chips use the
- *  library's own categorical tokens: the tiers are categories, so the
- *  category palette is the honest ink. The refusals strip closes the section:
- *  what the catalog admits and what it refuses are the same editorial
- *  decision, and each replacement renders live — the argument against the
- *  pie chart is a real SegmentedBar doing the same job better at word size. */
+/** Catalog grid + refusals strip (live replacement charts). */
 
 const REFUSALS = [
   {

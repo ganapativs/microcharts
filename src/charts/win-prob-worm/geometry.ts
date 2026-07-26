@@ -1,6 +1,6 @@
-// WinProbWorm geometry — pure, React-free. Who's winning, and when
+// WinProbWorm: Who's winning, and when
 // did it flip? A single win-probability series clamped to 0–100 on a FIXED
-// 0–100 axis (never truncated — the honesty rule for a probability), split at
+// 0–100 axis (never truncated — the honesty rule for a probability). split at
 // every 50% crossing: the leading stretches (>50) read accent, the trailing
 // stretches (<50) read neutral. Crossings are the lead changes; the largest
 // |Δ| between adjacent points is the momentum swing. Coords 2-dp.
@@ -16,11 +16,29 @@ export const PAD = 2;
 export const leaderProb = (v: number): number => (v >= 50 ? v : 100 - v);
 const leaderSide = (v: number, sides: readonly [string, string]): string =>
   v >= 50 ? sides[0] : sides[1];
-const pct = (v: number, fmt: (n: number) => string): string => {
-  const s = fmt(v);
-  // Callers often pass a formatter that already ends in `%` — don't double it.
-  return s.endsWith("%") ? s : `${s}%`;
-};
+/**
+ * A win probability (0–100) as a percent string.
+ *
+ * `pctFmt` takes the probability as a FRACTION and is a real percent formatter
+ * (`makePercentFormatter`), so the sign's position and its spacing follow
+ * `locale` — fr-FR writes "98 %", tr-TR puts the sign first. The old
+ * `` `${fmt(v)}%` `` was an en-US percent, the one number on this chart that
+ * `locale` never reached.
+ *
+ * A caller-supplied `format` still wins outright (it is the documented escape
+ * hatch and often already ends in `%`): `pctFmt` is then a wrapper over their
+ * formatter, and the `endsWith` guard below still stops a doubled sign.
+ */
+export const wormPct = (v: number, pctFmt: (fraction: number) => string): string => pctFmt(v / 100);
+
+/** Wraps a caller's own `format` for the percent slot: their string wins, and a
+ *  `%` is appended only when they did not already write one. */
+export const wormCustomPct =
+  (fmt: (n: number) => string) =>
+  (fraction: number): string => {
+    const s = fmt(fraction * 100);
+    return s.endsWith("%") ? s : `${s}%`;
+  };
 const signed = (d: number, fmt: (n: number) => string): string =>
   `${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d))}`;
 
@@ -178,12 +196,13 @@ export function resolveWormGeo(opts: {
   data: readonly (number | null)[];
   label: "last" | "none";
   font: number;
-  fmt: (n: number) => string;
+  /** Percent formatter (FRACTION in) for the endpoint probability label. */
+  pctFmt: (fraction: number) => string;
 }): { geo: WinProbWormGeometry | null; gutter: number; lastText: string } {
-  const { width, height, data, label, font, fmt } = opts;
+  const { width, height, data, label, font, pctFmt } = opts;
   const probe = winProbWormGeometry({ width, height, data });
   const showLast = label === "last" && probe != null && probe.end != null && height >= font + 0.8;
-  const lastText = showLast ? pct(leaderProb(probe!.last as number), fmt) : "";
+  const lastText = showLast ? wormPct(leaderProb(probe!.last as number), pctFmt) : "";
   const gutter = showLast ? wormGutter(lastText, font) : 0;
   const geo =
     gutter > 0 ? winProbWormGeometry({ width, height, data, gutterRight: gutter }) : probe;
@@ -235,9 +254,11 @@ export function winProbWormSummary(
   fmt: (v: number) => string,
   strings: WinProbWormStrings,
   sides: readonly [string, string],
+  /** Percent formatter (FRACTION in) for the probabilities. */
+  pctFmt: (fraction: number) => string = (f) => wormCustomPct(fmt)(f),
 ): string {
   const last = geo.last as number;
-  const prob = pct(leaderProb(last), fmt);
+  const prob = wormPct(leaderProb(last), pctFmt);
   if (geo.minV === geo.maxV) {
     return last === 50
       ? strings.winProbWormTied(prob)

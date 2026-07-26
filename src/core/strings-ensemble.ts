@@ -1,6 +1,4 @@
-// EnsembleGhosts summary templates (ensemble-ghosts) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// EnsembleGhosts summary templates (ensemble-ghosts)
 import type { SummaryStrings } from "./summary.js";
 
 export type EnsembleStrings = Pick<

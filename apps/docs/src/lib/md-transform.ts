@@ -14,6 +14,7 @@ import { GRAMMAR } from "./ai-grammar.ts";
 import { PROVIDER_GROUPS, MACHINE_SURFACES, AGENT_RULES } from "./ai-providers.ts";
 import { AI_LOGOS } from "./ai-logos.ts";
 import { interactionNote } from "./charts/interaction-note.ts";
+import { DOCS_CODE } from "./charts/docs-code.generated.ts";
 
 const fence = (lang: string, code: string) => `\`\`\`${lang}\n${code}\n\`\`\``;
 
@@ -132,15 +133,39 @@ const VISUAL_ONLY = [
   "SizeTable",
   "ThroughputSummary",
   "CatalogFacts",
-  "FourContexts",
   "PackageTabs",
-  "Playground",
   "Instrument",
-  "Sizing",
   "ChartChooser",
   "Reveal",
   "Showcase",
 ];
+
+/**
+ * `<Playground>`, `<Sizing>` and `<FourContexts>` are interactive shells, so the
+ * mirror can't show what they show — but each is built around real,
+ * copy-pasteable JSX, and on a chart page that JSX (the chart at rest, the
+ * sizing recipes, the four placements) is the most useful thing an agent can
+ * read. The live preview is dropped; the code survives, from the same snapshot
+ * the page renders (`charts/docs-code.generated.ts`).
+ */
+function playgroundMarkdown(slug: string): string {
+  const row = DOCS_CODE[slug];
+  return row ? fence("tsx", row.playground) : "";
+}
+
+function sizingMarkdown(slug: string): string {
+  const row = DOCS_CODE[slug];
+  if (!row) return "";
+  return row.recipes.map((r) => `**${r.label}**\n\n${fence("tsx", r.code)}`).join("\n\n");
+}
+
+function fourContextsMarkdown(slug: string): string {
+  const row = DOCS_CODE[slug];
+  if (!row) return "";
+  const blocks = row.contexts.map((c) => `**${c.label}**\n\n${fence("tsx", c.code)}`);
+  if (row.contextsNote) blocks.push(row.contextsNote);
+  return blocks.join("\n\n");
+}
 
 export function expandComponents(md: string, resolveChart?: ResolveChart): string {
   let out = md;
@@ -164,6 +189,16 @@ export function expandComponents(md: string, resolveChart?: ResolveChart): strin
     const chart = resolveChart?.(slug);
     return chart ? (interactionNote({ ...chart, slug }) ?? "") : "";
   });
+
+  // <Playground chart="x" /> / <Sizing chart="x" /> / <FourContexts slug="x" />
+  // → their JSX as fenced blocks (see the note above these builders).
+  out = out.replace(/<Playground\s+chart=["']([^"']+)["']\s*\/>/g, (_m, slug) =>
+    playgroundMarkdown(slug),
+  );
+  out = out.replace(/<Sizing\s+chart=["']([^"']+)["']\s*\/>/g, (_m, slug) => sizingMarkdown(slug));
+  out = out.replace(/<FourContexts\s+slug=["']([^"']+)["']\s*\/>/g, (_m, slug) =>
+    fourContextsMarkdown(slug),
+  );
 
   // <Snippet id="x" /> → the real code block
   out = out.replace(/<Snippet\s+id=["']([^"']+)["']\s*\/>/g, (_m, id) => {
@@ -220,8 +255,10 @@ export function expandComponents(md: string, resolveChart?: ResolveChart): strin
     (_m, title, href, desc) => `- [${title}](${href})${desc ? `: ${desc}` : ""}`,
   );
 
-  // Drop purely-visual components (self-closing or paired)
-  for (const name of VISUAL_ONLY) {
+  // Drop purely-visual components (self-closing or paired). The three projected
+  // shells ride along so an unexpected authoring form (extra prop, different
+  // attribute order) is still dropped rather than left as a literal tag.
+  for (const name of [...VISUAL_ONLY, "Playground", "Sizing", "FourContexts"]) {
     out = out.replace(new RegExp(`<${name}\\b[^>]*?/>`, "g"), "");
     out = out.replace(new RegExp(`<${name}\\b[^>]*?>[\\s\\S]*?</${name}>`, "g"), "");
   }

@@ -62,6 +62,18 @@ export const entry: ChartEntry = {
       required: false,
       description: "Latency threshold: at/above it the satellite doubles + the summary flags it.",
     },
+    {
+      name: "size",
+      type: "number",
+      required: false,
+      description: "Orbit box edge in viewBox units (default 20).",
+    },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the gutter label, in viewBox units. Defaults from `size`.",
+    },
   ],
   demo: [240, 12],
   example: {

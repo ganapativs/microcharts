@@ -1,6 +1,5 @@
-// OrbitStatus geometry — pure, React-free.
 // How slow and how busy is this dependency right now? Orbit RADIUS = latency;
-// orbit DASH DENSITY = call rate (quantized to 5 steps — denser = busier), which
+// orbit DASH DENSITY = call rate (quantized to 5 steps — denser = busier). which
 // the interactive entry mirrors as angular SPEED. Both are LOW-precision ordinal
 // channels (docs steer exact reads elsewhere). The satellite's static angle
 // (top) encodes NOTHING — only its speed does. All coords 2-dp.

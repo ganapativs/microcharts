@@ -1,11 +1,11 @@
-// VolumeProfile geometry — pure, React-free. A
-// histogram turned PERPENDICULAR to the usual trend axis: y = level (binned),
+// VolumeProfile: A
+// histogram turned PERPENDICULAR to the usual trend axis: y = level (binned).
 // bars extend horizontally by activity mass at that level. The modal bin (POC)
 // is accented and the value area (smallest contiguous span holding `valueArea`
 // of mass around the POC) is shaded. 2-dp.
 //
-// Split into `binProfile` (bin + POC + value-area walk — O(data.length), the
-// expensive pass) and `layoutProfile` (bar positions — O(bins), cheap). The
+// Split into `binProfile` (bin + POC + value-area walk — O(data.length). the
+// expensive pass) and `layoutProfile` (bar positions — O(bins). cheap). The
 // static component needs the POC level before it knows the label gutter width,
 // so it binned once and re-laid-out for the gutter; binning twice was the
 // bench-floor regression (superaudit). `volumeProfileGeometry` composes both

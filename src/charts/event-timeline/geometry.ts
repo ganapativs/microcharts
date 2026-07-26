@@ -1,9 +1,10 @@
-// EventTimeline geometry — pure, React-free. Spans + point
+// EventTimeline: Spans + point
 // events on ONE linear time axis: duration is length, never log/compressed
 // time. Items overlapping the window edge are clipped flat (honest partial
 // visibility); fully-outside items are excluded (the component dev-warns).
 // `coverage` merges intervals first — overlaps never double-count.
 import { clamp, scaleLinear } from "../../core/scale.js";
+import { proseCharsThatFit } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 
 interface TimelineSpan {
@@ -77,7 +78,13 @@ export function eventTimelineGeometry(opts: {
       y: round2(midY - spanH / 2),
       h: round2(spanH),
       i,
-      labelFits: estChars > 0 && x1 - x0 >= estChars * 0.62 * fontSize,
+      // Span labels are CALLER text drawn inside the span, so the fit test has
+      // to use the prose estimator: `0.62` is calibrated for the figures the
+      // library formats itself, and an all-caps label measures ~0.64–0.95 per
+      // char. At the digits rate a label that does not fit was seated anyway and
+      // painted over the span edges. `proseCharsThatFit` is the one sanctioned
+      // inverse of that estimate — never invert 0.95 inline.
+      labelFits: estChars > 0 && estChars <= proseCharsThatFit(x1 - x0, fontSize, 0),
       clipped: cs !== s || ce !== e,
     });
     // merge into coverage intervals

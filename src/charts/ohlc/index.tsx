@@ -2,7 +2,7 @@
 // Candles: hollow up-bodies / filled down-bodies — direction is shape-coded
 // and survives grayscale print where green/red candles fail; valence tokens
 // reinforce. Market up/down semantics are fixed: `positive` is ignored
-// (documented). Static, hook-free, RSC-safe.
+// (documented).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

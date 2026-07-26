@@ -1,15 +1,44 @@
 "use client";
-import { cloneElement, isValidElement, useRef, useState, type ReactNode } from "react";
+import { Component, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { ChevronDown, Play, RotateCw } from "lucide-react";
 import "@microcharts/react/motion"; // enables `animate` (same import consumers use)
 import { cn } from "@/lib/cn";
+import { A11yPane } from "./a11y-pane";
+import {
+  SUMMARY_MODES,
+  a11yLines,
+  a11yProps,
+  injectProps,
+  type SummaryMode,
+} from "./playground-a11y";
+import {
+  DEFAULT_FIXTURE,
+  DEFAULT_LOCALE,
+  DEFAULT_THEME,
+  FIXTURES,
+  FORMATS,
+  LOCALES,
+  THEMES,
+  PLAIN_SERIES,
+  applyFixture,
+  formatLines,
+  formatOption,
+  replaceDataLiteral,
+  themeAttr,
+  wrapTheme,
+  type Theme,
+} from "./playground-options";
 // Lazy, one chunk per chart — a static `registry` import here would put all 106
 // chart modules (each with its interactive twin) in this route's client bundle.
 import { useChartModule } from "@/lib/charts/use-chart-module";
+import { PLAYGROUND_CAPS } from "@/lib/charts/playground-caps.generated";
+import { injectChartProps } from "@/lib/charts/inject-chart-props";
+import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
 import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
 
-/* ── shared control primitives ─────────────────────────────────────────── */
+const READOUT_DESTINATIONS = ["chart", "panel", "both"] as const;
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -114,164 +143,169 @@ function Range({
   );
 }
 
-/** A compact styled dropdown — the requested "pick where the value goes" control. */
-function Select({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: readonly { value: string; label: string }[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <Field label={label}>
-      <div className="relative w-max">
-        <select
-          value={value}
-          aria-label={label}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-8 cursor-pointer appearance-none rounded-md border border-fd-border bg-fd-background py-0 pl-2.5 pr-7 text-[0.8rem] text-fd-foreground transition-colors hover:border-fd-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fd-primary/40"
-        >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 opacity-60" />
-      </div>
-    </Field>
-  );
-}
-
-/* ── the callback readout — the value, rendered OUTSIDE the chart ──────────── */
-
-/** The payload every `onActive` / `onSelect` hands back (mirrors `MicroDatum`). */
 type Datum = { index: number; value: number | null; label?: string; formatted?: string };
+type Ev = { id: number; kind: "active" | "select" | "window"; d: Datum | null };
 
-/** One logged callback firing. `d === null` is a clear (`onActive(null)` etc.). */
-type Ev = { id: number; kind: "active" | "select"; d: Datum | null };
-
-/** The display string for a datum — its `formatted`, falling back to the raw value. */
 const showDatum = (d: Datum): string => d.formatted ?? (d.value === null ? "—" : String(d.value));
 
-/**
- * The external readout — a compact HUD overlay fed purely by the chart's
- * callbacks. This is the whole point of `readout={false}`: the value leaves the
- * chart and is rendered wherever the product wants it.
- *
- * It is ABSOLUTELY positioned (top-right, `pointer-events-none`) so it floats
- * over the plot without ever changing the container's height — no shift on hover
- * or when switching static ↔ interactive — and never blocks a hover underneath
- * it. The value is STICKY (keeps the last reading, dimming to `idle`, rather
- * than blanking on mouse-out) and a short log keeps recent firings readable.
- */
+/** External `readout={false}` HUD — sticky last value; body is pointer-events-none. */
 function ReadoutTile({
   active,
   selected,
   events,
-  scalar,
+  label,
+  emptyHint = "hover · rove · click…",
 }: {
   active: Datum | null;
   selected: Datum | null;
   events: Ev[];
-  scalar: boolean;
+  label: string;
+  emptyHint?: string;
 }) {
+  const [open, setOpen] = useState(true);
   const last = events.find((e) => e.d)?.d ?? null; // most recent non-clear firing
   const shown = active ?? selected ?? last; // sticky: survives pointer-leave
-  const state = active ? "live" : selected ? "pinned" : shown ? "idle" : "empty";
+  // Window drags aren't a pinned unit selection — sticky reading stays `idle`.
+  const state = active
+    ? "live"
+    : selected && label !== "onWindowChange"
+      ? "pinned"
+      : shown
+        ? "idle"
+        : "empty";
   const value = shown ? showDatum(shown) : null;
+  const kindTag = (k: Ev["kind"]): string =>
+    k === "window" ? "win" : k === "select" ? "sel" : "act";
 
   return (
-    <div className="pointer-events-none absolute right-2.5 top-2.5 z-10 flex w-[9.5rem] flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md sm:w-[11rem]">
-      {/* compact value header */}
-      <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-2">
-        <div className="flex items-center justify-between gap-1">
-          <span className="mono-label text-[0.5rem]">{scalar ? "onSelect" : "onActive"}</span>
-          <span
-            className={cn(
-              "flex items-center gap-1 text-[0.55rem] font-medium",
-              state === "live"
-                ? "text-fd-primary"
-                : state === "pinned"
-                  ? "text-fd-foreground/70"
-                  : "text-fd-muted-foreground/55",
-            )}
-          >
-            {state === "live" && (
-              <span className="size-1 animate-pulse rounded-full bg-fd-primary" />
-            )}
-            {state === "empty" ? "idle" : state}
-          </span>
-        </div>
-        <span
-          className={cn(
-            "font-display font-medium leading-tight tracking-tight tabular-nums break-words",
-            value && value.length > 10 ? "text-[0.9rem]" : "text-lg leading-none",
-            value === null
-              ? "text-fd-muted-foreground/40"
-              : state === "idle"
-                ? "text-fd-foreground/70"
-                : "text-fd-foreground",
-          )}
-        >
-          {value ?? "—"}
+    <div
+      className={cn(
+        "pointer-events-none absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md transition-[width,max-width] duration-200 ease-out",
+        open ? "w-[11.5rem] sm:w-[13rem]" : "w-auto max-w-[11.5rem]",
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center gap-1.5 pl-2.5 pr-1.5",
+          open ? "justify-between pb-0 pt-2" : "h-7",
+        )}
+      >
+        <span className="mono-label min-w-0 flex-1 truncate leading-none text-[0.5rem]">
+          {label}
         </span>
+        <div className="flex h-5 shrink-0 items-center gap-1">
+          {(open || state !== "empty") && (
+            <span
+              className={cn(
+                "flex h-5 items-center gap-1 leading-none text-[0.55rem] font-medium",
+                state === "live"
+                  ? "text-fd-primary"
+                  : state === "pinned"
+                    ? "text-fd-foreground/70"
+                    : "text-fd-muted-foreground/55",
+              )}
+            >
+              {state === "live" && (
+                <span className="size-1 animate-pulse rounded-full bg-fd-primary" />
+              )}
+              {open
+                ? state === "empty"
+                  ? "idle"
+                  : state
+                : state !== "empty" &&
+                  state !== "live" && (
+                    <span className="size-1 rounded-full bg-fd-muted-foreground/45" />
+                  )}
+            </span>
+          )}
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-label={open ? `Collapse ${label} panel` : `Expand ${label} panel`}
+            onClick={() => setOpen((v) => !v)}
+            className="pointer-events-auto flex size-5 shrink-0 items-center justify-center rounded-md text-fd-muted-foreground/70 transition-colors hover:bg-fd-muted/60 hover:text-fd-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-fd-primary/50"
+          >
+            <ChevronDown
+              aria-hidden
+              className={cn(
+                "size-3.5 shrink-0 transition-transform duration-200 ease-out",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        </div>
       </div>
 
-      {/* Event log — the last firings, so the stream stays readable after
-          mouse-out. Fixed row budget → the overlay never grows the container. */}
-      <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
-        {events.length === 0 ? (
-          <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
-            hover · rove · click…
-          </li>
-        ) : (
-          events.slice(0, 6).map((e, i) => (
-            <li
-              key={e.id}
-              className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
-              style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
-            >
-              <span
-                className={cn(
-                  "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
-                  e.kind === "select" ? "text-fd-primary" : "text-fd-muted-foreground/70",
-                )}
-              >
-                {e.kind === "select" ? "sel" : "act"}
-              </span>
-              {e.d ? (
-                <span className="flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
-                  #{e.d.index + 1} {showDatum(e.d)}
-                </span>
-              ) : (
-                <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
-                  cleared
-                </span>
-              )}
-            </li>
-          ))
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-out",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
-      </ol>
+      >
+        <div className="pointer-events-none min-h-0 overflow-hidden">
+          <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-0.5">
+            <span
+              className={cn(
+                "font-display font-medium leading-tight tracking-tight tabular-nums break-all",
+                value && value.length > 12 ? "text-[0.85rem]" : "text-lg leading-none",
+                value === null
+                  ? "text-fd-muted-foreground/40"
+                  : state === "idle"
+                    ? "text-fd-foreground/70"
+                    : "text-fd-foreground",
+              )}
+            >
+              {value ?? "—"}
+            </span>
+          </div>
+
+          <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
+            {events.length === 0 ? (
+              <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
+                {emptyHint}
+              </li>
+            ) : (
+              events.slice(0, 6).map((e, i) => (
+                <li
+                  key={e.id}
+                  className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
+                  style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
+                >
+                  <span
+                    className={cn(
+                      "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
+                      e.kind === "active" ? "text-fd-muted-foreground/70" : "text-fd-primary",
+                    )}
+                  >
+                    {kindTag(e.kind)}
+                  </span>
+                  {e.d ? (
+                    <span className="min-w-0 flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
+                      {e.kind === "window" ? showDatum(e.d) : `#${e.d.index + 1} ${showDatum(e.d)}`}
+                    </span>
+                  ) : (
+                    <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
+                      cleared
+                    </span>
+                  )}
+                </li>
+              ))
+            )}
+          </ol>
+        </div>
+      </div>
     </div>
   );
 }
-
-/** Rewrite a chart's JSX snippet to render its value in an external node — the
-    copy-paste form of what the "In the panel" / "Chart + panel" modes show. */
-function withCallback(jsx: string, hideChip: boolean): string {
-  const extra = [
+function withCallback(jsx: string, hideChip: boolean, scalar: boolean): string {
+  const withProps = injectProps(jsx, [
     hideChip ? "  readout={false}" : null,
-    "  onActive={(d) => setReading(d?.formatted)}",
-  ]
-    .filter(Boolean)
-    .join("\n");
-  // Inject before the single element's self-closing `/>`; no-op if it isn't one.
-  const withProps = jsx.replace(/\n?\/>\s*$/, `\n${extra}\n/>`);
+    // Pickers stream the hovered unit through `onActive`; scalars only fire
+    // `onSelect` (one unit, no rove) — same `datum.formatted` either way.
+    scalar
+      ? "  onSelect={(d) => setReading(d?.formatted)}"
+      : "  onActive={(d) => setReading(d?.formatted)}",
+  ]);
   const body = withProps
     .split("\n")
     .map((l) => (l.length ? `  ${l}` : l))
@@ -285,8 +319,110 @@ function withCallback(jsx: string, hideChip: boolean): string {
     "</>",
   ].join("\n");
 }
+function withReadoutOff(jsx: string): string {
+  return injectProps(jsx, ["  readout={false}"]);
+}
 
-/* ── shell ──────────────────────────────────────────────────────────────── */
+/** Surface fixture throws in-frame (don't blank the route). */
+class PreviewBoundary extends Component<
+  { resetKey?: string | undefined; children: ReactNode },
+  { error: Error | null; seen: string | undefined }
+> {
+  override state: { error: Error | null; seen: string | undefined } = {
+    error: null,
+    seen: this.props.resetKey,
+  };
+
+  static getDerivedStateFromError(error: Error): { error: Error } {
+    return { error };
+  }
+  static getDerivedStateFromProps(
+    props: { resetKey?: string | undefined },
+    state: { error: Error | null; seen: string | undefined },
+  ): { error: null; seen: string | undefined } | null {
+    return props.resetKey === state.seen ? null : { error: null, seen: props.resetKey };
+  }
+
+  override render(): ReactNode {
+    const { error } = this.state;
+    if (!error) return this.props.children;
+    return (
+      <p className="max-w-sm text-center text-[0.72rem] leading-snug text-fd-muted-foreground">
+        This chart threw on the selected series —{" "}
+        <span className="font-mono text-fd-foreground/80">{error.message}</span>. That is a library
+        bug, not a rendering trick; every other option in this playground still works.
+      </p>
+    );
+  }
+}
+
+export interface Drawer {
+  key: string;
+  label: string;
+  badge?: string | undefined;
+  content: ReactNode;
+}
+function DrawerNote({ children }: { children: ReactNode }) {
+  return (
+    <p className="mt-2.5 max-w-prose text-[0.72rem] leading-snug text-fd-muted-foreground">
+      {children}
+    </p>
+  );
+}
+
+function Drawers({ drawers, onReset }: { drawers: Drawer[]; onReset?: () => void }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const paneId = useId();
+  const shown = drawers.find((d) => d.key === open);
+  const dirty = drawers.some((d) => d.badge);
+  return (
+    <div className="border-t border-hairline">
+      <div className="flex flex-wrap items-center gap-1.5 px-4 py-2">
+        {drawers.map((d) => (
+          <button
+            key={d.key}
+            type="button"
+            aria-expanded={open === d.key}
+            aria-controls={open === d.key ? paneId : undefined}
+            data-active={open === d.key}
+            onClick={() => setOpen((o) => (o === d.key ? null : d.key))}
+            className="group flex items-center gap-1.5 rounded-md border border-hairline px-2 py-1 text-[0.7rem] text-fd-muted-foreground transition-colors hover:bg-fd-muted/60 hover:text-fd-foreground data-[active=true]:border-fd-primary/30 data-[active=true]:bg-fd-primary/[0.06] data-[active=true]:text-fd-foreground"
+          >
+            {d.label}
+            {d.badge && (
+              <span className="rounded bg-fd-primary/10 px-1 font-mono text-[0.55rem] leading-[1.5] text-fd-primary">
+                {d.badge}
+              </span>
+            )}
+            <ChevronDown
+              aria-hidden
+              className={cn(
+                "size-3 shrink-0 opacity-50 transition-transform duration-200",
+                open === d.key && "rotate-180",
+              )}
+            />
+          </button>
+        ))}
+        {/* One way back to the chart as documented — otherwise a reader who has
+            wandered through four axes has to remember each default. */}
+        {dirty && onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="ml-auto rounded-md px-2 py-1 text-[0.68rem] text-fd-muted-foreground transition-colors hover:bg-fd-muted/60 hover:text-fd-foreground"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+      {shown && (
+        <div id={paneId} className="border-t border-hairline">
+          {shown.content}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Shell({
   onShuffle,
@@ -297,26 +433,35 @@ function Shell({
   aside,
   hint,
   controls,
+  drawers,
   code,
   sampleData,
   morphKey,
+  morphed,
+  previewRef,
+  themeScope,
+  onReset,
 }: {
   onShuffle?: () => void;
-  /** Present ⇒ a replay control re-runs the entrance motion. */
   onReplay?: () => void;
-  /** Present ⇒ the static ↔ interactive mode switch. */
   mode?: "static" | "interactive";
   onMode?: (m: "static" | "interactive") => void;
   preview: ReactNode;
-  /** Present ⇒ a panel beside the chart (the external callback readout). */
   aside?: ReactNode;
   hint?: string;
   controls: ReactNode;
+  drawers?: Drawer[];
   code: string;
   sampleData?: SampleData[];
-  /** Replays a gentle morph when this changes — pass only discrete props, never
-      slider values, so dragging doesn't strobe. */
+  /** Discrete props only — never slider values (avoids morph strobe). */
   morphKey?: string;
+  /** Has this playground already painted once? The morph marks a CHANGE — on
+   *  first mount there is nothing to morph from, and fading the chart in reads
+   *  as the page arriving late. */
+  morphed?: boolean;
+  previewRef?: React.RefObject<HTMLDivElement | null>;
+  themeScope?: string | undefined;
+  onReset?: () => void;
 }) {
   return (
     <div className="panel not-prose my-6 overflow-hidden">
@@ -356,8 +501,15 @@ function Shell({
           the chart centered keeps the container identical across static ↔
           interactive AND while the overlay's log fills. */}
       <div className="grid-paper relative flex h-52 items-center justify-center px-6 py-8">
-        <div key={morphKey} className="mc-morph flex w-full items-center justify-center">
-          {preview}
+        {/* `data-mc-theme` scopes a preset to this chart only — the same
+            attribute `MicroProvider` sets, so nothing docs-only is in play. */}
+        <div
+          key={morphKey}
+          ref={previewRef}
+          data-mc-theme={themeScope}
+          className={`${morphed ? "mc-morph " : ""}flex w-full items-center justify-center`}
+        >
+          <PreviewBoundary resetKey={morphKey}>{preview}</PreviewBoundary>
         </div>
         {aside}
       </div>
@@ -403,12 +555,11 @@ function Shell({
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4 border-t border-hairline px-4 py-4">
         {controls}
       </div>
+      {drawers?.length ? <Drawers drawers={drawers} onReset={onReset} /> : null}
       <CodeWithData code={code} sampleData={sampleData} className="border-t border-hairline" />
     </div>
   );
 }
-
-/* ── the engine — interprets a chart module's declarative PlaygroundSpec ── */
 
 function KnobControl({
   knob,
@@ -446,18 +597,8 @@ function KnobControl({
   }
 }
 
-/**
- * The unified live playground for any chart: props, static ↔ interactive mode,
- * opt-in entrance motion with replay, and a copy-complete snippet that tracks
- * every toggle. `<Playground chart="bullet" />`
- *
- * The module resolves LAZILY, one chunk per chart — every knob's initial state
- * is derived from `mod.playground`, so the view only mounts once that has landed
- * (the loader keys it by slug, so the initializers re-run on a chart change).
- */
 export function Playground({ chart }: { chart: string }) {
   const mod = useChartModule(chart);
-  // Reserve the playground's resolved height so the swap causes no layout shift.
   if (!mod) return <div className="not-prose my-6 min-h-[26rem]" aria-hidden />;
   return <PlaygroundView key={chart} mod={mod} />;
 }
@@ -475,17 +616,30 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   );
   const [animate, setAnimate] = useState(false);
   const [take, setTake] = useState(0);
-  // The chart's callbacks, surfaced live in the tile beside it, plus a rolling
-  // log of the last few firings so the stream stays readable after mouse-out.
   const [active, setActive] = useState<Datum | null>(null);
   const [selected, setSelected] = useState<Datum | null>(null);
   const [events, setEvents] = useState<Ev[]>([]);
   const evId = useRef(0);
-  // Where the value is shown: on the chart's own chip, in the external tile, or both.
   const [dest, setDest] = useState<"chart" | "panel" | "both">("chart");
+  const [chipOn, setChipOn] = useState(true);
+  const [summaryMode, setSummaryMode] = useState<SummaryMode>("auto");
+  // Title default OFF — don't inject a prop into every copied snippet.
+  const [named, setNamed] = useState(false);
+  const [byId, setById] = useState(false);
+  const [fixture, setFixture] = useState(DEFAULT_FIXTURE);
+  const [formatKey, setFormatKey] = useState(FORMATS[0]!.key);
+  const [locale, setLocale] = useState<string>(DEFAULT_LOCALE);
+  const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
+  const previewRef = useRef<HTMLDivElement>(null);
+  // Latched after the first commit: the morph fade belongs to a knob CHANGE, not
+  // to the arrival of the chart itself (that read as a flicker on load).
+  const painted = useRef(false);
+  useEffect(() => {
+    painted.current = true;
+  }, []);
   if (!spec || !entry) return null;
 
-  const logEvent = (kind: "active" | "select", d: Datum | null): void =>
+  const logEvent = (kind: Ev["kind"], d: Datum | null): void =>
     setEvents((es) => [{ id: evId.current++, kind, d }, ...es].slice(0, 6));
   const onActiveCb = (d: Datum | null): void => {
     setActive(d);
@@ -499,66 +653,145 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const interactive = mode === "interactive" && !!spec.renderInteractive;
   const canAnimate = interactive && spec.animates !== false;
   const ui = { animate: canAnimate && animate };
-  // `picker: false` charts have one whole-chart selection (onSelect only); every
-  // multi-unit chart also streams the hovered/focused unit through onActive.
-  const scalar = entry.picker === false;
-  // Only picker charts expose the readout dropdown — a scalar without a chip has
-  // no chip to hide, and injecting `readout` there would leak an unknown prop.
-  const showReadoutPicker = interactive && !scalar;
+  // Pickers: onActive + onSelect; scalars: both on one unit; minimap: onWindowChange.
+  const kind = interactionKind(entry);
+  const isMinimap = entry.slug === "minimap-strip";
+  const scalar = kind === "single";
+  const isPicker = kind === "picker";
+  const showCallbacks = isPicker || scalar || isMinimap;
+  const hasChip = entry.readout !== false;
+  const showReadoutPicker = interactive && hasChip && isPicker;
+  const showReadoutToggle = interactive && hasChip && !isPicker;
   const clearCallbacks = (): void => {
     setActive(null);
     setSelected(null);
     setEvents([]);
   };
+  const onWindowChangeCb = (win: [number, number]): void => {
+    const lo = Math.round(win[0]);
+    const hi = Math.round(win[1]);
+    const d: Datum = { index: 0, value: lo, formatted: `${lo}–${hi}` };
+    setSelected(d);
+    logEvent("window", d);
+  };
+
+  // Fixtures: threaded `data`, or inject into plain numeric demos only.
+  // Caps come from gen-playground-caps (options that actually change markup).
+  const caps = PLAYGROUND_CAPS[entry.slug];
+  // Don't double-control format/locale when knobs already own them.
+  const knobKeys = new Set(spec.knobs.map((k) => k.key));
+  const offerFormat = !!caps?.format && !knobKeys.has("format");
+  const offerLocale = !!caps?.locale && !knobKeys.has("locale");
+  const threadsData = !!spec.data;
+  const injectsData = !threadsData && PLAIN_SERIES.test(entry.dataShape) && entry.demo.length > 0;
+  const canFixture = (threadsData || injectsData) && !!caps?.fixtures.length;
+  const fixtureSeries = canFixture
+    ? applyFixture(fixture, threadsData ? data : entry.demo)
+    : undefined;
+  const shown = (threadsData ? (fixtureSeries ?? data) : data) as number[];
+  const dataOverride =
+    injectsData && fixture !== DEFAULT_FIXTURE ? (fixtureSeries as (number | null)[]) : undefined;
 
   // Remount on discrete knobs / data / mode — not on slider drags.
   const morphKey = spec.knobs
     .filter((k) => k.kind !== "range")
     .map((k) => String(state[k.key]))
     .concat(spec.shuffle ? [String(seed)] : [])
-    .concat([mode, String(animate), String(take)])
+    .concat([
+      mode,
+      String(animate),
+      String(take),
+      String(chipOn),
+      summaryMode,
+      String(named),
+      String(byId),
+      fixture,
+      formatKey,
+      locale,
+      theme,
+    ])
     .join("-");
 
   const importPath = interactive
     ? (entry.interactiveImport ?? entry.staticImport)
     : entry.staticImport;
 
-  // Inject the live callbacks (and `readout`) onto whatever element the chart's
-  // renderInteractive produced — one clone, uniform across all 106 charts, so no
-  // per-chart registry wiring is needed.
+  // Clone onto the chart node (not a host span) — Delta wraps in `<span>`.
   const showChip = dest !== "panel";
   const rawPreview = interactive
-    ? spec.renderInteractive!(state, data, ui)
-    : spec.render(state, data);
+    ? spec.renderInteractive!(state, shown, ui)
+    : spec.render(state, shown);
   const cbProps: Record<string, unknown> = {};
   if (interactive) {
-    cbProps.onSelect = onSelectCb;
-    if (!scalar) {
+    if (isMinimap) cbProps.onWindowChange = onWindowChangeCb;
+    else if (showCallbacks) {
+      cbProps.onSelect = onSelectCb;
       cbProps.onActive = onActiveCb;
-      cbProps.readout = showChip;
     }
+    if (hasChip) cbProps.readout = isPicker ? showChip : chipOn;
   }
-  const preview =
-    interactive && isValidElement(rawPreview) ? cloneElement(rawPreview, cbProps) : rawPreview;
+  // `id` naming (<title>/<desc> + aria-labelledby) is a STATIC-entry mode: the
+  // interactive wrapper owns the name and generates its ids with `useId`.
+  const naming = a11yProps(
+    summaryMode,
+    named && !!caps?.title,
+    byId && !interactive && !!caps?.idNaming,
+    entry,
+  );
+  const fmt = formatOption(formatKey);
+  const numbers: Record<string, unknown> = {};
+  if (fmt.value) numbers.format = fmt.value;
+  if (locale !== DEFAULT_LOCALE) numbers.locale = locale;
+  const preview = injectChartProps(rawPreview, {
+    ...(interactive ? cbProps : {}),
+    ...naming,
+    ...numbers,
+    ...(dataOverride ? { data: dataOverride } : {}),
+  });
 
   // The snippet mirrors what's on screen: when the value lives in the panel, show
-  // the real `readout={false}` + `onActive` → external-node pattern.
+  // the real `readout={false}` + callback → external-node pattern.
   const external = showReadoutPicker && dest !== "chart";
-  const chartJsx = interactive
-    ? (spec.codeInteractive?.(state, data, ui) ?? spec.code(state, data))
-    : spec.code(state, data);
-  const jsx = external ? withCallback(chartJsx, dest === "panel") : chartJsx;
+  const baseJsx = interactive
+    ? (spec.codeInteractive?.(state, shown, ui) ?? spec.code(state, shown))
+    : spec.code(state, shown);
+  const withData = dataOverride ? replaceDataLiteral(baseJsx, dataOverride) : baseJsx;
+  const chartJsx = injectProps(withData, [
+    ...a11yLines(naming, withData),
+    ...formatLines(formatKey, locale, withData),
+  ]);
+  const winAt = (state.window as number | undefined) ?? 520;
+  // Snippet mirrors the live tile: pickers show `onActive` when the value is
+  // read in the panel; scalars always show `onSelect` (the tile is always on).
+  const jsx = isMinimap
+    ? [
+        `const [viewport, setViewport] = useState<[number, number]>([${winAt}, ${winAt + 140}]);`,
+        "",
+        chartJsx,
+      ].join("\n")
+    : external
+      ? withCallback(chartJsx, dest === "panel", false)
+      : // External-callback snippet only when the in-chart chip is off.
+        showReadoutToggle && !chipOn
+        ? scalar && interactive
+          ? withCallback(chartJsx, true, true)
+          : withReadoutOff(chartJsx)
+        : chartJsx;
   const code = [
     `import { ${entry.name} } from "${importPath}";`,
-    ...(external ? ['import { useState } from "react";'] : []),
+    ...(theme !== DEFAULT_THEME ? ['import { MicroProvider } from "@microcharts/react";'] : []),
+    ...(external || isMinimap || (scalar && interactive && showReadoutToggle && !chipOn)
+      ? ['import { useState } from "react";']
+      : []),
     ...(ui.animate ? ['import "@microcharts/react/motion";'] : []),
     "",
-    jsx,
+    wrapTheme(jsx, theme),
   ].join("\n");
 
   return (
     <Shell
       morphKey={morphKey}
+      morphed={painted.current}
       mode={spec.renderInteractive ? mode : undefined}
       onMode={
         spec.renderInteractive
@@ -580,11 +813,20 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
       sampleData={mod?.entry.sampleData}
       preview={preview}
       aside={
-        interactive ? (
-          <ReadoutTile active={active} selected={selected} events={events} scalar={scalar} />
+        interactive && showCallbacks ? (
+          <ReadoutTile
+            active={active}
+            selected={selected}
+            events={events}
+            label={isMinimap ? "onWindowChange" : scalar ? "onSelect" : "onActive"}
+            emptyHint={
+              isMinimap ? "drag · click · ←/→…" : scalar ? "hover · click · Enter…" : undefined
+            }
+          />
         ) : undefined
       }
       hint={spec.interactiveHint}
+      themeScope={themeAttr(theme)}
       controls={
         <>
           {spec.knobs.map((k) => (
@@ -595,21 +837,188 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
               onChange={(v) => setState((s) => ({ ...s, [k.key]: v }))}
             />
           ))}
+          {/* Where the value is read out. A segmented control, not a select:
+              every other knob in this row is one, and the three destinations are
+              short enough to show at once — which also makes the choice visible
+              instead of hidden behind a closed dropdown. `showReadoutToggle` is
+              the mutually-exclusive branch, so "readout" cannot label two
+              controls at the same time. */}
           {showReadoutPicker && (
-            <Select
-              label="value readout"
+            <Segmented
+              label="readout"
               value={dest}
-              options={[
-                { value: "chart", label: "On the chart" },
-                { value: "panel", label: "In the panel" },
-                { value: "both", label: "Chart + panel" },
-              ]}
+              options={READOUT_DESTINATIONS}
               onChange={(v) => setDest(v as "chart" | "panel" | "both")}
             />
           )}
+          {showReadoutToggle && <Toggle label="readout chip" value={chipOn} onChange={setChipOn} />}
           {canAnimate && <Toggle label="animate" value={animate} onChange={setAnimate} />}
         </>
       }
+      drawers={[
+        ...(canFixture
+          ? [
+              {
+                key: "data",
+                label: "Data",
+                badge: fixture === DEFAULT_FIXTURE ? undefined : fixture,
+                content: (
+                  <div className="px-4 py-3">
+                    <Segmented
+                      label="series"
+                      value={fixture}
+                      // Only the fixtures that provably change THIS chart.
+                      options={[DEFAULT_FIXTURE, ...(caps?.fixtures ?? [])]}
+                      onChange={setFixture}
+                    />
+                    <DrawerNote>
+                      {FIXTURES.find((f) => f.key === fixture)?.note} This is the live component on
+                      that series — the documented edge-case behaviour, not a mock.
+                    </DrawerNote>
+                  </div>
+                ),
+              },
+            ]
+          : []),
+        ...(offerFormat || offerLocale
+          ? [
+              {
+                key: "format",
+                label: "Numbers",
+                badge:
+                  formatKey === FORMATS[0]!.key && locale === DEFAULT_LOCALE
+                    ? undefined
+                    : `${formatKey === FORMATS[0]!.key ? "" : formatKey}${
+                        locale === DEFAULT_LOCALE ? "" : ` ${locale}`
+                      }`.trim(),
+                content: (
+                  <div className="flex flex-wrap items-start gap-x-6 gap-y-4 px-4 py-3">
+                    {offerFormat && (
+                      <Segmented
+                        label="format"
+                        value={formatKey}
+                        options={FORMATS.map((f) => f.key)}
+                        onChange={setFormatKey}
+                      />
+                    )}
+                    {offerLocale && (
+                      <Segmented
+                        label="locale"
+                        value={locale}
+                        options={LOCALES}
+                        onChange={setLocale}
+                      />
+                    )}
+                    <DrawerNote>
+                      {offerFormat ? (
+                        <>
+                          <code className="text-xs">format</code> takes{" "}
+                          <code className="text-xs">Intl.NumberFormat</code> options (or your own
+                          function)
+                          {offerLocale ? ", and " : ". "}
+                        </>
+                      ) : (
+                        <>
+                          This chart&apos;s numbers are percentages, formatted by the library — no{" "}
+                          <code className="text-xs">format</code> override applies, but{" "}
+                        </>
+                      )}
+                      {offerLocale && (
+                        <>
+                          <code className="text-xs">locale</code> a BCP-47 tag.{" "}
+                        </>
+                      )}
+                      Both flow through every painted number, the hover readout AND the
+                      screen-reader announcement — one prop, not three.
+                    </DrawerNote>
+                  </div>
+                ),
+              },
+            ]
+          : []),
+        {
+          key: "theme",
+          label: "Theme",
+          badge: theme === DEFAULT_THEME ? undefined : theme,
+          content: (
+            <div className="px-4 py-3">
+              <Segmented
+                label="preset"
+                value={theme}
+                options={THEMES}
+                onChange={(v) => setTheme(v as Theme)}
+              />
+              <DrawerNote>
+                Presets are token bundles in <code className="text-xs">styles.css</code>, scoped by{" "}
+                <code className="text-xs">data-mc-theme</code> — exactly what{" "}
+                <code className="text-xs">MicroProvider</code> renders. They are visual only: no
+                preset ever changes what the data means. Per-token control lives on{" "}
+                <Link prefetch={false} href="/docs/theming" className="underline">
+                  Theming
+                </Link>
+                .
+              </DrawerNote>
+            </div>
+          ),
+        },
+        {
+          key: "a11y",
+          label: "Screen reader",
+          // Badges mark an axis that is OFF its default — the defaults being
+          // "the library's own naming, the chart's own title".
+          badge:
+            summaryMode !== "auto"
+              ? `summary ${summaryMode}`
+              : byId
+                ? "id naming"
+                : named
+                  ? "title"
+                  : undefined,
+          content: (
+            <A11yPane
+              chartRef={previewRef}
+              probeKey={morphKey}
+              interactive={interactive}
+              // Pickers announce every unit you rove to; lean scalars announce on
+              // value change; the range primitive announces no unit at all.
+              announce={isPicker ? "rove" : scalar ? "scalar" : "none"}
+              hint={spec.interactiveHint}
+              controls={
+                <>
+                  {/* `summary` is the accessible description (auto = describeSeries,
+                      off = decorative); `title` names the chart; `id` switches the
+                      static entry to <title>/<desc> + aria-labelledby. */}
+                  {caps?.summary && (
+                    <Segmented
+                      label="summary"
+                      value={summaryMode}
+                      options={SUMMARY_MODES}
+                      onChange={(v) => setSummaryMode(v as SummaryMode)}
+                    />
+                  )}
+                  {caps?.title && <Toggle label="title" value={named} onChange={setNamed} />}
+                  {/* `id` naming is a static-entry mode, and Delta and
+                      TokenConfidence render inline HTML instead of <Chart> — so
+                      neither has a <title>/<desc> pair to point at. */}
+                  {!interactive && caps?.idNaming && (
+                    <Toggle label="id naming" value={byId} onChange={setById} />
+                  )}
+                </>
+              }
+            />
+          ),
+        },
+      ]}
+      previewRef={previewRef}
+      onReset={() => {
+        setFixture(DEFAULT_FIXTURE);
+        setFormatKey(FORMATS[0]!.key);
+        setLocale(DEFAULT_LOCALE);
+        setTheme(DEFAULT_THEME);
+        setSummaryMode("auto");
+        setNamed(false);
+        setById(false);
+      }}
       code={code}
     />
   );

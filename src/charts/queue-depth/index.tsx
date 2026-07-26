@@ -1,8 +1,7 @@
 // <QueueDepth> — is the backlog draining or growing? A
 // zero-anchored stock area, a dashed capacity hairline, and above-capacity
 // spans re-stroked in the negative ink (shape + color, never color alone). The
-// endpoint label carries a trend glyph fit over the last quarter. Static,
-// hook-free, RSC-safe.
+// endpoint label carries a trend glyph fit over the last quarter.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";

@@ -1,10 +1,9 @@
 "use client";
 // Interactive <SegmentedBar>. useActivePicker owns interaction: one pointer
 // listener + segment-by-x lookup, ←/→ rove segments incl. "Other" (which
-// announces its member count), click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
+// announces its member count). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
   named,
@@ -88,10 +87,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
   // Largest-remainder integers (they must still sum to 100) rendered through a
   // real percent formatter — `${n}%` hardcoded the sign and its spacing, which
   // fr-FR writes as "12 %".
-  const pctFmt = useMemo(
-    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [locale],
-  );
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const pctAt = useCallback((i: number) => pctFmt((pcts[i] ?? 0) / 100), [pctFmt, pcts]);
 
   const locate = useCallback(
@@ -131,7 +127,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
       ? undefined
       : typeof summary === "string"
         ? summary
-        : sharesSummary(rolled, strings);
+        : sharesSummary(rolled, strings, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const outline = (i: number, pinned: boolean) => {

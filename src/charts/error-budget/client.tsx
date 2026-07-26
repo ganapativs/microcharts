@@ -2,7 +2,7 @@
 // Interactive <ErrorBudget>. useActivePicker owns interaction: one pointer
 // listener + nearest-step math, ←/→ step, End jumps to now, click / Enter /
 // Space selects (onSelect). The live region states remaining AND the local burn
-// multiple. Composes the static component (canon); the crosshair + focus ring +
+// multiple.crosshair + focus ring +
 // pin + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

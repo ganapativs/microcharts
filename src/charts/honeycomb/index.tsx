@@ -1,8 +1,7 @@
 // <Honeycomb> — how many of the available slots are taken.
 // Occupancy of capacity in an area-filling hex grid: units are countable (total
 // ≤ 60). Two merged <path> nodes (filled + empty) keep the node count O(1). Fill
-// order is row-major from the top-left (occupancy reads as a sweep). Static,
-// hook-free, RSC-safe.
+// order is row-major from the top-left (occupancy reads as a sweep).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";

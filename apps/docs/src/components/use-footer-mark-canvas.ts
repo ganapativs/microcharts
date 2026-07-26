@@ -134,8 +134,7 @@ export function useFooterMarkCanvas(
     let lastDrawMs = 0;
     let lastRowShift = -1; // conveyor row the spring buffer is aligned to
 
-    // ── live palette — refreshed on theme/accent MUTATIONS, never per frame
-    // (getComputedStyle in the raf loop forces style recalc = hover hitches)
+    // Palette on theme change only — getComputedStyle in raf forces style recalc.
     let key = "";
     let light = false;
     let pal: Palette = { accent: "#c2410c", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
@@ -159,7 +158,6 @@ export function useFooterMarkCanvas(
       };
     };
 
-    // ── canvases + the wordmark mask, DPR-crisp, built once per resize ────
     const build = () => {
       w = host.clientWidth;
       h = host.clientHeight;
@@ -369,7 +367,6 @@ export function useFooterMarkCanvas(
       }
       let energyAcc = 0;
 
-      // ── render the living mosaic once ───────────────────────────────────
       // infinite conveyor: the lattice drifts upward forever; virtual rows
       // advance as whole rows wrap, so fresh charts surface from the bottom
       fctx.clearRect(0, 0, w, h);
@@ -519,11 +516,7 @@ export function useFooterMarkCanvas(
         }
       }
 
-      // ── composite: faint full-bleed field, then the word — a ghost slab
-      // and hairline outline carry the letterform; the bright mosaic cut
-      // from the field is its ink ────────────────────────────────────────
-      // shared tuning; light gets only a whisper more letter ink — the field
-      // and torch stay identical so the mood matches dark
+      // Field + word composite. Light gets a touch more letter ink; torch stays equal.
       const fieldA = 0.16;
       const torchA = 0.34;
       const slabA = light ? 0.14 : 0.11;
@@ -534,15 +527,12 @@ export function useFooterMarkCanvas(
       ctx.drawImage(field, 0, 0, w, h);
       ctx.globalAlpha = 1;
 
-      // torch: the pointer is a soft light that lifts the hidden catalog out
-      // of the faint field at full color — only composited while hovering
+      // Pointer torch — only while hovering; knock the word out so letters stay dominant.
       if (!reduced && px > -1e8 && torch && tctx) {
         const tc = tctx;
         tc.setTransform(1, 0, 0, 1, 0, 0);
         tc.clearRect(0, 0, torch.width, torch.height);
         tc.drawImage(field, 0, 0);
-        // a quiet reading lamp, not a floodlight — and the word is knocked
-        // out of it so the letters always stay the dominant read
         const rad = Math.max(130, Math.min(210, w * 0.11)) * dpr;
         const g = tc.createRadialGradient(px * dpr, py * dpr, 0, px * dpr, py * dpr, rad);
         g.addColorStop(0, `rgba(0,0,0,${torchA})`);
@@ -558,8 +548,7 @@ export function useFooterMarkCanvas(
       }
 
       if (pWord > 0.01 && fontSpec) {
-        // ghost slab + breathing outline, drawn per letter so each rises
-        // and fades on its own beat with the mask
+        // Per-letter outline/fill so each rises with the mask.
         ctx.font = fontSpec;
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
@@ -671,7 +660,6 @@ export function useFooterMarkCanvas(
     // matches the running loop — a mid-animation repaint never time-warps
     const drawStill = () => draw(lastDrawMs || 2600, true);
 
-    // ── wiring ────────────────────────────────────────────────────────────
     const ro = new ResizeObserver(() => {
       box = null;
       build();

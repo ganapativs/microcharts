@@ -1,8 +1,7 @@
 "use client";
 // Interactive <DualWindowMeter>. useActivePicker owns interaction: ONE pointer
-// listener + nearest-sample-by-x math, roving keyboard (←/→/Home/End), touch
+// listener + nearest-sample-by-x math, roving keyboard (←/→/Home/End). touch
 // tap-to-pin, and the onActive/onSelect contract — never a DOM node per sample.
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { lastFinite } from "../../core/stats.js";

@@ -264,4 +264,28 @@ describe("focus rings sit concentric on the marks they enclose", () => {
   it("judged a real number of axes (guards against a vacuous suite)", () => {
     expect(judged).toBeGreaterThan(30);
   });
+
+  // The BRANDED ring, as opposed to the symmetric overlay rings above.
+  // `styles.css` styled `.mc-root:focus-visible` — the <svg> — but no static
+  // sets tabIndex: the tab stop is the wrapper span that `wrap()` stamps with
+  // `data-mc-host`. So the rule could never match and all ~104 focusable charts
+  // fell back to the UA outline, whatever that is on the host platform.
+  it("the accent focus ring lands on the element that actually takes focus", async () => {
+    const screen = await render(<CometTrail data={[3, 6, 2, 8, 5]} title="Focus" />);
+    const host = screen.container.querySelector("[data-mc-host]") as HTMLElement;
+    host.focus();
+    expect(host.matches(":focus"), "the wrapper is the tab stop").toBe(true);
+
+    // Resolve --mc-accent through the cascade rather than hardcoding a hex.
+    const probe = document.createElement("span");
+    probe.style.color = "var(--mc-accent)";
+    host.append(probe);
+    const accent = getComputedStyle(probe).color;
+    probe.remove();
+
+    const cs = getComputedStyle(host);
+    expect(cs.outlineStyle).toBe("solid");
+    expect(cs.outlineWidth).toBe("2px");
+    expect(cs.outlineColor).toBe(accent);
+  });
 });

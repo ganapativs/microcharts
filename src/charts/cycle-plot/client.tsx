@@ -1,24 +1,9 @@
 "use client";
-// Interactive <CyclePlot>. ←/→ step slots in render order (left→right, skipping
-// empty slots), announcing each slot's center, cycle count, and drift;
-// Enter/Space/click pins a slot (onSelect). A pointer picks the slot under the
-// cursor. useActivePicker owns interaction, composing the static component
-// (canon); the focus band + readout chip are overlay children.
-//
-// Index space: the navigable unit is the SLOT (index = slot index, render/
-// left-to-right order — a rollup, not the original data index); value = the
-// slot's center (mean/median), or `null` for an empty slot; label = the slot
-// name when supplied.
-//
-// TWO-LEVEL NAVIGATION, one-level contract. ←/→ walk slots (the kernel's axis);
-// ↑/↓ drill into the individual observations WITHIN the active slot. The drill
-// is deliberately CHART-LOCAL: `useActivePicker` stays single-axis so the ~84
-// other picker charts don't carry a compound-selection kernel for one chart's
-// feature. It is held as `{slot, cycle}` — keyed by slot, so moving slots
-// implicitly drops it with no reset effect — and driven from `step`, which
-// consumes ↑/↓ (returning the unchanged slot) and re-renders via its own state.
-// The drill is a READOUT depth, not a second selection axis: onActive/onSelect
-// keep reporting the slot, so the shared contract is unchanged.
+// Interactive <CyclePlot>. ←/→ step slots (left→right); Enter/Space/click pins (onSelect).
+// Index = slot (not raw data index); value = slot center (mean/median) or null if empty.
+// ↑/↓ drills into observations within the active slot — held as local `{slot,cycle}`
+// keyed by slot (moving slots drops it). `step` eats ↑/↓; don't extend useActivePicker
+// to 2-D selection. onActive/onSelect still report the slot (readout depth only).
 import { useCallback, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

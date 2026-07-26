@@ -3,12 +3,6 @@ import { HeatStrip } from "@microcharts/react/heat-strip";
 import { HeatStrip as HeatStripInteractive } from "@microcharts/react/heat-strip/interactive";
 import staticModule, { playground as staticPlayground, LOAD, D } from "./heat-strip";
 
-/** Interactive half of the heat-strip chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./heat-strip`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <HeatStripInteractive

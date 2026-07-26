@@ -1,6 +1,6 @@
-// RateVolume geometry — pure, React-free. A rate moved — on what
+// RateVolume: A rate moved — on what
 // volume? The rate line is precise; the ghost volume bars are deliberately
-// low-precision context (the denominator), on their own zero-anchored scale.
+// low-precision context (the denominator). on their own zero-anchored scale.
 // A rate on zero volume is undefined and is never plotted (line gap + zero bar):
 // that lie — a rate nobody generated — is the one this type exists to prevent.
 // Coords 2-dp, integer viewBox.
@@ -78,7 +78,7 @@ export function rateVolumeGeometry(opts: {
   const slotW = (plotR - plotL) / n;
   const center = (i: number) => plotL + slotW * (i + 0.5);
 
-  // ── volume: zero-anchored bars on their own scale (context, not a series) ──
+  // Volume: zero-anchored bars on their own scale (context, not a series).
   const volumes = data.map((d) => (isFiniteValue(d.volume) && d.volume > 0 ? d.volume : 0));
   const volMax = opts.volumeDomain?.[1] ?? Math.max(0, ...volumes);
   const volTop = opts.volumeDomain?.[0] ?? 0;
@@ -94,7 +94,7 @@ export function rateVolumeGeometry(opts: {
     };
   });
 
-  // ── rate: precise line; only periods with a real denominator are plotted ──
+  // Rate: precise line; only periods with a real denominator are plotted.
   const valid = data.map((d) => isFiniteValue(d.rate) && isFiniteValue(d.volume) && d.volume > 0);
   const rateVals = data.filter((_, i) => valid[i]).map((d) => d.rate);
   const rateExtent = extent(rateVals);

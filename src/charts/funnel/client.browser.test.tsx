@@ -54,4 +54,21 @@ describe("interactive <Funnel>", () => {
     const screen = await render(<Funnel data={PIPE} selectedIndex={2} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("a stage with no value reads out as an em dash, never 0%", async () => {
+    const screen = await render(
+      <Funnel
+        data={[
+          { label: "Visitors", value: 12400 },
+          { label: "Trials", value: null },
+        ]}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-funnel-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Trials —");
+  });
 });

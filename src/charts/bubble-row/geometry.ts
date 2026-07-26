@@ -1,6 +1,6 @@
-// BubbleRow geometry — pure, React-free. The catalog's honesty
+// BubbleRow: The catalog's honesty
 // exemplar: r ∝ √value with NO exceptions (a linear-radius map would be a ~squared
-// lie), and NO sorting (order = data order — reordering is the caller's statement).
+// lie). and NO sorting (order = data order — reordering is the caller's statement).
 // Area comparison is the weakest common channel — precision is LOW and the docs
 // carry the standing "for precise comparison, use MiniBar" steer. All coords 2-dp.
 import { round2 } from "../../core/types.js";

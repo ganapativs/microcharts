@@ -1,8 +1,7 @@
 // <FatDigits> — which numbers in a dense column are big, before you read them.
 // The numeral is the exact value; font-WEIGHT is a redundant preattentive tier
 // (5 or 3 ordinal steps). Adapted from FatFonts to discrete weights on the
-// inherited font, because a custom font would break zero-dep. Static,
-// hook-free, RSC-safe.
+// inherited font, because a custom font would break zero-dep.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";

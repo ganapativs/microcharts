@@ -1,5 +1,5 @@
-// CohortTriangle geometry — pure, React-free. Which vintage retains
-// worst, compared at equal maturity. Rows = cohorts (input order top→bottom),
+// CohortTriangle: Which vintage retains
+// worst, compared at equal maturity. Rows = cohorts (input order top→bottom).
 // columns = age; each cell is a rect shaded by a discrete retention level.
 // Ragged rows: a cohort observed for fewer ages leaves its trailing columns
 // empty, so the block reads as the classic retention triangle. Shares arrive as

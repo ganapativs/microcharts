@@ -1,12 +1,10 @@
 "use client";
 // Interactive <MicroBox>. useActivePicker owns interaction: one pointer
 // listener + nearest-stat-by-x math, roving the fixed 5-stop model
-// min → q1 → median → q3 → max ("Median: 42."), click / Enter / Space selects
-// (onSelect). Composes the static component (canon) — the SVG is never
-// re-implemented.
-//
+// min → q1 → median → q3 → max ("Median: 42."). click / Enter / Space selects
+// (onSelect).
 // Unit = one of the five summary STATS, so `datum.index` is the STAT POSITION
-// (0 = min … 4 = max), not a data index; `value` is that stat's value and
+// (0 = min … 4 = max). not a data index; `value` is that stat's value and
 // `label` its name.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";

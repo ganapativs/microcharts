@@ -1,6 +1,5 @@
-// GardenGrid summary templates (garden-grid) — its OWN module. Ordinal steps,
-// not values (docs steer exact reads to ActivityGrid/HeatStrip). English lives
-// only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// GardenGrid summary templates (garden-grid). Ordinal steps, not values (docs steer exact
+// reads to ActivityGrid/HeatStrip).
 import type { SummaryStrings } from "./summary.js";
 
 export type GardenStrings = Pick<SummaryStrings, "noData" | "gardenGrid" | "gardenCell"> & {

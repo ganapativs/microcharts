@@ -1,4 +1,4 @@
-// StarSpoke geometry — pure, React-free. Spokes radiate
+// StarSpoke: Spokes radiate
 // from center, first at 12 o'clock, clockwise; length = value on ONE shared
 // domain. NO contour polygon, ever — the validated finding is that contour-free
 // wins for outlier/similarity tasks (an enclosed area lies about magnitude and

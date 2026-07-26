@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { BreathingDot } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 describe("interactive <BreathingDot>", () => {
   it("pulses the core dot (motion IS the encoding)", async () => {
@@ -58,5 +60,48 @@ describe("interactive <BreathingDot>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.2, label: "calm" });
+  });
+
+  // Motion names the BAND; the level itself was invisible to a mouse reader
+  // unless `label="value"` printed it. Hover/focus reveals it.
+  it('hover reveals the load level; label="value" suppresses the chip', async () => {
+    const screen = await render(<BreathingDot value={0.62} title="Load" />);
+    const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    expect(chip()).toBeUndefined();
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("62% · elevated");
+    await pointerAway();
+    await expect.poll(chip).toBeUndefined();
+
+    // The number is already beside the dot — no second copy floating over it.
+    const labelled = await render(<BreathingDot value={0.62} label="value" title="Load" />);
+    const lw = labelled.container.querySelector(".mc-breathing-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
+  });
+
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
+  it("onActive reports the dot once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<BreathingDot value={0.62} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-breathing-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("62% · elevated");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({
+      index: 0,
+      value: 0.62,
+      label: "elevated",
+      formatted: chip(),
+    });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
+    await pointerAway();
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
+    expect(seen.length).toBe(2);
   });
 });

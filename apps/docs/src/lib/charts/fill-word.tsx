@@ -40,6 +40,13 @@ export const entry: ChartEntry = {
       required: false,
       description: "Append the percent numeral after the word.",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description:
+        "Word type size in viewBox units (default 12) — here the word is the mark, so this sizes the chart.",
+    },
   ],
   demo: [62],
   example: {

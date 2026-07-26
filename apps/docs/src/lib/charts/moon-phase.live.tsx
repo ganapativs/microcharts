@@ -3,12 +3,6 @@ import { MoonPhase } from "@microcharts/react/moon-phase";
 import { MoonPhase as MoonPhaseInteractive } from "@microcharts/react/moon-phase/interactive";
 import staticModule, { playground as staticPlayground } from "./moon-phase";
 
-/** Interactive half of the moon-phase chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./moon-phase`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive() {
   return (
     <span className="inline-flex items-center gap-3">
@@ -25,7 +19,7 @@ export const playground: PlaygroundSpec = {
     <MoonPhaseInteractive
       value={(s.value as number) / 100}
       mode={s.mode as "progress" | "cycle"}
-      summary={false}
+      title="Sprint"
       size={44}
     />
   ),

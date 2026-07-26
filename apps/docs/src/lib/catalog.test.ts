@@ -125,20 +125,70 @@ describe("catalog shared + interactive props", () => {
 
     const delta = catalog.charts.find((c) => c.slug === "delta")!;
     expect(delta.picker).toBe(false);
-    expect(delta.sharedInteractive).toEqual(["animate", "live", "onSelect"]);
+    expect(delta.sharedInteractive).toEqual(["animate", "live", "onActive", "onSelect"]);
 
+    // No picker (it is a slider), but it does paint a chip — the window range.
     const minimap = catalog.charts.find((c) => c.slug === "minimap-strip")!;
     expect(minimap.picker).toBe(false);
-    expect(minimap.sharedInteractive).toEqual(["animate"]);
+    expect(minimap.sharedInteractive).toEqual(["animate", "readout"]);
     expect(minimap.props.some((p) => p.name === "onWindowChange" && p.interactive)).toBe(true);
 
+    // Real focus moves into the text, so no shared picker props — but hovering
+    // a flagged token floats its tier + confidence, so `readout` applies.
     const token = catalog.charts.find((c) => c.slug === "token-confidence")!;
     expect(token.picker).toBe(false);
     expect(token.animates).toBe(false);
-    expect(token.sharedInteractive).toEqual([]);
+    expect(token.sharedInteractive).toEqual(["readout"]);
 
     const wind = catalog.charts.find((c) => c.slug === "wind-barb")!;
     expect(wind.interactiveImport).toBeUndefined();
     expect(wind.sharedInteractive).toBeUndefined();
+  });
+
+  // `readout` in `sharedInteractive` used to be derived by regexing the client
+  // source for the chip class. The registry's `readout: false` flag is the
+  // authority (and the flag the playground already reads), so the catalog reads
+  // it directly — these are the six entries that paint no chip.
+  it("derives readout from the registry flag, not the client source", async () => {
+    const { buildCatalog } = await import("./catalog-json");
+    const catalog = buildCatalog();
+    const noChip = ["delta", "dice-pips", "fat-digits", "status-dot", "tally-marks", "trend-arrow"];
+    for (const slug of noChip) {
+      const c = catalog.charts.find((x) => x.slug === slug)!;
+      expect(c.sharedInteractive, `${slug} must not advertise readout`).not.toContain("readout");
+      expect(CHARTS.find((x) => x.slug === slug)?.readout).toBe(false);
+    }
+    // Chip-carrying scalars have no picker but do take `readout`.
+    for (const slug of ["bullet", "thermometer", "progress", "token-confidence"]) {
+      const c = catalog.charts.find((x) => x.slug === slug)!;
+      expect(c.picker, `${slug} is a lean scalar`).toBe(false);
+      expect(c.sharedInteractive, `${slug} paints a chip`).toContain("readout");
+    }
+    // …and so does a plain multi-unit picker.
+    expect(catalog.charts.find((x) => x.slug === "sparkbar")!.sharedInteractive).toContain(
+      "readout",
+    );
+  });
+});
+
+// The catalog is the machine reference: an agent that can't see the docs page
+// still needs the honest-encoding facts (channel + precision rating, per
+// CLAUDE.md non-negotiable #7) and the browsing metadata.
+describe("catalog per-chart metadata is complete", () => {
+  it("every chart carries collection, tagline, precision and a node budget", async () => {
+    const { buildCatalog } = await import("./catalog-json");
+    const catalog = buildCatalog();
+    expect(catalog.charts.length).toBe(CHARTS.length);
+    for (const c of catalog.charts) {
+      expect(c.collection, `${c.slug} collection`).toBeTruthy();
+      expect(c.tagline.length, `${c.slug} tagline`).toBeGreaterThan(0);
+      expect(c.primaryEncoding.length, `${c.slug} primaryEncoding`).toBeGreaterThan(0);
+      expect(c.precision.length, `${c.slug} precision`).toBeGreaterThan(0);
+      expect(c.nodeBudget.length, `${c.slug} nodeBudget`).toBeGreaterThan(0);
+    }
+    const bubble = catalog.charts.find((c) => c.slug === "bubble-row")!;
+    // The catalog's worked example of an honest low-precision admission.
+    expect(bubble.precision).toContain("low");
+    expect(bubble.precision).toContain("MiniBar");
   });
 });

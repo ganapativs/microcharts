@@ -1,8 +1,7 @@
 "use client";
 // Interactive <StarSpoke>. useActivePicker owns interaction: one pointer
-// listener + nearest-spoke-by-angle lookup (atan2, pure), ←/→/↑/↓ rotate focus
+// listener + nearest-spoke-by-angle lookup (atan2, pure). ←/→/↑/↓ rotate focus
 // circularly through the spokes, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

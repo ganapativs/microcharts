@@ -1,7 +1,7 @@
 "use client";
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
-// No sub-part navigation — the pips are one value. Composes the static component.
+// No sub-part navigation — the pips are one value.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -22,6 +22,13 @@ export interface InteractiveDicePipsProps extends DicePipsProps {
    * always wins.
    */
   animate?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. The pips are ONE face,
+   * so this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the glyph, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the face count }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -33,12 +40,13 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     title,
     value,
     animate = false,
+    onActive,
     onSelect,
     className,
     style,
     ...rest
   } = props;
-  const summary = dicePipsSummary(value, strings);
+  const text = dicePipsSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
@@ -50,7 +58,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(summary);
+    if (live) setAnnounced(text);
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     // A new face is a roll landing — pips pop into place (scale + a tiny
     // per-pip stagger), not a flat dissolve.
@@ -72,20 +80,43 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
         () => {},
       );
     });
-  }, [value, live, summary]);
+  }, [value, live, text]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The pips are ONE face, not six navigable marks: a single selectable unit
-  // (index 0) carrying the rounded count the face renders.
-  const pick = (): void =>
-    onSelect?.({ index: 0, value: Number.isFinite(value) ? Math.round(value) : null });
+  // (index 0) carrying the rounded count the face renders. One builder, so
+  // `onActive` and `onSelect` can never report a different face.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? Math.round(value) : null,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
+  // mean "active", and the same unit must not be announced twice. No state — the
+  // face paints no chip, so a hover must not cost a render.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-dice-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;

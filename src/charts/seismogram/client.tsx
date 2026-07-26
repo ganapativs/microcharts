@@ -1,11 +1,10 @@
 "use client";
 // Interactive <Seismogram>. useActivePicker owns interaction: ONE pointer
 // listener + slot-by-x-band over the rendered series, ←/→ step slots, Home/End
-// jump to the first/last EVENT (quiet slots are skippable context), click /
+// jump to the first/last EVENT (quiet slots are skippable context). click /
 // Enter / Space selects (onSelect). Announces via the shared point template; a
-// quiet slot reads as the zero it is, and only a non-finite slot takes the
-// pointEmpty wording. Composes the static component (canon) — the SVG is never
-// re-implemented.
+// quiet slot reads as the zero it is, and only a non-finite slot takes
+// pointEmpty wording.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";

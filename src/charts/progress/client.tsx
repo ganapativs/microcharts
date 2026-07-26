@@ -2,7 +2,8 @@
 // Interactive <Progress>. `live` re-announces through a polite
 // region, throttled to whole-percent changes (no spam while a value streams).
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
-// mark). Composes the static component (canon).
+// mark) — hover/focus is a reveal of the reading, for the `label="none"` bar
+// that prints nothing.
 import { useEffect, useRef, useState } from "react";
 import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -24,6 +25,18 @@ export interface InteractiveProgressProps extends ProgressProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * Show the floating value chip on hover/focus (default `true`). It appears
+   * only when the bar prints no label of its own (`label="none"`).
+   */
+  readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One bar = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the mark, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -35,6 +48,8 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     strings = EN_SCALAR,
     title,
     summary,
+    readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -46,6 +61,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
   useEntrance(hostRef, "sweep", animate);
 
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
   const prev = useRef(wholePct);
   useEffect(() => {
     if (prev.current === wholePct) return; // sub-percent movement stays quiet
@@ -59,14 +75,43 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
 
   // One bar, one selectable unit (index 0): the fraction it encodes (unclamped —
   // the label already tells the truth past 100%).
-  const pick = (): void =>
-    onSelect?.({ index: 0, value: Number.isFinite(model.fraction) ? model.fraction : null });
+  // `label="none"` is the only mode with nothing painted; every other mode
+  // already renders `model.display`, so the chip would just duplicate it.
+  // The chip is the percent the bar WOULD have printed, resolved by the same
+  // model — never `${wholePct}%`, which hardcoded an en-US percent and ignored
+  // `locale` (and `format`) that every other number here honours.
+  const chipText =
+    rest.label === "none"
+      ? progressModel({ ...rest, strings, label: "percent" }).display
+      : undefined;
+  // One builder, so `onActive` and `onSelect` can never report a different
+  // number or a different string than the chip paints.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(model.fraction) ? model.fraction : null,
+    formatted: model.display ?? chipText,
+  });
+  const pick = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setHover(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-progress-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -76,6 +121,11 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     >
       <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
+      {readout && hover && chipText ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {chipText}
+        </span>
+      ) : null}
     </span>
   );
 }

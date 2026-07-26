@@ -1,4 +1,4 @@
-// DicePips geometry — pure, React-free. Canonical dice pip
+// DicePips: Canonical dice pip
 // patterns 1–6 (subitized count) on a fixed 3×3 grid; 0 is an empty face, and
 // > 6 is not subitizable so the face carries a centered numeral instead of an
 // invented pattern (the spec'd honesty fallback). All coords 2-dp.

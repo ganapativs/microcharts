@@ -3,12 +3,6 @@ import { Sparkline } from "@microcharts/react/sparkline";
 import { Sparkline as SparklineInteractive } from "@microcharts/react/sparkline/interactive";
 import staticModule, { entry, playground as staticPlayground } from "./sparkline";
 
-/** Interactive half of the sparkline chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./sparkline`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <SparklineInteractive
@@ -35,8 +29,8 @@ export const playground: PlaygroundSpec = {
       band={s.band ? [10, 26] : undefined}
       label={s.label as "none" | "last" | "minmax"}
       animate={ui.animate}
-      className="w-full max-w-md"
-      title="Playground"
+      style={{ width: "100%", maxWidth: "28rem" }}
+      title="Weekly revenue"
     />
   ),
   codeInteractive: (s, data, ui) =>

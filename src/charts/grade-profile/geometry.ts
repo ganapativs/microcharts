@@ -1,6 +1,6 @@
-// GradeProfile geometry — pure, React-free. How hard is the route,
+// GradeProfile: How hard is the route,
 // where: one baseline-anchored quad per segment filled by a QUANTIZED grade bin
-// (never a continuous ramp), with the elevation ridge on top. Grade = rise ÷ run
+// (never a continuous ramp). with the elevation ridge on top. Grade = rise ÷ run
 // × 100, so `d` and `elev` must share units. Descents are always the gentlest bin
 // — climb difficulty is the story. Non-finite / non-monotone segments drop out as
 // gaps. 2-dp coords.

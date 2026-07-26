@@ -5,6 +5,11 @@ import { ParetoStrip } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
+const vbWidth = (c: Element) =>
+  Number(c.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
 const CAUSES = [
   { label: "Timeouts", value: 38 },
   { label: "OOM", value: 24 },
@@ -69,6 +74,18 @@ describe("<ParetoStrip>", () => {
     const none = draw(<ParetoStrip data={CAUSES} label="none" width={160} />).container;
     expect(labeled.querySelector("text")!.textContent).toBe("4 of 9 → 82%");
     expect(none.querySelector("text")).toBeNull();
+  });
+
+  it("locale spells the percent, and the label gutter widens with the string", () => {
+    const en = draw(<ParetoStrip data={CAUSES} width={160} />).container;
+    const de = draw(<ParetoStrip data={CAUSES} width={160} locale="de-DE" />).container;
+    expect(de.querySelector("text")!.textContent).toBe(`4 of 9 → 82${NBSP}%`);
+    expect(de.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `Top 4 of 9 causes account for 82${NBSP}% of the total.`,
+    );
+    // the gutter is reserved from the FORMATTED string, so the extra character
+    // buys viewBox width instead of spilling the caption past it
+    expect(vbWidth(de)).toBeGreaterThan(vbWidth(en));
   });
 
   it("is axe-clean", async () => {

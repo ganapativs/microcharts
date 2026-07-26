@@ -58,7 +58,9 @@ describe("<SproutRow>", () => {
       const x = Number(t.getAttribute("x"));
       const fs = Number(t.getAttribute("font-size"));
       expect(fs).toBeGreaterThanOrEqual(7); // library legibility floor, never shrunk to a caption
-      const half = (t.textContent!.length * 0.72 * fs) / 2;
+      // 0.95 em/char — the PROSE estimate the layout reserves with, not the
+      // narrower digits rate (a 0.72 assertion would pass on a spilling row)
+      const half = (t.textContent!.length * 0.95 * fs) / 2;
       expect(x - half).toBeGreaterThanOrEqual(0);
       expect(x + half).toBeLessThanOrEqual(vbW!);
     }
@@ -66,7 +68,7 @@ describe("<SproutRow>", () => {
     // ≥ the widest label extent → no overlap within a tier
     const xs = cats.map((t) => Number(t.getAttribute("x"))).sort((a, b) => a - b);
     const fs = Number(cats[0]!.getAttribute("font-size"));
-    const widest = Math.max(...ACCT.map((d) => d.label.length * 0.72 * fs));
+    const widest = Math.max(...ACCT.map((d) => d.label.length * 0.95 * fs));
     for (let i = 2; i < xs.length; i++) expect(xs[i]! - xs[i - 2]!).toBeGreaterThanOrEqual(widest);
   });
 

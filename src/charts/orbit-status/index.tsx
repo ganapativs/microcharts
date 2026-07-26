@@ -1,10 +1,10 @@
 // <OrbitStatus> — how slow and how busy is this dependency right now?
 // (structured two-variable, motion type). The STATIC frame carries BOTH
 // variables with zero JS: orbit radius = latency, orbit dash density = call rate
-// (quantized to 5 steps, "denser dashes = more calls"), satellite at the top. The
+// (quantized to 5 steps, "denser dashes = more calls"). satellite at the top. The
 // interactive entry mirrors the rate as the satellite's angular SPEED (same 5
 // steps) and transitions the radius on latency change. The satellite's static
-// angle encodes nothing — only its speed does. Static, hook-free, RSC-safe.
+// angle encodes nothing — only its speed does.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";

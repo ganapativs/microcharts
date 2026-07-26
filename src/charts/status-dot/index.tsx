@@ -1,5 +1,5 @@
 // <StatusDot> — "what state is this thing in right now?" (S4 categorical).
-// Static, hook-free, RSC-safe. Each state pairs a distinct
+// Each state pairs a distinct
 // silhouette with a semantic token — never color-alone by construction; the
 // mapping is a contract (`color` recolors, never reshapes). Five built-ins;
 // `states` extends the vocabulary while preserving the pairing invariant.
@@ -39,7 +39,19 @@ export function resolveStatus(status: string, states?: Record<string, StatusStat
 export interface StatusDotProps {
   /** Built-in `"ok" | "warn" | "error" | "off" | "busy"`, or a `states` key. */
   status: string;
-  /** Live-now halo (CSS keyframe, reduced-motion-gated) — monitoring contexts. */
+  /**
+   * Live-now halo: a pulsing ring behind the mark, CSS-only and
+   * reduced-motion-gated. Default off, and independent of `status` — every state
+   * pulses the same way when you ask for it.
+   *
+   * This is the catalog's one DOCUMENTED exemption from the "no looping
+   * animation" rule (see design-notes), and the one thing besides
+   * `<Marker celebrate>` that moves inside a static host. The loop is the
+   * reading, not decoration: a monitoring dot that pulses says "this feed is
+   * live", and the same dot holding still says it stopped — which is the state a
+   * reader most needs to notice. Turn it off anywhere the liveness of the value
+   * is not itself part of the reading.
+   */
   pulse?: boolean | undefined;
   /** Extend/override the state map for domain vocabularies (pairing preserved). */
   states?: Record<string, StatusState> | undefined;

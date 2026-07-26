@@ -1,5 +1,5 @@
-// QueueDepth geometry — pure, React-free. Backlog stock vs
-// capacity: is the queue draining or growing? A zero-anchored area (the stock),
+// QueueDepth: Backlog stock vs
+// capacity: is the queue draining or growing? A zero-anchored area (the stock).
 // a dashed capacity hairline, and above-capacity spans re-stroked in the
 // negative ink (shape + color, never color alone). The trend glyph comes from a
 // plain linear fit over the last quarter of the window. Coords 2-dp, integer

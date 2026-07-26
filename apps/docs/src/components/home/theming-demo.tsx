@@ -9,12 +9,7 @@ import { Delta } from "@microcharts/react/delta/interactive";
 import { StackedArea } from "@microcharts/react/stacked-area/interactive";
 import { INK_PRESET_CATS } from "@/lib/token-export";
 
-/**
- * 07 · Theming, live — the swatches call the REAL `defineTheme` and spread
- * `theme.vars` / `theme.darkVars` (following the site theme) onto the demo
- * scope. The page is its own theming documentation: what you click is what
- * ships. Valence colors hold still on purpose — delight never lies.
- */
+/** Live theming demo — swatches call `defineTheme` and spread vars onto the scope. */
 
 const ACCENTS = [
   { name: "ember", hex: "#c2410c" },

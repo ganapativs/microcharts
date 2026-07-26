@@ -1,6 +1,5 @@
-// DualWindowMeter summary templates (dual-window-meter) — its OWN module. Two
-// integration windows vs a compliance target; the window sizes are part of the
-// meaning. English lives only in core string modules (canon).
+// DualWindowMeter summary templates (dual-window-meter). Two integration windows vs a
+// compliance target; the window sizes are part of the meaning.
 import type { SummaryStrings } from "./summary.js";
 
 export type DualWindowStrings = Pick<SummaryStrings, "noData" | "dualWindow" | "dualWindowAt">;

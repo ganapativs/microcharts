@@ -1,5 +1,5 @@
 // <CalibrationStrip> — when a model says 70%, does it happen 70% of the time,
-// and where is there enough data to even ask. Static, hook-free, RSC-safe.
+// and where is there enough data to even ask.
 // Predicted × observed against the identity diagonal, with
 // an always-on support lane; low-support bins render open + faded so tiny bins
 // never look authoritative. No single-number calibration score is ever shown.
@@ -146,7 +146,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 data-mc-ink="accent"
                 strokeOpacity={p.lowSupport ? 0.4 : 1}
                 style={{
-                  strokeWidth: "var(--mc-stroke-width)",
+                  strokeWidth: "var(--mc-sw)",
                   ...(color ? { stroke: color } : null),
                 }}
                 vectorEffect="non-scaling-stroke"

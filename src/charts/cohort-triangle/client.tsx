@@ -1,9 +1,8 @@
 "use client";
 // Interactive <CohortTriangle>. The heatmap interaction: hover a
-// cell for its retention, or roving-focus the block and walk it in 2-D with the
+// cell for its retention, or roving-focus the block and walk it in 2-D with
 // arrow keys; click / Enter / Space selects a cell (onSelect). useActivePicker
-// owns interaction (one wrapper listener + pure ragged-grid math), composing the
-// static component (summary={false}, focus + pin rings as its children).
+// owns interaction (one wrapper listener + pure ragged-grid math). composing
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";

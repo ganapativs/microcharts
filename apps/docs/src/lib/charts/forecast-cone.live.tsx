@@ -3,12 +3,6 @@ import { ForecastCone } from "@microcharts/react/forecast-cone";
 import { ForecastCone as ForecastConeInteractive } from "@microcharts/react/forecast-cone/interactive";
 import staticModule, { playground as staticPlayground, HIST, FORE } from "./forecast-cone";
 
-/** Interactive half of the forecast-cone chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./forecast-cone`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <ForecastConeInteractive

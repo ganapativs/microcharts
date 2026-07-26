@@ -3,12 +3,6 @@ import { EnsembleGhosts } from "@microcharts/react/ensemble-ghosts";
 import { EnsembleGhosts as EnsembleGhostsInteractive } from "@microcharts/react/ensemble-ghosts/interactive";
 import staticModule, { playground as staticPlayground, FUTURES } from "./ensemble-ghosts";
 
-/** Interactive half of the ensemble-ghosts chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./ensemble-ghosts`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <EnsembleGhostsInteractive

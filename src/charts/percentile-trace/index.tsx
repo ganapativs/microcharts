@@ -1,7 +1,7 @@
 // <PercentileTrace> — one entity's standing drifting inside a population
 // Because the series IS percentile rank, the y-axis is LOCKED to
 // [0,100] and the population bands (p25–75, p5–95) are fixed rects, not
-// estimates — the trace is the only line. Static, hook-free, RSC-safe. The
+// estimates — the trace is the only line. The
 // endpoint dot carries valence (`positive`); direction is also in the line, so
 // the color is a redundant cue, never the sole signal.
 import type { CSSProperties, ReactNode } from "react";

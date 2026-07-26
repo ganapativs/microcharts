@@ -1,7 +1,6 @@
-// Constellation summary templates (constellation) — its OWN module. Sparse S1
-// events on a time axis; the summary names the count, the span, and the largest
-// event, never the vertical position (which may be jitter — layout, not data).
-// English lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// Constellation summary templates (constellation). Sparse S1 events on a time axis; the
+// summary names the count, the span, and the largest event, never the vertical position
+// (which may be jitter — layout, not data).
 import type { SummaryStrings } from "./summary.js";
 
 export type ConstellationStrings = Pick<

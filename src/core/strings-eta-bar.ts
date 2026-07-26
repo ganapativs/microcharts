@@ -1,6 +1,5 @@
-// EtaBar summary templates (eta-bar) — its OWN module. The remainder is sized by
-// the OBSERVED rate, never linear interpolation, so the summary always hedges
-// with "at the current rate". English lives only in core string modules (canon).
+// EtaBar summary templates (eta-bar). The remainder is sized by the OBSERVED rate, never
+// linear interpolation, so the summary always hedges with "at the current rate".
 import type { SummaryStrings } from "./summary.js";
 
 export type EtaBarStrings = Pick<

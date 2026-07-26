@@ -19,8 +19,36 @@ import { docLastModified } from "@/lib/doc-dates";
 import { ChartSlugProvider } from "@/components/charts/chart-slug-context";
 import { RelatedCharts } from "@/components/charts/related-charts";
 import { getChart } from "@/lib/charts/entries";
+import type { ChartEntry } from "@/lib/charts/types";
 import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+
+/**
+ * The honest-encoding facts, in the page header. Every chart type documents one
+ * primary encoding channel and a precision rating (CLAUDE.md non-negotiable #7)
+ * plus the SVG node budget a typical render spends; all three live in the
+ * registry, and until now only the channel escaped it (into gallery search text
+ * and the relatedness scoring). Same treatment as the `LiveDemo` size meta —
+ * `mono-label` keys, muted values, dot-free because the precision rating is
+ * often a sentence with its own steer.
+ */
+function EncodingFacts({ entry }: { entry: ChartEntry }) {
+  const facts = [
+    { key: "encodes", value: entry.encoding.channel },
+    { key: "precision", value: entry.encoding.precision },
+    { key: "nodes", value: entry.nodeBudget },
+  ];
+  return (
+    <dl className="m-0 flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.82rem] leading-snug text-fd-muted-foreground">
+      {facts.map((f) => (
+        <div key={f.key} className="flex items-baseline gap-1.5">
+          <dt className="mono-label">{f.key}</dt>
+          <dd className="m-0">{f.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
 
 /**
  * Render a docs page from the **chart route** — the /docs/charts index and every
@@ -39,6 +67,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
   const url = abs(page.url);
   // Per-chart pages only — LiveDemo variants swap static → interactive via this.
   const chartSlug = page.slugs.length >= 2 ? page.slugs[1] : undefined;
+  const entry = chartSlug ? getChart(chartSlug) : undefined;
 
   const crumbs = [
     { name: "Docs", url: abs("/docs") },
@@ -75,6 +104,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
           {page.data.title}
         </DocsTitle>
         <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
+        {entry ? <EncodingFacts entry={entry} /> : null}
         <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
           {/* Fumadocs actions use cta-ghost like the rest of the site. */}
           <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />

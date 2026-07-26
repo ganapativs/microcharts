@@ -2,7 +2,7 @@
 // Interactive <SproutRow>. useActivePicker owns interaction: one pointer
 // listener + slot lookup, ←/→ (and ↑/↓) rove the row, click / Enter / Space
 // selects (onSelect). Announces each item's stage; a focus ring lifts the active
-// glyph. Composes the static component (overlay rings as children).
+// glyph.
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
@@ -28,10 +28,10 @@ import {
 export interface InteractiveSproutRowProps extends SproutRowProps, PickerProps {
   strings?: SproutStrings;
   /**
-   * Opt-in entrance motion (default `false`): each stage glyph settles into
-   * place, staggered, when the chart first mounts client-side — echoing the
-   * row sprouting in. Inert on the server and on hydrated server HTML;
-   * `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): each stage glyph grows upward from
+   * the soil, staggered left to right, when the chart first mounts client-side —
+   * the row literally sprouts in. Inert on the server and on hydrated server
+   * HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }

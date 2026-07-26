@@ -1,6 +1,4 @@
-// ControlStrip summary templates (control-strip) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ControlStrip summary templates (control-strip)
 import type { SummaryStrings } from "./summary.js";
 
 export type ControlStrings = Pick<

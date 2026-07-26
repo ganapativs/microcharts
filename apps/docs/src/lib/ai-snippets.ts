@@ -172,7 +172,6 @@ const svg = renderToStaticMarkup(<Sparkline data={data} title="Revenue" />);
 // → a self-contained <svg> string for anywhere HTML goes`,
   },
 
-  // ── MCP (see /docs/mcp) ────────────────────────────────────────────────────
   mcpConfig: {
     lang: "json",
     code: `{

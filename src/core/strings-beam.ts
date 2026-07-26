@@ -1,6 +1,5 @@
-// BalanceBeam summary templates (balance-beam) — its OWN module. Direction is
-// the headline; magnitude reads coarsely (docs steer exact ratios elsewhere).
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// BalanceBeam summary templates (balance-beam). Direction is the headline; magnitude reads
+// coarsely (docs steer exact ratios elsewhere).
 import type { SummaryStrings } from "./summary.js";
 
 export type BeamStrings = Pick<

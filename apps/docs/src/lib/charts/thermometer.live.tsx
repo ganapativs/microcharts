@@ -3,12 +3,6 @@ import { Thermometer } from "@microcharts/react/thermometer";
 import { Thermometer as ThermometerInteractive } from "@microcharts/react/thermometer/interactive";
 import staticModule, { playground as staticPlayground } from "./thermometer";
 
-/** Interactive half of the thermometer chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./thermometer`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-end gap-3">
@@ -27,7 +21,7 @@ export const playground: PlaygroundSpec = {
       target={s.target as number}
       orientation={s.orientation as "vertical" | "horizontal"}
       bulb={s.bulb as boolean}
-      summary={false}
+      title="Fundraiser"
       animate={ui.animate}
       {...(s.orientation === "horizontal" ? { width: 120 } : { height: 72 })}
     />

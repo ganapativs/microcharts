@@ -3,12 +3,6 @@ import { TrendArrow } from "@microcharts/react/trend-arrow";
 import { TrendArrow as TrendArrowInteractive } from "@microcharts/react/trend-arrow/interactive";
 import staticModule, { playground as staticPlayground, PCT } from "./trend-arrow";
 
-/** Interactive half of the trend-arrow chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./trend-arrow`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-3">
@@ -29,7 +23,7 @@ export const playground: PlaygroundSpec = {
       showValue={s.showValue as boolean}
       positive={s.positive as "up" | "down"}
       format={PCT}
-      summary={false}
+      title="Latency direction"
       animate={ui.animate}
       style={{ width: (s.showValue as boolean) ? 96 : 48, height: 48 }}
     />

@@ -1,9 +1,9 @@
-// Hypnogram geometry — pure, React-free. A categorical
+// Hypnogram: A categorical
 // step strip that REFUSES interpolation: state is a fact, not a sample of a
 // continuum, so runs are right-angle (H/V) only — never a diagonal. Consecutive
 // same-state entries merge; the last state holds to domain[1]. 2-dp.
 import { round2 } from "../../core/types.js";
-import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
+import { labelFitsBand, labelFont, textGutterProse } from "../../core/labels.js";
 
 export interface HypnoEntry {
   t: number;
@@ -45,10 +45,13 @@ export interface HypnoLabelLayout {
  *    em-boxes past the viewBox edge. `labelFont` floors at 7, so there is no
  *    smaller type to fall back to — the scaffold goes and the runs keep the box.
  *  - **Horizontally** the widest name is the budget, reserved at the library's
- *    per-char over-estimate. Names are caller text of unknown width, so the
- *    reserve can outgrow the sensible share of a narrow chart (40%); when it
- *    does, the old behaviour was to CLAMP the gutter, which silently slid the
- *    text out through the left edge. Dropping is the honest degradation.
+ *    PROSE per-char over-estimate. A state name is caller text ("Slow-wave", an
+ *    all-caps "REM"), never a figure this chart formatted, so the digits rate
+ *    `textGutter` is calibrated for under-reserves it — and `.mc-root` is
+ *    `overflow: visible`, so the surplus paints into the page. Unknown width also
+ *    means the reserve can outgrow the sensible share of a narrow chart (40%);
+ *    when it does, the old behaviour was to CLAMP the gutter, which silently slid
+ *    the text out through the left edge. Dropping is the honest degradation.
  *
  * The data is never the thing that degrades: the runs simply reclaim the gutter.
  */
@@ -63,7 +66,7 @@ export function hypnogramLabels(opts: {
   const { labels, width, height, rows, maxChars } = opts;
   const n = Math.max(1, rows);
   const fontSize = labelFont(height / n, 0.62);
-  const gutter = textGutter(Math.max(1, maxChars), fontSize, 4);
+  const gutter = textGutterProse(Math.max(1, maxChars), fontSize, 4);
   // the pitch geometry actually lays the rows out on — the padded band, split n ways
   const rowPitch = (height - PAD * 2) / n;
   const show = labels && labelFitsBand(rowPitch, fontSize) && gutter <= width * 0.4;

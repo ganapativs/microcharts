@@ -1,11 +1,11 @@
-// EventRaster geometry — pure, React-free. One lane
+// EventRaster: One lane
 // per source, one tick per event. Vertical banding = synchronization, diagonals
 // = propagation, sparse rows = silence. One tick = one event, always — the only
 // exception is the honest `overflow="bin"` mode, which switches an aliasing lane
 // to per-bucket counts (opacity) and SAYS SO in the summary. 2-dp.
 import { uniformBins } from "../../core/bin.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
-import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
+import { labelFitsBand, labelFont, textGutterProse } from "../../core/labels.js";
 
 /** Lane-label layout: whether the source names are drawn, and the gutter they cost. */
 export interface RasterLabelLayout {
@@ -28,10 +28,14 @@ export interface RasterLabelLayout {
  *    stack, and the first and last lanes push their em-boxes past the viewBox
  *    edge — that is a Raster in a tab header stacking "api/db/cache". `labelFont`
  *    floors at 7, so there is no smaller type to retreat to.
- *  - **Horizontally** the widest name is the budget, at the library's per-char
- *    over-estimate. Names are caller text of unknown width, so the reserve can
- *    outgrow the sensible share of a narrow chart (45%); when it did, the old
- *    behaviour CLAMPED the gutter and slid the text out through the left edge.
+ *  - **Horizontally** the widest name is the budget, at the library's PROSE
+ *    per-char over-estimate. A lane name is caller text ("API", "authz-service"),
+ *    not a figure this chart formatted, so the digits rate `textGutter` is
+ *    calibrated for under-reserves an all-caps source and pushes it out of the
+ *    gutter (`.mc-root` is `overflow: visible` — it spills, it never clips).
+ *    Unknown width also means the reserve can outgrow the sensible share of a
+ *    narrow chart (45%); when it did, the old behaviour CLAMPED the gutter and
+ *    slid the text out through the left edge.
  *
  * The events never degrade: the lanes reclaim the gutter and keep every tick.
  */
@@ -46,7 +50,7 @@ export function rasterLabels(opts: {
   const { labels, width, height, lanes, maxChars } = opts;
   const laneH = height / Math.max(1, lanes);
   const fontSize = labelFont(laneH, 0.56);
-  const gutter = textGutter(Math.max(1, maxChars), fontSize, 4);
+  const gutter = textGutterProse(Math.max(1, maxChars), fontSize, 4);
   const show = labels && labelFitsBand(laneH, fontSize) && gutter <= width * 0.45;
   return { show, gutter: show ? gutter : 0, fontSize };
 }

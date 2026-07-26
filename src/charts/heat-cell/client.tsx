@@ -1,7 +1,7 @@
 "use client";
 // Interactive <HeatCell>. One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
-// announcement parity ("42 — level 3 of 5."). Composes the static entry.
+// announcement parity ("42 — level 3 of 5.").
 import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
@@ -20,8 +20,18 @@ export interface InteractiveHeatCellProps extends HeatCellProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
-  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  /**
+   * Show the floating value chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="value"` already prints it.
+   */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One cell = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the cell, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The cell was activated (click, tap, Enter or Space): `{ index: 0, value }` — the cell's value. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -39,6 +49,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     strings = EN_SCALAR,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -56,23 +67,39 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  // Drill-down: the cell's own value (the number the readout shows).
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(value) ? value : null,
-      formatted: geo.step !== null ? strings.level(fmt(value), geo.step + 1, steps) : fmt(value),
-    });
+  // Chip drops the summary's trailing period; keeps value + level (the cell
+  // alone doesn't name the step). Its own `strings` token, never an inline
+  // template — a chip is rendered text, so English in it is untranslatable.
+  // Suppressed when `label="value"` already prints the number on the cell.
+  const chip = geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, steps) : fmt(value);
+
+  // Cell value (readout number). One datum builder — callbacks match the chip.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(value) ? value : null,
+    formatted: chip,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `active` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setActive(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-heat-cell-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => setActive(true)}
-      onPointerLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -94,9 +121,9 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{active ? text : ""}</LiveRegion>
-      {readout && active && geo.step !== null ? (
+      {readout && active && geo.step !== null && props.label !== "value" ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {strings.level(fmt(value), geo.step + 1, steps)}
+          {chip}
         </span>
       ) : null}
     </span>

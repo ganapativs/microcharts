@@ -160,3 +160,35 @@ describe("OKLCH round-trip stays in-gamut", () => {
     expect(twin).toMatch(HEX);
   });
 });
+
+describe("categorical label ink travels with a derived palette", () => {
+  // `--mc-on-cat` is the ink PartitionStrip paints its labels in, and it is
+  // measured against the DEFAULT categorical family. A derived palette replaces
+  // that family, so the ink has to be re-decided or the measurement is void.
+  it("a derived palette emits an on-cat ink for both themes", () => {
+    const t = defineTheme({ accent: "#1f6091" });
+    expect(t.vars["--mc-on-cat"]).toMatch(/^rgba\(/);
+    expect(t.darkVars["--mc-on-cat"]).toMatch(/^rgba\(/);
+  });
+
+  it("dark twins are lighter, so they take the DARK ink", () => {
+    // deriveCats places the dark family at L 0.67-0.77, above the L 0.62
+    // crossover where a light and a dark ink contrast equally.
+    const t = defineTheme({ accent: "#1f6091" });
+    expect(t.darkVars["--mc-on-cat"]).toBe("rgba(0, 0, 0, 0.9)");
+  });
+
+  it("an explicit onCat wins over the derivation", () => {
+    const t = defineTheme({ accent: "#1f6091", onCat: "#123456" });
+    expect(t.vars["--mc-on-cat"]).toBe("#123456");
+  });
+
+  it("a hand-listed cat array does not silently keep the default ink", () => {
+    // An explicit `cat` list is the case the derivation CANNOT judge for the
+    // caller (any lightness at all), so it stays unset and the stylesheet
+    // default applies — documented on `onCat`, asserted here so a future change
+    // to that behaviour is deliberate.
+    const t = defineTheme({ cat: ["#d2982f", "#5b9fd4"] });
+    expect(t.vars["--mc-on-cat"]).toBeUndefined();
+  });
+});

@@ -1,23 +1,19 @@
-// Entrance-motion gate. The opt-in
-// `animate` prop on every `…/interactive` entry routes through this hook.
-//
-// Contract:
-//   - OFF (default) and on the server this is inert: no markup, no styles, no
-//     animation artifacts — the rendered output is byte-identical.
-//   - The engine ships separately: `import "@microcharts/react/motion"` once,
-//     client-side — the same import-once shape as `styles.css` and
-//     `./annotations`. Charts that never animate never carry the engine; the
-//     gate itself costs each interactive entry almost nothing.
-//   - SSR-hydrated mounts NEVER animate. The server frame is already on
-//     screen; replaying an entrance over painted content is a flash, not a
-//     delight. Only fresh client-side mounts (streamed AI UIs, route changes,
-//     toggles) get the entrance — progressive enhancement, zero layout shift.
-//   - `prefers-reduced-motion` wins unconditionally.
+// Opt-in `animate` gate: inert on SSR/default; engine is a separate import.
+// SSR-hydrated first paint must not replay entrance (flash over painted HTML) —
+// only fresh client mounts animate. `prefers-reduced-motion` wins.
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
 
-/** One shared motion vocabulary — every entrance and interaction speaks it. */
-export const MC_EASE_ENTER = "cubic-bezier(0.23, 1, 0.32, 1)"; // strong ease-out
-export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)"; // on-screen morphs
+/**
+ * Published motion tokens for consumer UI — not the per-archetype engine tables.
+ * WAAPI can't read `--mc-easing`, so the literal is duplicated; theming-contract.test.ts guards drift.
+ */
+export const MC_EASE_ENTER = "cubic-bezier(0.22, 1, 0.36, 1)";
+/** On-screen morphs (a value updating in place), for consumer UI.
+ *  @knipignore — published vocabulary; nothing in the library imports it. */
+export const MC_EASE_MOVE = "cubic-bezier(0.77, 0, 0.175, 1)";
+/** Coarse beats for consumer UI around a chart.
+ *  @knipignore — published vocabulary; the engine's own per-archetype `DUR`
+ *  table is what the entrances use. */
 export const MC_DUR = {
   /** press / hover / focus feedback */ interact: 120,
   /** value + state updates */ update: 240,

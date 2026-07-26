@@ -1,11 +1,9 @@
-// ParetoStrip summary templates (pareto-strip) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ParetoStrip summary templates (pareto-strip)
 import type { SummaryStrings } from "./summary.js";
 
 export type ParetoStrings = Pick<
   SummaryStrings,
-  "noData" | "pareto" | "paretoTop" | "paretoEmpty" | "paretoAt"
+  "noData" | "pareto" | "paretoTop" | "paretoEmpty" | "paretoAt" | "paretoCount"
 >;
 
 export const EN_PARETO: ParetoStrings = {
@@ -15,4 +13,5 @@ export const EN_PARETO: ParetoStrings = {
   paretoTop: (topLabel, topPct) => `${topLabel} leads at ${topPct}.`,
   paretoEmpty: (metric) => `No recorded ${metric}.`,
   paretoAt: (label, sharePct, cumPct) => `${label}: ${sharePct} of total, cumulative ${cumPct}.`,
+  paretoCount: (k, n, cumPct) => `${k} of ${n} → ${cumPct}`,
 };

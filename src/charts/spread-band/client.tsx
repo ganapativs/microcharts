@@ -3,7 +3,6 @@
 // that point ("Point 6 of 12: organic +11 over paid."); the crosshair touches
 // both lines. useActivePicker owns interaction: one pointer listener + nearest-x
 // math, roving keyboard, touch tap-to-pin, and the onActive/onSelect contract.
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";
 import {
@@ -181,7 +180,8 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         format={format}
         locale={locale}
         strings={strings}
-        title={title}
+        // No `title` on the child: the wrapper owns the accessible name, and a
+        // titled static is named (not hidden) even with `summary={false}`.
         summary={false}
         style={fillFor(style)}
       >

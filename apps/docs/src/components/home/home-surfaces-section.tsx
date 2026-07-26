@@ -5,24 +5,14 @@ import { Delta } from "@microcharts/react/delta/interactive";
 import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 
-/**
- * Where they live — the pitch is "sits INSIDE an interface," so this section
- * puts real charts inside two surfaces: a written report, and the small
- * placements a chart drops into (a table cell, a KPI figure, a tab, a
- * sentence). Two panels only — the 2026-07 density pass cut the dashboard and
- * chat mocks (the hero already streams a chat reply). Every mark is the
- * interactive `@microcharts/react` entry so hover/scrub works in situ.
- */
+/** Charts in situ: a written report + small placements (cell / KPI / tab / sentence). */
 
-/* Illustrative report data — depicting a document, not claiming a fact. */
 const BOOKINGS = [18, 22, 20, 27, 25, 31, 29, 34, 33, 38, 41, 46];
 
-/** Small caption under every surface so the "where" is always named. */
 function Where({ children }: { children: ReactNode }) {
   return <span className="mono-label opacity-60">{children}</span>;
 }
 
-/* ── Surface 2 · the written report (serif, chart inside the prose) ───────── */
 function ReportSurface() {
   return (
     <div className="flex flex-col gap-2.5">
@@ -47,7 +37,6 @@ function ReportSurface() {
   );
 }
 
-/* ── Surface 3 · the small placements (cell / KPI / tab / sentence) ───────── */
 function PlacementQuad() {
   return (
     <div className="grid grid-cols-2 gap-2.5">

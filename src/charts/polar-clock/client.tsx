@@ -1,8 +1,7 @@
 "use client";
 // Interactive <PolarClock>. useActivePicker owns interaction: one pointer
-// listener + cursor-angle→segment lookup (atan2, 12 o'clock clockwise), ←/→ step
-// segments circularly, click / Enter / Space selects (onSelect). Composes the
-// static component (canon) — the SVG is never re-implemented.
+// listener + cursor-angle→segment lookup (atan2, 12 o'clock clockwise). ←/→ step
+// segments circularly, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
@@ -35,9 +34,9 @@ const TAU = Math.PI * 2;
 export interface InteractivePolarClockProps extends PolarClockProps, PickerProps {
   strings?: PolarClockStrings;
   /**
-   * Opt-in entrance motion (default `false`): the radial segments settle
-   * into place when the chart first mounts client-side. Inert on the server
-   * and on hydrated server HTML; `prefers-reduced-motion` always wins.
+   * Opt-in entrance motion (default `false`): the dial grows outward from its
+   * centre as it fades in when the chart first mounts client-side. Inert on the
+   * server and on hydrated server HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
 }
@@ -113,9 +112,15 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     (cur: number, key: string) => {
       if (n === 0) return null;
       switch (key) {
+        // ↓/↑ alias forward/back, as on every other radial chart (StarSpoke,
+        // TreeRings, MicroDonut via `nav1d`). Returning null for them left the
+        // keys unconsumed, so pressing ↑ scrolled the page out from under a
+        // reader roving the dial.
         case "ArrowRight":
+        case "ArrowDown":
           return (((cur + 1) % n) + n) % n;
         case "ArrowLeft":
+        case "ArrowUp":
           return (((cur - 1) % n) + n) % n;
         case "Home":
           return 0;

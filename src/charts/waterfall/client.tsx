@@ -1,8 +1,7 @@
 "use client";
 // Interactive <Waterfall>. useActivePicker owns interaction: one pointer
 // listener + column-by-x band lookup, ←/→ rove steps ("Refunds: −140, running
-// 1,410."), End focuses the total, click / Enter / Space selects (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
+// 1,410."). End focuses the total, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";

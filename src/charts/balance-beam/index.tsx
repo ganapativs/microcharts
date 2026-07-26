@@ -2,7 +2,7 @@
 // two). Tilt direction is instant; the angle SATURATES at maxTilt (read
 // direction + rough magnitude, not an exact ratio — docs steer precise ratios to
 // PairedBars/Delta). Weights are area-true. Endpoints are pre-rotated in geometry
-// (no SVG transform → containment provable). Static, hook-free, RSC-safe.
+// (no SVG transform → containment provable).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
@@ -186,6 +186,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         x2={geo.beam.x2}
         y2={geo.beam.y2}
         data-mc-ink="data"
+        vectorEffect="non-scaling-stroke"
       />
       {/* Heavier pan = accent. Unknown pan: no weight mark (missing ≠ zero). */}
       {geo.known[0] ? weightMark(geo.weights[0], "wl", geo.heavier === -1) : null}

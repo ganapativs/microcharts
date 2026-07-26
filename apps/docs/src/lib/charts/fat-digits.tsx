@@ -14,6 +14,7 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/fat-digits`,
   interactiveImport: `${PKG}/fat-digits/interactive`,
   picker: false,
+  readout: false,
   dataShape: "{ value: number }",
   encoding: { channel: "the numeral + redundant font-weight tier", precision: "high" },
   nodeBudget: "1 (value) / ≤ len (digit)",
@@ -44,6 +45,13 @@ export const entry: ChartEntry = {
         "value weights the whole numeral; digit weights each digit by its own magnitude.",
     },
     { name: "tiers", type: "3 | 5", required: false, description: "Weight steps (default 5)." },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description:
+        "Numeral type size in viewBox units (default 14) — here the numeral is the mark, so this sizes the chart.",
+    },
   ],
   demo: COLUMN,
   example: {

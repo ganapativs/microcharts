@@ -2,7 +2,7 @@
 // (structured, flagship). Building HEIGHT (zero-anchored, high precision) is
 // the primary read; the lit-window FRACTION is a secondary low-precision channel
 // ("mostly lit / half lit / dark", not a number). No roofline/antenna/width
-// variation — height, roof, and ground are constants. Static, hook-free, RSC-safe.
+// variation — height, roof, and ground are constants.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";

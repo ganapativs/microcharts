@@ -5,11 +5,6 @@ import { getChart } from "./tools/get";
 import { renderChart } from "./render-core";
 import { dataParam } from "./schema";
 
-/**
- * The same three capabilities as the MCP server, packaged as Vercel AI-SDK
- * tools for apps built with the `ai` package: `import { microchartsTools }` and
- * spread them into `streamText`/`generateText`. One core, two front doors.
- */
 export const microchartsTools: ToolSet = {
   find_microchart: tool({
     description:

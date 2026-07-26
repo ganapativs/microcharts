@@ -3,12 +3,6 @@ import { MicroScatter } from "@microcharts/react/micro-scatter";
 import { MicroScatter as MicroScatterInteractive } from "@microcharts/react/micro-scatter/interactive";
 import staticModule, { playground as staticPlayground, CLOUD } from "./micro-scatter";
 
-/** Interactive half of the micro-scatter chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./micro-scatter`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <MicroScatterInteractive

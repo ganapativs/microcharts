@@ -3,12 +3,6 @@ import { OrbitStatus } from "@microcharts/react/orbit-status";
 import { OrbitStatus as OrbitStatusInteractive } from "@microcharts/react/orbit-status/interactive";
 import staticModule, { playground as staticPlayground, LD, RD } from "./orbit-status";
 
-/** Interactive half of the orbit-status chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./orbit-status`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive() {
   return (
     <OrbitStatusInteractive
@@ -31,7 +25,7 @@ export const playground: PlaygroundSpec = {
       latencyDomain={LD}
       rateDomain={RD}
       threshold={s.threshold === "on" ? 300 : undefined}
-      summary={false}
+      title="Payments API"
       size={120}
     />
   ),

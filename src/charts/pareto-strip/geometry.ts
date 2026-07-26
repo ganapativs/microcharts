@@ -1,4 +1,4 @@
-// ParetoStrip geometry — pure, React-free. What should we fix
+// ParetoStrip: What should we fix
 // first? Descending bars + a cumulative-share line on a FIXED 0–100% scale that
 // spans the full plot height (never rescaled to steepen the curve). Bars up to
 // the threshold crossing are "vital" (accent); the rest are muted — the chart's

@@ -5,6 +5,11 @@ import { Hourglass } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
+const vbWidth = (c: Element) =>
+  Number(c.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
 
 describe("<Hourglass>", () => {
   it("summary carries both sides", () => {
@@ -44,6 +49,18 @@ describe("<Hourglass>", () => {
   it("label='elapsed' prints the elapsed percent", () => {
     const { container } = draw(<Hourglass value={0.75} label="elapsed" />);
     expect(container.querySelector("text")!.textContent).toBe("75%");
+  });
+
+  it("locale spells the percent, and the label gutter widens with the string", () => {
+    const en = draw(<Hourglass value={0.75} label="elapsed" />).container;
+    const de = draw(<Hourglass value={0.75} label="elapsed" locale="de-DE" />).container;
+    expect(de.querySelector("text")!.textContent).toBe(`75${NBSP}%`);
+    expect(de.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `75${NBSP}% elapsed, 25${NBSP}% remaining.`,
+    );
+    // the gutter is reserved from the FORMATTED string, so the extra character
+    // buys viewBox width instead of spilling the numeral past it
+    expect(vbWidth(de)).toBeGreaterThan(vbWidth(en));
   });
 
   it("summary={false} hides it from assistive tech", () => {

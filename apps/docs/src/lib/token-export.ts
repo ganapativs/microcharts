@@ -182,8 +182,21 @@ export const BASE_TOKENS: BaseToken[] = [
   {
     cssVar: "--mc-on-fill",
     light: "rgba(255, 255, 255, 0.96)",
+    dark: "rgba(0, 0, 0, 0.9)",
     category: "surface",
-    note: "Label ink on saturated data fills",
+    note: "Label ink on a saturated semantic fill",
+  },
+  {
+    cssVar: "--mc-on-cat",
+    light: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on a categorical fill (mid-tone, so it wants the opposite ink)",
+  },
+  {
+    cssVar: "--mc-on-fill-dim",
+    light: "var(--mc-stroke)",
+    category: "surface",
+    note: "Label that steps back from the on-fill treatment",
   },
   // motion
   { cssVar: "--mc-duration", light: "300ms", category: "motion", note: "Entrance timing (interactive only)" }, // prettier-ignore

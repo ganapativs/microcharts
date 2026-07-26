@@ -1,9 +1,9 @@
-// SpiralYear geometry — pure, React-free. A year (or
+// SpiralYear: A year (or
 // several) wound onto an Archimedean spiral: angle = position in the year (Jan 1
-// at 12 o'clock, clockwise), each turn outward = the next year. Marks carry a
+// at 12 o'clock, clockwise). each turn outward = the next year. Marks carry a
 // 5-step (or 3-step) opacity — the value's ORDINAL level; the spiral RADIUS
 // encodes time only, never value. Marks are grouped by step into ≤ steps paths
-// so the node count is O(steps), not O(days). All coords 2-dp.
+// so the node count is O(steps). not O(days). All coords 2-dp.
 import { arcPath, polarPoint } from "../../core/arc.js";
 import { monthStartDays } from "../../core/calendar-grid.js";
 import { round2, type Value } from "../../core/types.js";

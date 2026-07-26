@@ -3,12 +3,6 @@ import { PairedBars } from "@microcharts/react/paired-bars";
 import { PairedBars as PairedBarsInteractive } from "@microcharts/react/paired-bars/interactive";
 import staticModule, { playground as staticPlayground, BUDGET } from "./paired-bars";
 
-/** Interactive half of the paired-bars chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./paired-bars`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <PairedBarsInteractive

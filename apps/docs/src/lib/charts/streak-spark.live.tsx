@@ -3,12 +3,6 @@ import { StreakSpark } from "@microcharts/react/streak-spark";
 import { StreakSpark as StreakSparkInteractive } from "@microcharts/react/streak-spark/interactive";
 import staticModule, { playground as staticPlayground, STREAK } from "./streak-spark";
 
-/** Interactive half of the streak-spark chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./streak-spark`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <StreakSparkInteractive
@@ -31,8 +25,8 @@ export const playground: PlaygroundSpec = {
       animate={ui.animate}
       width={340}
       height={92}
-      className="w-full max-w-md"
-      title="Playground"
+      style={{ width: "100%", maxWidth: "28rem" }}
+      title="Deploy streak"
     />
   ),
   codeInteractive: (s, data, ui) =>

@@ -36,7 +36,7 @@ static chart can never accidentally drag a listener into your server bundle.
 The interactive entry composes the static one rather than re-implementing it, so the interactive rendering can't drift
 from the static one. Every multi-unit chart resolves a gesture to a navigable _unit_ through the same kernel — so
 interaction is one thing to learn across the catalog, not one dialect per chart. Single-unit charts have nothing to rove
-between and take `onSelect` alone.
+between, so they take the hover/select half of that contract without the index half.
 
 ## One grammar, not an options bag
 
@@ -59,14 +59,17 @@ makes the charts calm: there's no room for anything that isn't carrying informat
 
 ## Motion lives in the interactive build, not on every chart
 
-Static charts have no `animate` prop and run no animation JavaScript — the one thing that moves inside a static host is
-`<Marker celebrate>`, a pure-CSS one-shot burst that reduced motion stills. Only the `/interactive` entries can play an
-entrance, and only when you opt in with `animate` (off by default). It runs through the Web Animations API, gated on
-`prefers-reduced-motion`. Every entrance follows the logic of the data it draws: a line draws left-to-right along its
-time axis, bars grow from the baseline, a donut fills clockwise from twelve o'clock, and labels arrive last — they
-annotate marks that already exist. Marks decelerate into place; they never bounce, loop, or draw the eye away from the
-data. Motion is a property of the interactive build, not a knob bolted onto the static one, so it can't leak into a
-server render or turn into decoration.
+Static charts have no `animate` prop and run no animation JavaScript. Two things move inside a static host, both pure
+CSS and both stilled by reduced motion: `<Marker celebrate>`, a one-shot burst on a milestone crossing, and
+`StatusDot pulse` — the catalog's one looping animation, and its one documented exemption from the rule below. A
+monitoring dot that pulses says "this feed is live", and the same dot holding still says it stopped; the loop is the
+reading rather than decoration, which is why it is opt-in per instance and off by default. Only the `/interactive`
+entries can play an entrance, and only when you opt in with `animate` (off by default). It runs through the Web
+Animations API, gated on `prefers-reduced-motion`. Every entrance follows the logic of the data it draws: a line draws
+left-to-right along its time axis, bars grow from the baseline, a donut fills clockwise from twelve o'clock, and labels
+arrive last — they annotate marks that already exist. Marks decelerate into place; they never bounce, loop, or draw the
+eye away from the data. Motion is a property of the interactive build, not a knob bolted onto the static one, so it
+can't leak into a server render or turn into decoration.
 
 ## Budgets are build gates
 
@@ -99,8 +102,9 @@ uncommon _shapes_.
 ## What we don't ship
 
 No pie, no needle gauge, no battery, no waffle, no violin, no 3-D, no gradients-as-decoration, no drop shadows on data,
-no looping animation. These aren't theme options you can switch on — they're designed out, because at a glance they
-mislead more than they inform. Where a rejected chart answered a real question, the catalog ships a faster replacement:
-[Bullet](/docs/charts/bullet) or [TapeGauge](/docs/charts/tape-gauge) instead of a speedometer,
-[SegmentedBar](/docs/charts/segmented-bar) for comparative part-to-whole, [MicroDonut](/docs/charts/micro-donut) as a
-capped icon-size mix when a glyph is specifically wanted, [MicroBox](/docs/charts/micro-box) instead of a violin.
+no looping animation (with the one exemption noted above, where the loop is the reading rather than decoration). These
+aren't theme options you can switch on — they're designed out, because at a glance they mislead more than they inform.
+Where a rejected chart answered a real question, the catalog ships a faster replacement: [Bullet](/docs/charts/bullet)
+or [TapeGauge](/docs/charts/tape-gauge) instead of a speedometer, [SegmentedBar](/docs/charts/segmented-bar) for
+comparative part-to-whole, [MicroDonut](/docs/charts/micro-donut) as a capped icon-size mix when a glyph is specifically
+wanted, [MicroBox](/docs/charts/micro-box) instead of a violin.

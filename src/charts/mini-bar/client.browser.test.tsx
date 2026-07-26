@@ -73,4 +73,22 @@ describe("interactive <MiniBar>", () => {
     const screen = await render(<MiniBar data={DATA} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("an empty bar reads out as an em dash", async () => {
+    const screen = await render(
+      <MiniBar
+        data={[
+          { label: "East", value: 940 },
+          { label: "West", value: null },
+        ]}
+        order="data"
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-minibar-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("West: —");
+  });
 });

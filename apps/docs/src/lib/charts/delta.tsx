@@ -12,6 +12,7 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/delta`,
   interactiveImport: `${PKG}/delta/interactive`,
   picker: false,
+  readout: false,
   dataShape: "number (+ optional from)",
   encoding: { channel: "text + direction glyph (▲/▼)", precision: "high — it is the number" },
   nodeBudget: "2 (glyph + value, HTML)",

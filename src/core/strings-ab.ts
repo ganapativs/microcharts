@@ -1,7 +1,5 @@
-// ABStrips summary templates (ab-strips) — its OWN module (see strings-scalar.ts
-// for the chunk rationale). The overlap number is always in the summary — the
-// overlap IS the honest answer. English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ABStrips summary templates (ab-strips). The overlap number is always in the summary — the
+// overlap IS the honest answer.
 import type { SummaryStrings } from "./summary.js";
 
 export type ABStrings = Pick<

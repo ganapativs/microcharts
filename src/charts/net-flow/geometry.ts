@@ -1,7 +1,7 @@
-// NetFlow geometry — pure, React-free. In vs out, and where that
+// NetFlow: In vs out, and where that
 // leaves us net. Inflow area above a zero baseline, outflow mirrored below on
 // ONE shared magnitude scale (never independently scaled to balance the
-// picture), with the net line (in − out) restoring the precise decision value.
+// picture). with the net line (in − out) restoring the precise decision value.
 // Flows are magnitudes: a negative input is invalid and coerced to 0. Coords
 // 2-dp, integer viewBox.
 import { linePath } from "../../core/path.js";

@@ -1,4 +1,4 @@
-// CyclePlot geometry — pure, React-free. What repeats beneath the
+// CyclePlot: What repeats beneath the
 // trend, and is any slot itself drifting? The series is reshaped row-major into
 // `period` slots (slot = i mod period). Per slot: a tiny polyline of that slot's
 // raw values in TIME order (never smoothed, never connected across a slot

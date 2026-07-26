@@ -1,4 +1,4 @@
-// Honeycomb geometry — pure, React-free. Occupancy of capacity
+// Honeycomb: Occupancy of capacity
 // as filled cells in an area-filling hex grid (unit counting — units are
 // countable, total ≤ 60). Two merged <path> nodes (filled + empty) keep the node
 // count O(1) regardless of total. Pointy-top hexes, odd-row offset, near-square,

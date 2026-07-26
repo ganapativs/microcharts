@@ -1,7 +1,6 @@
-// CometTrail summary templates (comet-trail) — its OWN module. A live rolling
-// value; the summary states the current value and the recent trend. The trail's
-// opacity encodes age only, never value, so the summary reads the head. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// CometTrail summary templates (comet-trail). A live rolling value; the summary states the
+// current value and the recent trend. The trail's opacity encodes age only, never value,
+// so the summary reads the head.
 import type { SummaryStrings } from "./summary.js";
 
 export type CometTrailStrings = Pick<

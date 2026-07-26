@@ -3,12 +3,6 @@ import { Dumbbell } from "@microcharts/react/dumbbell";
 import { Dumbbell as DumbbellInteractive } from "@microcharts/react/dumbbell/interactive";
 import staticModule, { playground as staticPlayground, BANDS } from "./dumbbell";
 
-/** Interactive half of the dumbbell chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./dumbbell`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <DumbbellInteractive data={BANDS} summary={false} width={130} height={52} animate={animate} />

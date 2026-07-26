@@ -1,4 +1,4 @@
-// BiasStrip geometry — pure, React-free. A word-sized
+// BiasStrip: A word-sized
 // Bland–Altman plot (Bland & Altman 1986): x = the mean of a paired measurement
 // (a+b)/2, y = their difference (a−b) centered on 0, so a systematic offset from
 // the zero line reads as vertical drift. The bias (mean difference) and the

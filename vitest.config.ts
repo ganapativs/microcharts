@@ -45,6 +45,8 @@ export default defineConfig({
         test: {
           name: "browser",
           include: ["src/**/*.browser.test.{ts,tsx}"],
+          // parks the pointer off-chart before each test (see browser-setup.ts)
+          setupFiles: ["./src/test/browser-setup.ts"],
           browser: {
             enabled: true,
             provider: playwright(),

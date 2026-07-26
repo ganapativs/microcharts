@@ -1,5 +1,5 @@
 // <WindBarb> — which way it's flowing and roughly how hard, in one character
-// Static, hook-free, RSC-safe. Direction is the shaft
+// Direction is the shaft
 // angle; magnitude is QUANTIZED into WMO barbs (that quantization is the honesty
 // — the per-barb quantum is stated next to every example). No interactive entry:
 // a single glyph has no meaningful pointer/keyboard interaction (the a11y name
@@ -134,7 +134,8 @@ export function WindBarb(props: WindBarbProps): ReactNode {
             y2={geo.shaft.y2}
             data-mc-ink="data"
             strokeLinecap="round"
-            style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
+            vectorEffect="non-scaling-stroke"
+            style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
           />
           {mode === "arrow" && arrowHead ? (
             <path
@@ -142,7 +143,8 @@ export function WindBarb(props: WindBarbProps): ReactNode {
               data-mc-ink="data"
               fill="none"
               strokeLinecap="round"
-              style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
+              vectorEffect="non-scaling-stroke"
+              style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
             />
           ) : (
             <>
@@ -152,7 +154,8 @@ export function WindBarb(props: WindBarbProps): ReactNode {
                   data-mc-ink="data"
                   fill="none"
                   strokeLinecap="round"
-                  style={{ strokeWidth: "calc(var(--mc-stroke-width) * 1.25)" }}
+                  vectorEffect="non-scaling-stroke"
+                  style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
                 />
               ) : null}
               {geo.pennants.map((p, i) => (

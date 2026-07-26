@@ -95,4 +95,24 @@ describe("<CalendarStrip>", () => {
     const { container } = draw(<CalendarStrip data={DATA} end={END} title="Deploy cadence" />);
     await expectNoA11yViolations(container);
   });
+
+  // The only static in the catalog that reads the clock. It is a documented
+  // default, but on the server it is also a hydration trap: render at 23:59 UTC,
+  // hydrate at 00:01, and the grid differs. Dev-only warning, server-only path
+  // — called as a plain function because statics are hook-free by contract.
+  it("warns when rendered server-side with no `end` (hydration trap)", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.stubGlobal("window", undefined);
+    try {
+      CalendarStrip({ data: [{ date: "2026-03-01", value: 3 }] });
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("without `end`"));
+      warn.mockClear();
+      // Pinned `end` is deterministic — no warning.
+      CalendarStrip({ data: [{ date: "2026-03-01", value: 3 }], end: "2026-03-02" });
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+      warn.mockRestore();
+    }
+  });
 });

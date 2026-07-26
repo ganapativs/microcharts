@@ -1,12 +1,12 @@
 // <IconArray> — how likely is this, really? A
 // stated rate made countable: filled units in a fixed N-unit grid with the
-// denominator visible. Static, hook-free, RSC-safe. Two moves kill denominator
+// denominator visible. Two moves kill denominator
 // neglect: the ratio label and the fixed grid. No partial-unit fills ever;
 // fill order is contiguous reading-order (scattered is harder to count).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
@@ -45,6 +45,10 @@ export interface IconArrayProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
+  /** Number formatting for the `"percent"` label. Replaces the percent style
+   *  rather than extending it, like every other `format` in the catalog — pass
+   *  `{ style: "percent", maximumFractionDigits: 1 }` to keep the sign. */
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: FreqStrings | undefined;
   title?: string | undefined;
@@ -65,6 +69,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
     width = 140,
     height = 28,
     color,
+    format,
     locale,
     strings = EN_FREQ,
     title,
@@ -96,7 +101,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
     devWarn("<IconArray> total=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
   }
 
-  const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
+  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => iconArraySummary(geo, pctFmt, strings));
 
   // no custom color: the fill role token IS the ink role (bound in
@@ -109,7 +114,10 @@ export function IconArray(props: IconArrayProps): ReactNode {
       : positive === "up"
         ? "positive"
         : "accent";
-  const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
+  // "3 in 20" is PROSE, so it comes from `strings` like every other rendered
+  // word — an inline template here is English no bundle can translate.
+  const labelText =
+    label === "percent" ? pctFmt(geo.k / geo.n) : strings.iconArrayRatio(geo.k, geo.n);
   // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 

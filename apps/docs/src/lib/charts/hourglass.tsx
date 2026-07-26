@@ -44,6 +44,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Print the percent that matters to the context.",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the percent numeral, in viewBox units (default 8).",
+    },
   ],
   demo: [75],
   example: {

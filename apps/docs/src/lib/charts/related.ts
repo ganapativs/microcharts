@@ -11,7 +11,12 @@
  *   - encoding channel (+2) — any shared channel keyword (position, length,
  *     color, arc, glyph, …); full channel strings are unique by design, so
  *     token overlap is the signal
- *   - bestFor overlap (+1 each, cap +2) — shared documented use cases
+ *   - bestFor overlap (+1 per shared keyword, cap +2) — shared documented use
+ *     cases. Tokenised like the channel, for the same reason: `bestFor` entries
+ *     are hand-written phrases ("an inline trend", "a table-cell trend"), so
+ *     comparing whole strings almost never matched and the term was dead
+ *     weight — 17 charts appeared in nobody's rail because the fourth slot
+ *     degenerated to registry order.
  *  Ties break on registry order, which is itself stable.
  */
 import type { ChartEntry } from "./types";
@@ -41,14 +46,96 @@ function shapeClass(dataShape: string): string {
 
 const CHANNEL_STOPWORDS = new Set(["the", "per", "over", "via", "and", "with", "from"]);
 
-function channelTokens(channel: string): Set<string> {
+/**
+ * Everything in `CHANNEL_STOPWORDS` plus the connective vocabulary that shows up
+ * in `bestFor` prose. Channel strings are terse noun phrases; `bestFor` entries
+ * are sentences, so without the wider list every pair shares "when" / "exact" /
+ * "values" and the term stops discriminating again in the other direction.
+ */
+const PROSE_STOPWORDS: ReadonlySet<string> = new Set([
+  ...CHANNEL_STOPWORDS,
+  "for",
+  "its",
+  "that",
+  "this",
+  "when",
+  "what",
+  "how",
+  "one",
+  "two",
+  "few",
+  "any",
+  "all",
+  "not",
+  "but",
+  "into",
+  "onto",
+  "out",
+  "off",
+  "own",
+  "too",
+  "very",
+  "can",
+  "has",
+  "had",
+  "have",
+  "use",
+  "using",
+  "used",
+  "than",
+  "then",
+  "them",
+  "they",
+  "you",
+  "your",
+  "are",
+  "was",
+  "where",
+  "which",
+  "while",
+  "only",
+  "just",
+  "more",
+  "most",
+  "less",
+  "least",
+  "same",
+  "other",
+  "others",
+  "each",
+  "both",
+  "who",
+  "whose",
+  "why",
+  "already",
+  "also",
+  "yet",
+  "still",
+  "such",
+  "been",
+  "being",
+]);
+
+/** Content words of a phrase: lowercase, punctuation-stripped, stopwords out. */
+function tokens(text: string, stopwords: ReadonlySet<string>): Set<string> {
   return new Set(
-    channel
+    text
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, " ")
       .split(/\s+/)
-      .filter((w) => w.length > 2 && !CHANNEL_STOPWORDS.has(w)),
+      .filter((w) => w.length > 2 && !stopwords.has(w)),
   );
+}
+
+function channelTokens(channel: string): Set<string> {
+  return tokens(channel, CHANNEL_STOPWORDS);
+}
+
+/** Union of the content words across every `bestFor` phrase on an entry. */
+function bestForTokens(bestFor: readonly string[]): Set<string> {
+  const out = new Set<string>();
+  for (const phrase of bestFor) for (const t of tokens(phrase, PROSE_STOPWORDS)) out.add(t);
+  return out;
 }
 
 function score(self: ChartEntry, candidate: ChartEntry): number {
@@ -61,8 +148,10 @@ function score(self: ChartEntry, candidate: ChartEntry): number {
   let shared = false;
   for (const t of candTokens) if (selfTokens.has(t)) shared = true;
   if (shared) s += 2;
+  const selfBest = bestForTokens(self.bestFor);
+  const candBest = bestForTokens(candidate.bestFor);
   let bestFor = 0;
-  for (const b of candidate.bestFor) if (self.bestFor.includes(b)) bestFor += 1;
+  for (const t of candBest) if (selfBest.has(t)) bestFor += 1;
   s += Math.min(bestFor, 2);
   return s;
 }

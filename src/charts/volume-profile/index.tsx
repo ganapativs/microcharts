@@ -1,12 +1,10 @@
-// <VolumeProfile> — at which LEVEL did activity concentrate, not when (
-// §16, F15). Static, hook-free, RSC-safe. A histogram perpendicular to
-// the trend axis: y = level, bars extend horizontally by activity mass. The
-// modal bin (POC) is accented and the value area is shaded — a stated 70%
-// convention, never an implied confidence interval.
+// <VolumeProfile> — at which LEVEL did activity concentrate (not when).
+// Histogram perpendicular to the trend axis: y = level, bars extend by mass.
+// Modal bin (POC) accented; value area shaded (stated 70% convention, not a CI).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
 import { profileLayout, volumeProfileGeometry, type LevelRow } from "./geometry.js";
 
@@ -40,15 +38,13 @@ export function volumeProfileSummary(
   valueArea: number,
   strings: VolumeProfileStrings,
   fmt: (n: number) => string,
+  /** Percent formatter (FRACTION in) for the value-area convention. A stated
+   *  share, not a level — `locale` reaches it, the value `format` must not. */
+  pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   if (!geo.poc) return strings.noData;
   if (geo.even) return strings.volumeEven;
-  return strings.volumeProfile(
-    fmt(geo.poc.level),
-    `${Math.round(valueArea * 100)}%`,
-    fmt(geo.vaLo),
-    fmt(geo.vaHi),
-  );
+  return strings.volumeProfile(fmt(geo.poc.level), pct(valueArea), fmt(geo.vaLo), fmt(geo.vaHi));
 }
 
 export function VolumeProfile(props: VolumeProfileProps): ReactNode {
@@ -72,6 +68,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
+  const pctFmt = makePercentFormatter(locale);
   const fontSize = labelFont(height, 0.11);
   // bins once (the O(data.length) pass); only the O(bins) layout repeats for the
   // gutter — re-running the bin + value-area walk was the bench-floor regression
@@ -87,7 +84,9 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
     fmt,
   });
   const accName =
-    summary === false ? false : (summary ?? volumeProfileSummary(geo, valueArea, strings, fmt));
+    summary === false
+      ? false
+      : (summary ?? volumeProfileSummary(geo, valueArea, strings, fmt, pctFmt));
 
   const normal = geo.bars.filter((b) => !b.poc);
   const pocBar = geo.bars.find((b) => b.poc);

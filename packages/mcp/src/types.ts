@@ -1,8 +1,6 @@
 /**
- * Local mirror of the catalog shapes the package consumes. Kept self-contained
- * (not imported from the docs app) so the published package never reaches into
- * `apps/docs`. The `catalog-sync` test guarantees `catalog.generated.json` still
- * matches the live registry, so these types can't silently drift.
+ * Local mirror of catalog shapes — not imported from `apps/docs`. `catalog-sync`
+ * test keeps `catalog.generated.json` aligned with the live registry.
  */
 
 export interface ChartProp {
@@ -31,21 +29,17 @@ export interface ChartEntry {
   bestFor: string[];
   avoidFor: string[];
   props: ChartProp[];
-  /** Copy-runnable snippet — sample-data definitions already prepended. */
   example: { title: string; code: string };
   /**
-   * A ready-to-render JSON prop bag derived from `example` at generation time —
-   * what `render_microchart` actually takes. Present for every chart whose
-   * example is fully serializable; absent when the example is mostly callbacks.
+   * JSON prop bag from `example` at gen time — what `render_microchart` takes.
+   * Absent when the example is not fully serializable.
    */
   sample?: Record<string, unknown>;
 }
 
-/** The committed snapshot: catalog data + the library version it was cut from. */
+/** Committed snapshot + library version stamp. */
 export interface Catalog {
-  /** `@microcharts/react` version this snapshot was generated from. */
   library: string;
-  /** Shared grammar/layout/i18n props every chart accepts. */
   sharedProps: ChartProp[];
   charts: ChartEntry[];
 }

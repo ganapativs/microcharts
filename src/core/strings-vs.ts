@@ -1,5 +1,4 @@
-// Dual-series (benchmark) summary templates — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale).
+// Dual-series (benchmark) summary templates
 import type { SummaryStrings } from "./summary.js";
 
 export type VsStrings = Pick<SummaryStrings, "noData" | "vsAt" | "vs" | "vsMatching">;

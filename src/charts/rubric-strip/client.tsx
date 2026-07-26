@@ -1,9 +1,9 @@
 "use client";
 // Interactive <RubricStrip>. useActivePicker owns interaction: one pointer
 // listener + row-by-y lookup, ↑/↓ rove criteria, click / Enter / Space selects
-// (onSelect). Composes the static component (canon) — never re-implemented.
+// (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
@@ -65,6 +65,9 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
 
   const n = Math.max(1, data.length);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The weight SHARE is a percent of the rubric, not a score — it takes `locale`
+  // but never the score `format`. `${Math.round(x*100)}%` was an en-US percent.
+  const weightFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   // Height / font / gutter mirror the static entry EXACTLY (same defaults, same
   // label-fit rule) — both entries must land on identical geometry or the focus
   // box drifts off the rows it is meant to frame.
@@ -110,11 +113,11 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         value: row?.score ?? null,
         label: row?.label,
         formatted: row
-          ? `${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${Math.round(row.weightShare * 100)}%)`
+          ? `${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${weightFmt(row.weightShare)})`
           : "",
       };
     },
-    [geo, fmt],
+    [geo, fmt, weightFmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -156,7 +159,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
 
   const shown = active ?? selected;
   const row = shown !== null ? geo.rows[shown] : undefined;
-  const weightPct = row ? `${Math.round(row.weightShare * 100)}%` : "";
+  const weightPct = row ? weightFmt(row.weightShare) : "";
   const announced = row
     ? isFiniteValue(row.score)
       ? strings.rubricRow(row.label, fmt(row.score), weightPct)

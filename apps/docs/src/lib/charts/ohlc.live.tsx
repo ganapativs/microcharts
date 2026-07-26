@@ -3,12 +3,6 @@ import { Ohlc } from "@microcharts/react/ohlc";
 import { Ohlc as OhlcInteractive } from "@microcharts/react/ohlc/interactive";
 import staticModule, { playground as staticPlayground, PERIODS } from "./ohlc";
 
-/** Interactive half of the ohlc chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./ohlc`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <OhlcInteractive data={PERIODS} summary={false} width={140} height={24} animate={animate} />

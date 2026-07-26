@@ -3,12 +3,6 @@ import { MiniBar } from "@microcharts/react/mini-bar";
 import { MiniBar as MiniBarInteractive } from "@microcharts/react/mini-bar/interactive";
 import staticModule, { playground as staticPlayground, MIX, SIGNED } from "./mini-bar";
 
-/** Interactive half of the mini-bar chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./mini-bar`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <MiniBarInteractive data={MIX} summary={false} width={100} height={32} animate={animate} />

@@ -35,10 +35,18 @@ export const entry: ChartEntry = {
       description: "Fraction retained per period (0–1 or 0–100); period 0 is typically 1.0.",
     },
     {
+      name: "compare",
+      type: "number[]",
+      required: false,
+      description:
+        "Peer/industry curve, drawn as a subordinate dashed ghost. The catalog word for a second series to read the first against (DualSparkline, StarSpoke).",
+    },
+    {
       name: "benchmark",
       type: "number[]",
       required: false,
-      description: "Peer/industry curve, drawn as a subordinate dashed ghost.",
+      description:
+        "Deprecated alias for `compare`, still accepted and still winning when both are passed.",
     },
     {
       name: "plateau",

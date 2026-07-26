@@ -33,6 +33,7 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/status-dot`,
   interactiveImport: `${PKG}/status-dot/interactive`,
   picker: false,
+  readout: false,
   dataShape: '"ok" | "warn" | "error" | "off" | "busy" (extensible)',
   encoding: { channel: "paired glyph shape + semantic color", precision: "n/a — categorical" },
   nodeBudget: "≤ 2 (mark + optional pulse halo)",

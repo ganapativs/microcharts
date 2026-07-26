@@ -1,4 +1,4 @@
-// HeatCell geometry — pure, React-free. One calibrated color
+// HeatCell: One calibrated color
 // step for one value against a known scale. Discrete steps only: continuous
 // opacity is a false-precision channel at 12 px. All metrics 2-dp.
 import { clamp } from "../../core/scale.js";

@@ -2,9 +2,6 @@ import { SizeFootprintCard } from "@/components/home/size-footprint-card";
 import { CATALOG, SIZE, BENCH, SIZE_SPAN, sizeRow } from "@/lib/docs-facts";
 import { getChart } from "@/lib/catalog";
 
-/** Perf-page figures from measured `docs-facts` (build + bench). */
-
-// ── Size distribution — same interactive footprint as the home page ──────────
 export function SizeDistribution() {
   return (
     <figure className="not-prose my-6">
@@ -27,7 +24,6 @@ export function SizeDistribution() {
   );
 }
 
-// ── Size span — smallest / median / largest across the whole catalog ─────────
 export function SizeTable() {
   return (
     <div className="not-prose my-6 overflow-x-auto">
@@ -61,7 +57,6 @@ export function SizeTable() {
   );
 }
 
-// ── SSR scaling table — N sparklines → SVG string, from the real run ─────────
 export function ScalingTable() {
   return (
     <div className="not-prose my-6 overflow-x-auto">
@@ -89,7 +84,6 @@ export function ScalingTable() {
   );
 }
 
-// ── Catalog-wide throughput summary ──────────────────────────────────────────
 export function ThroughputSummary() {
   return (
     <div className="not-prose my-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -108,7 +102,6 @@ export function ThroughputSummary() {
   );
 }
 
-// ── Catalog facts — inline chips reused on Intro / All charts ────────────────
 export function CatalogFacts() {
   const c = CATALOG.collections;
   return (

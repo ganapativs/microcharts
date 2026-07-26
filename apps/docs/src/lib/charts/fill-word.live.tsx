@@ -3,12 +3,6 @@ import { FillWord } from "@microcharts/react/fill-word";
 import { FillWord as FillWordInteractive } from "@microcharts/react/fill-word/interactive";
 import staticModule, { playground as staticPlayground } from "./fill-word";
 
-/** Interactive half of the fill-word chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./fill-word`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-4">
@@ -32,7 +26,7 @@ export const playground: PlaygroundSpec = {
       value={(s.value as number) / 100}
       mode={s.mode as "fill" | "drain"}
       label={s.label ? "value" : "none"}
-      summary={false}
+      title="Upload"
       animate={ui.animate}
       fontSize={18}
     />

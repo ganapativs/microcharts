@@ -3,19 +3,13 @@ import { PercentileLadder } from "@microcharts/react/percentile-ladder";
 import { PercentileLadder as PercentileLadderInteractive } from "@microcharts/react/percentile-ladder/interactive";
 import staticModule, { playground as staticPlayground, LATENCY } from "./percentile-ladder";
 
-/** Interactive half of the percentile-ladder chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./percentile-ladder`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <PercentileLadderInteractive
       data={LATENCY}
       summary={false}
-      width={140}
-      height={14}
+      width={160}
+      height={20}
       animate={animate}
     />
   );

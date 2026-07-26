@@ -1,9 +1,3 @@
-/**
- * `@microcharts/mcp` public core. The stdio server lives in the `bin`
- * (`microcharts-mcp`); this entry exports the underlying functions. The Vercel
- * AI-SDK tools live on the `@microcharts/mcp/ai-sdk` subpath so importing the
- * core never pulls in the `ai` peer dependency.
- */
 export { findChart } from "./tools/find";
 export type { FindOptions, FindResult } from "./tools/find";
 export { getChart } from "./tools/get";

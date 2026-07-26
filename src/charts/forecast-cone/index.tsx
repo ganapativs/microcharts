@@ -1,7 +1,7 @@
 // <ForecastCone> — will we land where we need to? History as a
 // solid line, then a fan of prediction bands (p80 outer, p50 inner) widening
 // over the horizon with a DASHED median — an estimate never renders as fact.
-// Static, hook-free, RSC-safe. The fan's entire honesty is visible confidence
+// The fan's entire honesty is visible confidence
 // decay: at most 2 bands, the mid is always dashed, and a cone that fails to
 // widen is flagged (never auto-inflated).
 import type { CSSProperties, ReactNode } from "react";
@@ -207,7 +207,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         fill="none"
         strokeDasharray="2.5 2.5"
         vectorEffect="non-scaling-stroke"
-        style={{ stroke: accent, strokeWidth: "var(--mc-stroke-width)" }}
+        style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
       />
       {geo.target ? (
         <line

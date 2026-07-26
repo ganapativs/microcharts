@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Delta } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
@@ -48,5 +50,34 @@ describe("interactive <Delta>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 0.2 }]);
+  });
+
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
+  it("onActive reports the change once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<Delta value={0.12} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-delta-live") as HTMLElement;
+    // `onActive` alone makes the glyph a tab stop — there is something to report.
+    expect(wrap.getAttribute("tabindex")).toBe("0");
+    await userEvent.hover(wrap);
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.12, formatted: "+12%" });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
+    await pointerAway();
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
+    expect(seen.length).toBe(2);
+  });
+
+  it("the decorative form reports nothing", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <Delta value={0.12} summary={false} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-delta-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    expect(wrap.getAttribute("tabindex")).toBeNull();
+    expect(seen).toEqual([]);
   });
 });

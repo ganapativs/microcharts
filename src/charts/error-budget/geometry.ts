@@ -1,4 +1,4 @@
-// ErrorBudget geometry — pure, React-free. Are we burning the
+// ErrorBudget: Are we burning the
 // error budget too fast to survive the window? X = window elapsed 0→1, Y =
 // budget remaining 1→0. The steady-burn diagonal (0,1)→(1,0) is the pace that
 // exactly spends the window; faster burn-rate reference lines (Google-SRE

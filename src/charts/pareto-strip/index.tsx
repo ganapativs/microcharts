@@ -1,23 +1,32 @@
 // <ParetoStrip> — what should we fix first? Descending bars + a
 // cumulative-share line on a FIXED 0–100% scale (never rescaled to steepen the
-// curve). Bars up to the threshold crossing are accent ("vital few"), the rest
+// curve). Bars up to the threshold crossing are accent ("vital few"). the rest
 // muted — the chart's one job is to say where to stop reading. 80% is a working
-// REFERENCE, never a law; `Other` never participates in ranking. Static,
-// hook-free, RSC-safe.
+// REFERENCE, never a law; `Other` never participates in ranking.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
+import { makePercentFormatter } from "../../core/format.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import { paretoGeometry, type ParetoGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
-const pct = (frac: number): string => `${Math.round(frac * 100)}%`;
+/** Cumulative + per-bar shares go through `Intl`'s own percent style. The old
+ *  `${Math.round(frac * 100)}%` was an en-US percent (fr-FR wants a NBSP before
+ *  the sign, tr-TR puts it first). `locale` is the chart's own prop, threaded so
+ *  a server render and its client hydration resolve the same string instead of
+ *  each taking its host default. Trailing and optional: callers that never
+ *  localized keep compiling. */
+export const paretoPercent = (
+  locale?: string | string[] | undefined,
+): ((fraction: number) => string) => makePercentFormatter(locale);
 
 export function paretoSummary(
   geo: ParetoGeometry,
   opts: { unit: string; metric: string },
   strings: ParetoStrings,
+  pct: (fraction: number) => string = paretoPercent(),
 ): string {
   if (geo.degenerate) return strings.paretoEmpty(opts.metric);
   if (geo.crossing === null) return strings.paretoTop(geo.topLabel, pct(geo.topShare));
@@ -40,6 +49,7 @@ export interface ParetoStripProps {
   width?: number | undefined;
   height?: number | undefined;
   color?: string | undefined;
+  locale?: string | string[] | undefined;
   strings?: ParetoStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -60,6 +70,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     width = 80,
     height = 20,
     color,
+    locale,
     strings = EN_PARETO,
     title,
     summary,
@@ -70,6 +81,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
   } = props;
 
   const FONT = labelFont(height);
+  const pct = paretoPercent(locale);
   const cls = className ? `mc-pareto-strip ${className}` : "mc-pareto-strip";
 
   const probe = paretoGeometry({ width, height, data, threshold, maxItems });
@@ -84,8 +96,10 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     probe != null &&
     probe.crossing != null &&
     labelFitsY(height / 2, FONT, height);
+  // Gutter off the FORMATTED string, so a locale that widens the percent
+  // ("82 %") reserves the extra character instead of spilling the viewBox.
   const labelText = showLabel
-    ? `${probe!.vitalCount} of ${probe!.n} → ${pct(probe!.cumAtCrossing)}`
+    ? strings.paretoCount(probe!.vitalCount, probe!.n, pct(probe!.cumAtCrossing))
     : "";
   const gutterCh = showLabel ? labelText.length : 0;
 
@@ -116,7 +130,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => paretoSummary(geo, { unit, metric }, strings));
+  const accName = resolveSummary(summary, () => paretoSummary(geo, { unit, metric }, strings, pct));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 

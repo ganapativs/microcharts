@@ -1,6 +1,5 @@
-// TraceFold summary templates (trace-fold) — its OWN module. Widths are
-// durations on one linear shared time scale; the critical path is the decision
-// read. English lives only in core string modules (canon). Aggregate: strings.ts.
+// TraceFold summary templates (trace-fold). Widths are durations on one linear shared time
+// scale; the critical path is the decision read.
 import type { SummaryStrings } from "./summary.js";
 
 export type TraceFoldStrings = Pick<

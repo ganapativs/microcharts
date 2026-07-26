@@ -1,4 +1,4 @@
-// ProgressRing geometry — pure, React-free. Arc sweep from a
+// ProgressRing: Arc sweep from a
 // FIXED 12-o'clock start, clockwise, butt caps. `sweep` renders remaining.
 // Value arc = stroked centerline (drawable + accent CSS strokes paths).
 import { annulusSector, arcPath, TAU } from "../../core/arc.js";

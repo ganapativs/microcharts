@@ -1,22 +1,8 @@
 import type { ChartEntry } from "./types";
 
 /**
- * Search index + scorer for `find_microchart`. The field set mirrors the docs
- * gallery's `keywords()` (name, tagline, dataShape, encoding channel,
- * collection, bestFor) — the same text the site's chart search indexes — with
- * bestFor + tagline + name weighted highest, since those carry the "what
- * decision does this answer" signal the finder is built on.
- *
- * Matching is stem-level: two words match when their stems are equal, or when
- * the shorter stem is a prefix of the longer. Substring-anywhere matching was
- * tried and removed — at this vocabulary size it mapped "per" onto *percentile
- * / temperature / experiments*, "commits" onto *common* and *its*, "confident"
- * onto *con*, and "uptime" onto *time*, which is how "how many commits per day"
- * used to rank BenchmarkStrip first.
- *
- * Terms are IDF-weighted, so a word carried by half the catalog ("value",
- * "time", "row") moves the ranking far less than one carried by two charts
- * ("hypnogram", "budget").
+ * Scorer for `find_microchart` — mirrors docs gallery fields; stem + prefix match
+ * (substring matching was removed — false positives at catalog size). IDF-weighted.
  */
 
 const STOP = new Set([
@@ -61,10 +47,6 @@ const STOP = new Set([
   "much",
 ]);
 
-/**
- * Longest-first, so "distributions" loses "ions" rather than "s". Applied only
- * when at least 3 characters survive, so short words keep their shape.
- */
 const SUFFIXES = [
   "ations",
   "ation",
@@ -88,7 +70,6 @@ function stem(word: string): string {
   return word;
 }
 
-/** Break `camelCase` apart so `FoldedDayBand` indexes as three searchable words. */
 function split(text: string): string[] {
   return text
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
@@ -111,7 +92,6 @@ export function tokenize(text: string): string[] {
   ];
 }
 
-/** Stems match when equal, or when the shorter is a prefix of the longer. */
 function wordMatch(term: string, word: string): boolean {
   if (term === word) return true;
   const [short, long] = term.length < word.length ? [term, word] : [word, term];
@@ -134,10 +114,6 @@ function fields(c: ChartEntry): Field[] {
   ];
 }
 
-/**
- * Document frequency per stem across the catalog, built once per corpus. A term
- * present in most charts says almost nothing about *which* chart to pick.
- */
 let cache: { size: number; df: Map<string, number> } | undefined;
 
 function frequencies(charts: ChartEntry[]): { size: number; df: Map<string, number> } {
@@ -151,20 +127,14 @@ function frequencies(charts: ChartEntry[]): { size: number; df: Map<string, numb
   return cache;
 }
 
-/** Inverse document frequency, floored so even a ubiquitous term still counts. */
 function idf(term: string, { size, df }: { size: number; df: Map<string, number> }): number {
-  // A query stem may only appear as a *prefix* of indexed words, so fall back to
-  // the broadest form it matches rather than treating it as unseen (and rare).
+  // Query stem may match indexed words by prefix only — don't treat as unseen.
   let n = df.get(term) ?? 0;
   if (n === 0) for (const [w, count] of df) if (wordMatch(term, w)) n = Math.max(n, count);
   if (n === 0) return 1;
   return Math.max(0.2, Math.log(size / n));
 }
 
-/**
- * Score a chart against pre-tokenized query terms, and name the top hit.
- * `corpus` supplies the IDF statistics — pass the full candidate set.
- */
 export function score(
   c: ChartEntry,
   terms: string[],

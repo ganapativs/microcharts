@@ -68,6 +68,9 @@ describe("docs guide claims stay true", () => {
     expect(src).toContain(`median of ${SIZE.interactiveMedian} kB`);
     expect(src).toContain(`${SIZE.min} kB and ${SIZE.max} kB`);
     expect(src).toContain(`median of ${SIZE.median} kB`);
+    const overBy = Math.round((SIZE.max - 3) * 100) / 100;
+    expect(src).toContain(`more than ${overBy} kB`);
+    expect(SIZE.over3).toHaveLength(27); // keep in lockstep with "Twenty-seven charts…" in the prose
   });
 
   it("index.mdx quotes the durable marketing size band", () => {

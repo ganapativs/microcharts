@@ -1,5 +1,4 @@
-// Bullet summary templates (bullet) — its OWN module. English lives only in
-// core string modules (canon). Aggregate: core/strings.ts `EN`.
+// Bullet summary templates (bullet)
 import type { SummaryStrings } from "./summary.js";
 
 export type BulletStrings = Pick<SummaryStrings, "noData" | "bullet" | "bulletTarget">;

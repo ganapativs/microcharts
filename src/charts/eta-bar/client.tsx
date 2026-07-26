@@ -1,10 +1,10 @@
 "use client";
 // Interactive <EtaBar>. `live` mode: on prop change the remainder
 // width transitions (CSS, reduced-motion → snap) and a polite live region
-// re-announces at most every 10 s. No pointer scrub — there is no series.
-// Composes the static entry (canon).
+// re-announces at most every 10 s. No pointer scrub — there is no series — but
+// hover OR focus reveals the forecast chip, the reveal-on-hover scalar pattern.
 import { useEffect, useRef, useState } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -28,6 +28,13 @@ export interface InteractiveEtaBarProps extends EtaBarProps {
   animate?: boolean;
   /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
   readout?: boolean;
+  /**
+   * The active (hovered / keyboard-focused) unit changed. One bar = one unit, so
+   * this fires once with `{ index: 0, … }` on pointer enter or focus and once
+   * with `null` when that clears — never repeatedly while the pointer moves
+   * inside the mark, and never twice when hover and focus overlap.
+   */
+  onActive?: ((datum: MicroDatum | null) => void) | undefined;
   /** The bar was activated (click, tap, Enter or Space): `{ index: 0, value }` — the clamped progress. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -46,6 +53,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     announceEvery = 10000,
     animate = false,
     readout = true,
+    onActive,
     onSelect,
     className,
     style,
@@ -63,25 +71,50 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         ? summary
         : etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt }, strings);
   const label = [title, full].filter(Boolean).join(". ") || undefined;
-  // The chip shows only the two numbers the summary is built from — never
-  // `full`, whose sentence (or an unbounded caller `summary`) blew past the
-  // chip's width cap and duplicated the aria-label beside it verbatim. The
-  // sentence stays in the live region.
-  const etaGeo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: 80, height: 8 });
-  const etaPct = makeFormatter(undefined, locale, {
-    style: "percent",
-    maximumFractionDigits: 0,
-  })(Math.max(0, Math.min(1, progress || 0)));
+  // Chip = whatever the permanent gutter is NOT already printing. Default
+  // `label="eta"` → chip is the percent; `label="percent"` → chip is the ETA;
+  // `label="none"` (or a too-short bar that drops the gutter) → both.
+  const height = rest.height ?? 8;
+  const labelMode = rest.label ?? "eta";
+  const etaGeo = etaBarGeometry({
+    progress,
+    elapsed,
+    rate: rate ?? null,
+    width: rest.width ?? 80,
+    height,
+  });
+  const etaPct = makePercentFormatter(locale)(Math.max(0, Math.min(1, progress || 0)));
+  const etaOnly =
+    progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
+      ? undefined
+      : etaFormat
+        ? etaFormat(etaGeo.remainingTime)
+        : fmt(etaGeo.remainingTime);
+  // Mirrors the static's own gutter rule (`label`/`height < 9`/no ETA to print).
+  // Left uncoerced on purpose: this subpath sits exactly on its size budget, and
+  // a `!!` costs 2 B gzipped. Only ever read as a condition.
+  const gutterPaints = labelMode !== "none" && height >= 9 && (labelMode === "percent" || etaOnly);
   const chip =
     summary === false
       ? undefined
-      : progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
-        ? etaPct
-        : `${etaPct} · ${etaFormat ? etaFormat(etaGeo.remainingTime) : fmt(etaGeo.remainingTime)}`;
+      : !gutterPaints
+        ? etaOnly
+          ? `${etaPct} · ${etaOnly}`
+          : etaPct
+        : labelMode === "eta"
+          ? etaPct
+          : (etaOnly ?? etaPct);
 
   const [announced, setAnnounced] = useState("");
-  const [focused, setFocused] = useState(false);
-  const last = useRef(0);
+  const [open, setOpen] = useState(false);
+  // -Infinity, not 0: `performance.now()` is milliseconds since THIS document's
+  // time origin, so anchoring at 0 claims "already announced at page load" and
+  // silently swallows the leading edge for the whole first `announceEvery`
+  // window — 10 s by default. An ETA bar that mounts and ticks inside a
+  // streamed reply (the common case) therefore announced nothing at all, since
+  // this branch drops the update rather than deferring it. -Infinity means
+  // "never announced", so the first change always emits.
+  const last = useRef(-Infinity);
   useEffect(() => {
     if (!full) return;
     const now = performance.now();
@@ -91,21 +124,36 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     }
   }, [full, announceEvery]);
 
-  // Drill-down: the clamped progress fraction the done bar encodes.
-  const select = (): void =>
-    onSelect?.({
-      index: 0,
-      value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,
-      formatted: chip,
-    });
+  // Clamped progress fraction. One datum builder — callbacks match the chip.
+  const datum = (): MicroDatum => ({
+    index: 0,
+    value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,
+    formatted: chip,
+  });
+  const select = (): void => onSelect?.(datum());
+  // ONE unit: `onActive` fires on the enter/leave EDGE only. `open` alone can't
+  // gate it — pointer-enter then focus both set it `true`, which would announce
+  // the same unit twice — so the last emitted state is tracked here.
+  const shown = useRef(false);
+  const activate = (on: boolean): void => {
+    setOpen(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-eta-live", className, style)}
       {...named(label)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      // Pointer AND focus, like every other reveal-on-hover scalar (Bullet,
+      // Thermometer, HeatCell, MoonPhase, OrbitStatus): keyboard-only would
+      // hide the forecast from a mouse reader entirely.
+      onPointerEnter={() => activate(true)}
+      onPointerLeave={() => activate(false)}
+      onFocus={() => activate(true)}
+      onBlur={() => activate(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -127,7 +175,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {readout && focused && chip ? (
+      {readout && open && chip ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {chip}
         </span>

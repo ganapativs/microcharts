@@ -3,18 +3,15 @@
 // the interactive entry makes each FIELD a navigable unit (station, wind, sky,
 // temp, dew point, pressure) so a reader can step or point at them one at a time
 // instead of hearing one long string.
-//
-// The unit is the sub-metric, NOT a data point: `index` is the position in the
+// The unit is the sub-metric, NOT a data point: `index` is the position in
 // PRESENT fields (absent props are not units — a glyph with no dew point has no
-// dew unit), `value` is that field's encoded number (`null` for the station
-// name, which encodes nothing), `label` is its announced phrase.
-//
-// useActivePicker owns interaction: one pointer listener + nearest-field math
-// over the anchors the STATIC entry draws at (both entries read the same pure
-// `stationLayout`, so the hit boxes cannot drift from the marks). Composes the
-// static entry (canon) — no re-implemented SVG.
+// dew unit). `value` is that field's encoded number (`null` for the station
+// name, which encodes nothing). `label` is its announced phrase.
+// useActivePicker: nearest-field math over the same `stationLayout` anchors the
+// static entry draws — hit boxes cannot drift from the marks.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
+import { textGutter } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -96,9 +93,11 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     const presT = pressure != null && Number.isFinite(pressure) ? fmt(pressure) : null;
     const lay = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
     const { font, cx, cy, r, yOff, gap } = lay;
-    // per-char over-estimate — the static path never measures text either
+    // per-char over-estimate — the static path never measures text either, and
+    // it is the SHARED estimator (core/labels), so a hit box is exactly as wide
+    // as the gutter `stationLayout` reserved for the same string
     const textBox = (s: string, right: number, y: number): [number, number, number, number] => {
-      const w = 0.62 * font * s.length;
+      const w = textGutter(s.length, font, 0);
       return [right - w - 0.5, y - font * 0.7, w + 1, font * 1.4];
     };
     const out: Field[] = [];
@@ -106,7 +105,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       out.push({
         text: station,
         value: null, // a name, not a measurement
-        box: textBox(station, 0.5 + 0.62 * font * station.length, font),
+        box: textBox(station, 0.5 + textGutter(station.length, font, 0), font),
       });
     if (wind && Number.isFinite(wind.magnitude)) {
       const calm = Math.abs(wind.magnitude) < step / 4;
@@ -161,7 +160,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         box: [
           cx + r + gap - 0.5,
           cy - yOff - font * 0.7,
-          0.62 * font * presT.length + 1,
+          textGutter(presT.length, font, 1),
           font * 1.4,
         ],
       });
@@ -247,7 +246,8 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         format={format}
         locale={locale}
         strings={strings}
-        title={title}
+        // No `title` on the child: the wrapper owns the accessible name, and a
+        // titled static is named (not hidden) even with `summary={false}`.
         summary={false}
         style={fillFor(style)}
       >

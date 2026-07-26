@@ -1,4 +1,4 @@
-// PercentileLadder geometry — pure, React-free. What does the
+// PercentileLadder: What does the
 // tail look like, not just the median? Ticks at chosen percentiles on a
 // zero-anchored track, graduated so the tail reads strongest (taller + accent).
 // Tick DISTANCES carry the story, so the origin is never cropped; a log

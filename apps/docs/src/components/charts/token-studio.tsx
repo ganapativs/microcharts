@@ -319,8 +319,6 @@ export function TokenStudio() {
         <PreviewPane tone="dark" style={darkStyle} label="Dark" />
       </div>
 
-      {/* ── output: full width, no inner scroll cap, and long lines wrap
-           (annotated "All" lines) so the block never scrolls sideways ── */}
       <div className="token-code p-4 sm:p-5 [&_.fd-scroll-container]:!max-h-none [&_.line]:whitespace-pre-wrap [&_.line]:break-words [&_figure]:!my-0 [&_pre]:!w-full">
         <DynamicCodeBlock
           lang={format === "js" ? "ts" : "css"}

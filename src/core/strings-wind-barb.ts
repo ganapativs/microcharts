@@ -1,6 +1,5 @@
-// WindBarb summary templates (wind-barb) — its OWN module. Direction as a
-// compass octant + degrees; magnitude is quantized (the honesty, stated with a
-// per-barb key). English lives only in core string modules (canon).
+// WindBarb summary templates (wind-barb). Direction as a compass octant + degrees;
+// magnitude is quantized (the honesty, stated with a per-barb key).
 import type { SummaryStrings } from "./summary.js";
 
 export type WindBarbStrings = Pick<SummaryStrings, "windBarb" | "windBarbCalm" | "compass8">;

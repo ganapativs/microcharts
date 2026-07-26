@@ -1,6 +1,5 @@
-// StarSpoke summary templates (star-spoke) — its OWN module. Names the extremes
-// of the profile (the outlier read); no enclosed area is ever implied. English
-// lives only in core string modules (canon). Aggregate: core/strings.ts.
+// StarSpoke summary templates (star-spoke). Names the extremes of the profile (the outlier
+// read); no enclosed area is ever implied.
 import type { SummaryStrings } from "./summary.js";
 
 export type StarSpokeStrings = Pick<

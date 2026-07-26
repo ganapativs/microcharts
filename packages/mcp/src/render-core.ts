@@ -4,46 +4,27 @@ import { STYLES } from "./assets.generated";
 import type { ChartEntry } from "./types";
 
 /**
- * Render a static chart to a self-contained SVG string, using the real
- * `@microcharts/react` static component (imported at runtime from the package's
- * own dependency — carry model A). The default `svg` format embeds the shipped
- * stylesheet so the mark renders correctly dropped into any surface with no
- * external CSS; `bare` omits it for callers that already load `styles.css`.
- *
- * The `summary` is the chart's own generated accessible name (read back out of
- * the rendered markup) — correct for every data shape, no assumption that the
- * data is a number series.
- *
- * React and `react-dom/server` are imported lazily, inside the first render:
- * a session that only calls `find` / `get` (and every consumer of the AI-SDK
- * subpath that never renders) then never pays for loading them.
+ * Static render to self-contained SVG (carry model A: runtime `@microcharts/react`).
+ * Default `svg` embeds stylesheet; `bare` omits it. `summary` read from markup.
+ * React loads lazily on first render so find/get-only sessions stay light.
  */
 
 export type RenderFormat = "svg" | "bare";
 
 export interface RenderResult {
-  /** The rendered mark. SVG for most charts; HTML for the few inline text marks
-   *  (delta, token-confidence) — see `mimeType`. */
+  /** SVG or inline HTML (delta, token-confidence) — see `mimeType`. */
   svg: string;
-  /** `image/svg+xml` for SVG-rooted charts, `text/html` for inline text marks. */
   mimeType: "image/svg+xml" | "text/html";
-  /** The chart's generated accessible name — its honest alt text. */
   summary: string;
-  /** Pixel size for SVG-rooted charts; 0 for font-relative inline marks. */
   width: number;
   height: number;
-  /** The `@microcharts/react` version that produced this render. */
   library: string;
 }
 
 export interface RenderInput {
-  /** Chart slug, e.g. "sparkline". */
   type: string;
-  /** Primary data — mapped to the `data` prop; omit for scalar charts. */
   data?: unknown;
-  /** Any other props (e.g. `value`, `target`, `curve`, `color`, `width`). */
   props?: Record<string, unknown> | undefined;
-  /** `svg` (default, self-contained) or `bare` (no embedded CSS). */
   format?: RenderFormat | undefined;
 }
 
@@ -58,7 +39,7 @@ const MAX_OUTPUT_BYTES = 512_000;
 
 const componentCache = new Map<string, ComponentType<Record<string, unknown>>>();
 
-/** Loaded on first render; see the lazy-import note above. */
+/** Lazy-loaded on first render — see module header. */
 let reactRuntime:
   | Promise<{
       createElement: typeof import("react").createElement;
@@ -101,18 +82,7 @@ function decodeEntities(s: string): string {
     .replace(/&amp;/g, "&");
 }
 
-/**
- * The chart's accessible name, exactly as an assistive technology would compute
- * it. Two shapes reach us:
- *
- *  - **No `id`** — the root carries `aria-label` (the default). Inner glyphs are
- *    aria-hidden, so the first hit is always the name.
- *  - **With an `id`** — the chart switches to `<title>`/`<desc>` +
- *    `aria-labelledby`, and the generated sentence lives in `<desc>`, with the
- *    author's `title` in `<title>`. Reading `<title>` alone would return
- *    "Revenue" and drop the data entirely, so resolve the reference list in
- *    order and join it, the way the accessibility tree does.
- */
+/** No `id` ⇒ `aria-label`; with `id` ⇒ join `<title>`/`<desc>` via `aria-labelledby`. */
 function extractSummary(markup: string): string {
   const label = /aria-label="([^"]*)"/.exec(markup);
   if (label?.[1]) return decodeEntities(label[1]);
@@ -134,7 +104,6 @@ function extractSummary(markup: string): string {
   return title?.[1] ? decodeEntities(title[1]) : "";
 }
 
-/** Pixel size from the ROOT tag only (px for SVG-rooted; 0 for font-relative). */
 function extractSize(rootTag: string): { width: number; height: number } {
   // Signed, so an out-of-range prop surfaces as a negative to validate rather
   // than silently reading as 0.
@@ -145,7 +114,6 @@ function extractSize(rootTag: string): { width: number; height: number } {
   return { width: Number(vb?.[1] ?? 0), height: Number(vb?.[2] ?? 0) };
 }
 
-/** `JSON.stringify` that answers "how big is this" without throwing on cycles. */
 function sizeOf(value: unknown): number {
   try {
     return JSON.stringify(value)?.length ?? 0;
@@ -154,26 +122,13 @@ function sizeOf(value: unknown): number {
   }
 }
 
-/**
- * Required props the caller didn't pass. Charts declare their own required
- * props in the catalog, so this is exact per chart — and the message names the
- * data shape, because the alternative is React throwing `Cannot read properties
- * of undefined (reading 'length')` at a model that has no way to act on it.
- */
 function missingRequired(entry: ChartEntry, props: Record<string, unknown>): string[] {
   return entry.props
     .filter((p) => p.required && !p.interactive && props[p.name] === undefined)
     .map((p) => p.name);
 }
 
-/**
- * Coarse shape check against the catalog's declared prop types. Only the three
- * unambiguous cases are enforced — an array type, a plain `number`, a plain
- * `string` — because that is where a model actually goes wrong (passing
- * `"1,2,3"` or `{…}` where a series belongs) and the failure would otherwise
- * surface as `r.map is not a function`. Anything richer is left to the chart,
- * which has documented edge-case behaviour for nulls and non-finite numbers.
- */
+/** Coarse check: array / number / string only — where models most often mismatch. */
 function typeMismatches(entry: ChartEntry, props: Record<string, unknown>): string[] {
   const wrong: string[] = [];
   for (const p of entry.props) {
@@ -195,7 +150,6 @@ function typeMismatches(entry: ChartEntry, props: Record<string, unknown>): stri
   return wrong;
 }
 
-/** Split a declared type on its TOP-LEVEL `|`, so `(d: A | null) => void` stays one alternative. */
 function alternatives(type: string): string[] {
   const out: string[] = [];
   let depth = 0;
@@ -213,16 +167,7 @@ function alternatives(type: string): string[] {
   return out;
 }
 
-/**
- * Props that cannot mean anything over this transport, and why.
- *
- * JSON has no functions and no React children, and this tool renders the STATIC
- * entry. Left unchecked, each of these fails in a different unhelpful way: a
- * partial `strings` table throws `o.trendPct is not a function` from deep
- * inside the library, and `animate` is accepted and silently does nothing —
- * which is worse, because the caller believes it applied. Naming the reason is
- * the only honest option.
- */
+/** Static entry over JSON — reject functions, children, interactive-only props. */
 function unsupportedProps(entry: ChartEntry, props: Record<string, unknown>): string[] {
   // Shared grammar props (`animate`, `onActive`, `format`, …) live beside the
   // chart's own; a chart-specific entry wins if both declare the same name.

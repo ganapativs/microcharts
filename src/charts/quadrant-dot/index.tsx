@@ -1,9 +1,9 @@
 // <QuadrantDot> — where does this item sit in the 2×2, against the field?
 // A focal dot placed by 2-D position, a hairline cross at the
-// split (default = domain midpoints, always overridable, NEVER hidden), a faint
+// split (default = domain midpoints, always overridable, NEVER hidden). a faint
 // tint on the focal's quadrant, and tiny muted ghost dots for the peers. No
 // in-chart text at glyph scale — axis meaning lives in `title` + summary, so
-// skipping them is the documented anti-pattern. Static, hook-free, RSC-safe.
+// skipping them is the documented anti-pattern.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";

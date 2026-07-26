@@ -1,6 +1,6 @@
 // <StationGlyph> — a full weather observation in one character.
-// Static, hook-free, RSC-safe. Sky cover fills the center disc, a
-// wind barb gives direction + quantized speed (reused from WindBarb), and up to
+// Sky cover fills the center disc, a
+// wind barb gives direction + quantized speed (reused from WindBarb). and up to
 // three corner numerals carry temperature, dew point, and pressure. One glyph,
 // four channels, no legend — the meteorologist's station model, shrunk to a word.
 import type { CSSProperties, ReactNode } from "react";
@@ -164,6 +164,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
             data-mc-ink="data"
             fill="none"
             strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
           />
           {barb.pennants.map((p, i) => (
             <path key={i} d={p} data-mc-ink="point" />

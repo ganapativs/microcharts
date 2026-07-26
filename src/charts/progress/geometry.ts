@@ -1,4 +1,4 @@
-// Progress geometry — pure, React-free. Zero-anchored bar
+// Progress: Zero-anchored bar
 // length + a right label gutter reserved OUTSIDE the bar ( — never
 // measured): the viewBox widens for the label, the track never shrinks, so the
 // same fraction renders the same bar length whatever the label says (rows stay

@@ -1,7 +1,5 @@
-// RateVolume summary templates (rate-volume) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). This chart never states a rate
-// without its volume, so both numbers are always in the string. English lives
-// only in core string modules (canon). Aggregate: core/strings.ts `EN`.
+// RateVolume summary templates (rate-volume). This chart never states a rate without its
+// volume, so both numbers are always in the string.
 import type { SummaryStrings } from "./summary.js";
 
 export type RateVolumeStrings = Pick<

@@ -96,4 +96,19 @@ describe("interactive <PairedBars>", () => {
     const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
     expect(wrap.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("a pair with no value reads out as an em dash", async () => {
+    const screen = await render(
+      <PairedBars
+        data={[
+          { label: "East", value: 940, ref: 1200 },
+          { label: "West", value: null, ref: 800 },
+        ]}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")?.textContent).toBe("West: —");
+  });
 });

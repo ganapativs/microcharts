@@ -3,13 +3,9 @@ import { Delta } from "@microcharts/react/delta";
 import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive";
 import staticModule, { playground as staticPlayground } from "./delta";
 
-/** Interactive half of the delta chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./delta`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
+  // Same type-scale wrapper the static `Preview` uses — the gallery swaps one
+  // for the other in place, so a different font size is a visible jump.
   return (
     <span className="text-2xl">
       <DeltaInteractive value={0.184} summary={false} animate={animate} />
@@ -24,44 +20,43 @@ export const playground: PlaygroundSpec = {
     const positive = s.positive as "up" | "down";
     const mode = s.mode as string;
     const locale = s.locale as string;
+    // Chart is the root so playground callback injection lands on Delta — not a
+    // sizing wrapper. Type scale via style (inherits into the glyph + figure) —
+    // `lineHeight` included because the static render gets both from `text-3xl`,
+    // and a bare font-size left the interactive line box 6px shorter.
+    const style = { fontSize: "1.875rem", lineHeight: "2.25rem" };
     if (mode === "from prior") {
       return (
-        <span className="text-3xl">
-          <DeltaInteractive
-            value={100 + pct}
-            from={100}
-            positive={positive}
-            locale={locale}
-            summary={false}
-            animate={ui.animate}
-          />
-        </span>
+        <DeltaInteractive
+          value={100 + pct}
+          from={100}
+          positive={positive}
+          locale={locale}
+          animate={ui.animate}
+          style={style}
+        />
       );
     }
     if (mode === "currency") {
       return (
-        <span className="text-3xl">
-          <DeltaInteractive
-            value={pct * 1000}
-            format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
-            positive={positive}
-            locale={locale}
-            summary={false}
-            animate={ui.animate}
-          />
-        </span>
+        <DeltaInteractive
+          value={pct * 1000}
+          format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
+          positive={positive}
+          locale={locale}
+          animate={ui.animate}
+          style={style}
+        />
       );
     }
     return (
-      <span className="text-3xl">
-        <DeltaInteractive
-          value={pct / 100}
-          positive={positive}
-          locale={locale}
-          summary={false}
-          animate={ui.animate}
-        />
-      </span>
+      <DeltaInteractive
+        value={pct / 100}
+        positive={positive}
+        locale={locale}
+        animate={ui.animate}
+        style={style}
+      />
     );
   },
   codeInteractive: (s, _data, ui) => {

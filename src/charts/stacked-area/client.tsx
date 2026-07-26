@@ -1,5 +1,5 @@
 "use client";
-// Interactive <StackedArea>. Nearest-x lookup shows ALL layers at the column —
+// Interactive <StackedArea>. Nearest-x lookup shows ALL layers at the column
 // as rows in the chip and as one sentence in the live region ("Point 8 of 12:
 // Mobile 45%, Web 38%, API 17%."); ←/→ step x-columns, Enter/Space/click
 // selects a column (onSelect). useActivePicker owns interaction; the static is

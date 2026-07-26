@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Hourglass } from "./client.js";
+import { pointerAway } from "../../test/pointer.js";
 
 describe("interactive <Hourglass>", () => {
   it("announces only when a documented threshold is crossed", async () => {
@@ -37,5 +39,39 @@ describe("interactive <Hourglass>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.25 });
+  });
+
+  it("hover reveals the elapsed percent; a printed label suppresses the chip", async () => {
+    const screen = await render(<Hourglass value={0.42} title="Trial" />);
+    const wrap = screen.container.querySelector(".mc-hourglass-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("42%");
+    await pointerAway();
+    await expect.poll(chip).toBeUndefined();
+
+    const labelled = await render(<Hourglass value={0.42} label="remaining" title="Trial" />);
+    const lw = labelled.container.querySelector(".mc-hourglass-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
+  });
+
+  // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
+  it("onActive reports the glyph once, then null when the active state clears", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(<Hourglass value={0.42} onActive={(d) => seen.push(d)} />);
+    const wrap = screen.container.querySelector(".mc-hourglass-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("42%");
+    // the datum carries the chip's own string, so a consumer can render it
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 0.42, formatted: chip() });
+    wrap.focus(); // already active — must not re-announce
+    expect(seen.length).toBe(1);
+    // pointerAway before blur — see src/test/pointer.ts (hover+blur order flakes edge counts).
+    await pointerAway();
+    await expect.poll(() => seen.at(-1)).toBeNull();
+    wrap.blur(); // already cleared — must not re-announce
+    expect(seen.length).toBe(2);
   });
 });

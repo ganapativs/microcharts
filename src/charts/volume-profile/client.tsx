@@ -1,11 +1,10 @@
 "use client";
 // Interactive <VolumeProfile>. useActivePicker owns interaction: one pointer
 // listener + the level band containing y, ↑/↓ rove bins (bottom-up index
-// order), click / Enter / Space selects (onSelect). Composes the static
-// component (canon) — the SVG is never re-implemented.
+// order). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -71,10 +70,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   // Shares went through `Math.round(x * 100) + "%"` — a hand-rolled percent that
   // ignores `locale` (fr-FR writes "18 %") and the mass behind it. Both fixed:
   // real formatter, and the magnitude travels with its share.
-  const pctFmt = useMemo(
-    () => makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [locale],
-  );
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const massFmt = useMemo(
     () => makeFormatter(undefined, locale, { notation: "compact" }),
     [locale],
@@ -142,7 +138,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : volumeProfileSummary(geo, valueArea, strings, fmt);
+        : volumeProfileSummary(geo, valueArea, strings, fmt, pctFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const band = (i: number, pinned: boolean) => {

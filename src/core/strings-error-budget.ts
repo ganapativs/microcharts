@@ -1,6 +1,4 @@
-// ErrorBudget summary templates (error-budget) — a separate MODULE (see
-// strings-scalar.ts for the chunk rationale). English lives only in core string
-// modules (canon). Aggregate: core/strings.ts `EN`.
+// ErrorBudget summary templates (error-budget)
 import type { SummaryStrings } from "./summary.js";
 
 export type ErrorBudgetStrings = Pick<

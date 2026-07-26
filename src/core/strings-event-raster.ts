@@ -1,6 +1,5 @@
-// EventRaster summary templates (event-raster) — its OWN module. One tick = one
-// event; a lane switched to binned overflow mode is DISCLOSED, never silent.
-// English lives only in core string modules (canon). Aggregate: core/strings.ts.
+// EventRaster summary templates (event-raster). One tick = one event; a lane switched to
+// binned overflow mode is DISCLOSED, never silent.
 import type { SummaryStrings } from "./summary.js";
 
 export type EventRasterStrings = Pick<

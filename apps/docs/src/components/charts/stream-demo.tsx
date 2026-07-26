@@ -219,9 +219,7 @@ const labeled = (b: string, prefix: string) =>
 // string), inline ones are described by the surrounding sentence. Data is
 // number[], mapped to {label,value}[] for categorical charts, or key=value for
 // composites.
-// Data charts get the site accent so the stream reads vibrant, not monochrome
-// grey; charts that already encode meaning by colour (delta/trend/status/bullet/
-// progress/thermometer, the heat ramp) keep their own semantics.
+// Accent-tint neutral charts; keep semantic colour on delta/trend/status/bullet/etc.
 const TINTED = new Set([
   "sparkline",
   "sparkbar",
@@ -561,36 +559,14 @@ function Message({
   );
 }
 
-// Delay after revealing `last` before the next token.
-//
-// Matched to the hero (stream-vignette.tsx) — one stream speed across the site.
-//
-// The hero advances one WHOLE WORD per tick at a flat 52ms. This page tokenises
-// with /\s+|\S+/g, so a word costs two ticks (the word, then its trailing
-// whitespace) — 38 + 14 lands the same 52ms per word. Both fixed, no jitter:
-// simulated typing noise reads as lag, and it was also half of why the two
-// pages felt like different animations.
-//
-// The clause/comma pauses that used to live here are gone with it. They were
-// defensible when this page ran its own slower cadence, but they are the other
-// half of the mismatch, and the hero proved the reply reads fine without them.
-//
-// History worth keeping: a first attempt at "it feels slow" cut every rate to
-// ~55% of the clock and fixed nothing, because the part that read as *stuck*
-// was the fence hand-off, not the typing. Don't reach for these numbers again
-// for a stall — check the morph first.
+// Match hero (stream-vignette): 52ms/word. Here a word is two ticks (token +
+// trailing whitespace) → 38+14. Stall feel is usually the fence morph, not these rates.
 function nextDelay(last: string | null, next: string): number {
-  if (last === null) return 380; // a beat of "thinking" before the first token
-  if (last.includes("\n\n")) return 140; // paragraph break
-  // A chart just closed. This used to be 560ms of nothing, and .mc-stream-chart
-  // then faded the chart up from opacity 0 through a 3px blur over another
-  // 0.42s — nearly a second where the code had vanished and the chart had not
-  // arrived. The morph is now a 0.26s settle from part-visible, so this only
-  // needs to be the beat that lets the reader see the fence complete. Same
-  // 140ms the hero holds at its own fences.
-  if (last === "```") return 140;
-  if (/^\s+$/.test(next)) return 14; // whitespace
-  return 38; // a word
+  if (last === null) return 380;
+  if (last.includes("\n\n")) return 140;
+  if (last === "```") return 140; // fence → morph settle
+  if (/^\s+$/.test(next)) return 14;
+  return 38;
 }
 
 export function StreamDemo() {

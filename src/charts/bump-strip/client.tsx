@@ -1,7 +1,7 @@
 "use client";
 // Interactive <BumpStrip>. useActivePicker owns interaction: one pointer
 // listener + nearest-x lookup, ←/→/Home/End step periods, click / Enter / Space
-// selects (onSelect). Composes the static component (canon); the focus ring +
+// selects (onSelect).focus ring +
 // persistent pin + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";

@@ -20,21 +20,22 @@ build.
 
 <SizeDistribution />
 
-The interactive catalog lands between **1.88 kB and 6.64 kB** gzip, with a **median of 5.04 kB** — hover, roving
+The interactive catalog lands between **2.17 kB and 6.75 kB** gzip, with a **median of 5.07 kB** — hover, roving
 keyboard focus, select-to-pin, touch scrub, and live announcements from the `/interactive` subpath. The static twin
-lands between **0.97 kB and 3.99 kB**, with a **median of 2.6 kB** — pure SVG, zero client JavaScript. A page pays for
+lands between **1 kB and 4.07 kB**, with a **median of 2.64 kB** — pure SVG, zero client JavaScript. A page pays for
 interactivity only where it actually uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which
 the per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Twenty-five charts sit above the 3 kB static reference line, none of them by more than 0.99 kB. Sparkline, the most
+Twenty-seven charts sit above the 3 kB static reference line, none of them by more than 1.07 kB. Sparkline, the most
 configurable primitive in the set, is the largest; most of the rest are value-series charts that host annotations
 (ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
 SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, ShiftHistogram, StackedArea, ABStrips,
-PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, and TapeGauge. The annotation hosts carry a small shared
-walker that resolves `Threshold`, `Marker`, and the rest against the chart's scale — you pay for it only on those
-charts, and each is still smaller than a single icon font.
+PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, GradedBand and LikertStrip — the last two crossed
+the line when their percent labels moved onto a real `Intl` formatter. The annotation hosts carry a small shared walker
+that resolves `Threshold`, `Marker`, and the rest against the chart's scale — you pay for it only on those charts, and
+each is still smaller than a single icon font.
 
 ### Splitting the stylesheet
 

@@ -1,5 +1,5 @@
 // <EventRaster> — when did each source fire, and do sources fire together, in
-// sequence, or not at all. Static, hook-free, RSC-safe.
+// sequence, or not at all.
 // Vertical banding is the phenomenon; one tick is always one event (the only
 // exception is the disclosed `overflow="bin"` mode).
 import type { CSSProperties, ReactNode } from "react";

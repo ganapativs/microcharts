@@ -1,6 +1,5 @@
-// RubricStrip summary templates (rubric-strip) — its OWN module. The summary
-// names EXTREMES, never a weighted total: the type exists to resist collapsing
-// quality into one number. English lives only in core string modules (canon).
+// RubricStrip summary templates (rubric-strip). The summary names EXTREMES, never a
+// weighted total: the type exists to resist collapsing quality into one number.
 import type { SummaryStrings } from "./summary.js";
 
 export type RubricStrings = Pick<

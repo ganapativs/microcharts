@@ -6,6 +6,7 @@ import {
   SHARED_PROP_NAMES,
   SHARED_INTERACTIVE_NAMES,
   SHARED_INTERACTIVE_PROPS,
+  SHARED_PROPS,
 } from "./charts/shared-props";
 
 // Each chart's prop table (hand-authored in lib/charts/<slug>.tsx) must document
@@ -41,6 +42,29 @@ function interfaceProps(file: string): string[] {
   if (!body) return [];
   return [...body[1]!.matchAll(/^\s*(?:readonly\s+)?([A-Za-z_]\w*)\??\s*:/gm)].map((m) => m[1]!);
 }
+
+// Everything a per-chart table is excused from must be documented SOMEWHERE —
+// the shared grammar / layout / i18n lists render into quickstart, the PropTable
+// footer and catalog.json's `sharedProps`. The only legitimate extras are the
+// structural React props, which are not part of the chart API at all.
+//
+// `size`, `fontSize`, `gap` and `cell` used to sit here undocumented: excused
+// from every per-chart table AND absent from every shared list, so 31 charts had
+// public knobs that appeared nowhere. Re-adding an undocumented name here is
+// that same hole, so this test closes it.
+describe("the shared-prop escape hatch documents what it excuses", () => {
+  it("excuses only documented shared props plus the structural React props", () => {
+    const documented = new Set(SHARED_PROPS.map((p) => p.name));
+    const structural = new Set(["children", "ref", "key"]);
+    const undocumented = [...SHARED_PROP_NAMES].filter(
+      (n) => !documented.has(n) && !structural.has(n),
+    );
+    expect(
+      undocumented,
+      `SHARED_PROP_NAMES hides props no shared list documents: ${undocumented.join(", ")}`,
+    ).toEqual([]);
+  });
+});
 
 describe("chart prop tables cover the component's public props", () => {
   for (const chart of STABLE_CHARTS) {
@@ -103,12 +127,22 @@ describe("interactive-flagged props are interactive-only", () => {
 // has no units to rove between, and nothing above would notice. These guards
 // tie `entry.picker` (the registry's machine-readable split) to the library.
 const PICKER_PROPS = ["onActive", "onSelect", "selectedIndex", "defaultSelectedIndex"] as const;
-/** The picker props that only make sense with more than one navigable unit. */
-const ROVING_PROPS: ReadonlySet<string> = new Set([
-  "onActive",
-  "selectedIndex",
-  "defaultSelectedIndex",
-]);
+/**
+ * The picker props that only make sense with more than one navigable unit.
+ *
+ * `onActive` used to be in here, and that was a category error: it reports that
+ * the HOVERED / FOCUSED unit changed, which a chart with exactly one unit does
+ * every time a pointer enters and leaves it. What is genuinely roving-only is an
+ * INDEX into a unit list — there is nothing for `selectedIndex` to point at when
+ * there is one unit and no cursor to move.
+ *
+ * The distinction is load-bearing for the readout contract: `readout={false}`
+ * plus `datum.formatted` on `onActive` is how a consumer lifts the value out of
+ * the chart into their own KPI card, and that pattern is exactly as useful on a
+ * Progress or a Thermometer as on a Sparkline. Excluding the scalars made it work
+ * on 84 charts and not on 19, for no reason a reader of the API could see.
+ */
+const ROVING_PROPS: ReadonlySet<string> = new Set(["selectedIndex", "defaultSelectedIndex"]);
 
 /** Registry's claim: a multi-unit chart with the shared picker contract. */
 const isPickerChart = (c: (typeof STABLE_CHARTS)[number]) =>

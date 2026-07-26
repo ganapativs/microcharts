@@ -2,7 +2,6 @@
 // Interactive <PairedBars>. useActivePicker owns interaction: one pointer
 // listener + pair-by-category-band lookup — ←/→ (or ↑/↓) rove pairs, announcing
 // each ("East: 940 vs 1,200."); click / Enter / Space selects a pair (onSelect).
-// Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
@@ -131,12 +130,14 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         index: i,
         value: isFiniteValue(d?.value) ? d!.value : null,
         label: d?.label,
-        formatted:
-          d && isFiniteValue(d.value)
-            ? isFiniteValue(d.ref)
+        // Mirrors the chip, em dash and all.
+        formatted: d
+          ? !isFiniteValue(d.value)
+            ? `${d.label}: —`
+            : isFiniteValue(d.ref)
               ? `${d.label}: ${fmt(d.value)} / ${fmt(d.ref)}`
               : `${d.label}: ${fmt(d.value)}`
-            : undefined,
+          : undefined,
       };
     },
     [data, fmt],
@@ -217,7 +218,10 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         {rest.children}
       </StaticPairedBars>
       <LiveRegion>{announced}</LiveRegion>
-      {readout && shownPair && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {/* A pair with no value is still a navigable band and still announces
+          `pairAtEmpty`, so it reads out as an em dash rather than nothing. A
+          missing REF alone keeps the value and drops the second half. */}
+      {readout && shownPair && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={
@@ -226,9 +230,11 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
               : rowReadoutStyle(width / 2, shownPos + bandW / 2, width, height)
           }
         >
-          {isFiniteValue(shownDatum.ref)
-            ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`
-            : `${shownDatum.label}: ${fmt(shownDatum.value)}`}
+          {!isFiniteValue(shownDatum.value)
+            ? `${shownDatum.label}: —`
+            : isFiniteValue(shownDatum.ref)
+              ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`
+              : `${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

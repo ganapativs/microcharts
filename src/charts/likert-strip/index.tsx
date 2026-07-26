@@ -1,6 +1,6 @@
 // <LikertStrip> — does the response lean agree or disagree (S2-ordinal
 // diverging). The center line is the question; everything else is
-// the answer. Static, hook-free, RSC-safe. Neutral is NEVER hidden: `omit`
+// the answer. Neutral is NEVER hidden: `omit`
 // removes it from the bar but the labels/summary always carry it.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
@@ -83,8 +83,10 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
-  // end labels reserve deterministic ch gutters ("100%" worst case = 4 chars)
-  const gutter = likertGutter(wantLabels, fontSize);
+  // End labels reserve deterministic gutters, measured off the widest string this
+  // chart's OWN formatter can produce — `pctFmt(1)` is the 100% case, and it is
+  // one character longer than "100%" in every locale that spaces the sign.
+  const gutter = likertGutter(wantLabels, fontSize, pctFmt(1).length);
   const geo = likertStripGeometry({
     width,
     height,
@@ -107,13 +109,15 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   // must not leave its label floating at the far edge
   const barX0 = geo?.segments.length ? minOf(geo.segments.map((g) => g.x)) : 0;
   const barX1 = geo?.segments.length ? maxOf(geo.segments.map((g) => g.x + g.width)) : width;
-  const estL = 4 * fontSize * 0.62;
+  // the SAME reserve `likertGutter` opened, from the one shared estimator — the
+  // end labels are percentages this chart formatted, so the digits rate holds
+  const est = likertGutter(true, fontSize);
   const leftLabel =
-    barX0 - 4 - estL >= 0
+    barX0 - est >= 0
       ? { x: barX0 - 4, anchor: "end" as const }
       : { x: 1, anchor: "start" as const };
   const rightLabel =
-    barX1 + 4 + estL <= width
+    barX1 + est <= width
       ? { x: barX1 + 4, anchor: "start" as const }
       : { x: width - 1, anchor: "end" as const };
   const barH = Math.max(3, height - 4);

@@ -1,9 +1,8 @@
 "use client";
 // Interactive <BubbleRow>. useActivePicker owns interaction: one pointer
 // listener + nearest-bubble lookup, ←/→ (and ↑/↓) rove the row, click / Enter /
-// Space selects (onSelect). Announces each bubble's exact value — the number the
-// low-precision area channel can't carry. Composes the static component (canon)
-// — the SVG is never re-implemented.
+// Space selects (onSelect). Announces each bubble's exact value — the number
+// low-precision area channel can't carry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";

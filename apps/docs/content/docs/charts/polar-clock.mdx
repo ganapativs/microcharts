@@ -88,6 +88,20 @@ const week = [120, 200, 180, 210, 260, 90, 60];
   />
 </LiveDemo>
 
+## Edge cases
+
+<LiveDemo label="all-null cycle" code={`<PolarClock data={Array(24).fill(null)} title="No data yet" />`}>
+  <PolarClock data={Array(24).fill(null)} title="No data yet" size={56} />
+</LiveDemo>
+
+<LiveDemo label="flat cycle — every hour equal" code={`<PolarClock data={Array(24).fill(50)} title="Steady" />`}>
+  <PolarClock data={Array(24).fill(50)} title="Steady" size={56} />
+</LiveDemo>
+
+## Four homes
+
+<FourContexts slug="polar-clock" />
+
 ## Why this default
 
 The channel is radial **length from the inner baseline**, not sector area. Equal-value bars at the rim span more area
@@ -102,20 +116,6 @@ o'clock" there is no way to tell where the cycle starts, so "when is it busy" ca
 alone. The four ticks are merged into one path (a single node), so the orientation cue is free of the usual
 label-drop-out tradeoff — set `labels={false}` only when the shape itself is the whole story and the axis genuinely
 doesn't matter.
-
-## Edge cases
-
-<LiveDemo label="all-null cycle" code={`<PolarClock data={Array(24).fill(null)} title="No data yet" />`}>
-  <PolarClock data={Array(24).fill(null)} title="No data yet" size={56} />
-</LiveDemo>
-
-<LiveDemo label="flat cycle — every hour equal" code={`<PolarClock data={Array(24).fill(50)} title="Steady" />`}>
-  <PolarClock data={Array(24).fill(50)} title="Steady" size={56} />
-</LiveDemo>
-
-## Four homes
-
-<FourContexts slug="polar-clock" />
 
 ## Accessibility
 

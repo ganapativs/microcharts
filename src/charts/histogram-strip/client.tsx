@@ -1,7 +1,7 @@
 "use client";
 // Interactive <HistogramStrip>. useActivePicker owns interaction: one pointer
-// listener + bin-by-x-band lookup, ←/→ rove bins ("40 to 50: 34 values."),
-// click / Enter / Space pins one (onSelect). Composes the static entry (canon).
+// listener + bin-by-x-band lookup, ←/→ rove bins ("40 to 50: 34 values.").
+// click / Enter / Space pins one (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";

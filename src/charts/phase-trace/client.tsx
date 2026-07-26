@@ -3,7 +3,7 @@
 // distance (which carries a definite time index — spatial interpolation would
 // lie at crossings); arrows step time. useActivePicker owns interaction: one
 // pointer listener + pure nearest-point math, roving keyboard, touch tap-to-pin
-// and the onActive/onSelect contract. Composes the static component (canon).
+// and the onActive/onSelect contract.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

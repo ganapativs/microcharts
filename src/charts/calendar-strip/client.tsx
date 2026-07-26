@@ -2,7 +2,7 @@
 // Interactive <CalendarStrip>. Hover a day or walk the grid in
 // 2-D (←/→ day, ↑/↓ week — ActivityGrid parity); click / Enter / Space selects
 // a day (onSelect). Announces the real calendar day: "Tuesday, June 24: 12."
-// useActivePicker owns interaction; the SVG is the composed static component.
+// useActivePicker owns interaction; the composed static component.
 import { useCallback, useMemo, useRef } from "react";
 import {
   makeFormatter,
@@ -46,8 +46,11 @@ export interface InteractiveCalendarStripProps extends CalendarStripProps, Picke
    *  for the same reason as `format`. */
   locale?: string | string[];
   /**
-   * Opt-in entrance motion (default `false`): cells fade in on first
-   * client-side mount. Inert on the server and on hydrated server HTML;
+   * Opt-in entrance motion (default `false`): cells fade in, staggered, on first
+   * client-side mount. Past 80 cells — about twelve `weeks` — the strip reveals
+   * with one left-to-right wipe instead. The cap is the engine's and deliberate:
+   * a per-cell stagger over hundreds of days costs more in animation tracks than
+   * it returns in legibility. Inert on the server and on hydrated server HTML;
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;

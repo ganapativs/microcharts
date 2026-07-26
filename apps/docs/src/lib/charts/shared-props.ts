@@ -1,20 +1,10 @@
 /**
- * The shared grammar — props whose name means the same thing on every chart, so
- * they're documented ONCE here instead of repeated in every per-chart table.
- *
- * Three consumers read this single source:
- *  - `catalog.json` emits it as a top-level `sharedProps` block so the machine
- *    catalog is a complete reference (not just chart-specific knobs).
- *  - `PropTable`'s footer links here rather than re-listing.
- *  - `prop-parity.test.ts` derives its allow-lists from `SHARED_PROP_NAMES` /
- *    `SHARED_INTERACTIVE_NAMES`, so a prop can never be "shared" in the docs but
- *    still flagged as drift by the guard (or vice-versa).
- *
- * Descriptions mirror quickstart#the-shared-grammar — keep them in sync.
+ * Shared grammar — documented once for `catalog.json`, PropTable footer, and
+ * `prop-parity.test.ts` (`SHARED_PROP_NAMES` / `SHARED_INTERACTIVE_NAMES`).
+ * Descriptions mirror quickstart#the-shared-grammar — keep in sync.
  */
 import type { ChartProp } from "./types";
 
-/** The shared grammar — encoding vocabulary common to the whole catalog. */
 export const GRAMMAR_PROPS: ChartProp[] = [
   {
     name: "data",
@@ -48,7 +38,7 @@ export const GRAMMAR_PROPS: ChartProp[] = [
     type: "string | false",
     required: false,
     description:
-      "Override the auto-generated accessible sentence, or pass `false` to mark the chart decorative.",
+      "Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title`, that marks the chart decorative (hidden from assistive tech).",
   },
   {
     name: "format",
@@ -78,7 +68,6 @@ export const GRAMMAR_PROPS: ChartProp[] = [
   },
 ];
 
-/** Layout / container props every chart accepts. */
 export const LAYOUT_PROPS: ChartProp[] = [
   {
     name: "width",
@@ -113,7 +102,6 @@ export const LAYOUT_PROPS: ChartProp[] = [
   },
 ];
 
-/** Internationalization plumbing — string bundles, shared with `strings`. */
 export const I18N_PROPS: ChartProp[] = [
   {
     name: "locale",
@@ -136,18 +124,7 @@ export const I18N_PROPS: ChartProp[] = [
   },
 ];
 
-/**
- * The shared INTERACTIVE grammar — props that exist only on `/interactive`
- * entries but mean the same thing wherever they appear.
- *
- * `animate` is on every interactive entry whose marks can carry an entrance
- * (`entry.animates === false` marks the ones that can't). `live` is narrower
- * still — only the entries whose value can change under a static cursor
- * declare it. The four picker props
- * (`onActive`, `onSelect`, `selectedIndex`, `defaultSelectedIndex`) come from
- * `PickerProps` and exist only on charts with more than one navigable unit —
- * `entry.picker === false` marks the ones without (see `types.ts`).
- */
+/** Interactive-only shared props — see `types.ts` (`picker` / `animates` flags). */
 export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
   {
     name: "animate",
@@ -179,7 +156,7 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
     required: false,
     interactive: true,
     description:
-      "A unit was activated — click, tap, `Enter` or `Space` — pinning it so it survives blur. `null` when the selection is cleared (re-activating the same unit, or `Escape`). Same `MicroDatum` payload as `onActive`.",
+      "A unit was activated — click, tap, `Enter` or `Space`. On multi-unit pickers this pins the unit so it survives blur (`null` when cleared by re-selecting or `Escape`). On lean scalars there is only one unit, so the callback fires with no pinned state. Same `MicroDatum` payload as `onActive`.",
   },
   {
     name: "selectedIndex",
@@ -207,7 +184,6 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
   },
 ];
 
-/** Everything, in the order the catalog reference should list it. */
 export const SHARED_PROPS: ChartProp[] = [
   ...GRAMMAR_PROPS,
   ...LAYOUT_PROPS,
@@ -216,9 +192,9 @@ export const SHARED_PROPS: ChartProp[] = [
 ];
 
 /**
- * Static-side shared prop names the per-chart guard/table may omit. Superset of
- * the documented grammar: also covers structural props (`children`, `ref`,
- * `key`) and sizing-ish universal knobs treated as layout, not chart-specific.
+ * Static shared names per-chart tables may omit. `size`, `fontSize`, `gap`, `cell`
+ * left this set — not universal and not one meaning across charts; each chart
+ * documents its own row (`prop-parity` enforces).
  */
 export const SHARED_PROP_NAMES: ReadonlySet<string> = new Set([
   ...GRAMMAR_PROPS.map((p) => p.name),
@@ -228,14 +204,8 @@ export const SHARED_PROP_NAMES: ReadonlySet<string> = new Set([
   "children",
   "ref",
   "key",
-  // sizing-ish universal knobs treated as layout, not chart-specific
-  "size",
-  "fontSize",
-  "gap",
-  "cell",
 ]);
 
-/** Interactive-only shared prop names — documented once, omitted per chart. */
 export const SHARED_INTERACTIVE_NAMES: ReadonlySet<string> = new Set(
   SHARED_INTERACTIVE_PROPS.map((p) => p.name),
 );

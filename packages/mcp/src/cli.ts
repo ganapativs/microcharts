@@ -2,11 +2,7 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./server";
 
-/**
- * The stdio entry point (`npx @microcharts/mcp`). A client (Claude Desktop,
- * Cursor, …) spawns this process and speaks MCP over stdin/stdout. Nothing is
- * hosted; it runs on the user's machine.
- */
+/** stdout is JSON-RPC only — no logging on stdout. */
 async function main(): Promise<void> {
   const server = createServer();
   await server.connect(new StdioServerTransport());

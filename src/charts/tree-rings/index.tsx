@@ -1,8 +1,7 @@
 // <TreeRings> — how growth accumulated, period over period (S1, flagship).
 // Radial ring THICKNESS ∝ per-period value, oldest at the centre. The
 // channel is thickness, never area (equal thickness at a larger radius spans more
-// area — the ring illusion). Static, hook-free, RSC-safe.
-//
+// area — the ring illusion).
 // NOTE: the spec named the render variant `style`, but every chart
 // exposes `style?: CSSProperties`; the knob ships as `rings` here to keep it.
 import type { CSSProperties, ReactNode } from "react";
@@ -190,7 +189,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
                 cy={geo.center.cy}
                 r={accentRing.rOuter}
                 fill="none"
-                style={{ stroke: paint, strokeWidth: "calc(var(--mc-stroke-width) * 1.5)" }}
+                style={{ stroke: paint, strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
               />
             ) : null,
           ]}

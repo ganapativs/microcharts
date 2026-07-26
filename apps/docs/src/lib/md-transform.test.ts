@@ -78,11 +78,48 @@ describe("expandComponents", () => {
     expect(out).not.toContain("<LiveDemo");
   });
 
+  // `Playground`, `Sizing` and `FourContexts` are interactive shells whose JSX is
+  // the most useful thing on a chart page, so the mirror keeps the code and drops
+  // only the live preview. (This case used `<Playground>` as the stand-in for a
+  // stripped visual before those projections existed — it now fills its heading,
+  // so the emptied-heading case moved to a genuinely visual-only component.)
+  it("projects <Playground> to the chart's snippet", () => {
+    const out = expandComponents(`## Try it\n\n<Playground chart="sparkline" />`);
+    expect(out).toContain("## Try it");
+    expect(out).toContain("```tsx");
+    expect(out).toContain('import { Sparkline } from "@microcharts/react/sparkline/interactive"');
+    expect(out).not.toContain("<Playground");
+  });
+
+  it("projects <Sizing> to labelled recipe blocks", () => {
+    const out = expandComponents(`## Sizing\n\n<Sizing chart="sparkline" />`);
+    expect(out).toContain("**fixed size**");
+    expect(out).toContain("<Sparkline data={[3, 5, 4, 8, 6, 9]} width={200} height={48} />");
+    expect(out).not.toContain("<Sizing");
+  });
+
+  it("projects <FourContexts> to the four labelled placements", () => {
+    const out = expandComponents(`## Four homes\n\n<FourContexts slug="sparkline" />`);
+    for (const label of [
+      "**In a sentence**",
+      "**In a table cell**",
+      "**In a KPI card**",
+      "**In a tab header**",
+    ]) {
+      expect(out).toContain(label);
+    }
+    expect(out).not.toContain("<FourContexts");
+  });
+
+  it("drops an unresolvable projection, and its now-empty heading with it", () => {
+    const out = expandComponents(`## Try it\n\n<Playground chart="not-a-chart" />`);
+    expect(out).not.toContain("<Playground");
+    expect(out).toBe("");
+  });
+
   it("drops a heading emptied by a stripped visual, keeps deeper subsections", () => {
-    const out = expandComponents(
-      `## Try it\n\n<Playground chart="delta" />\n\n## When to use it\n\nProse.`,
-    );
-    expect(out).not.toContain("## Try it"); // emptied → removed
+    const out = expandComponents(`## Watch it\n\n<StreamDemo />\n\n## When to use it\n\nProse.`);
+    expect(out).not.toContain("## Watch it"); // emptied → removed
     expect(out).toContain("## When to use it");
     // a heading followed by a deeper subheading is preserved
     const nested = expandComponents(`## Section\n\n### Sub\n\nBody.`);

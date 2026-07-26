@@ -1,8 +1,8 @@
-// ForecastCone geometry — pure, React-free. Will we land where we
+// ForecastCone: Will we land where we
 // need to? History as a solid line, then a fan of prediction bands (p80, p50)
 // widening over the horizon with a DASHED median (an estimate never renders as
 // fact). The fan's whole honesty is visible confidence decay, so: at most 2
-// bands (50/80 — a 95% band reads as false tail confidence at micro scale), the
+// bands (50/80 — a 95% band reads as false tail confidence at micro scale). the
 // mid is always dashed, and non-widening input is flagged, never auto-inflated.
 // Coords 2-dp, integer viewBox.
 import { linePath } from "../../core/path.js";

@@ -24,6 +24,7 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/trend-arrow`,
   interactiveImport: `${PKG}/trend-arrow/interactive`,
   picker: false,
+  readout: false,
   dataShape: "number (signed change)",
   encoding: {
     channel: "glyph orientation (up / down / flat)",

@@ -1,7 +1,5 @@
-// QueueDepth summary templates (queue-depth) — its OWN module (see
-// strings-scalar.ts for the chunk rationale). Backlog stock vs capacity: is the
-// queue draining or growing? English lives only in core string modules (canon).
-// Aggregate: core/strings.ts `EN`.
+// QueueDepth summary templates (queue-depth). Backlog stock vs capacity: is the queue
+// draining or growing?
 import type { SummaryStrings } from "./summary.js";
 
 export type QueueDepthStrings = Pick<

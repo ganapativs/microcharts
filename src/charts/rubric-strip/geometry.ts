@@ -1,4 +1,4 @@
-// RubricStrip geometry — pure, React-free. Stacked
+// RubricStrip: Stacked
 // horizontal mini-bars: bar THICKNESS = weight share of the height, bar LENGTH =
 // score on a shared domain (zero-anchored). No composite/total bar exists and
 // none may be added — the type structurally resists collapsing quality into one

@@ -53,6 +53,12 @@ export const entry: ChartEntry = {
       required: false,
       description: "Draw the reservoir bulb (default true).",
     },
+    {
+      name: "fontSize",
+      type: "number",
+      required: false,
+      description: "Type size of the tick and value numerals, in viewBox units (default 8).",
+    },
   ],
   demo: [72],
   example: {

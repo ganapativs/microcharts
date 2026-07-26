@@ -3,12 +3,6 @@ import { BalanceBeam } from "@microcharts/react/balance-beam";
 import { BalanceBeam as BalanceBeamInteractive } from "@microcharts/react/balance-beam/interactive";
 import staticModule, { playground as staticPlayground, FLOW } from "./balance-beam";
 
-/** Interactive half of the balance-beam chart module — the ONLY place that imports
- *  this chart's `…/interactive` ('use client') entry. Kept out of `./balance-beam`
- *  so the server-side registry can reach the static module without turning all
- *  106 interactive twins into eager client references. Reached exclusively
- *  through the lazy maps (`modules.generated`, `preview-live.generated`). */
-
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
   return (
     <span className="inline-flex items-center gap-4">

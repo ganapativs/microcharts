@@ -1,8 +1,7 @@
 // <DataDiff> — what changed between two versions? One diverging
-// bar per key: removed leftward (--mc-neg), added rightward (--mc-pos), both
+// bar per key: removed leftward (--mc-neg). added rightward (--mc-pos). both
 // ALWAYS drawn on one symmetric shared scale. Net is a summary tick, never a
 // replacement for the two bars (a +500/−480 churn must never look like +20/−0).
-// Static, hook-free, RSC-safe.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
@@ -10,7 +9,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
-import { dataDiffGeometry, type DataDiffGeometry } from "./geometry.js";
+import { dataDiffGeometry, dataDiffGutter, type DataDiffGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 import { maxOf } from "../../core/scale.js";
 
@@ -100,14 +99,16 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   const rowH = nRows > 0 ? (height - 2 * pad - footerH) / nRows : 0;
   // a text glyph box measures ~1.6× its fontSize tall, so a tag must be ≤ half
   // the row pitch to never touch its neighbour; only draw tags with real room
-  const showTags = labels && rowH >= 10;
-  const tagFont = showTags ? Math.max(5, Math.min(FONT, Math.floor(rowH * 0.5))) : FONT;
-  const gutterCh = showTags
-    ? maxOf(
-        data.map((d) => d.key.length),
-        0,
-      )
-    : 0;
+  const keyChars = maxOf(
+    data.map((d) => d.key.length),
+    0,
+  );
+  const fitFont = Math.max(5, Math.min(FONT, Math.floor(rowH * 0.5)));
+  // …and horizontally the widest key is the budget: past its share of the box the
+  // tags drop, and their gutter drops with them (`dataDiffGutter` returns 0).
+  const showTags = labels && rowH >= 10 && dataDiffGutter(keyChars, fitFont, width) > 0;
+  const tagFont = showTags ? fitFont : FONT;
+  const gutterCh = showTags ? keyChars : 0;
 
   // A stack of diverging rows has no floor — added/removed grow sideways from a
   // shared vertical axis — so the row band centres on the cap band. It is the

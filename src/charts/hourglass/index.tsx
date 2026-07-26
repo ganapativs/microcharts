@@ -1,9 +1,10 @@
 // <Hourglass> — how much time is gone AND how much remains, the two-sided story
 // Progress can't tell. Sand area splits top (remaining) /
-// bottom (elapsed), both AREA-TRUE. The stream is a binary "running" state mark,
-// only while 0<value<1 — never animated in the static entry. Static, hook-free.
+// bottom (elapsed). both AREA-TRUE. The stream is a binary "running" state mark,
+// only while 0<value<1 — never animated in the static entry.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
+import { makePercentFormatter } from "../../core/format.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
 import { hourglassGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -20,6 +21,7 @@ export interface HourglassProps {
   width?: number | undefined;
   height?: number | undefined;
   fontSize?: number | undefined;
+  locale?: string | string[] | undefined;
   strings?: HourglassStrings | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
@@ -31,9 +33,29 @@ export interface HourglassProps {
 
 const PAD = 1;
 
-export function hourglassSummary(value: number, strings: HourglassStrings = EN_HOURGLASS): string {
+/**
+ * A whole percent as rendered text — a real `Intl` percent, not `${n}%`, which is
+ * an en-US percent (fr-FR wants a NBSP before the sign, tr-TR puts the sign
+ * first). Takes the WHOLE percent rather than the fraction so elapsed and
+ * remaining are rounded once and still sum to 100.
+ *
+ * `locale` comes from the chart's own prop, so a server render and its client
+ * hydration produce the same string instead of each resolving its host default.
+ * Trailing and optional: callers that never localized keep compiling. Exported
+ * so the interactive entry's hover chip reads the SAME string the `label`
+ * numeral prints.
+ */
+export function hourglassPct(whole: number, locale?: string | string[] | undefined): string {
+  return makePercentFormatter(locale)(whole / 100);
+}
+
+export function hourglassSummary(
+  value: number,
+  strings: HourglassStrings = EN_HOURGLASS,
+  locale?: string | string[] | undefined,
+): string {
   const e = Math.round((Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0) * 100);
-  return strings.hourglass(`${e}%`, `${100 - e}%`);
+  return strings.hourglass(hourglassPct(e, locale), hourglassPct(100 - e, locale));
 }
 
 export function Hourglass(props: HourglassProps): ReactNode {
@@ -44,6 +66,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
     color,
     height = 24,
     fontSize = 8,
+    locale,
     strings = EN_HOURGLASS,
     title,
     summary,
@@ -54,17 +77,22 @@ export function Hourglass(props: HourglassProps): ReactNode {
   } = props;
 
   const e = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
-  const pct = label === "remaining" ? 100 - Math.round(e * 100) : Math.round(e * 100);
+  const pct = hourglassPct(
+    label === "remaining" ? 100 - Math.round(e * 100) : Math.round(e * 100),
+    locale,
+  );
   const showLabel = label !== "none";
-  // 0.72 em/char (not 0.62): the % glyph is wide and under-reserves at 0.62
-  const gutter = showLabel ? Math.ceil(`${pct}%`.length * 0.72 * fontSize + 3) : 0;
+  // 0.72 em/char (not 0.62): the % glyph is wide and under-reserves at 0.62.
+  // Measured off the FORMATTED string, so a locale that adds a NBSP before the
+  // sign widens the gutter with it instead of spilling the numeral onto the page.
+  const gutter = showLabel ? Math.ceil(pct.length * 0.72 * fontSize + 3) : 0;
   // The glass box tracks height so the instrument keeps a natural hourglass
   // proportion at ANY size — a fixed width made tall demos read as a thin sliver.
   const boxW = props.width ?? Math.max(12, Math.round(height * 0.66));
   const width = boxW + gutter;
 
   const geo = hourglassGeometry({ value, width: boxW, height, pad: PAD });
-  const accName = resolveSummary(summary, () => hourglassSummary(value, strings));
+  const accName = resolveSummary(summary, () => hourglassSummary(value, strings, locale));
 
   return (
     <Chart
@@ -129,7 +157,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
           textAnchor="start"
           data-mc-ink="label"
         >
-          {`${pct}%`}
+          {pct}
         </text>
       ) : null}
       {children}
