@@ -1,5 +1,18 @@
 # @microcharts/mcp
 
+## 0.1.4
+
+### Patch Changes
+
+- [#78](https://github.com/ganapativs/microcharts/pull/78)
+  [`3766e86`](https://github.com/ganapativs/microcharts/commit/3766e8620e9d29547b568dbb81a5cf597ac1aa33) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-embed the stylesheet so rendered SVGs carry the updated readout
+  rules. No API or tool-surface change — the server inlines `styles.css`, so it needs a release whenever that file
+  changes or npm keeps serving the previous snapshot.
+- Updated dependencies
+  [[`3766e86`](https://github.com/ganapativs/microcharts/commit/3766e8620e9d29547b568dbb81a5cf597ac1aa33)]:
+  - @microcharts/react@0.9.0
+
 ## 0.1.3
 
 ### Patch Changes
