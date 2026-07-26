@@ -505,8 +505,11 @@ function Message({
   nodes: Node[];
   animate: boolean;
   streaming?: boolean;
-  /** Token counter — keys the fading tail so it replays once per token. Keying
-   *  on the tail's text would skip the fade whenever a word repeats. */
+  /** WORD counter (not token) — keys the fading tail so it replays exactly once
+   *  per word. Pass the raw token count and every word fades twice, because the
+   *  trailing-whitespace token bumps the key while the tail is still that same
+   *  word. Keying on the tail's text instead would skip the fade whenever a
+   *  word repeats. */
   tick?: number;
 }) {
   const lastText = streaming && nodes.length > 0 && nodes[nodes.length - 1]?.t === "text";
@@ -553,28 +556,34 @@ function Message({
 
 // Delay after revealing `last` before the next token.
 //
-// This page keeps the realistic cadence — the stream IS the subject here, so
-// clause pauses are content, not decoration.
+// Matched to the hero (stream-vignette.tsx) — one stream speed across the site.
 //
-// A first attempt at "it feels slow" cut every rate to ~55% of the clock. That
-// diagnosed the wrong thing: replies did run long (14–21s across the five
-// scripts), but the part that read as *stuck* was the fence hand-off, not the
-// typing, and at 55% the prose became too quick to follow. So the word rates
-// come back up to ~83% of original, and the one value that actually drops is
-// the closing-fence hold — see below.
+// The hero advances one WHOLE WORD per tick at a flat 52ms. This page tokenises
+// with /\s+|\S+/g, so a word costs two ticks (the word, then its trailing
+// whitespace) — 38 + 14 lands the same 52ms per word. Both fixed, no jitter:
+// simulated typing noise reads as lag, and it was also half of why the two
+// pages felt like different animations.
+//
+// The clause/comma pauses that used to live here are gone with it. They were
+// defensible when this page ran its own slower cadence, but they are the other
+// half of the mismatch, and the hero proved the reply reads fine without them.
+//
+// History worth keeping: a first attempt at "it feels slow" cut every rate to
+// ~55% of the clock and fixed nothing, because the part that read as *stuck*
+// was the fence hand-off, not the typing. Don't reach for these numbers again
+// for a stall — check the morph first.
 function nextDelay(last: string | null, next: string): number {
   if (last === null) return 380; // a beat of "thinking" before the first token
-  if (last.includes("\n\n")) return 250; // paragraph break
+  if (last.includes("\n\n")) return 140; // paragraph break
   // A chart just closed. This used to be 560ms of nothing, and .mc-stream-chart
   // then faded the chart up from opacity 0 through a 3px blur over another
   // 0.42s — nearly a second where the code had vanished and the chart had not
   // arrived. The morph is now a 0.26s settle from part-visible, so this only
-  // needs to be the beat that lets the reader see the fence complete.
-  if (last === "```") return 200;
-  if (/[.:;!?]$/.test(last)) return 145 + Math.random() * 110; // end of a clause
-  if (last.endsWith(",")) return 110 + Math.random() * 70;
-  if (/^\s+$/.test(next)) return 16 + Math.random() * 25; // whitespace flicks by
-  return 46 + Math.random() * 70; // a word
+  // needs to be the beat that lets the reader see the fence complete. Same
+  // 140ms the hero holds at its own fences.
+  if (last === "```") return 140;
+  if (/^\s+$/.test(next)) return 14; // whitespace
+  return 38; // a word
 }
 
 export function StreamDemo() {
@@ -654,6 +663,15 @@ export function StreamDemo() {
 
   const revealed = useMemo(() => tokens.slice(0, count).join(""), [tokens, count]);
   const nodes = useMemo(() => parse(revealed), [revealed]);
+  // Words revealed, not tokens — this keys the tail fade. Tokens alternate
+  // word / whitespace, so keying on `count` re-mounted the fading span twice
+  // per word: once when the word landed, then again ~14ms later when its
+  // trailing space did (splitTail looks past a trailing space, so the tail is
+  // still that same word). Two fades a few frames apart is the flicker.
+  const wordTick = useMemo(
+    () => tokens.slice(0, count).reduce((n, t) => n + (/\S/.test(t) ? 1 : 0), 0),
+    [tokens, count],
+  );
   const done = count >= total;
   const status = done ? "streamed" : running && count === 0 ? "thinking…" : "streaming…";
   const ghost = useMemo(() => <Message nodes={fullNodes} animate={false} />, [fullNodes]);
@@ -708,7 +726,7 @@ export function StreamDemo() {
             {ghost}
           </div>
           <div className="absolute inset-0">
-            <Message nodes={nodes} animate streaming={!done} tick={count} />
+            <Message nodes={nodes} animate streaming={!done} tick={wordTick} />
           </div>
         </div>
       </div>
