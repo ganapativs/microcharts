@@ -514,14 +514,22 @@ function Message({ nodes, animate, caret }: { nodes: Node[]; animate: boolean; c
 }
 
 // Delay after revealing `last` before the next token.
+//
+// This page keeps the realistic cadence — the stream IS the subject here, so
+// clause pauses and the hold on a closing fence are content, not decoration.
+// What it does not need is the *duration*: at the old rates a reply ran 14–21s
+// (measured across the five scripts), long enough that a reader who arrives
+// mid-stream reads it as hung. Every rate below is the same rhythm at roughly
+// 55% of the clock — replies now land in 8–12s. The relative proportions are
+// unchanged, so the texture survives.
 function nextDelay(last: string | null, next: string): number {
-  if (last === null) return 450; // a beat of "thinking" before the first token
-  if (last.includes("\n\n")) return 300; // paragraph break
-  if (last === "```") return 560; // a chart just closed → let it morph in
-  if (/[.:;!?]$/.test(last)) return 200 + Math.random() * 150; // end of a clause
-  if (last.endsWith(",")) return 140 + Math.random() * 90;
-  if (/^\s+$/.test(next)) return 20 + Math.random() * 30; // whitespace flicks by
-  return 55 + Math.random() * 85; // a word
+  if (last === null) return 320; // a beat of "thinking" before the first token
+  if (last.includes("\n\n")) return 200; // paragraph break
+  if (last === "```") return 380; // a chart just closed → let it morph in
+  if (/[.:;!?]$/.test(last)) return 120 + Math.random() * 90; // end of a clause
+  if (last.endsWith(",")) return 90 + Math.random() * 55;
+  if (/^\s+$/.test(next)) return 10 + Math.random() * 16; // whitespace flicks by
+  return 30 + Math.random() * 45; // a word
 }
 
 export function StreamDemo() {

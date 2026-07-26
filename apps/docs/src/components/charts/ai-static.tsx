@@ -62,7 +62,7 @@ function Mark({ name }: { name: string }) {
  */
 export function ProviderWall({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="panel not-prose my-6 flex flex-col overflow-hidden">
+    <div className="panel-soft not-prose my-6 flex flex-col overflow-hidden">
       {PROVIDER_GROUPS.map((g) => {
         const lead = compact ? g.names.slice(0, g.lead) : g.names;
         const tail = compact ? g.names.slice(g.lead) : [];

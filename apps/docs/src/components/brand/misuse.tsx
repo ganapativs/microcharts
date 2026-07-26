@@ -77,9 +77,9 @@ const MISUSE = [
 export function BrandMisuse() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="04">Don’t</SectionMark>
+      <SectionMark>Don’t</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">Protect the read.</h2>
+        <h2 className="display text-[length:var(--text-fluid-h2)]">What not to do with it</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
           Recolor cells, invert fills, rotate, stretch, add effects, or reflow the grid. Each one
           breaks the encoding the mark shares with the charts.
@@ -87,7 +87,7 @@ export function BrandMisuse() {
       </Reveal>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {MISUSE.map((d, i) => (
-          <Reveal key={d.label} delay={i * 35} className="glass flex flex-col overflow-hidden">
+          <Reveal key={d.label} delay={i * 35} className="panel-soft flex flex-col overflow-hidden">
             <div className="bk-stage relative min-h-[6.5rem]" data-tile="light">
               <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden>
                 {d.svg}

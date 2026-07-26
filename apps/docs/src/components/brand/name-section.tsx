@@ -8,16 +8,16 @@ import { SectionMark } from "@/components/brand/shared";
 export function BrandNameSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="07">The name</SectionMark>
+      <SectionMark>The name</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">One lowercase word.</h2>
+        <h2 className="display text-[length:var(--text-fluid-h2)]">Writing the name</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
           Always “microcharts,” even at the start of a sentence. Never MicroCharts, micro charts, or
           µcharts.
         </p>
       </Reveal>
       <div className="grid items-stretch gap-3 lg:grid-cols-2">
-        <Reveal className="panel flex h-full flex-col gap-5 p-7">
+        <Reveal className="panel-soft flex h-full flex-col gap-5 p-7">
           <div className="flex items-center gap-3">
             <Brandmark size={30} />
             <span className="text-2xl font-semibold leading-none tracking-[-0.01em] text-fd-foreground">
@@ -29,7 +29,7 @@ export function BrandNameSection() {
             <li>Don’t redraw the wordmark. Use the shipped lockup.</li>
           </ul>
         </Reveal>
-        <Reveal delay={80} className="panel flex h-full flex-col overflow-hidden p-0">
+        <Reveal delay={80} className="panel-soft flex h-full flex-col overflow-hidden p-0">
           <dl className="grid h-full min-h-[8.25rem] grid-rows-3 divide-y divide-hairline">
             {[
               { k: "Name", v: "microcharts", cmd: false },

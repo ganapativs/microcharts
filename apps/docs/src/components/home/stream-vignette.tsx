@@ -487,7 +487,7 @@ export function StreamVignette({
     };
   }, [total, startDelay]);
 
-  // Advance one atom at a time.
+  // Advance one atom at a time, at a fixed cadence (see the delay below).
   useEffect(() => {
     if (mode !== "tour") return;
     if (!running || pos >= total) {
@@ -506,13 +506,21 @@ export function StreamVignette({
       }
       acc += n;
     }
+    // Even cadence, not simulated typing. The hero used to jitter each word
+    // (26 + random*42) to imitate a real token stream; on a fold the reader
+    // only ever sees once, that stutter reads as lag rather than realism.
+    // Fixed rates instead — the reveal glides. Two rates, not one: a text atom
+    // is a whole word and a grammar atom is a single character, so one shared
+    // rate would either strobe the prose or crawl through the backticks.
+    // /docs/ai keeps the realistic pacing; that page is about the stream
+    // itself, so the texture is the content there.
+    // Grammar runs at 4ms/char, not 9. The fenced blocks are the long ones
+    // (the mini-bar fence is ~106 chars) and at 9ms they crawled for a full
+    // second while nothing else on the fold moved — that was the "stuck" beat,
+    // not the prose. 4ms keeps the block legible as it lands and cuts a
+    // scenario from 4.1s to 3.1s.
     const closing = inSeg === atomCount(seg) - 1;
-    const delay =
-      seg.kind === "chart"
-        ? closing
-          ? 360 // morph hold
-          : 9
-        : 26 + Math.random() * 42;
+    const delay = seg.kind === "chart" ? (closing ? 200 : 4) : 34;
     const t = window.setTimeout(() => setPos((p) => p + 1), delay);
     return () => window.clearTimeout(t);
   }, [running, pos, total, active, mode]);
@@ -594,7 +602,7 @@ export function StreamVignette({
   const streaming = pos < total;
 
   return (
-    <div ref={hostRef} className="panel overflow-hidden">
+    <div ref={hostRef} className="panel-soft overflow-hidden">
       <div className="flex min-h-11 items-center justify-between border-b border-hairline py-1.5 pl-4 pr-2">
         <span className="flex items-baseline gap-2 leading-none">
           <span className="mono-label leading-none">assistant reply</span>

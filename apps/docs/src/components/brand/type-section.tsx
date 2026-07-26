@@ -5,7 +5,7 @@ const TYPE_FACES = [
   {
     cls: "display text-5xl",
     specimen: "Ag",
-    name: "Bricolage Grotesque",
+    name: "Mona Sans",
     role: "Display",
     use: "Titles, hero, section headings.",
   },
@@ -28,9 +28,9 @@ const TYPE_FACES = [
 export function BrandTypeSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="06">Type</SectionMark>
+      <SectionMark>Type</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">Three voices. One system.</h2>
+        <h2 className="display text-[length:var(--text-fluid-h2)]">The three typefaces</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
           Display for titles, grotesk for reading, mono for measurement. Same trio as the rest of
           the site.
@@ -41,7 +41,7 @@ export function BrandTypeSection() {
           <Reveal
             key={t.name}
             delay={i * 50}
-            className="glass flex h-full flex-col gap-4 px-5 py-6"
+            className="panel-soft flex h-full flex-col gap-4 px-5 py-6"
           >
             <div className={t.cls + " text-fd-foreground"}>{t.specimen}</div>
             <div className="mt-auto border-t border-hairline pt-4 leading-5">

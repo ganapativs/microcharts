@@ -27,7 +27,7 @@ const SURFACES = [
   },
   {
     path: "/agent-setup.md",
-    note: "the whole setup as one prompt - install, conventions, first chart",
+    note: "the whole setup as one prompt: install, conventions, first chart",
   },
 ] as const;
 
@@ -73,68 +73,20 @@ const CASES: readonly Case[] = [
 
 const PROVIDER_COUNT = PROVIDER_GROUPS.reduce((n, g) => n + g.names.length, 0);
 
-/** The three tools the MCP server registers, in call order. */
-const MCP_TOOLS = ["find_microchart", "get_microchart", "render_microchart"] as const;
-
-/**
- * The band's third verb. Everything above it is a model *emitting* charts into a
- * surface you control, and the surfaces panel is a model *reading* the API; this
- * is a model *calling* them, for the surfaces you don't control.
- *
- * Deliberately the same `$ command` / `→ note` idiom as the surfaces panel above
- * rather than a new shape — the band already has a grammar, and a third
- * invention would read as three unrelated cards. The page still climaxes on the
- * examples, not here.
- */
-function CallItRow() {
-  return (
-    <div className="mt-10">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <h3 className="font-medium text-fd-foreground">
-          Callable, where the surface can&rsquo;t run React.
-        </h3>
-        <a href="/docs/mcp" className="link-underline text-[0.8rem] text-fd-muted-foreground">
-          MCP server
-        </a>
-      </div>
-      <div className="panel mt-3 overflow-hidden">
-        <div className="flex items-center border-b border-hairline px-4 py-2.5">
-          <span className="mono-label">call it · mcp</span>
-        </div>
-        <ul className="space-y-4 px-5 py-5 font-mono text-[0.8rem] leading-relaxed">
-          <li>
-            <span className="text-fd-foreground">
-              <span aria-hidden className="text-fd-primary">
-                ${" "}
-              </span>
-              npx -y @microcharts/mcp
-            </span>
-            <p className="mt-0.5 pl-4 text-fd-muted-foreground">→ {MCP_TOOLS.join(" · ")}</p>
-          </li>
-        </ul>
-      </div>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-fd-muted-foreground">
-        For surfaces with nothing to render React - a desktop assistant, a terminal, an email draft
-        - the MCP server picks the right chart and returns a finished SVG, alt text attached.
-      </p>
-    </div>
-  );
-}
-
 export function HomeModelsSection() {
   return (
-    <section className="dark hv-band py-14 text-fd-foreground">
+    <section className="dark hv-band py-16 text-fd-foreground">
       <div className="mx-auto max-w-shell px-4 sm:px-6">
-        <SectionMark n="04">made for models</SectionMark>
+        <SectionMark>made for models</SectionMark>
 
         <Reveal>
           <h2 className="display max-w-2xl text-[length:var(--text-fluid-h2)]">
-            Text is the wire format.
+            Charts arrive as plain text
           </h2>
           <p className="mt-4 max-w-2xl text-fd-muted-foreground">
-            A reply streams as plain text, and each chart block becomes the shipped component the
-            moment it closes. It works wherever your models write: {PROVIDER_COUNT} assistants,
-            coding agents, and SDKs, no adapter in between.
+            A streamed reply is ordinary text until a chart fence closes; at that moment the block
+            becomes the shipped component. Works with any of the {PROVIDER_COUNT} tools below, and
+            anything else that writes text.
           </p>
         </Reveal>
 
@@ -144,8 +96,8 @@ export function HomeModelsSection() {
 
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
           <Reveal delay={120}>
-            <h3 className="font-medium text-fd-foreground">The docs, in model-ready form.</h3>
-            <div className="panel mt-3 overflow-hidden">
+            <h3 className="font-medium text-fd-foreground">Docs a model can read whole</h3>
+            <div className="panel-soft mt-3 overflow-hidden">
               <div className="flex items-center border-b border-hairline px-4 py-2.5">
                 <span className="mono-label">machine surfaces</span>
               </div>
@@ -165,35 +117,53 @@ export function HomeModelsSection() {
                     <p className="mt-0.5 pl-4 text-fd-muted-foreground">→ {s.note}</p>
                   </li>
                 ))}
+                {/* The MCP server rides the same $-command idiom instead of
+                    getting its own sub-section (2026-07 density pass). The
+                    tool names stay literal — mcp-docs.test.ts holds this row
+                    to the server's real registrations. */}
+                <li>
+                  <a
+                    href="/docs/mcp"
+                    className="group inline-flex items-center gap-1.5 text-fd-foreground no-underline hover:text-fd-primary"
+                  >
+                    <span aria-hidden className="text-fd-primary">
+                      $
+                    </span>
+                    npx -y @microcharts/mcp
+                    <ArrowUpRight className="size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </a>
+                  <p className="mt-0.5 pl-4 text-fd-muted-foreground">
+                    → find_microchart · get_microchart · render_microchart, finished SVGs for
+                    surfaces that can&rsquo;t run React
+                  </p>
+                </li>
               </ul>
             </div>
             {/* The highest-intent action on this band, one click instead of a
                 URL you have to know exists: the canonical setup prompt, onto
                 the clipboard. */}
-            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="mt-4">
               <CopyAgentSetup />
-              <p className="mono-label opacity-60">
-                kept in sync with package.json#exports, gated by tests
-              </p>
             </div>
           </Reveal>
 
           <Reveal delay={160}>
-            <h3 className="font-medium text-fd-foreground">Safe to emit, even mid-stream.</h3>
-            <div className="panel mt-3 overflow-hidden">
+            <h3 className="font-medium text-fd-foreground">
+              Bad data degrades, it doesn&rsquo;t crash
+            </h3>
+            <div className="panel-soft mt-3 overflow-hidden">
               <div className="flex items-center border-b border-hairline px-4 py-2.5">
-                <span className="mono-label">malformed in · rendered + described out</span>
+                <span className="mono-label">hostile input, rendered anyway</span>
               </div>
               <ul>
-                {CASES.map((c, i) => {
+                {CASES.map((c) => {
                   // The chart's accessible name and the visible sentence are
                   // the SAME describeSeries call, by construction.
                   const summary = describeSeries(c.data);
                   return (
                     <li
                       key={String(c.data)}
-                      className="hx-stagger flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-hairline px-4 py-2.5 first:border-t-0"
-                      style={{ "--i": i } as React.CSSProperties}
+                      className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-hairline px-4 py-2.5 first:border-t-0"
                     >
                       <code className="w-[8.5rem] shrink-0 font-mono text-[0.75rem] leading-tight text-fd-foreground">
                         {c.literal}
@@ -215,19 +185,12 @@ export function HomeModelsSection() {
                 })}
               </ul>
             </div>
-            <p className="mono-label mt-3 opacity-60">
-              no try/catch on this page · documented edge cases, verified in the test suite
-            </p>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-fd-muted-foreground">
-              A model mid-reply can&rsquo;t promise clean numbers - bad values degrade to documented
-              behavior, never to a crash in the reply.
+              A model mid-reply will sometimes emit NaN, Infinity, or an empty array. Each case
+              renders something sensible, with no try/catch on this page.
             </p>
           </Reveal>
         </div>
-
-        <Reveal delay={200}>
-          <CallItRow />
-        </Reveal>
       </div>
     </section>
   );

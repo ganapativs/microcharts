@@ -13,10 +13,13 @@
   --font-mono: var(--font-mono-src), ui-monospace, "SF Mono", monospace;
   --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
 
-  /* Fluid type ramp for the marketing surface. Trimmed ~12% 2026-07-25 (user:
-     headings read oversized across home/charts/examples/brand). */
-  --text-fluid-hero: clamp(2.45rem, 1.4rem + 4.8vw, 5.1rem);
-  --text-fluid-h2: clamp(1.6rem, 1.05rem + 2.1vw, 2.65rem);
+  /* Fluid type ramp for the marketing surface. Pulled down to the docs scale
+     2026-07-26: a doc title is 2.15rem/500, and the marketing pages were
+     running a full step above it, which is most of why they read synthetic.
+     The h2 ceiling now lands just under the doc title, so a section heading is
+     never louder than the page it links to. */
+  --text-fluid-hero: clamp(2.1rem, 1.4rem + 2.9vw, 3.2rem);
+  --text-fluid-h2: clamp(1.5rem, 1.12rem + 1.5vw, 2.2rem);
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -582,13 +585,16 @@ body {
 
 /* ---- Identity primitives ------------------------------------------------- */
 
-/* Expressive display — the signature voice (Bricolage Grotesque, optical). */
+/* The signature voice (Mona Sans, optical). Weight 500 rather than 600: Mona
+   carries an industrial-grotesque sturdiness that 600 turns into shouting, and
+   the whole scale came down with it. Leading opens from 0.98 to 1.06 — 0.98 was
+   compensating for headline sizes we no longer set. */
 .display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 600;
-  letter-spacing: -0.021em;
-  line-height: 0.98;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  line-height: 1.06;
 }
 
 /* Small mono metadata: section markers, sizes, coordinates. */
@@ -708,8 +714,33 @@ body {
     transition-duration: 0.12s;
   }
 
+  /* Presentational stage — a surface that demonstrates something, never a
+     control. No rim, no shadow: the fill pools under the content and
+     dissolves before it reaches the edges, so the stage reads as part of the
+     page rather than a card sitting on it (2026-07 de-slop pass — a hard
+     1px shell on every block read as generated chrome). Interactive surfaces
+     (wells, popovers, doc cards, gallery cards) keep the crisp .panel shell. */
+  .panel-soft {
+    position: relative;
+    isolation: isolate;
+    border-radius: var(--radius-panel);
+  }
+  .panel-soft::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+      130% 130% at 50% 22%,
+      var(--glass-surface-strong) 42%,
+      transparent 100%
+    );
+  }
+
   /* In-panel dividers — gallery .g2-meta shelf parity. */
   .panel :where([class*="border-hairline"]),
+  .panel-soft :where([class*="border-hairline"]),
   .glass :where([class*="border-hairline"]) {
     border-color: color-mix(in oklab, var(--hairline) 50%, transparent);
   }
@@ -1200,28 +1231,6 @@ body {
     }
   }
 
-  /* One-time entrance: opacity only, and OPT-IN. Written as `:not([entered])`
-     it applied on first paint with no JS involved, and `backwards` held the
-     grid at opacity 0 through the 180ms delay — so a cold visit to /charts
-     spent ~0.9s fading in markup the server had already sent. The gallery is
-     marked by the dock hook, which only marks an SPA arrival. */
-  @media (prefers-reduced-motion: no-preference) {
-    .g2[data-enter] .g2-head {
-      animation: g2-fade 0.55s ease-out backwards;
-    }
-    .g2[data-enter] .g2-grid {
-      animation: g2-fade 0.7s ease-out 0.18s backwards;
-    }
-  }
-  @keyframes g2-fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
   /* ── the floating dock ────────────────────────────────────────────────── */
   .g2-dock {
     position: fixed;
@@ -1524,8 +1533,7 @@ body {
         border-color 0.3s linear,
         box-shadow 0.3s linear;
     }
-    .g2-dock,
-    .g2[data-enter] .g2-cell {
+    .g2-dock {
       animation: none;
     }
   }
@@ -2524,40 +2532,24 @@ div:where(
   animation: mc-stream-in 0.42s var(--ease-out-quint) both;
 }
 
-/* Scroll-reveal: charts and panels settle in once — a short rise + fade only.
-   (An entrance blur was shipped and cut in the 2026-07 calm pass: frosting
-   every section read as effect, not craft.) Gated on reduced-motion. */
-@keyframes rise-in {
+/* Reveal is a passthrough since the 2026-07 de-slop pass — scroll-into-view
+   fades are gone; sections render at rest, always. The one survivor is
+   `deferred` (hero stream panel): its content arrives with hydration, so a
+   short opacity-only fade covers the pop. `pending` is the state the server
+   renders for a deferred subtree only; nothing else ever hides. */
+[data-reveal="pending"] {
+  opacity: 0;
+}
+[data-reveal="in"] {
+  animation: settle-in 0.4s var(--ease-out-quint) both;
+}
+@keyframes settle-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
   to {
     opacity: 1;
-    transform: none;
   }
-}
-/* Scroll-reveal states.
-
-   `static` is what the server renders and what every element keeps until the
-   client decides otherwise: no rule, no animation, fully visible. First paint
-   is never gated on JS — the page is readable the instant the HTML lands, on
-   any connection, and with scripting off entirely.
-
-   `pending` (hidden rest state) is applied by the client only where it cannot
-   be observed: offscreen nodes on a cold load, any node on an SPA navigation
-   (nothing has painted yet). `in` plays the entrance once, in view. */
-[data-reveal="pending"] {
-  opacity: 0;
-  transform: translateY(10px);
-  /* No will-change here: pending is the idle rest state held (for every
-     below-fold reveal) until the observer fires at the viewport edge, so the
-     hint buys ~no lead time while pinning a GPU layer per element. The
-     one-shot rise-in still composites fine (transform/opacity are both
-     compositor properties). */
-}
-[data-reveal="in"] {
-  animation: rise-in 0.55s var(--ease-out-quint) both;
 }
 
 @keyframes pop-in {
@@ -2576,24 +2568,8 @@ div:where(
   animation: pop-in 0.2s var(--ease-out-expo) both;
 }
 
-/* Opacity only — no transform. A transformed ancestor (even the identity
-   matrix a `both`-filled animation holds at rest) breaks in-page anchor /
-   fragment scrolling: TOC links land the heading at the wrong offset. */
-@keyframes route-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-.route-fade {
-  animation: route-fade 0.34s var(--ease-out-expo) both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
-  .route-fade,
   .pop-in,
   .mc-morph,
   .mc-stream-chart,
@@ -2636,6 +2612,11 @@ div:where(
     background-image: none;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+  /* The soft stage's pooled fill is translucency too — swap it for nothing at
+     all: content on the bare field, which is exactly what the fade aspires to. */
+  .panel-soft::before {
+    display: none;
   }
   .glass-strong {
     background-color: var(--color-fd-card);
@@ -2686,6 +2667,12 @@ div:where(
     backdrop-filter: none;
     box-shadow: inset 0 0 0 1px var(--color-fd-foreground);
   }
+  .panel-soft {
+    box-shadow: inset 0 0 0 1px var(--color-fd-foreground);
+  }
+  .panel-soft::before {
+    display: none;
+  }
   .glass-rail {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -2698,11 +2685,15 @@ div:where(
 @media (forced-colors: active) {
   .glass,
   .panel,
+  .panel-soft,
   .glass-rail,
   .cta-accent {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
     border: 1px solid CanvasText;
+  }
+  .panel-soft::before {
+    display: none;
   }
   .cta-accent::after {
     display: none;
@@ -2714,8 +2705,8 @@ div:where(
 .prose h2 {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  font-weight: 560;
-  letter-spacing: -0.016em;
+  font-weight: 500;
+  letter-spacing: -0.014em;
 }
 .prose :where(h1, h2, h3, h4) {
   /* Below xl the sticky toc-popover bar (2.5rem) rides the top of the content
@@ -2895,21 +2886,6 @@ div:where(
     }
   }
 
-  /* Staggered settle for children of a revealed block. Set --i inline. */
-  [data-reveal="pending"] .hx-stagger {
-    opacity: 0;
-  }
-  [data-reveal="in"] .hx-stagger {
-    animation: hx-settle 0.5s var(--ease-out-quint) both;
-    animation-delay: min(calc(var(--i, 0) * 34ms), 300ms);
-  }
-  @keyframes hx-settle {
-    from {
-      opacity: 0;
-      translate: 0 6px;
-    }
-  }
-
   /* Stream vignette: emitted grammar text settles into the shipped chart. */
   .hx-morph-in {
     animation: hx-morph-in 0.42s var(--ease-out-expo);
@@ -3019,10 +2995,6 @@ div:where(
   }
   .hx-tile {
     transition: none;
-  }
-  [data-reveal] .hx-stagger {
-    animation: none;
-    opacity: 1;
   }
   .hx-word svg {
     transition: none;

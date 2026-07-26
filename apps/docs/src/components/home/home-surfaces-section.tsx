@@ -2,101 +2,24 @@ import type { ReactNode } from "react";
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 import { SparkBar } from "@microcharts/react/sparkbar/interactive";
 import { Delta } from "@microcharts/react/delta/interactive";
-import { Bullet } from "@microcharts/react/bullet/interactive";
-import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
 import { SectionMark } from "@/components/home/section-mark";
 import { Reveal } from "@/components/ui/reveal";
 
 /**
- * 03 · Where they live — the pitch is "sits INSIDE an interface," so this
- * section puts real charts inside the surfaces they were built for, all at
- * once: a product dashboard, a written report, and the small placements a
- * chart drops into (a table cell, a KPI figure, a tab, a sentence). No video,
- * no rotation. Every mark is the interactive `@microcharts/react` entry so
- * hover/scrub works in situ; the demo IS the product. One motion idea only:
- * cells settle on reveal.
+ * Where they live — the pitch is "sits INSIDE an interface," so this section
+ * puts real charts inside two surfaces: a written report, and the small
+ * placements a chart drops into (a table cell, a KPI figure, a tab, a
+ * sentence). Two panels only — the 2026-07 density pass cut the dashboard and
+ * chat mocks (the hero already streams a chat reply). Every mark is the
+ * interactive `@microcharts/react` entry so hover/scrub works in situ.
  */
 
-/* Illustrative product/report data — depicting an app, not claiming a fact. */
-const MRR = [31, 33, 32, 36, 35, 40, 42, 45, 44, 48];
-const LAT = [48, 45, 44, 40, 38, 36, 33, 31];
+/* Illustrative report data — depicting a document, not claiming a fact. */
 const BOOKINGS = [18, 22, 20, 27, 25, 31, 29, 34, 33, 38, 41, 46];
-const SERVICES = [
-  { name: "checkout", data: [48, 45, 44, 40, 38, 36, 33, 31], now: "31ms", d: -0.14 },
-  { name: "search", data: [80, 78, 82, 79, 81, 80, 79, 78], now: "78ms", d: 0.01 },
-  { name: "auth", data: [12, 13, 12, 14, 13, 15, 14, 16], now: "16ms", d: 0.08 },
-];
 
 /** Small caption under every surface so the "where" is always named. */
 function Where({ children }: { children: ReactNode }) {
   return <span className="mono-label opacity-60">{children}</span>;
-}
-
-/* ── Surface 1 · the product dashboard (the tall, dense cell) ─────────────── */
-function ProductSurface() {
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-fd-foreground">Revenue overview</span>
-        <span className="mono-label opacity-60">last 30 days</span>
-      </div>
-      <div className="grid grid-cols-2 gap-2.5">
-        <div className="plate-inner flex flex-col gap-1.5 p-3">
-          <span className="mono-label opacity-70">MRR</span>
-          <div className="flex items-baseline gap-1.5">
-            <span className="display text-lg leading-none tabular-nums">$48k</span>
-            <Delta value={0.082} summary={false} />
-          </div>
-          <Sparkline data={MRR} summary={false} width={128} height={22} fill dots="none" />
-        </div>
-        <div className="plate-inner flex flex-col gap-1.5 p-3">
-          <span className="mono-label opacity-70">p95 latency</span>
-          <div className="flex items-baseline gap-1.5">
-            <span className="display text-lg leading-none tabular-nums">31ms</span>
-            <Delta value={-0.14} summary={false} />
-          </div>
-          <Sparkline data={LAT} summary={false} width={128} height={22} dots="none" />
-        </div>
-      </div>
-      <div className="plate-inner flex flex-col gap-1.5 p-3">
-        <span className="mono-label opacity-70">error budget</span>
-        <span className="display text-lg leading-none tabular-nums">72%</span>
-        <Bullet
-          value={72}
-          target={90}
-          bands={[60, 95]}
-          width={220}
-          height={12}
-          className="w-full"
-          summary={false}
-        />
-      </div>
-      <table className="mc-inline-table w-full text-sm tabular-nums">
-        <thead className="sr-only">
-          <tr>
-            <th scope="col">Service</th>
-            <th scope="col">Trend</th>
-            <th scope="col">Latency</th>
-            <th scope="col">Change</th>
-          </tr>
-        </thead>
-        <tbody className="[&>tr+tr]:border-t [&>tr+tr]:border-hairline">
-          {SERVICES.map((s) => (
-            <tr key={s.name}>
-              <td className="py-1.5 pr-3 text-fd-muted-foreground">{s.name}</td>
-              <td className="py-1.5">
-                <Sparkline data={s.data} summary={false} width={72} height={16} dots="none" />
-              </td>
-              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{s.now}</td>
-              <td className="py-1.5 pl-3 text-right">
-                <Delta value={s.d} summary={false} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
 }
 
 /* ── Surface 2 · the written report (serif, chart inside the prose) ───────── */
@@ -222,88 +145,30 @@ function PlacementQuad() {
   );
 }
 
-/* ── Surface 4 · a chat reply (compact card: the answer reads in serif, the
-      categorical chart it emitted sits under it with a legend) ─────────────── */
-function ChatSurface() {
-  return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-center gap-2">
-        <span
-          aria-hidden
-          className="grid size-6 place-items-center rounded-md bg-[color:var(--accent)]/12 text-[0.7rem] font-semibold text-[color:var(--accent)]"
-        >
-          AI
-        </span>
-        <span className="mono-label opacity-70">assistant</span>
-      </div>
-      <p className="hv-reply-body text-[0.98rem] leading-relaxed text-fd-foreground">
-        Traffic split fairly evenly last week, with direct in the lead:
-      </p>
-      <SegmentedBar
-        data={[
-          { label: "direct", value: 42 },
-          { label: "search", value: 31 },
-          { label: "social", value: 15 },
-          { label: "referral", value: 12 },
-        ]}
-        width={340}
-        height={16}
-        className="w-full"
-        summary={false}
-      />
-      <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[0.76rem] text-fd-muted-foreground">
-        {[
-          ["direct", "42%"],
-          ["search", "31%"],
-          ["social", "15%"],
-          ["referral", "12%"],
-        ].map(([k, v]) => (
-          <span key={k}>
-            {k} {v}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function HomeSurfacesSection() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="03">where they live</SectionMark>
+      <SectionMark>where they live</SectionMark>
 
-      {/* Heading = top-left bento cell. Two masonry columns; mobile stacks. */}
-      <div className="grid items-start gap-4 lg:grid-cols-2">
-        <div className="grid items-start gap-4">
-          <Reveal className="flex flex-col gap-3 lg:pr-6 lg:pt-1">
-            <h2 className="display max-w-md text-[length:var(--text-fluid-h2)]">
-              Built for the inside of an interface.
-            </h2>
-            <p className="max-w-md text-fd-muted-foreground">
-              The charts sit where the words already are: a product screen, a report, a table cell,
-              a KPI, a tab, a sentence. Every surface here is rendered live from the library.
-            </p>
-          </Reveal>
-          <Reveal className="panel flex flex-col gap-3 p-4" delay={140}>
-            <Where>rendered report</Where>
-            <ReportSurface />
-          </Reveal>
-          <Reveal className="panel flex flex-col gap-3 p-4" delay={210}>
-            <Where>chat reply</Where>
-            <ChatSurface />
-          </Reveal>
-        </div>
+      <Reveal className="mb-10 max-w-md">
+        <h2 className="display text-[length:var(--text-fluid-h2)]">
+          They sit where your text already is
+        </h2>
+        <p className="mt-4 text-fd-muted-foreground">
+          Both mockups below are rendered live from the library, down to the sparkline inside the
+          table cell.
+        </p>
+      </Reveal>
 
-        <div className="grid items-start gap-4">
-          <Reveal className="panel flex flex-col gap-3 p-4" delay={70}>
-            <Where>product UI</Where>
-            <ProductSurface />
-          </Reveal>
-          <Reveal className="panel flex flex-col gap-3 p-4" delay={180}>
-            <Where>the small placements</Where>
-            <PlacementQuad />
-          </Reveal>
-        </div>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <Reveal className="panel-soft flex flex-col gap-3 p-5">
+          <Where>rendered report</Where>
+          <ReportSurface />
+        </Reveal>
+        <Reveal className="panel-soft flex flex-col gap-3 p-5">
+          <Where>the small placements</Where>
+          <PlacementQuad />
+        </Reveal>
       </div>
     </section>
   );

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@/components/analytics";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
@@ -19,10 +20,21 @@ const sans = Hanken_Grotesk({
   display: "swap",
 });
 
-const display = Bricolage_Grotesque({
-  subsets: ["latin"],
+// Mona Sans (GitHub × Degarism, SIL OFL — licence kept beside the file) is
+// self-hosted because it isn't on Google Fonts. The shipped file is a latin
+// subset of `MonaSansVF[opsz,wght]` with the weight axis clipped to 400–800:
+// 66 kB, roughly half what Bricolage's latin subset cost, and it keeps the
+// optical-size axis, which is the point — the type scale is small now, so
+// small sizes need the sturdier optical cut and headings the finer one.
+// Regenerate with fontTools: instancer `wght=400:800`, then subset to the
+// Google latin unicode range with kern,liga,calt,ccmp,locl,mark,mkmk,tnum.
+const display = localFont({
+  src: "../fonts/MonaSans-latin.woff2",
   variable: "--font-display-src",
   display: "swap",
+  weight: "400 800",
+  style: "normal",
+  declarations: [{ prop: "font-optical-sizing", value: "auto" }],
 });
 
 const mono = JetBrains_Mono({
@@ -129,11 +141,6 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      // "cold" = this document painted from server HTML, so entrance
-      // animations must not gate that paint. Flipped to "warm" by <Provider>
-      // once the first page is on screen; from then on every transition is an
-      // SPA one, where the animation costs nothing the reader is waiting for.
-      data-boot="cold"
       className={`${sans.variable} ${display.variable} ${mono.variable}`}
       suppressHydrationWarning
     >

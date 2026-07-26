@@ -65,7 +65,7 @@ export function GalleryView({
             )}
           </span>
           <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
-            {hub ? hub.title : `${STABLE_CHARTS.length} React microcharts, at true size.`}
+            {hub ? hub.title : `${STABLE_CHARTS.length} React microcharts, at true size`}
           </h1>
           <p className="mt-3 max-w-3xl text-fd-muted-foreground">
             {hub ? (
@@ -73,8 +73,8 @@ export function GalleryView({
             ) : (
               <>
                 Every chart at the size it lives (in a sentence, a table cell, a KPI card), beside
-                the decision it answers. Browse by collection or search. Live by default - hover a
-                mark to scrub; switch to Static in the dock if you want stillness.
+                the decision it answers. Browse by collection or search. They render live: hover a
+                mark to scrub, or switch to Static in the dock if you want stillness.
               </>
             )}
           </p>

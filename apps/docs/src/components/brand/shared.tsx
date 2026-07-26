@@ -35,10 +35,9 @@ export function readAsset(file: string): { src: string; bytes: number } {
   return { src, bytes: Buffer.byteLength(src, "utf8") };
 }
 
-export function SectionMark({ n, children }: { n: string; children: React.ReactNode }) {
+export function SectionMark({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-8 flex items-center gap-3">
-      <span className="mono-label text-fd-primary">{n}</span>
       <span className="h-px flex-1 bg-hairline" />
       <span className="mono-label">{children}</span>
     </div>

@@ -55,21 +55,21 @@ export function CatalogGrid({
       {/* SSR board keeps layout until client modules land (same slugs/keys, so
           the static→interactive upgrade never re-deals the board). */}
       {modules
-        ? board.map((entry, i) => {
+        ? board.map((entry) => {
             const mod = modules[entry.slug];
             if (!mod) return <li key={entry.slug} aria-hidden />;
             // Interactive twin whenever it exists — pointer reaches the chart
             // (tile link lives on the name row, not around the mark).
             const Preview = mod.PreviewLive ?? mod.Preview;
             return (
-              <CatalogTile key={entry.slug} i={i} entry={entry}>
+              <CatalogTile key={entry.slug} entry={entry}>
                 <Preview />
               </CatalogTile>
             );
           })
         : children}
 
-      <li className="hx-stagger" style={{ "--i": 11 } as React.CSSProperties}>
+      <li>
         <Link
           prefetch={false}
           href="/charts"
@@ -102,20 +102,12 @@ export function CatalogGrid({
  * is never nested inside the `<a>`. Clicks on the raised slot are handled by
  * `useClickableCard`: a short click navigates, a pointer scrub does not.
  */
-export function CatalogTile({
-  i,
-  entry,
-  children,
-}: {
-  i: number;
-  entry: TileMeta;
-  children: ReactNode;
-}) {
+export function CatalogTile({ entry, children }: { entry: TileMeta; children: ReactNode }) {
   const href = `/docs/charts/${entry.slug}`;
   const nav = useClickableCard(href);
 
   return (
-    <li className="hx-stagger" style={{ "--i": i % 12 } as React.CSSProperties}>
+    <li>
       <div
         className="hx-tile group relative flex h-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] px-3 pb-3 pt-4"
         {...nav}

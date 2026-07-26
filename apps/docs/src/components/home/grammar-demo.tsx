@@ -8,7 +8,7 @@ import { BumpStrip } from "@microcharts/react/bump-strip/interactive";
 import { Threshold, Marker } from "@microcharts/react/annotations";
 
 /**
- * 01 · The grammar, settled: the full JSX is readable at once, the real
+ * 01 · The shared prop API, settled: the full JSX is readable at once, the real
  * component draws with the library's own entrance (viewport- and
  * reduced-motion-gated by the motion engine), and the sentence under it is
  * read back OUT OF THE DOM — the actual generated aria-label of the mounted
@@ -172,7 +172,7 @@ export function GrammarDemo() {
   }, [tab]);
 
   return (
-    <div className="panel overflow-hidden">
+    <div className="panel-soft overflow-hidden">
       <div
         role="tablist"
         aria-label="Chart grammar examples"
@@ -198,7 +198,11 @@ export function GrammarDemo() {
 
       <div className="grid gap-0 sm:grid-cols-2">
         <div className="border-b border-hairline p-5 sm:border-b-0 sm:border-r">
-          <p className="mono-label mb-3 opacity-60">a model writes</p>
+          {/* "an agent", not "a model": this panel is the React prop API — what
+              a coding agent writes into a repo. The compact `microchart …`
+              grammar a chat model emits mid-reply is a different thing, owned
+              by the hero and by /docs/ai. Don't let the two labels converge. */}
+          <p className="mono-label mb-3 opacity-60">an agent writes</p>
           <pre className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground">
             <Code tokens={TAB_TOKENS[tab]} />
           </pre>

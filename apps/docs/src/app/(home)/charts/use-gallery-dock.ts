@@ -1,11 +1,8 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import type { ChartCollection } from "@/lib/charts/types";
 import { getGalleryMode, subscribeGalleryMode, type GalleryMode } from "./gallery-mode";
-
-const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
-let hasEntered = false;
 
 export type GalleryDensity = "comfortable" | "compact";
 export type GallerySort = "catalog" | "name";
@@ -110,20 +107,6 @@ export function useGalleryDock(
       for (const c of cells) c.style.order = "";
     }
   }, [sort]);
-
-  // The gallery entrance is opt-in (see .g2[data-enter] in global.css) and
-  // plays at most once a session. A cold load never gets it: the grid arrived
-  // painted in the server HTML, so "fading it in" could only mean hiding it
-  // first — the visitor would wait ~0.9s to be shown what they already had.
-  // Landing here from anywhere else in the site is the case where nothing has
-  // painted yet and the fade is free.
-  useIsoLayoutEffect(() => {
-    if (hasEntered) return;
-    hasEntered = true;
-    if (document.documentElement.dataset.boot !== "warm") return;
-    const el = document.querySelector<HTMLElement>(".g2");
-    if (el) el.dataset.enter = "1";
-  }, []);
 
   useEffect(() => {
     const grid = document.querySelector<HTMLElement>(".g2-grid");

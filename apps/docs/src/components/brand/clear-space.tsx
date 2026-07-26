@@ -5,18 +5,16 @@ import { markInner, SectionMark } from "@/components/brand/shared";
 export function BrandClearSpace() {
   return (
     <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark n="03">Clear space &amp; size</SectionMark>
+      <SectionMark>Clear space &amp; size</SectionMark>
       <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">
-          One cell of air. Sixteen pixels floor.
-        </h2>
+        <h2 className="display text-[length:var(--text-fluid-h2)]">Clear space and minimum size</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Keep clear space of at least one cell-width on every side. Below 16 px the grade
-          collapses. Never go smaller.
+          Keep at least one cell-width of air on every side, and don&rsquo;t render the mark below
+          16&nbsp;px, where the grade between the cells stops reading.
         </p>
       </Reveal>
       <div className="grid gap-3 lg:grid-cols-2">
-        <Reveal className="panel flex flex-col items-center justify-center gap-5 p-8">
+        <Reveal className="panel-soft flex flex-col items-center justify-center gap-5 p-8">
           <svg
             viewBox="0 0 56 56"
             width="188"
@@ -39,7 +37,7 @@ export function BrandClearSpace() {
           </svg>
           <p className="mono-label text-center opacity-70">dashed field = reserved space</p>
         </Reveal>
-        <Reveal delay={80} className="panel flex flex-col justify-center gap-8 p-8">
+        <Reveal delay={80} className="panel-soft flex flex-col justify-center gap-8 p-8">
           <div className="grid grid-cols-3 gap-4">
             {[
               { px: 16, label: "16 px", role: "Favicon · minimum" },
