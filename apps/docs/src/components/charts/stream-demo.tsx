@@ -542,9 +542,16 @@ function Message({
             <BlockChart info={n.type} body={n.body} />
           </span>
         ) : (
+          // Bare, like the hero's raw fence — no `.code-inset`. That class
+          // fills with `--glass-surface-strong`, which on light is a near-white
+          // frost, so a slab appeared behind the grammar and then vanished when
+          // the chart replaced it. A model emitting a fence is mid-sentence, not
+          // presenting a code sample; it should read as text until it becomes a
+          // chart. Padding goes with it, or the block would still shift as the
+          // panel dissolved.
           <code
             key={i}
-            className="code-inset my-3 block whitespace-pre px-4 py-3 font-mono text-[0.8rem] text-fd-muted-foreground"
+            className="my-3 block whitespace-pre font-mono text-[0.8rem] text-fd-muted-foreground"
           >
             {"```microchart " + n.type + "\n" + n.body}
           </code>
