@@ -105,7 +105,11 @@ updates as you hover — set `readout={false}` to keep the crosshair but drop th
 `datum.formatted` from `onActive` yourself.
 
 Charts with only **one** unit — Delta, Progress, StatusDot, Bullet, and the rest of the scalar set — have nothing to
-rove between, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state.
+rove between, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state. Hover or focus
+still _reveals_: a scalar whose mark does not print its own number floats it in the same chip the pickers use, so a
+ProgressRing arc, an Hourglass, a BreathingDot or a TapeGauge too small for its numeral is never a shape with no
+reading. The exceptions are the six glyphs that already are the number, or a count you read by counting — Delta,
+FatDigits, TrendArrow, StatusDot, DicePips, TallyMarks.
 
 **Values that change on their own.** Fifteen single-value charts built for updating KPI cards take `live` (default
 `true`): when the value changes, the new reading is re-announced through the polite region without anyone touching the

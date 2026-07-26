@@ -1,7 +1,8 @@
 "use client";
 // Interactive <EtaBar>. `live` mode: on prop change the remainder
 // width transitions (CSS, reduced-motion → snap) and a polite live region
-// re-announces at most every 10 s. No pointer scrub — there is no series.
+// re-announces at most every 10 s. No pointer scrub — there is no series — but
+// hover OR focus reveals the forecast chip, the reveal-on-hover scalar pattern.
 // Composes the static entry (canon).
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
@@ -63,24 +64,45 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         ? summary
         : etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt }, strings);
   const label = [title, full].filter(Boolean).join(". ") || undefined;
-  // The chip shows only the two numbers the summary is built from — never
-  // `full`, whose sentence (or an unbounded caller `summary`) blew past the
-  // chip's width cap and duplicated the aria-label beside it verbatim. The
-  // sentence stays in the live region.
-  const etaGeo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: 80, height: 8 });
+  // Chip = whatever the permanent gutter is NOT already printing. Default
+  // `label="eta"` → chip is the percent; `label="percent"` → chip is the ETA;
+  // `label="none"` (or a too-short bar that drops the gutter) → both.
+  const height = rest.height ?? 8;
+  const labelMode = rest.label ?? "eta";
+  const etaGeo = etaBarGeometry({
+    progress,
+    elapsed,
+    rate: rate ?? null,
+    width: rest.width ?? 80,
+    height,
+  });
   const etaPct = makeFormatter(undefined, locale, {
     style: "percent",
     maximumFractionDigits: 0,
   })(Math.max(0, Math.min(1, progress || 0)));
+  const etaOnly =
+    progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
+      ? undefined
+      : etaFormat
+        ? etaFormat(etaGeo.remainingTime)
+        : fmt(etaGeo.remainingTime);
+  // Mirrors the static's own gutter rule (`label`/`height < 9`/no ETA to print).
+  // Left uncoerced on purpose: this subpath sits exactly on its size budget, and
+  // a `!!` costs 2 B gzipped. Only ever read as a condition.
+  const gutterPaints = labelMode !== "none" && height >= 9 && (labelMode === "percent" || etaOnly);
   const chip =
     summary === false
       ? undefined
-      : progress >= 1 || etaGeo.indeterminate || etaGeo.remainingTime == null
-        ? etaPct
-        : `${etaPct} · ${etaFormat ? etaFormat(etaGeo.remainingTime) : fmt(etaGeo.remainingTime)}`;
+      : !gutterPaints
+        ? etaOnly
+          ? `${etaPct} · ${etaOnly}`
+          : etaPct
+        : labelMode === "eta"
+          ? etaPct
+          : (etaOnly ?? etaPct);
 
   const [announced, setAnnounced] = useState("");
-  const [focused, setFocused] = useState(false);
+  const [open, setOpen] = useState(false);
   const last = useRef(0);
   useEffect(() => {
     if (!full) return;
@@ -104,8 +126,13 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       ref={hostRef}
       {...wrap("mc-eta-live", className, style)}
       {...named(label)}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
+      // Pointer AND focus, like every other reveal-on-hover scalar (Bullet,
+      // Thermometer, HeatCell, MoonPhase, OrbitStatus): keyboard-only would
+      // hide the forecast from a mouse reader entirely.
+      onPointerEnter={() => setOpen(true)}
+      onPointerLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -127,7 +154,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
         style={fillFor(style)}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {readout && focused && chip ? (
+      {readout && open && chip ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {chip}
         </span>

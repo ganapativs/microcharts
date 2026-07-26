@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Progress } from "./client.js";
 
 const key = (el: HTMLElement, k: string) =>
@@ -38,5 +39,20 @@ describe("interactive <Progress>", () => {
     wrap.focus();
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 0.75 }]);
+  });
+
+  it('label="none" bars reveal their percent on hover; labelled ones don\'t', async () => {
+    const screen = await render(<Progress value={0.62} label="none" />);
+    const wrap = screen.container.querySelector(".mc-progress-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("62%");
+    await userEvent.unhover(wrap);
+    await expect.poll(chip).toBeUndefined();
+
+    const labelled = await render(<Progress value={0.62} />);
+    const lw = labelled.container.querySelector(".mc-progress-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
 });

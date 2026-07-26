@@ -1,39 +1,39 @@
 {
   "sparkline": {
-    "static": 3.99,
-    "interactive": 6.64
+    "static": 4.01,
+    "interactive": 6.67
   },
   "sparkbar": {
     "static": 3.17,
     "interactive": 5.65
   },
   "delta": {
-    "static": 1.11,
-    "interactive": 2.02
+    "static": 1.12,
+    "interactive": 2.03
   },
   "bullet": {
     "static": 2.31,
-    "interactive": 3.46
+    "interactive": 3.63
   },
   "activity-grid": {
     "static": 2.39,
     "interactive": 5.31
   },
   "trend-arrow": {
-    "static": 1.88,
-    "interactive": 2.83
+    "static": 1.89,
+    "interactive": 2.84
   },
   "status-dot": {
-    "static": 1.69,
-    "interactive": 2.59
+    "static": 1.7,
+    "interactive": 2.6
   },
   "heat-cell": {
-    "static": 2.02,
-    "interactive": 3.26
+    "static": 2.03,
+    "interactive": 3.28
   },
   "progress": {
-    "static": 2.1,
-    "interactive": 3.26
+    "static": 2.11,
+    "interactive": 3.41
   },
   "rug-strip": {
     "static": 2.45,
@@ -45,7 +45,7 @@
   },
   "pictogram-row": {
     "static": 2.13,
-    "interactive": 4.51
+    "interactive": 4.69
   },
   "seismogram": {
     "static": 2.58,
@@ -65,7 +65,7 @@
   },
   "paired-bars": {
     "static": 2.8,
-    "interactive": 5.32
+    "interactive": 5.33
   },
   "slope": {
     "static": 3.86,
@@ -88,8 +88,8 @@
     "interactive": 5.2
   },
   "progress-ring": {
-    "static": 2.47,
-    "interactive": 3.76
+    "static": 2.48,
+    "interactive": 3.89
   },
   "micro-donut": {
     "static": 2.86,
@@ -97,7 +97,7 @@
   },
   "funnel": {
     "static": 2.44,
-    "interactive": 4.81
+    "interactive": 4.82
   },
   "likert-strip": {
     "static": 3,
@@ -128,8 +128,8 @@
     "interactive": 5.12
   },
   "calendar-strip": {
-    "static": 2.48,
-    "interactive": 5.26
+    "static": 2.59,
+    "interactive": 5.37
   },
   "event-timeline": {
     "static": 2.88,
@@ -213,35 +213,35 @@
   },
   "tally-marks": {
     "static": 1.6,
-    "interactive": 2.98
+    "interactive": 3
   },
   "dice-pips": {
     "static": 1.53,
-    "interactive": 2.85
+    "interactive": 2.87
   },
   "fill-word": {
     "static": 1.57,
-    "interactive": 2.82
+    "interactive": 2.95
   },
   "fat-digits": {
     "static": 1.78,
-    "interactive": 2.95
+    "interactive": 2.96
   },
   "thermometer": {
     "static": 2.48,
-    "interactive": 3.81
+    "interactive": 3.84
   },
   "moon-phase": {
     "static": 1.41,
-    "interactive": 2.91
+    "interactive": 2.93
   },
   "hourglass": {
     "static": 1.83,
-    "interactive": 3.18
+    "interactive": 3.34
   },
   "balance-beam": {
     "static": 2.35,
-    "interactive": 4.79
+    "interactive": 4.81
   },
   "sprout-row": {
     "static": 2.03,
@@ -285,27 +285,27 @@
   },
   "breathing-dot": {
     "static": 1.77,
-    "interactive": 3.17
+    "interactive": 3.33
   },
   "heartbeat-blip": {
-    "static": 2.18,
-    "interactive": 3.57
+    "static": 2.2,
+    "interactive": 3.71
   },
   "comet-trail": {
     "static": 2.25,
-    "interactive": 4.71
+    "interactive": 4.83
   },
   "orbit-status": {
     "static": 2.27,
-    "interactive": 4.15
+    "interactive": 4.16
   },
   "rate-volume": {
     "static": 2.85,
     "interactive": 5.37
   },
   "icon-array": {
-    "static": 2.36,
-    "interactive": 4.76
+    "static": 2.38,
+    "interactive": 4.91
   },
   "time-in-range": {
     "static": 2.21,
@@ -317,7 +317,7 @@
   },
   "eta-bar": {
     "static": 2.18,
-    "interactive": 3.55
+    "interactive": 3.62
   },
   "waveform": {
     "static": 2.52,
@@ -332,8 +332,8 @@
     "interactive": 4.86
   },
   "token-confidence": {
-    "static": 0.97,
-    "interactive": 1.88
+    "static": 0.98,
+    "interactive": 2.29
   },
   "wind-barb": {
     "static": 2.6
@@ -344,7 +344,7 @@
   },
   "minimap-strip": {
     "static": 2.75,
-    "interactive": 3.99
+    "interactive": 4.14
   },
   "dual-window-meter": {
     "static": 2.63,
@@ -383,8 +383,8 @@
     "interactive": 5.13
   },
   "tape-gauge": {
-    "static": 3.2,
-    "interactive": 4.48
+    "static": 3.27,
+    "interactive": 4.7
   },
   "station-glyph": {
     "static": 3.29,

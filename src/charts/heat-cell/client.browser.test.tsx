@@ -10,8 +10,15 @@ describe("interactive <HeatCell>", () => {
     wrap.focus();
     await expect
       .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("42 — level 3 of 5.");
+      .toBe("42 — level 3 of 5");
     expect(document.querySelector('[aria-live="polite"]')!.textContent).toBe("42 — level 3 of 5.");
+  });
+
+  it('label="value" suppresses the chip (numeral already on the cell)', async () => {
+    const screen = await render(<HeatCell value={42} domain={[0, 100]} label="value" />);
+    const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
+    wrap.focus();
+    expect(document.querySelector(".mc-spark-readout")).toBeNull();
   });
 
   it("blur hides the readout", async () => {

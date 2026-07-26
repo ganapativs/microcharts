@@ -1,10 +1,12 @@
 "use client";
 // Interactive <MinimapStrip>. Drag or click to move the viewport
 // window; ←/→ nudge 5% (Shift 20%). The window maps linearly to the domain — no
-// fisheye. Composes the static component (canon).
+// fisheye. Hover/focus/drag floats the window's own range as a chip, so the
+// edges the slider reports to assistive tech are visible too. Composes the
+// static component (canon).
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { fillFor, wrap } from "../../shared/interactive.js";
+import { crosshairReadoutStyle, fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
 import { minimapDomain, minimapWindow } from "./geometry.js";
@@ -16,6 +18,12 @@ import {
 
 export interface InteractiveMinimapProps extends MinimapStripProps {
   onWindowChange?: (window: [number, number]) => void;
+  /**
+   * Show the floating window-range chip on hover/focus/drag (default `true`).
+   * `false` suppresses only the chip — `aria-valuetext` and `onWindowChange`
+   * are untouched, so the range can be rendered elsewhere.
+   */
+  readout?: boolean;
   /**
    * Opt-in entrance motion (default `false`): the strip wipes in left to
    * right on first client-side mount. Inert on the server and on hydrated
@@ -37,6 +45,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
     summary,
     onWindowChange,
     animate = false,
+    readout = true,
     className,
     style,
     ...rest
@@ -44,6 +53,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
+  const [open, setOpen] = useState(false);
 
   const domain = useMemo(() => minimapDomain(data, domainProp), [domainProp, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -119,6 +129,10 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
       aria-valuetext={label}
       onPointerDown={onPointer}
       onPointerMove={onPointer}
+      onPointerEnter={() => setOpen(true)}
+      onPointerLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
       onKeyDown={onKeyDown}
     >
       <StaticMinimapStrip
@@ -146,6 +160,17 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
       >
         {strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))}
       </span>
+      {/* The window edges are the whole point of the control, and until now
+          only `aria-valuetext` carried them — a sighted reader dragging saw a
+          rectangle and no numbers. The chip rides over the window's centre. */}
+      {readout && open ? (
+        <span
+          className="mc-spark-readout"
+          style={crosshairReadoutStyle((((win[0] + win[1]) / 2 - domain[0]) / span) * width, width)}
+        >
+          {`${fmt(win[0])}–${fmt(win[1])}`}
+        </span>
+      ) : null}
     </span>
   );
 }

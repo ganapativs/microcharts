@@ -49,7 +49,7 @@
   {
     "name": "@microcharts/react/bullet/interactive",
     "path": "dist/charts/bullet/client.js",
-    "limit": "3.54 kB",
+    "limit": "3.66 kB",
     "gzip": true
   },
   {
@@ -109,7 +109,7 @@
   {
     "name": "@microcharts/react/progress/interactive",
     "path": "dist/charts/progress/client.js",
-    "limit": "3.33 kB",
+    "limit": "3.45 kB",
     "gzip": true
   },
   {
@@ -145,7 +145,7 @@
   {
     "name": "@microcharts/react/pictogram-row/interactive",
     "path": "dist/charts/pictogram-row/client.js",
-    "limit": "4.61 kB",
+    "limit": "4.72 kB",
     "gzip": true
   },
   {
@@ -277,7 +277,7 @@
   {
     "name": "@microcharts/react/progress-ring/interactive",
     "path": "dist/charts/progress-ring/client.js",
-    "limit": "3.84 kB",
+    "limit": "3.95 kB",
     "gzip": true
   },
   {
@@ -391,7 +391,7 @@
   {
     "name": "@microcharts/react/calendar-strip (static)",
     "path": "dist/charts/calendar-strip/index.js",
-    "limit": "2.53 kB",
+    "limit": "2.65 kB",
     "gzip": true
   },
   {
@@ -667,7 +667,7 @@
   {
     "name": "@microcharts/react/fill-word/interactive",
     "path": "dist/charts/fill-word/client.js",
-    "limit": "2.88 kB",
+    "limit": "3.00 kB",
     "gzip": true
   },
   {
@@ -715,7 +715,7 @@
   {
     "name": "@microcharts/react/hourglass/interactive",
     "path": "dist/charts/hourglass/client.js",
-    "limit": "3.24 kB",
+    "limit": "3.40 kB",
     "gzip": true
   },
   {
@@ -859,7 +859,7 @@
   {
     "name": "@microcharts/react/breathing-dot/interactive",
     "path": "dist/charts/breathing-dot/client.js",
-    "limit": "3.24 kB",
+    "limit": "3.37 kB",
     "gzip": true
   },
   {
@@ -871,7 +871,7 @@
   {
     "name": "@microcharts/react/heartbeat-blip/interactive",
     "path": "dist/charts/heartbeat-blip/client.js",
-    "limit": "3.64 kB",
+    "limit": "3.79 kB",
     "gzip": true
   },
   {
@@ -883,7 +883,7 @@
   {
     "name": "@microcharts/react/comet-trail/interactive",
     "path": "dist/charts/comet-trail/client.js",
-    "limit": "4.81 kB",
+    "limit": "4.89 kB",
     "gzip": true
   },
   {
@@ -925,7 +925,7 @@
   {
     "name": "@microcharts/react/icon-array/interactive",
     "path": "dist/charts/icon-array/client.js",
-    "limit": "4.86 kB",
+    "limit": "4.96 kB",
     "gzip": true
   },
   {
@@ -961,7 +961,7 @@
   {
     "name": "@microcharts/react/eta-bar/interactive",
     "path": "dist/charts/eta-bar/client.js",
-    "limit": "3.62 kB",
+    "limit": "3.63 kB",
     "gzip": true
   },
   {
@@ -1009,7 +1009,7 @@
   {
     "name": "@microcharts/react/token-confidence/interactive",
     "path": "dist/charts/token-confidence/client.js",
-    "limit": "1.93 kB",
+    "limit": "2.34 kB",
     "gzip": true
   },
   {
@@ -1039,7 +1039,7 @@
   {
     "name": "@microcharts/react/minimap-strip/interactive",
     "path": "dist/charts/minimap-strip/client.js",
-    "limit": "4.08 kB",
+    "limit": "4.20 kB",
     "gzip": true
   },
   {
@@ -1159,7 +1159,7 @@
   {
     "name": "@microcharts/react/tape-gauge/interactive",
     "path": "dist/charts/tape-gauge/client.js",
-    "limit": "4.57 kB",
+    "limit": "4.75 kB",
     "gzip": true
   },
   {

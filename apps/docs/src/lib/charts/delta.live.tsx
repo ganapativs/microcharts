@@ -32,7 +32,6 @@ export const playground: PlaygroundSpec = {
             from={100}
             positive={positive}
             locale={locale}
-            summary={false}
             animate={ui.animate}
           />
         </span>
@@ -46,7 +45,6 @@ export const playground: PlaygroundSpec = {
             format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
             positive={positive}
             locale={locale}
-            summary={false}
             animate={ui.animate}
           />
         </span>
@@ -58,7 +56,6 @@ export const playground: PlaygroundSpec = {
           value={pct / 100}
           positive={positive}
           locale={locale}
-          summary={false}
           animate={ui.animate}
         />
       </span>

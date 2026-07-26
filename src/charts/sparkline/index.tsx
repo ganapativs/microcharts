@@ -155,8 +155,14 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = metrics
-    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+  // …and `minmax` paints text too: pinning only the `last` size left the two
+  // extremum labels laid out at `mmFont` (5–9) but PAINTED at the inherited
+  // `0.75em` (~12 units against 16px prose), which is how they escaped the top
+  // of the viewBox. One pin, whichever mode is painting — the two are mutually
+  // exclusive (`label` is a single enum).
+  const pinFont = metrics?.fontSize ?? (mmFont || undefined);
+  const rootStyle = pinFont
+    ? { ...style, "--mc-label-size": `${pinFont}px` }
     : (style as CSSProperties);
 
   return (
@@ -216,15 +222,21 @@ export function Sparkline(props: SparklineProps): ReactNode {
             const kind = i ? "min" : "max";
             const text = fmt(m.value);
             const half = (text.length * mmFont * 0.62) / 2;
+            /* `central` on BOTH labels (the min used `hanging`, whose box grows
+               a whole em downward from y): one baseline means one containment
+               rule — the line straddles y by half a font each way — so the same
+               clamp holds it inside the box top and bottom. The 3-unit offset
+               off the mark is a preference; staying in the viewBox is not. */
+            const halfLine = mmFont / 2 + 0.5;
             return (
               <text
                 key={kind}
                 /* centered on the mark, clamped inside the viewBox (containment) */
                 x={Math.min(Math.max(m.x, half + 1), width - half - 1)}
-                y={i ? m.y + 3 : m.y - 3}
+                y={Math.min(Math.max(i ? m.y + 3 : m.y - 3, halfLine), height - halfLine)}
                 fontSize={mmFont}
                 textAnchor="middle"
-                dominantBaseline={i ? "hanging" : undefined}
+                dominantBaseline="central"
                 data-mc-ink="label"
               >
                 {text}

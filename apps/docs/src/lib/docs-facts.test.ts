@@ -45,15 +45,15 @@ describe("docs-facts derivations", () => {
     expect(SIZE.max).toBeLessThanOrEqual(4.5);
   });
 
-  // performance.mdx prose names these explicitly ("Twenty-two charts sit above the
+  // performance.mdx prose names these explicitly ("Twenty-five charts sit above the
   // 3 kB reference line … Sparkline is the largest"). If the measured sizes shift,
   // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
     expect(SIZE.over3).toHaveLength(25);
     // over3 is largest-first — Sparkline leads.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
-    // None is more than 0.97 kB over the 3 kB line.
-    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(3.99 + 0.001);
+    // None is more than 1.01 kB over the 3 kB line (sparkline 4.01).
+    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(4.01 + 0.001);
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
     expect(over3Slugs).toEqual(
       [

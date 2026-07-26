@@ -31,8 +31,10 @@ export interface FillWordProps {
 
 const PAD = 2;
 
-/** Whole-percent shown for the context (fill = complete, drain = remaining). */
-function shownPct(value: number, mode: FillMode): number {
+/** Whole-percent shown for the context (fill = complete, drain = remaining).
+ *  Exported so the interactive entry's hover chip reads the SAME number the
+ *  `label="value"` numeral would print. */
+export function shownPct(value: number, mode: FillMode): number {
   const v = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   const pct = Math.round(v * 100);
   return mode === "drain" ? 100 - pct : pct;

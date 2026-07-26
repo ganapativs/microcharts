@@ -1,7 +1,8 @@
 "use client";
 // Interactive <Hourglass>. Sand levels cross-fade on change (opacity
 // swap — not d: interpolation); announces at documented thresholds (50 / 90 /
-// 100%), not on every tick. Wrapper focus only. Composes the static component.
+// 100%), not on every tick. Hover/focus reveals the elapsed percent the sand
+// only approximates. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -22,6 +23,11 @@ export interface InteractiveHourglassProps extends HourglassProps {
    * always wins.
    */
   animate?: boolean;
+  /**
+   * Show the floating percent chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label` already prints a percent.
+   */
+  readout?: boolean;
   /** The glyph was activated (click, tap, Enter or Space): `{ index: 0, value }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -35,6 +41,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     title,
     value,
     animate = false,
+    readout = true,
     onSelect,
     summary,
     className,
@@ -50,6 +57,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
+  // The elapsed percent the sand encodes — the same number `label="elapsed"`
+  // prints, so hovering and labelling never disagree.
+  const elapsedPct = Number.isFinite(value)
+    ? Math.round(Math.min(1, Math.max(0, value)) * 100)
+    : null;
+  const readoutText = elapsedPct === null ? "—" : `${elapsedPct}%`;
 
   useEffect(() => {
     const before = prev.current;
@@ -84,6 +98,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     onSelect?.({
       index: 0,
       value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
+      formatted: readoutText,
     });
 
   return (
@@ -91,6 +106,10 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
       ref={wrap}
       {...wrapAttrs("mc-hourglass-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -107,6 +126,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
+      {/* The sand is a rough gauge; the number behind it is invisible unless
+          `label` prints it. Hover/focus reveals the elapsed percent. */}
+      {readout && hover && (props.label ?? "none") === "none" ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {readoutText}
+        </span>
+      ) : null}
     </span>
   );
 }

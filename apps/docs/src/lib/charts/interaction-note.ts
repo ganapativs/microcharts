@@ -29,6 +29,8 @@ export interface InteractionEntryLike {
   interactiveImport?: string;
   /** `false` ⇒ no unit picker (the lean scalar set, plus the two exceptions). */
   picker?: false;
+  /** `false` ⇒ the entry paints no readout chip (the value is already on the glyph). */
+  readout?: false;
 }
 
 /**
@@ -54,6 +56,14 @@ const CONTRACT_HREF = "/docs/accessibility#one-interaction-contract";
  * the repo's 120-column prose width so the generated `.md` mirrors read like
  * the hand-written sections around them; HTML collapses the newlines away.
  */
+/**
+ * Appended to the single-unit sentence for every scalar that reveals its
+ * reading on hover/focus — which is all of them except the handful whose glyph
+ * already prints the number (`readout: false` in the registry).
+ */
+export const REVEAL_NOTE =
+  "Hover or focus also reveals the reading itself in a floating chip, for the sizes and label modes where the mark\ndoes not print it; `readout={false}` drops the chip and keeps everything else.";
+
 export const INTERACTION_NOTES: Record<Exclude<InteractionKind, "none">, string> = {
   picker: [
     `The interactive entry follows the shared [interaction contract](${CONTRACT_HREF}):`,
@@ -71,5 +81,9 @@ export const INTERACTION_NOTES: Record<Exclude<InteractionKind, "none">, string>
 /** The note for one chart, or `null` when the chart gets no generated sentence. */
 export function interactionNote(entry: InteractionEntryLike): string | null {
   const kind = interactionKind(entry);
-  return kind === "none" ? null : INTERACTION_NOTES[kind];
+  if (kind === "none") return null;
+  // Picker charts always carry a chip (library-side gate), and their sentence
+  // already says the readout pins — only the scalar half needs the clause.
+  if (kind === "picker" || entry.readout === false) return INTERACTION_NOTES[kind];
+  return `${INTERACTION_NOTES[kind]}\n${REVEAL_NOTE}`;
 }

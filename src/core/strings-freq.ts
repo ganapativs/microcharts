@@ -4,7 +4,10 @@
 // modules (canon). Aggregate dictionary: core/strings.ts `EN`.
 import type { SummaryStrings } from "./summary.js";
 
-export type FreqStrings = Pick<SummaryStrings, "noData" | "iconArray" | "iconArrayUnit">;
+export type FreqStrings = Pick<
+  SummaryStrings,
+  "noData" | "iconArray" | "iconArrayRatio" | "iconArrayUnit" | "iconArrayChip"
+>;
 
 export const EN_FREQ: FreqStrings = {
   noData: "No data.",
@@ -14,6 +17,8 @@ export const EN_FREQ: FreqStrings = {
     if (note === "sub") return `0 in ${n} (less than 1 in ${n}). About ${pct}.`;
     return `${k} in ${n}. About ${pct}.`;
   },
+  iconArrayRatio: (k, n) => `${k} in ${n}`,
   iconArrayUnit: (index, n, filled, filledCount) =>
     `Unit ${index} of ${n} — ${filled ? "filled" : "empty"}. ${filledCount} of ${n} filled.`,
+  iconArrayChip: (index, n, filled) => `${index} of ${n} — ${filled ? "filled" : "empty"}`,
 };

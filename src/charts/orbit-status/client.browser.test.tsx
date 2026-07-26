@@ -81,4 +81,13 @@ describe("interactive <OrbitStatus>", () => {
       expect.objectContaining({ index: 0, value: 240, label: "API" }),
     );
   });
+
+  it('label="latency" suppresses the chip (ms already beside the orbit)', async () => {
+    const screen = await render(
+      <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} label="latency" />,
+    );
+    const fig = screen.container.querySelector(".mc-orbit-live") as HTMLElement;
+    fig.focus();
+    expect(fig.querySelector(".mc-spark-readout")).toBeNull();
+  });
 });

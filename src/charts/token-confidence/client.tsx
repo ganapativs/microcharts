@@ -1,8 +1,10 @@
 "use client";
 // Interactive <TokenConfidence>. Roving tabIndex across FLAGGED
 // tokens (confident tokens are skipped — they carry no mark); focus announces
-// the tier + confidence. HTML host (the documented SVG exception); shares the
-// pure tiering with the static entry.
+// the tier + confidence, and hover OR focus floats that same reading as a chip
+// over the token (the underline says "flagged"; only the chip says how badly).
+// HTML host (the documented SVG exception); shares the pure tiering with the
+// static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
@@ -24,6 +26,11 @@ export interface InteractiveTokenConfidenceProps extends TokenConfidenceProps {
    */
   format?: Format;
   locale?: string | string[];
+  /**
+   * Show the floating tier + confidence chip on hover/focus (default `true`).
+   * `false` suppresses only the chip; the announcement is untouched.
+   */
+  readout?: boolean;
 }
 
 export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.ReactNode {
@@ -32,6 +39,7 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
     tiers = DEFAULT_TIERS,
     show = "flagged",
     legend = false,
+    readout = true,
     format,
     locale,
     strings = EN_TOKEN_CONFIDENCE,
@@ -56,9 +64,23 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
     return m;
   }, [flagged]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const refs = useRef<(HTMLSpanElement | null)[]>([]);
+  const hostRef = useRef<HTMLSpanElement>(null);
+  // Tokens are addressed through one data attribute, not an array of ref
+  // callbacks: an inline `ref={(el) => …}` has a fresh identity every render, so
+  // React detached and re-attached EVERY token ref on every render — and a
+  // streamed reply re-renders once per token. Same for the listeners below.
+  const tokenEl = useCallback(
+    (i: number): HTMLElement | null =>
+      hostRef.current?.querySelector<HTMLElement>(`[data-mc-token="${i}"]`) ?? null,
+    [],
+  );
   const [active, setActive] = useState<number | null>(null);
   const [announced, setAnnounced] = useState("");
+  // The chip carries its own position: the host is a paragraph of flowing,
+  // wrapping text, so "above the chart" is meaningless — the chip has to sit
+  // over the token itself, which means measuring it. A client entry may
+  // measure; the static one may not.
+  const [chip, setChip] = useState<{ text: string; left: number; top: number } | null>(null);
   const baseId = useId();
 
   const accName =
@@ -67,6 +89,13 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       : typeof summary === "string"
         ? summary
         : tokenConfidenceSummary(tokens, strings);
+  // Decorative opt-out, the same rule `named()` applies to every other chart:
+  // `summary={false}` with no `title` means the text is already in the page and
+  // the marks are ornament. The static entry honoured it; this one named itself
+  // unconditionally AND kept its roving tab stops, so assistive tech landed on
+  // an image it had nothing to say about (WCAG 4.1.2). Tab stops go with it —
+  // focusable descendants of `aria-hidden` are exactly the state that rule bans.
+  const decorative = summary === false && !title;
   const label = [title, accName].filter(Boolean).join(". ") || strings.tokenConfidenceLabel;
 
   const announce = useCallback(
@@ -83,14 +112,32 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
     [tokens, strings, fmt],
   );
 
+  const showChip = useCallback(
+    (tokenIndex: number) => {
+      const host = hostRef.current;
+      const el = tokenEl(tokenIndex);
+      const t = tokens[tokenIndex];
+      if (!readout || !host || !el || !t) return;
+      const h = host.getBoundingClientRect();
+      const r = el.getBoundingClientRect();
+      setChip({
+        text: strings.tokenChip(strings.tokenTierNames[TIER_INDEX[t.tier]]!, fmt(t.confidence)),
+        left: r.left - h.left + r.width / 2,
+        top: r.top - h.top,
+      });
+    },
+    [readout, tokens, strings, fmt, tokenEl],
+  );
+
   const focusFlagged = useCallback(
     (fi: number) => {
       const clamped = Math.max(0, Math.min(flagged.length - 1, fi));
       setActive(clamped);
-      refs.current[flagged[clamped]!]?.focus();
+      tokenEl(flagged[clamped]!)?.focus();
       announce(flagged[clamped]!);
+      showChip(flagged[clamped]!);
     },
-    [flagged, announce],
+    [flagged, announce, showChip, tokenEl],
   );
 
   const onKeyDown = useCallback(
@@ -122,13 +169,50 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
     ? `mc-token-confidence mc-tc-live ${className}`
     : "mc-token-confidence mc-tc-live";
 
+  // ONE listener set on the host instead of three per flagged token. React's
+  // onFocus/onBlur are focusin/focusout (they bubble), and pointerover bubbles
+  // where pointerenter does not — so delegation is a straight swap, and a
+  // 500-token reply stops paying 1 500 handler bindings per render.
+  const tokenIndexFrom = (target: EventTarget | null): number | null => {
+    const el = (target as Element | null)?.closest?.("[data-mc-token]");
+    const raw = el?.getAttribute("data-mc-token");
+    return raw === null || raw === undefined ? null : Number(raw);
+  };
+
   return (
     <span
       className={rootClass}
       style={style as CSSProperties}
-      role="img"
-      aria-label={label}
-      onKeyDown={onKeyDown}
+      ref={hostRef}
+      {...(decorative ? { "aria-hidden": true as const } : { role: "img", "aria-label": label })}
+      onKeyDown={decorative ? undefined : onKeyDown}
+      onPointerOver={
+        decorative
+          ? undefined
+          : (e) => {
+              const i = tokenIndexFrom(e.target);
+              // Clearing on the way OUT of a token matters as much as showing:
+              // the host is a paragraph, so the pointer leaves a flagged token
+              // onto ordinary prose long before it leaves the host, and a chip
+              // that only cleared on `pointerleave` hung over unrelated words.
+              if (i !== null && flaggedPosOf.has(i)) showChip(i);
+              else setChip(null);
+            }
+      }
+      onPointerLeave={() => setChip(null)}
+      onFocus={
+        decorative
+          ? undefined
+          : (e) => {
+              const i = tokenIndexFrom(e.target);
+              const pos = i === null ? undefined : flaggedPosOf.get(i);
+              if (i === null || pos === undefined) return;
+              setActive(pos);
+              announce(i);
+              showChip(i);
+            }
+      }
+      onBlur={() => setChip(null)}
     >
       {tokens.map((t, i) => {
         const flaggedPos = flaggedPosOf.get(i) ?? -1;
@@ -143,23 +227,13 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
           <span
             // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
             key={i}
-            ref={(el) => {
-              refs.current[i] = el;
-            }}
-            id={isFlagged ? `${baseId}-${i}` : undefined}
+            data-mc-token={isFlagged ? i : undefined}
+            id={isFlagged && !decorative ? `${baseId}-${i}` : undefined}
             tabIndex={
-              isFlagged
+              isFlagged && !decorative
                 ? active === flaggedPos || (active === null && flaggedPos === 0)
                   ? 0
                   : -1
-                : undefined
-            }
-            onFocus={
-              isFlagged
-                ? () => {
-                    setActive(flaggedPos);
-                    announce(i);
-                  }
                 : undefined
             }
           >
@@ -182,6 +256,19 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       ) : null}
       {children}
       <LiveRegion>{announced}</LiveRegion>
+      {readout && chip ? (
+        <span
+          className="mc-spark-readout"
+          style={{
+            left: chip.left,
+            top: chip.top,
+            bottom: "auto",
+            transform: "translate(-50%, calc(-100% - 0.2em))",
+          }}
+        >
+          {chip.text}
+        </span>
+      ) : null}
     </span>
   );
 }

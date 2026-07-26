@@ -100,11 +100,13 @@ describe("interactive <PictogramRow>", () => {
           flatChange: "Aucun changement.",
           status: (s) => `${s}.`,
           level: (v, l, s) => `${v} ${l}/${s}.`,
+          levelChip: (v, l, s) => `${v} ${l}/${s}`,
           progress: (p) => `${p}.`,
           remaining: (p) => `${p}.`,
           stepsDone: (d, t) => `${d}/${t}.`,
           countOf: (v, t) => `${v} sur ${t}.`,
           pictogramUnit: (i, n, fill) => `Unité ${i} sur ${n} — ${fill}.`,
+          pictogramChip: (i, n, fill) => `${i} sur ${n} — ${fill}`,
         }}
       />,
     );
@@ -113,10 +115,46 @@ describe("interactive <PictogramRow>", () => {
     wrap.focus();
     key(wrap, "Home");
     await expect.poll(() => live.textContent).toBe("Unité 1 sur 8 — full.");
+    // The VISIBLE chip is translated too — no English leaks into the painted UI.
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("1 sur 8 — full");
   });
 
   it("controlled selectedIndex pins the ring without focus", async () => {
     const screen = await render(<PictogramRow value={5} total={8} selectedIndex={2} />);
     expect(screen.container.querySelectorAll('circle[data-mc-w="tick"]')).toHaveLength(1);
+  });
+
+  // Full, empty and the partly-filled unit each read out — the partial one is
+  // the whole reason this chart's chip cannot just be "filled/empty".
+  it("roving paints the unit's reading as a chip; `formatted` mirrors it", async () => {
+    const seen: { formatted?: string | undefined }[] = [];
+    const screen = await render(
+      <PictogramRow value={5.4} total={8} onActive={(d) => d && seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-pictogram-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    wrap.focus();
+    key(wrap, "Home");
+    await expect.poll(chip).toBe("1 of 8 — filled");
+    expect(seen.at(-1)?.formatted).toBe("1 of 8 — filled");
+    for (let i = 0; i < 5; i++) key(wrap, "ArrowRight");
+    await expect.poll(chip).toBe("6 of 8 — 40%");
+    key(wrap, "End");
+    await expect.poll(chip).toBe("8 of 8 — empty");
+  });
+
+  it("readout={false} drops the chip and keeps the ring + callback", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <PictogramRow value={5} total={8} readout={false} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-pictogram-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    await expect.poll(() => seen.at(-1)).toMatchObject({ formatted: "1 of 8 — filled" });
+    expect(screen.container.querySelector('circle[data-mc-w="full"]')).not.toBeNull();
+    expect(screen.container.querySelector(".mc-spark-readout")).toBeNull();
   });
 });

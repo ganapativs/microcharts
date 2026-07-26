@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       showValue={s.showValue as boolean}
       positive={s.positive as "up" | "down"}
       format={PCT}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       style={{ width: (s.showValue as boolean) ? 96 : 48, height: 48 }}
     />

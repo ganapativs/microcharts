@@ -37,10 +37,11 @@ export const playground: PlaygroundSpec = {
   codeInteractive: (s, _data, ui) =>
     [
       "<MinimapStrip",
-      `  data={{ content, window: [${s.window}, ${(s.window as number) + 140}], marks, known }}`,
+      "  data={{ content, window: viewport, marks, known }}",
       s.mode !== "bars" && `  mode="${s.mode}"`,
       s.markLane === false && "  markLane={false}",
-      ui.animate && " animate",
+      ui.animate && "  animate",
+      "  onWindowChange={setViewport}",
       "/>",
     ]
       .filter(Boolean)

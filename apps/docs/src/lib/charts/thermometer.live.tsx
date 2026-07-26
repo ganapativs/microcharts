@@ -27,7 +27,7 @@ export const playground: PlaygroundSpec = {
       target={s.target as number}
       orientation={s.orientation as "vertical" | "horizontal"}
       bulb={s.bulb as boolean}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       {...(s.orientation === "horizontal" ? { width: 120 } : { height: 72 })}
     />

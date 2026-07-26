@@ -27,9 +27,9 @@ export declare const I18N_PROPS: ChartProp[];
  * (`entry.animates === false` marks the ones that can't). `live` is narrower
  * still — only the entries whose value can change under a static cursor
  * declare it. The four picker props
- * (`onActive`, `onSelect`, `selectedIndex`, `defaultSelectedIndex`) come from
- * `PickerProps` and exist only on charts with more than one navigable unit —
- * `entry.picker === false` marks the ones without (see `types.ts`).
+ * (`onActive`, `selectedIndex`, `defaultSelectedIndex`) come from `PickerProps`
+ * and exist only on multi-unit charts. Lean scalars (`picker: false`) still
+ * take whole-chart `onSelect` — see `types.ts`.
  */
 export declare const SHARED_INTERACTIVE_PROPS: ChartProp[];
 /** Everything, in the order the catalog reference should list it. */

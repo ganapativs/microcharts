@@ -39,4 +39,20 @@ describe("interactive <Bullet>", () => {
     fig.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 72 });
   });
+
+  // The chip states the SIGNED GAP to target; the accessible name states only
+  // value and target. Without a live region a screen-reader user never got the
+  // gap — Bullet was the one interactive entry with no announcement channel.
+  it("announces the same reading the chip shows", async () => {
+    const fig = await mount(<Bullet value={72} target={80} title="Sales" />);
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("");
+    fig.focus();
+    await expect.poll(() => live.textContent).toBe("72 / 80 · −8");
+    await expect
+      .poll(() => fig.querySelector(".mc-spark-readout")?.textContent)
+      .toBe(live.textContent);
+    fig.blur();
+    await expect.poll(() => live.textContent).toBe("");
+  });
 });

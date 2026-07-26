@@ -34,7 +34,10 @@ export interface InteractiveOrbitStatusProps extends OrbitStatusProps {
    * always wins.
    */
   animate?: boolean;
-  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  /**
+   * Show the floating value chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="latency"` already prints it.
+   */
   readout?: boolean;
   /** The dependency was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — value is latency. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
@@ -173,7 +176,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {readout && open ? (
+      {/* Skip when `label="latency"` already prints the same ms beside the orbit. */}
+      {readout && open && rest.label !== "latency" ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(geo.size / 2, vbWidth)}>
           {geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency)))}
         </span>

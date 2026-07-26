@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { FillWord } from "./client.js";
 
 describe("interactive <FillWord>", () => {
@@ -41,5 +42,27 @@ describe("interactive <FillWord>", () => {
     await expect
       .poll(() => picks.at(-1))
       .toMatchObject({ index: 0, value: 0.2, label: "uploading" });
+  });
+
+  it("hover reveals the percent the ink edge only approximates", async () => {
+    const screen = await render(<FillWord word="Deploy" value={0.42} />);
+    const wrap = screen.container.querySelector(".mc-fillword-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("42%");
+    await userEvent.unhover(wrap);
+    await expect.poll(chip).toBeUndefined();
+
+    // drain mode reads out what is LEFT, exactly like its own numeral does
+    const drain = await render(<FillWord word="Deploy" value={0.42} mode="drain" />);
+    const dw = drain.container.querySelector(".mc-fillword-live") as HTMLElement;
+    await userEvent.hover(dw);
+    await expect.poll(() => dw.querySelector(".mc-spark-readout")?.textContent).toBe("58%");
+
+    // …and stays away when the numeral is printed
+    const labelled = await render(<FillWord word="Deploy" value={0.42} label="value" />);
+    const lw = labelled.container.querySelector(".mc-fillword-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
 });

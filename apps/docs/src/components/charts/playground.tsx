@@ -6,6 +6,7 @@ import { cn } from "@/lib/cn";
 // Lazy, one chunk per chart — a static `registry` import here would put all 106
 // chart modules (each with its interactive twin) in this route's client bundle.
 import { useChartModule } from "@/lib/charts/use-chart-module";
+import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
 import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
 
@@ -153,7 +154,7 @@ function Select({
 type Datum = { index: number; value: number | null; label?: string; formatted?: string };
 
 /** One logged callback firing. `d === null` is a clear (`onActive(null)` etc.). */
-type Ev = { id: number; kind: "active" | "select"; d: Datum | null };
+type Ev = { id: number; kind: "active" | "select" | "window"; d: Datum | null };
 
 /** The display string for a datum — its `formatted`, falling back to the raw value. */
 const showDatum = (d: Datum): string => d.formatted ?? (d.value === null ? "—" : String(d.value));
@@ -163,110 +164,170 @@ const showDatum = (d: Datum): string => d.formatted ?? (d.value === null ? "—"
  * callbacks. This is the whole point of `readout={false}`: the value leaves the
  * chart and is rendered wherever the product wants it.
  *
- * It is ABSOLUTELY positioned (top-right, `pointer-events-none`) so it floats
- * over the plot without ever changing the container's height — no shift on hover
- * or when switching static ↔ interactive — and never blocks a hover underneath
- * it. The value is STICKY (keeps the last reading, dimming to `idle`, rather
- * than blanking on mouse-out) and a short log keeps recent firings readable.
+ * Absolutely positioned top-right so it never shifts the plot container. Body
+ * stays `pointer-events-none` (hover passes through to the chart); only the
+ * collapse control is clickable. Open by default; collapse to a chip when the
+ * panel covers the mark. Value is sticky (last reading dims to `idle`).
  */
 function ReadoutTile({
   active,
   selected,
   events,
-  scalar,
+  label,
+  emptyHint = "hover · rove · click…",
 }: {
   active: Datum | null;
   selected: Datum | null;
   events: Ev[];
-  scalar: boolean;
+  label: string;
+  emptyHint?: string;
 }) {
+  const [open, setOpen] = useState(true);
   const last = events.find((e) => e.d)?.d ?? null; // most recent non-clear firing
   const shown = active ?? selected ?? last; // sticky: survives pointer-leave
-  const state = active ? "live" : selected ? "pinned" : shown ? "idle" : "empty";
+  // Window drags aren't a pinned unit selection — sticky reading stays `idle`.
+  const state = active
+    ? "live"
+    : selected && label !== "onWindowChange"
+      ? "pinned"
+      : shown
+        ? "idle"
+        : "empty";
   const value = shown ? showDatum(shown) : null;
+  const kindTag = (k: Ev["kind"]): string =>
+    k === "window" ? "win" : k === "select" ? "sel" : "act";
 
   return (
-    <div className="pointer-events-none absolute right-2.5 top-2.5 z-10 flex w-[9.5rem] flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md sm:w-[11rem]">
-      {/* compact value header */}
-      <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-2">
-        <div className="flex items-center justify-between gap-1">
-          <span className="mono-label text-[0.5rem]">{scalar ? "onSelect" : "onActive"}</span>
-          <span
-            className={cn(
-              "flex items-center gap-1 text-[0.55rem] font-medium",
-              state === "live"
-                ? "text-fd-primary"
-                : state === "pinned"
-                  ? "text-fd-foreground/70"
-                  : "text-fd-muted-foreground/55",
-            )}
-          >
-            {state === "live" && (
-              <span className="size-1 animate-pulse rounded-full bg-fd-primary" />
-            )}
-            {state === "empty" ? "idle" : state}
-          </span>
-        </div>
-        <span
-          className={cn(
-            "font-display font-medium leading-tight tracking-tight tabular-nums break-words",
-            value && value.length > 10 ? "text-[0.9rem]" : "text-lg leading-none",
-            value === null
-              ? "text-fd-muted-foreground/40"
-              : state === "idle"
-                ? "text-fd-foreground/70"
-                : "text-fd-foreground",
-          )}
-        >
-          {value ?? "—"}
+    <div
+      className={cn(
+        "pointer-events-none absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md transition-[width,max-width] duration-200 ease-out",
+        open ? "w-[11.5rem] sm:w-[13rem]" : "w-auto max-w-[11.5rem]",
+      )}
+    >
+      <div
+        className={cn(
+          "flex items-center gap-1.5 pl-2.5 pr-1.5",
+          open ? "justify-between pb-0 pt-2" : "h-7",
+        )}
+      >
+        <span className="mono-label min-w-0 flex-1 truncate leading-none text-[0.5rem]">
+          {label}
         </span>
+        <div className="flex h-5 shrink-0 items-center gap-1">
+          {(open || state !== "empty") && (
+            <span
+              className={cn(
+                "flex h-5 items-center gap-1 leading-none text-[0.55rem] font-medium",
+                state === "live"
+                  ? "text-fd-primary"
+                  : state === "pinned"
+                    ? "text-fd-foreground/70"
+                    : "text-fd-muted-foreground/55",
+              )}
+            >
+              {state === "live" && (
+                <span className="size-1 animate-pulse rounded-full bg-fd-primary" />
+              )}
+              {open
+                ? state === "empty"
+                  ? "idle"
+                  : state
+                : state !== "empty" &&
+                  state !== "live" && (
+                    <span className="size-1 rounded-full bg-fd-muted-foreground/45" />
+                  )}
+            </span>
+          )}
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-label={open ? `Collapse ${label} panel` : `Expand ${label} panel`}
+            onClick={() => setOpen((v) => !v)}
+            className="pointer-events-auto flex size-5 shrink-0 items-center justify-center rounded-md text-fd-muted-foreground/70 transition-colors hover:bg-fd-muted/60 hover:text-fd-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-fd-primary/50"
+          >
+            <ChevronDown
+              aria-hidden
+              className={cn(
+                "size-3.5 shrink-0 transition-transform duration-200 ease-out",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        </div>
       </div>
 
-      {/* Event log — the last firings, so the stream stays readable after
-          mouse-out. Fixed row budget → the overlay never grows the container. */}
-      <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
-        {events.length === 0 ? (
-          <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
-            hover · rove · click…
-          </li>
-        ) : (
-          events.slice(0, 6).map((e, i) => (
-            <li
-              key={e.id}
-              className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
-              style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
-            >
-              <span
-                className={cn(
-                  "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
-                  e.kind === "select" ? "text-fd-primary" : "text-fd-muted-foreground/70",
-                )}
-              >
-                {e.kind === "select" ? "sel" : "act"}
-              </span>
-              {e.d ? (
-                <span className="flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
-                  #{e.d.index + 1} {showDatum(e.d)}
-                </span>
-              ) : (
-                <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
-                  cleared
-                </span>
-              )}
-            </li>
-          ))
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows] duration-200 ease-out",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
-      </ol>
+      >
+        <div className="pointer-events-none min-h-0 overflow-hidden">
+          <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-0.5">
+            <span
+              className={cn(
+                "font-display font-medium leading-tight tracking-tight tabular-nums break-all",
+                value && value.length > 12 ? "text-[0.85rem]" : "text-lg leading-none",
+                value === null
+                  ? "text-fd-muted-foreground/40"
+                  : state === "idle"
+                    ? "text-fd-foreground/70"
+                    : "text-fd-foreground",
+              )}
+            >
+              {value ?? "—"}
+            </span>
+          </div>
+
+          <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
+            {events.length === 0 ? (
+              <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
+                {emptyHint}
+              </li>
+            ) : (
+              events.slice(0, 6).map((e, i) => (
+                <li
+                  key={e.id}
+                  className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
+                  style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
+                >
+                  <span
+                    className={cn(
+                      "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
+                      e.kind === "active" ? "text-fd-muted-foreground/70" : "text-fd-primary",
+                    )}
+                  >
+                    {kindTag(e.kind)}
+                  </span>
+                  {e.d ? (
+                    <span className="min-w-0 flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
+                      {e.kind === "window" ? showDatum(e.d) : `#${e.d.index + 1} ${showDatum(e.d)}`}
+                    </span>
+                  ) : (
+                    <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
+                      cleared
+                    </span>
+                  )}
+                </li>
+              ))
+            )}
+          </ol>
+        </div>
+      </div>
     </div>
   );
 }
 
 /** Rewrite a chart's JSX snippet to render its value in an external node — the
     copy-paste form of what the "In the panel" / "Chart + panel" modes show. */
-function withCallback(jsx: string, hideChip: boolean): string {
+function withCallback(jsx: string, hideChip: boolean, scalar: boolean): string {
   const extra = [
     hideChip ? "  readout={false}" : null,
-    "  onActive={(d) => setReading(d?.formatted)}",
+    // Pickers stream the hovered unit through `onActive`; scalars only fire
+    // `onSelect` (one unit, no rove) — same `datum.formatted` either way.
+    scalar
+      ? "  onSelect={(d) => setReading(d?.formatted)}"
+      : "  onActive={(d) => setReading(d?.formatted)}",
   ]
     .filter(Boolean)
     .join("\n");
@@ -284,6 +345,11 @@ function withCallback(jsx: string, hideChip: boolean): string {
     body,
     "</>",
   ].join("\n");
+}
+
+/** Pin `readout={false}` onto a self-closing chart snippet. */
+function withReadoutOff(jsx: string): string {
+  return jsx.replace(/\n?\/>\s*$/, `\n  readout={false}\n/>`);
 }
 
 /* ── shell ──────────────────────────────────────────────────────────────── */
@@ -483,9 +549,11 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const evId = useRef(0);
   // Where the value is shown: on the chart's own chip, in the external tile, or both.
   const [dest, setDest] = useState<"chart" | "panel" | "both">("chart");
+  // Scalar chip on/off (pickers use `dest` instead).
+  const [chipOn, setChipOn] = useState(true);
   if (!spec || !entry) return null;
 
-  const logEvent = (kind: "active" | "select", d: Datum | null): void =>
+  const logEvent = (kind: Ev["kind"], d: Datum | null): void =>
     setEvents((es) => [{ id: evId.current++, kind, d }, ...es].slice(0, 6));
   const onActiveCb = (d: Datum | null): void => {
     setActive(d);
@@ -499,16 +567,30 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const interactive = mode === "interactive" && !!spec.renderInteractive;
   const canAnimate = interactive && spec.animates !== false;
   const ui = { animate: canAnimate && animate };
-  // `picker: false` charts have one whole-chart selection (onSelect only); every
-  // multi-unit chart also streams the hovered/focused unit through onActive.
-  const scalar = entry.picker === false;
-  // Only picker charts expose the readout dropdown — a scalar without a chip has
-  // no chip to hide, and injecting `readout` there would leak an unknown prop.
-  const showReadoutPicker = interactive && !scalar;
+  // Match the published interaction contract: pickers stream `onActive`, lean
+  // scalars fire `onSelect`. TokenConfidence has no callback tile; MinimapStrip
+  // surfaces its own `onWindowChange` instead of the shared picker props.
+  const kind = interactionKind(entry);
+  const isMinimap = entry.slug === "minimap-strip";
+  const scalar = kind === "single";
+  const streamActive = kind === "picker";
+  const showCallbacks = kind === "picker" || kind === "single" || isMinimap;
+  // Any chart that paints `.mc-spark-readout` exposes a control to hide it.
+  // Pickers get chart/panel/both; scalars + exceptions get an on/off toggle.
+  const hasChip = entry.readout !== false;
+  const showReadoutPicker = interactive && hasChip && streamActive;
+  const showReadoutToggle = interactive && hasChip && !streamActive;
   const clearCallbacks = (): void => {
     setActive(null);
     setSelected(null);
     setEvents([]);
+  };
+  const onWindowChangeCb = (win: [number, number]): void => {
+    const lo = Math.round(win[0]);
+    const hi = Math.round(win[1]);
+    const d: Datum = { index: 0, value: lo, formatted: `${lo}–${hi}` };
+    setSelected(d);
+    logEvent("window", d);
   };
 
   // Remount on discrete knobs / data / mode — not on slider drags.
@@ -516,7 +598,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     .filter((k) => k.kind !== "range")
     .map((k) => String(state[k.key]))
     .concat(spec.shuffle ? [String(seed)] : [])
-    .concat([mode, String(animate), String(take)])
+    .concat([mode, String(animate), String(take), String(chipOn)])
     .join("-");
 
   const importPath = interactive
@@ -532,25 +614,37 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     : spec.render(state, data);
   const cbProps: Record<string, unknown> = {};
   if (interactive) {
-    cbProps.onSelect = onSelectCb;
-    if (!scalar) {
-      cbProps.onActive = onActiveCb;
-      cbProps.readout = showChip;
+    if (isMinimap) cbProps.onWindowChange = onWindowChangeCb;
+    else if (showCallbacks) {
+      cbProps.onSelect = onSelectCb;
+      if (streamActive) cbProps.onActive = onActiveCb;
     }
+    if (hasChip) cbProps.readout = streamActive ? showChip : chipOn;
   }
   const preview =
     interactive && isValidElement(rawPreview) ? cloneElement(rawPreview, cbProps) : rawPreview;
 
   // The snippet mirrors what's on screen: when the value lives in the panel, show
-  // the real `readout={false}` + `onActive` → external-node pattern.
+  // the real `readout={false}` + callback → external-node pattern.
   const external = showReadoutPicker && dest !== "chart";
   const chartJsx = interactive
     ? (spec.codeInteractive?.(state, data, ui) ?? spec.code(state, data))
     : spec.code(state, data);
-  const jsx = external ? withCallback(chartJsx, dest === "panel") : chartJsx;
+  const winAt = (state.window as number | undefined) ?? 520;
+  const jsx = isMinimap
+    ? [
+        `const [viewport, setViewport] = useState<[number, number]>([${winAt}, ${winAt + 140}]);`,
+        "",
+        chartJsx,
+      ].join("\n")
+    : external
+      ? withCallback(chartJsx, dest === "panel", false)
+      : showReadoutToggle && !chipOn
+        ? withReadoutOff(chartJsx)
+        : chartJsx;
   const code = [
     `import { ${entry.name} } from "${importPath}";`,
-    ...(external ? ['import { useState } from "react";'] : []),
+    ...(external || isMinimap ? ['import { useState } from "react";'] : []),
     ...(ui.animate ? ['import "@microcharts/react/motion";'] : []),
     "",
     jsx,
@@ -580,8 +674,14 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
       sampleData={mod?.entry.sampleData}
       preview={preview}
       aside={
-        interactive ? (
-          <ReadoutTile active={active} selected={selected} events={events} scalar={scalar} />
+        interactive && showCallbacks ? (
+          <ReadoutTile
+            active={active}
+            selected={selected}
+            events={events}
+            label={isMinimap ? "onWindowChange" : scalar ? "onSelect" : "onActive"}
+            emptyHint={isMinimap ? "drag · click · ←/→…" : undefined}
+          />
         ) : undefined
       }
       hint={spec.interactiveHint}
@@ -607,6 +707,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
               onChange={(v) => setDest(v as "chart" | "panel" | "both")}
             />
           )}
+          {showReadoutToggle && <Toggle label="readout chip" value={chipOn} onChange={setChipOn} />}
           {canAnimate && <Toggle label="animate" value={animate} onChange={setAnimate} />}
         </>
       }

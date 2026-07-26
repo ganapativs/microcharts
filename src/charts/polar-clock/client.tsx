@@ -113,9 +113,15 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
     (cur: number, key: string) => {
       if (n === 0) return null;
       switch (key) {
+        // ↓/↑ alias forward/back, as on every other radial chart (StarSpoke,
+        // TreeRings, MicroDonut via `nav1d`). Returning null for them left the
+        // keys unconsumed, so pressing ↑ scrolled the page out from under a
+        // reader roving the dial.
         case "ArrowRight":
+        case "ArrowDown":
           return (((cur + 1) % n) + n) % n;
         case "ArrowLeft":
+        case "ArrowUp":
           return (((cur - 1) % n) + n) % n;
         case "Home":
           return 0;

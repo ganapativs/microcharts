@@ -2,12 +2,15 @@
 // Interactive <IconArray>. useActivePicker owns interaction: one pointer
 // listener + pure grid lookup, ←/→/↑/↓ 2-D roving (row-major), click / Enter /
 // Space selects (onSelect). Each unit announces the running count — genuinely
-// useful for a SR user counting. Composes the static component (canon); the
-// focus ring + persistent pin are overlay children re-using geometry.
+// useful for a SR user counting — and shows the terse chip form of that same
+// reading (`readout={false}` suppresses only the chip). Composes the static
+// component (canon); the focus ring + persistent pin are overlay children
+// re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import {
+  crosshairReadoutStyle,
   named,
   fillFor,
   useActivePicker,
@@ -45,6 +48,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     animate = false,
     className,
     style,
+    readout = true,
     onActive,
     onSelect,
     selectedIndex,
@@ -131,9 +135,18 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
     [geo],
   );
 
+  // `formatted` mirrors the chip exactly (the shared contract), so a consumer
+  // pairing `readout={false}` with `onActive` can print the same string.
   const datum = useCallback(
-    (i: number) => ({ index: i, value: geo.units[i]?.filled ? 1 : 0 }),
-    [geo],
+    (i: number) => {
+      const filled = geo.units[i]?.filled ?? false;
+      return {
+        index: i,
+        value: filled ? 1 : 0,
+        formatted: strings.iconArrayChip(i + 1, geo.n, filled),
+      };
+    },
+    [geo, strings],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -204,6 +217,14 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
         {rest.children}
       </StaticIconArray>
       <LiveRegion>{announced}</LiveRegion>
+      {readout && unit ? (
+        <span
+          className="mc-spark-readout"
+          style={crosshairReadoutStyle(unit.x + geo.cell / 2, geo.totalWidth)}
+        >
+          {strings.iconArrayChip(shown! + 1, geo.n, unit.filled)}
+        </span>
+      ) : null}
     </span>
   );
 }

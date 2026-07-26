@@ -23,6 +23,7 @@ export const playground: PlaygroundSpec = {
       tiers={[(s.lo as number) / 100, (s.hi as number) / 100]}
       show={s.all ? "all" : "flagged"}
       legend={s.legend as boolean}
+      title="Playground"
       summary={false}
       style={{ fontSize: "0.95rem" }}
     />

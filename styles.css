@@ -367,10 +367,17 @@
     width: 0.95em;
     height: 0.95em;
   }
-  /* focusable interactive charts never lose a visible ring */
-  :where(.mc-root:focus-visible) {
+  /* Focusable interactive charts never lose a visible ring.
+     The tab stop is the WRAPPER span (`wrap()` stamps `data-mc-host`), never the
+     `<svg>` — no static sets `tabIndex`, so a `.mc-root:focus-visible` rule can
+     never match and every chart fell back to the UA outline. Keep `.mc-root`
+     too: a consumer may make the SVG itself focusable in a custom host. */
+  :where([data-mc-host]:focus-visible, .mc-root:focus-visible) {
     outline: 2px solid var(--mc-accent);
     outline-offset: 2px;
+    /* the wrapper is line-height: 0 and hugs the mark; a hair of radius keeps
+       the ring from reading as a hard box around a round glyph */
+    border-radius: 0.2em;
   }
 
   /* <Delta> — inline text metric; glyph + number share the valence color via
@@ -1068,7 +1075,7 @@
     :where(.mc-root circle[data-mc-ink="flag"]) {
       fill: Highlight;
     }
-    :where(.mc-root:focus-visible) {
+    :where([data-mc-host]:focus-visible, .mc-root:focus-visible) {
       outline-color: Highlight;
     }
     /* Delta: glyph shape already distinguishes direction; unify to system ink */

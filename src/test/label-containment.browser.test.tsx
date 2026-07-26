@@ -45,6 +45,7 @@ import { Sparkline } from "../charts/sparkline/index.js";
 import { SpreadBand } from "../charts/spread-band/index.js";
 import { StackedArea } from "../charts/stacked-area/index.js";
 import { StreakSpark } from "../charts/streak-spark/index.js";
+import { TapeGauge } from "../charts/tape-gauge/index.js";
 import { TrendArrow } from "../charts/trend-arrow/index.js";
 import { Waterfall } from "../charts/waterfall/index.js";
 
@@ -254,6 +255,27 @@ const CASES: Record<string, () => ReactElement> = {
  * leading, which routinely exceeds the glyph ink vertically and would make a
  * vertical assertion fire on correct charts.
  */
+/** The same measurement on the vertical axis — top and bottom viewBox edges. */
+function measureSpillY(root: ParentNode): { label: string; spill: number }[] {
+  const out: { label: string; spill: number }[] = [];
+  for (const svg of root.querySelectorAll("svg.mc-root")) {
+    const box = svg.getBoundingClientRect();
+    if (box.height < 2) continue;
+    const vb = (svg.getAttribute("viewBox") ?? "").split(/[\s,]+/).map(Number);
+    if (vb.length !== 4 || !vb[3]) continue;
+    const cssPerUnit = box.height / vb[3];
+    for (const text of svg.querySelectorAll("text")) {
+      const content = (text.textContent ?? "").trim();
+      if (!content) continue;
+      const r = text.getBoundingClientRect();
+      if (r.height === 0) continue;
+      const spillPx = Math.max(box.top - r.top, r.bottom - box.bottom);
+      if (spillPx > 0) out.push({ label: content, spill: spillPx / cssPerUnit });
+    }
+  }
+  return out;
+}
+
 function measureSpill(root: ParentNode): { label: string; spill: number }[] {
   const out: { label: string; spill: number }[] = [];
   for (const svg of root.querySelectorAll("svg.mc-root")) {
@@ -322,6 +344,62 @@ describe("label containment (real browser + real stylesheet)", () => {
       expect(
         worst,
         `at density ${density}: ${worst.map((w) => `"${w.label}" by ${w.spill.toFixed(1)}u`).join(", ")}`,
+      ).toEqual([]);
+    });
+  }
+
+  // VERTICAL spill. `measureSpill` above compares only left/right edges, which
+  // is exactly why `label="minmax"` passed while painting outside the top of the
+  // box: its two labels are placed by y, and its size pin was missing, so they
+  // were laid out at 5–9 units and painted at the inherited 0.75em. Charts whose
+  // labels are positioned vertically need both axes measured.
+  const VERTICAL: Record<string, () => ReactElement> = {
+    "sparkline label=minmax (short)": () => (
+      <Sparkline data={[3, 9, 2, 8, 5]} label="minmax" height={28} title="MinMax" />
+    ),
+    "sparkline label=minmax (tall)": () => (
+      <Sparkline data={[3, 9, 2, 8, 5]} label="minmax" height={48} title="MinMax" />
+    ),
+    "sparkline label=minmax (flat series)": () => (
+      <Sparkline data={[5, 5, 5, 5]} label="minmax" height={40} title="Flat" />
+    ),
+    "sparkline label=minmax (long figures)": () => (
+      <Sparkline data={[1234567, 9, 2, 8, 5]} label="minmax" height={40} title="Long" />
+    ),
+    "sparkline label=last": () => (
+      <Sparkline data={[3, 6, 2, 8, 5]} label="last" height={20} title="Last" />
+    ),
+    // Two type sizes in one chart: the root pins the TICK size, so the hero
+    // readout needs an inline font-size or it paints at 7 while its clearance
+    // is reserved for up to 13.
+    "tape-gauge readout (vertical)": () => (
+      <TapeGauge value={142} span={25} height={80} title="Airspeed" />
+    ),
+    "tape-gauge readout (horizontal)": () => (
+      <TapeGauge
+        value={142}
+        span={25}
+        orientation="horizontal"
+        width={90}
+        height={34}
+        title="Air"
+      />
+    ),
+  };
+
+  // Tighter than the horizontal tolerance on purpose. These charts are ~28 units
+  // tall rendered at 1 unit = 1 px, so a vertical escape is small in absolute
+  // terms and still wrong: the unpinned `minmax` labels measured exactly 1.0
+  // unit past each edge, which a 1-unit slack would wave through.
+  const VERTICAL_TOLERANCE = 0.5;
+
+  for (const [name, renderChart] of Object.entries(VERTICAL)) {
+    it(`${name} — labels stay inside the viewBox top and bottom`, async () => {
+      const screen = await render(renderChart());
+      const worst = measureSpillY(screen.container).filter((s) => s.spill > VERTICAL_TOLERANCE);
+      expect(
+        worst,
+        `${name}: ${worst.map((w) => `"${w.label}" by ${w.spill.toFixed(1)}u`).join(", ")}`,
       ).toEqual([]);
     });
   }

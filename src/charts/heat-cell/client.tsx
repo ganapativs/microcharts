@@ -20,7 +20,10 @@ export interface InteractiveHeatCellProps extends HeatCellProps {
    * `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
-  /** Show the floating value chip on hover/focus (default `true`). `false` suppresses only the chip. */
+  /**
+   * Show the floating value chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="value"` already prints it.
+   */
   readout?: boolean;
   /** The cell was activated (click, tap, Enter or Space): `{ index: 0, value }` — the cell's value. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
@@ -56,12 +59,18 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
+  // Chip drops the summary's trailing period; keeps value + level (the cell
+  // alone doesn't name the step). Its own `strings` token, never an inline
+  // template — a chip is rendered text, so English in it is untranslatable.
+  // Suppressed when `label="value"` already prints the number on the cell.
+  const chip = geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, steps) : fmt(value);
+
   // Drill-down: the cell's own value (the number the readout shows).
   const select = (): void =>
     onSelect?.({
       index: 0,
       value: Number.isFinite(value) ? value : null,
-      formatted: geo.step !== null ? strings.level(fmt(value), geo.step + 1, steps) : fmt(value),
+      formatted: chip,
     });
 
   return (
@@ -94,9 +103,9 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{active ? text : ""}</LiveRegion>
-      {readout && active && geo.step !== null ? (
+      {readout && active && geo.step !== null && props.label !== "value" ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
-          {strings.level(fmt(value), geo.step + 1, steps)}
+          {chip}
         </span>
       ) : null}
     </span>

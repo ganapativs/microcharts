@@ -26,7 +26,7 @@ export const playground: PlaygroundSpec = {
       value={(s.value as number) / 100}
       label={s.label as "none" | "remaining" | "elapsed"}
       stream={s.stream as boolean}
-      summary={false}
+      title="Playground"
       height={64}
     />
   ),

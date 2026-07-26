@@ -6,11 +6,13 @@
 // never simulated between updates. Reduced-motion → instant reposition (the static
 // encoding is already complete). useActivePicker owns interaction: one pointer
 // listener + nearest-point-by-x math, ←/→ walk the trail (left = older, right =
-// newer), click / Enter / Space selects (onSelect). Composes the static
-// component (canon).
+// newer), click / Enter / Space selects (onSelect). The shown point's value
+// rides in a floating chip over its dot (`readout={false}` suppresses only the
+// chip). Composes the static component (canon).
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import {
+  crosshairReadoutStyle,
   named,
   fillFor,
   useActivePicker,
@@ -60,6 +62,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     summary,
     className,
     style,
+    readout = true,
     onActive,
     onSelect,
     selectedIndex,
@@ -215,6 +218,18 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
         {rest.children}
       </StaticCometTrail>
       <LiveRegion>{announced}</LiveRegion>
+      {/* The head's value is already printed by `label="last"`, and the chip
+          would land on top of that numeral — skip it there (SparkLine's rule),
+          and read out every earlier point in the trail. */}
+      {readout &&
+      shownMark &&
+      shownValue !== undefined &&
+      Number.isFinite(shownValue) &&
+      !(label === "last" && shown === marks.length - 1) ? (
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownMark.cx, width)}>
+          {fmt(shownValue)}
+        </span>
+      ) : null}
     </span>
   );
 }

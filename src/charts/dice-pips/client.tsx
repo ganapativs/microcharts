@@ -38,7 +38,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     style,
     ...rest
   } = props;
-  const summary = dicePipsSummary(value, strings);
+  const text = dicePipsSummary(value, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   // seat the wrapper, not just the SVG, so the click target stays on the
   // painted glyph when this sits inline in prose (see seat-hoist).
@@ -50,7 +50,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(summary);
+    if (live) setAnnounced(text);
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     // A new face is a roll landing — pips pop into place (scale + a tiny
     // per-pip stagger), not a flat dissolve.
@@ -72,9 +72,15 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
         () => {},
       );
     });
-  }, [value, live, summary]);
+  }, [value, live, text]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // The pips are ONE face, not six navigable marks: a single selectable unit
   // (index 0) carrying the rounded count the face renders.

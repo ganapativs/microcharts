@@ -11,6 +11,7 @@ export type ScalarStrings = Pick<
   | "flatChange"
   | "status"
   | "level"
+  | "levelChip"
   | "progress"
   | "remaining"
   | "stepsDone"
@@ -23,6 +24,7 @@ export const EN_SCALAR: ScalarStrings = {
   flatChange: "No change.",
   status: (state) => `Status: ${state}.`,
   level: (v, level, steps) => `${v} — level ${level} of ${steps}.`,
+  levelChip: (v, level, steps) => `${v} — level ${level} of ${steps}`,
   progress: (pct) => `${pct} complete.`,
   remaining: (pct) => `${pct} remaining.`,
   stepsDone: (done, total) => `${done} of ${total} steps.`,

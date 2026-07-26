@@ -77,4 +77,29 @@ describe("interactive <PolarClock>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('path[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // ↑/↓ must MOVE (and be consumed). Unhandled, they scrolled the page while a
+  // keyboard reader was roving the dial — every other radial chart aliases them.
+  it("↑/↓ rove the cycle like ←/→, and are consumed", async () => {
+    const screen = await render(<PolarClock data={WEEK} title="Week" />);
+    const wrap = screen.getByRole("img").element() as HTMLElement;
+    const live = wrap.querySelector('[aria-live="polite"]')!;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    // let the Home announcement land before capturing it — React state is async
+    await expect.poll(() => live.textContent).not.toBe("");
+    const first = live.textContent;
+    const down = new KeyboardEvent("keydown", {
+      key: "ArrowDown",
+      bubbles: true,
+      cancelable: true,
+    });
+    wrap.dispatchEvent(down);
+    expect(down.defaultPrevented, "ArrowDown must be consumed, not left to scroll").toBe(true);
+    await expect.poll(() => live.textContent).not.toBe(first);
+    const up = new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true });
+    wrap.dispatchEvent(up);
+    expect(up.defaultPrevented).toBe(true);
+    await expect.poll(() => live.textContent).toBe(first);
+  });
 });

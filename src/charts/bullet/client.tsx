@@ -9,7 +9,7 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_BULLET } from "../../core/strings-bullet.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { Bullet as StaticBullet, bulletSummary, type BulletProps } from "./index.js";
 
 // The measure bar shares the "bar" ink with the background bands; it's always
@@ -48,9 +48,6 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   } = props;
   const [open, setOpen] = useState(false);
   const hostRef = useRef<HTMLSpanElement>(null);
-  // no LiveRegion here to host it: seat the wrapper so the readout chip
-  // and the hit box travel with the mark when inline (see seat-hoist).
-  useSeatHoist(hostRef);
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
   const fmt = makeFormatter(format, locale);
@@ -61,13 +58,18 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : auto;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const readoutText = hasTarget
-    ? `${fmt(value)} / ${fmt(target)}${
-        Number.isFinite(value - target)
-          ? ` · ${value - target >= 0 ? "+" : "−"}${fmt(Math.abs(value - target))}`
-          : ""
-      }`
-    : fmt(value);
+  // The gap is the chip's unique contribution — the permanent gutter never
+  // prints it. When `label="both"` already shows value/target, float only the gap.
+  const gap =
+    hasTarget && Number.isFinite(value - target!)
+      ? `${value - target! >= 0 ? "+" : "−"}${fmt(Math.abs(value - target!))}`
+      : "";
+  const readoutText =
+    (rest.label ?? "none") === "both" && gap
+      ? gap
+      : hasTarget
+        ? `${fmt(value)} / ${fmt(target)}${gap ? ` · ${gap}` : ""}`
+        : fmt(value);
 
   // Drill-down: the MEASURE — the one thing the bar encodes. The target and the
   // qualitative bands are context, not the datum.
@@ -105,6 +107,13 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       />
+      {/* The chip carries the signed distance to target, which the accessible
+          name does NOT — the summary states value and target, not the gap. So a
+          screen-reader user could reach this chart and never get the number the
+          sighted reader is handed. Announcing the readout closes that, and the
+          region doubles as this entry's inline-seat host (see live-region.tsx),
+          which is what `useSeatHoist` was standing in for. */}
+      <LiveRegion>{open ? readoutText : ""}</LiveRegion>
       {readout && open ? (
         <span className="mc-spark-readout" style={{ right: 0 }}>
           {readoutText}

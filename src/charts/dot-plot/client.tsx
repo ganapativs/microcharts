@@ -136,7 +136,8 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         index: i,
         value: v,
         label: d?.label,
-        formatted: v === null ? undefined : `${d!.label}: ${fmt(v)}`,
+        // Mirrors the chip, em dash and all — an empty row is a reading too.
+        formatted: d ? `${d.label}: ${v === null ? "—" : fmt(v)}` : undefined,
       };
     },
     [data, fmt],
@@ -216,16 +217,15 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         {rest.children}
       </StaticDotPlot>
       <LiveRegion>{announced}</LiveRegion>
-      {readout &&
-      shownRow &&
-      shownDatum &&
-      isFiniteValue(shownDatum.value) &&
-      shownRow.x !== null ? (
+      {/* An empty row is still a navigable unit and still announces "no data",
+          so it reads out too — as an em dash, the shared empty-chip form. Its
+          dot has no x to sit over, so the chip centres on the row instead. */}
+      {readout && shownRow && shownDatum ? (
         <span
           className="mc-spark-readout"
-          style={rowReadoutStyle(shownRow.x, shownRow.y, width, height)}
+          style={rowReadoutStyle(shownRow.x ?? width / 2, shownRow.y, width, height)}
         >
-          {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
+          {`${shownDatum.label}: ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}
     </span>

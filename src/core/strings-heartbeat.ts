@@ -6,7 +6,12 @@ import type { SummaryStrings } from "./summary.js";
 
 export type HeartbeatStrings = Pick<
   SummaryStrings,
-  "heartbeat" | "heartbeatFlat" | "heartbeatWindow" | "heartbeatAgo" | "heartbeatEmpty"
+  | "heartbeat"
+  | "heartbeatFlat"
+  | "heartbeatWindow"
+  | "heartbeatAgo"
+  | "heartbeatEmpty"
+  | "heartbeatChip"
 >;
 
 export const EN_HEARTBEAT: HeartbeatStrings = {
@@ -22,4 +27,5 @@ export const EN_HEARTBEAT: HeartbeatStrings = {
   },
   heartbeatAgo: (ms) => (ms < 60_000 ? `${Math.round(ms / 1000)}s` : `${Math.round(ms / 60_000)}m`),
   heartbeatEmpty: "no events",
+  heartbeatChip: (n) => (n === 1 ? "1 event" : `${n} events`),
 };

@@ -622,7 +622,17 @@ export function runEntrance(
     start();
   };
   const unobserve = observeOnce(svg, kick);
-  const safety = window.setTimeout(kick, 400);
+  // The failsafe RELEASES THE HOLD; it does not play the entrance. It used to
+  // call `kick`, so a chart mounted below the fold ran its whole entrance
+  // invisibly 400 ms after mount and the reader who scrolled to it later found a
+  // static chart — the exact opposite of this file's contract ("off-screen
+  // charts hold their first frame"). Revealing is enough for the cases the
+  // timeout exists for (a zero-size host, a background tab, no IO delivery);
+  // the observer is still armed, so the entrance plays whenever the chart is
+  // actually seen, and `start()` re-clears opacity itself.
+  const safety = window.setTimeout(() => {
+    if (!started) svg.style.opacity = "";
+  }, 400);
 
   return () => {
     window.clearTimeout(safety);

@@ -32,7 +32,7 @@ export const playground: PlaygroundSpec = {
       value={(s.value as number) / 100}
       mode={s.mode as "fill" | "drain"}
       label={s.label ? "value" : "none"}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       fontSize={18}
     />

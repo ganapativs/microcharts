@@ -2,14 +2,20 @@
 // Interactive <FillWord>. The ink edge glides along the word via a
 // CSS clip-path transition (styles.css, reduced-motion-gated). Announces changes
 // through a polite region, throttled to ≥1 s so a streaming value never spams.
-// Wrapper focus only (one value). Composes the static component.
+// Wrapper focus only (one value) — but hover/focus reveals the percent, which
+// the fill edge alone only approximates. Composes the static component.
 import { useEffect, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
-import { FillWord as StaticFillWord, fillWordSummary, type FillWordProps } from "./index.js";
+import {
+  FillWord as StaticFillWord,
+  fillWordSummary,
+  shownPct,
+  type FillWordProps,
+} from "./index.js";
 
 export interface InteractiveFillWordProps extends FillWordProps {
   /** Announce changes through a polite region (default true). */
@@ -22,6 +28,11 @@ export interface InteractiveFillWordProps extends FillWordProps {
    * always wins.
    */
   animate?: boolean;
+  /**
+   * Show the floating percent chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="value"` already prints it.
+   */
+  readout?: boolean;
   /** The word was activated (click, tap, Enter or Space): `{ index: 0, value, label }` — the clamped fill fraction, named by the word. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -35,6 +46,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     value,
     word,
     mode = "fill",
+    readout = true,
     onSelect,
     className,
     style,
@@ -49,11 +61,15 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
   // svg-level reveal plays once on mount, then the text-level clip keeps
   // tracking `value` independently afterward.
   useEntrance(hostRef, "wipe", animate);
-  const summary = fillWordSummary(value, word, mode, strings);
+  const text = fillWordSummary(value, word, mode, strings);
   const prev = useRef(value);
   const last = useRef(0);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
+  // The same numeral `label="value"` prints — one source, so hover and label
+  // can never disagree about the reading.
+  const readoutText = `${shownPct(value, mode)}%`;
 
   useEffect(() => {
     if (prev.current === value) return;
@@ -61,7 +77,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     if (!live) return;
     const emit = () => {
       last.current = performance.now();
-      setAnnounced(summary);
+      setAnnounced(text);
     };
     const since = performance.now() - last.current;
     if (since >= 1000) emit();
@@ -70,9 +86,15 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
       timer.current = setTimeout(emit, 1000 - since);
     }
     return () => clearTimeout(timer.current);
-  }, [value, summary, live]);
+  }, [value, text, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Drill-down: the clamped fraction the ink clips to, named by the word itself.
   const select = (): void =>
@@ -80,6 +102,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
       index: 0,
       value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
       label: word,
+      formatted: readoutText,
     });
 
   return (
@@ -87,6 +110,10 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
       ref={hostRef}
       {...wrap("mc-fillword-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -105,6 +132,13 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
+      {/* The word's ink edge is a rough gauge; the percent behind it is
+          invisible unless `label="value"` prints it. */}
+      {readout && hover && props.label !== "value" ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {readoutText}
+        </span>
+      ) : null}
     </span>
   );
 }

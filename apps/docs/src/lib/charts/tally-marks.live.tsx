@@ -22,7 +22,6 @@ export const playground: PlaygroundSpec = {
       pen={s.pen as "ruled" | "drawn"}
       overflow={s.overflow as "numeral" | "clamp"}
       title="Count"
-      summary={false}
       height={28}
     />
   ),

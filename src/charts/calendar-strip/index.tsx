@@ -104,6 +104,15 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
   } = props;
 
   if (weeks > 8) devWarn("<CalendarStrip> weeks > 8 — use ActivityGrid.");
+  // The one place a static component reads the clock. It stays, because "the
+  // last four weeks" is the useful default — but on the SERVER it is a trap:
+  // render at 23:59 UTC, hydrate at 00:01, and the client builds a different
+  // grid than the HTML it is hydrating. Dev-only, once per message.
+  if (end === undefined && typeof window === "undefined") {
+    devWarn(
+      "<CalendarStrip> rendered on the server without `end` — it defaults to today (UTC), so a render that straddles UTC midnight will not match hydration. Pass `end` for SSR.",
+    );
+  }
 
   const geo = calendarStripGeometry({
     weeks,

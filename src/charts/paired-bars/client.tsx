@@ -131,12 +131,14 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         index: i,
         value: isFiniteValue(d?.value) ? d!.value : null,
         label: d?.label,
-        formatted:
-          d && isFiniteValue(d.value)
-            ? isFiniteValue(d.ref)
+        // Mirrors the chip, em dash and all.
+        formatted: d
+          ? !isFiniteValue(d.value)
+            ? `${d.label}: —`
+            : isFiniteValue(d.ref)
               ? `${d.label}: ${fmt(d.value)} / ${fmt(d.ref)}`
               : `${d.label}: ${fmt(d.value)}`
-            : undefined,
+          : undefined,
       };
     },
     [data, fmt],
@@ -217,7 +219,10 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         {rest.children}
       </StaticPairedBars>
       <LiveRegion>{announced}</LiveRegion>
-      {readout && shownPair && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {/* A pair with no value is still a navigable band and still announces
+          `pairAtEmpty`, so it reads out as an em dash rather than nothing. A
+          missing REF alone keeps the value and drops the second half. */}
+      {readout && shownPair && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={
@@ -226,9 +231,11 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
               : rowReadoutStyle(width / 2, shownPos + bandW / 2, width, height)
           }
         >
-          {isFiniteValue(shownDatum.ref)
-            ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`
-            : `${shownDatum.label}: ${fmt(shownDatum.value)}`}
+          {!isFiniteValue(shownDatum.value)
+            ? `${shownDatum.label}: —`
+            : isFiniteValue(shownDatum.ref)
+              ? `${shownDatum.label}: ${fmt(shownDatum.value)} / ${fmt(shownDatum.ref)}`
+              : `${shownDatum.label}: ${fmt(shownDatum.value)}`}
         </span>
       ) : null}
     </span>

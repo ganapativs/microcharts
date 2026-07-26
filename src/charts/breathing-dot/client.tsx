@@ -5,8 +5,10 @@
 // because the loop parameter (rate) is the datum. Gated on BOTH
 // reduced-motion (→ the static frame) and on-screen (→ paused off-viewport).
 // Composes the static component (canon); a polite live region announces BAND
-// changes only, never per tick.
-import { useEffect, useRef, useState } from "react";
+// changes only, never per tick, and hover/focus reveals the level itself —
+// which the glyph alone never shows.
+import { useEffect, useMemo, useRef, useState } from "react";
+import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
@@ -21,6 +23,13 @@ import {
 
 export interface InteractiveBreathingDotProps extends BreathingDotProps {
   strings?: BreathingDotStrings;
+  /**
+   * Show the floating level chip on hover/focus (default `true`). `false`
+   * suppresses only the chip — the announcement and `onSelect` are untouched.
+   * Inert when `label="value"` already prints the percent beside the dot.
+   * Chip text is `62% · elevated` — percent plus the band the pulse encodes.
+   */
+  readout?: boolean;
   /** The dot was activated (click, tap, Enter or Space): `{ index: 0, value, label }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -39,6 +48,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     strings = EN_BREATHING_DOT,
     title,
     summary,
+    readout = true,
     onSelect,
     className,
     style,
@@ -48,6 +58,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
   const geo = breathingDotGeometry({ value, size, thresholds, pad: 1 });
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
+  const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prevBand = useRef<number | null>(null);
   const mounted = useRef(false);
@@ -100,12 +111,20 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     return () => anim.cancel();
   }, [reduced, inView, geo.band, geo.unknown, wrapRef]);
 
+  // Percent + band: the permanent `label="value"` only has room for the
+  // percent, so the chip adds the band name the pulse already encodes.
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  const readoutText = geo.unknown
+    ? "—"
+    : `${fmt(Math.round(geo.level * 100))}% · ${strings.loadBands[geo.band]}`;
+
   // Drill-down: the level the ring + pulse encode, named by its load band.
   const select = (): void =>
     onSelect?.({
       index: 0,
       value: geo.unknown ? null : geo.level,
       label: geo.unknown ? undefined : strings.loadBands[geo.band],
+      formatted: readoutText,
     });
 
   return (
@@ -113,6 +132,10 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
       ref={wrapRef}
       {...wrap("mc-breathing-live", className, style)}
       {...named(ariaLabel)}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
       onClick={select}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -133,6 +156,14 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
         summary={false}
       />
       <LiveRegion>{props.summary !== false ? announced : ""}</LiveRegion>
+      {/* Motion carries the band; the exact level is invisible unless
+          `label="value"` prints the percent. Hover/focus reveals percent +
+          band — skipped when the permanent label already shows the percent. */}
+      {readout && hover && props.label !== "value" ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {readoutText}
+        </span>
+      ) : null}
     </span>
   );
 }

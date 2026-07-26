@@ -118,10 +118,12 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         index: i,
         value: v,
         label: d?.label,
-        formatted: v === null ? `${d?.label}: ${strings.noData}` : `${d?.label}: ${fmt(v)}`,
+        // Mirrors the chip exactly (the shared contract) — including the em
+        // dash an empty bar reads out with.
+        formatted: `${d?.label}: ${v === null ? "—" : fmt(v)}`,
       };
     },
-    [sorted, fmt, strings],
+    [sorted, fmt],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -198,7 +200,10 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
         {rest.children}
       </StaticMiniBar>
       <LiveRegion>{announced}</LiveRegion>
-      {readout && shownBar && shownDatum && isFiniteValue(shownDatum.value) ? (
+      {/* An empty bar keeps its band (zero-length rect), so it stays navigable,
+          announces "no data", and reads out as an em dash — never a silent
+          hover. */}
+      {readout && shownBar && shownDatum ? (
         <span
           className="mc-spark-readout"
           style={
@@ -207,7 +212,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
               : rowReadoutStyle(width / 2, shownBar.y + shownBar.h / 2, width, height)
           }
         >
-          {`${shownDatum.label}: ${fmt(shownDatum.value)}`}
+          {`${shownDatum.label}: ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}
     </span>

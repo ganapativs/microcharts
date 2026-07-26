@@ -41,7 +41,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     style,
     ...rest
   } = props;
-  const summary = moonPhaseSummary(value, mode, strings);
+  const text = moonPhaseSummary(value, mode, strings);
   const wrap = useRef<HTMLSpanElement>(null);
   useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
@@ -81,7 +81,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     if (!live) return;
     const emit = () => {
       last.current = performance.now();
-      setAnnounced(summary);
+      setAnnounced(text);
     };
     const since = performance.now() - last.current;
     if (since >= 1000) emit();
@@ -90,9 +90,15 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       timer.current = setTimeout(emit, 1000 - since);
     }
     return () => clearTimeout(timer.current);
-  }, [value, summary, live]);
+  }, [value, text, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
   // The lit AREA is the datum, so the clamped fraction is what both the readout
   // and `onSelect` report — one disc, one selectable unit (index 0).
   const frac = Math.min(1, Math.max(0, value));

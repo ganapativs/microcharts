@@ -1,7 +1,8 @@
 "use client";
 // Interactive <ProgressRing>. `live` announces at 25/50/75/100%
 // threshold crossings only (documented anti-spam rule). No pointer lookup
-// (single mark). Composes the static component (canon).
+// (single mark) — hover/focus is a reveal of the percent, not a lookup.
+// Composes the static component (canon).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
@@ -20,6 +21,11 @@ export interface InteractiveProgressRingProps extends ProgressRingProps {
    * HTML; `prefers-reduced-motion` always wins.
    */
   animate?: boolean;
+  /**
+   * Show the floating percent chip on hover/focus (default `true`). `false`
+   * suppresses only the chip. Inert when `label="percent"` already prints it.
+   */
+  readout?: boolean;
   /** Click/tap or Enter/Space — `{ index: 0, value: the fraction value/max }`. */
   onSelect?: ((datum: MicroDatum | null) => void) | undefined;
 }
@@ -33,6 +39,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     strings = EN_SCALAR,
     title,
     summary,
+    readout = true,
     onSelect,
     className,
     style,
@@ -49,6 +56,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   );
 
   const [announced, setAnnounced] = useState("");
+  const [hover, setHover] = useState(false);
   const prev = useRef(fraction);
   useEffect(() => {
     const before = prev.current;
@@ -72,12 +80,21 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     summary === false ? undefined : typeof summary === "string" ? summary : summaryText;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
+  // What the chip shows: the swept percent, or the REMAINING percent in
+  // `sweep` mode — the same number the summary speaks, and `formatted` mirrors
+  // it exactly.
+  const readoutText = !Number.isFinite(fraction)
+    ? "—"
+    : sweep
+      ? pctFmt(Math.max(0, 1 - fraction))
+      : pctFmt(fraction);
+
   // One arc, one selectable unit (index 0): the fraction it sweeps.
   const pick = (): void =>
     onSelect?.({
       index: 0,
       value: Number.isFinite(fraction) ? fraction : null,
-      formatted: Number.isFinite(fraction) ? pctFmt(fraction) : undefined,
+      formatted: readoutText,
     });
 
   return (
@@ -85,6 +102,10 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       ref={hostRef}
       {...wrap("mc-ring-live", className, style)}
       {...named(label)}
+      onPointerEnter={() => setHover(true)}
+      onPointerLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
       onClick={pick}
       onKeyDown={(e) => {
         if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
@@ -94,6 +115,14 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     >
       <StaticProgressRing {...rest} style={fillFor(style)} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
+      {/* An arc is a rough gauge — the percent is invisible unless
+          `label="percent"` prints it inside the ring. Hover/focus reveals it,
+          the same reveal Bullet and Thermometer ship. */}
+      {readout && hover && rest.label !== "percent" ? (
+        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+          {readoutText}
+        </span>
+      ) : null}
     </span>
   );
 }

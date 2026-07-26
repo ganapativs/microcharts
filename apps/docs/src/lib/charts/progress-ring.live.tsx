@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       weight={s.weight as number}
       label={(s.label as boolean) ? "percent" : "none"}
       size={48}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       style={{ width: 96, height: 96 }}
     />

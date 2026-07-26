@@ -81,6 +81,43 @@ describe("entrance motion (opt-in `animate`)", () => {
     });
   });
 
+  // The failsafe timeout used to CALL the entrance, so a chart below the fold
+  // played its whole animation unseen 400 ms after mount and the reader who
+  // scrolled down found a static chart. It must only release the opacity hold.
+  it("off-screen: reveals without animating, then animates when scrolled to", async () => {
+    const screen = await render(
+      <div>
+        <div style={{ height: "250vh" }} />
+        <span data-test="below">
+          <Sparkline data={D} title="Rev" animate />
+        </span>
+      </div>,
+    );
+    const svg = svgOf(screen.container.querySelector<HTMLElement>('[data-test="below"]')!);
+    try {
+      // Past the 400 ms failsafe the chart is VISIBLE (no lingering opacity: 0)…
+      await vi.waitFor(
+        () => {
+          expect(svg.style.opacity).toBe("");
+        },
+        { timeout: 2000 },
+      );
+      // …and it has not spent its entrance where nobody could see it.
+      expect(svg.getAnimations({ subtree: true }).length).toBe(0);
+
+      svg.scrollIntoView();
+      await vi.waitFor(
+        () => {
+          expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+        },
+        { timeout: 2000 },
+      );
+      await settled(svg);
+    } finally {
+      window.scrollTo(0, 0);
+    }
+  });
+
   it("unmount mid-entrance cancels cleanly (no leaked animations)", async () => {
     const screen = await render(<Sparkline data={D} title="Rev" animate />);
     const svg = svgOf(screen.getByRole("img").element() as HTMLElement);

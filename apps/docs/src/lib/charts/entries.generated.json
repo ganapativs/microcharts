@@ -172,6 +172,7 @@
     "staticImport": "@microcharts/react/delta",
     "interactiveImport": "@microcharts/react/delta/interactive",
     "picker": false,
+    "readout": false,
     "dataShape": "number (+ optional from)",
     "encoding": {
       "channel": "text + direction glyph (▲/▼)",
@@ -384,6 +385,7 @@
     "staticImport": "@microcharts/react/trend-arrow",
     "interactiveImport": "@microcharts/react/trend-arrow/interactive",
     "picker": false,
+    "readout": false,
     "dataShape": "number (signed change)",
     "encoding": {
       "channel": "glyph orientation (up / down / flat)",
@@ -439,6 +441,7 @@
     "staticImport": "@microcharts/react/status-dot",
     "interactiveImport": "@microcharts/react/status-dot/interactive",
     "picker": false,
+    "readout": false,
     "dataShape": "\"ok\" | \"warn\" | \"error\" | \"off\" | \"busy\" (extensible)",
     "encoding": {
       "channel": "paired glyph shape + semantic color",
@@ -3586,6 +3589,7 @@
     "interactiveImport": "@microcharts/react/tally-marks/interactive",
     "animates": false,
     "picker": false,
+    "readout": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "mark count in four-and-strike clusters of five",
@@ -3644,6 +3648,7 @@
     "interactiveImport": "@microcharts/react/dice-pips/interactive",
     "animates": false,
     "picker": false,
+    "readout": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "canonical pip pattern 1–6 (subitized)",
@@ -3742,6 +3747,7 @@
     "staticImport": "@microcharts/react/fat-digits",
     "interactiveImport": "@microcharts/react/fat-digits/interactive",
     "picker": false,
+    "readout": false,
     "dataShape": "{ value: number }",
     "encoding": {
       "channel": "the numeral + redundant font-weight tier",

@@ -65,4 +65,46 @@ describe("interactive <CometTrail>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // The trail's older points had a focus ring and a spoken announcement but no
+  // VISIBLE value: a sighted mouse reader got strictly less than a screen
+  // reader. The chip closes that gap.
+  it("roving paints the point's value as a chip", async () => {
+    const screen = await render(<CometTrail data={RISING} title="Price" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    await expect.poll(() => fig.querySelector(".mc-spark-readout")?.textContent).toBe("40");
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.poll(() => fig.querySelector(".mc-spark-readout")?.textContent).toBe("45");
+  });
+
+  it('skips the chip at the head, where `label="last"` already prints it', async () => {
+    const screen = await render(<CometTrail data={RISING} title="Price" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    // The head is announced but not chipped — the numeral beside it says 87.
+    await expect.poll(() => fig.querySelector('[aria-live="polite"]')?.textContent).toBe("Now 87.");
+    expect(fig.querySelector(".mc-spark-readout")).toBeNull();
+    // …unless the numeral is off, in which case the head chips like any point.
+    const bare = await render(<CometTrail data={RISING} label="none" title="Price" />);
+    const bareFig = bare.container.querySelector(".mc-comet-live") as HTMLElement;
+    bareFig.focus();
+    await userEvent.keyboard("{End}");
+    await expect.poll(() => bareFig.querySelector(".mc-spark-readout")?.textContent).toBe("87");
+  });
+
+  it("readout={false} keeps the ring and onActive, drops only the chip", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <CometTrail data={RISING} readout={false} onActive={(d) => seen.push(d)} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: 40, formatted: "40" });
+    expect(fig.querySelector('circle[data-mc-w="support"]')).not.toBeNull();
+    expect(fig.querySelector(".mc-spark-readout")).toBeNull();
+  });
 });

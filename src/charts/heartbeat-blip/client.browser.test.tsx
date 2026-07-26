@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { HeartbeatBlip } from "./client.js";
 
 describe("interactive <HeartbeatBlip>", () => {
@@ -50,5 +51,24 @@ describe("interactive <HeartbeatBlip>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 1, label: "minute" });
+  });
+
+  it('hover reveals the in-window count; label="count" suppresses the chip', async () => {
+    const screen = await render(
+      <HeartbeatBlip events={[97_000, 90_000, 80_000]} now={100_000} title="Requests" />,
+    );
+    const wrap = screen.container.querySelector(".mc-heartbeat-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("3 events");
+    await userEvent.unhover(wrap);
+    await expect.poll(chip).toBeUndefined();
+
+    const labelled = await render(
+      <HeartbeatBlip events={[97_000, 90_000]} now={100_000} label="count" />,
+    );
+    const lw = labelled.container.querySelector(".mc-heartbeat-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
 });

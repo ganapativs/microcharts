@@ -99,10 +99,12 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         index: i,
         value: d && isFiniteValue(d.value) ? d.value : null,
         label: d?.label,
-        formatted:
-          d && isFiniteValue(d.value)
+        // Mirrors the chip, em dash and all (a share of nothing is not 0%).
+        formatted: d
+          ? isFiniteValue(d.value)
             ? `${d.label} ${pctFmt(geo.stages[i]!.share)} (${fmt(d.value)})`
-            : undefined,
+            : `${d.label} —`
+          : undefined,
       };
     },
     [data, geo, fmt, pctFmt],
@@ -182,9 +184,13 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         {rest.children}
       </StaticFunnel>
       <LiveRegion>{announced}</LiveRegion>
-      {readout && st && stDatum && isFiniteValue(stDatum.value) ? (
+      {/* A stage with no value keeps its band and its "no data" announcement,
+          so it reads out as an em dash — a share of nothing is not 0%. */}
+      {readout && st && stDatum ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(st.x + st.w / 2, width)}>
-          {`${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`}
+          {isFiniteValue(stDatum.value)
+            ? `${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`
+            : `${stDatum.label} —`}
         </span>
       ) : null}
     </span>

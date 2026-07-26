@@ -43,17 +43,23 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
   } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
-  const summary = fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale });
+  const text = fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale });
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
 
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(summary);
-  }, [value, summary, live]);
+    if (live) setAnnounced(text);
+  }, [value, text, live]);
 
-  const label = [title, summary].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // One numeral, one selectable unit (index 0): the value it prints.
   const pick = (): void => onSelect?.({ index: 0, value: Number.isFinite(value) ? value : null });

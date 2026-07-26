@@ -14,6 +14,8 @@ export const entry: ChartEntry = {
   staticImport: `${PKG}/fat-digits`,
   interactiveImport: `${PKG}/fat-digits/interactive`,
   picker: false,
+  // The glyph prints (or IS) its own reading — a hover chip would duplicate it.
+  readout: false,
   dataShape: "{ value: number }",
   encoding: { channel: "the numeral + redundant font-weight tier", precision: "high" },
   nodeBudget: "1 (value) / ≤ len (digit)",

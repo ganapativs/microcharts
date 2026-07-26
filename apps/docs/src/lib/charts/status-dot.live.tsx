@@ -31,7 +31,7 @@ export const playground: PlaygroundSpec = {
     <StatusDotInteractive
       status={s.status as string}
       pulse={s.pulse as boolean}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       style={{ width: 40, height: 40 }}
     />

@@ -109,7 +109,10 @@ export function IconArray(props: IconArrayProps): ReactNode {
       : positive === "up"
         ? "positive"
         : "accent";
-  const labelText = label === "percent" ? pctFmt(geo.k / geo.n) : `${geo.k} in ${geo.n}`;
+  // "3 in 20" is PROSE, so it comes from `strings` like every other rendered
+  // word — an inline template here is English no bundle can translate.
+  const labelText =
+    label === "percent" ? pctFmt(geo.k / geo.n) : strings.iconArrayRatio(geo.k, geo.n);
   // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 

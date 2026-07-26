@@ -22,7 +22,7 @@ export const playground: PlaygroundSpec = {
       value={(s.pct as number) / 100}
       segments={(s.segments as number) >= 2 ? (s.segments as number) : undefined}
       label={s.label as "percent" | "value" | "fraction" | "none"}
-      summary={false}
+      title="Playground"
       animate={ui.animate}
       width={200}
       height={26}

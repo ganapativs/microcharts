@@ -39,4 +39,11 @@ describe("interactive <Thermometer>", () => {
     key(wrap, "Enter");
     expect(picks).toMatchObject([{ index: 0, value: 40 }]);
   });
+
+  it('label="value" suppresses the chip (numeral already beside the tube)', async () => {
+    const screen = await render(<Thermometer value={72} label="value" width={30} height={48} />);
+    const wrap = screen.container.querySelector(".mc-thermo-live") as HTMLElement;
+    wrap.focus();
+    expect(wrap.querySelector(".mc-spark-readout")).toBeNull();
+  });
 });

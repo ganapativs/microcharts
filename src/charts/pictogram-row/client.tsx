@@ -7,11 +7,13 @@
 //      are navigable at all. Roving SPEAKS: each unit announces its position and
 //      fullness via `pictogramUnit`, which (unlike the boolean `iconArrayUnit`)
 //      can describe a partly-filled unit honestly. With no unit active the live
-//      region falls back to (1)'s value-change text.
+//      region falls back to (1)'s value-change text. The same reading is painted
+//      as a chip over the unit (`readout={false}` suppresses only the chip).
 // Composes the static component (canon) — the SVG is never re-implemented.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  crosshairReadoutStyle,
   named,
   fillFor,
   useActivePicker,
@@ -62,6 +64,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     fractional = "clip",
     width = 60,
     height = 12,
+    readout = true,
     onActive,
     onSelect,
     selectedIndex,
@@ -112,12 +115,24 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     },
     [geo],
   );
+  // The chip's text for unit `i` — one function, so `formatted` and the painted
+  // chip cannot say different things (the shared readout contract).
+  const chipTextOf = useCallback(
+    (i: number): string | undefined => {
+      const u = geo.units[i];
+      if (!u) return undefined;
+      const state = u.fill >= 1 ? "full" : u.fill <= 0 ? "none" : "part";
+      return strings.pictogramChip(i + 1, geo.units.length, state, pctFmt(u.fill));
+    },
+    [geo, pctFmt, strings],
+  );
+
   const datum = useCallback(
     (i: number) => {
       const u = geo.units[i];
-      return { index: i, value: u?.fill ?? null, formatted: u ? pctFmt(u.fill) : undefined };
+      return { index: i, value: u?.fill ?? null, formatted: chipTextOf(i) };
     },
-    [geo, pctFmt],
+    [geo, chipTextOf],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -140,7 +155,13 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     if (live) setAnnounced(text);
   }, [value, text, live]);
 
-  const label = [title, text].filter(Boolean).join(". ") || undefined;
+  // The caller's `summary` owns the wrapper's name: `false` is the decorative
+  // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a
+  // string replaces the generated sentence. The generated text stays what the
+  // live region announces on a value change.
+  const accName =
+    props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
+  const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // What the live region says while roving. A unit is full, empty, or genuinely
   // partial (`fractional="clip"`) — the percentage is only spoken in that third
@@ -215,6 +236,14 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
       <LiveRegion>
         {live && props.summary !== false ? (shown === null ? announced : unitSpoken) : ""}
       </LiveRegion>
+      {readout && shown !== null && geo.units[shown] ? (
+        <span
+          className="mc-spark-readout"
+          style={crosshairReadoutStyle(geo.units[shown]!.cx, width)}
+        >
+          {chipTextOf(shown)}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -127,15 +127,18 @@ describe("catalog shared + interactive props", () => {
     expect(delta.picker).toBe(false);
     expect(delta.sharedInteractive).toEqual(["animate", "live", "onSelect"]);
 
+    // No picker (it is a slider), but it does paint a chip — the window range.
     const minimap = catalog.charts.find((c) => c.slug === "minimap-strip")!;
     expect(minimap.picker).toBe(false);
-    expect(minimap.sharedInteractive).toEqual(["animate"]);
+    expect(minimap.sharedInteractive).toEqual(["animate", "readout"]);
     expect(minimap.props.some((p) => p.name === "onWindowChange" && p.interactive)).toBe(true);
 
+    // Real focus moves into the text, so no shared picker props — but hovering
+    // a flagged token floats its tier + confidence, so `readout` applies.
     const token = catalog.charts.find((c) => c.slug === "token-confidence")!;
     expect(token.picker).toBe(false);
     expect(token.animates).toBe(false);
-    expect(token.sharedInteractive).toEqual([]);
+    expect(token.sharedInteractive).toEqual(["readout"]);
 
     const wind = catalog.charts.find((c) => c.slug === "wind-barb")!;
     expect(wind.interactiveImport).toBeUndefined();

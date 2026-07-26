@@ -31,15 +31,15 @@ export interface ChartEntry {
    */
   animates?: boolean;
   /**
-   * `false` ⇒ the interactive entry has NO unit picker, so it does not accept
-   * the shared picker props (`onActive`, `onSelect`, `selectedIndex`,
-   * `defaultSelectedIndex`) and has no roving keyboard navigation. Two reasons a
-   * chart is marked `false`:
+   * `false` ⇒ the interactive entry has NO unit picker: no `onActive`,
+   * `selectedIndex`, `defaultSelectedIndex`, or roving keyboard navigation.
+   * Two reasons a chart is marked `false`:
    *  - **lean scalar charts** — one value, nothing to rove between (`delta`,
-   *    `status-dot`, `progress`, `orbit-status`, …). Selection is whole-chart.
+   *    `status-dot`, `progress`, `orbit-status`, …). They still take whole-chart
+   *    `onSelect` (click / Enter / Space); no selection stays pinned.
    *  - **deliberate exceptions** — `minimap-strip` is a range/slider primitive
    *    (`onWindowChange`) and `token-confidence` flows inline in text; both keep
-   *    their own interaction props instead.
+   *    their own interaction props instead of the shared picker set.
    *
    * Omitted (⇒ `true`) on every multi-unit chart. Charts with no
    * `interactiveImport` at all (`wind-barb`) are outside the split entirely.

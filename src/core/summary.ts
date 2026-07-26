@@ -30,6 +30,8 @@ export interface SummaryStrings {
   status: (stateLabel: string) => string;
   /** S4 calibrated step, e.g. "42 — level 3 of 5." (heat-cell; 1-based level). */
   level: (value: string, level: number, steps: number) => string;
+  /** Terse VISIBLE chip form of `level`, e.g. "42 — level 3 of 5" (no period). */
+  levelChip: (value: string, level: number, steps: number) => string;
   /** S3 completion, e.g. "68% complete." (progress; reused by progress-ring). */
   progress: (pct: string) => string;
   /** S3 burn-down / countdown, e.g. "32% remaining." (progress `positive="down"`). */
@@ -171,6 +173,8 @@ export interface SummaryStrings {
   heartbeatAgo: (ms: number) => string;
   /** Static empty-state in-chart label (heartbeat-blip). */
   heartbeatEmpty: string;
+  /** Terse VISIBLE chip form, e.g. "3 events" (heartbeat-blip). */
+  heartbeatChip: (n: number) => string;
   /** S1 rolling window, e.g. "Now 87, rising over the last 12 updates." */
   cometTrail: (last: string, trendWord: string, n: number) => string;
   /** Single point, e.g. "Now 87." (comet-trail). */
@@ -365,8 +369,14 @@ export interface SummaryStrings {
   bandPoint: (value: string) => string;
   /** Icon-array summary, e.g. "3 in 20. About 15%." (+ note for degenerate/sub-unit). */
   iconArray: (k: number, n: number, pct: string, note: "none" | "all" | "sub" | null) => string;
+  /** Terse VISIBLE chip form of `tokenAt`, e.g. "guessing 0.31". */
+  tokenChip: (tier: string, confidence: string) => string;
+  /** Icon-array's PAINTED ratio label, e.g. "3 in 20" (`label="ratio"`, the default). */
+  iconArrayRatio: (k: number, n: number) => string;
   /** Icon-array unit announcement, e.g. "Unit 7 of 20 — filled. 3 of 20 filled." */
   iconArrayUnit: (index: number, n: number, filled: boolean, filledCount: number) => string;
+  /** Terse VISIBLE chip form of `iconArrayUnit`, e.g. "7 of 20 — filled". */
+  iconArrayChip: (index: number, n: number, filled: boolean) => string;
   /**
    * Pictogram unit announcement, e.g. "Unit 7 of 8 — 40% filled." (pictogram-row).
    * Unlike `iconArrayUnit` a pictogram unit may be PARTLY filled (`fractional`),
@@ -374,6 +384,8 @@ export interface SummaryStrings {
    * (only meaningful for `"part"`).
    */
   pictogramUnit: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
+  /** Terse VISIBLE chip form of `pictogramUnit`, e.g. "7 of 8 — 40%". */
+  pictogramChip: (index: number, n: number, fill: "full" | "part" | "none", pct: string) => string;
   /** Quantile-dots with a threshold, e.g. "4 in 20 chances above 15 min." */
   quantileDots: (past: number, count: number, side: string, threshold: string) => string;
   /** Quantile-dots without a threshold, e.g. "Most likely 12–15; range 4 to 38." */

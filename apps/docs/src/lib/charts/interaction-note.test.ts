@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHARTS } from "./entries";
-import { interactionKind, interactionNote, INTERACTION_NOTES } from "./interaction-note";
+import {
+  interactionKind,
+  interactionNote,
+  INTERACTION_NOTES,
+  REVEAL_NOTE,
+} from "./interaction-note";
 import { expandComponents } from "../md-transform";
 
 const mdx = (slug: string) =>
@@ -55,6 +60,24 @@ describe("interaction note", () => {
     expect(INTERACTION_NOTES.picker).toMatch(/arrow keys rove/);
     expect(picker.every((c) => c.picker !== false)).toBe(true);
     expect(single.every((c) => c.picker === false)).toBe(true);
+  });
+
+  // A scalar's note promises a hover chip only where the chart paints one, and
+  // the registry flag that decides it must match the library. The six exempt
+  // charts are the ones whose glyph already prints (or is) the number.
+  it("the hover-reveal clause tracks the registry's `readout` flag", () => {
+    const quiet = CHARTS.filter((c) => c.readout === false).map((c) => c.slug);
+    expect(quiet.sort()).toEqual(
+      ["delta", "dice-pips", "fat-digits", "status-dot", "tally-marks", "trend-arrow"].sort(),
+    );
+    for (const chart of CHARTS.filter((c) => interactionKind(c) === "single")) {
+      const note = interactionNote(chart)!;
+      expect(note.includes(REVEAL_NOTE), chart.slug).toBe(chart.readout !== false);
+    }
+    // Picker charts never repeat it — their own sentence covers the readout.
+    for (const chart of CHARTS.filter((c) => interactionKind(c) === "picker")) {
+      expect(interactionNote(chart), chart.slug).not.toContain(REVEAL_NOTE);
+    }
   });
 
   it("the Markdown mirrors carry the same sentence the page renders", () => {

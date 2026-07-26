@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { userEvent } from "vitest/browser";
 import { Hourglass } from "./client.js";
 
 describe("interactive <Hourglass>", () => {
@@ -37,5 +38,20 @@ describe("interactive <Hourglass>", () => {
     wrap.focus();
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect.poll(() => picks.at(-1)).toMatchObject({ index: 0, value: 0.25 });
+  });
+
+  it("hover reveals the elapsed percent; a printed label suppresses the chip", async () => {
+    const screen = await render(<Hourglass value={0.42} title="Trial" />);
+    const wrap = screen.container.querySelector(".mc-hourglass-live") as HTMLElement;
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await userEvent.hover(wrap);
+    await expect.poll(chip).toBe("42%");
+    await userEvent.unhover(wrap);
+    await expect.poll(chip).toBeUndefined();
+
+    const labelled = await render(<Hourglass value={0.42} label="remaining" title="Trial" />);
+    const lw = labelled.container.querySelector(".mc-hourglass-live") as HTMLElement;
+    await userEvent.hover(lw);
+    expect(lw.querySelector(".mc-spark-readout")).toBeNull();
   });
 });
