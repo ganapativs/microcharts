@@ -101,8 +101,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "current" | "both" | "none"}
       width={340}
       height={92}
-      className="w-full max-w-md"
-      style={{ height: "auto" }}
+      style={{ width: "100%", maxWidth: "28rem", height: "auto" }}
       title="Deploy streak"
     />
   ),

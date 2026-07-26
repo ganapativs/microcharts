@@ -42,17 +42,17 @@ export function fillFor(style: CSSProperties | undefined): CSSProperties {
 
 /**
  * Interactive wrapper base: inline, positioned, line-height 0,
- * `verticalAlign: middle` (~2px table-cell drift vs baseline),
- * `width: fit-content` (flex stretch vs FILL's 100%). No `alignSelf: center` —
- * left KPI columns stay left; tab rows center via parent `items-center`.
+ * `verticalAlign: middle` (~2px table-cell drift vs baseline). No
+ * `alignSelf: center` — left KPI columns stay left; tab rows center via parent
+ * `items-center`. The width defaults (`fit-content` / `max-width: 100%`) live in
+ * `styles.css` under `:where([data-mc-host])`: inline they outranked a consumer
+ * `className="w-full"`, which the static entry obeys — same props, two layouts.
  */
 const WRAP: CSSProperties = {
   display: "inline-block",
   position: "relative",
   lineHeight: 0,
   verticalAlign: "middle",
-  width: "fit-content",
-  maxWidth: "100%",
 };
 
 type WrapAttrs = { className: string; style: CSSProperties; "data-mc-host": "" };

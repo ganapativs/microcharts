@@ -25,7 +25,7 @@ export const playground: PlaygroundSpec = {
       animate={ui.animate}
       width={340}
       height={92}
-      className="w-full max-w-md"
+      style={{ width: "100%", maxWidth: "28rem" }}
       title="Deploy streak"
     />
   ),

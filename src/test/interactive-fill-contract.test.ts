@@ -113,9 +113,12 @@ describe("interactive fill contract", () => {
         position: "relative",
         lineHeight: 0,
         verticalAlign: "middle",
-        width: "fit-content",
-        maxWidth: "100%",
       });
+      // The width defaults are NOT inline: `:where([data-mc-host])` in styles.css
+      // owns `fit-content`/`max-width`, so a consumer class can size the host the
+      // way it sizes the static entry's <svg>.
+      expect(base).not.toHaveProperty("width");
+      expect(base).not.toHaveProperty("maxWidth");
       const merged = wrap("mc-x", undefined, { width: "100%", display: "block" }).style;
       // consumer overrides win; untouched base keys survive.
       expect(merged).toMatchObject({
@@ -123,7 +126,6 @@ describe("interactive fill contract", () => {
         width: "100%",
         position: "relative",
         verticalAlign: "middle",
-        maxWidth: "100%",
       });
       expect(merged.alignSelf).toBeUndefined();
       expect(merged.justifySelf).toBeUndefined();

@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       band={s.band ? [10, 26] : undefined}
       label={s.label as "none" | "last" | "minmax"}
       animate={ui.animate}
-      className="w-full max-w-md"
+      style={{ width: "100%", maxWidth: "28rem" }}
       title="Weekly revenue"
     />
   ),

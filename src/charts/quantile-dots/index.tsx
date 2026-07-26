@@ -91,7 +91,12 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
   // the announcement and left the painted label behind. Gutter off the produced
   // string, so a longer translation reserves the room it needs.
   const labelText = showLabel ? strings.quantileDotsOdds(probe!.past, probe!.count) : "";
-  const gutterCh = showLabel ? labelText.length : 0;
+  // Reserve the WIDEST odds string this dotplot can print (`count in count`),
+  // never the current one. The interactive entry drives `threshold` from the
+  // pointer, so a gutter sized to today's digits would grow and shrink the
+  // viewBox under the cursor — and the same props would paint a different box
+  // static vs interactive.
+  const gutterCh = showLabel ? strings.quantileDotsOdds(probe!.count, probe!.count).length : 0;
 
   const geo = quantileDotsGeometry({
     width,

@@ -92,8 +92,7 @@ export const playground: PlaygroundSpec = {
       label={s.label as "none" | "value" | "target" | "both"}
       width={300}
       height={28}
-      className="w-full max-w-md"
-      style={{ height: "auto" }}
+      style={{ width: "100%", maxWidth: "28rem", height: "auto" }}
       title="Quota attainment"
     />
   ),

@@ -29,7 +29,7 @@ export const playground: PlaygroundSpec = {
       animate={ui.animate}
       width={300}
       height={28}
-      className="w-full max-w-md"
+      style={{ width: "100%", maxWidth: "28rem" }}
       title="Quota attainment"
     />
   ),

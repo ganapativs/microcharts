@@ -10,8 +10,8 @@ export function PreviewLive({ animate = false }: { animate?: boolean }) {
       field={FIELD}
       {...AXES}
       summary={false}
-      width={72}
-      height={72}
+      width={48}
+      height={48}
       animate={animate}
     />
   );

@@ -3,10 +3,10 @@
 // the count past it recomputes purely; ←/→ step it one quantile bin, Enter /
 // Space / click pins a bin, Esc returns to the prop threshold. useActivePicker
 // owns interaction.
-// Layout is frozen: the composed static uses `label="none"` so the viewBox
-// never grows/shrinks with the live "N in count" string (that reflow was
-// gallery bug — hit targets drifted and the plate shifted under the cursor).
-// Idle odds sit in an HTML gutter beside the SVG; the probe chip covers hover.
+// Layout is frozen by the static's own gutter, which reserves the widest odds
+// string the dotplot can print rather than the current one — so the "N in
+// count" label tracks the live threshold without the viewBox growing or
+// shrinking under the cursor, and this entry paints the box the static paints.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
@@ -23,7 +23,7 @@ import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-q
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { quantileDotplot } from "../../core/quantile.js";
 import { round2 } from "../../core/types.js";
-import { quantileDotsGeometry } from "./geometry.js";
+import { oddsGutter, quantileDotsGeometry } from "./geometry.js";
 import {
   QuantileDots as StaticQuantileDots,
   quantileDotsSummary,
@@ -86,7 +86,24 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     [plot],
   );
 
-  // Standard viewBox mapping — SVG width is the plot `width` (no live gutter).
+  // The static reserves an odds gutter to the right of the plot, so the root
+  // viewBox is WIDER than the plot `width` — mirror that reserve here or the
+  // pointer map and the chip both drift by the gutter. Sized off `count in
+  // count` (the widest string), so it is a constant, not a function of the
+  // threshold the pointer is moving. `label="none"` when the caller passed no
+  // threshold: hovering supplies one, and a gutter that only exists while the
+  // cursor is down would resize the box mid-scrub.
+  const hasThreshold = threshold !== undefined && Number.isFinite(threshold);
+  const labelMode = hasThreshold ? (props.label ?? "count") : "none";
+  const font = labelFont(height);
+  const gutterCh =
+    labelMode === "count" && plot !== null && labelFitsY(height / 2, font, height)
+      ? strings.quantileDotsOdds(dotCount, dotCount).length
+      : 0;
+  /** Root viewBox width — the plot plus that reserved gutter. */
+  const boxW = width + oddsGutter(gutterCh, font);
+
+  // Pointer x maps across the painted SVG — plot coords, gutter included.
   const locate = useCallback(
     (x: number) => {
       if (columns === 0) return null;
@@ -126,7 +143,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
 
   const { active, selected, bind } = useActivePicker({
     count: columns,
-    width,
+    width: boxW,
     height,
     locate,
     datum,
@@ -149,8 +166,10 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
         threshold: activeThreshold,
         side,
         domain: props.domain,
+        gutterCh,
+        fontSize: font,
       }),
-    [width, height, data, count, activeThreshold, side, props.domain],
+    [width, height, data, count, activeThreshold, side, props.domain, gutterCh, font],
   );
 
   const staticGeo = useMemo(
@@ -181,16 +200,6 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
         : geo.pad + Math.max(0, Math.min(1, (selLo - geo.x0) / geo.range)) * (width - 2 * geo.pad)
       : null;
 
-  const showIdleOdds =
-    (props.label ?? "count") === "count" &&
-    threshold !== undefined &&
-    Number.isFinite(threshold) &&
-    staticGeo != null &&
-    labelFitsY(height / 2, labelFont(height), height);
-  const idleOdds =
-    showIdleOdds && staticGeo ? strings.quantileDotsOdds(staticGeo.past, staticGeo.count) : null;
-  const oddsHidden = shown !== null;
-
   return (
     <span
       ref={hostRef}
@@ -198,65 +207,42 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
       {...named(ariaLabel)}
       {...bind}
     >
-      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35em" }}>
-        <span style={{ position: "relative", display: "inline-block", lineHeight: 0 }}>
-          <StaticQuantileDots
-            {...rest}
-            style={fillFor(style)}
-            data={data}
-            count={count}
-            threshold={activeThreshold}
-            side={side}
-            width={width}
-            height={height}
-            format={format}
-            locale={locale}
-            strings={strings}
-            label="none"
-            summary={false}
-          >
-            {selX !== null ? (
-              <line
-                x1={round2(selX)}
-                y1={1}
-                x2={round2(selX)}
-                y2={height - 1}
-                data-mc-ink="accent"
-                data-mc-w="tick"
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null}
-            {rest.children}
-          </StaticQuantileDots>
-          {readout && shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
-            <span
-              className="mc-quantile-dots-readout mc-spark-readout"
-              style={crosshairReadoutStyle(geo.threshold.x, width)}
-            >
-              {strings.quantileDotsChip(geo.past, geo.count, side, fmt(activeThreshold))}
-            </span>
-          ) : null}
-        </span>
-        {idleOdds ? (
-          <span
-            className="mc-quantile-dots-odds"
-            aria-hidden
-            style={{
-              font: `${labelFont(height)}px var(--mc-font, inherit)`,
-              fontVariantNumeric: "tabular-nums",
-              color: "var(--mc-neutral)",
-              lineHeight: 1,
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-              // Keep the gutter reserved while probing so the plate never
-              // shifts under the cursor when idle odds hide.
-              visibility: oddsHidden ? "hidden" : "visible",
-            }}
-          >
-            {idleOdds}
-          </span>
+      <StaticQuantileDots
+        {...rest}
+        style={fillFor(style)}
+        data={data}
+        count={count}
+        threshold={activeThreshold}
+        side={side}
+        width={width}
+        height={height}
+        format={format}
+        locale={locale}
+        strings={strings}
+        label={labelMode}
+        summary={false}
+      >
+        {selX !== null ? (
+          <line
+            x1={round2(selX)}
+            y1={1}
+            x2={round2(selX)}
+            y2={height - 1}
+            data-mc-ink="accent"
+            data-mc-w="tick"
+            vectorEffect="non-scaling-stroke"
+          />
         ) : null}
-      </span>
+        {rest.children}
+      </StaticQuantileDots>
+      {readout && shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
+        <span
+          className="mc-quantile-dots-readout mc-spark-readout"
+          style={crosshairReadoutStyle(geo.threshold.x, boxW)}
+        >
+          {strings.quantileDotsChip(geo.past, geo.count, side, fmt(activeThreshold))}
+        </span>
+      ) : null}
       <LiveRegion>{announced}</LiveRegion>
     </span>
   );

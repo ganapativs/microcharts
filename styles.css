@@ -866,6 +866,14 @@
      drag pans the page and fires pointercancel; the picker clears on it. */
   :where([data-mc-host]) {
     touch-action: pan-y pinch-zoom;
+    /* Shrink-wrap the mark — a flex/grid parent would otherwise stretch the
+       wrapper, and the SVG fills it. Here rather than in the wrapper's inline
+       style because an inline width BEATS a consumer class: `className="w-full
+       max-w-md"` sized the static entry to its container while the interactive
+       twin stayed shrink-wrapped, so one component drew two different charts.
+       Zero specificity, so any consumer rule still wins. */
+    width: fit-content;
+    max-width: 100%;
   }
 
   /* MinimapStrip is a range slider, not an image: it drags a window along the

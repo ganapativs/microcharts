@@ -4,7 +4,13 @@ import { Delta as DeltaInteractive } from "@microcharts/react/delta/interactive"
 import staticModule, { playground as staticPlayground } from "./delta";
 
 export function PreviewLive({ animate = false }: { animate?: boolean }) {
-  return <DeltaInteractive value={0.184} summary={false} animate={animate} />;
+  // Same type-scale wrapper the static `Preview` uses — the gallery swaps one
+  // for the other in place, so a different font size is a visible jump.
+  return (
+    <span className="text-2xl">
+      <DeltaInteractive value={0.184} summary={false} animate={animate} />
+    </span>
+  );
 }
 
 export const playground: PlaygroundSpec = {
@@ -15,8 +21,10 @@ export const playground: PlaygroundSpec = {
     const mode = s.mode as string;
     const locale = s.locale as string;
     // Chart is the root so playground callback injection lands on Delta — not a
-    // sizing wrapper. Type scale via style (inherits into the glyph + figure).
-    const style = { fontSize: "1.875rem" };
+    // sizing wrapper. Type scale via style (inherits into the glyph + figure) —
+    // `lineHeight` included because the static render gets both from `text-3xl`,
+    // and a bare font-size left the interactive line box 6px shorter.
+    const style = { fontSize: "1.875rem", lineHeight: "2.25rem" };
     if (mode === "from prior") {
       return (
         <DeltaInteractive

@@ -1,5 +1,5 @@
 "use client";
-import { Component, useId, useRef, useState, type ReactNode } from "react";
+import { Component, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { ChevronDown, Play, RotateCw } from "lucide-react";
 import "@microcharts/react/motion"; // enables `animate` (same import consumers use)
@@ -437,6 +437,7 @@ function Shell({
   code,
   sampleData,
   morphKey,
+  morphed,
   previewRef,
   themeScope,
   onReset,
@@ -454,6 +455,10 @@ function Shell({
   sampleData?: SampleData[];
   /** Discrete props only — never slider values (avoids morph strobe). */
   morphKey?: string;
+  /** Has this playground already painted once? The morph marks a CHANGE — on
+   *  first mount there is nothing to morph from, and fading the chart in reads
+   *  as the page arriving late. */
+  morphed?: boolean;
   previewRef?: React.RefObject<HTMLDivElement | null>;
   themeScope?: string | undefined;
   onReset?: () => void;
@@ -502,7 +507,7 @@ function Shell({
           key={morphKey}
           ref={previewRef}
           data-mc-theme={themeScope}
-          className="mc-morph flex w-full items-center justify-center"
+          className={`${morphed ? "mc-morph " : ""}flex w-full items-center justify-center`}
         >
           <PreviewBoundary resetKey={morphKey}>{preview}</PreviewBoundary>
         </div>
@@ -626,6 +631,12 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const [locale, setLocale] = useState<string>(DEFAULT_LOCALE);
   const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
   const previewRef = useRef<HTMLDivElement>(null);
+  // Latched after the first commit: the morph fade belongs to a knob CHANGE, not
+  // to the arrival of the chart itself (that read as a flicker on load).
+  const painted = useRef(false);
+  useEffect(() => {
+    painted.current = true;
+  }, []);
   if (!spec || !entry) return null;
 
   const logEvent = (kind: Ev["kind"], d: Datum | null): void =>
@@ -780,6 +791,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   return (
     <Shell
       morphKey={morphKey}
+      morphed={painted.current}
       mode={spec.renderInteractive ? mode : undefined}
       onMode={
         spec.renderInteractive

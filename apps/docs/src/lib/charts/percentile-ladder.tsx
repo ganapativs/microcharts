@@ -86,7 +86,7 @@ export const entry: ChartEntry = {
 };
 
 export function Preview() {
-  return <PercentileLadder data={LATENCY} summary={false} label="none" width={160} height={20} />;
+  return <PercentileLadder data={LATENCY} summary={false} width={160} height={20} />;
 }
 export const playground: PlaygroundSpec = {
   knobs: [

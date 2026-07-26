@@ -127,8 +127,7 @@ export const playground: PlaygroundSpec = {
         label={s.label ? "last" : "none"}
         positive={s.positive as "up" | "down"}
         locale={s.locale as string}
-        className="w-full max-w-md"
-        style={{ height: "auto" }}
+        style={{ width: "100%", maxWidth: "28rem", height: "auto" }}
         title="Deploys per day"
       />
     );

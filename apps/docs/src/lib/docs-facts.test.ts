@@ -52,8 +52,8 @@ describe("docs-facts derivations", () => {
     expect(SIZE.over3).toHaveLength(27);
     // over3 is largest-first — Sparkline leads.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
-    // None is more than 1.06 kB over the 3 kB line (sparkline 4.06).
-    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(4.06 + 0.001);
+    // None is more than 1.07 kB over the 3 kB line (sparkline 4.07).
+    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(4.07 + 0.001);
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
     expect(over3Slugs).toEqual([
       "ab-strips",

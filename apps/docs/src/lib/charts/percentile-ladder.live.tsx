@@ -8,8 +8,8 @@ export function PreviewLive({ animate = false }: { animate?: boolean }) {
     <PercentileLadderInteractive
       data={LATENCY}
       summary={false}
-      width={140}
-      height={14}
+      width={160}
+      height={20}
       animate={animate}
     />
   );
