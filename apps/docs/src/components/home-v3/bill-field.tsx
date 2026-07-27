@@ -10,6 +10,12 @@ import { RECHARTS } from "@/lib/competitor-facts";
  * comparison is counted rather than asserted: the reader can check the ratio by
  * looking. Running off the right edge to the viewport is the point — the bill
  * does not fit inside the measure.
+ *
+ * This section holds the page's ONLY link to `.size-limit.json`, and it is in the
+ * provenance line at the bottom — the one place a reader goes looking for where a
+ * number came from. The fold, the bracket caption and the claim paragraph all
+ * state measured figures and none of them link: a figure repeated four times with
+ * four links to the same file reads as insistence, not evidence.
  */
 const SIZE_LIMIT = `${SITE.repo}/blob/main/.size-limit.json`;
 
@@ -24,7 +30,7 @@ export function BillField() {
   return (
     <>
       <div
-        className="mt-10 sm:mt-14 lg:mt-20"
+        className="u-block"
         style={{
           // The field starts on the shell's left axis and runs to the viewport
           // edge — no right padding, on purpose.
@@ -67,9 +73,10 @@ export function BillField() {
             className="font-mono text-[11px] leading-[1.45] tracking-[-0.02em]"
             style={{ gridColumn: `1 / span ${leftSpan}`, color: "var(--ink)" }}
           >
-            <a href={SIZE_LIMIT} target="_blank" rel="noreferrer noopener" className="u">
-              {inked} kB
-            </a>
+            {/* A caption on a bracket, not a citation. It names what the inked
+                span of the field is; the file it came from is credited once, in
+                the provenance line under the argument. */}
+            {inked} kB
           </div>
           <div
             className="pr-5 font-mono text-[11px] leading-[1.45] tracking-[-0.02em]"
@@ -86,26 +93,19 @@ export function BillField() {
         </div>
       </div>
 
-      <div className="shell mt-12 grid items-start gap-x-10 gap-y-8 lg:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,224px)] lg:gap-x-16">
+      <div className="shell u-block grid items-start gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,224px)] lg:gap-x-16">
         <div className="grid gap-6">
           <p
             className="font-mono text-[12px] leading-[1.6] tracking-[-0.03em]"
             style={{ maxWidth: "var(--m-note)", color: "var(--ink-2)" }}
           >
+            {/* Claims, unlinked. The provenance line three elements down cites
+                `.size-limit.json` and the CI run that produced it, and this
+                paragraph used to link BOTH of those same two URLs — the page
+                citing one file from four places is a page that sounds unsure of
+                it. Say the numbers here; receipt them once, below. */}
             {SIZE.interactiveMin.toFixed(2)}–{SIZE.interactiveMax.toFixed(2)} kB gzip per
-            interactive chart. Median{" "}
-            <a href={SIZE_LIMIT} target="_blank" rel="noreferrer noopener" className="u">
-              {SIZE.interactiveMedian.toFixed(2)}
-            </a>
-            .{" "}
-            <a
-              href={`${SITE.repo}/actions`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="u"
-            >
-              Enforced in CI.
-            </a>
+            interactive chart. Median {SIZE.interactiveMedian.toFixed(2)}. Enforced in CI.
           </p>
 
           <p className="lead" style={{ maxWidth: "var(--m-lead)" }}>
@@ -141,7 +141,7 @@ export function BillField() {
           <span className="block pt-2" style={{ color: "var(--ink)" }}>
             dependencies: {"{}"}
           </span>
-          React is a peer. That is the whole tree.
+          {`React is a peer dependency. There’s nothing else to install.`}
         </p>
       </div>
     </>

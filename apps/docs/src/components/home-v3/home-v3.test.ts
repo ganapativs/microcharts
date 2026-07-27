@@ -31,12 +31,16 @@ const sources = () =>
 
 describe("Act I — the same component in four places", () => {
   it("plots one series in every frame; different data would prove nothing", () => {
+    // Four frames, four Sparklines — but the KPI card is its own client module
+    // (it holds the reading its chart drives), so the quad spans two files.
     const src = readFileSync(join(dir, "four-places.tsx"), "utf8");
-    // Four Sparklines, and each one reads CHECKOUT_P95 (the /search row is the
-    // second table row, deliberately a different route).
-    const sparks = src.match(/<Sparkline\b/g) ?? [];
+    const kpi = readFileSync(join(dir, "kpi-card.tsx"), "utf8");
+    // `PrintSparkline` is the fourth: the same component, static entry, because
+    // that frame is paper.
+    const sparks = [...src.matchAll(/<(?:Print)?Sparkline\b/g), ...kpi.matchAll(/<Sparkline\b/g)];
     expect(sparks.length).toBeGreaterThanOrEqual(4);
-    expect(src).not.toMatch(/data=\{\[\s*\d/); // no inline literal series
+    for (const s of [src, kpi]) expect(s).not.toMatch(/data=\{\[\s*\d/); // no inline literal series
+    expect(kpi).toContain("CHECKOUT_P95");
   });
 
   it("uses the checkout series the copy quotes", () => {
@@ -184,19 +188,36 @@ describe("every figure resolves from measured data", () => {
   });
 });
 
-describe("nothing on the page animates itself", () => {
-  it("declares no keyframes and no hidden resting state", () => {
+describe("nothing on the page animates itself except the specimen", () => {
+  it("declares no keyframes, and hides nothing the server painted", () => {
     const css = readFileSync(join(routeDir, "v3.css"), "utf8");
     const rules = css.replace(/\/\*[\s\S]*?\*\//g, "");
-    // The page ships static. Every entrance this route tried — scroll reveals, a
+    // The page ships static. Every ENTRANCE this route tried — scroll reveals, a
     // staggered hero, the library's own draw — could only hide something the
-    // server had already painted, so the reload read as a flicker.
-    expect(rules).not.toMatch(/@keyframes/);
-    expect(rules).not.toMatch(/opacity:\s*0\s*[;}]/);
-    // `animation: none` in the reduced-motion block is the opposite of a problem.
-    // Whitespace is normalised first: with `\s*` able to match nothing, a negative
-    // lookahead lands on the space and passes, which made this assertion vacuous.
-    expect(rules.replace(/animation:\s+/g, "animation:")).not.toMatch(/animation:(?!none)/);
+    // server had already painted, so the reload read as a flicker. That still
+    // holds, and it is a different thing from the specimen rotation: the first
+    // frame is painted and opaque in server HTML, and only the four ALTERNATES
+    // behind it rest at zero.
+    // Exactly ONE keyframe is allowed, by name: the scroll cue's tick. It is page
+    // chrome pointing at the rest of the document, not a chart drawing itself in
+    // and not an entrance — the thing it annotates is painted and opaque before it
+    // ever runs. Anything else that moves on this page is a `[data-state]`
+    // transition, and a second `@keyframes` means an entrance has crept back.
+    expect(rules.match(/@keyframes\s+([\w-]+)/g) ?? []).toEqual(["@keyframes v3-cue"]);
+    const anim = rules.replace(/animation:\s+/g, "animation:").match(/animation:[\w-]+/g) ?? [];
+    expect([...new Set(anim)].sort()).toEqual(["animation:none", "animation:v3-cue"]);
+    // So every `opacity: 0` in the file has to be a swap state. A bare one on a
+    // plain selector is the old failure coming back.
+    // Keyframe STEPS (`0% { opacity: 0 }`) are not selectors and are not a hidden
+    // resting state, so the one allowed animation's body is dropped first.
+    const noFrames = rules.replace(/@keyframes\s+[\w-]+\s*\{[\s\S]*?\n\}/g, "");
+    const blocks = [...noFrames.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
+    for (const [, selector, body] of blocks) {
+      if (!/opacity:\s*0\s*[;}]/.test(body!)) continue;
+      expect(selector!.trim(), `hidden by default: ${selector!.trim()}`).toMatch(
+        /\[data-state="(?:off|out)"\]/,
+      );
+    }
   });
 
   it("carries no reveal attributes, gate, or motion engine anywhere", () => {
@@ -215,9 +236,126 @@ describe("nothing on the page animates itself", () => {
     const css = readFileSync(join(routeDir, "v3.css"), "utf8");
     // A transition is a response to the reader. Anything longer than a third of a
     // second stops reading as feedback and starts reading as choreography.
-    for (const m of css.matchAll(/transition:[^;]*?([\d.]+)s/g)) {
+    //
+    // The hero specimen swap is the ONE exception and it is deliberate: it is not
+    // feedback, it is a hand-off between two charts, and at 0.3s two marks this
+    // dense crossfade into a smear. It goes through `--hero-swap` precisely so it
+    // is declared in one place and cannot be copied by accident — a second rule
+    // reaching for it would have to name it.
+    // Comments are stripped first: several of them contain the word `transition:`
+    // followed by prose, and the scan was asserting on an explanation.
+    for (const m of css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/transition:[^;]*?([\d.]+)s/g)) {
       expect(Number(m[1]), m[0].trim()).toBeLessThanOrEqual(0.3);
     }
+    expect(css).toMatch(/--hero-swap:\s*460ms/);
+  });
+});
+
+describe("the hero claim rotates without moving anything", () => {
+  const frames = () => readFileSync(join(dir, "hero-frames.tsx"), "utf8");
+  const sentence = () => readFileSync(join(dir, "hero-sentence.tsx"), "utf8");
+  const css = () => readFileSync(join(routeDir, "v3.css"), "utf8");
+
+  it("rotates the SENTENCE, not just the mark", () => {
+    // An earlier pass swapped only the chart and left one sentence about
+    // kilobytes underneath it, so three frames out of four sat inside words that
+    // had nothing to do with them — the mark changed and the claim did not, which
+    // reads as decoration. Each frame owns its own sentence and its own mark.
+    const src = stripComments(frames());
+    expect(src.match(/sentence: \(/g) ?? []).toHaveLength(4);
+    expect(src.match(/<Mark>/g) ?? []).toHaveLength(4);
+    expect(stripComments(sentence())).not.toMatch(/hero-cap/);
+  });
+
+  it("shows no chart type twice, and no dataset twice", () => {
+    const src = stripComments(frames());
+    const types = [...src.matchAll(/^\s{10}<([A-Z]\w+)$/gm)].map((m) => m[1]!);
+    expect(types).toHaveLength(4);
+    // Two of one type is one claim wearing two costumes, and so is one dataset
+    // drawn two ways. Both shipped for a few minutes and both read as padding —
+    // the fold is meant to show the catalog's RANGE.
+    expect(new Set(types).size, types.join(",")).toBe(4);
+    const data = [...src.matchAll(/data=\{\[\.\.\.(\w+)\]\}/g)].map((m) => m[1]!);
+    expect(new Set(data).size, data.join(",")).toBe(data.length);
+  });
+
+  it("draws every frame at one size, or its own sentence re-wraps", () => {
+    const src = stripComments(frames());
+    expect(src).toMatch(/const W = \d+;/);
+    expect(src).toMatch(/const H = \d+;/);
+    expect(src.match(/width=\{W\}/g) ?? []).toHaveLength(4);
+    expect(src.match(/height=\{H\}/g) ?? []).toHaveLength(4);
+    expect(src).not.toMatch(/(?:width|height)=\{\d/);
+  });
+
+  it("reserves the tallest sentence, so nothing below the claim can be pushed", () => {
+    // All four share ONE grid cell, so the box is the height of the tallest at the
+    // current width — correct in server HTML, identical on every tick. Absolute
+    // positioning would collapse the box and let it move on every rotation.
+    expect(css()).toMatch(/\.v3 \.hero-say \{[^}]*display: grid/s);
+    expect(css()).toMatch(/\.v3 \.hero-say > \.sentence \{[^}]*grid-area: 1 \/ 1/s);
+  });
+
+  it("quotes each type's own measured weight in the callout", () => {
+    // Four types spanning 4.77–6.75 kB demonstrate the range the first sentence
+    // claims. A hard-coded kB beside a mark that becomes three other charts is
+    // the exact drift this file exists to catch.
+    const quoted = [...frames().matchAll(/kb: ([\d.]+),/g)].map((m) => Number(m[1]));
+    expect(quoted).toHaveLength(4);
+    const real = new Set(Object.values(CHART_GZIP).map((g) => g.interactive));
+    for (const kb of quoted) expect(real, String(kb)).toContain(kb);
+  });
+
+  it("gives the rail one dot per claim, and every dot a name", () => {
+    const src = stripComments(sentence());
+    expect(src).toMatch(/HERO_FRAMES\.map\(\(f, i\) => \(\s*<button/s);
+    expect(src).toContain("aria-label={f.name}");
+    expect(src).toContain("aria-selected={i === active}");
+    // State is never colour alone on this page, and its own furniture follows the
+    // rule the charts do: the active dot changes WIDTH as well.
+    expect(css()).toMatch(/\.v3 \.hero-dot\[data-state="on"\] \.hero-dot-mark \{[^}]*width:/s);
+  });
+
+  it("hides every claim but the visible one from keyboards and screen readers", () => {
+    // Four mounted charts is four tab stops and four announced images, and the
+    // callout beside them says "one tab stop" — without `inert` that label lies.
+    expect(stripComments(sentence())).toMatch(/inert=\{i !== active\}/);
+  });
+
+  it("stops the cycle for reduced motion rather than cutting without one", () => {
+    const src = stripComments(sentence());
+    expect(src).toContain('matchMedia("(prefers-reduced-motion: reduce)")');
+    // And a hidden tab, a reader inspecting the mark, or one stepping the rail
+    // all hold it.
+    expect(src).toContain("visibilitychange");
+    expect(src).toContain("onPointerEnter");
+  });
+
+  it("crossfades with overlap, so the box is never blank mid-swap", () => {
+    // The first version eased opacity on `--e` (ease-out-expo) and delayed the
+    // incoming frame by 90ms. Expo spends almost all of its change in the first
+    // few frames, so the outgoing sentence hit zero before the incoming one
+    // started and the box went visibly BLANK — caught in a screenshot, and
+    // exactly the flicker this rotation is not allowed to have. Opacity is LINEAR
+    // and undelayed so the pair cross; only the travel keeps its easing.
+    for (const sel of ["\\.hero-say > \\.sentence", "\\.fan-swap"]) {
+      expect(css(), sel).toMatch(
+        new RegExp(`\\.v3 ${sel} \\{[^}]*opacity var\\(--hero-fade\\) linear`, "s"),
+      );
+    }
+    expect(css()).not.toMatch(/transition-delay/);
+  });
+
+  it("never clips the mark, because the readout lives outside it", () => {
+    // The hover readout is absolutely positioned at `bottom: 100%` of the chart.
+    // `overflow: clip` on the slot cut it off, which removed the one piece of UI
+    // in the fold that proves the mark is interactive.
+    const mark = /\.v3 \.hero-mark \{([\s\S]*?)\n\}/.exec(css())?.[1] ?? "";
+    expect(mark).not.toMatch(/overflow/);
+    // Full-bleed types (SegmentedBar, SparkBar) paint to the very edge of their
+    // box and read as glued to the words at `.mc-inline`'s own `.2em`. Only a
+    // little more, though: `.45em` opened a hole and split the line in two.
+    expect(mark).toMatch(/margin-inline: 0\.22em/);
   });
 });
 
@@ -234,13 +372,21 @@ describe("inline marks use the library's own seat", () => {
       expect(code, file).not.toMatch(/\bvertical-?[Aa]lign\b/);
     }
     // And the marks that ARE in prose take it.
-    for (const f of ["hero-sentence.tsx", "four-places.tsx", "paper-inversion.tsx"]) {
+    for (const f of ["four-places.tsx", "paper-inversion.tsx"]) {
       const src = readFileSync(join(dir, f), "utf8");
       const marks = (src.match(/<(?:Sparkline|SparkBar|MicroBox|HeatStrip|RugStrip)\b/g) ?? [])
         .length;
       expect(marks, f).toBeGreaterThan(0);
       expect(src, f).toContain('className="mc-inline"');
     }
+    // The hero's marks moved into `hero-frames.tsx` when the claim started
+    // rotating, and the seat moved WITH them — each sentence sets its own mark, so
+    // the wrapper belongs beside the words it sits in. One `Mark` helper carries
+    // it for all four, which is what stops a fifth frame being added without one.
+    const frames = readFileSync(join(dir, "hero-frames.tsx"), "utf8");
+    expect(frames).toMatch(/<(?:Sparkline|SparkBar|SegmentedBar|RugStrip)\b/);
+    expect(frames).toContain('className="mc-inline hero-mark"');
+    expect(frames.match(/<Mark>/g) ?? []).toHaveLength(4);
     // A chart in a table CELL is not prose and takes the table reset instead.
     expect(readFileSync(join(dir, "four-places.tsx"), "utf8")).toContain("mc-inline-table");
   });
@@ -262,19 +408,38 @@ describe("inline marks use the library's own seat", () => {
     const css = readFileSync(join(routeDir, "v3.css"), "utf8");
     expect(css).toMatch(/\.v3 \.fan-lab \{[^}]*left: calc\(var\(--fan-step\)/s);
     expect(css).toMatch(/\.v3 \.fan-drop \{[^}]*left: calc\(var\(--fan-step\)/s);
-    // The stem's default must be server-renderable, or a JS-less reader sees no tree.
+    // The stem is the ONE part of the tree the server cannot place: it points at
+    // the mark, and where the mark lands depends on where the sentence wrapped.
+    // It used to render at the `50%` default and snap across on hydration — a
+    // sideways jump with no cause a reader could see. So it must start scaled to
+    // nothing and draw itself once a browser has measured. The `50%` fallback
+    // stays as a value, but nothing is painted at it.
     expect(css).toMatch(/left: var\(--fan-x, 50%\)/);
+    expect(css).toMatch(/\.v3 \.fan-stem\[data-state="off"\] \{[^}]*transform: scaleY\(0\)/s);
+    expect(stripComments(src)).toContain('data-state={aimed ? "on" : "off"}');
+    // And the rest of the tree still IS server-renderable — only the stem waits.
+    expect(css).not.toMatch(/\.v3 \.fan-(?:bus|drop)\[data-state/);
   });
 });
 
 describe("interactivity is spent where a reader can act on it", () => {
   /** Sections that import an `/interactive` entry, and the reason each earns it. */
   const EARNS_IT = new Set([
-    // The fold's living mark: hovering it IS the product's thesis.
-    "hero-sentence.tsx",
+    // The fold's living marks: hovering one IS the product's thesis. They live in
+    // `hero-frames.tsx` because each rotating claim sets its own.
+    "hero-frames.tsx",
     // One `domain` toggle re-scaling five encodings — the readouts are how you
     // check that each one stayed correct.
     "grammar-rows.tsx",
+    // "The same component in four places" is a claim about SCREENS. Three of the
+    // four are screens, and a mark you can scrub in a sentence, in a table cell
+    // and on a card proves sameness better than three still pictures do.
+    "four-places.tsx",
+    // The card whose chart drives the card: `onActive` → the big number.
+    "kpi-card.tsx",
+    // The fence's mark is the thing the fence produced. A mark you cannot touch
+    // is a picture of a component, which is the one thing this beat denies.
+    "fence-beat.tsx",
   ]);
 
   it("imports the interactive entry in exactly the sections that use it", () => {
@@ -282,17 +447,39 @@ describe("interactivity is spent where a reader can act on it", () => {
     for (const [file, src] of sources()) {
       if (/@microcharts\/react\/[\w-]+\/interactive/.test(stripComments(src))) found.add(file);
     }
-    // A hover readout that repeats a figure already printed beside the mark — the
-    // table row, the KPI card, the fence's own JSON — is a client bundle bought for
-    // nothing. And a printed report has no pointer at all.
+    // The exclusions are surfaces, not budgets: the printed sheet and the printed
+    // frame inside the placement quad stay static, because paper has no pointer.
     expect([...found].sort()).toEqual([...EARNS_IT].sort());
   });
 
-  it("keeps the placement section and the fence on the server", () => {
+  it("keeps the printed sheet static, and every section a server module", () => {
+    // `paper-inversion` is the printed page — static entries only, no exceptions.
+    const paper = stripComments(readFileSync(join(dir, "paper-inversion.tsx"), "utf8"));
+    expect(paper).not.toMatch(/@microcharts\/react\/[\w-]+\/interactive/);
+    // …and the printed FRAME inside the placement quad is held to the same rule,
+    // which is what the static alias is for.
+    expect(stripComments(readFileSync(join(dir, "four-places.tsx"), "utf8"))).toMatch(
+      /Sparkline as PrintSparkline \} from "@microcharts\/react\/sparkline"/,
+    );
+    // Importing a `'use client'` entry does not make the importer a client module.
+    // These three stay server-rendered; only `kpi-card` holds state.
     for (const f of ["four-places.tsx", "fence-beat.tsx", "paper-inversion.tsx"]) {
       const src = stripComments(readFileSync(join(dir, f), "utf8"));
       expect(src, f).not.toContain('"use client"');
     }
+  });
+
+  it("reads the KPI card's number off the chart it sits beside", () => {
+    const src = stripComments(readFileSync(join(dir, "kpi-card.tsx"), "utf8"));
+    // `readout={false}` + `datum.formatted` is the library's documented KPI
+    // pattern: one reading, painted once, in the place the card already reads.
+    expect(src).toContain("readout={false}");
+    expect(src).toContain("onActive=");
+    expect(src).toContain("d.formatted");
+    // No hardcoded 141 — the card's resting value is the series' own last point,
+    // so editing `CHECKOUT_P95` can never leave a stale number on the card.
+    expect(src).not.toMatch(/\b141\b/);
+    expect(src).toContain("CHECKOUT_P95");
   });
 });
 
@@ -399,13 +586,19 @@ describe("the page invents no editorial furniture", () => {
 });
 
 describe("rules stay quiet and controls stay still", () => {
-  it("keeps both rule weights faint and the lattice fainter still", () => {
+  it("keeps both rule weights faint and draws no rule in the lattice at all", () => {
     const css = readFileSync(join(routeDir, "v3.css"), "utf8");
     for (const m of css.matchAll(/--rule-2: color-mix\(in oklab, #[0-9a-f]{6} (\d+)%/g)) {
       expect(Number(m[1]), "the emphasis rule is structure, not a mark").toBeLessThanOrEqual(20);
     }
-    // ~220 edges at once, so the lattice halves the hairline again.
-    expect(css).toMatch(/--rule-cell: color-mix\(in oklab, var\(--hairline\) 50%/);
+    // The lattice used to rule all four sides of 106 cells and then halve the
+    // hairline to survive it. It is separated by space now: a cell is a field,
+    // and the sheet carries no line ink of its own. Half a hairline times 220
+    // edges is still 220 edges.
+    const cells = /\.v3 \.cells \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    const cell = /\.v3 \.cell \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? "";
+    expect(cells).toMatch(/\n {2}gap:/);
+    for (const block of [cells, cell]) expect(block).not.toMatch(/^\s*border[^-]/m);
   });
 
   it("gives the install and copy controls one resting edge", () => {

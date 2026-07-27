@@ -15,7 +15,7 @@ import { SiteFooter } from "@/components/site-footer";
  * a surface once there is content behind it. Its appearance popover owns theme,
  * accent and all six chart presets, with a description for each.
  *
- * **The ground spans the whole page, including behind the rail.** The ember wash
+ * **The ground spans the whole page, including behind the rail.** The accent wash
  * used to live inside Act I, whose box starts below the sticky header — so the
  * 56px strip behind the transparent rail showed the bare field while the fold
  * showed field + wash, and the seam between them read as a header background. Two

@@ -80,10 +80,34 @@
      isolation. The fold's own padding is `--sp-beat` top AND bottom, which is what
      makes the space above "Five kilobytes." match the space under the install row:
      the beat that follows adds nothing of its own. */
+  /* FOUR steps, and only four. Everything below `--sp-act` used to be an ad-hoc
+     Tailwind margin picked per component — `mt-4` through `mt-28` with responsive
+     variants that disagreed with each other — so the page had fourteen different
+     vertical gaps and no two sub-sections were separated by the same amount. The
+     ladder is what makes a gap MEAN something: a reader learns four distances,
+     not fourteen.
+
+       --sp-act    section  → section          141
+       --sp-sub    block    → block, in one    ~94
+       --sp-block  text     → the thing it introduces  ~43
+       --sp-lede   heading  → its own paragraph  24
+
+     (The fold keeps `--sp-beat` for its own internal padding; it is not a gap
+     between two things, it is the fold's frame.) */
   --sp-act: clamp(6rem, 11vw, 12.5rem);
   --sp-beat: clamp(3rem, 5.5vw, 5.5rem);
+  --sp-sub: clamp(4rem, 6.5vw, 6.5rem);
+  --sp-block: clamp(2rem, 3vw, 2.75rem);
+  --sp-lede: 1.5rem;
 
   --e: var(--ease-out-expo);
+  /* How long a hero specimen takes to leave. Mirrored by `SWAP_MS` in
+     `hero-sentence.tsx`, which uses it to park the outgoing frame once it has
+     gone — the two must agree or a frame re-enters from the wrong side. */
+  --hero-swap: 460ms;
+  /* How long the crossfade itself takes. Shorter than the travel and LINEAR, so
+     the outgoing and incoming frames overlap instead of leaving a blank gap. */
+  --hero-fade: 220ms;
   /* The site nav's height (`h-14`), which is what the sticky specimen readout
      offsets itself by. A constant, not a measurement: the rail is a fixed-height
      flex row on every breakpoint, and reading it at runtime was the one thing the
@@ -127,13 +151,47 @@
   padding-bottom: calc(var(--sp-act) - 3.5rem);
 }
 
-/* One gap per kind, applied by class. Padding-TOP only: a section owns the space
-   above it, so removing a section can never collapse two gaps into one. */
+/* ONE gap, applied by class. Padding-TOP only: a section owns the space above
+   it, so removing a section can never collapse two gaps into one.
+
+   This used to be a two-tier rhythm — `--sp-act` between acts, `--sp-beat`
+   between beats inside one. It read as inconsistent rather than as a rhythm:
+   with nine sections the reader met 70px, 70px, 141px, 70px, 70px, 141px, 141px,
+   141px on the way down and had no way to learn which boundary meant what, so
+   the two sizes registered as sloppiness. One gap everywhere, and the ACTS are
+   separated by their display headings, which is a stronger signal than 70px of
+   air ever was. */
 .v3 .act {
   padding-top: var(--sp-act);
 }
-.v3 .beat {
-  padding-top: var(--sp-beat);
+/* The one exception, and it exists to make the gap the SAME rather than
+   different. The fold carries `--sp-beat` of its own padding top and bottom (its
+   internal symmetry is load-bearing: the space above the headline has to match
+   the space under the install row). So the section directly after it adds only
+   the remainder, and the boundary the reader sees is the same `--sp-act` as
+   every other one on the page. */
+.v3 .act-after-fold {
+  padding-top: calc(var(--sp-act) - var(--sp-beat));
+}
+
+/* The three sub-gaps as classes, so a component names the RELATIONSHIP it is
+   expressing rather than picking a number. Changing the rhythm is then one edit
+   here instead of forty across the route. */
+.v3 .u-sub {
+  margin-top: var(--sp-sub);
+}
+.v3 .u-block {
+  margin-top: var(--sp-block);
+}
+.v3 .u-lede {
+  margin-top: var(--sp-lede);
+}
+/* A sub-block that draws its own rule. The rule is already doing the separating,
+   so the space does not have to do it a second time — `--sp-sub` above a visible
+   hairline reads as a gap that lost its nerve, and these two were 44px before the
+   ladder went in. One step down, and the rule carries the boundary. */
+.v3 .u-ruled {
+  margin-top: var(--sp-block);
 }
 
 /* ── the inversion ──────────────────────────────────────────────────────────
@@ -349,7 +407,7 @@
 /* ── ground: grain, not glow ────────────────────────────────────────────────
    §11 bans the reflexive radial halo. Two layers instead: a film-grain tile
    over the whole page (printed stock — the specimen premise), and one angled
-   ember wash cut off well before centre in Act I only. Both re-derive from the
+   accent wash cut off well before centre in Act I only. Both re-derive from the
    accent, so a preset change moves them. */
 .v3-grain {
   position: fixed;
@@ -361,21 +419,365 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
-/* The fold's ground. Page-level and starting at y=0, so it runs BEHIND the
-   transparent masthead: parented to Act I (whose box starts below the sticky
-   rail) it left the 56px strip behind the rail on the bare field, and the seam
-   between the two read as a header background. Height is the fold's own cap. */
+/* The ground under everything. FIXED and full-viewport, like the grain above it.
+
+   It used to be `position: absolute` with `height: min(100svh, 49rem)` — the
+   fold's own cap — so the layer simply ENDED mid-page. At 152deg the axis runs
+   toward the bottom-left, which means the left edge still carries tint when the
+   box runs out, and the reader saw a hard horizontal seam across the page with
+   lit ground above it and bare field below. Cutting a wash off is only invisible
+   if it has already reached zero everywhere it is cut, and this one had not.
+
+   Fixed also means it does not travel with the content: the tint stays where the
+   light is rather than sliding up and off, which is what a ground is for. The
+   percentage is pushed out to 55% so the far corner resolves to nothing well
+   inside the viewport, and the accent still drives it, so a preset change moves
+   it. §11's ban is on the reflexive radial halo behind a hero; this is an angled
+   wash at 7%, and it is the page's stock rather than a glow behind anything. */
 .v3-wash {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: min(100svh, 49rem);
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background: linear-gradient(
     152deg,
     color-mix(in oklab, var(--mc-accent) 7%, transparent) 0%,
-    transparent 44%
+    transparent 55%
   );
+}
+
+/* ── the scroll cue ────────────────────────────────────────────────────────
+   A hairline leader with a tick running down it. The page already has a grammar
+   for "this points at that" — the callout tree's 1px leaders — so the cue is
+   built from the same parts rather than from a bouncing chevron, which is the one
+   piece of borrowed chrome this page would otherwise carry.
+
+   It is absolutely positioned inside the fold's own bottom padding, so it adds no
+   height: the fold is height-capped and centres its content, and 60px of cue in
+   normal flow would either push the claim off-centre or overflow the cap. */
+.v3 .scroll-cue {
+  /* FIXED, not absolute. Anchored to the fold's own bottom padding it rendered
+     6px BELOW the viewport: the fold's content overflows its `44rem` height cap
+     on a laptop, so the section ends past the fold and the cue went with it. A
+     cue you have to scroll to find is not a cue. Pinned to the viewport it is
+     always where a reader looks for one, and it costs no layout either way. */
+  position: fixed;
+  inset-inline: 0;
+  bottom: 16px;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity var(--hero-fade) linear;
+}
+/* Hidden while the section below is already on screen. An always-on cue urging a
+   reader toward what they are already looking at is noise, and on a tall window
+   that is every visit. `scroll-cue.tsx` owns the observation. */
+.v3 .scroll-cue[data-state="off"] {
+  opacity: 0;
+}
+.v3 .scroll-cue[data-state="on"] {
+  opacity: 1;
+}
+.v3 .scroll-cue-rule {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 38px;
+  /* Fades out downward, so the leader dissolves into the page instead of
+     stopping at an edge — the same call the specimen readout's mask makes. */
+  background: linear-gradient(to bottom, var(--rule-2), transparent);
+  overflow: hidden;
+}
+.v3 .scroll-cue-tick {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: 1px;
+  height: 10px;
+  background: var(--mc-accent);
+  animation: v3-cue 2.8s var(--e) infinite;
+}
+/* The ONE keyframe on this page, and the guard in `home-v3.test.ts` allows it by
+   name. Everything else that moves here is a `[data-state]` transition. */
+@keyframes v3-cue {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(38px);
+    opacity: 0;
+  }
+}
+/* On the page's left axis, like everything else. The label sits BESIDE the foot
+   of the leader rather than stacked above it: stacked, the type read as a second
+   mark in the same column and the pair looked like two unrelated things. Beside
+   the rule's bottom it reads the way the callout tree reads — a leader arriving
+   somewhere, and the words naming what it arrived at. `flex-end` on the cross
+   axis is what lands the type on the rule's last pixel instead of its middle. */
+.v3 .scroll-cue .shell {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 9px;
+}
+.v3 .scroll-cue-label {
+  display: block;
+  /* Optically on the rule's last pixel: `.kicker` is 10px with a 1 line-height,
+     so its box already sits on the baseline and needs only the descender's worth
+     of nudge to stop looking like it floats. */
+  margin-bottom: -1px;
+}
+/* Reduced motion keeps the leader and drops the travel: a static hairline with a
+   mark at its head still reads as "there is more this way", and that is the whole
+   job. Nothing here is the only way to learn the page continues. */
+@media (prefers-reduced-motion: reduce) {
+  .v3 .scroll-cue-tick {
+    animation: none;
+    opacity: 1;
+  }
+}
+/* On a short window the fold's content already fills the cap, and the cue would
+   sit on top of the install row instead of below it. There is nothing to point
+   at that the reader cannot already see. */
+@media (max-height: 700px) {
+  .v3 .scroll-cue {
+    display: none;
+  }
+}
+
+/* ── the rotating claim ────────────────────────────────────────────────────
+   Four sentences, each with its own chart set inside it, occupying ONE box. A
+   dot rail above says how many there are and which one you are on.
+
+   THE BOX is a grid whose children all take the same cell, so its height is the
+   TALLEST sentence at the current width, not the active one. That is the whole
+   trick: a frame that wraps to two lines on a laptop and four on a phone can
+   never push the tree below it, and the reserved height is correct in server
+   HTML before a swap has happened. `position: absolute` would collapse the box
+   and let it move on every rotation. */
+.v3 .hero-say {
+  display: grid;
+}
+.v3 .hero-say > .sentence {
+  grid-area: 1 / 1;
+  /* Only opacity and translate — compositor properties, so a swap never lays out
+     or repaints the fold around it.
+
+     OPACITY IS LINEAR AND UNDELAYED. The first version eased it on `--e`
+     (ease-out-expo) and held the incoming frame back by 90ms: expo dumps almost
+     all of its change in the first few frames, so the outgoing sentence hit zero
+     before the incoming one started and the box went visibly BLANK mid-swap.
+     That is the flicker. Linear and overlapping means the pair cross at 0.5 and
+     the box is never empty; the travel keeps its expo easing, which is what makes
+     the movement feel like it lands rather than stops.
+
+     The fade is SHORTER than the travel on purpose. Two paragraphs crossfading
+     at equal opacity is a double exposure — readable as a smear, not a swap — so
+     the overlap is kept brief and the 14px of travel does the work of telling
+     the two apart while they are both on screen. */
+  transition:
+    opacity var(--hero-fade) linear,
+    translate var(--hero-swap) var(--e);
+}
+/* Waiting below, ready to rise. No transition: a frame that is neither entering
+   nor leaving must snap home, or it drifts while invisible and arrives from the
+   wrong side on its next turn. */
+.v3 .hero-say > .sentence[data-state="off"] {
+  opacity: 0;
+  translate: 0 14px;
+  transition: none;
+  pointer-events: none;
+}
+.v3 .hero-say > .sentence[data-state="on"] {
+  opacity: 1;
+  translate: 0 0;
+}
+/* Leaving upward, so the set reads as a column that advances rather than a pile
+   that shuffles. */
+.v3 .hero-say > .sentence[data-state="out"] {
+  opacity: 0;
+  translate: 0 -14px;
+  pointer-events: none;
+}
+
+/* The rail. Four dots on the page's own left axis, above the claim — a column
+   beside the text would be the only thing on this page starting anywhere else.
+
+   The hit area is 24px square and the mark inside it is 6px, because a 6px
+   target is not a target. The active dot widens into a bar rather than changing
+   colour alone: this page's rule is that state is never carried by colour by
+   itself, and the same rule the charts follow applies to its own furniture. */
+/* The rail sits on the page's left axis, and it is the DOT that has to land on
+   it, not the button. The hit area is 24px and the mark inside it is 6px, so the
+   mark is inset 9px, so `-9px` puts the dot's left edge exactly on the axis. It
+   sits 5px INSIDE that instead. Dots are not type: flush on the axis they read as
+   a fourth item in the left column competing with the headline and the sentence,
+   where a small indent reads as what they are — a control belonging to the block
+   below. Same reason a bullet hangs. (`-6px` earlier was neither: a guess that
+   landed 3px inboard by accident.) The button still overhangs into the shell's
+   own gutter, which has room for it at every width. */
+.v3 .hero-rail {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: -4px;
+}
+.v3 .hero-dot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.v3 .hero-dot-mark {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  opacity: 0.45;
+  transition:
+    width var(--hero-swap) var(--e),
+    opacity var(--hero-fade) linear,
+    background-color var(--hero-fade) linear;
+}
+.v3 .hero-dot[data-state="on"] .hero-dot-mark {
+  width: 18px;
+  opacity: 1;
+  background: var(--mc-accent);
+}
+.v3 .hero-dot:hover .hero-dot-mark {
+  opacity: 0.8;
+}
+.v3 .hero-dot:focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+/* `.mc-inline` reserves `.2em` either side, which is the right air for a
+   glyph-sized mark set tight into running text. These are 132px wide in a 26px
+   sentence and read as objects rather than letters, and half of them are
+   full-bleed — SegmentedBar and SparkBar paint to the very edge of their box, so
+   at `.2em` alone they touch the words. A little more, not a lot: an earlier pass
+   at `.45em` opened a hole in the middle of the line and the sentence read as two
+   fragments with a chart parked between them. `.mc-inline`'s own margin is a
+   `:where()` rule at zero specificity, so this simply wins.
+
+   NOT CLIPPED, and nothing here sets `overflow`: the hover readout is absolutely
+   positioned at `bottom: 100%` of the chart, and clipping the mark cut off the
+   one piece of UI in this fold that proves it is interactive. */
+.v3 .hero-mark {
+  margin-inline: 0.22em;
+}
+/* On a phone the sentence is 19px and the mark was still 132px, so one chart ate
+   roughly 40% of the measure: it landed at the start of its own line as often as
+   not, and the claim read as two fragments with a picture wedged between them.
+   The library draws into a `viewBox` with `preserveAspectRatio` and
+   `non-scaling-stroke` precisely so a chart can be re-sized by CSS without the
+   geometry or the stroke weight changing, and `--mc-seat` is applied as a
+   percentage of the element's own height, so the baseline seat scales with it and
+   stays correct. Same aspect (4.4:1), two thirds the footprint. */
+@media (max-width: 640px) {
+  /* The WRAPPER, not the svg. An interactive entry renders
+     `<span class="mc-*-interactive">` around its chart and that span owns the
+     layout box — sizing only `.mc-root` left the box at 132px and moved nothing.
+     The svg is then told to fill it, which is the same contract the client
+     entries already rely on for hit-testing. */
+  .v3 .hero-mark > span {
+    width: 92px;
+    height: 21px;
+  }
+  .v3 .hero-mark .mc-root {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* The one callout that changes with the claim: the active type's own weight. It
+   crossfades on the SAME clock as the sentence — an earlier pass cut it
+   instantly while the chart took 460ms, and the figure read as belonging to
+   something else on screen.
+
+   `7ch` is exact, not approximate: every weight is `n.nn kB` in a mono face, so
+   the box is the same width on every frame. That is what keeps the `<li>`'s
+   `translateX(-50%)` resolving to the same centre, which is what keeps the leader
+   that drops onto this label from moving. */
+.v3 .fan-swap-box {
+  position: relative;
+  display: inline-block;
+  width: 7ch;
+  height: 1em;
+}
+.v3 .fan-swap {
+  position: absolute;
+  inset: 0;
+  transition:
+    opacity var(--hero-fade) linear,
+    translate var(--hero-swap) var(--e);
+}
+.v3 .fan-swap[data-state="off"] {
+  opacity: 0;
+  translate: 0 4px;
+  transition: none;
+}
+.v3 .fan-swap[data-state="on"] {
+  opacity: 1;
+  translate: 0 0;
+}
+.v3 .fan-swap[data-state="out"] {
+  opacity: 0;
+  translate: 0 -4px;
+}
+
+/* The stem follows the mark from claim to claim, since each sentence puts it at
+   a different x. Transitioning `left` on a 1px absolutely-positioned rule lays
+   out nothing but itself. */
+.v3 .fan-stem {
+  /* It also DRAWS ITSELF the first time. The server cannot know where the mark
+     landed — that depends on where the sentence wrapped — so the stem used to
+     render at the `50%` default and snap to its real x on hydration, which is a
+     sideways jump with no cause a reader can see. Now it is scaled to nothing
+     until a browser has measured, then grows UP from the bus to the mark. Origin
+     at the BOTTOM: the stem is an arrow, and an arrow is drawn from its tail
+     toward the thing it points at. Grown downward it read as the label reaching
+     for the chart, which is backwards — and once it is at full length, the
+     direction it grew is the only thing that says which end is the point. */
+  transform-origin: bottom;
+  transition:
+    left var(--hero-swap) var(--e),
+    transform var(--hero-swap) var(--e),
+    opacity var(--hero-fade) linear;
+}
+.v3 .fan-stem[data-state="off"] {
+  opacity: 0;
+  transform: scaleY(0);
+  transition: none;
+}
+.v3 .fan-stem[data-state="on"] {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+/* Reduced motion: the cycle is already stopped in JS (cutting between frames
+   with the transition suppressed is a flicker, which is what the preference is
+   asking us not to do), so this only has to stop anything left mid-flight. */
+@media (prefers-reduced-motion: reduce) {
+  .v3 .hero-say > .sentence,
+  .v3 .hero-dot-mark,
+  .v3 .fan-swap,
+  .v3 .fan-stem {
+    transition: none;
+  }
 }
 
 /* ── the tree ───────────────────────────────────────────────────────────────
@@ -494,24 +896,37 @@
 }
 
 /* ── the 106-cell specimen lattice ──────────────────────────────────────────
-   Its own, fainter rule. A lattice is ~220 visible edges at once: at the page's
-   normal hairline the sheet read as a wireframe and the ruling competed with the
-   106 marks it exists to hold. At half strength the grid is still legible as a
-   grid — you can see the cells — but the ink you notice is the marks'. */
+   Fields, not a table. The sheet was drawn as a grid once — a hairline on all
+   four sides of every cell, over a fill, under two lines of mono — so holding
+   106 marks cost ~220 edges and 318 elements, and the eye sorted the chrome
+   before it reached the ink. Halving the rule's opacity didn't fix it: the
+   weight was never the problem, the count was.
+
+   Removing the containers outright was worse, and worth recording because it
+   sounds like the obvious answer. 106 marks are 106 different silhouettes; with
+   nothing holding them the sheet stops reading as a hundred specimens and starts
+   reading as one scattered field of shapes. What the cell needed was to be a
+   FIELD instead of a BOX — same grouping, no line ink — with the gap doing the
+   separating and hover stepping the field up one tone.
+
+   The third element went too: the kB under every name is one reading, and one
+   reading belongs on the band that is already following the cursor. */
 .v3 .cells {
-  --rule-cell: color-mix(in oklab, var(--hairline) 50%, transparent);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
-  border-top: 1px solid var(--rule-cell);
-  border-left: 1px solid var(--rule-cell);
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: 6px;
 }
 .v3 .cell {
+  /* A field, and no stroke. Dropping the containers entirely was worse than the
+     ruling: 106 marks are 106 different silhouettes, and with nothing holding
+     them the sheet reads as one scattered field of shapes instead of a hundred
+     specimens. The tile does that grouping work — a stroke was never what did
+     it, only what made it loud. */
   background: var(--field-1);
-  border-right: 1px solid var(--rule-cell);
-  border-bottom: 1px solid var(--rule-cell);
-  padding: 12px 11px 10px;
+  border-radius: 8px;
+  padding: 14px 10px 13px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
   /* CENTRED, all of it. The marks are authored at 106 different aspect ratios and
      several place their own labels, so left-aligning them made the sheet read as a
      ragged column of unrelated things — the eye picks up the mismatched left edges
@@ -543,7 +958,12 @@
   color: var(--ink);
 }
 .v3 .cell-mark {
-  /* 30px, not the mark's own 26: a handful of types set value labels above the
+  /* Painted exactly as the library ships them. Desaturating the sheet at rest
+     and restoring colour on hover made a calmer page and a dishonest one: the
+     colour IS the encoding on a third of these types, and a specimen sheet that
+     shows you the wrong ink until you point at it is showing you the wrong ink.
+
+     30px, not the mark's own 26: a handful of types set value labels above the
      plot, and a box cut to the plot clips them. */
   height: 30px;
   display: flex;
@@ -590,6 +1010,24 @@
   /* No bottom edge: the band dissolves into the sheet it is annotating. */
   -webkit-mask-image: linear-gradient(to bottom, #000 0 calc(100% - 16px), transparent 100%);
   mask-image: linear-gradient(to bottom, #000 0 calc(100% - 16px), transparent 100%);
+}
+/* Without a pointer, the band has nothing to follow — and it was covering the
+   sheet's first row at rest, which is the one thing a floating annotation must
+   never do. On touch it becomes what it actually is there: a static caption above
+   the lattice, in normal flow, with no blur and no mask because it is no longer
+   over anything. The reading it shows is the first cell's, which is honest: with
+   no hover and no focus, that IS the current cell. */
+@media (max-width: 640px), (hover: none) {
+  .v3 .readout {
+    position: static;
+    height: auto;
+    padding-inline: 0;
+    background-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 .v3 .readout-tag {
   display: -webkit-box;
@@ -687,6 +1125,58 @@
   gap: clamp(1px, 0.22vw, 3px);
 }
 
+/* ── Act IV plates: what is INSIDE one ────────────────────────────────────────
+   Three specimens per plate, and they were a flex row: `max-w-[88px]` boxes,
+   packed left, with a gap. Every number that row could vary, varied. The marks
+   are 18–88 px wide and 12–43 px tall at their natural aspects, so each plate got
+   its own three tick positions and its own band height (30, 32, 37, 49), and the
+   blurb above ran one line or two, which started the band at four different
+   heights across seven plates. Seven cards, no two agreeing on anything.
+
+   So the band is a fixed grid rather than a packed row: three equal slots, one
+   fixed height, one midline. A wide mark and a 18px dial now occupy the same
+   cell, and the three columns land on the same x on every plate in the wall. The
+   blurb reserves its second line whether it needs one or not, which is what
+   fixes the band's y — a paragraph that sizes itself is a paragraph that moves
+   everything under it. */
+.v3 .plate-blurb {
+  /* Two lines at 15px/1.5. Cheaper and steadier than clamping: no blurb runs to
+     three, so this reserves rather than truncates. */
+  min-height: 45px;
+  color: var(--ink-2);
+}
+.v3 .plate-marks {
+  display: grid;
+  /* Slots are the MARK's width, not a share of the plate's. At `1fr` the band
+     stretched with the card, so a 12-column plate spread three 88px marks across
+     660px and the specimens read as three lonely objects rather than one band —
+     the same scatter as before, at a larger scale. Capped at 88, the band is the
+     same 292px object on every plate in the wall, and only the narrow plates
+     shrink it. */
+  grid-template-columns: repeat(3, minmax(0, 88px));
+  justify-content: start;
+  align-items: center;
+  column-gap: clamp(10px, 1.4vw, 18px);
+  padding-top: 2px;
+}
+.v3 .plate-mark {
+  /* Tall enough for the tallest natural mark on the wall (43px) to sit without
+     being scaled, so no plate pays for another plate's aspect ratio. */
+  height: 44px;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+/* Left in its slot, not centred: the plate has a strong left axis (name, blurb,
+   host) and three centred marks floated free of it. Centring is the lattice's
+   answer because 106 marks have no shared axis to hold; three inside a card do. */
+.v3 .plate-mark svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 /* ── Act IV plates: their own offset lattice with corner overlaps ── */
 @media (min-width: 1081px) {
   .v3 .plates {
@@ -711,7 +1201,7 @@
 /* ── motion ─────────────────────────────────────────────────────────────────
    There is NO entrance motion on this page, and that is a decision, not an
    omission.
- 
+
    Every version of it was worse than nothing. Scroll reveals meant the reader met
    each section as a fade rather than as a page, and a mis-fired observer left a
    block blank. A staggered hero sequence — the line drawing itself, then the type
@@ -720,12 +1210,12 @@
    after the server's HTML has painted, so the first thing an entrance does is
    HIDE something the reader already saw. The library's own `animate` draw on the
    hero mark had the same problem one layer down, plus a hydration seam of its own.
- 
+
    The current home page reaches the same conclusion, and this page is held to it:
    the only motion here is a response to the reader — hover and focus on controls,
    cells and links, and the interactive charts' own readouts. Nothing moves because
    the page loaded, and nothing moves because the page scrolled.
- 
+
    The practical rule for anyone extending this: no `opacity: 0` resting state and
    no `@keyframes` anywhere in this file. There is a test. */
 

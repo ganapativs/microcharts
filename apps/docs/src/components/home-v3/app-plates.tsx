@@ -48,11 +48,29 @@ type Plate = {
   place: { gridColumn: string; gridRow: string };
 };
 
+/**
+ * Two rules on the three slugs, and the second one is new.
+ *
+ * No text-shaped marks (TokenConfidence, FillWord, FatDigits): they set real prose
+ * at real sizes, which overruns an 88px slot.
+ *
+ * And every mark must draw at roughly 88×26, its natural aspect. The catalog runs
+ * from an 8px StatusDot to a 32×75 GardenGrid, and the first pass picked purely on
+ * meaning: Vitals carried an 18px ProgressRing between two 88px strips, Cortex a
+ * 26px StarSpoke, Atlas a 60×12 Dumbbell beside a 40×26 Slope. Inside a card that
+ * reads as three unrelated objects that happen to share a row, and seven cards of
+ * it is the whole wall looking scattered. Same-footprint marks make the band read
+ * as three specimens of one thing, which is what it is.
+ *
+ * Each trio still has to be the app's own — `home-v3.test.ts` checks every slug
+ * against that app's real import list — and the three should not all be the same
+ * texture. A line, a field and a set of bars beats three strips.
+ */
 const PLATES: Plate[] = [
   {
     slug: "pulse",
     preset: "modern",
-    marks: ["sparkline", "funnel", "cohort-triangle"],
+    marks: ["sparkline", "funnel", "retention-curve"],
     place: { gridColumn: "1 / 8", gridRow: "1" },
   },
   {
@@ -64,35 +82,33 @@ const PLATES: Plate[] = [
   {
     slug: "atlas",
     preset: "print",
-    marks: ["mini-bar", "dumbbell", "slope"],
+    marks: ["mini-bar", "percentile-ladder", "stacked-area"],
     place: { gridColumn: "1 / 7", gridRow: "2" },
   },
   {
     slug: "vitals",
     preset: "eink",
-    marks: ["hypnogram", "progress-ring", "streak-spark"],
+    marks: ["hypnogram", "cycle-plot", "streak-spark"],
     place: { gridColumn: "7 / 13", gridRow: "2" },
   },
   {
     slug: "cortex",
     preset: "editorial",
-    // No text-shaped marks here (TokenConfidence, FillWord, FatDigits): they set
-    // real prose at real sizes, which overruns an 88px glyph slot.
-    marks: ["calibration-strip", "waveform", "star-spoke"],
+    marks: ["calibration-strip", "waveform", "rubric-strip"],
     place: { gridColumn: "1 / 5", gridRow: "3" },
   },
   {
     slug: "shipyard",
     preset: "mono",
     own: true,
-    marks: ["activity-grid", "error-budget", "seismogram"],
+    marks: ["error-budget", "seismogram", "micro-box"],
     place: { gridColumn: "5 / 9", gridRow: "3" },
   },
   {
     slug: "dispatch",
     preset: "editorial",
     own: true,
-    marks: ["sparkline", "dumbbell", "music-staff"],
+    marks: ["sparkbar", "likert-strip", "music-staff"],
     place: { gridColumn: "9 / 13", gridRow: "3" },
   },
 ];
@@ -100,7 +116,7 @@ const PLATES: Plate[] = [
 export function AppPlates({ catalogTotal }: { catalogTotal: number }) {
   return (
     <>
-      <div className="plates mt-10 sm:mt-14 lg:mt-20">
+      <div className="plates u-block">
         {PLATES.map((p) => {
           const app = SHOWCASE.find((a) => a.slug === p.slug);
           if (!app) return null;
@@ -130,23 +146,24 @@ export function AppPlates({ catalogTotal }: { catalogTotal: number }) {
                   </span>
                 </div>
 
-                <p
-                  className="text-[15px] leading-[1.5] text-pretty"
-                  style={{ color: "var(--ink-2)" }}
-                >
-                  {app.blurb}
-                </p>
+                {/* Two lines of room, always. The blurbs run one line or two, and
+                    a self-sizing paragraph put the specimen band at four different
+                    heights across seven plates — which is most of what made the
+                    grid read as scattered. */}
+                <p className="plate-blurb text-[15px] leading-[1.5] text-pretty">{app.blurb}</p>
 
-                <div aria-hidden className="flex flex-wrap items-center gap-x-5 gap-y-4 pt-1">
+                {/* Three equal slots, not a flex row. The marks are 18–88 px wide
+                    and 12–43 px tall by nature, so packing them left with a gap
+                    gave every plate its own three tick positions and its own row
+                    height. One slot grid puts all 21 marks on three columns and
+                    one midline. */}
+                <div aria-hidden className="plate-marks">
                   {p.marks.map((slug) => {
                     const mod = getModule(slug);
                     if (!mod) return null;
                     const { Mark, entry } = mod;
                     return (
-                      <span
-                        key={slug}
-                        className="flex max-w-[88px] items-center overflow-hidden text-[0.6rem]"
-                      >
+                      <span key={slug} className="plate-mark text-[0.6rem]">
                         <Mark data={entry.demo} width={88} height={26} />
                       </span>
                     );

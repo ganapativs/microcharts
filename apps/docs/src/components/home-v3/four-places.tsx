@@ -1,17 +1,25 @@
-import { Sparkline } from "@microcharts/react/sparkline";
+import { Sparkline as PrintSparkline } from "@microcharts/react/sparkline";
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+import { KpiCard } from "./kpi-card";
 import { CHECKOUT_P95, SEARCH_P95 } from "./v3-data";
 
 /**
  * Act I's second beat — the same component in four places, unchanged.
  *
- * All four frames plot `CHECKOUT_P95`, the same interactive `<Sparkline curve="smooth">`, with
+ * All four frames plot `CHECKOUT_P95`, the same `<Sparkline curve="smooth">`, with
  * nothing changed but `width`/`height`. The brief asked for a scroll-scrubbed
  * sequence; it was built and cut, because it hijacked ~1,800px of scroll to swap
  * four small frames. All four now sit stacked and visible in one normal pass, so
  * the comparison is something you can look at rather than something you have to
  * scroll through.
  *
- * The fourth frame inverts the surface — the act always ends on the opposite
+ * The first three frames are the INTERACTIVE entry — a screen has a pointer, and
+ * "unchanged" is a stronger claim when the mark in a sentence, in a table cell and
+ * on a card all scrub the same way. The fourth is the STATIC entry: it is a
+ * printed sheet, and paper has no hover. That is the only difference between the
+ * four, and it is a difference of surface, not of component.
+ *
+ * The fourth frame also inverts the surface — the act always ends on the opposite
  * stock — and the charts inside it re-derive their ink for that ground.
  */
 
@@ -24,7 +32,7 @@ const th = "pb-2.5 pt-2.5 text-left font-normal kicker border-b" as const;
 
 export function FourPlaces() {
   return (
-    <div className="mt-8 grid gap-9 sm:mt-10">
+    <div className="u-block grid gap-9">
       {/* 1 — in a line of prose */}
       <figure>
         <figcaption className="kicker mb-3">in a line of prose</figcaption>
@@ -32,6 +40,7 @@ export function FourPlaces() {
           Latency held under budget all week
           <span className="mc-inline">
             <Sparkline
+              curve="smooth"
               data={[...CHECKOUT_P95]}
               width={104}
               height={26}
@@ -95,31 +104,12 @@ export function FourPlaces() {
         </div>
       </figure>
 
-      {/* 3 — on a KPI card */}
+      {/* 3 — on a KPI card. The only frame whose chart drives something outside
+          itself: `onActive` streams the scrubbed point into the card's own big
+          number, so the reading is painted where a KPI card already reads. */}
       <figure>
         <figcaption className="kicker mb-3">on a KPI card</figcaption>
-        <div className="plate grid max-w-[20rem] gap-3.5 px-5 pb-4 pt-5">
-          <div className="kicker">p95 latency</div>
-          <div className="flex items-end justify-between gap-4">
-            <div
-              className="font-mono text-[34px] leading-none tracking-[-0.05em]"
-              style={{ color: "var(--ink)" }}
-            >
-              141
-              <span className="text-[15px]" style={{ color: "var(--ink-3)" }}>
-                {" "}
-                ms
-              </span>
-            </div>
-            <Sparkline
-              curve="smooth"
-              data={[...CHECKOUT_P95]}
-              width={100}
-              height={30}
-              title="Checkout p95 latency, weekly, milliseconds"
-            />
-          </div>
-        </div>
+        <KpiCard />
       </figure>
 
       {/* 4 — in a printed report */}
@@ -129,7 +119,7 @@ export function FourPlaces() {
           <p className="text-[17px] leading-[1.6]" style={{ fontFamily: "var(--fr)" }}>
             Checkout latency held at <span className="font-mono text-[0.78em]">141 ms</span>
             <span className="mc-inline">
-              <Sparkline
+              <PrintSparkline
                 curve="smooth"
                 data={[...CHECKOUT_P95]}
                 width={82}
@@ -148,7 +138,7 @@ export function FourPlaces() {
             className="mt-5 pt-2.5 font-mono text-[10px] tracking-[0.02em]"
             style={{ color: "var(--paper-faint)" }}
           >
-            ink re-derived for the stock
+            static entry · no hover on paper · ink re-derived for the stock
           </div>
         </div>
       </figure>

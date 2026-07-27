@@ -44,7 +44,7 @@ const mono = JetBrains_Mono({
 });
 
 // Apply saved accent + chart preset before first paint.
-const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="ember")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
+const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
 // Predict the hero's live-mode layout before first paint, so the panel is born
 // its final size instead of growing into it.
@@ -61,7 +61,7 @@ const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem
 const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.getItem("mc-live")==="1")document.documentElement.dataset.mcLive="1"}catch(e){}`;
 
 // Console easter egg — unicode blocks of the hero sparkline series [3,5,4,8,6,9,7,11].
-const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#c2410c;font-size:15px;letter-spacing:1.5px","color:#c2410c;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
+const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-size:15px;letter-spacing:1.5px","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),

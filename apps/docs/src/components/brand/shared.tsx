@@ -5,17 +5,17 @@ import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand"
 export type Tile = "light" | "dark" | "auto";
 
 export const ASSETS: { file: string; name: string; note: string; tile: Tile }[] = [
-  { file: "mark.svg", name: "Primary", note: "Ember squircle", tile: "light" },
+  { file: "mark.svg", name: "Primary", note: "Cobalt squircle", tile: "light" },
   { file: "mark-adaptive.svg", name: "Adaptive", note: "Auto light / dark", tile: "auto" },
   { file: "mark-mono-dark.svg", name: "Mono", note: "Dark ink · on light", tile: "light" },
   { file: "mark-mono-light.svg", name: "Mono", note: "Light ink · on dark", tile: "dark" },
-  { file: "mark-cobalt.svg", name: "Cobalt", note: "Cool accent", tile: "light" },
+  { file: "mark-ember.svg", name: "Ember", note: "Warm accent", tile: "light" },
   { file: "mark-teal.svg", name: "Teal", note: "Cool accent", tile: "light" },
 ];
 
 export const ACCENTS: { name: string; light: string; dark: string }[] = [
+  { name: "Cobalt", light: "#2f52d4", dark: "#528dff" },
   { name: "Ember", light: "#c2410c", dark: "#f7924e" },
-  { name: "Cobalt", light: "#2f52d4", dark: "#7f9cf5" },
   { name: "Clay", light: "#a14a34", dark: "#e08e73" },
   { name: "Moss", light: "#4d7c1e", dark: "#a3c46a" },
   { name: "Teal", light: "#0f766e", dark: "#55c2b3" },

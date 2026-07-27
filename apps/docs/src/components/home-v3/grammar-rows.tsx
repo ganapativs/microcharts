@@ -79,7 +79,7 @@ export function GrammarRows() {
   const domain = fixed ? FIXED : undefined;
 
   return (
-    <div className="mt-11 max-w-[46rem] sm:mt-16">
+    <div className="u-sub max-w-[46rem]">
       <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-2">
         <span className="kicker" id={groupId}>
           one array, five types

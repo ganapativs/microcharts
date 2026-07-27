@@ -43,12 +43,12 @@
   --color-hairline: var(--hairline);
 }
 
-/* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Ember. */
+/* --accent drives chrome + chart emphasis; [data-accent] swaps it. Default Cobalt. */
 :root {
-  /* accent — Ember default (light): deep burnt orange, matte, editorial */
-  --accent: #c2410c;
-  --accent-strong: #9a330a;
-  --accent-fg: #fffaf5;
+  /* accent — Cobalt default (light): deep true blue, matte, editorial */
+  --accent: #2f52d4;
+  --accent-strong: #2543b8;
+  --accent-fg: #fdfdff;
 
   /* Light field: cool blue-grey so frosted glass separates. */
   --color-fd-background: #e9edf4;
@@ -114,12 +114,12 @@
     ),
     radial-gradient(
       52% 52% at 100% 2%,
-      color-mix(in oklab, #e6a866 24%, transparent),
+      color-mix(in oklab, #86a2e6 24%, transparent),
       transparent 62%
     ),
     radial-gradient(
       82% 72% at 50% 122%,
-      color-mix(in oklab, #e8c4a4 32%, transparent),
+      color-mix(in oklab, #9fb1de 32%, transparent),
       transparent 64%
     ),
     radial-gradient(
@@ -146,18 +146,18 @@
   /* Charts inherit the docs sans via the public --mc-font token (not a .mc-root
      text override). Same technique as Theming → Fonts. */
   --mc-font: var(--font-sans);
-  /* Categorical palette (light) — the site's default accent is Ember, so its
-     categories are the real defineTheme output for the ember accent, leading
-     with warm terracotta like every other accent leads its own hue. [data-accent]
+  /* Categorical palette (light) — the site's default accent is Cobalt, so its
+     categories are the real defineTheme output for the cobalt accent, leading
+     with its own blue like every other accent leads its own hue. [data-accent]
      swaps the whole set; gated by accent-palettes.test.ts. (The library's curated
      gold-led default still ships in styles.css and is documented in the token
-     table above — this is the ember-branded site dogfooding derivation.) */
-  --mc-cat-1: #c07157;
-  --mc-cat-2: #7c6c05;
-  --mc-cat-3: #479d70;
-  --mc-cat-4: #007891;
-  --mc-cat-5: #7b82ca;
-  --mc-cat-6: #935181;
+     table above — this is the cobalt-branded site dogfooding derivation.) */
+  --mc-cat-1: #6b87cb;
+  --mc-cat-2: #8c548c;
+  --mc-cat-3: #c26e65;
+  --mc-cat-4: #876701;
+  --mc-cat-5: #5a9b62;
+  --mc-cat-6: #007a86;
   /* interactive readout chip → site popover surface so it matches the theme */
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
@@ -169,10 +169,15 @@
 /* ---- Dark: graphite optical field — no pure black, no neon glow. Glass sings
    here: rich on AMOLED/XDR, cool hairline, faint accent bloom. ------------- */
 .dark {
-  /* accent — Ember (dark): warm lifted amber, matte, not neon */
-  --accent: #f7924e;
-  --accent-strong: #ffa869;
-  --accent-fg: #180a03;
+  /* accent — Cobalt (dark): lifted true blue, matte, not cyan. Sits deeper and
+     truer-blue than a naive lightening of the light hex: at L 0.71 sRGB caps
+     blue chroma around 0.15, so the old #7f9cf5 read as dusty periwinkle.
+     Dropped to OKLCH L 0.66 (where the ceiling is 0.18, taken in full) and
+     nudged the hue 269 → 262 off violet. 6.2:1 on the canvas, 5.7:1 on cards,
+     6.2:1 against --accent-fg on filled controls. */
+  --accent: #528dff;
+  --accent-strong: #679cff;
+  --accent-fg: #0a0c14;
 
   --color-fd-background: #0a0b0f;
   --color-fd-foreground: #e9e8e3;
@@ -205,12 +210,12 @@
   --glass-sat: 1.7;
   --glass-bright: 1.12;
   --grain-opacity: 0.05;
-  /* border token (dark) — warm near-white line; keep it readable on chrome rims. */
-  --hairline: color-mix(in oklab, #ece0cf 16%, transparent);
+  /* border token (dark) — cool near-white line; keep it readable on chrome rims. */
+  --hairline: color-mix(in oklab, #cdd8f5 16%, transparent);
   --glass-edge:
     inset 0 1px 0.5px color-mix(in oklab, #ffffff 16%, transparent),
     inset 0 -1px 1.5px color-mix(in oklab, #ffffff 4%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, #ece0cf 10%, transparent);
+    inset 0 0 0 1px color-mix(in oklab, #cdd8f5 10%, transparent);
   --glass-edge-lift:
     inset 0 1.5px 0.5px color-mix(in oklab, #ffffff 17%, transparent),
     inset 0 -1px 2px color-mix(in oklab, #ffffff 4.5%, transparent),
@@ -228,12 +233,12 @@
     ),
     radial-gradient(
       52% 48% at 100% 0%,
-      color-mix(in oklab, #b5652e 16%, transparent),
+      color-mix(in oklab, #2bb3a6 16%, transparent),
       transparent 62%
     ),
     radial-gradient(
       88% 78% at 50% 124%,
-      color-mix(in oklab, #3d1f0c 46%, transparent),
+      color-mix(in oklab, #16365f 46%, transparent),
       transparent 64%
     ),
     radial-gradient(
@@ -249,15 +254,15 @@
   --mc-negative: #df7856;
   --mc-accent: var(--accent);
   --mc-neutral: #8f8a80;
-  /* Categorical (dark) — ember-derived dark twins (`defineTheme` .darkVars),
+  /* Categorical (dark) — cobalt-derived dark twins (`defineTheme` .darkVars),
      the site default. Must be re-declared here because the docs force theme via
      the .dark class, not @media/[data-mc-theme]. Gated by accent-palettes.test. */
-  --mc-cat-1: #f09c81;
-  --mc-cat-2: #a69640;
-  --mc-cat-3: #74c99a;
-  --mc-cat-4: #30a5c2;
-  --mc-cat-5: #a4adf8;
-  --mc-cat-6: #c07aac;
+  --mc-cat-1: #95b2fa;
+  --mc-cat-2: #b87db8;
+  --mc-cat-3: #f1998f;
+  --mc-cat-4: #b2903e;
+  --mc-cat-5: #85c78c;
+  --mc-cat-6: #23a8b7;
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
   --mc-surface-edge: var(--color-fd-border);
@@ -349,30 +354,31 @@
    .vars, dark = .darkVars), seeded from each accent's light hex; they are NOT
    hand-picked. `accent-palettes.test.ts` recomputes them from the library and
    fails on any drift. Valence (positive/negative) and the default ink never
-   move — only emphasis + categoricals follow the brand. The default "ember"
-   writes no attribute (it lives in the base :root / .dark above); Cobalt is
+   move — only emphasis + categoricals follow the brand. The default "cobalt"
+   writes no attribute (it lives in the base :root / .dark above); Ember is
    now just a sibling, carried here like the rest. ------------------------- */
-:root[data-accent="cobalt"] {
-  --accent: #2f52d4;
-  --accent-strong: #2543b8;
-  --accent-fg: #fdfdff;
-  --mc-cat-1: #6b87cb;
-  --mc-cat-2: #8c548c;
-  --mc-cat-3: #c26e65;
-  --mc-cat-4: #876701;
-  --mc-cat-5: #5a9b62;
-  --mc-cat-6: #007a86;
+:root[data-accent="ember"] {
+  --accent: #c2410c;
+  --accent-strong: #9a330a;
+  --accent-fg: #fffaf5;
+  --mc-cat-1: #c07157;
+  --mc-cat-2: #7c6c05;
+  --mc-cat-3: #479d70;
+  --mc-cat-4: #007891;
+  --mc-cat-5: #7b82ca;
+  --mc-cat-6: #935181;
 }
-.dark[data-accent="cobalt"] {
-  --accent: #7f9cf5;
-  --accent-strong: #93abff;
-  --accent-fg: #0a0c14;
-  --mc-cat-1: #95b2fa;
-  --mc-cat-2: #b87db8;
-  --mc-cat-3: #f1998f;
-  --mc-cat-4: #b2903e;
-  --mc-cat-5: #85c78c;
-  --mc-cat-6: #23a8b7;
+.dark[data-accent="ember"] {
+  /* Warm lifted amber, matte, not neon. */
+  --accent: #f7924e;
+  --accent-strong: #ffa869;
+  --accent-fg: #180a03;
+  --mc-cat-1: #f09c81;
+  --mc-cat-2: #a69640;
+  --mc-cat-3: #74c99a;
+  --mc-cat-4: #30a5c2;
+  --mc-cat-5: #a4adf8;
+  --mc-cat-6: #c07aac;
 }
 
 :root[data-accent="moss"] {

@@ -10,11 +10,11 @@ import { ACCENTS, CAT_VARS, deriveCatPalette } from "@/lib/token-export";
 // this test recomputes them via the shared `deriveCatPalette` engine (the same
 // one the studio + home widget use) and fails on any drift.
 //
-// "ember" is the site default and writes no attribute — its derived palette
+// "cobalt" is the site default and writes no attribute — its derived palette
 // lives in the base :root / .dark blocks and is checked separately below.
 
 const css = readFileSync(resolve(process.cwd(), "src/app/global.css"), "utf8");
-const NON_DEFAULT_ACCENTS = ACCENTS.filter((a) => a.id !== "ember");
+const NON_DEFAULT_ACCENTS = ACCENTS.filter((a) => a.id !== "cobalt");
 
 /** Pull one selector block's declarations into a name→value map. */
 function block(selector: string): Record<string, string> {
@@ -28,17 +28,17 @@ function block(selector: string): Record<string, string> {
   return out;
 }
 
-describe("Ember (default) categorical palette is real defineTheme output", () => {
-  // Ember is the site default and carries no attribute — its derived palette
+describe("Cobalt (default) categorical palette is real defineTheme output", () => {
+  // Cobalt is the site default and carries no attribute — its derived palette
   // lives in the base :root (light) and .dark (dark) blocks.
-  const derived = deriveCatPalette("modern", "ember")!;
+  const derived = deriveCatPalette("modern", "cobalt")!;
   const light = block(":root");
   const dark = block(".dark");
 
-  it.each([...CAT_VARS])("ember light %s matches defineTheme", (cat) => {
+  it.each([...CAT_VARS])("cobalt light %s matches defineTheme", (cat) => {
     expect(light[cat]).toBe(derived.light[cat]);
   });
-  it.each([...CAT_VARS])("ember dark %s matches defineTheme", (cat) => {
+  it.each([...CAT_VARS])("cobalt dark %s matches defineTheme", (cat) => {
     expect(dark[cat]).toBe(derived.dark[cat]);
   });
 });

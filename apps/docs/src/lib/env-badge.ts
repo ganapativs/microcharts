@@ -14,11 +14,11 @@ export function appEnv(): AppEnv {
   return "staging";
 }
 
-// Ember (the brand default) signals production; cobalt + teal stay visually
+// Cobalt (the brand default) signals production; ember + teal stay visually
 // distinct for staging + local so the favicon still tells environments apart.
 export const ENV_ICON: Record<AppEnv, { bg: string; label: string }> = {
-  production: { bg: "#c2410c", label: "prod" },
-  staging: { bg: "#2f52d4", label: "staging" },
+  production: { bg: "#2f52d4", label: "prod" },
+  staging: { bg: "#c2410c", label: "staging" },
   development: { bg: "#0f766e", label: "dev" },
 };
 

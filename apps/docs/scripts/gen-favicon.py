@@ -19,7 +19,7 @@ Run: python3 scripts/gen-favicon.py   (from apps/docs)
 
 from PIL import Image, ImageDraw
 
-EMBER = (194, 65, 12, 255)  # #c2410c — production accent (lib/env-badge.ts)
+COBALT = (47, 82, 212, 255)  # #2f52d4 — production accent (lib/env-badge.ts)
 CELL = (250, 247, 241)  # #faf7f1 — lib/brand.ts CELL_FILL
 OPACITIES = (0.4, 0.7, 1.0)
 SS = 16  # supersample factor
@@ -45,7 +45,7 @@ def draw_icon(size: int) -> Image.Image:
     d = ImageDraw.Draw(img)
     # Full-bleed rounded-square background (SERP chips mask to a circle; full
     # bleed keeps the accent edge-to-edge with no whitespace ring).
-    d.rounded_rectangle([0, 0, s - 1, s - 1], radius=bg_r * SS, fill=EMBER)
+    d.rounded_rectangle([0, 0, s - 1, s - 1], radius=bg_r * SS, fill=COBALT)
     for x, o in zip(xs, OPACITIES):
         y = size - x - cell  # mirror: climb bottom-left -> top-right
         fill = (*CELL, round(255 * o))

@@ -173,8 +173,8 @@ const PRESET_OPTS = PRESETS.map((p) => ({ id: p.id, label: p.label }));
 
 export function TokenStudio() {
   const [preset, setPreset] = useState("modern");
-  // Ember is the default, mirroring the site + appearance menu.
-  const [accentChoice, setAccent] = useState<string | null>("ember");
+  // Cobalt is the default, mirroring the site + appearance menu.
+  const [accentChoice, setAccent] = useState<string | null>("cobalt");
   const [mode, setMode] = useState<Mode>("both");
   const [include, setInclude] = useState<"color" | "all">("color");
   const [format, setFormat] = useState<Format>("css");

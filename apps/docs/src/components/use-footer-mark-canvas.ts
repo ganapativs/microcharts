@@ -137,7 +137,7 @@ export function useFooterMarkCanvas(
     // Palette on theme change only — getComputedStyle in raf forces style recalc.
     let key = "";
     let light = false;
-    let pal: Palette = { accent: "#c2410c", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
+    let pal: Palette = { accent: "#2f52d4", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
     const refreshPalette = () => {
       light = !document.documentElement.classList.contains("dark");
       const cs = getComputedStyle(document.documentElement);

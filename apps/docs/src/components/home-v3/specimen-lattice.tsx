@@ -98,10 +98,15 @@ export function SpecimenLattice({
             className="font-mono text-[13px] font-medium leading-[1.3] tracking-[-0.03em]"
             style={{ color: "var(--ink)" }}
           >
-            {/* No size here. Every cell already prints its own, directly below its
-                mark, and repeating it in the readout put the same number on screen
-                twice, two inches apart. */}
-            {active.name}
+            {/* The size lives HERE, and only here. It used to print in all 106
+                cells, which put a second line of mono under every mark and made
+                the sheet three elements deep per cell — the numbers read as a
+                column of their own and the marks had to compete with it. One
+                reading, on the band that is already following the cursor. */}
+            {active.name}{" "}
+            <span className="font-normal" style={{ color: "var(--ink-3)" }}>
+              {active.kb}
+            </span>
           </div>
           {/* One polite region for the whole sheet. Roving focus changes the
               reading, so the announcement follows the cursor rather than
@@ -152,13 +157,6 @@ export function SpecimenLattice({
             </span>
             <span aria-hidden className="cell-name">
               {item.slug}
-            </span>
-            <span
-              aria-hidden
-              className="font-mono text-[10px] leading-none tracking-[-0.03em]"
-              style={{ color: "var(--ink-3)" }}
-            >
-              {item.kb}
             </span>
             <span id={`${DESC}-${item.slug}`} hidden>
               {item.tagline}

@@ -7,7 +7,7 @@ export const OG = {
   paper: "#faf7f1",
   card: "#fffdf8",
   rule: "#e4ddd0",
-  accent: "#c2410c",
+  accent: "#2f52d4",
 } as const;
 
 export const OG_GRID_V = Array.from({ length: 25 }, (_, i) => i);

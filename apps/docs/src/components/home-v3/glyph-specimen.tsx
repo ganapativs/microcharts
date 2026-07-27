@@ -13,8 +13,11 @@ import { SpecimenLattice, type SpecimenItem } from "./specimen-lattice";
  * (gzip, produced by `pnpm build && node scripts/sync-sizes.mjs`). Each cell links
  * to that chart's own reference page, which is where its import line lives.
  */
-const BOX_W = 84;
-const BOX_H = 24;
+/* The drawn box. Wider than it was: with the cell's ruling and its second line of
+   mono gone, the mark is the only ink left in the cell, and at 84×24 it sat in
+   the middle of a column it no longer filled. */
+const BOX_W = 96;
+const BOX_H = 26;
 
 export function GlyphSpecimen() {
   const stable = CHARTS.filter((c) => c.status === "stable");

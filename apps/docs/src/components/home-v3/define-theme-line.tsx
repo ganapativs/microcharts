@@ -10,11 +10,11 @@ import { CodeTokens } from "@/components/code-tokens";
  * The paragraph above claims the masthead's palette control runs this function
  * live. A hardcoded hex would make that claim false the moment a reader picked a
  * different accent — the swatch beside the line would be teal and the line would
- * still say ember. So the value is read off the resolved `--mc-accent` after
+ * still say cobalt. So the value is read off the resolved `--mc-accent` after
  * mount and re-read whenever the accent or theme attribute changes, which is
  * exactly the surface the popover writes to.
  *
- * Server render is the default (ember) from the token source, so the line is
+ * Server render is the default (cobalt) from the token source, so the line is
  * correct and complete before any JS runs — it is only ever *refined* on the
  * client, never revealed by it.
  */

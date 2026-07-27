@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { SHARES } from "./v3-data";
 
@@ -56,15 +57,21 @@ const STANDINS = [
 
 export function LeftOut({ ceilingPx }: { ceilingPx: number }) {
   return (
-    <section className="beat">
+    <section className="act">
       <div className="shell">
+        {/* The exclusions are a documented decision, not an omission, so the
+            clause that states them links to where that decision is written down —
+            `design-notes` has a "What we don't ship" section and this is the only
+            place on the page that raises the subject. */}
         <p className="prose" style={{ maxWidth: "var(--m-prose)" }}>
-          Pie charts, needle gauges, violins and waffles stop being readable at this size, so the
-          catalog doesn&rsquo;t have them. Each one has a replacement that answers the same
-          question.
+          Pie charts, needle gauges, violins and waffles stop being readable at this size, so{" "}
+          <Link prefetch={false} href="/docs/design-notes#what-we-dont-ship" className="u">
+            {`the catalog doesn’t have them`}
+          </Link>
+          . Each one has a replacement that answers the same question.
         </p>
 
-        <div className="mt-8 border-t pt-6 sm:mt-11" style={{ borderColor: "var(--rule)" }}>
+        <div className="u-ruled border-t pt-6" style={{ borderColor: "var(--rule)" }}>
           <div className="kicker">same five shares · {SHARES.join(" ")}</div>
 
           <div className="mt-6 grid gap-7 sm:grid-cols-[repeat(2,minmax(0,max-content))] sm:gap-x-12 lg:gap-x-[4.5rem]">
@@ -123,12 +130,11 @@ export function LeftOut({ ceilingPx }: { ceilingPx: number }) {
         </div>
 
         <p
-          className="lead mt-12 border-t pt-7 sm:mt-16"
+          className="lead u-ruled border-t pt-7"
           style={{ maxWidth: "var(--m-lead)", borderColor: "var(--rule-2)" }}
         >
-          None of this replaces a dashboard library, and it isn&rsquo;t trying to. Above roughly{" "}
-          <span className="fig">{ceilingPx}</span> pixels you want axes, and a chart with axes is a
-          different tool.
+          Somewhere around <span className="fig">{ceilingPx}</span> pixels a chart starts wanting
+          axes, and that&rsquo;s where you want a full charting library instead.
         </p>
       </div>
     </section>

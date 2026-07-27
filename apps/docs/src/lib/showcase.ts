@@ -40,7 +40,7 @@ export const SHOWCASE: ShowcaseApp[] = [
     name: "Cortex",
     blurb: "An eval console that reads a model's answer through the model's own confidence.",
     story:
-      "An eval console that reads a model's answer through the model's own confidence. Token-confidence spans, calibration strips, and a confusion grid turn raw eval output into marks a reviewer can trust at a glance.",
+      "Every screen is built out of the model's own eval output: token-confidence spans over the answer text, calibration strips beside it, a confusion grid for the run as a whole. A reviewer can see where the model was unsure without reading a number.",
     tag: "the AI story",
     url: "https://microcharts-cortex.pages.dev",
     host: "microcharts-cortex.pages.dev",
@@ -77,7 +77,7 @@ export const SHOWCASE: ShowcaseApp[] = [
     blurb:
       "Product analytics rendered in Server Components. Static routes ship no chart JS at all.",
     story:
-      "Product analytics rendered entirely in React Server Components — the static routes ship no chart JavaScript at all. Dozens of series, funnels, and cohort triangles, hydrated only where a reader actually reaches in to interact.",
+      "Dozens of series, funnels and cohort triangles, all drawn on the server. Hydration happens only on the screens where a reader reaches in to scrub something, so most of the app arrives as HTML and stays that way.",
     tag: "RSC · zero client JS",
     url: "https://microcharts-pulse.pages.dev",
     host: "microcharts-pulse.pages.dev",
@@ -124,9 +124,9 @@ export const SHOWCASE: ShowcaseApp[] = [
   {
     slug: "ledger",
     name: "Ledger",
-    blurb: "A night-session trading terminal: candles, order flow, live animated marks.",
+    blurb: "A night-session trading terminal where the marks redraw as quotes tick.",
     story:
-      "A night-session trading terminal: OHLC candles, depth wedges, and order-flow marks that draw on as quotes tick. Every chart is the interactive entry, driven by one pointer listener and the shared animate engine.",
+      "Every chart here is the interactive entry: OHLC candles, depth wedges and order-flow marks that draw on as quotes arrive, each one driven by a single pointer listener and the shared animate engine. It is the densest app of the seven, and the one that spends the most on interaction.",
     tag: "interactive + animate",
     url: "https://microcharts-ledger.pages.dev",
     host: "microcharts-ledger.pages.dev",
@@ -165,7 +165,7 @@ export const SHOWCASE: ShowcaseApp[] = [
     name: "Dispatch",
     blurb: "A print magazine where the charts sit inside the sentences, as typography.",
     story:
-      "A print magazine where the charts sit inside the sentences, as typography. The editorial preset and the inline seat let a sparkline or a dumbbell set on the baseline like a letter, not a figure.",
+      "The editorial preset and the inline seat let a sparkline or a dumbbell stand on the baseline like a letter rather than sit in a box beside the text. Nothing in the issue is captioned, because nothing in it is a figure.",
     tag: "inline · editorial preset",
     url: "https://microcharts-dispatch.pages.dev",
     host: "microcharts-dispatch.pages.dev",
@@ -199,7 +199,7 @@ export const SHOWCASE: ShowcaseApp[] = [
     name: "Shipyard",
     blurb: "A grayscale service-health console where color is spent only on meaning.",
     story:
-      "A grayscale service-health console where color is spent only on meaning. The mono preset holds everything neutral until an error budget or a burn-down actually needs to speak.",
+      "The mono preset holds every mark neutral until something needs to speak. An error budget going red or a burn-down falling behind is the only color on the screen, which is what makes it readable at three in the morning.",
     tag: "mono preset",
     url: "https://microcharts-shipyard.pages.dev",
     host: "microcharts-shipyard.pages.dev",
@@ -233,9 +233,9 @@ export const SHOWCASE: ShowcaseApp[] = [
   {
     slug: "vitals",
     name: "Vitals",
-    blurb: "A gentle health almanac: rings, hypnograms, and streaks on cream stock.",
+    blurb: "A gentle health almanac on cream stock, where a year of sleep fits on one page.",
     story:
-      "A gentle health almanac — rings, hypnograms, and streaks on cream stock. Per-instance categorical palettes keep sleep stages and activity legible without ever moving the valence hues.",
+      "Sleep stages, activity and streaks, printed at almanac scale on cream stock. Per-instance categorical palettes keep a night's stages apart without ever moving the valence hues, so up is still good and down is still bad.",
     tag: "categorical palette",
     url: "https://microcharts-vitals.pages.dev",
     host: "microcharts-vitals.pages.dev",
@@ -272,9 +272,9 @@ export const SHOWCASE: ShowcaseApp[] = [
   {
     slug: "atlas",
     name: "Atlas",
-    blurb: "Housing-market intelligence: heat maps, dumbbells, and slopes on limestone.",
+    blurb: "Housing-market intelligence, dense enough that every table cell carries its own chart.",
     story:
-      "Housing-market intelligence on limestone: heat maps, dumbbells, and slopes under a custom ink theme. One accent, run through defineTheme, derives the whole color-blind-safe palette and its dark twin.",
+      "Regional price and supply data on limestone stock, under a custom ink theme. One accent, run through defineTheme, derives the whole color-blind-safe palette and its dark twin, and the tables lean on it hard: heat cells, dumbbells and slopes sit inside the rows rather than beside them.",
     tag: "custom ink theme",
     url: "https://microcharts-atlas.pages.dev",
     host: "microcharts-atlas.pages.dev",

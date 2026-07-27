@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SIZE, CATALOG } from "@/lib/docs-facts";
 import { RECHARTS } from "@/lib/competitor-facts";
 
@@ -28,7 +29,7 @@ export function GiveUpTable() {
   const td = "border-b py-2.5";
 
   return (
-    <div className="shell mt-16 lg:mt-24">
+    <div className="shell u-sub">
       <div className="kicker">what you give up</div>
       <div className="mt-5">
         <table
@@ -86,9 +87,16 @@ export function GiveUpTable() {
           </tbody>
         </table>
       </div>
+      {/* Sending a reader away is the sincere version of this paragraph, so the
+          words that send them are the link: `full-chart-libraries` is the page
+          that says the same thing at length. Not `vs-recharts` — that page argues
+          one decision, and this line is conceding the other one. */}
       <p className="prose mt-6" style={{ maxWidth: "var(--m-prose)" }}>
-        Both columns are honest. If you need axes and a legend, the right answer is a toolkit, and{" "}
-        {RECHARTS.name} is a good one.
+        If you need axes and a legend, use{" "}
+        <Link prefetch={false} href="/docs/full-chart-libraries" className="u">
+          a toolkit
+        </Link>
+        . {RECHARTS.name} is a good one.
       </p>
     </div>
   );

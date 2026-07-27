@@ -9,7 +9,7 @@ export function BrandColorSection() {
       <Reveal className="mb-8 max-w-2xl">
         <h2 className="display text-[length:var(--text-fluid-h2)]">The accent, in six tunings</h2>
         <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          A single token drives chrome, links, and chart emphasis. Ember is the default; five
+          A single token drives chrome, links, and chart emphasis. Cobalt is the default; five
           siblings swap through the picker. Click any chip to copy its hex.
         </p>
       </Reveal>

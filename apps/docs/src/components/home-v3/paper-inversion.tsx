@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SparkBar } from "@microcharts/react/sparkbar";
 import { MicroBox } from "@microcharts/react/micro-box";
@@ -15,8 +16,10 @@ import { BOOKINGS_WEEKS } from "./v3-data";
  * cannot: three DIFFERENT encodings, set inline like words, in a line of real
  * prose. The table demonstrates a cell; this demonstrates a sentence.
  *
- * Its claim — "Nothing here is an image" — is literally true of the whole route,
+ * "no images" in the note under the sheet is literally true of the whole route,
  * and `home-v3.test.ts` asserts it: no `<img>`, `<picture>` or `<video>` anywhere.
+ * The prose used to end on "Nothing here is an image." too, which said the same
+ * thing eight words earlier than the note did and ended a paragraph on a slogan.
  * These are the STATIC entries, hook-free and listener-free, because a printed
  * page has no hover; the interactive twins appear everywhere the surface is a
  * screen. There is no `'use client'` here at all — the sheet is server HTML.
@@ -48,8 +51,22 @@ export function PaperInversion() {
         <span className="mc-inline">
           <MicroBox data={WEEKS} width={96} height={20} title="Spread of weekly bookings" />
         </span>
-        &mdash; the same components the rest of this page uses, set like words. Nothing here is an
-        image.
+        &mdash; the same components the rest of this page uses,{" "}
+        {/* The placement act's only outbound link, and it belongs on the sentence
+            that makes the placement claim. `/docs/composition` is the page for
+            every frame in the quad above — a sentence, a table cell, a KPI card, a
+            tab — and nothing else on the page points at it. The link's underline
+            takes the sheet's own rule colour, or it would draw in the screen's
+            hairline on paper stock. */}
+        <Link
+          prefetch={false}
+          href="/docs/composition"
+          className="u"
+          style={{ textDecorationColor: "var(--paper-rule)" }}
+        >
+          set like words
+        </Link>
+        .
       </p>
 
       {/* The one rule on the sheet, and it earns itself: it separates the prose

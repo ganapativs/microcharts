@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CATALOG } from "@/lib/docs-facts";
 import { SITE } from "@/lib/site";
 import { ActOne } from "@/components/home-v3/act-one";
@@ -33,14 +34,39 @@ import { ClosingActions } from "@/components/home-v3/actions";
  * component from the library, and there is no `<img>`, `<picture>` or `<video>`
  * anywhere in the route — `home-v3.test.tsx` holds all three lines.
  *
- * It is `noindex` while it is a candidate: it argues the same product as `/`, and
- * two indexed pages making one argument is a duplicate, not a choice.
+ * **The head is `/`'s head.** This route is a candidate for the same page, so
+ * everything a machine reads has to be what `/` serves: title, description,
+ * keywords, canonical, icons, Open Graph, Twitter, theme-color and all four
+ * JSON-LD blocks. All of it comes from the root layout, and the way to keep it
+ * identical is to override as little as possible here.
+ *
+ * That is why there is no `title` and no `description` on this object. Both were
+ * set once — `title: "Put a chart in a sentence"` rendered
+ * "Put a chart in a sentence · microcharts" through the root template, so the
+ * candidate and the page it is competing with disagreed in the one place a
+ * search result and a browser tab actually show. Omitted, the root `default`
+ * applies and the two are identical by construction rather than by copying.
+ *
+ * `alternates` still has to be spelled out in full. Next REPLACES the key rather
+ * than merging it, so declaring `canonical` alone silently dropped the RSS and
+ * llms.txt `<link rel="alternate">` tags that every other route on the site
+ * carries.
+ *
+ * The ONE deliberate difference is `robots`. It argues the same product as `/`,
+ * and two indexed pages making one argument is a duplicate, not a choice — the
+ * canonical points home and the crawler is told to stay away. When this route
+ * becomes `/`, delete the `robots` and `alternates.canonical` overrides and the
+ * head is already correct.
  */
 export const metadata: Metadata = {
-  title: "Put a chart in a sentence",
-  description: SITE.description,
   robots: { index: false, follow: false },
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }],
+      "text/plain": [{ url: "/llms.txt", title: `${SITE.name} for LLMs` }],
+    },
+  },
 };
 
 /** Above this, a micro chart stops being a micro chart. */
@@ -57,18 +83,18 @@ export default function HomeV3Page() {
       <PresetScopeStyle />
 
       {/* ─────────── ACT I · it sits in a sentence ─────────── */}
-      <ActOne catalogTotal={total} />
+      <ActOne />
 
-      <section aria-labelledby="four-places">
+      <section aria-labelledby="four-places" className="act-after-fold">
         <div className="shell">
           <h2 id="four-places" className="d2" style={{ maxWidth: "var(--m-head)" }}>
-            The same component in four places, unchanged.
+            Here it is in four places.
           </h2>
           <FourPlaces />
         </div>
       </section>
 
-      <section className="beat">
+      <section className="act">
         <div className="shell">
           <PaperInversion />
         </div>
@@ -78,10 +104,11 @@ export default function HomeV3Page() {
       <section aria-labelledby="act2" className="act">
         <div className="shell">
           <h2 id="act2" className="d2" style={{ maxWidth: "var(--m-head)" }}>
-            Once you can write one of these, you can write all{" "}
-            <span className="font-mono text-[0.86em] font-medium tracking-[-0.05em]">{total}</span>.
+            All{" "}
+            <span className="font-mono text-[0.86em] font-medium tracking-[-0.05em]">{total}</span>{" "}
+            work the same way.
           </h2>
-          <p className="prose mt-6" style={{ maxWidth: "var(--m-prose)" }}>
+          <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
             Pass <code className="font-mono text-[0.82em] text-[var(--ink)]">data</code> and you get
             something correct. After that,{" "}
             <code className="font-mono text-[0.82em] text-[var(--ink)]">domain</code>,{" "}
@@ -96,7 +123,7 @@ export default function HomeV3Page() {
         </div>
       </section>
 
-      <section aria-label="Every chart type" className="beat">
+      <section aria-label="Every chart type" className="act">
         <div className="shell">
           <GlyphSpecimen />
         </div>
@@ -108,13 +135,13 @@ export default function HomeV3Page() {
       <section aria-labelledby="act3" className="act">
         <div className="shell">
           <h2 id="act3" className="d2" style={{ maxWidth: "var(--m-head)" }}>
-            It has to be small enough that nobody argues about it.
+            What you trade for that.
           </h2>
-          <p className="prose mt-6" style={{ maxWidth: "var(--m-prose)" }}>
+          <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
             Recharts is a toolkit and 106 kB is a fair price for what it carries: tree-shaking drops
-            the chart types you don&rsquo;t use, but the shared kernel comes along. On a page that
-            is mostly chart, that&rsquo;s the right trade. Inside a table cell, it&rsquo;s the
-            entire budget.
+            the chart types you don&rsquo;t use, but the shared kernel comes along either way.
+            That&rsquo;s a fine trade on a page that is mostly chart. In a table cell it&rsquo;s the
+            whole budget.
           </p>
         </div>
 
@@ -126,24 +153,36 @@ export default function HomeV3Page() {
       {/* ─────────── ACT IV · wear it ─────────── */}
       <section aria-labelledby="act4" className="act">
         <div className="shell">
+          {/* Short sentences, ordinary words, in the register the rest of the page
+              uses ("Both columns are honest.", "Bad data renders anyway."). Two
+              earlier drafts failed the same way in opposite directions: the first
+              ended each claim with an explanation of itself ("...because those two
+              carry meaning"), and the second reached for a voice ("a dark mode
+              somebody sat down and tuned", "up is up and down is down"). Both read
+              as written-up rather than said. The rule for this page: if you would
+              not say it to someone at a desk, it does not go on the page.
+
+              The link is on `defineTheme` itself, and it goes to the section of
+              the theming page about that one function. A trailing "read more about
+              theming" line would be a second element saying what the first element
+              already said.
+
+              Text after a JSX expression must be a template literal when it spans
+              a newline and carries a typographic apostrophe — SWC glues the words
+              together in SSR otherwise (swc-ssr-spaces.test.ts). */}
           <p className="lead" style={{ maxWidth: "var(--m-lead)" }}>
-            Give <code className="font-mono text-[0.78em]">defineTheme</code> one color and it works
-            out the rest: a color-blind-safe scale and a hand-tuned dark version of it. Positive
-            stays green and negative stays vermillion whatever you pass, because those two carry
-            meaning. The palette control in the masthead runs it on this page.
+            Give{" "}
+            <Link prefetch={false} href="/docs/theming#build-a-theme-from-one-colour" className="u">
+              <code className="font-mono text-[0.78em]">defineTheme</code>
+            </Link>
+            {` one color. It works out the rest: a color-blind-safe scale, and a dark version tuned by hand. Green stays positive and vermillion stays negative whatever color you pass. The palette control at the top of the page runs it. Change the accent and the line below changes too.`}
           </p>
           <DefineThemeLine />
 
-          <h2
-            id="act4"
-            className="d2 mt-14 sm:mt-20 lg:mt-24"
-            style={{ maxWidth: "var(--m-head)" }}
-          >
-            Seven example apps you can open. Between them they use all{" "}
-            <span className="font-mono text-[0.86em] font-medium tracking-[-0.05em]">{total}</span>{" "}
-            types.
+          <h2 id="act4" className="d2 u-sub" style={{ maxWidth: "var(--m-head)" }}>
+            Seven apps, and every chart type between them.
           </h2>
-          <p className="prose mt-6" style={{ maxWidth: "var(--m-prose)" }}>
+          <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
             Each one lives in this repo and installs{" "}
             <code className="font-mono text-[0.82em] text-[var(--ink)]">{SITE.pkg}</code> from npm
             the way you would. They are all deployed, and the source sits next to the running site.
@@ -153,7 +192,7 @@ export default function HomeV3Page() {
               be describing a layout the reader cannot see. The per-app count
               stays on every plate at every width. */}
           <p
-            className="mt-5 hidden font-mono text-[12px] leading-[1.6] tracking-[-0.03em] lg:block"
+            className="u-lede hidden font-mono text-[12px] leading-[1.6] tracking-[-0.03em] lg:block"
             style={{ color: "var(--ink-3)" }}
           >
             plate width follows how many of the {total} types each example uses

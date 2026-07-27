@@ -12,8 +12,8 @@ import { INK_PRESET_CATS } from "@/lib/token-export";
 /** Live theming demo — swatches call `defineTheme` and spread vars onto the scope. */
 
 const ACCENTS = [
-  { name: "ember", hex: "#c2410c" },
   { name: "cobalt", hex: "#2f52d4" },
+  { name: "ember", hex: "#c2410c" },
   { name: "violet", hex: "#6d28d9" },
   { name: "moss", hex: "#4d7c1e" },
   { name: "teal", hex: "#0f766e" },

@@ -10,10 +10,10 @@ import { cn } from "@/lib/cn";
 import { PRESETS as MC_PRESETS } from "@/lib/mc-tokens";
 import { serializeTokens } from "@/lib/token-export";
 
-// Accent palette — Ember default. Charts bind `--mc-accent` to the choice.
+// Accent palette — Cobalt default. Charts bind `--mc-accent` to the choice.
 const SOLIDS = [
-  { id: "ember", label: "Ember", swatch: "#c2410c" },
   { id: "cobalt", label: "Cobalt", swatch: "#2f52d4" },
+  { id: "ember", label: "Ember", swatch: "#c2410c" },
   { id: "clay", label: "Clay", swatch: "#a14a34" },
   { id: "moss", label: "Moss", swatch: "#4d7c1e" },
   { id: "teal", label: "Teal", swatch: "#0f766e" },
@@ -80,7 +80,7 @@ export function AppearanceMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<CSSProperties>({});
-  const [accent, setAccentState] = useState<string>("ember");
+  const [accent, setAccentState] = useState<string>("cobalt");
   const [preset, setPresetState] = useState<string>("modern");
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -114,7 +114,7 @@ export function AppearanceMenu() {
 
   useEffect(() => {
     setMounted(true);
-    setAccentState(document.documentElement.dataset.accent ?? "ember");
+    setAccentState(document.documentElement.dataset.accent ?? "cobalt");
     setPresetState(document.documentElement.dataset.mcPreset ?? "modern");
   }, []);
 
@@ -135,7 +135,7 @@ export function AppearanceMenu() {
   }, [open]);
 
   function setAccent(id: string) {
-    if (id === "ember") delete document.documentElement.dataset.accent;
+    if (id === "cobalt") delete document.documentElement.dataset.accent;
     else document.documentElement.dataset.accent = id;
     try {
       localStorage.setItem("mc-accent", id);
@@ -158,7 +158,7 @@ export function AppearanceMenu() {
     const css = serializeTokens({
       preset,
       // Every accent derives its own matched categorical palette, so passing the
-      // chosen accent through emits exactly what the site paints (Ember is the
+      // chosen accent through emits exactly what the site paints (Cobalt is the
       // default; the others swap in via [data-accent]).
       accent,
       mode: "both",

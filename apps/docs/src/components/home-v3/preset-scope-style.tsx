@@ -21,7 +21,7 @@ import {
  *
  * **2. The inverted sheet** (`[data-v3-invert]`). A chart on the opposite stock
  * needs the ink the OTHER mode would give it — but it still has to follow the
- * active preset, or flipping to eink leaves an ember endpoint on a grayscale
+ * active preset, or flipping to eink leaves an accent endpoint on a grayscale
  * page and the "one pass re-themes every mark" claim stops being true. So the
  * inversion is emitted per preset from `resolveTokens`, whose light/dark maps are
  * exactly what the library ships, and `--mc-accent` gets its own per-accent rule
@@ -116,10 +116,10 @@ export function PresetScopeStyle() {
     blocks.push(`:root${sel} .v3 [data-v3-invert]{${accentDecl(accent.dark)}}`);
     blocks.push(`:root${sel}.dark .v3 [data-v3-invert]{${accentDecl(accent.light)}}`);
   }
-  // Ember is the site default and carries no [data-accent] attribute.
-  const ember = ACCENTS[0]!;
-  blocks.push(`:root:not([data-accent]) .v3 [data-v3-invert]{${accentDecl(ember.dark)}}`);
-  blocks.push(`:root:not([data-accent]).dark .v3 [data-v3-invert]{${accentDecl(ember.light)}}`);
+  // Cobalt is the site default and carries no [data-accent] attribute.
+  const base = ACCENTS[0]!;
+  blocks.push(`:root:not([data-accent]) .v3 [data-v3-invert]{${accentDecl(base.dark)}}`);
+  blocks.push(`:root:not([data-accent]).dark .v3 [data-v3-invert]{${accentDecl(base.light)}}`);
 
   // A preset that names its own `--mc-accent` owns it, whatever the accent picker
   // says — mono/print/eink own their whole ink set, and editorial's claret

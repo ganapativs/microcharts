@@ -96,7 +96,7 @@ place to change.
 
 ## Color
 
-No new palette. The single `--accent` token (cobalt `#2f52d4` light / cornflower `#7f9cf5` dark) keeps driving chrome
+No new palette. The single `--accent` token (cobalt `#2f52d4` light / lifted blue `#528dff` dark) keeps driving chrome
 and chart emphasis; the section-07 theming demo drives real `--mc-*` custom properties through `defineTheme` — the page
 is the theming system's own demo. The one dark band (05 · Made for models) uses the existing dark field values so
 light/dark parity holds in both directions.

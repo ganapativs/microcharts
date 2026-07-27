@@ -7,11 +7,11 @@ honest channel the charts use. Never hand-redraw it; scale the SVG.
 
 Files
 -----
-mark.svg               Primary. Ember squircle, near-white cells.
+mark.svg               Primary. Cobalt squircle, near-white cells.
 mark-adaptive.svg      Auto light/dark (embedded prefers-color-scheme).
 mark-mono-dark.svg     One ink, dark — for light backgrounds.
 mark-mono-light.svg    One ink, light — for dark backgrounds.
-mark-cobalt.svg        Cobalt accent variant.
+mark-ember.svg         Ember accent variant.
 mark-teal.svg          Teal accent variant.
 
 All are SVG — they scale to any size with no loss. For a favicon, 16px
@@ -19,8 +19,8 @@ is the smallest supported size.
 
 Colors
 ------
-Ember (accent), light    #c2410c
-Ember (accent), dark     #f7924e
+Cobalt (accent), light   #2f52d4
+Cobalt (accent), dark    #528dff
 Cell fill (near-white)   #faf7f1
 Ink (light theme)        #17110a
 Paper (light theme)      #efe9dd

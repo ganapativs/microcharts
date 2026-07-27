@@ -57,7 +57,9 @@ function inkStyle(ink: string, tag: string): CSSProperties | undefined {
   }
 }
 
-const CAT = ["#c2410c", "#0e7a5f", "#2f52d4", "#b45309", "#7c3aed", "#0f766e"] as const;
+// The site's real cobalt-derived categorical ramp (defineTheme light .vars),
+// same values the base :root carries in global.css.
+const CAT = ["#6b87cb", "#8c548c", "#c26e65", "#876701", "#5a9b62", "#007a86"] as const;
 
 const MC_VARS: Record<string, string> = {
   "--mc-stroke": OG.ink,
