@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -7,6 +7,7 @@ import { ArrowUpRight, Check, Copy, Monitor, Moon, Palette, Sun } from "lucide-r
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { cn } from "@/lib/cn";
+import { PRESETS as MC_PRESETS } from "@/lib/mc-tokens";
 import { serializeTokens } from "@/lib/token-export";
 
 // Accent palette — Ember default. Charts bind `--mc-accent` to the choice.
@@ -27,14 +28,12 @@ const THEMES = [
 
 // Chart presets → [data-mc-preset] on <html> (modern = default, no attribute).
 // print + eink are output-context bundles (paper, grayscale e-paper).
-const PRESETS = [
-  { id: "modern", label: "Modern" },
-  { id: "editorial", label: "Editorial" },
-  { id: "mono", label: "Mono" },
-  { id: "vivid", label: "Vivid" },
-  { id: "print", label: "Print" },
-  { id: "eink", label: "E-ink" },
-] as const;
+//
+// Read straight off `mc-tokens`, which is also what the token studio, the export
+// serializer and the preset-parity test read. That module already carries a
+// one-line `note` per preset saying what the bundle retunes, so the descriptions
+// below are the same strings the docs use — there is no second list to drift.
+const PRESETS = MC_PRESETS.map((p) => ({ id: p.id, label: p.label, note: p.note }));
 
 function AccentChip({
   id,
@@ -84,6 +83,8 @@ export function AppearanceMenu() {
   const [accent, setAccentState] = useState<string>("ember");
   const [preset, setPresetState] = useState<string>("modern");
   const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const noteId = useId();
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -94,9 +95,10 @@ export function AppearanceMenu() {
   function toggle() {
     if (!open && ref.current) {
       const r = ref.current.getBoundingClientRect();
-      // approximate popover height (preview + theme + accent + chart-style rows)
-      // so the up/down flip keeps it on-screen; err tall to avoid clipping.
-      const PANEL_H = 570;
+      // approximate popover height (preview + theme + accent + chart-style rows
+      // + the preset note line) so the up/down flip keeps it on-screen; err tall
+      // to avoid clipping.
+      const PANEL_H = 610;
       const openUp = r.bottom + PANEL_H > window.innerHeight && r.top > PANEL_H;
       const vertical: CSSProperties = openUp
         ? { bottom: window.innerHeight - r.top + 10 }
@@ -266,7 +268,7 @@ export function AppearanceMenu() {
               </div>
 
               <div className="mono-label mb-2 mt-4 text-[0.58rem]">Chart style</div>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5" onMouseLeave={() => setHovered(null)}>
                 {PRESETS.map((p) => {
                   const active = preset === p.id;
                   return (
@@ -274,7 +276,15 @@ export function AppearanceMenu() {
                       key={p.id}
                       type="button"
                       onClick={() => setPreset(p.id)}
+                      onMouseEnter={() => setHovered(p.id)}
+                      onFocus={() => setHovered(p.id)}
+                      onBlur={() => setHovered(null)}
                       aria-pressed={active}
+                      // The note below is a hint, not the control's name: put it
+                      // in the accessible description so a screen reader gets it
+                      // from the button rather than from a line it may never
+                      // reach, and sighted readers get it on hover.
+                      aria-describedby={`${noteId}-${p.id}`}
                       className={cn(
                         "rounded-lg border py-1.5 text-[0.7rem] transition-all duration-200 hover:-translate-y-px",
                         active
@@ -283,10 +293,20 @@ export function AppearanceMenu() {
                       )}
                     >
                       {p.label}
+                      <span id={`${noteId}-${p.id}`} hidden>
+                        {p.note}
+                      </span>
                     </button>
                   );
                 })}
               </div>
+              {/* What the hovered (or selected) bundle retunes. Two lines are
+                  always reserved: the notes run 32–74 characters, and letting the
+                  box grow would shove the copy row under the reader's cursor
+                  every time they moved across the grid. */}
+              <p className="mt-2 h-[2.1rem] text-[0.68rem] leading-[1.35] text-fd-muted-foreground">
+                {(PRESETS.find((p) => p.id === (hovered ?? preset)) ?? PRESETS[0]).note}
+              </p>
 
               <div
                 aria-hidden

@@ -1,0 +1,741 @@
+/*
+ * The v3 homepage's own layer. Scoped to `.v3` so nothing here can leak into
+ * the docs or the current marketing surface — this route is a parallel
+ * candidate, not a redesign of the shell.
+ *
+ * Every non-typographic value is an ALIAS onto a token global.css already
+ * owns. That is the point: theme switching, the accent picker and the six chart
+ * presets keep working through the machinery the rest of the site uses, and a
+ * change to the palette lands here for free. The three faces plus the display
+ * face are the one deliberate divergence (see layout.tsx).
+ *
+ *   --field / --field-1..3   surface ladder → the fd background/card/muted/accent ladder
+ *   --ink / --ink-2 / --ink-3  three type steps → foreground / muted / muted-mixed
+ *   --rule / --rule-2        two rule weights → --hairline and a doubled mix
+ *   --paper / --paper-ink    the one inversion — flips WITH the theme
+ *   --m-lead / --m-prose / --m-note   the three absolute measure edges (px, not ch)
+ */
+
+.v3 {
+  /* ---- surface ladder — four graded levels, never one flat black ---- */
+  --field: var(--color-fd-background);
+  --field-1: var(--color-fd-card);
+  --field-2: var(--color-fd-muted);
+  --field-3: var(--color-fd-accent);
+
+  /* ---- type ink — hierarchy from contrast, not weight ----
+     Three steps, and the QUIETEST one is the docs' own muted foreground rather
+     than something mixed further toward the field. A third step built by fading
+     past `muted-foreground` measures under 4.5:1, and everything it carries here
+     is small text (10–12px kickers, figures, footnotes). So the ladder is built
+     the other way: step 2 is pulled UP toward the foreground and step 3 is the
+     muted token itself. Measured light / dark: 15.5 / 16.0 · 9.2 / 9.5 ·
+     5.3 / 6.0 — all AA, in every preset. */
+  --ink: var(--color-fd-foreground);
+  --ink-2: color-mix(in srgb, var(--color-fd-foreground) 45%, var(--color-fd-muted-foreground));
+  --ink-3: var(--color-fd-muted-foreground);
+
+  /* ---- rules — two weights only, and both quiet ----
+     `--rule` is the docs' own hairline; `--rule-2` is the emphasis weight, for
+     the few edges that separate one *kind* of thing from another (a table head
+     from its body, a control from the field). It is composed from the same base
+     ink the hairline uses rather than derived from it, because color-mix on an
+     already transparent token cannot darken it.
+
+     Both are deliberately faint. An early pass drew --rule-2 at 30% and the page
+     read as a wireframe: once a dozen structural edges are all visible at once,
+     the rules compete with the marks, and the marks are the content. Structure
+     here is carried by space and alignment first; a rule appears only where
+     space alone would be ambiguous. */
+  --rule: var(--hairline);
+  --rule-2: color-mix(in oklab, #1a2438 17%, transparent);
+
+  /* ---- the inversion pair: the act always ends on the opposite surface ---- */
+  --paper: var(--color-fd-foreground);
+  --paper-ink: var(--color-fd-background);
+
+  /* The kilobytes you don't ship. Not a library token — it exists only for
+     Act III's counted field, so it is derived from the ink rather than picked. */
+  --mc-ghost: color-mix(in oklab, var(--mc-stroke) 15%, transparent);
+
+  /* ---- measure ladder: three absolute edges, one left axis ----
+     px and not ch on purpose — ch scales with font size, so a 66ch body column
+     and a 66ch mono note render at different widths, which is what makes the
+     left-right rhythm illegible. Three edges is a rhythm a reader perceives. */
+  --m-lead: 560px;
+  --m-prose: 680px;
+  --m-head: 680px;
+  --m-note: 820px;
+
+  /* ---- faces ---- */
+  --fd: var(--font-display-v3);
+  --fs: var(--font-sans);
+  --fm: var(--font-mono);
+  --fr: var(--font-serif);
+
+  /* ---- vertical rhythm: two gaps, and only two ----
+     `--sp-act` opens a new ACT; `--sp-beat` separates a beat inside one. Every
+     section on the page uses one or the other, so the page has a rhythm a reader
+     can feel rather than eleven hand-picked paddings that each looked right in
+     isolation. The fold's own padding is `--sp-beat` top AND bottom, which is what
+     makes the space above "Five kilobytes." match the space under the install row:
+     the beat that follows adds nothing of its own. */
+  --sp-act: clamp(6rem, 11vw, 12.5rem);
+  --sp-beat: clamp(3rem, 5.5vw, 5.5rem);
+
+  --e: var(--ease-out-expo);
+  /* The site nav's height (`h-14`), which is what the sticky specimen readout
+     offsets itself by. A constant, not a measurement: the rail is a fixed-height
+     flex row on every breakpoint, and reading it at runtime was the one thing the
+     deleted bespoke masthead needed a client component for. */
+  --hdr: 56px;
+
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--fs);
+}
+
+.dark .v3 {
+  --rule-2: color-mix(in oklab, #ece0cf 19%, transparent);
+}
+
+/* ── the shell ──────────────────────────────────────────────────────────────
+   ONE measure for the whole page, and it is the site nav's measure exactly:
+   `max-w-shell` with the nav's own gutters. Act I's first line has to start on
+   the same vertical as the wordmark above it — when the acts carried their own
+   wider gutter at `lg`, every heading on the page sat 16px inboard of the
+   masthead and the whole column read subtly untrue. Change this in one place or
+   not at all. */
+.v3 .shell {
+  width: 100%;
+  max-width: var(--container-shell);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .v3 .shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* The page ends on the same gap the colophon opened with. The colophon is an
+   `.act`, so `--sp-act` sits above it; the footer contributes its own `pt-14` and
+   draws no rule, so subtracting that from `--sp-act` makes the space under the
+   closing line equal the space over it. (The separator that used to sit here was
+   doing the job of space, badly.) */
+.v3-main {
+  padding-bottom: calc(var(--sp-act) - 3.5rem);
+}
+
+/* One gap per kind, applied by class. Padding-TOP only: a section owns the space
+   above it, so removing a section can never collapse two gaps into one. */
+.v3 .act {
+  padding-top: var(--sp-act);
+}
+.v3 .beat {
+  padding-top: var(--sp-beat);
+}
+
+/* ── the inversion ──────────────────────────────────────────────────────────
+   The one inverted surface per act boundary. Only the SURFACE lives here — the
+   chart ink on an inverted sheet is emitted per preset by
+   `preset-scope-style.tsx` from the library's own token maps, so flipping the
+   masthead switch re-themes the sheet along with everything else instead of
+   leaving a stale accent on it.
+
+   Read the pair as "which sheet is this?", not "which theme is the page in": in
+   light mode the sheet is dark; in dark mode the sheet is light. */
+.v3 [data-v3-invert] {
+  background: var(--paper);
+  color: var(--paper-ink);
+  --paper-rule: color-mix(in oklab, #ece0cf 16%, transparent);
+  --paper-faint: #928d84;
+}
+.dark .v3 [data-v3-invert] {
+  --paper-rule: color-mix(in oklab, #1a2438 17%, transparent);
+  --paper-faint: #5a616f;
+}
+
+/* ── type ramp ─────────────────────────────────────────────────────────────
+   The display face is 40px and up ONLY, and never carries a numeral — every
+   figure on the page is JetBrains Mono. display-1 is spent on exactly two
+   lines: the opening claim and the closing aphorism. */
+.v3 .d1 {
+  font: 700 clamp(44px, 2.2rem + 5.6vw, 108px) / 0.9 var(--fd);
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.v3 .d2 {
+  font: 600 clamp(30px, 1.5rem + 2.1vw, 48px) / 1.12 var(--fd);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+/* Sub-heads are Hanken Grotesk 600, not the display face: at this step the
+   display face would breach its own 40px floor. */
+.v3 .h3 {
+  font: 600 clamp(21px, 1.05rem + 0.8vw, 27px) / 1.24 var(--fs);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.v3 .sentence {
+  font: 400 clamp(19px, 1rem + 0.66vw, 26px) / 1.55 var(--fr);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.v3 .lead {
+  font: 400 clamp(17px, 0.95rem + 0.5vw, 22px) / 1.56 var(--fs);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.v3 .prose {
+  font: 400 16.5px/1.62 var(--fs);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.v3 .mono {
+  font: 400 12.5px/1.55 var(--fm);
+  letter-spacing: -0.03em;
+}
+.v3 .mono-s {
+  font: 400 11px/1.5 var(--fm);
+  letter-spacing: -0.02em;
+}
+.v3 .kicker {
+  font: 400 10px/1 var(--fm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* every figure in running text */
+.v3 .fig {
+  font: 500 0.84em/1 var(--fm);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+/* ── links ──────────────────────────────────────────────────────────────────
+   Scoped to the page body, not `.v3`: the shared footer lives inside the same
+   token wrapper and styles its own links with utilities that a `.v3 a` rule
+   would outrank. */
+.v3-main a {
+  color: inherit;
+  text-decoration: none;
+}
+.v3 .u {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-2);
+  transition: color 0.18s var(--e);
+}
+.v3 .u:hover {
+  color: var(--mc-accent);
+  text-decoration-color: currentColor;
+}
+.v3 :focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ── plates: one edge, no elevation. §11 bans hairline + diffuse shadow. ── */
+.v3 .plate {
+  background: var(--field-1);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+/* ── controls ───────────────────────────────────────────────────────────────
+   The install pill and the copy buttons share one border, one radius and one
+   hover. They used to sit on the emphasis rule and darken to `--ink-3` on hover:
+   a two-step jump in edge weight that made a button look like it changed size,
+   and the pill's edge read heavier than the section rules around it. Now the
+   edge is the plain hairline at rest and it deepens by a fraction of itself —
+   the surface does the acknowledging, not the outline. */
+.v3 .ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  font: 400 13px/1 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  background: var(--field-1);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  transition:
+    border-color 0.2s var(--e),
+    background-color 0.2s var(--e),
+    transform 0.2s var(--e);
+}
+.v3 .ctrl:hover {
+  border-color: var(--rule-2);
+  background: var(--field-2);
+  transform: translateY(-1px);
+}
+.v3 .ctrl:active {
+  transform: none;
+}
+/* ── doors ──────────────────────────────────────────────────────────────────
+   The page's actions. No filled pill and no outline: hierarchy comes from type
+   size and ink, the same two things every other level on this page is built from.
+   The rule under a door is its affordance — 2px on the accent for the primary,
+   a hairline one ink step back for the secondary — and it grows on hover rather
+   than lighting up, so the row stays still.
+
+   A filled accent button plus an outlined one was tried, twice, and cut both
+   times: this page has no filled surfaces, no shadows and no rounded buttons
+   anywhere else, so two of them in the fold read as a widget from another site. */
+.v3 .door {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font: 500 clamp(16px, 0.95rem + 0.28vw, 19px) / 1.2 var(--fs);
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+  padding-bottom: 5px;
+  transition: color 0.18s var(--e);
+}
+.v3 .door-label {
+  box-shadow: inset 0 -1px 0 0 var(--rule-2);
+  transition: box-shadow 0.18s var(--e);
+}
+.v3 .door:hover {
+  color: var(--ink);
+}
+.v3 .door:hover .door-label {
+  box-shadow: inset 0 -1px 0 0 currentColor;
+}
+.v3 .door[data-primary] {
+  color: var(--mc-accent);
+  font-weight: 600;
+  font-size: clamp(18px, 1rem + 0.5vw, 22px);
+}
+.v3 .door[data-primary] .door-label {
+  box-shadow: inset 0 -2px 0 0 var(--mc-accent);
+}
+.v3 .door[data-primary]:hover {
+  color: color-mix(in oklab, var(--mc-accent) 82%, var(--ink));
+}
+
+/* The install command and the AI link: the quiet meta row under the doors. No
+   field, no border — mono type and the shared `hv-tok-*` syntax colours are what
+   mark it as a command, and they recolour with the accent like every mark does. A
+   hairline pill here made three outlined rectangles in one row, none of which
+   looked more important than the others. The hover is a whisper of the card field
+   so the copy target still announces itself. */
+.v3 .cmd {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 400 13px/1 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  /* No padding, no background, no negative margin. It shares a row with plain mono
+     links, and box padding pushed its text off their baseline — the command looked
+     like it had been dropped in from a different row. Nothing here occupies space
+     the links don't. The hover lives on the copy icon instead. */
+  transition: color 0.18s var(--e);
+}
+.v3 .cmd svg {
+  color: var(--ink-3);
+  transition: color 0.18s var(--e);
+}
+.v3 .cmd:hover svg {
+  color: var(--mc-accent);
+}
+
+/* ── ground: grain, not glow ────────────────────────────────────────────────
+   §11 bans the reflexive radial halo. Two layers instead: a film-grain tile
+   over the whole page (printed stock — the specimen premise), and one angled
+   ember wash cut off well before centre in Act I only. Both re-derive from the
+   accent, so a preset change moves them. */
+.v3-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+/* The fold's ground. Page-level and starting at y=0, so it runs BEHIND the
+   transparent masthead: parented to Act I (whose box starts below the sticky
+   rail) it left the 56px strip behind the rail on the bare field, and the seam
+   between the two read as a header background. Height is the fold's own cap. */
+.v3-wash {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: min(100svh, 49rem);
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    152deg,
+    color-mix(in oklab, var(--mc-accent) 7%, transparent) 0%,
+    transparent 44%
+  );
+}
+
+/* ── the tree ───────────────────────────────────────────────────────────────
+   Five leaders dropping out of the mark in the sentence above into two rows of
+   labels, and every coordinate is a percentage the server already knows.
+
+   The geometry: five equal columns. Each label is centred in its own column, so
+   the drop that reaches it can never land inside a neighbour — collision-free by
+   construction rather than by measuring label widths and clamping them. The bus
+   spans the first and last column centres. The stem rises from the bus to the
+   mark, and its x is the ONE value only a browser can know (the mark sits
+   mid-sentence, so where it lands depends on where the line wrapped) — it arrives
+   as `--fan-x`, defaulting to the middle. Every rule is an absolutely-positioned
+   1px span, so none of this can move anything: the tree is drawn on top of a box
+   whose height is reserved. */
+.v3 .fan {
+  position: relative;
+  height: 128px;
+  margin-top: 12px;
+  /* Capped, not full-measure. Spread across the whole 1192px shell the outer two
+     leaders ran so far from the mark that the tree stopped reading as annotation
+     and started reading as a bracket under the page. The sentence itself is
+     560px (`--m-lead`), so a box this wide always contains the mark and therefore
+     always contains the stem. */
+  max-width: 860px;
+  --fan-bus: 22px;
+  --fan-row0: 40px;
+  --fan-row1: 86px;
+  /* Half a column, in percent — the centre of column `i` is (i + 0.5) × this. */
+  --fan-step: calc(100% / var(--fan-cols, 5));
+}
+.v3 .fan-rules {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.v3 .fan-rules span {
+  position: absolute;
+  background: color-mix(in oklab, var(--ink-3) 55%, transparent);
+}
+/* The stem: mark → bus. `--fan-x` is set on the fan after mount; the 50% default
+   is what the server renders and what a JS-less reader keeps. */
+.v3 .fan-stem {
+  left: var(--fan-x, 50%);
+  top: 0;
+  width: 1px;
+  height: var(--fan-bus);
+}
+/* The bus: first column centre → last column centre. */
+.v3 .fan-bus {
+  left: calc(var(--fan-step) * 0.5);
+  right: calc(var(--fan-step) * 0.5);
+  top: var(--fan-bus);
+  height: 1px;
+}
+/* One drop per label, down its own column, stopping 3px short of the type. */
+.v3 .fan-drop {
+  left: calc(var(--fan-step) * (var(--i) + 0.5));
+  top: var(--fan-bus);
+  width: 1px;
+  height: calc(var(--fan-row0) - var(--fan-bus) - 3px);
+}
+.v3 .fan-drop[data-row="1"] {
+  height: calc(var(--fan-row1) - var(--fan-bus) - 3px);
+}
+/* The labels. A grid of the same five columns, each label centred on its own
+   column centre, which is exactly where its drop lands. */
+.v3 .fan-labs {
+  position: absolute;
+  inset: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.v3 .fan-lab {
+  position: absolute;
+  top: var(--fan-row0);
+  left: calc(var(--fan-step) * (var(--i) + 0.5));
+  transform: translateX(-50%);
+  font: 400 11px/1.45 var(--fm);
+  letter-spacing: -0.02em;
+  color: var(--ink-2);
+  text-align: center;
+  /* One line each. These are mono at a known size and the longest is 24
+     characters (~154px) against a 172px column, so they fit — but `text-wrap:
+     balance` was breaking the longest into three lines anyway, which read as a
+     label that had run out of room. No wrapping, and the column arithmetic
+     guarantees they still can't collide. */
+  white-space: nowrap;
+}
+.v3 .fan-lab[data-row="1"] {
+  top: var(--fan-row1);
+}
+/* Under 860px five columns cannot hold five labels, so the tree goes and the
+   callouts become what they are underneath: a wrapped row of properties. */
+@media (max-width: 860px) {
+  .v3 .fan {
+    height: auto;
+    margin-top: 18px;
+  }
+  .v3 .fan-rules {
+    display: none;
+  }
+  .v3 .fan-labs {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  .v3 .fan-lab {
+    position: static;
+    transform: none;
+    max-width: none;
+    text-align: left;
+  }
+}
+
+/* ── the 106-cell specimen lattice ──────────────────────────────────────────
+   Its own, fainter rule. A lattice is ~220 visible edges at once: at the page's
+   normal hairline the sheet read as a wireframe and the ruling competed with the
+   106 marks it exists to hold. At half strength the grid is still legible as a
+   grid — you can see the cells — but the ink you notice is the marks'. */
+.v3 .cells {
+  --rule-cell: color-mix(in oklab, var(--hairline) 50%, transparent);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  border-top: 1px solid var(--rule-cell);
+  border-left: 1px solid var(--rule-cell);
+}
+.v3 .cell {
+  background: var(--field-1);
+  border-right: 1px solid var(--rule-cell);
+  border-bottom: 1px solid var(--rule-cell);
+  padding: 12px 11px 10px;
+  display: grid;
+  gap: 8px;
+  /* CENTRED, all of it. The marks are authored at 106 different aspect ratios and
+     several place their own labels, so left-aligning them made the sheet read as a
+     ragged column of unrelated things — the eye picks up the mismatched left edges
+     before it picks up the marks. One centre line per cell, mark and caption
+     together, is what makes 106 different shapes read as one sheet. */
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+  min-width: 0;
+  cursor: pointer;
+  transition: background-color 0.18s var(--e);
+}
+.v3 .cell:hover,
+.v3 .cell[data-on] {
+  background: var(--field-2);
+}
+.v3 .cell-name {
+  font: 400 10.5px/1.3 var(--fm);
+  letter-spacing: -0.04em;
+  color: var(--ink-2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.18s var(--e);
+}
+.v3 .cell:hover .cell-name,
+.v3 .cell[data-on] .cell-name {
+  color: var(--ink);
+}
+.v3 .cell-mark {
+  /* 30px, not the mark's own 26: a handful of types set value labels above the
+     plot, and a box cut to the plot clips them. */
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: 100%;
+  /* A few types ARE prose (FillWord, TokenConfidence). Left to wrap they set two
+     lines in a 30px box and both get clipped in half, which reads as a rendering
+     bug rather than a truncation. One line, cut at the right edge, reads as a
+     specimen. No effect on the SVG marks. */
+  white-space: nowrap;
+}
+/* ── the readout ────────────────────────────────────────────────────────────
+   The same glass as the masthead, and no border, no radius, no card — a bordered
+   rounded panel here read as a second widget bolted over the sheet.
+
+   The seam that made this hard is worth writing down, because the obvious fixes
+   all fail: `backdrop-filter` CLAMPS at its own element's edges, so the rail's
+   blur samples only what is inside the rail's box and this one samples only what
+   is inside its own. Two boxes that meet therefore blur two different regions and
+   composite to two different tones — identical CSS, visible line. Matching the
+   colours does nothing; matching the filters does nothing.
+
+   What works is to stop them meeting. This starts 1px BEHIND the rail's bottom
+   edge, so the only boundary on screen is the rail's own — which the reader
+   already expects — and it fades out at the bottom instead of ending on a second
+   one. Two hard edges become none.
+
+   Height is LOCKED. It sits above 106 cells and its text changes on every one the
+   pointer crosses; a band that resizes itself moves the whole lattice under the
+   cursor. Two lines of tagline are reserved and a third clipped — they run 28–140
+   characters, so reserving for the longest would leave a hole under most of them. */
+.v3 .readout {
+  height: 92px;
+  /* Indented from the band's own left edge. Flush against it, the name and the
+     description started exactly where the lattice's first column starts and read
+     as text that had escaped its box — a caption inside a surface needs to sit
+     inside it. The cells keep the shell's axis; this sits one step in from it. */
+  padding: 14px 18px;
+  background-color: color-mix(in oklab, var(--color-fd-background) 72%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
+  /* No bottom edge: the band dissolves into the sheet it is annotating. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0 calc(100% - 16px), transparent 100%);
+}
+.v3 .readout-tag {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+/* Both fallbacks the rail has: no backdrop-filter support, and the two settings
+   where translucency is the wrong answer. A mask that fades into an opaque band
+   would show the lattice through it, so it goes too. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .v3 .readout {
+    background-color: var(--color-fd-background);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce), (forced-colors: active) {
+  .v3 .readout {
+    background-color: var(--color-fd-background);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+/* The readout un-sticks where hover doesn't exist. A sticky panel eats a third of
+   a phone viewport, and on touch the reading arrives from the tap, not from
+   passing over a cell — so it can also size itself freely down here. */
+@media (max-width: 860px) {
+  .v3 .readout {
+    position: relative;
+    top: auto;
+    height: auto;
+    gap: 12px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+/* Registry Marks are authored at their own natural sizes; the lattice needs one
+   box. Cap the drawn width so a wide mark never pushes its cell. */
+.v3 .cell-mark svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── the comparison table ───────────────────────────────────────────────────
+   Below 700px the three columns restack per row: measure on its own line, then
+   each side labelled from its cell's `data-col`. Horizontal scrolling showed
+   only the microcharts column at rest, which reads as a one-sided claim — the
+   exact failure the section is written to avoid. Semantics stay a real table. */
+@media (max-width: 700px) {
+  .v3 .cmp,
+  .v3 .cmp tbody,
+  .v3 .cmp tr,
+  .v3 .cmp tbody th,
+  .v3 .cmp td {
+    display: block;
+    width: auto;
+  }
+  .v3 .cmp thead {
+    display: none;
+  }
+  .v3 .cmp tr {
+    border-bottom: 1px solid var(--rule);
+    padding: 13px 0;
+  }
+  .v3 .cmp tbody th,
+  .v3 .cmp td {
+    border: 0;
+    padding: 0;
+  }
+  .v3 .cmp tbody th {
+    padding-bottom: 6px;
+  }
+  .v3 .cmp td {
+    padding-left: 1rem;
+    text-indent: -1rem;
+  }
+  .v3 .cmp td::before {
+    content: attr(data-col) " · ";
+    color: var(--ink-3);
+  }
+}
+
+/* ── Act III: the bill. 106 units, 5 inked, the rest ghosted, running off the
+   right edge of the shell — the one object on the page that breaks it. ── */
+.v3 .units {
+  display: grid;
+  /* One column per counted kilobyte. The count is data (a competitor's measured
+     one-chart cost), so it arrives as a variable rather than a literal. */
+  grid-template-columns: repeat(var(--units), minmax(0, 1fr));
+  gap: clamp(1px, 0.22vw, 3px);
+}
+
+/* ── Act IV plates: their own offset lattice with corner overlaps ── */
+@media (min-width: 1081px) {
+  .v3 .plates {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(14px, 1.6vw, 22px);
+  }
+}
+@media (max-width: 1080px) {
+  .v3 .plates {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .v3 .plates > * {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    margin: 0 !important;
+  }
+}
+
+/* ── motion ─────────────────────────────────────────────────────────────────
+   There is NO entrance motion on this page, and that is a decision, not an
+   omission.
+ 
+   Every version of it was worse than nothing. Scroll reveals meant the reader met
+   each section as a fade rather than as a page, and a mis-fired observer left a
+   block blank. A staggered hero sequence — the line drawing itself, then the type
+   arriving around it — read beautifully in a screen recording and, on an actual
+   reload, as text flashing on, blanking, and returning: the gate can only land
+   after the server's HTML has painted, so the first thing an entrance does is
+   HIDE something the reader already saw. The library's own `animate` draw on the
+   hero mark had the same problem one layer down, plus a hydration seam of its own.
+ 
+   The current home page reaches the same conclusion, and this page is held to it:
+   the only motion here is a response to the reader — hover and focus on controls,
+   cells and links, and the interactive charts' own readouts. Nothing moves because
+   the page loaded, and nothing moves because the page scrolled.
+ 
+   The practical rule for anyone extending this: no `opacity: 0` resting state and
+   no `@keyframes` anywhere in this file. There is a test. */
+
+/* Hover and focus feedback is still motion to someone who asked for less of it.
+   Nothing here can hide content, so this rule has nothing to un-hide. */
+@media (prefers-reduced-motion: reduce) {
+  .v3 *,
+  .v3 *::before,
+  .v3 *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

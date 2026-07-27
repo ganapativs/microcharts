@@ -1423,6 +1423,10 @@ body {
       width: 2.75rem;
       height: 2.75rem;
     }
+    /* "/" is desktop-only — in the collapsed touch field it stacks on the icon. */
+    .g2-dock-kbd {
+      display: none;
+    }
     /* On touch, search is a centered icon button that expands on tap — a
        squished half-field with a left-pinned icon read as "off-centre". It
        reopens while focused OR while it holds a query. */
@@ -1472,6 +1476,7 @@ body {
   }
   .g2-setup-chip {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     gap: 0.35rem;
     height: 2rem;
@@ -1511,9 +1516,12 @@ body {
       border: 0;
     }
     .g2-setup-chip {
-      width: 2rem;
+      width: 2.75rem;
+      min-width: 2.75rem;
+      height: 2.75rem;
       padding-inline: 0;
       justify-content: center;
+      border-radius: 999px;
     }
   }
   .g2-empty {

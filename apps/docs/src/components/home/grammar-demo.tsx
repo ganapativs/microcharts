@@ -6,6 +6,7 @@ import { Bullet } from "@microcharts/react/bullet/interactive";
 import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
 import { BumpStrip } from "@microcharts/react/bump-strip/interactive";
 import { Threshold, Marker } from "@microcharts/react/annotations";
+import { CodeTokens } from "@/components/code-tokens";
 
 /**
  * 01 · The shared prop API, settled: the full JSX is readable at once, the real
@@ -114,49 +115,6 @@ const TABS: Tab[] = [
   },
 ];
 
-/** Tiny JSX lexer — enough color for these snippets, zero deps. */
-interface Tok {
-  text: string;
-  cls?: string;
-}
-const TOK_RE = /(<\/?[A-Z]\w*|\/>|>|[A-Za-z][\w-]*|"[^"]*"|\s+|.)/g;
-
-function lex(code: string): Tok[] {
-  const out: Tok[] = [];
-  for (const m of code.matchAll(TOK_RE)) {
-    const t = m[0];
-    let cls: string | undefined;
-    if (/^<\/?[A-Z]/.test(t) || t === "/>" || t === ">") cls = "hv-tok-tag";
-    else if (/^[A-Za-z]/.test(t) && code[(m.index ?? 0) + t.length] === "=") cls = "hv-tok-attr";
-    else if (t.startsWith('"')) cls = "hv-tok-str";
-    // merge single default chars so we don't emit a span per character
-    if (!cls && out.length && !out[out.length - 1].cls) {
-      out[out.length - 1] = { text: out[out.length - 1].text + t };
-      continue;
-    }
-    out.push(cls ? { text: t, cls } : { text: t });
-  }
-  return out;
-}
-
-const TAB_TOKENS = TABS.map((t) => lex(t.code));
-
-function Code({ tokens }: { tokens: Tok[] }) {
-  return (
-    <>
-      {tokens.map((t, i) =>
-        t.cls ? (
-          <span key={i} className={t.cls}>
-            {t.text}
-          </span>
-        ) : (
-          t.text
-        ),
-      )}
-    </>
-  );
-}
-
 export function GrammarDemo() {
   const [tab, setTab] = useState(0);
   const [sentence, setSentence] = useState("");
@@ -204,7 +162,7 @@ export function GrammarDemo() {
               by the hero and by /docs/ai. Don't let the two labels converge. */}
           <p className="mono-label mb-3 opacity-60">an agent writes</p>
           <pre className="min-h-[14rem] whitespace-pre-wrap font-mono text-[0.8rem] leading-relaxed text-fd-foreground">
-            <Code tokens={TAB_TOKENS[tab]} />
+            <CodeTokens code={active.code} />
           </pre>
         </div>
         <div className="flex flex-col p-5">
