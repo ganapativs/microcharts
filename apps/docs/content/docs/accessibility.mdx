@@ -1,19 +1,17 @@
 ---
 title: Accessibility
-description:
-  Accessible React charts by default — every microchart is role="img" with a generated natural-language summary,
-  keyboard-ready interactive entries, CVD-safe tokens, and forced-colors / reduced-motion support. No extra a11y work.
+description: >-
+  How microcharts names, announces, and navigates a chart: generated summaries, the decorative opt-out, the keyboard and
+  live-region contract, color and locale, and system preferences.
 ---
 
-Accessibility isn't a setting in microcharts. Every chart is accessible the moment you render it, because the accessible
-name is generated from your data — there's no `alt` text to forget and nothing to drift out of sync when the numbers
-change.
+Every chart carries its accessibility with it. The accessible name is generated from your data, so there is no `alt`
+text to write and no caption to update when the numbers change.
 
-## Summaries that write themselves
+## Generated summaries
 
-By default a chart is an `img` whose accessible name is a natural-language sentence built from the series. It's the
-flagship feature of the library: the same words a screen reader announces are the words a crawler indexes and a model
-can quote.
+By default a chart is an `img` whose accessible name is a sentence built from the series. A screen reader announces that
+sentence, a crawler indexes it, and a model can quote it.
 
 <LiveDemo
   label="Announced automatically"
@@ -24,14 +22,14 @@ can quote.
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={140} height={36} title="Weekly revenue" />
 </LiveDemo>
 
-The name is `title` + the generated summary, joined into one sentence. The summary is deterministic — the same data
-always produces the same words — so it's testable, and every one of these strings in the docs is the real output, not an
-approximation.
+The name is `title` plus the generated summary, joined into one sentence. The summary is deterministic: the same data
+always produces the same words, so you can assert on it in a test. Every summary string in these docs is real generator
+output.
 
-### Degenerate data stays honest
+### Empty, single, and flat data
 
-The single most common accessibility bug in charting is a broken summary for empty, single, or flat data. microcharts
-produces an honest short form instead — every string below is the literal output of `describeSeries`:
+Empty, single-point, and flat series are where a generated summary usually breaks. Each one gets its own short form.
+Every string below is the literal output of `describeSeries`:
 
 | Data                 | Accessible summary                               |
 | -------------------- | ------------------------------------------------ |
@@ -42,13 +40,12 @@ produces an honest short form instead — every string below is the literal outp
 
 ## Every chart is an `img`
 
-The accessible name is composed deterministically — no module-level id counters that could desync between server and
-client and cause a hydration mismatch. Two levels:
+The name is composed deterministically, with no module-level id counters that could desync between server and client and
+cause a hydration mismatch. Two levels:
 
-- **Default** — a chart renders `role="img"` with a computed `aria-label` (and an id-less `<title>`). Nothing to wire;
-  it just has a name.
+- **Default** — a chart renders `role="img"` with a computed `aria-label` (and an id-less `<title>`). You wire nothing.
 - **Explicit `id`** — pass an `id` and the chart upgrades to a `<title>`/`<desc>` pair referenced by `aria-labelledby`,
-  the richest form, for when you want the title and description addressable.
+  so both the title and the description are addressable.
 
 Override the whole sentence with a string when you have better words than the generator:
 
@@ -58,8 +55,8 @@ Override the whole sentence with a string when you have better words than the ge
 
 ## Decorative opt-out
 
-When the surrounding text already describes the data — the common case for a word-sized chart _inside_ a sentence — mark
-the chart decorative with `summary={false}` so screen readers skip the redundancy rather than reading it twice.
+When the surrounding text already describes the data, mark the chart decorative with `summary={false}` and screen
+readers skip it. That is the common case for a chart set inside a sentence.
 
 ```tsx
 <p>
@@ -67,53 +64,52 @@ the chart decorative with `summary={false}` so screen readers skip the redundanc
 </p>
 ```
 
-A decorative chart renders `aria-hidden="true"` instead of `role="img"` — it leaves the accessibility tree entirely, and
-no `<title>` or `<desc>` is emitted. On an `/interactive` entry the same call resolves the name: with nothing left to
-announce, the wrapper drops `role="img"` and `tabIndex={0}` and takes `aria-hidden="true"` instead — so there's nothing
-to tab to or activate, and the static and interactive entries tell one story.
+A decorative chart renders `aria-hidden="true"` in place of `role="img"`. It leaves the accessibility tree entirely, and
+no `<title>` or `<desc>` is emitted. An `/interactive` entry resolves the name the same way: with nothing left to
+announce, the wrapper drops `role="img"` and `tabIndex={0}` and takes `aria-hidden="true"`, so it stops being a tab stop
+and can no longer be activated. Static and interactive entries match.
 
-`summary={false}` drops the generated _sentence_; the chart leaves the tree when that leaves it with no name at all. So
-`summary={false}` alongside a `title` is not decorative — the chart keeps `role="img"` and is announced as its title,
-because a name you wrote by hand is not redundancy. Drop the `title` too when you want silence.
+`summary={false}` drops the generated _sentence_; the chart leaves the tree only when that leaves it with no name at
+all. With a `title` still set, the chart keeps `role="img"` and is announced as its title. Drop the `title` too when you
+want silence.
 
 ## One interaction contract
 
-The `/interactive` entries share a single contract across the catalog: learn it on a Sparkline and it already holds on
-an ActivityGrid, a Dumbbell, or a Waterfall. What differs between charts is only what a _unit_ is — a point, a bar, a
-day cell, a segment, a pair — and each chart's page names its own.
+The `/interactive` entries share one contract across the catalog: learn it on a Sparkline and it holds on an
+ActivityGrid, a Dumbbell, or a Waterfall. Only the _unit_ differs between charts — a point, a bar, a day cell, a
+segment, a pair — and each chart's page names its own.
 
-**Roving focus, one tab stop.** A chart is one focusable element (`role="img"`, `tabIndex={0}`), never a tab trap of one
-stop per data point. Arrow keys rove between units: **←/↑** move to the previous unit, **→/↓** to the next — both axes,
-so a grid navigates the same way a line does. **Home** and **End** jump to the first and last unit.
+**Roving focus, one tab stop.** A chart is one focusable element (`role="img"`, `tabIndex={0}`), not a tab trap of one
+stop per data point. Arrow keys rove between units: **←/↑** move to the previous unit, **→/↓** to the next. Both axes
+work, so a grid navigates the same way a line does. **Home** and **End** jump to the first and last unit.
 
-**Active vs selected.** Hovering or roving makes a unit _active_ — a transient read that clears when the pointer leaves
-or focus blurs. **Enter** or **Space** (or a click, or a tap) _selects_ it, which **pins** the readout so it survives
-blur and pointer-leave — a keyboard user can move focus elsewhere and the pinned value stays on screen. Selecting the
-same unit again clears it, and **Escape** clears the selection from anywhere. The two states are visually distinct, so
-"where I am" and "what I kept" never read as the same thing.
+**Active vs selected.** Hovering or roving makes a unit _active_: a transient read that clears when the pointer leaves
+or focus blurs. **Enter**, **Space**, a click, or a tap _selects_ it and **pins** the readout, so it survives blur and
+pointer-leave. A keyboard user can move focus elsewhere and the pinned value stays on screen. Selecting the same unit
+again clears it, and **Escape** clears the selection from anywhere. The two states are drawn differently, so "where I
+am" and "what I kept" never look the same.
 
-**Touch.** A tap pins a unit exactly like a click; dragging across the chart scrubs the active unit continuously. A drag
-is treated as a scrub, never mistaken for a tap, so scrolling past a chart can't pin a value by accident.
+**Touch.** A tap pins a unit the way a click does; dragging across the chart scrubs the active unit continuously. A drag
+always resolves as a scrub, so scrolling past a chart can't pin a value by accident.
 
 **Announcements.** Every change of active or selected unit is written into a polite live region, so a keyboard or
-screen-reader user reads the same detail a mouse user gets from the hover chip. The picker fires only when the _unit_
-changes, not on every pointer move, so sweeping across a chart announces once per unit crossed rather than once per
-pixel.
+screen-reader user reads the detail the hover chip shows. The picker fires when the _unit_ changes, not on every pointer
+move, so sweeping across a chart announces once per unit crossed.
 
-The callbacks mirror the states exactly. `onActive` fires as the active unit changes; `onSelect` fires on selection.
-Both receive a `MicroDatum` — `{ index, value, label?, formatted? }`, where `index` identifies the unit, `value` is that
-unit's primary encoded number (`null` when the unit encodes nothing), and `formatted` is the exact string the chart's
-own readout chip would show — or `null` when the chart clears. Selection is controllable with `selectedIndex`, or seeded
-once with `defaultSelectedIndex`. To move the value out of the chart entirely — a KPI number, a sentence, a cell that
-updates as you hover — set `readout={false}` to keep the crosshair but drop the in-chart chip, and render
-`datum.formatted` from `onActive` yourself.
+The callbacks mirror the two states. `onActive` fires as the active unit changes; `onSelect` fires on selection. Both
+receive a `MicroDatum` (`{ index, value, label?, formatted? }`), or `null` when the chart clears. `index` identifies the
+unit, `value` is that unit's primary encoded number (`null` when the unit encodes nothing), and `formatted` is the exact
+string the chart's own readout chip would show. Control the selection with `selectedIndex`, or seed it once with
+`defaultSelectedIndex`. To render the value outside the chart — a KPI number, a sentence, a cell that updates as you
+hover — set `readout={false}` to keep the crosshair without the in-chart chip, and render `datum.formatted` from
+`onActive` yourself.
 
-Charts with only **one** unit — Delta, Progress, StatusDot, Bullet, and the rest of the scalar set — have nothing to
-rove between, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state. Hover or focus
-still _reveals_: a scalar whose mark does not print its own number floats it in the same chip the pickers use, so a
-ProgressRing arc, an Hourglass, a BreathingDot or a TapeGauge too small for its numeral is never a shape with no
-reading. The exceptions are the six glyphs that already are the number, or a count you read by counting — Delta,
-FatDigits, TrendArrow, StatusDot, DicePips, TallyMarks.
+Charts with a single unit (Delta, Progress, StatusDot, Bullet, and the rest of the scalar set) have no second unit to
+rove to, so they take `onSelect` alone (click, tap, Enter, or Space) and carry no selection state. Hover and focus still
+reveal the value: a scalar whose mark does not print its own number floats it in the same chip the pickers use, so a
+ProgressRing arc, an Hourglass, a BreathingDot, or a TapeGauge too small for its numeral still gives you a reading. Six
+glyphs skip the chip because they already are the number, or a count you read by counting: Delta, FatDigits, TrendArrow,
+StatusDot, DicePips, TallyMarks.
 
 **Values that change on their own.** Fifteen single-value charts built for updating KPI cards take `live` (default
 `true`): when the value changes, the new reading is re-announced through the polite region without anyone touching the
@@ -125,26 +121,28 @@ chart. Set `live={false}` to silence it. A few throttle that announcement so a s
 | MoonPhase, FillWord                                                                                                                       | at most once per second       |
 | Delta, ProgressRing, StatusDot, TrendArrow, Thermometer, Hourglass, FatDigits, TallyMarks, DicePips, Honeycomb, PictogramRow, BalanceBeam | none — every change announces |
 
-Two charts throttle without taking `live` at all: **EtaBar** and **TapeGauge** re-announce their reading as it changes,
-but never more often than `announceEvery` milliseconds — 10 s and 5 s by default, and tunable per instance.
+Two charts throttle without taking `live` at all. **EtaBar** and **TapeGauge** re-announce their reading as it changes,
+but never more often than `announceEvery` milliseconds: 10 s and 5 s by default, and tunable per instance.
 
-Three charts sit outside the contract, deliberately: **MinimapStrip** is a viewport-window slider (`role="slider"`, with
-its own `onWindowChange([lo, hi])` range payload), **TokenConfidence** flows as inline HTML text and moves real focus
-onto each _flagged_ token span — confident tokens carry no mark and are skipped — and **WindBarb** ships static-only.
+Three charts sit outside the contract on purpose. **MinimapStrip** is a viewport-window slider (`role="slider"`, with
+its own `onWindowChange([lo, hi])` range payload). **TokenConfidence** flows as inline HTML text and moves real focus
+onto each _flagged_ token span; confident tokens carry no mark and are skipped. **WindBarb** ships static-only.
 
-Static entries carry no listeners at all; every bit of this is opt-in.
+Static entries carry no listeners, so all of this is opt-in.
 
 ## Color is never the only channel
 
-Direction and state are always doubled, so a chart survives with no color at all:
+Direction and state are always encoded twice, so a chart still reads with no color at all:
 
-- **Delta** pairs a ▲/▼ glyph with its color — the glyph carries the sign.
-- **SparkBar** encodes sign by _position_ above or below the baseline, not hue.
+- **Delta** pairs a ▲/▼ glyph with its color, and the glyph carries the sign.
+- **SparkBar** encodes sign by _position_ above or below the baseline rather than by hue.
 - **ActivityGrid** always ships a numeric summary alongside its intensity ramp.
 
-The default stroke tokens are chosen against a **4.5:1 contrast** target on the page backgrounds they're designed for,
-and the dark values are hand-tuned per token rather than inverted, so nothing washes out in dark mode. Contrast against
-_your_ surface is still yours to check — charts paint no background, so a mark inherits whatever you place it on.
+The valence tokens are CVD-safe by construction: positive is a bluish-green and negative a vermillion, a split that
+stays legible to a red-green colorblind reader. The default stroke tokens clear a **4.5:1 contrast** target on the page
+backgrounds they are designed for, and the dark values are hand-tuned per token rather than inverted, so they hold up in
+dark mode. Contrast against _your_ surface is still yours to check: charts paint no background, so a mark inherits
+whatever you place it on.
 
 ## Internationalization and RTL
 
@@ -157,45 +155,45 @@ Nothing about a chart is hard-coded to English or to left-to-right layout.
   <Sparkline data={data} locale="de-DE" format={{ style: "currency", currency: "EUR" }} />
   ```
 
-  See [Formatting & scale](/docs/formatting) for the full `format` / `locale` story, including the exported
+  See [Formatting & scale](/docs/formatting) for the full `format` / `locale` rules, including the exported
   `makeFormatter` helper for matching your prose numbers to a chart's.
 
 - **Localized words.** The summary templates are a swappable contract (`SummaryStrings`; the English set ships as the
   exported `EN` dictionary). Spread `EN`, override the keys you're translating, and pass the result as `strings` —
   static and `/interactive` entries both accept it, so a server-rendered chart localizes without shipping any client
   JavaScript. Or override the whole sentence with a `summary` string. Either way the accessible name, the live-region
-  announcements, and the readout chip on an interactive entry all speak your language, because all three read from the
+  announcements, and the readout chip on an interactive entry all use your translation, because all three read from the
   same dictionary.
 
   Six charts don't take `strings` on their static entry: Sparkline, ActivityGrid, and MusicStaff accept it on the
-  `/interactive` entry only, while SparkBar, Delta, and Bullet compose their sentence inline — `summary` is the
+  `/interactive` entry only, while SparkBar, Delta, and Bullet compose their sentence inline. `summary` is the
   translation seam there.
 
-  `summary` and `strings` stay the entire text surface, and that is now enforced rather than asserted. A guard renders
-  22 interactive entries — the readouts are where the drift lives, and they only exist in a browser — each with a
-  `strings` object of sentinel tokens, and fails on any English left in the output. It was written because the claim had
-  quietly stopped being true: readouts had accumulated words like "median", "vs" and "queued" in component code, which
-  is exactly the drift a guard catches and a promise does not.
+  `summary` and `strings` are the entire text surface, and a guard enforces that. It renders 22 interactive entries,
+  each with a `strings` object of sentinel tokens, and fails on any English left in the output. It targets readouts
+  because they only render in a browser, which is where the claim had stopped being true: readouts had accumulated words
+  like "median", "vs" and "queued" in component code.
 
   The generator itself is exported too: `import { describeSeries } from "@microcharts/react"` returns the exact sentence
   for a series, handy for tests, tooltips, or feeding a model.
 
-- **RTL layouts.** A chart is direction-neutral SVG with a localized text name, so it drops into an RTL document without
-  breaking — it's an `img`, not a run of text. Time-ordered charts keep their conventional oldest-to-newest reading
-  order; you localize the summary and the number formatting, which is what a screen-reader user actually hears.
+- **RTL layouts.** A chart is direction-neutral SVG with a localized text name, so it drops into an RTL document as an
+  `img` rather than a run of text. Time-ordered charts keep their conventional oldest-to-newest reading order. What a
+  screen-reader user hears is the summary and the number formatting, and both localize.
 
-## System preferences, handled
+## Reduced motion, forced colors, and contrast
 
 - **`prefers-reduced-motion`** — entrance and update animations resolve instantly to their final state. Static charts
   have no `animate` prop and run no JavaScript animation; the one thing that moves inside a static host is
   `<Marker celebrate>`, whose particle burst is a pure-CSS one-shot that reduced motion also stills.
 - **`forced-colors`** — data ink maps to system `CanvasText`, accents to `Highlight`, muted marks to `GrayText`, so a
-  Windows High Contrast user sees a correct chart, not a blank box.
+  Windows High Contrast user sees the chart rather than a blank box.
 - **`prefers-contrast`** — strokes thicken and bands deepen automatically.
 
 ## Verify it yourself
 
-Because the summary is deterministic and the markup is plain SVG, accessibility is testable in CI, not a manual audit:
+The summary is deterministic and the markup is plain SVG, so you can assert accessibility in CI instead of running a
+manual audit:
 
 ```tsx
 import { axe } from "vitest-axe";

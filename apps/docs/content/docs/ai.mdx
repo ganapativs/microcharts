@@ -1,36 +1,33 @@
 ---
 title: AI-native
 description:
-  microcharts is built to be read and written by machines as well as people — a stream-friendly chart grammar, inline
-  word-sized charts, a generated catalog, Markdown mirrors, and llms.txt so LLMs and agents get the API right the first
-  time.
+  How a model writes microcharts — the stream grammar, prompt recipes, integration paths, the MCP server, and the
+  machine-readable docs surfaces (llms.txt, catalog.json, Markdown mirrors).
 ---
 
-Most chart libraries are written for a human with a mouse. microcharts is written so a **model** can draw a chart
-mid-sentence and a **person** can trust it. Two properties make that work: every chart renders from plain `data`, and
+A model can draw a chart mid-sentence. Two properties make that work: every microchart renders from plain `data`, and
 every chart carries a generated, human-readable summary — the same sentence a screen reader speaks, a crawler indexes,
-and a model can quote back. Nothing is hidden in pixels, so a few tokens of text become a real, accessible instrument.
+and a model can quote back. A few tokens of text become a real, accessible chart.
 
 <StreamDemo />
 
 <Callout type="info">
-  Above is the real thing, not a video: a scripted reply streams in, and the chart syntax it emits becomes shipped
+  This is a live render, not a video: a scripted reply streams in, and the chart syntax it emits becomes shipped
   microcharts the instant each fence closes. Everything below is the contract behind it.
 </Callout>
 
-The AI reply is the newest home for a word-sized chart, not the only one — the same component lives in a product UI, a
-rendered report, and inline in docs like these. This page is the model-facing contract;
-[Where they live](/docs#where-they-live) shows the rest.
+The same components live in a product UI, a rendered report, and inline in docs like these. This page is the
+model-facing contract; [Where they live](/docs#where-they-live) shows the rest.
 
 ## The grammar
 
-A model emits a chart in one of two forms — both deliberately forgiving, the kind of thing a model produces reliably
-mid-stream. Pick a type and a form to see exactly what it writes, what it renders, and the React it's equivalent to:
+A model emits a chart in one of two forms, both forgiving enough to produce reliably mid-stream. Pick a type and a form
+to see what it writes, what it renders, and the React it's equivalent to:
 
 <GrammarExplorer />
 
 The body is whitespace- or comma-separated numbers for series charts, or `key=value` pairs for composites. These five
-cover the questions an assistant answers most — _trend, magnitude, change, attainment, cadence_ — but the same pattern
+cover the questions an assistant answers most — _trend, magnitude, change, attainment, cadence_ — and the same pattern
 extends to [any chart in the catalog](/docs/charts): name a type, pick a body convention, map it to that chart's import.
 
 ## Wire it up
@@ -70,7 +67,7 @@ summary; give it a `title`.
 
 Wrap every inline SVG mark in `className="mc-inline"` — the class ships in `@microcharts/react/styles.css` (imported
 once in the Quickstart). It seats the mark on the text baseline, so it rides the line like a word in any font. Leave
-`Delta` bare; it is a text metric and owns its own baseline already.
+`Delta` bare; it is a text metric and owns its own baseline.
 
 ```tsx
 NVDA closed +3.8%{" "}
@@ -86,8 +83,8 @@ on the session — up <Delta value={0.038} summary={false} /> week over week.
 
 ## Prompt the model
 
-A few lines teach the grammar. Reach for the technique that matches how the model is driven — structured output and tool
-calls first, since that's how most agents run today:
+A few lines teach the grammar. Start with the technique that matches how your model is driven — structured output and
+tool calls first, since that's how most agents run today:
 
 <Tabs items={["Structured JSON", "Tool use", "System prompt", "Few-shot", "Guardrails"]}>
 
@@ -128,7 +125,7 @@ When you want a specific house style, show one exchange. Models mirror the shape
 <Tab value="Guardrails">
 
 Never trust generated data blindly. Validate the type, coerce the numbers, and fall back to text when a block is
-malformed — the summary makes a graceful fallback trivial.
+malformed. The generated summary makes text a graceful fallback.
 
 <Snippet id="guardrails" />
 
@@ -139,10 +136,9 @@ malformed — the summary makes a graceful fallback trivial.
 ## Where it runs
 
 A chart is plain text and JSON, so anything that reads or writes text can emit one and render it back — no SDK, no
-partnership, no island bridge. That spans the whole stack a model runs in today: the **chat assistants** that answer in
-prose, the **coding agents and IDEs** that scaffold the components from the typed catalog, and the **frameworks and
-SDKs** that wire tool-call output straight to charts. None of these is an integration we built — they work because the
-output is just text.
+bridge. That spans the **chat assistants** that answer in prose, the **coding agents and IDEs** that scaffold the
+components from the typed catalog, and the **frameworks and SDKs** that wire tool-call output straight to charts. None
+of these needed an integration; the output is text.
 
 <ProviderWall />
 
@@ -155,8 +151,8 @@ Every path from model output to a rendered chart, with the one thing each needs.
 <Accordion title="Streaming chat reply — morph blocks as they close">
 
 Parse the partial Markdown on every token; render a fence as raw text until it closes, then swap in the chart.
-Word-sized charts land inside the sentence, standalone ones below it. The live demo at the top of this page is exactly
-this shape.
+Word-sized charts land inside the sentence, standalone ones below it. The live demo at the top of this page is this
+shape.
 
 <Snippet id="streaming" />
 
@@ -193,25 +189,24 @@ Static entries are hook-free and listener-free, so the markup they emit stands o
 
 <Accordion title="Validation & safety — malformed data never breaks a render">
 
-Every chart already handles the degenerate cases — empty, single value, all-equal, nulls, NaN, ±Infinity — with an
-honest short summary instead of a broken chart. Layer the type/coercion guardrails above and a bad block downgrades to
-plain text, never a crash.
+Every chart already handles the degenerate cases — empty, single value, all-equal, nulls, NaN, ±Infinity — with an exact
+short summary instead of a broken chart. Layer the type/coercion guardrails above and a bad block downgrades to plain
+text instead of crashing.
 
 </Accordion>
 
 </Accordions>
 
-## Call it: the MCP server
+## The MCP server
 
 Everything above is a model **emitting** a chart into a surface you control, where your code maps a block to a
 component. Sometimes there is no such surface — a desktop assistant's reply, a terminal, a draft email. There, the model
-needs the finished mark, not an instruction to draw one.
+needs the finished mark.
 
-[`@microcharts/mcp`](/docs/mcp) is that third verb. It's a Model Context Protocol server, run over stdio on your own
-machine, that gives an assistant three tools: **find** the chart type that answers a question, **get** its exact props
-and a valid sample, **render** it to a self-contained SVG with the real generated alt text attached. The rendering is
-done by this library, so what comes back is the same mark you'd get from the component — honest by construction, not a
-picture of one.
+[`@microcharts/mcp`](/docs/mcp) is a Model Context Protocol server, run over stdio on your own machine, that gives an
+assistant three tools: **find** the chart type that answers a question, **get** its exact props and a valid sample,
+**render** it to a self-contained SVG with the real generated alt text attached. This library does the rendering, so
+what comes back is the same mark the component would produce.
 
 Point any MCP client at it — Claude Desktop, Claude Code, Cursor, VS Code — with the config it already understands:
 
@@ -222,16 +217,14 @@ The same three capabilities also ship as Vercel AI SDK tools, for an assistant y
 
 ## Machine-readable surfaces
 
-Real, generated routes — the substance behind "AI-native", not a slogan. Point an agent here and it reads the true API
-instead of guessing.
+These routes are generated from the same source as the package, so an agent reads the current API instead of guessing:
 
 <SurfaceCards />
 
-The `.md` mirrors are real static files — `/docs/ai` has a sibling `/docs/ai.md` — so they resolve on any host, with no
+The `.md` mirrors are static files — `/docs/ai` has a sibling `/docs/ai.md` — so they resolve on any host with no
 runtime, rewrite, or middleware. This site also deploys behind a small Cloudflare Worker that runs on `/docs/*` only:
 send `Accept: text/markdown` and the same doc URL returns the mirror inline, with `Vary: Accept` on both the Markdown
-and the HTML response. That negotiation is a convenience layered on top of the mirrors, never a dependency — appending
-`.md` always works.
+and the HTML response. Appending `.md` always works; the negotiation is a convenience on top.
 
 `/llms.txt` points at one more surface the cards don't: [`/agent-setup.md`](/agent-setup.md), the paste-and-run setup
 prompt for a coding agent, extracted from the [Quickstart](/docs/quickstart) so the two can't drift. Or skip the URL
@@ -239,15 +232,14 @@ entirely:
 
 <CopyAgentSetup />
 
-## The whole contract, on one card
+## The agent cheat sheet
 
 Don't make a model memorize the catalog — [All charts](/docs/charts) files every type by the question it answers, and
 the [Charts index](/charts) shows them at a glance. Everything an agent needs to emit correct microcharts fits on one
-card — copy it straight into a system prompt:
+card. Copy it straight into a system prompt:
 
 <AgentCheatSheet />
 
-That's the entire surface area: a grammar a model already knows how to write, and charts a person can trust on sight.
-Point an assistant at [`/llms.txt`](/llms.txt) — or the fuller [`/llms-full.txt`](/llms-full.txt) and the
+For more, point an assistant at [`/llms.txt`](/llms.txt), the fuller [`/llms-full.txt`](/llms-full.txt), or the
 machine-readable [`/catalog.json`](/catalog.json) — or start from the [Quickstart](/docs/quickstart) and render your
-first chart in minutes.
+first chart.

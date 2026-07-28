@@ -1,13 +1,11 @@
 ---
 title: PictogramRow
 description: >-
-  React pictogram row chart — counts as a row of pictograms you can tally at a glance. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+  PictogramRow prints a count as a row of same-size units, filled and hollow, that a reader can tally.
 ---
 
-PictogramRow answers "how many of the N units are filled?" — ●●●○○ — counts a human can verify by counting. Filled vs
-hollow is a shape difference too, never opacity alone, and unit size is constant: scaling glyphs with value is the
-classic pictogram lie this component refuses to tell.
+●●●○○ — three of five units filled, a count a reader can verify by counting. Filled and hollow differ in shape as well
+as opacity, and PictogramRow keeps every unit the same size: the glyph never scales with the value.
 
 <LiveDemo label="PictogramRow" sizeOf="pictogram-row">
   <span className="text-lg">
@@ -27,8 +25,8 @@ classic pictogram lie this component refuses to tell.
 
 ## When to use it
 
-- **Good for** — seats, slots, and ratings in a sentence; capacity rows in tables.
-- **Avoid for** — more than 20 units (counting fails; use Progress) or continuous ratios (Progress).
+Use it for seats, slots, and ratings in a sentence, and for capacity rows in tables. Past 20 units counting fails, and
+continuous ratios are not a count: use Progress for both.
 
 ## Sizing
 
@@ -52,6 +50,10 @@ classic pictogram lie this component refuses to tell.
   <PictogramRow value={2.5} total={4} fractional="round" title="Whole seats" width={90} height={18} />
 </LiveDemo>
 
+The default clips the partial unit rather than rounding it away, and draws it as a true circular segment instead of a
+`clipPath` — generated ids would break server-render determinism. Use `fractional="round"` where a partial unit is
+meaningless.
+
 <LiveDemo label="squares" code={`<PictogramRow value={3} total={5} shape="square" />`}>
   <PictogramRow value={3} total={5} shape="square" title="Squares" width={90} height={18} />
 </LiveDemo>
@@ -74,20 +76,14 @@ classic pictogram lie this component refuses to tell.
   <PictogramRow value={9} total={8} title="Over capacity" width={90} height={18} />
 </LiveDemo>
 
-A `total` of 0 (or non-finite) draws nothing and the summary is "No data." — there is no meaningful row to count. A
-negative value renders every unit hollow, and the summary still states the true number ("-2 of 4.") rather than clamping
-to 0. A value past the total fills every unit — never more than `total` units drawn — but the summary keeps the honest
-count ("9 of 8.") with a dev-time warning, so the overflow is never hidden.
+A `total` of 0 (or non-finite) draws nothing and the summary is "No data.", since there is no row to count. A negative
+value renders every unit hollow, and the summary states the true number ("-2 of 4.") rather than clamping to 0. A value
+past the total fills every unit, and never draws more than `total` units, but the summary keeps the true count ("9 of
+8.") and dev-warns, so the overflow is never hidden.
 
 ## Four homes
 
 <FourContexts slug="pictogram-row" />
-
-## Why this default
-
-Clip over round — the partial unit is real data, drawn as a true circular segment (not a `clipPath`, which would need
-generated ids that break server rendering determinism). Overflow renders all units filled but the summary keeps the true
-numbers ("9 of 8.") with a dev warning; the chart never silently caps the figure.
 
 ## Accessibility
 

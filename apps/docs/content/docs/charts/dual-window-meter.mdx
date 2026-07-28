@@ -1,14 +1,13 @@
 ---
 title: DualWindowMeter
-description: >-
-  React dual-window meter chart — two time windows compared in one compact meter. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: DualWindowMeter overlays a fast and a slow rolling mean of one series against a target line.
 ---
 
-DualWindowMeter answers "is the level compliant against its target both right now and on average — momentary spikes vs
-sustained drift?". From one raw series it computes two rolling means: a thin fast window that reacts instantly and a
-thick slow window that carries the sustained read, both against a target line. It is the general form of any noisy
-metric with a compliance target.
+DualWindowMeter computes two rolling means from one raw series: a thin fast window that reacts instantly, and a thick
+slow window that carries the sustained read. Both run against a target line, so a momentary spike stays separable from
+sustained drift. The slow trace is the thicker of the two because drift away from target matters more than a spike, and
+the window sizes are part of the reading, so `windows` is an explicit prop. It is the general form of any noisy metric
+with a compliance target.
 
 <LiveDemo label="DualWindowMeter" sizeOf="dual-window-meter">
   <DualWindowMeter
@@ -31,8 +30,8 @@ metric with a compliance target.
 
 ## When to use it
 
-- **Good for** — loudness / LUFS metering, latency SLO or CPU-headroom compliance.
-- **Avoid for** — a single series (Sparkline) or anything without a target to compare against.
+Use it for loudness and LUFS metering, latency SLO compliance, and CPU-headroom compliance. For a single series use
+Sparkline, and reach for something else when there is no target to compare against.
 
 ## Sizing
 
@@ -105,8 +104,8 @@ metric with a compliance target.
   />
 </LiveDemo>
 
-With a `locale`, the right-edge readings and the accessible summary follow that locale's decimal mark — the fast reading
-above renders "-23,9", not "-23.9", and the accessible name reads "Slow window -25 vs target -23; fast -23,9."
+With a `locale`, the right-edge readings and the accessible summary follow that locale's decimal mark: the fast reading
+above renders "-23,9" rather than "-23.9", and the accessible name reads "Slow window -25 vs target -23; fast -23,9."
 
 ## Edge cases
 
@@ -129,20 +128,17 @@ above renders "-23,9", not "-23.9", and the accessible name reads "Slow window -
   />
 </LiveDemo>
 
+Both traces share one domain, and each begins only where its window has filled. With the default `windows={[3, 30]}` and
+the 10 samples above, the fast trace starts at sample 3 and the slow trace never appears at all; its readout shows "—"
+instead of a partial-window value.
+
 ## Four homes
 
 <FourContexts slug="dual-window-meter" />
 
-## Why this default
-
-Thin-fast, thick-slow because the sustained read should carry more ink — a momentary spike on the fast trace matters
-less than a slow-window drift away from target. The window sizes are part of the reading, not a hidden implementation
-detail — `windows` is an explicit prop, and the examples that change it state both sizes. Both traces always share one
-domain; a trace begins only where its window has filled, never faking a partial-window value.
-
 ## Accessibility
 
-The accessible name leads with the sustained read — **"Slow window -25 vs target -23; fast -23,9."** The interactive
+The accessible name leads with the sustained read: **"Slow window -25 vs target -23; fast -23,9."** The interactive
 entry roves the samples with ←/→, announcing the fast value, the slow value, and the target at each point.
 
 <InteractionNote slug="dual-window-meter" />

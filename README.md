@@ -25,18 +25,12 @@ by default, and server-component safe.
 
 ---
 
-microcharts is **106 tiny, handcrafted chart types** built to sit _inside_ an interface — in a sentence, a table cell, a
-KPI card, a tab header, a streamed AI reply — where a full chart library would be too heavy and too loud. One quiet
-signal, read at a glance.
+microcharts is **106 tiny, handcrafted chart types** built to sit _inside_ an interface: a sentence, a table cell, a KPI
+card, a tab header, a streamed AI reply. The grammar is small enough for a model to emit correctly mid-sentence, and
+every chart describes itself in words, so a chart an LLM streams into a chat reply is one a person can read and check.
 
-The grammar is small enough for a model to emit correctly mid-sentence, and every chart describes itself in words. So a
-chart an LLM streams into a chat reply is one a person can read and trust — the properties that make it safe for a model
-to write are the ones that make it pleasant for a human to use.
-
-> **Status: production-ready, still earning its scars.** microcharts is tested and ready to use in production, but it
-> hasn't been battle-tested across every stack and edge yet — you may hit the occasional rough edge. When you do, tell
-> us: bug reports and feature requests on [GitHub issues](https://github.com/ganapativs/microcharts/issues) are how it
-> keeps getting sharper.
+> **Status:** tested and in production use, but not across every stack and edge yet. If you hit something, open an issue
+> on [GitHub](https://github.com/ganapativs/microcharts/issues).
 
 ## Why
 
@@ -45,10 +39,10 @@ to write are the ones that make it pleasant for a human to use.
 - **Zero dependencies.** No chart engine, no D3 — just SVG. React is the only peer. CI-enforced, forever.
 - **Server-component safe.** Static charts are hook-free and render to HTML with **zero client JavaScript**.
   Interactivity is a separate opt-in `/interactive` import.
-- **Accessible by default.** Every chart is an `img` with a natural-language summary built from your data — nothing to
-  remember, nothing to drift. → [Accessibility](https://microcharts.dev/docs/accessibility)
-- **Tiny + honest.** **~2–7 kB interactive · ~1–4 kB static** gzip per chart, budget-gated in CI. Every type has one
-  documented, honest encoding channel. Delight never lies.
+- **Accessible by default.** Every chart is an `img` with a natural-language summary built from your data; it updates
+  when the numbers do. → [Accessibility](https://microcharts.dev/docs/accessibility)
+- **Tiny.** **~2–7 kB interactive · ~1–4 kB static** gzip per chart, budget-gated in CI. Every type has one documented,
+  honest encoding channel and a stated precision.
 
 ## Install
 
@@ -81,8 +75,8 @@ two-entry pattern: a static default, and an `/interactive` twin (`WindBarb` is t
 ## Add interactivity
 
 Need hover, keyboard navigation, touch, or live announcements? Import the same chart from `/interactive`. The rendered
-output and the accessible name are identical — the interactive entry composes its static twin — and it **adds** props
-rather than changing any: you opt into the client component where it matters.
+output and the accessible name are identical, because the interactive entry composes its static twin. It only **adds**
+props; you opt into the client component where it matters.
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
@@ -131,7 +125,7 @@ import { MicroProvider } from "@microcharts/react";
 
 Presets: `modern` (default), `editorial`, `mono`, `vivid`, plus output-context `print` and `eink`. Dark mode is
 hand-tuned, not inverted. For a whole brand theme, `defineTheme` (from `@microcharts/react/theme`) derives a matched,
-colour-blind-safe palette and dark twins from one accent:
+color-blind-safe palette and dark twins from one accent:
 
 ```tsx
 import { defineTheme } from "@microcharts/react/theme";
@@ -140,27 +134,25 @@ const brand = defineTheme({ accent: "#6d28d9" });
 <MicroProvider style={brand.style}>…</MicroProvider>;
 ```
 
-Retune density with one scalar (`--mc-density`), give figures their own face (`--mc-font-numeric`), or recolour a single
+Retune density with one scalar (`--mc-density`), give figures their own face (`--mc-font-numeric`), or recolor a single
 categorical chart with a `colors` array. → [Theming guide](https://microcharts.dev/docs/theming)
 
 ## The catalog
 
 **106 stable chart types** — 34 core, 26 decision, 23 expressive, 23 frontier — grouped by the _question_ each one
 answers. `data` alone always renders something correct, and a prop name means the same thing on every chart (`domain`,
-`color`, `title`, `summary`, `label`, `format`…), so you pick by the decision you need read, not by fighting an options
-bag.
+`color`, `title`, `summary`, `label`, `format`…), so picking a chart is picking the question you need answered.
 
 Sparklines, bars, deltas, and bullets through bump charts, funnels, honeycombs, calendar strips, and confidence bands —
 **[browse them all in the live gallery →](https://microcharts.dev/docs/charts)**
 
 > **Not shipping, on purpose:** pie, needle-gauge/speedometer, battery, waffle, violin. Each fails at micro scale or on
-> the honest-encoding bar, and each has a strictly-better in-catalog replacement (Bullet for gauges, SegmentedBar for
-> pie, MicroBox for violin). → [what to use instead](https://microcharts.dev/llms.txt)
+> the honest-encoding bar, and each has an in-catalog replacement (Bullet for gauges, SegmentedBar for pie, MicroBox for
+> violin). → [what to use instead](https://microcharts.dev/llms.txt)
 
 ## Made for models
 
-microcharts is built to be written _by_ an LLM and read _by_ a person. The docs site publishes machine surfaces
-alongside the human ones:
+A model writes the chart; a person reads it. The docs site publishes machine surfaces alongside the human ones:
 
 | Surface                                                   | What it is                                          |
 | --------------------------------------------------------- | --------------------------------------------------- |
@@ -168,12 +160,12 @@ alongside the human ones:
 | [`/llms-full.txt`](https://microcharts.dev/llms-full.txt) | The complete generated docs corpus                  |
 | [`/catalog.json`](https://microcharts.dev/catalog.json)   | Every chart's name, import path, props, data shapes |
 
-## Call it over MCP
+## The MCP server
 
-Those surfaces are for a model that _reads_. [`@microcharts/mcp`](https://www.npmjs.com/package/@microcharts/mcp) is for
-one that _calls_ — a Model Context Protocol server that runs on your machine over stdio, with three tools backed by this
-library: **find** the chart type that answers a question, **get** its exact props and a ready-to-render sample, and
-**render** it to a self-contained SVG with the generated alt text attached.
+The surfaces above are for reading. [`@microcharts/mcp`](https://www.npmjs.com/package/@microcharts/mcp) lets an
+assistant call the library directly: a Model Context Protocol server that runs on your machine over stdio, with three
+tools backed by this library — **find** the chart type that answers a question, **get** its exact props and a
+ready-to-render sample, and **render** it to a self-contained SVG with the generated alt text attached.
 
 ```json
 {
@@ -196,9 +188,9 @@ capabilities ship as Vercel AI SDK tools on the `@microcharts/mcp/ai-sdk` subpat
 React **18 and 19**. ESM-only, per-component subpath exports, types-first export conditions. Static charts render in any
 RSC or SSR setup with no client runtime.
 
-`sideEffects` is a two-entry allowlist rather than `false`, because `styles.css` and the opt-in `./motion` engine are
-both imported for their side effects and `false` would let a bundler drop them. Every other module is side-effect free
-and tree-shakes normally — and since charts ship as per-component subpaths, you only ever pay for the ones you import.
+`sideEffects` is a two-entry allowlist, never `false`: `styles.css` and the opt-in `./motion` engine are both imported
+for their side effects, and `false` would let a bundler drop them. Every other module is side-effect free and
+tree-shakes normally, and since charts ship as per-component subpaths, you only pay for the ones you import.
 
 ## Contributing
 

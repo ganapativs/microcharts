@@ -1,23 +1,12 @@
 /**
- * Interactive-gzip size history, per release: the **ceiling**, meaning the
- * largest chart in the catalog at each tag.
+ * Interactive-gzip size history per release (catalog ceiling = largest chart).
  *
- * `CEILING_CLAIM` is the only thing the v3 hero reads from here — the number its
- * sentence quotes. The hero's mark used to PLOT this series, which is what this
- * note used to say; seven near-identical values read as an underscore at 132×30,
- * so it draws a demo shape now (`HERO_TREND` in `components/home/home-data.ts`).
- *
- * Provenance: `apps/docs/src/lib/chart-sizes.json` and
- * `apps/docs/src/lib/charts/entries.generated.json` read at each
- * `@microcharts/react@<version>` git tag, median and max computed across the
- * stable catalog's interactive subpaths (105 of 106 — `wind-barb` is static
- * only). Reproduce with:
+ * Kept as a docs-as-tests claim: the hero sentence quotes "&lt; 7 kB", and
+ * `CEILING_CLAIM` must stay the tightest whole number above every measured max.
+ * Current release numbers come live from `docs-facts` so the newest point can't
+ * drift. Reproduce history with:
  *
  *   git show "@microcharts/react@0.9.0:apps/docs/src/lib/chart-sizes.json"
- *
- * The current release is NOT frozen here: it reads live from `docs-facts`, so
- * the newest point can never drift from the measured file. `CURRENT_VERSION` is
- * checked against the workspace package version by `release-sizes.test.ts`.
  */
 import { SIZE } from "./docs-facts";
 
@@ -46,8 +35,8 @@ export const RELEASE_SIZES: readonly ReleaseSize[] = [
   { version: CURRENT_VERSION, median: SIZE.interactiveMedian, max: SIZE.interactiveMax },
 ];
 
-/** The ceiling series the hero sparkline draws. */
+/** Ceiling series across releases (kB). */
 export const CEILINGS: readonly number[] = RELEASE_SIZES.map((r) => r.max);
 
-/** Rounded-up kB ceiling the copy quotes — 7 while every max stays under it. */
+/** Rounded-up kB ceiling the hero copy quotes — 7 while every max stays under it. */
 export const CEILING_CLAIM = Math.ceil(Math.max(...CEILINGS));

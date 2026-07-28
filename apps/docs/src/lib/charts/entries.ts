@@ -8,7 +8,7 @@ import generated from "./entries.generated.json";
 
 const ENTRIES = generated as unknown as ChartEntry[];
 
-export const CHART_ENTRIES: Record<string, ChartEntry> = Object.fromEntries(
+const CHART_ENTRIES: Record<string, ChartEntry> = Object.fromEntries(
   ENTRIES.map((e) => [e.slug, e]),
 );
 

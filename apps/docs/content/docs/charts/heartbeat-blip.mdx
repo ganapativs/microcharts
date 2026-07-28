@@ -1,14 +1,16 @@
 ---
 title: HeartbeatBlip
-description: >-
-  React heartbeat blip chart — recent events as blips in a live window. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description:
+  HeartbeatBlip draws one ECG-style spike per event in a rolling window, so a service's liveness and rate read together.
 ---
 
-HeartbeatBlip answers "is it alive, and how busy?" at a glance. Each event in the recent window is an ECG-style spike;
-in the interactive entry the trace sweeps left in real time and a new event blips in at the right edge, so the rate you
-see **is** the event rate. Every spike is one real event — never a synthesized pulse on a timer — and an empty, flat
-baseline is the down signal, carried by shape, not color.
+HeartbeatBlip draws one ECG-style spike per event in a rolling window, 60 seconds by default, because liveness questions
+are about the last minute. In the interactive entry the trace sweeps left in real time and a new event blips in at the
+right edge, so the rate you see **is** the event rate. Every spike is one real event, never a synthesized pulse on a
+timer, and an empty window leaves a flat baseline: the down signal is carried by shape, not color.
+
+Pass `now` from your data layer. The static entry never calls `Date.now()`, because a server render and the client
+hydrate would disagree and mismatch.
 
 <LiveDemo label="HeartbeatBlip" sizeOf="heartbeat-blip">
   <HeartbeatBlip events={[97000, 92000, 85000, 70000, 55000, 48000]} now={100000} title="Requests" width={90} />
@@ -24,19 +26,17 @@ baseline is the down signal, carried by shape, not color.
 
 ## Motion, and reduced motion
 
-The trace advances in real time so old spikes drift left and new events enter at the right — the liveness comes from
-watching the blips arrive. This is the deliberate idle-loop exception, allowed because the loop parameter (elapsed time)
-is the datum. It pauses off-screen (a shared observer) and, under `prefers-reduced-motion`, does not sweep at all: the
-static strip simply re-renders on each data change — the same information, discretely updated. The one rule this chart
-must never break: **a flat service never gets a fake pulse.** Every spike is a real event; when the window empties, the
-baseline goes flat and stays flat.
+The trace advances in real time, so old spikes drift left and new events enter at the right. This is the deliberate
+idle-loop exception, allowed because the loop parameter (elapsed time) is the datum. It pauses off-screen through a
+shared observer, and under `prefers-reduced-motion` it does not sweep at all: the static strip re-renders on each data
+change instead, carrying the same information discretely. **A flat service never gets a fake pulse.** When the window
+empties, the baseline goes flat and stays flat.
 
 ## When to use it
 
-- **Good for** — at-a-glance liveness of a service or stream, request rate in a header, or per-service liveness in a
-  status table.
-- **Avoid for** — exact event counts (`Seismogram`, `EventTimeline`), a continuous level (`BreathingDot`), or long-term
-  trends (`Sparkline`).
+Use it for the liveness of a service or stream, a request rate in a header, or per-service liveness in a status table.
+For exact event counts use `Seismogram` or `EventTimeline`, for a continuous level `BreathingDot`, and for long-term
+trends `Sparkline`.
 
 ## Sizing
 
@@ -112,20 +112,13 @@ through the formatter), and the in-chart spikes never carry text, so there's not
 
 <FourContexts slug="heartbeat-blip" />
 
-## Why this default
-
-The 60-second window is the default because liveness questions are about the last minute. The `now` clock is a
-required-in-spirit prop: the static entry must never call `Date.now()` (a server render and the client hydrate would
-disagree and mismatch), so you pass the clock from your data layer. Flatline is never dressed up — down and no-data are
-different states, and the summary distinguishes them. The boundary with `BreathingDot`: discrete arriving events are a
-HeartbeatBlip; a continuous level is a BreathingDot.
-
 ## Accessibility
 
 The accessible name is the count, the window, and the time since the last event — **"3 events in the last minute; last
-3s ago."** — or **"No events in the last minute."** when the trace is flat. The trace sweeps only when motion is allowed
-and on-screen; the live region announces on data change, and there is no per-spike navigation because the spikes are
-transient — the summary is the record.
+3s ago."** — or **"No events in the last minute."** when the trace is flat. Down and no-data are different states, and
+the summary distinguishes them. The trace sweeps only when motion is allowed and the chart is on-screen. The live region
+announces on data change, and there is no per-spike navigation, because the spikes are transient and the summary is the
+record.
 
 <InteractionNote slug="heartbeat-blip" />
 

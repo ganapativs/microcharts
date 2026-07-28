@@ -1,44 +1,43 @@
 ---
 title: microcharts vs Recharts — inline charts comparison
-description:
-  A narrow, factual comparison for one decision — a chart inside a sentence, table cell, or KPI in React. Measured
-  bundle sizes, dependency counts, RSC behavior, and accessibility defaults. Recharts stays the right call for full
-  dashboard surfaces.
+description: >-
+  A measured comparison of Recharts and microcharts for one job: a chart small enough to sit in a sentence, a table
+  cell, or a KPI card.
 ---
 
-[Recharts](https://recharts.org) is a full chart library and microcharts is not a replacement for it. If your page _is_
-the chart — axes, legend, tooltip, brush — stop reading and use Recharts. This page compares the two for exactly one
-job: a word-sized chart _inside_ an interface, where the surface is mostly words and UI.
+[Recharts](https://recharts.org) is a full chart library, and microcharts does not replace it. If your page _is_ the
+chart, with axes, a legend, a tooltip, and a brush, use Recharts. This page compares the two for one job: a word-sized
+chart inside an interface, where the surface is mostly words and UI.
 
 The broader positioning lives in [When to use microcharts](/docs/when-to-use) and
-[Full chart libraries](/docs/full-chart-libraries). This page is the measured detail for the Recharts decision.
+[Full chart libraries](/docs/full-chart-libraries). What follows is the measured detail for the Recharts decision.
 
 ## The numbers
 
 <VsRechartsTable />
 
 Both microcharts columns come from `.size-limit.json`, the CI gate that fails the build when a chart grows past its
-budget. The Recharts numbers are pinned with version, method, and date — they are orientation, not a scoreboard, and
-they will age.
+budget. The Recharts figures are pinned with version, method, and date. They are dated orientation rather than live
+measurements, and they will age.
 
-## Where the difference actually shows
+## What differs
 
 **Bundle cost per mark.** A tree-shaken Recharts `LineChart` carries the shared Recharts core. That cost is fine
-amortized over a dashboard; it is hard to justify for one sparkline in a table header. microcharts imports one chart per
+amortized over a dashboard, and hard to justify for one sparkline in a table header. microcharts imports one chart per
 subpath, so a page that uses only `Sparkline` pays only for `Sparkline`.
 
 **Server Components.** Recharts components are hook-based, so in an App Router app they run inside a client boundary and
-ship their JavaScript. The microcharts default export is hook-free static SVG — it renders in an RSC with zero client
+ship their JavaScript. The microcharts default export is hook-free static SVG: it renders in an RSC with zero client
 JavaScript, and interactivity is a separate opt-in `/interactive` import.
 
-**Accessibility defaults.** Recharts ships an accessibility layer, on by default in v3 — keyboard navigation and ARIA
-roles on the chart surface. A natural-language description of the data is still yours to write. Every microchart is
+**Accessibility defaults.** Recharts ships an accessibility layer, on by default in v3, with keyboard navigation and
+ARIA roles on the chart surface. A natural-language description of the data is still yours to write. Every microchart is
 `role="img"` with that description generated from the data by default (`describeSeries`); the decorative opt-out is
 explicit (`summary={false}`).
 
-**Chart chrome.** Recharts draws axes, ticks, legends, and tooltips because dashboard surfaces need them. microcharts
-hard-codes them away because word-sized marks cannot afford them. Neither choice is a defect; they serve different
-surfaces.
+**Chart chrome.** Recharts draws axes, ticks, legends, and tooltips because dashboard surfaces need them, and it is
+sized correctly for that job. microcharts hard-codes them away because word-sized marks cannot afford them. The two
+libraries serve different surfaces.
 
 ## Reach for Recharts
 
@@ -55,7 +54,7 @@ surfaces.
 
 ## Same app, both libraries
 
-This is the common ending, not a compromise:
+Most apps that need both end up here. Recharts on the analytics page, microcharts in the table that links to it:
 
 ```tsx
 // analytics page — Recharts
@@ -67,12 +66,6 @@ This is the common ending, not a compromise:
 import { Sparkline } from "@microcharts/react/sparkline";
 <Sparkline data={row.series} width={72} height={16} dots="none" summary={false} />;
 ```
-
-## What this page is not saying
-
-- Not "Recharts is heavy" — it is correctly sized for the job it does
-- Not "microcharts can replace your dashboards" — it cannot and does not try
-- The gzip figures are dated pins, not live measurements
 
 ## Next
 

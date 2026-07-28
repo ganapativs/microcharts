@@ -80,7 +80,7 @@ export default function EngagementPage() {
             <RetentionCurve
               animate
               data={retention}
-              benchmark={retentionBenchmark}
+              compare={retentionBenchmark}
               label="last"
               unit="week"
               width={480}

@@ -1,14 +1,15 @@
 ---
 title: MinimapStrip
-description: >-
-  React minimap strip chart — overview density with a brushable viewport. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  MinimapStrip shows where a viewport sits in a long document or log, with marks and fog over unloaded regions.
 ---
 
-MinimapStrip answers "where am I in the whole — and where in the whole is everything else I care about?". A content
-thumbnail sits under a viewport window and a lane of annotation ticks, and any region you haven't loaded or crawled is
-drawn as fog rather than blank — because absence is not the same as zero. The unknown share travels with the accessible
-name.
+You are 300 lines into a 1,200-line log, three search hits sit elsewhere in it, and the tail hasn't loaded yet.
+MinimapStrip shows all three at once: a content thumbnail under a viewport window, a separate lane of annotation ticks,
+and hatched fog over any region you haven't loaded or crawled. Keeping position and annotations in two lanes keeps them
+as two reads instead of one muddle. Fog is a first-class state rather than a blank stretch that would read as empty
+content, and the unknown share is disclosed in the accessible name. The window maps linearly to the domain; there is no
+fisheye to distort where you are.
 
 <LiveDemo label="MinimapStrip" sizeOf="minimap-strip">
   <MinimapStrip
@@ -34,8 +35,8 @@ name.
 
 ## When to use it
 
-- **Good for** — document or log position, long-timeline navigation.
-- **Avoid for** — a single value (Progress) or exact content values (Sparkline).
+Use it for document or log position and long-timeline navigation. For a single value use Progress; for exact content
+values use Sparkline.
 
 ## Sizing
 
@@ -95,23 +96,18 @@ name.
   />
 </LiveDemo>
 
+When `known` covers the whole domain, no fog renders at all.
+
 ## Four homes
 
 <FourContexts slug="minimap-strip" />
 
-## Why this default
-
-Bars plus a separate mark lane keep "where am I" and "where are the annotations" as two clean reads instead of one
-muddle. Fog-of-war is a first-class state — unknown regions get a hatched texture, never a blank stretch that would read
-as empty content, and the unknown share is disclosed in the summary. The window maps linearly to the domain; there is no
-fisheye to distort where you are.
-
 ## Accessibility
 
-The accessible name places you in the whole — **"Viewing 12% of the whole (300–440 of 1,200); 2 marks."** The
-interactive entry is a slider: drag or click to move the window, or nudge it with ←/→ (Shift for a bigger jump). Hover,
-focus or drag it and the window's own edges float above it as a chip (`400–500`) — the same range `aria-valuetext`
-reports, so a sighted reader and a screen-reader reader get the same numbers. `readout={false}` drops the chip.
+The accessible name places you in the whole: **"Viewing 12% of the whole (300–440 of 1,200); 2 marks."** The interactive
+entry is a slider. Drag or click to move the window, or nudge it with ←/→ (Shift for a bigger jump). On hover, focus, or
+drag, the window's own edges float above it as a chip (`400–500`), the same range `aria-valuetext` reports, so a sighted
+reader and a screen-reader reader get the same numbers. `readout={false}` drops the chip.
 
 <InteractionNote slug="minimap-strip" />
 

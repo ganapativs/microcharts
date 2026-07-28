@@ -7,20 +7,9 @@
  * list, or the comparison is about the data rather than the encoding.
  */
 
-/**
- * The shape in the hero sentence — a demo series, and the only one on the page
- * that is a shape rather than a measured fact, so nothing near it claims
- * otherwise. The catalog's real per-release ceiling was seven near-identical
- * values that read as an underscore at 132×30.
- */
-export const HERO_TREND = [0, 4, 2, 7, 5, 11, 8, 14, 12, 18] as const;
-
-/* ── the hero's rotating specimen ────────────────────────────────────────────
- *
- * Every array below is a LITERAL, checked against its real source by
- * `home.test.ts`. Deriving them at runtime would pull `entries.generated.json`
- * (~1 MB) into a client component; a literal plus a guard test costs ~700 B.
- */
+/* Hero specimen literals — checked against their sources by `home.test.ts`.
+ * Runtime derivation would pull `entries.generated.json` (~1 MB) into a client
+ * component; a literal plus a guard test costs ~700 B. */
 
 /**
  * Interactive gzip kB for all 105 interactive entries in the stable catalog,

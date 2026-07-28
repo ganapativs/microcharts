@@ -1,14 +1,13 @@
 ---
 title: PartitionStrip
 description: >-
-  React partition strip chart — two-level hierarchy as nested strips of share. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+  PartitionStrip shows a two-level breakdown as two aligned rows, each parent's children tiling the x-range beneath it.
 ---
 
-PartitionStrip answers "what is the whole made of — and what are the big parts made of — with parentage visible?".
-Parents sit on the top row with widths proportional to their share of the whole, and each parent's children tile the
-exact x-range beneath it. Two aligned rows beat a treemap because alignment is the comparison channel — and two levels
-is a hard limit, because deeper hierarchies become unreadable texture at this size.
+The top row is the whole: one bar per parent, width proportional to its share. The row beneath it holds each parent's
+children, tiling the exact x-range of their parent, so parentage reads out of the alignment. Alignment is the comparison
+channel here, which a treemap discards and a flat SegmentedBar drops along with the hierarchy. Two levels is a hard
+limit: deeper nesting becomes texture at this size.
 
 <LiveDemo
   label="PartitionStrip"
@@ -61,8 +60,8 @@ is a hard limit, because deeper hierarchies become unreadable texture at this si
 
 ## When to use it
 
-- **Good for** — bundle / storage / budget composition, two-level breakdowns.
-- **Avoid for** — deep hierarchies (unreadable at this size) or flat parts (SegmentedBar).
+Use it for bundle, storage, or budget composition, and for any two-level breakdown. Deep hierarchies are unreadable at
+this size, and flat parts belong in SegmentedBar.
 
 ## Sizing
 
@@ -183,15 +182,13 @@ is a hard limit, because deeper hierarchies become unreadable texture at this si
   />
 </LiveDemo>
 
+Data with no children anywhere renders as the parent row alone; the child row stays empty. Height, not width, is what
+drops the labels: below the floor font size they drop out rather than overlap. Grandchildren are ignored with a dev
+warning, since three levels of nesting at 24px is texture rather than information.
+
 ## Four homes
 
 <FourContexts slug="partition-strip" />
-
-## Why this default
-
-Two aligned rows because alignment is the comparison — you can see at a glance that a child sits under its parent and
-how much of it that child is. A treemap discards that alignment and a flat SegmentedBar discards the hierarchy entirely.
-Grandchildren are ignored with a dev warning, on purpose: three levels of nesting at 24px is texture, not information.
 
 ## Accessibility
 

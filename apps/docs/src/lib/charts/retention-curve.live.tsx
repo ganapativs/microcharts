@@ -20,7 +20,7 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <RetentionCurveInteractive
       data={DEMO}
-      benchmark={s.benchmark ? BENCH : undefined}
+      compare={s.compare ? BENCH : undefined}
       plateau={s.plateau as boolean}
       curve={s.curve as "step" | "smooth"}
       unit="week"
@@ -34,7 +34,7 @@ export const playground: PlaygroundSpec = {
     [
       "<RetentionCurve",
       "  data={cohort}",
-      s.benchmark && "  benchmark={industry}",
+      s.compare && "  compare={industry}",
       s.plateau === false && "  plateau={false}",
       s.curve !== "step" && `  curve="${s.curve}"`,
       ui.animate && " animate",

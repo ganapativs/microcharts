@@ -1,14 +1,13 @@
 ---
 title: ConfusionGrid
-description: >-
-  React confusion grid chart — 2×2 classification outcomes at a glance. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: ConfusionGrid shows where a classifier's errors land, as a grid of row-normalized shares.
 ---
 
-ConfusionGrid answers "where do the errors go?" — the one thing accuracy-as-a-number hides. Rows are the actual class,
-columns the predicted class, and each cell's ink is the row-normalized share: of the actual X, where did the predictions
-go? The diagonal (agreement) is accented by shape, never by colour, so good and bad are positions on the grid, not hues.
-The one-line key — rows actual, columns predicted — belongs next to every example.
+A classifier is 73% accurate; ConfusionGrid shows where the other 27% went, which is what an accuracy number hides. Rows
+are the actual class, columns the predicted class, and each cell's ink is the row-normalized share: of the actual X,
+where did the predictions go? The diagonal (agreement) is accented by an inset stroke rather than by color, and the ink
+ramp is the same for agreement and error cells, so good and bad are positions on the grid. That is what keeps it
+readable under forced colors. Put the one-line key — rows actual, columns predicted — next to every example.
 
 <LiveDemo
   label="ConfusionGrid"
@@ -37,15 +36,17 @@ const counts = { labels: ["A", "B", "C"], counts: [ [70, 8, 2], [6, 62, 12], [3,
 
 ## When to use it
 
-- **Good for** — classifier evaluation, and any paired-classification agreement (triage vs outcome, plan vs actual,
-  rater A vs rater B).
-- **Avoid for** — a single accuracy number (Delta) or more than four classes (use a full-size heatmap).
+Use it for classifier evaluation and any paired-classification agreement: triage vs outcome, plan vs actual, rater A vs
+rater B. For a single accuracy number reach for Delta; for more than four classes, a full-size heatmap.
 
 ## Sizing
 
 <Sizing chart="confusion-grid" />
 
 ## Variants
+
+`accent="errors"` moves the accent from the diagonal to the worst confusion cell. `label="accuracy"` prints the accuracy
+number; it is off by default and never rendered without the grid, so the number does not leave its context.
 
 <LiveDemo label="worst-confusion accent" code={`<ConfusionGrid data={cm} accent="errors" />`}>
   <ConfusionGrid
@@ -98,10 +99,9 @@ const counts = { labels: ["A", "B", "C"], counts: [ [70, 8, 2], [6, 62, 12], [3,
   />
 </LiveDemo>
 
-A fifth class doesn't grow the grid — legibility caps at 4×4, so a `k` of 5 or more clamps to the first four labels and
-rows/columns, with a dev warning steering to a full-size heatmap. The grid never silently drops classes in production
-(the warning is dev-only), but the render itself does truncate; pass pre-filtered `labels`/`counts` if you need a
-specific four.
+A fifth class doesn't grow the grid. Legibility caps at 4×4, so a `k` of 5 or more clamps to the first four labels and
+rows/columns, with a dev warning steering to a full-size heatmap. The warning is dev-only, but the render truncates in
+production too; pass pre-filtered `labels`/`counts` if you need a specific four.
 
 <LiveDemo
   label="an all-zero row (a class with no samples)"
@@ -133,24 +133,16 @@ specific four.
 
 <FourContexts slug="confusion-grid" />
 
-## Why this default
-
-The row view answers the question practitioners actually ask — "of the real cats, how many did we call dogs?" — so
-row-normalization is stated in the summary phrasing ("% of cats") and the denominator travels with every number.
-Accuracy is off by default and never rendered without the grid: the number may not leave its context. The diagonal
-accent is a shape (an inset stroke), and the ink ramp is identical for agreement and error cells — good and bad are
-positions, not colours, which is what keeps it readable under forced colours.
-
 ## Accessibility
 
-The accessible name states accuracy and the worst confusion, with the row-normalized denominator carried in the phrasing
-— the grid at the top of this page reads **"Accuracy 73%. Most confused: B predicted as C (43% of Bs)."** A perfect
-classifier reads **"Accuracy 100%. No confusion."**, and a class with no samples is named rather than hidden — the
-`cat`/`dog` example above reads **"Accuracy 80%. Most confused: cat predicted as dog (20% of cats). No dog samples."**
-The interactive entry roves the cells with the arrow keys (Home and End jump to the two ends of the diagonal),
-announcing each cell's actual and predicted class as a share of the actual class, with the tally it was computed from
-(**"Actual cat, predicted dog: 12% of cats (12)."**) — a row percentage cannot be inverted back to a count without the
-row total.
+The row view answers the question practitioners ask — "of the real cats, how many did we call dogs?" — so the summary
+phrasing states the row normalization ("% of cats") and the denominator travels with every number. The grid at the top
+of this page reads **"Accuracy 73%. Most confused: B predicted as C (43% of Bs)."** A perfect classifier reads
+**"Accuracy 100%. No confusion."**, and a class with no samples is named rather than hidden: the `cat`/`dog` example
+above reads **"Accuracy 80%. Most confused: cat predicted as dog (20% of cats). No dog samples."** The interactive entry
+roves the cells with the arrow keys (Home and End jump to the two ends of the diagonal), announcing each cell's actual
+and predicted class as a share of the actual class, with the tally it was computed from: **"Actual cat, predicted dog:
+12% of cats (12)."** A row percentage cannot be inverted back to a count without the row total.
 
 <InteractionNote slug="confusion-grid" />
 

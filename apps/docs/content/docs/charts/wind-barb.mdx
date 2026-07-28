@@ -1,14 +1,11 @@
 ---
 title: WindBarb
-description: >-
-  React wind barb chart — shaft angle for bearing and quantized WMO barbs for strength. Tiny accessible SVG microchart;
-  RSC-safe, static-only (no /interactive entry).
+description: WindBarb encodes bearing as the shaft angle and magnitude as counted WMO barbs.
 ---
 
-WindBarb answers "which way is it flowing and roughly how hard — in one character?". The shaft points along the bearing
-and the barbs count the magnitude: a half barb, a full barb, and a pennant are fixed quanta, so the glyph reads at a
-glance without a scale. Quantization is the honesty here, not a limitation — the per-barb quantum is stated next to
-every example.
+Southwest at 32, in one character. WindBarb points the shaft along the bearing and counts the magnitude in barbs: a half
+barb, a full barb, and a pennant are fixed quanta, calibrated to the chart's `step`, so counting them gives the
+magnitude without a scale to measure against. The per-barb quantum is stated next to every example below.
 
 <LiveDemo label="WindBarb" sizeOf="wind-barb">
   <WindBarb direction={225} magnitude={32} step={10} label="value" title="Wind" size={64} />
@@ -24,9 +21,8 @@ every example.
 
 ## Reading the barb
 
-WindBarb has no interactive mode — a single glyph carries the whole reading, so its accessible name is the full
-sentence. This gallery is the read-back key: each full barb is one `step`, a half barb is half a `step`, and a pennant
-is five.
+WindBarb has no interactive mode. A single glyph carries the whole reading, so its accessible name is the full sentence.
+This gallery is the read-back key: each full barb is one `step`, a half barb is half a `step`, and a pennant is five.
 
 <LiveDemo label="compass — the same magnitude at eight bearings" code={`<WindBarb direction={45} magnitude={35} />`}>
   <span style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap", justifyContent: "center" }}>
@@ -64,8 +60,8 @@ is five.
 
 ## When to use it
 
-- **Good for** — wind or current direction + strength, traffic flow, net migration, request routing.
-- **Avoid for** — exact magnitude (add `label`) or a time series (Sparkline).
+Use it for wind or current direction plus strength, traffic flow, net migration, and request routing. For an exact
+magnitude add `label`; for a time series use Sparkline.
 
 ## Sizing
 
@@ -125,24 +121,18 @@ is five.
   />
 </LiveDemo>
 
-`format`/`locale` reach the `label="value"` numeral and the accessible summary's magnitude together — the component
-builds one formatter and reuses it for both.
+`format`/`locale` reach the `label="value"` numeral and the accessible summary's magnitude together: the component
+builds one formatter and reuses it for both. A near-zero magnitude renders the conventional open circle for calm rather
+than a zero-length shaft, and a negative magnitude flips the bearing 180° with a dev warning.
 
 ## Four homes
 
 <FourContexts slug="wind-barb" />
 
-## Why this default
-
-Quantized barbs read faster and more honestly than a scaled arrow whose length you'd have to measure against a legend —
-the glyph is calibrated to its `step`, so counting barbs gives the magnitude directly. A near-zero magnitude renders the
-conventional open circle for calm rather than a zero-length shaft, and a negative magnitude flips the bearing 180° with
-a dev warning.
-
 ## Accessibility
 
-The accessible name is the full reading — **"Southwest (225°), magnitude 32."** Calm renders as **"Calm."** Because the
-glyph is self-describing, rows of barbs get their interaction from the host table or list, not from the mark.
+The accessible name is the full reading: **"Southwest (225°), magnitude 32."** Calm renders as **"Calm."** The glyph is
+self-describing, so rows of barbs get their interaction from the host table or list rather than from the mark.
 
 <InteractionNote slug="wind-barb" />
 

@@ -1,14 +1,13 @@
 ---
 title: NetFlow
-description: >-
-  React net flow chart — inflow vs outflow as a compact signed balance. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: NetFlow mirrors inflow and outflow on one shared scale and rides the net line on top.
 ---
 
-NetFlow answers "in versus out — and where does that leave us net?". Inflow is an area above a zero baseline, outflow is
-mirrored below it on **one shared magnitude scale** (never independently scaled to balance the picture), and the net
-line (`in − out`) rides on top to restore the precise decision value. Gross and net answer different questions; the cell
-answers both.
+Money came in, money went out, and the number you act on is what's left. NetFlow draws inflow as an area above a zero
+baseline and outflow mirrored below it on **one shared magnitude scale**, never independently scaled to balance the
+picture, with the net line (`in − out`) on top. Gross and net answer different questions, and one cell answers both.
+Both areas anchor at zero, the net line is a plain `in − out` and is never smoothed, and its sign is stated in the
+label's **text**, so direction is never carried by color alone.
 
 <LiveDemo label="NetFlow" sizeOf="net-flow">
   <NetFlow
@@ -44,9 +43,8 @@ answers both.
 
 ## When to use it
 
-- **Good for** — cash flow per account row, in vs out (signups vs churn) in a KPI card, any in-vs-out where the net is
-  the decision.
-- **Avoid for** — a single net series (Sparkline) or one period's split (Delta / SegmentedBar).
+Use it for cash flow per account row, in vs out (signups vs churn) in a KPI card, and any in-vs-out where the net is the
+decision. For a single net series use Sparkline; for one period's split use Delta or SegmentedBar.
 
 ## Sizing
 
@@ -122,7 +120,7 @@ answers both.
   />
 </LiveDemo>
 
-The net label and accessible summary both follow `format`/`locale` — 38000 reads "38.000" under `de-DE` rather than the
+The net label and accessible summary both follow `format`/`locale`: 38000 reads "38.000" under `de-DE` rather than the
 English "38,000".
 
 ## Edge cases
@@ -145,26 +143,20 @@ English "38,000".
   <NetFlow data={[{ in: -5, out: -3 }]} title="Bad reading" width={140} height={28} />
 </LiveDemo>
 
-A single period always renders as mirrored bars, never an area — an area drawn through one point would imply continuity
-the data doesn't have. `in`/`out` are magnitudes: a negative value is invalid input, not a reversed direction, so it's
-coerced to `0`. When every period's magnitudes are zero (all periods coerced or genuinely empty), NetFlow draws only the
-zero baseline — no areas, no bars, no net line — and the accessible name says so plainly: **"No flow across 1 period."**
+A single period always renders as mirrored bars, never an area, since an area drawn through one point would imply
+continuity the data doesn't have. `in`/`out` are magnitudes: a negative value is invalid input rather than a reversed
+direction, so it is coerced to `0`. When every period's magnitudes are zero (all periods coerced or genuinely empty),
+NetFlow draws only the zero baseline, with no areas, no bars, and no net line, and the accessible name says so plainly:
+**"No flow across 1 period."**
 
 ## Four homes
 
 <FourContexts slug="net-flow" />
 
-## Why this default
-
-Mirrored areas plus a net line, because gross and net answer different questions and a cell must answer both. Both
-directions share **one** scale — never independently scaled to make the picture look balanced — and both areas anchor at
-zero, so their extents are honest. The net line is a plain `in − out`, never smoothed, and its sign is stated in the
-label's **text** so direction is never carried by color alone.
-
 ## Accessibility
 
-The accessible name pairs the net with its gross and counts the healthy periods — **"Net +14 last period; in 57 vs out
-43; net positive 4 of 6 periods."**. The interactive entry steps the periods and announces inflow, outflow, and the
+The accessible name pairs the net with its gross and counts the positive periods: **"Net +14 last period; in 57 vs out
+43; net positive 4 of 6 periods."** The interactive entry steps the periods and announces inflow, outflow, and the
 signed net together.
 
 <InteractionNote slug="net-flow" />

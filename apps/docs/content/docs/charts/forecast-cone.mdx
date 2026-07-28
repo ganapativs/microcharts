@@ -1,15 +1,14 @@
 ---
 title: ForecastCone
-description: >-
-  React forecast cone chart — history plus a widening prediction cone for landing risk. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  ForecastCone draws history as a solid line and the forecast as prediction bands that widen over the horizon.
 ---
 
-ForecastCone answers "will we land where we need to?". History is a solid line; the forecast is a fan of prediction
-bands that **widen over the horizon**, with a **dashed** median — because an estimate should never render as fact. The
-whole point of a fan chart is visible confidence decay, so three rules are not style options: at most two bands (50/80 —
-a 95% band reads as false tail confidence at micro scale), the median is always dashed, and a cone that fails to widen
-is flagged, never quietly inflated.
+Q4 revenue is at 38 and the target is 45: ForecastCone shows the spread of where it lands. History is a solid line, and
+the forecast is a fan of prediction bands that **widen over the horizon** under a **dashed** median. Three of those
+choices are fixed rather than style options. At most two bands, 50 and 80, because a 95% band reads as false tail
+confidence at micro scale. The median is always dashed, so an estimate never renders as fact. And the cone must visibly
+widen: bands that narrow or stay flat are flagged, never quietly inflated.
 
 <LiveDemo label="ForecastCone" sizeOf="forecast-cone">
   <ForecastCone
@@ -47,9 +46,8 @@ is flagged, never quietly inflated.
 
 ## When to use it
 
-- **Good for** — a "will we hit Q4?" forecast in a KPI card, a projection with honest uncertainty in a sentence,
-  band-vs-target landing reads.
-- **Avoid for** — a forecast with no uncertainty (Sparkline) or one estimate's spread (GradedBand).
+Use it for a "will we hit Q4?" forecast in a KPI card, a projection with its uncertainty inside a sentence, and
+band-vs-target landing reads. For a forecast with no uncertainty use Sparkline; for one estimate's spread, GradedBand.
 
 ## Sizing
 
@@ -172,7 +170,7 @@ above reads "4.200 €", not "€4,200").
 <LiveDemo
   label="a cone that fails to widen"
   code={`// bands that narrow instead of widen render exactly as given — the
-// component flags this in dev, it never inflates the shape to look honest
+// component flags this in dev and renders the shape as given
 <ForecastCone
   data={[10, 11]}
   forecast={{ mid: [12, 13, 14], p80: [[9, 15], [10, 14], [11, 13]] }}
@@ -195,27 +193,20 @@ above reads "4.200 €", not "€4,200").
   />
 </LiveDemo>
 
-With no history the cone still draws from the first forecast point, and the accessible summary quietly drops its "from N
-today" clause instead of naming a value that doesn't exist. A cone whose bands narrow instead of widen is an
-input-honesty failure — it renders exactly as supplied (never auto-inflated to look right) and logs a one-time dev
-warning so the mistake surfaces in development rather than silently misleading a reader.
+With no history the cone still draws from the first forecast point, and the accessible summary drops its "from N today"
+clause instead of naming a value that doesn't exist. A cone whose bands narrow instead of widen is an input error:
+uncertainty that doesn't grow with the horizon misrepresents confidence decay. It renders exactly as supplied, never
+auto-inflated, and logs a one-time dev warning so the mistake surfaces in development.
 
 ## Four homes
 
 <FourContexts slug="forecast-cone" />
 
-## Why this default
-
-50/80 bands, not 95, because micro-scale tails invite overreading — a 95% band paints false confidence about the
-extremes. The median is dashed so it never reads as a committed number, and the cone must visibly widen: if the supplied
-bands don't (they narrow, or stay flat), that is an input-honesty failure the component surfaces rather than papering
-over — a forecast whose uncertainty doesn't grow with the horizon is misrepresenting confidence decay.
-
 ## Accessibility
 
-The accessible name states the median, the horizon interval, today's actual, and — with a target — whether the band
-clears it: **"Median forecast 42 by week 11 (80% between 33 and 55), from 38 today. The 80% band straddles the 50
-target."**. The interactive entry is region-aware: history points announce a value, forecast points announce the median
+The accessible name states the median, the horizon interval, and today's actual. With a `target` it adds whether the
+band clears it: **"Median forecast 42 by week 11 (80% between 33 and 55), from 38 today. The 80% band straddles the 50
+target."** The interactive entry is region-aware: history points announce a value, forecast points announce the median
 and 80% interval.
 
 <InteractionNote slug="forecast-cone" />

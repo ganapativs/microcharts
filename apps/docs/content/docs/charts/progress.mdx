@@ -1,12 +1,11 @@
 ---
 title: Progress
 description: >-
-  React progress chart — elapsed fraction with a percent label, step segments, and honest >100% handling. Tiny
-  accessible SVG microchart; RSC-safe static or /interactive.
+  Progress shows an elapsed fraction with the percent label as the datum, and keeps the true figure past 100%.
 ---
 
-Progress answers "how far along is this, exactly?". The bar gives the instant read; the percent label _is_ the datum — a
-bare bar is decoration. The track never shrinks for the label (the viewBox widens instead), so fractions stay comparable
+68% complete, or 3 of 5 steps: the label _is_ the datum, which is why it is on by default. The bar gives the instant
+read, and the track never shrinks to make room for the label — the viewBox widens instead — so fractions stay comparable
 down a table column.
 
 <LiveDemo label="Progress" sizeOf="progress">
@@ -23,8 +22,8 @@ down a table column.
 
 ## When to use it
 
-- **Good for** — KPI cards, table completion columns, step counts (`segments`).
-- **Avoid for** — icon-size slots (ProgressRing) or composition (SegmentedBar).
+Use it for KPI cards, table completion columns, and step counts (`segments`). For icon-size slots use ProgressRing; for
+composition use SegmentedBar.
 
 ## Sizing
 
@@ -89,24 +88,19 @@ than the English "68%".
   <Progress value={5} max={0} title="Unknown goal" width={160} height={22} />
 </LiveDemo>
 
-`max <= 0` (or a non-finite `value`/`max`) renders an empty track with no fill, and the label becomes an em dash ("—")
-rather than a fabricated number — the accessible name says "No data." instead of computing a meaningless ratio. A
-`value` of `0` renders a real, empty-but-present bar (not the no-data state), so "not started" and "unmeasurable" stay
-visually distinct.
+Past 100% the bar clamps at full and the label carries the true figure ("112%"). That is the one documented case where
+the bar and the number disagree, and the number wins. `max <= 0` (or a non-finite `value`/`max`) renders an empty track
+with no fill, and the label becomes an em dash ("—") rather than a fabricated number; the accessible name says "No
+data." instead of computing a ratio it can't compute. A `value` of `0` renders a real, empty-but-present bar rather than
+the no-data state, so "not started" and "unmeasurable" stay visually distinct.
+
+`max` — not `total` — is the deliberate exception across the library. Every other denominator prop names a discrete
+count (`total` on IconArray, TallyMarks, Honeycomb…), but Progress tracks a continuous goal that can be overshot, so it
+keeps the word for a ceiling.
 
 ## Four homes
 
 <FourContexts slug="progress" />
-
-## Why this default
-
-The percent label is on by default because it is the datum — the bar alone can't say "68%". Past 100% the bar clamps at
-full but the label carries the true figure ("112%"): the number and the bar only ever disagree in that one documented
-case, and the number wins. `max <= 0` renders an empty track and says "No data." rather than inventing a fraction.
-
-`max` — not `total` — is the deliberate exception across the library: every other denominator prop names a discrete
-count (`total` on IconArray, TallyMarks, Honeycomb…), but Progress tracks a continuous goal that can be overshot, so it
-keeps the word that says "ceiling," not "count."
 
 ## Accessibility
 

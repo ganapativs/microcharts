@@ -1,14 +1,13 @@
 ---
 title: PercentileTrace
 description: >-
-  React percentile trace chart — percentile fan or ribbon over ordered samples. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+  PercentileTrace traces one entity's percentile rank over time against the fixed bands of the pack.
 ---
 
-PercentileTrace answers "is this entity's standing rising or slipping inside the pack?". It traces one **percentile
-rank** over time on a scale **locked to 0–100**. Because the axis _is_ rank, the population is constant by definition —
-the middle-half (**p25–75**) and near-full (**p5–95**) bands are fixed fields, not estimates — so the only line on the
-chart is the entity itself, drifting through a known landscape.
+PercentileTrace traces one entity's **percentile rank** over time on a scale **locked to 0–100**. Because the axis _is_
+rank, the population is constant by definition: the middle-half (**p25–75**) and near-full (**p5–95**) bands are fixed
+fields, exact by construction rather than estimated from the traced series, and the only line on the chart is the entity
+itself. The axis is never truncated, which would hide how much headroom or floor is left.
 
 <LiveDemo
   label="PercentileTrace"
@@ -40,9 +39,9 @@ chart is the entity itself, drifting through a known landscape.
 
 ## When to use it
 
-- **Good for** — one player's or product's rank drifting over time, whether a standing has crossed into the top or
-  bottom of the pack, a percentile KPI where the population context matters.
-- **Avoid for** — a raw value over time (Sparkline) or one absolute number vs a target (Bullet / Delta).
+Use it for one player's or product's rank drifting over time, for whether a standing has crossed into the top or bottom
+of the pack, and for a percentile KPI where the population context matters. For a raw value over time use Sparkline; for
+one absolute number against a target use Bullet or Delta.
 
 ## Sizing
 
@@ -74,9 +73,9 @@ chart is the entity itself, drifting through a known landscape.
   </span>
 </LiveDemo>
 
-The endpoint dot carries **valence**: by default a rising standing is good, so it turns positive; set `positive="down"`
-when slipping _down_ the pack is the win (a support ticket's backlog rank, say). The line already encodes the direction,
-so the color is only a redundant cue — never the sole signal.
+The endpoint dot carries **valence**. By default a rising standing is good, so it turns positive; set `positive="down"`
+when slipping _down_ the pack is the win, as with a support ticket's backlog rank. The line already encodes direction,
+so color is a redundant cue and never the only signal.
 
 <LiveDemo
   label="positive='down'"
@@ -131,21 +130,14 @@ so the color is only a redundant cue — never the sole signal.
   />
 </LiveDemo>
 
-A single reading is a lone endpoint with no line to draw — it still reports its standing and holds the accessible-name
+A single reading is a lone endpoint with no line to draw. It still reports its standing and holds the accessible-name
 contract. Ranks outside 0–100 are clamped to the axis (a value of `102` reads as `p100`) and warn once in development.
-With a `locale`, the percentile label and every announced number follow that locale's own formatting — `de-DE` renders
+With a `locale`, the percentile label and every announced number follow that locale's own formatting: `de-DE` renders
 `p81,5` with a comma.
 
 ## Four homes
 
 <FourContexts slug="percentile-trace" />
-
-## Why this default
-
-The full 0–100 axis with fixed bands, because a percentile is a standing _within a population_ — truncating the axis
-would hide how much headroom or floor is left, and re-estimating the bands from the single traced series would be a
-fiction. The middle-half and near-full fields are exact by construction, so the chart shows one honest line over a
-landscape you can trust, never a thicket of competing series.
 
 ## Accessibility
 

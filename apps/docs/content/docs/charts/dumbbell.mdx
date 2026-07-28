@@ -1,12 +1,12 @@
 ---
 title: Dumbbell
-description: >-
-  React dumbbell chart — before/after or A/B pairs as dots linked on one scale. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: Dumbbell links a before dot and an after dot per row on one shared scale.
 ---
 
-Dumbbell answers "where did each row start and end?". The hollow dot is _before_, the filled dot is _after_ — direction
-is shape-coded, so it never relies on color alone. With `positive` the connector takes the valence token by direction.
+Dumbbell draws each row as a hollow dot at `from`, a filled dot at `to`, and a connector between them: a band that moved
+62,000 → 84,000 reads without a legend. Direction is shape-coded, so it never relies on color alone, and the pair
+renders the same whichever way the values run. With `positive` the connector takes the valence token by direction. Drop
+`positive` for ranges such as min→max or a confidence span, which have no valence to color.
 
 <LiveDemo label="Dumbbell" sizeOf="dumbbell">
   <Dumbbell data={[{ from: 62000, to: 84000 }]} title="Band move" style={{ width: 200, height: 28 }} />
@@ -22,8 +22,8 @@ is shape-coded, so it never relies on color alone. With `positive` the connector
 
 ## When to use it
 
-- **Good for** — salary bands, before/after per table row, ranges.
-- **Avoid for** — many categories where crossings matter (Slope) or the path between (Sparkline).
+Use it for salary bands, before/after per table row, and ranges. When you have many categories and the crossings matter,
+use Slope; when the path between the two ends matters, use Sparkline.
 
 ## Sizing
 
@@ -65,32 +65,25 @@ is shape-coded, so it never relies on color alone. With `positive` the connector
 ## Edge cases
 
 <LiveDemo
-  label="from === to — a single dot, honestly"
+  label="from === to — a single dot"
   code={`// from === to → a single dot, no connector
 <Dumbbell data={[{ from: 55, to: 55 }]} />`}
 >
   <Dumbbell data={[{ from: 55, to: 55 }]} title="Flat" style={{ width: 200, height: 24 }} />
 </LiveDemo>
 
-When a row's `from` equals its `to`, the connector is dropped and only one filled dot is drawn — never a
-hollow-and-filled pair sitting on top of each other pretending to be two points. The summary says **"No change at 55."**
-for a single row.
+When a row's `from` equals its `to`, the connector is dropped and one filled dot is drawn, rather than a hollow and a
+filled dot stacked on the same coordinate. The summary says **"No change at 55."** for a single row.
 
 ## Four homes
 
 <FourContexts slug="dumbbell" />
 
-## Why this default
-
-Hollow → filled reads as before → after without a legend, and renders identically whichever way the data runs —
-direction comes from the values, not the array order. For _ranges_ (min→max, confidence spans) the docs require dropping
-`positive`: a range has no valence, and coloring it green or red would invent one.
-
 ## Accessibility
 
-Single row: **"From 40 to 60, up 50%."**; a degenerate pair says **"No change at 55."**; multi-row leads with the
-largest change (**"2 rows. Largest change Paris, up 17%."**). The interactive entry roves rows with ↑/↓ (←/→ do the
-same), announcing each row's own pair — **"From 52 to 61, up 17%."**
+A single row reads **"From 40 to 60, up 50%."**, a degenerate pair reads **"No change at 55."**, and a multi-row chart
+leads with the largest change (**"2 rows. Largest change Paris, up 17%."**). The interactive entry roves rows with ↑/↓
+(←/→ do the same) and announces each row's own pair: **"From 52 to 61, up 17%."**
 
 <InteractionNote slug="dumbbell" />
 

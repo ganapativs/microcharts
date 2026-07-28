@@ -1,14 +1,13 @@
 ---
 title: BreathingDot
-description: >-
-  React breathing dot chart — ambient load as pulse rate, with a static reduced-motion twin. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: "Ambient system load as a colored dot with an offset ring, pulsing at a rate set by its band."
 ---
 
-BreathingDot answers "how loaded is the system right now?" as an ambient signal. In the interactive entry the dot
-**pulses** — slow and small when calm, fast and large when strained — so you feel the state without reading a number.
-The static frame is a real chart with zero JavaScript: a core dot colored by band, and a ring whose distance from the
-core is the level. This is a low-precision ambient read; for an exact figure reach for `Progress` or `Sparkline`.
+BreathingDot takes a single level between 0 and 1 and shows how strained a system is right now, as an ambient signal you
+can leave running in a corner of the interface. A core dot colored by band, and a ring whose distance from the core is
+the level: that is the static frame, and it renders with zero JavaScript. The interactive entry adds the pulse: slow and
+small when calm, fast and large when strained, so the state is legible without reading a number. This is a low-precision
+ambient read; for an exact figure use `Progress` or `Sparkline`.
 
 <LiveDemo label="BreathingDot" sizeOf="breathing-dot">
   <BreathingDot value={0.42} title="Load" size={40} />
@@ -24,19 +23,20 @@ core is the level. This is a low-precision ambient read; for an exact figure rea
 
 ## Motion, and reduced motion
 
-The pulse **is** the encoding — its rate and amplitude are snapped to three named bands (calm, elevated, strained), so
-the motion is readable, not decorative. This is the deliberate exception to the no-looping-animation rule, allowed only
-because the loop parameter (the rate) is the datum. The animation is gated on two things: it pauses when the dot scrolls
-off-screen (a shared observer), and it never runs at all under `prefers-reduced-motion` — reduced-motion readers get
-exactly the static frame, where the ring's distance from the core already carries the level. The band is announced
-through a polite live region only when it changes, never on every pulse.
+The pulse **is** the encoding: its rate and amplitude snap to three named bands (calm, elevated, strained). Three,
+because ambient motion supports about three discriminable states, and more would be false precision. This is the
+deliberate exception to the no-looping-animation rule, allowed because the loop parameter (the rate) is the datum. The
+animation is gated twice. It pauses when the dot scrolls off-screen (a shared observer), and it never runs at all under
+`prefers-reduced-motion`; reduced-motion readers get exactly the static frame, where the ring's distance from the core
+already carries the level. The band is announced through a polite live region only when it changes, never on every
+pulse.
 
 ## When to use it
 
-- **Good for** — an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node
-  load in a dense table.
-- **Avoid for** — an exact load figure (`Progress`, `Sparkline`), discrete events (`HeartbeatBlip`), or a trend over
-  time (`Sparkline`).
+Use it for an ambient "how strained is it right now" read, a live status dot in a header or KPI card, or per-node load
+in a dense table. For an exact load figure use `Progress` or `Sparkline`; for a trend over time, `Sparkline`. The
+boundary with `HeartbeatBlip` is the data shape: a continuous level is a BreathingDot, discrete arriving events are a
+HeartbeatBlip.
 
 ## Sizing
 
@@ -77,6 +77,9 @@ reserves. `fontSize` follows `size` unless you set it.
   <BreathingDot value={0.723} label="value" locale="de-DE" size={28} />
 </LiveDemo>
 
+An unknown value (`null` or `NaN`) turns the dot gray, drops its ring, and **never pulses**, so an unknown system never
+renders as a calm one.
+
 `format`/`locale` reach the `label="value"` percent numeral — always a whole percent, so a locale mostly changes digit
 shapes here, not grouping or decimals. The band words in the accessible summary ("calm" / "elevated" / "strained") stay
 in `strings` (`BreathingDotStrings`), not the number formatter.
@@ -84,14 +87,6 @@ in `strings` (`BreathingDotStrings`), not the number formatter.
 ## Four homes
 
 <FourContexts slug="breathing-dot" />
-
-## Why this default
-
-Three bands, because ambient motion supports about three discriminable states — more would be false precision. The band
-color is always doubled: by the ring offset in the static frame and by the pulse rate in motion, so the state never
-rests on color alone. When the value is unknown (`null` or `NaN`) the dot goes gray, drops its ring, and **never
-pulses** — an unknown system must not look calm. The boundary with `HeartbeatBlip`: a continuous level is a
-BreathingDot; discrete arriving events are a HeartbeatBlip.
 
 ## Accessibility
 

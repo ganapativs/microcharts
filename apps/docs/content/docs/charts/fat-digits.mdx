@@ -1,14 +1,13 @@
 ---
 title: FatDigits
-description: >-
-  React fat digits chart — a number whose weight encodes magnitude tier. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: FatDigits prints the exact number and encodes its magnitude tier as font weight.
 ---
 
-FatDigits answers "which numbers in this dense column are big, before I read them?" The numeral is always the exact
-value; font _weight_ is a second, redundant channel — five (or three) ordinal tiers mapped from your `domain` — so the
-large numbers pop preattentively as you scan a column. Weight is never the primary read: it is ordinal and coarse, and
-the number is right there.
+FatDigits renders the exact number and maps its magnitude to font _weight_: five ordinal tiers across your `domain`, or
+three with `tiers={3}`. The weight is a redundant second channel, so the large values in a dense column pop
+preattentively before you read any of them. Five is the most weight steps that stay discriminable at text size. Weight
+is never the primary read, since it is ordinal and coarse and the numeral is right there. Always pass a `domain`:
+without one a lone number has no tier to sit in and renders at the middle weight.
 
 <LiveDemo label="FatDigits" sizeOf="fat-digits">
   <span
@@ -32,9 +31,8 @@ the number is right there.
 
 ## When to use it
 
-- **Good for** — a dense numeric table column you scan for the big ones, a KPI number that should carry its own
-  magnitude, or an amount in a sentence.
-- **Avoid for** — trends (Sparkline), proportions (Progress), or comparisons (MiniBar).
+Use it for a dense numeric table column you scan for the big ones, a KPI number that should carry its own magnitude, or
+an amount in a sentence. For trends use Sparkline, for proportions Progress, and for comparisons MiniBar.
 
 ## Sizing
 
@@ -53,7 +51,11 @@ the number is right there.
   </span>
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — the numeral itself follows the locale's own grouping and decimal marks.
+`encode="digit"` weights each digit by its own magnitude instead, a redundancy that helps you scan long ids and amounts.
+The idea is adapted from FatFonts, which encodes magnitude as glyph ink area using a custom font; shipping a font would
+add a dependency, so weight tiers on the inherited font carry the ordinal here.
+
+`format` also takes `Intl.NumberFormatOptions`, and the numeral follows the locale's own grouping and decimal marks.
 
 <LiveDemo
   label="locale"
@@ -88,25 +90,17 @@ the number is right there.
   <FatDigits value={Number.NaN} domain={[0, 2100]} fontSize={18} title="Missing" />
 </LiveDemo>
 
-A non-finite value renders nothing (no numeral, no weight) and reports **"No data."** rather than guessing a tier.
+A non-finite value renders nothing, neither numeral nor weight, and reports **"No data."** rather than guessing a tier.
+On a font without many weights the browser snaps to the nearest available face, so fewer of the tiers stay visually
+distinct.
 
 ## Four homes
 
 <FourContexts slug="fat-digits" />
 
-## Why this default
-
-Value mode with five tiers is the default because scanning a column is the use case, and five is the most weight steps
-that stay discriminable at text size. Always pass a `domain` — without one a lone number has no tier to sit in, so it
-renders at the middle weight and means nothing. `encode="digit"` instead weights each digit by its own magnitude, a
-redundancy that helps scan long ids and amounts. This is adapted from the FatFonts idea: the research encodes magnitude
-as glyph ink area with a custom font; shipping a font would add a dependency, so weight tiers on the inherited font
-carry the ordinal instead — the numeral is always the exact value. On a font without many weights the browser snaps to
-the nearest available face, so fewer of the tiers stay visually distinct.
-
 ## Accessibility
 
-The accessible name is the exact value and its tier — **"1,204 — tier 3 of 5."** — and in digit mode just the number,
+The accessible name is the exact value and its tier: **"1,204 — tier 3 of 5."** In digit mode it is the number alone,
 since each digit carries its own weight. The interactive entry eases the weight to its new tier on variable fonts (it
 snaps otherwise) with no layout shift, and announces the value and tier through a polite live region.
 

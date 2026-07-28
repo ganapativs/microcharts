@@ -1,13 +1,12 @@
 ---
 title: MicroBox
-description: >-
-  React micro box chart — distribution summary as a word-sized box plot. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: MicroBox shows median, quartiles, and whisker range as a word-sized box plot in a table row.
 ---
 
-MicroBox answers "what are the p50 and spread of this metric?" — the five-number summary in a table row. Min-max
-whiskers by default (Tukey fences imply a normality assumption most product data doesn't meet); `tukey` mode exposes
-fence-breakers as dots.
+MicroBox prints a five-number summary in a table row: min, Q1, median, Q3, max. Whiskers run to the min and max by
+default, because Tukey fences imply a normality assumption most product data doesn't meet. `whiskers="tukey"` switches
+to those fences and exposes fence-breakers as dots, capped at 3 per side (the furthest). Precomputed `stats` whose
+values aren't monotonic are refused with a dev warning rather than drawn as a plausible-looking box.
 
 <LiveDemo label="MicroBox" sizeOf="micro-box">
   <MicroBox stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }} title="p95 latency" width={220} height={32} />
@@ -23,9 +22,8 @@ fence-breakers as dots.
 
 ## When to use it
 
-- **Good for** — latency percentile rows (p50/p95/p99), spread beside a stat — precomputed `stats` is the production
-  path.
-- **Avoid for** — distribution shape (HistogramStrip) or fewer than 5 observations (renders honest dots).
+Use it for latency percentile rows (p50/p95/p99) and spread beside a stat; precomputed `stats` is the production path.
+For distribution shape use HistogramStrip. Fewer than 5 observations render as dots rather than a box.
 
 ## Sizing
 
@@ -66,20 +64,18 @@ fence-breakers as dots.
   <MicroBox data={[7, 7, 7, 7, 7, 7]} title="All equal" width={220} height={32} />
 </LiveDemo>
 
+Under 5 observations MicroBox draws the raw values as dots, never a box built from too few of them. An all-equal series
+has a degenerate IQR: the box collapses to a 1-unit tick, and the domain pads ±1 around the value so the mark stays
+centered and visible.
+
 ## Four homes
 
 <FourContexts slug="micro-box" />
 
-## Why this default
-
-Never a box from fewer than 5 observations — dots at the raw values instead. Precomputed `stats` with non-monotonic
-values are refused with a dev warning: garbage in must not render a plausible-looking lie. Outlier dots cap at 3 per
-side (the furthest).
-
 ## Accessibility
 
-The accessible name is the five-number reading — **"Median 50.5, middle half 45.25 to 55.75, range 40 to 500."** The
-interactive entry roves a fixed 5-stop model (min → Q1 → median → Q3 → max), announcing each stat (**"Median: 42."**).
+The accessible name is the five-number reading: **"Median 50.5, middle half 45.25 to 55.75, range 40 to 500."** The
+interactive entry roves a fixed 5-stop model (min → Q1 → median → Q3 → max) and announces each stat (**"Median: 42."**).
 
 <InteractionNote slug="micro-box" />
 

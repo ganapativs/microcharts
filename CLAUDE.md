@@ -169,6 +169,26 @@ a real, compiled component (docs-as-tests): `describeSeries` output shown in doc
 The docs also publish machine surfaces — `/llms.txt`, `/llms-full.txt`, and `/catalog.json` — kept in sync with
 `package.json#exports` and gated by tests.
 
+## Writing voice (every prose surface: docs, README, site copy, error messages, PR/issue text)
+
+The 2026-07 voice pass set the register for the whole repo. Exemplars: `apps/docs/content/docs/index.mdx`,
+`quickstart.mdx`, `ai.mdx`, and the root `README.md` — match them. The rules:
+
+- Second person, present tense, active voice. One claim per sentence; short average, varied length. Lead with the
+  working example; explain after.
+- Say what a thing **is**. "X, not Y" contrast only where a reader would genuinely be confused, at most once per page.
+- Never anthropomorphize (charts don't whisper, compete, or tell one story — they render, clamp, announce, warn).
+  Replace virtue-words with the mechanism that earned them; "honest" survives only as the defined term "honest
+  encoding". No epigram closers, no doublets ("nothing to X, nothing to Y"), no chiasmus.
+- Em-dash budget ~1 per 3 paragraphs (list-lead and table dashes don't count). Cut "actually"; "exactly" only for
+  testable guarantees. American spelling (`color`) — except inside existing anchor slugs, which never change.
+- Headings state a task or an answer, never a mood. Meta descriptions: one plain page-specific sentence — multiline
+  frontmatter descriptions use `description: >-` (plain scalars with ": " break YAML; guarded by
+  `apps/docs/src/lib/frontmatter.test.ts`).
+- Precision is never the problem: keep every number, chart name, token, caveat, and literal generated-summary string
+  (many are CI-guarded byte-exact). One dry aside per page maximum — it must survive being read aloud to a senior
+  engineer.
+
 ## Working rules
 
 - Commit style: conventional commits, subject ≤ 50 chars, body only when the "why" isn't obvious.

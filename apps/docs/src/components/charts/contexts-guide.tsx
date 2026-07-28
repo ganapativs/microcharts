@@ -5,8 +5,8 @@ import { FourContextsView } from "./contexts-view";
 
 // Narrow module map for `<FourContexts />` on GUIDE pages — only the slugs a
 // guide actually renders (today just /docs uses it, slug="sparkline"), imported
-// one by one like `home/hero-modules.ts`. Sourcing the module here instead of
-// `registry.getModule()` keeps the 106-chart graph out of the guide route.
+// one by one. Sourcing the module here instead of `registry.getModule()` keeps
+// the 106-chart graph out of the guide route.
 // Keep in sync with FourContexts usages in content/docs/*.mdx (non-charts).
 const GUIDE_CONTEXT_MODULES: Record<string, ChartModule> = {
   sparkline: sparkline,

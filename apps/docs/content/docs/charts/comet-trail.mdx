@@ -1,14 +1,12 @@
 ---
 title: CometTrail
-description: >-
-  React comet trail chart — a path with a fading trail of recent positions. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: CometTrail marks the current value with a bright head dot and fades the recent positions behind it by age.
 ---
 
-CometTrail answers "where is the value now, and where has it just been?" A bright head dot marks the current value;
-behind it, a trail of recent points fades out with age, like a comet. In the interactive entry the head eases to each
-new value and the old head decays into the trail, so a live stream draws a comet and a stall goes still. Opacity encodes
-**age only** — the y position does the value — so the trail is recency context, never data you have to decode.
+CometTrail plots the current value as a bright head dot, with recent points trailing behind it and fading with age. In
+the interactive entry the head eases to each new value and the old head steps down into the trail, so a live stream
+draws a comet and a stall goes still. Opacity encodes **age only**; the y position carries the value. The trail is
+recency context, not data you have to decode.
 
 <LiveDemo label="CometTrail" sizeOf="comet-trail">
   <CometTrail data={[40, 45, 50, 55, 60, 65, 70, 72, 75, 78, 80, 84, 87]} title="Latency" width={90} />
@@ -24,28 +22,31 @@ new value and the old head decays into the trail, so a live stream draws a comet
 
 ## Motion, and reduced motion
 
-Motion happens **only on a data change** — there is no idle loop. When a new value arrives the head eases (~200 ms, the
-library's canonical strong ease-out) from its old position to the new one and the previous head steps down into the
-trail; a continuous stream produces the comet, a stalled stream simply goes still, which is itself the signal (staleness
-reads as stillness). The dot jumps to the truth, eased — it never simulates phantom positions between updates. Under
-`prefers-reduced-motion` the head repositions instantly (the static encoding is already complete), and the same is true
-off-screen — one shared viewport check means the ease only runs while the chart is actually in view.
+Motion happens **only on a data change**; there is no idle loop. When a new value arrives the head eases (~200 ms, the
+library's canonical strong ease-out) from its old position to the new one, and the previous head steps down into the
+trail. A continuous stream produces the comet; a stalled stream goes still, which is itself the signal. The head never
+simulates phantom positions between updates: it eases to each real value. Under `prefers-reduced-motion` the head
+repositions instantly, since the static encoding is already complete. The same holds off-screen — one shared viewport
+check means the ease only runs while the chart is in view.
 
 ## When to use it
 
-- **Good for** — a live price or metric with a little recency context, a realtime KPI that should show momentum, or
-  per-stream "where is it now" in a table.
-- **Avoid for** — the full history (`Sparkline`), an exact multi-point comparison (`Sparkline`, `DotPlot`), or discrete
-  events (`HeartbeatBlip`).
+Use it for a live price or metric with a little recency context, a realtime KPI that should show momentum, or per-stream
+"where is it now" in a table. For the full history or an exact multi-point comparison reach for `Sparkline` (or
+`DotPlot`); for discrete events, `HeartbeatBlip`.
 
 ## Sizing
 
 `width` and `height` are viewBox units that also set the rendered pixel box — they default to `60 × 16`, sized to sit in
 a table cell or beside a line of text. Omit them and drive the width from CSS to fill a column; the viewBox keeps the
 aspect ratio. `trail` controls how many recent points the tail carries, which is a density decision rather than a size
-one.
+one. It is capped at 20: past that the trail stops being a trail and becomes a sparkline, which is the better tool for
+the full history.
 
 ## Variants
+
+`label="last"` is on by default, so the head always prints its number. Changing `trail` gives you more or less recency
+context without changing the head read, because opacity encodes age and nothing else.
 
 <LiveDemo
   label="shorter trail, or no numeral"
@@ -76,26 +77,19 @@ one.
   <CometTrail data={[40, 55, 48, 62]} trail={20} title="Short stream" width={90} />
 </LiveDemo>
 
-Empty data draws just the frame, with "No data." as the summary. A single point has no trail to fade — just the head and
-"Now 52." A `trail` larger than the data never backfills or pads: the trail simply shows every point there is.
+Empty data draws just the frame, with "No data." as the summary. A single point has no trail to fade: the head alone,
+and "Now 52." A `trail` larger than the data never backfills or pads. It shows every point there is.
 
 ## Four homes
 
 <FourContexts slug="comet-trail" />
 
-## Why this default
-
-`label="last"` is on because a live value without its number is a mood, not a measurement — the whole point is knowing
-where it is now. Opacity encodes age and nothing else, so changing `trail` gives you more or less recency context
-without ever changing the head read. The trail is capped at 20 points: past that it stops being a trail and becomes a
-sparkline, which is the better tool for the full history.
-
 ## Accessibility
 
-The accessible name is the now-value and the recent trend — **"Now 62, rising over the last 3 updates."** — or just the
-value when there is a single point, as in the edge case above: **"Now 52."** Arrow keys step back through the trail ("3
-updates ago: 78.") and return toward now; motion is gated on `prefers-reduced-motion`, and the trail opacity is age,
-never a value you must read from fading.
+The accessible name is the now-value and the recent trend: **"Now 62, rising over the last 3 updates."** With a single
+point it is the value alone, as in the edge case above: **"Now 52."** Arrow keys step back through the trail ("3 updates
+ago: 78.") and return toward now. Motion is gated on `prefers-reduced-motion`, and no reading depends on decoding the
+fade.
 
 <InteractionNote slug="comet-trail" />
 

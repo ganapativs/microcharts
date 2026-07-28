@@ -1,13 +1,13 @@
 ---
 title: TokenConfidence
-description: >-
-  React token confidence chart — per-token confidence as inline emphasis in generated text. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  TokenConfidence underlines generated text by per-token confidence, in three tiers, leaving confident tokens unmarked.
 ---
 
-TokenConfidence answers "which parts of this generated text should I double-check?". The text itself is the chart:
-confidence becomes a typographic underline beneath each token, in three discrete tiers — confident tokens get no mark at
-all, so reading stays primary and only the uncertain words draw the eye.
+TokenConfidence underlines each token by how confident the model was. The text itself is the chart, and confidence
+resolves to three discrete tiers rather than a continuous ramp. Confident tokens get no mark at all, so reading stays
+primary and only the uncertain words draw the eye. The two flagged tiers differ in stroke as well as color: unsure is a
+solid underline, guessing a dotted one.
 
 <LiveDemo
   label="TokenConfidence"
@@ -64,8 +64,8 @@ all, so reading stays primary and only the uncertain words draw the eye.
 
 ## When to use it
 
-- **Good for** — LLM answers in chat or transcripts, flagging text to review.
-- **Avoid for** — numeric confidence auditing (use CalibrationStrip) or a single score (Delta).
+Use it for LLM answers in chat or transcripts, and for flagging text a reader should review. To audit exact
+probabilities use [CalibrationStrip](/docs/charts/calibration-strip); for a single score use Delta.
 
 ## Sizing
 
@@ -122,8 +122,8 @@ The text is the chart, so it inherits the surrounding font size — there is no 
   />
 </LiveDemo>
 
-Every token clears the `hi` threshold, so nothing is flagged — the sentence renders as plain, unmarked text. That
-absence of marks is the finding: nothing here needs a second look.
+Every token clears the `hi` threshold, so nothing is flagged and the sentence renders as plain, unmarked text. No marks
+means no word here needs a second look.
 
 <LiveDemo label="empty data" code={`<TokenConfidence data={[]} />`}>
   <TokenConfidence data={[]} style={{ fontSize: "1.05rem" }} />
@@ -135,20 +135,12 @@ An empty `data` array renders nothing and reports **"No tokens."** to assistive 
 
 <FourContexts slug="token-confidence" />
 
-## Why this default
-
-The tiers are discrete — confident, unsure, guessing — never a continuous gradient, because people calibrate
-categorically: a smooth colour ramp reads as noise, but "double-check this word" reads instantly. Confident tokens carry
-no mark at all, and the two flagged tiers differ in **stroke style** as well as colour — unsure is a solid underline,
-guessing a dotted one — so the tier never depends on colour alone. For auditing exact probabilities, reach for
-[CalibrationStrip](/docs/charts/calibration-strip) instead.
-
 ## Accessibility
 
-The accessible name is the tier tally — **"4 tokens: 1 confident, 1 unsure, 2 guessing."** The interactive entry gives
+The accessible name is the tier tally: **"4 tokens: 1 confident, 1 unsure, 2 guessing."** The interactive entry gives
 each flagged token a roving tab stop; ←/→ move between them (skipping confident tokens), announcing each one's tier and
-confidence. Hovering or focusing a flagged token also floats that reading over it as a chip (`guessing 0.22`) — the
-underline says a token is flagged, the chip says how badly. `readout={false}` drops the chip.
+confidence. Hovering or focusing a flagged token also floats that reading over it as a chip (`guessing 0.22`): the
+underline says the token is flagged, the chip gives its tier and number. `readout={false}` drops the chip.
 
 <InteractionNote slug="token-confidence" />
 

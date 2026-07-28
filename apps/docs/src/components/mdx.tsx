@@ -116,10 +116,8 @@ import { SpreadBand } from "@microcharts/react/spread-band";
 import { BiasStrip } from "@microcharts/react/bias-strip";
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { SparkGroup } from "@microcharts/react";
-import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
-import { AnnotationHostGallery, AnnotationHostShowcase } from "@/components/annotation-hosts";
-import { InstallCommand } from "@/components/ui/copy";
+import { AnnotationHostShowcase } from "@/components/annotation-hosts";
 import { PackageTabs } from "@/components/ui/package-tabs";
 import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
@@ -340,11 +338,8 @@ export function getMDXComponents(components?: MDXComponents) {
     OrbitStatus,
     SparkGroup,
     // docs building blocks
-    Instrument,
     LiveDemo,
-    AnnotationHostGallery,
     AnnotationHostShowcase,
-    InstallCommand,
     PackageTabs,
     StreamDemo,
     GrammarExplorer,
@@ -382,5 +377,3 @@ export function getMDXComponents(components?: MDXComponents) {
     ...components,
   } satisfies MDXComponents;
 }
-
-export const useMDXComponents = getMDXComponents;

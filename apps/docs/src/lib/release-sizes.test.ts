@@ -5,10 +5,9 @@ import { CEILINGS, CEILING_CLAIM, CURRENT_VERSION, RELEASE_SIZES } from "./relea
 import { SIZE } from "./docs-facts";
 
 /**
- * The v3 hero plots this series and its sentence quotes the ceiling. Both are
- * checkable claims, so they get checked: the newest point must be live data, the
- * version label must be the version the workspace is actually on, and the
- * ceiling the copy names has to still be above every measured max.
+ * Release size history: newest point must be live data, version label must match
+ * the workspace package, and the hero's "&lt; 7 kB" claim must stay above every
+ * measured max.
  */
 describe("release size history", () => {
   it("labels the current release as the version the workspace is on", () => {

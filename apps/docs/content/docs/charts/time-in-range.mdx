@@ -1,13 +1,12 @@
 ---
 title: TimeInRange
-description: >-
-  React time-in-range chart — how much of a period stayed inside its corridor, with in-range percent as the headline.
-  Tiny accessible SVG microchart; RSC-safe static or /interactive.
+description: TimeInRange shows how much of a period stayed inside its corridor, and which side the rest missed on.
 ---
 
-TimeInRange answers "how much of the period was the metric inside its acceptable corridor — and which side did it miss
-on?". Zones sit in a fixed semantic order — below, in, above — so the strip is read by position first and color second.
-The in-range percent is the one number that matters.
+72% in range, 9% below, 19% above. TimeInRange prints the share of a period that stayed inside its corridor and which
+side the rest missed on, with the in-range percent leading. Zones sit in a fixed order (below, in, above), so the strip
+reads by position first and color second. They are never sorted by magnitude, because which side a miss landed on is
+half the reading.
 
 <LiveDemo label="TimeInRange" sizeOf="time-in-range">
   <TimeInRange data={{ below: 9, in: 72, above: 19 }} title="Time in range" width={240} height={22} />
@@ -23,8 +22,8 @@ The in-range percent is the one number that matters.
 
 ## When to use it
 
-- **Good for** — SLO / uptime corridors, glucose-style time-in-range, thermal or budget bands.
-- **Avoid for** — ranking parts (SegmentedBar) or a single ratio (Progress).
+Use it for SLO and uptime corridors, glucose-style time-in-range, and thermal or budget bands. To rank parts use
+SegmentedBar; for a single ratio use Progress.
 
 ## Sizing
 
@@ -62,6 +61,8 @@ The in-range percent is the one number that matters.
   />
 </LiveDemo>
 
+Severity tiers are drawn in the same hue at greater ink weight, so a severe zone never depends on color alone.
+
 ## Edge cases
 
 <LiveDemo
@@ -81,21 +82,17 @@ The in-range percent is the one number that matters.
   <TimeInRange data={{ below: 3, in: 90, above: 7 }} label="all" title="Mostly in range" width={60} height={10} />
 </LiveDemo>
 
+Percent labels use largest-remainder rounding, so they always sum to 100 and the summary reads the same integers as the
+labels.
+
 ## Four homes
 
 <FourContexts slug="time-in-range" />
 
-## Why this default
-
-Zone order is semantic and immutable — it is never sorted by magnitude, because the position of a miss (too low vs too
-high) is half the reading. Severity tiers are drawn with the same hue at greater ink weight, so the strip never relies
-on color alone. Percent labels round with largest-remainder rounding so they always sum to 100, and the summary reads
-the same integers as the label.
-
 ## Accessibility
 
-The accessible name leads with the headline and then the misses — **"72% in range, 7% below, 15% above, 2% severe low,
-4% severe high."** The interactive entry roves the zones; each announces its share (**"in range: 72%."**).
+The accessible name leads with the headline, then the misses: **"72% in range, 7% below, 15% above, 2% severe low, 4%
+severe high."** The interactive entry roves the zones, and each announces its share (**"in range: 72%."**).
 
 <InteractionNote slug="time-in-range" />
 

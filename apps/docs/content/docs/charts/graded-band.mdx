@@ -1,13 +1,14 @@
 ---
 title: GradedBand
-description: >-
-  React graded band chart — a measured value seated inside qualitative grade bands. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  GradedBand shows how sure one number is, as nested central intervals graded by opacity around a median tick.
 ---
 
-GradedBand answers "how sure are we about this one number?". Nested central intervals are graded by opacity, with a
-median tick. It is **never** a bar from zero — a bar with an error bar induces edge-literalism bias, so this form exists
-precisely to avoid it. Opacity maps to probability level and nothing else.
+GradedBand prints one number's uncertainty as nested central intervals, graded by opacity, with a median tick. Opacity
+maps to probability level and nothing else. It is **never** a bar from zero: a bar with an error whisker induces
+edge-literalism bias, where the bar's end reads as the answer and the whisker as noise, and a graded band has no
+endpoint to over-read. Inner intervals are clipped inside their outer, so quantile rounding can never invert the
+nesting.
 
 <LiveDemo label="GradedBand" sizeOf="graded-band">
   <GradedBand
@@ -29,8 +30,8 @@ precisely to avoid it. Opacity maps to probability level and nothing else.
 
 ## When to use it
 
-- **Good for** — a forecast with its uncertainty, estimate-vs-actual in a KPI card, posterior summaries.
-- **Avoid for** — countable odds (QuantileDots) or a forecast over time (ForecastCone).
+Use it for a forecast with its uncertainty, estimate-vs-actual in a KPI card, and posterior summaries. For countable
+odds use QuantileDots; for a forecast over time, ForecastCone.
 
 ## Sizing
 
@@ -108,8 +109,8 @@ With a `locale`, the median label and the accessible summary follow that locale'
   <GradedBand data={[42, 42, 42, 42, 42, 42]} title="No spread" width={200} height={14} />
 </LiveDemo>
 
-The accessible name for that strip is **"Point value 42, no interval."** — a degenerate sample is announced as a point
-estimate, never dressed up as certainty about a range.
+The accessible name for that strip is **"Point value 42, no interval."** A degenerate sample is announced as a point
+estimate rather than as certainty about a range.
 
 <LiveDemo
   label="actual far outside the forecast"
@@ -133,18 +134,11 @@ estimate, never dressed up as certainty about a range.
 
 <FourContexts slug="graded-band" />
 
-## Why this default
-
-Nested central intervals graded by opacity — never a bar from zero. A bar with an error whisker invites reading the
-bar's end as "the answer" and the whisker as noise; the graded band has no endpoint to over-read, so opacity maps to
-probability and nothing else. Inner intervals are clipped inside their outer, so quantile rounding can never invert the
-nesting.
-
 ## Accessibility
 
-The accessible name states the median and the innermost + outermost intervals — for the forecast above that's **"Median
-22; 50% within 15–27, 95% within 8–36."** The interactive entry roves the band edges and announces each interval's
-coverage and bounds.
+The accessible name states the median with the innermost and outermost intervals. For the forecast above that is
+**"Median 22; 50% within 15–27, 95% within 8–36."** The interactive entry roves the band edges, announcing each
+interval's coverage and bounds.
 
 <InteractionNote slug="graded-band" />
 

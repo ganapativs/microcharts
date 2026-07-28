@@ -1,14 +1,13 @@
 ---
 title: RetentionCurve
-description: >-
-  React retention curve chart — cohort retention over age as a declining curve. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  RetentionCurve draws cohort retention as a step line locked to 0–100%, marking the period where the curve plateaus.
 ---
 
-RetentionCurve answers "do they stay — and does the curve plateau?". It draws a **step** line (cohort periods are
-discrete) on a scale **locked to 0–100%** — the full range is the honest frame for a share, so the floor is never
-truncated to manufacture drama. When the curve flattens, a dotted plateau marker appears; a peer curve can ride behind
-as a subordinate ghost.
+A cohort has run twelve weeks and the curve looks like it is flattening. RetentionCurve draws it as a **step** line
+(cohort periods are discrete) on a scale **locked to 0–100%**: the full range is the frame a share is read against, and
+a truncated floor would exaggerate or hide the drop. When the curve flattens, a dotted plateau marker appears. A
+`compare` series rides behind as a subordinate dashed ghost.
 
 <LiveDemo
   label="RetentionCurve"
@@ -40,9 +39,9 @@ as a subordinate ghost.
 
 ## When to use it
 
-- **Good for** — a cohort retention curve in a KPI card, your decay vs an industry benchmark, spotting whether retention
-  plateaus (or keeps leaking).
-- **Avoid for** — a continuous signal (Sparkline) or one-number retention (Progress / Delta).
+Use it for a cohort retention curve in a KPI card, your decay against an industry benchmark, and spotting whether
+retention plateaus or keeps leaking. For a continuous signal use Sparkline; for one-number retention use Progress or
+Delta.
 
 ## Sizing
 
@@ -51,10 +50,10 @@ as a subordinate ghost.
 ## Variants
 
 <LiveDemo
-  label="benchmark ghost + smooth"
+  label="compare ghost + smooth"
   code={`<RetentionCurve
   data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38]}
-  benchmark={[1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28]}
+  compare={[1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28]}
 />
 <RetentionCurve
   data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38]}
@@ -64,7 +63,7 @@ as a subordinate ghost.
   <span className="inline-flex flex-col gap-1.5">
     <RetentionCurve
       data={[1, 0.72, 0.55, 0.47, 0.42, 0.4, 0.39, 0.385, 0.382, 0.38]}
-      benchmark={[1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28]}
+      compare={[1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.285, 0.282, 0.28]}
       unit="week"
       title="vs industry"
       width={220}
@@ -80,6 +79,11 @@ as a subordinate ghost.
     />
   </span>
 </LiveDemo>
+
+The compare series stays a dashed ghost behind your curve rather than a second competing line. `curve="smooth"`
+interpolates between periods, which implies values that were never measured; the step default doesn't. The plateau
+marker appears only when the mean period-over-period change across the tail falls below half a point, never as
+decoration.
 
 ## Edge cases
 
@@ -122,26 +126,19 @@ as a subordinate ghost.
 </LiveDemo>
 
 A single period is too short for plateau detection (the window needs at least four finite points) and renders as a
-single step with no visible line. `data` accepts either a 0–1 fraction or a 0–100 percent series — whichever the max
-value implies — so a raw percent export renders identically to its fraction form without a manual divide. With a
+single step with no visible line. `data` accepts either a 0–1 fraction or a 0–100 percent series, whichever the max
+value implies, so a raw percent export renders identically to its fraction form without a manual divide. With a
 `locale`, the percent label and every announced number follow that locale's own formatting.
 
 ## Four homes
 
 <FourContexts slug="retention-curve" />
 
-## Why this default
-
-Step line plus the full 0–100% range, because retention is a discrete share, not a continuous signal — a smoothed curve
-implies between-period values that never existed, and a truncated floor exaggerates or hides the drop. The plateau
-marker appears **only** when the mean period-over-period change over the tail falls below half a point — never as
-decoration — and the benchmark stays a subordinate dashed ghost, never a second competing line.
-
 ## Accessibility
 
-The accessible name states the final retention and, when detected, the plateau — **"38% retained after 10 weeks; curve
-plateaus from week 6."**. The interactive entry steps the periods and announces each period's retention alongside the
-benchmark's.
+The accessible name states the final retention and, when one is detected, the plateau: **"38% retained after 10 weeks;
+curve plateaus from week 6."** The interactive entry steps the periods and announces each period's retention alongside
+the benchmark's.
 
 <InteractionNote slug="retention-curve" />
 

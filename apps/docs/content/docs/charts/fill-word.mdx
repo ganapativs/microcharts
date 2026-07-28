@@ -1,14 +1,13 @@
 ---
 title: FillWord
-description: >-
-  React fill word chart — a word whose glyphs fill with accent — the label is the bar. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: FillWord fills a word's own glyphs to a value fraction, so the label is the bar.
 ---
 
-FillWord answers "how far along is this named task?" by making the label _be_ the bar. A muted word is overlaid with an
-accent copy of itself, clipped to the value fraction of the word's own inked extent — so 50% visually bisects the word.
-The fill is a percentage of the glyphs you see, never of a hidden wider track. It trades some precision for a read that
-needs no separate label.
+FillWord makes the label the bar, so a named task shows its own progress: the word `uploading` renders with 62% of its
+glyph ink in accent and the rest muted. A muted word is overlaid with an accent copy of itself, clipped to the value
+fraction of the word's own inked extent, so 50% bisects the word. The fill is a percentage of the glyphs you see rather
+than of a hidden wider track. Glyph ink is uneven, so fine reads are ±5%: the fill edge lands between letters, not on an
+exact tick. Add `label="value"` for the percent alongside, or use Progress when precision is the point.
 
 <LiveDemo label="FillWord" sizeOf="fill-word">
   <FillWord word="uploading" value={0.62} title="Upload" fontSize={18} />
@@ -24,9 +23,9 @@ needs no separate label.
 
 ## When to use it
 
-- **Good for** — a labelled progress read in a sentence or cell, a sync/upload status where the label names the task, or
-  a quota/TTL where the word is the metric.
-- **Avoid for** — precise percentages (Progress), trends (Sparkline), or many parallel bars (MiniBar).
+Use it for a labeled progress read in a sentence or cell, a sync or upload status where the label names the task, or a
+quota or TTL where the word is the metric. For precise percentages use Progress, for trends Sparkline, and for many
+parallel bars MiniBar.
 
 ## Sizing
 
@@ -45,6 +44,9 @@ needs no separate label.
   </span>
 </LiveDemo>
 
+Fill is the default mode, since a word filling as a step completes covers most uses. `mode="drain"` empties the ink from
+the left as the value rises, which is the remaining-time read fill can't give you: TTLs, expiring sessions.
+
 ## Edge cases
 
 <LiveDemo
@@ -58,33 +60,25 @@ needs no separate label.
   </span>
 </LiveDemo>
 
-At 0% the word is entirely the muted track; at 100% it is entirely accent ink — both ends are honest limits of the same
-clip, not a special case.
+At 0% the word is entirely the muted track; at 100% it is entirely accent ink. Both ends are limits of the same clip
+rather than special cases in the code.
 
 <LiveDemo label="empty word" code={`<FillWord word="" value={0.5} />`}>
   <FillWord word="" value={0.5} fontSize={16} title="Empty" />
 </LiveDemo>
 
-An empty `word` renders nothing and reports **"No data."** — there is no label to be the bar.
+An empty `word` renders nothing and reports **"No data."**, since there is no label to be the bar.
 
 ## Four homes
 
 <FourContexts slug="fill-word" />
 
-## Why this default
-
-Fill (not drain) is the default because progress is the ninety-percent case — a word filling as a step completes.
-`mode="drain"` empties the ink from the left as the value rises, the remaining-time story that fill cannot tell (TTLs,
-expiring sessions). Because glyph ink is uneven, fine reads are ±5% — the fill edge lands between letters, not on an
-exact tick. When you need the number, add `label="value"` for the percent alongside, or reach for `Progress` when
-precision is the point.
-
 ## Accessibility
 
-The accessible name names the task and its state — **"storage: 40% complete."** — or, in drain mode, where `value` is
-the fraction already drained, **"expiring: 30% remaining."** for `value={0.7}`. An empty word reads "No data." The
+The accessible name gives the task and its state: **"storage: 40% complete."** In drain mode, where `value` is the
+fraction already drained, `value={0.7}` reads **"expiring: 30% remaining."** An empty word reads "No data." The
 interactive entry glides the ink edge with a reduced-motion-gated clip-path transition and announces changes through a
-polite live region, throttled to at most once a second so a streaming value never spams.
+polite live region, throttled to at most once a second so a streaming value doesn't spam a screen reader.
 
 <InteractionNote slug="fill-word" />
 

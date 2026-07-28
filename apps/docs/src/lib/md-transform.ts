@@ -134,10 +134,7 @@ const VISUAL_ONLY = [
   "ThroughputSummary",
   "CatalogFacts",
   "PackageTabs",
-  "Instrument",
   "ChartChooser",
-  "Reveal",
-  "Showcase",
 ];
 
 /**

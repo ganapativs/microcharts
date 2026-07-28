@@ -1,14 +1,13 @@
 ---
 title: ChangePoint
-description: >-
-  React change-point chart — regime breaks marked on a series with mean hairlines. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: ChangePoint marks where a series stepped to a new level, shading each regime and drawing its mean.
 ---
 
-ChangePoint answers "when did the behavior change level?". It shades alternating regimes, draws a per-regime mean, and
-marks the break where one level became another — because a spike means nothing without the regime it broke. The detector
-is a **documented heuristic, not statistics**; for production anomaly pipelines, pass your own break indices and the
-chart becomes pure annotation.
+An error rate sat at 30 for two weeks, then sat at 48. ChangePoint shades the two regimes, draws a mean hairline through
+each, and marks the break between them, so a reader gets "errors stepped up here" rather than "errors are high". The
+detector is a **documented heuristic, not statistics**: a two-segment mean-shift found by binary segmentation, accepted
+only when the split both cuts the variance enough and clears an effect-size threshold, so a constant series shows no
+break. Pass your own break indices and detection switches off — the chart becomes pure annotation.
 
 <LiveDemo
   label="ChangePoint"
@@ -43,9 +42,9 @@ chart becomes pure annotation.
 
 ## When to use it
 
-- **Good for** — context for an anomaly, an error rate / latency / cost that stepped to a new level, or annotating a
-  known deploy or incident (pass explicit `breaks`).
-- **Avoid for** — a gradual trend (Sparkline) or a plain time series with no regime question.
+Use it for context around an anomaly, an error rate / latency / cost that stepped to a new level, or annotating a known
+deploy or incident with explicit `breaks`. Skip it for a gradual trend (Sparkline) or a plain time series with no regime
+question.
 
 ## Sizing
 
@@ -77,6 +76,10 @@ chart becomes pure annotation.
     />
   </span>
 </LiveDemo>
+
+This is a mean-shift test, not a trend test. A steady ramp is still fitted as two regimes: the second variant above
+reports a shift around point 10. Pass `breaks` explicitly when you already know the series is trending rather than
+stepping.
 
 ## Edge cases
 
@@ -112,31 +115,21 @@ chart becomes pure annotation.
 </LiveDemo>
 
 With a `locale`, the summary and delta label format their numbers in that locale's own grouping and decimal marks.
-Auto-detection (`breaks="auto"`) only runs at 8 or more points — a six-point series with an obvious jump still renders
-as one flat, unbroken regime unless you pass `breaks` explicitly; this is deliberate, since a two-segment fit on that
-few points is mostly noise. A single point has no line to draw and no break to find; `data={[]}` renders the frame with
-the "no data" summary and no marks.
+Auto-detection (`breaks="auto"`) only runs at 8 or more points. A six-point series with an obvious jump still renders as
+one flat, unbroken regime unless you pass `breaks` explicitly, because a two-segment fit on that few points is mostly
+noise. A single point has no line to draw and no break to find; `data={[]}` renders the frame with the "no data" summary
+and no marks.
 
 ## Four homes
 
 <FourContexts slug="change-point" />
 
-## Why this default
-
-Context for every anomaly — the shading names the regime a value belongs to, and the break marks where the level truly
-changed, so a reader sees "errors stepped up here" rather than "errors are high". The detector is a **labelled
-heuristic**: a two-segment mean-shift found by binary segmentation, accepted only when the split both cuts the variance
-enough and clears an effect-size threshold, so a constant series shows no break. It is a mean-shift test, not a trend
-test: a steady ramp is still fitted as two regimes (the ramp variant above reports a shift around point 10), so pass
-`breaks` explicitly when you already know the series is trending rather than stepping. For anomaly pipelines that
-already know their breakpoints, `breaks={[…]}` turns the detection off and the chart becomes a faithful annotation.
-
 ## Accessibility
 
-The accessible name states the shift, the break, the regime means, and what happened after — **"Level shifted up 60%
-around point 14 (mean 30 → 48); stable since."** — or, with no detected shift, "No clear level shift across N points."
-The interactive entry steps the points with ←/→ (value + regime) and cycles the breaks with Tab, each announcing its
-mean shift.
+The accessible name states the shift, the break, the regime means, and what followed: **"Level shifted up 60% around
+point 14 (mean 30 → 48); stable since."** With no detected shift it reads "No clear level shift across N points." The
+interactive entry steps the points with ←/→ (value + regime) and cycles the breaks with Tab, each announcing its mean
+shift.
 
 <InteractionNote slug="change-point" />
 

@@ -1,14 +1,14 @@
 ---
 title: PercentileLadder
 description: >-
-  React percentile ladder chart — where a value sits on a percentile ladder. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+  PercentileLadder puts the chosen percentiles on one zero-anchored track, drawing the tail strongest.
 ---
 
-PercentileLadder answers "what does the tail look like — not just the median?". Ticks at the chosen percentiles sit on a
-zero-anchored track; graduated height and accent make the **tail** read strongest. Tick distances carry the story, so
-the origin is never cropped — and a log transform (for long latency tails) is never silent: an in-chart `log` tag
-renders when it applies.
+A service answers at 124.5 ms for half its requests and 1,661.13 ms for the slowest 1%. PercentileLadder puts both ticks
+on one zero-anchored track, where the distance between them is the reading. Graduated height and accent make the
+**tail** read strongest, because the tail is usually the SLO question. The origin is never cropped: cropping it would
+distort every gap. A log transform for long tails is never silent — `scale="log"` applies only when every sample is
+strictly positive, and an in-chart `log` tag renders whenever it does.
 
 <LiveDemo
   label="PercentileLadder"
@@ -45,8 +45,8 @@ renders when it applies.
 
 ## When to use it
 
-- **Good for** — latency SLOs in a sentence, the tail per endpoint in tables, payment-size spread.
-- **Avoid for** — the odds of an outcome (QuantileDots) or the full distribution shape (MicroBox).
+Use it for latency SLOs in a sentence, the tail per endpoint in tables, and payment-size spread. For the odds of an
+outcome use QuantileDots; for the full distribution shape use MicroBox.
 
 ## Sizing
 
@@ -159,7 +159,7 @@ renders when it applies.
   label="log falls back silently on any value ≤ 0"
   code={`// a single ≤ 0 sample would make a log axis a lie, so scale="log" falls
 // back to linear — no in-chart "log" tag renders, because the transform
-// wasn't actually applied
+// was never applied
 <PercentileLadder data={[0, 10, 100, 1000]} scale="log" />`}
 >
   <PercentileLadder data={[0, 10, 100, 1000]} scale="log" title="Falls back" width={120} height={14} />
@@ -177,16 +177,13 @@ renders when it applies.
   <PercentileLadder data={[10, 20, 30, 90, 900]} title="Too narrow for labels" width={40} height={14} />
 </LiveDemo>
 
+When every sample is identical the ladder collapses to a single tick instead of stacking overlapping ones. A single
+value at or below zero makes `scale="log"` fall back to linear, and no `log` tag renders, because the transform was not
+applied. Below 56 px wide the tick labels drop out rather than overlap.
+
 ## Four homes
 
 <FourContexts slug="percentile-ladder" />
-
-## Why this default
-
-The default linear track is zero-anchored — tick **distances** carry the story, so cropping the origin would distort
-every gap between percentiles. Height and accent grow toward the tail because the tail, not the median, is usually the
-SLO question. A log transform for long tails is never silent: it only applies when every sample is strictly positive,
-and an in-chart `log` tag renders whenever it does, so the axis is never misread as linear.
 
 ## Accessibility
 

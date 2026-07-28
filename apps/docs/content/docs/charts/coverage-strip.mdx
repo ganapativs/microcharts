@@ -1,13 +1,12 @@
 ---
 title: CoverageStrip
-description: >-
-  React coverage strip chart — what fraction of a range is covered, as a compact strip. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: CoverageStrip shows which slots in a series were measured and which are missing, drawing gaps hollow.
 ---
 
-CoverageStrip answers "can I trust this data — where was nothing measured?". Measured slots are filled; gaps are hollow
-with a hairline outline. The distinction between `null` (no measurement) and `0` (a measured zero) is the whole chart,
-and it is carried by **shape**, so it survives forced-colors and print. Nothing is ever interpolated across a gap.
+A sensor was meant to report 18 times and reported 10. CoverageStrip fills the measured slots and outlines the missing
+ones with a hairline, so you can see where nothing was measured before you trust the numbers. The distinction between
+`null` (no measurement) and `0` (a measured zero) is the whole chart, and **shape** carries it, so it survives
+forced-colors and print. Nothing is interpolated across a gap.
 
 <LiveDemo label="CoverageStrip" sizeOf="coverage-strip">
   <CoverageStrip
@@ -30,8 +29,8 @@ and it is carried by **shape**, so it survives forced-colors and print. Nothing 
 
 ## When to use it
 
-- **Good for** — data-quality cells beside a metric, sensor-uptime rows, trailing-gap detection.
-- **Avoid for** — magnitude over time (HeatStrip) or exact values (Sparkline).
+Use it for data-quality cells beside a metric, sensor-uptime rows, and trailing-gap detection. For magnitude over time
+reach for HeatStrip; for exact values, Sparkline.
 
 ## Sizing
 
@@ -85,8 +84,9 @@ and it is carried by **shape**, so it survives forced-colors and print. Nothing 
   />
 </LiveDemo>
 
-`locale` formats the coverage percentage in the gutter and the accessible summary — the strip above reads "56 %" (German
-percent spacing) instead of "56%". `format` shapes the measured values the interactive entry announces.
+`mode="intensity"` shades each filled slot by its value; `shape="round"` swaps the slot shape. `locale` formats the
+coverage percentage in the gutter and the accessible summary: the strip above reads "56 %" with German percent spacing
+instead of "56%". `format` shapes the measured values the interactive entry announces.
 
 ## Edge cases
 
@@ -107,23 +107,20 @@ percent spacing) instead of "56%". `format` shapes the measured values the inter
   <CoverageStrip data={[]} title="Empty" width={80} height={16} />
 </LiveDemo>
 
+An `expected` beyond `data.length` pads the tail with hollow slots, so a feed that stops reporting counts as coverage
+loss rather than dropping out of the denominator. A measured `0` is a filled cell like any other value; only `null` (no
+record) is hollow. A missing slot stays visibly empty instead of being smoothed into its neighbors, and an empty series
+renders the frame alone.
+
 ## Four homes
 
 <FourContexts slug="coverage-strip" />
 
-## Why this default
-
-Shape carries the presence/absence distinction, not just color, so it survives forced-colors and print. A measured `0`
-is a filled cell like any other value; only `null` (no record) is hollow — the two never look the same. `expected` lets
-a trailing shortfall count as coverage loss: a feed that simply stops reporting is the worst gap of all, so it isn't
-silently dropped from the denominator. Nothing is ever interpolated across a gap — a missing slot stays visibly empty
-rather than being smoothed into its neighbors.
-
 ## Accessibility
 
-The accessible name states how many slots were measured, the coverage percentage, and the longest gap — **"10 of 18
-slots measured (56 %); longest gap 4 slots."** An empty series states "No data." instead. The interactive entry roves
-slots with ←/→, announcing each one as a measured value or "no measurement".
+The accessible name states how many slots were measured, the coverage percentage, and the longest gap: **"10 of 18 slots
+measured (56 %); longest gap 4 slots."** An empty series states "No data." instead. The interactive entry roves slots
+with ←/→, announcing each one as a measured value or "no measurement".
 
 <InteractionNote slug="coverage-strip" />
 

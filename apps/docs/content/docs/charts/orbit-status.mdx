@@ -1,15 +1,14 @@
 ---
 title: OrbitStatus
 description: >-
-  React orbit status chart — cyclic status as position on an orbit — where we are in the cycle. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+  OrbitStatus carries a dependency's latency as orbit radius and its call rate as dash density, in one square glyph.
 ---
 
-OrbitStatus answers "how slow and how busy is this dependency right now?" in one small mark. The orbit radius is latency
-— a wider orbit is a slower service — and the orbit's dash density is the call rate, denser dashes meaning more calls.
-In the interactive entry the satellite orbits at a speed that mirrors that rate, so a busy service visibly spins faster.
-Both channels are deliberately low-precision ambient reads; for exact numbers, use a `Sparkline` for latency and a
-`Delta` or `MiniBar` for rate.
+OrbitStatus encodes two numbers in one glyph. The orbit radius is latency, so a wider orbit is a slower service, and the
+orbit's dash density is the call rate, so denser dashes mean more calls. In the interactive entry the satellite orbits
+at a speed that mirrors the rate. Both channels are low-precision ambient reads; for exact numbers use a `Sparkline` for
+latency and a `Delta` or `MiniBar` for rate. A lone orbit radius means nothing on its own, so pass explicit
+`latencyDomain` and `rateDomain` — the same steer as `FatDigits`.
 
 <LiveDemo label="OrbitStatus" sizeOf="orbit-status">
   <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} title="Payments API" size={40} />
@@ -26,16 +25,15 @@ Both channels are deliberately low-precision ambient reads; for exact numbers, u
 ## Motion, and reduced motion
 
 The satellite's angular speed is quantized to the same five steps as the static dash density, so the motion and the
-still frame decode identically — you learn nothing extra from watching, you just feel the rate. This is the deliberate
-idle-loop exception, allowed because the loop rate is the datum. It pauses off-screen and, under
-`prefers-reduced-motion`, does not spin at all: the dash density already carries the rate. The satellite's angular
-_position_ never means anything — only its speed does — so the docs say plainly not to read the angle.
+still frame decode identically. Rate lives in the dashes as well as the spin, which is what lets a paused satellite
+still carry both variables. This is the deliberate idle-loop exception, allowed because the loop rate is the datum. It
+pauses off-screen and, under `prefers-reduced-motion`, does not spin at all: the dash density already carries the rate.
+Read the satellite's speed, not its angular position; the position encodes nothing.
 
 ## When to use it
 
-- **Good for** — a live dependency health dot in a service table, latency and rate together in one small mark, or an
-  infra status glance.
-- **Avoid for** — exact latency (`Sparkline`), exact rate (`Delta`, `MiniBar`), or a trend over time (`Sparkline`).
+Use it for a live dependency health dot in a service table, for latency and rate together in one small mark, or for an
+infra status read. For exact latency or a trend over time use `Sparkline`; for exact rate use `Delta` or `MiniBar`.
 
 ## Sizing
 
@@ -103,26 +101,21 @@ set it.
   <OrbitStatus latency={90} rate={0} latencyDomain={[0, 500]} rateDomain={[0, 20]} size={40} />
 </LiveDemo>
 
+An unknown latency or rate renders gray, drops the satellite, and stops the spin, so an unreachable dependency never
+looks healthy. A rate of `0` draws a solid, dash-free orbit. At `threshold` the satellite doubles in size. The rate is
+quantized to five ordinal steps in both renderings (five dash counts and five angular periods), and radius and speed
+read from the same domains in the static and interactive frames.
+
 ## Four homes
 
 <FourContexts slug="orbit-status" />
 
-## Why this default
-
-The dash-density static encoding exists because a paused satellite says nothing — the still frame had to carry both
-variables or the chart would fail the survivor test, so rate lives in the dashes as well as the spin. The rate is
-quantized to five ordinal steps in both renderings — five dash counts and five angular periods — and radius and speed
-always come from the same domains in the static and interactive frames, so nothing drifts. A lone orbit radius is
-meaningless, so the docs insist on explicit `latencyDomain` and `rateDomain` — the same steer as `FatDigits`. At
-`threshold`, the satellite doubles and flags the summary, never relying on color alone. Unknown latency or rate goes
-gray and stops the spin: an unknown dependency must not look healthy.
-
 ## Accessibility
 
 The accessible name is both variables with units — **"240ms latency at 12 calls/s."** — plus "— above threshold" when
-the latency crosses `threshold`, or **"Latency unknown."** when a value is missing. The threshold state is carried by
-the satellite's size and the summary, never color alone; motion is gated on `prefers-reduced-motion`; and the live
-region announces threshold crossings only.
+the latency crosses `threshold`, or **"Latency unknown."** when a value is missing. The satellite's size and the summary
+carry the threshold state, never color alone. Motion is gated on `prefers-reduced-motion`, and the live region announces
+threshold crossings only.
 
 <InteractionNote slug="orbit-status" />
 

@@ -1,12 +1,14 @@
 ---
 title: ActivityGrid
 description: >-
-  React activity grid chart — contribution-graph intensity on a calendar or matrix. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+  "Contribution-graph intensity: ordered values on a grid of cells, shaded in four discrete steps over an empty track."
 ---
 
-ActivityGrid maps ordered values onto a grid of cells, each shaded by intensity. It's the contribution-graph shape:
-cadence, streaks, and seasonality, readable at a glance.
+Each cell is one slot in the series, shaded by intensity: the contribution-graph shape, read for cadence, streaks, and
+seasonality. There are five levels — a faint empty track plus four intensity steps — and the four steps share the exact
+opacity ramp HeatCell and HeatStrip use, so "how intense" means the same thing across the library. Level 0 is the empty
+track, because a slot with no activity is empty rather than a bottom-of-scale value. The steps are discrete bins, never
+a continuous gradient: a continuous ramp implies precision a handful of pixels can't deliver.
 
 <LiveDemo
   label="ActivityGrid"
@@ -34,9 +36,9 @@ const commitCounts = [ 0, 1, 2, 1, 3, 4, 2, 0, 1, 3, 2, 4, 3, 1, 0, 2, 4, 3, 2, 
 
 ## When to use it
 
-- **Good for** — daily activity, streaks and cadence, seasonality at a glance.
-- **Avoid for** — exact values, or precise comparison between two individual cells. Color intensity is deliberately
-  approximate; pair it with a number when precision matters.
+Use it for daily activity, streaks and cadence, and seasonality. Avoid it for exact values or for a precise comparison
+between two individual cells: color intensity is deliberately approximate, so pair it with a number when precision
+matters.
 
 ## Sizing
 
@@ -71,8 +73,8 @@ drive the width from CSS to fill a container; the viewBox keeps the grid's aspec
   </span>
 </LiveDemo>
 
-`shape` swaps the cell mark — same data, same levels, different voice: `"round"` for friendlier product surfaces,
-`"dot"` adds breathing room in dense strips.
+`shape` swaps the cell mark without changing the data or the levels. `"round"` softens the grid for product surfaces;
+`"dot"` adds space between cells in dense strips.
 
 <LiveDemo
   label="round vs dot"
@@ -99,7 +101,9 @@ drive the width from CSS to fill a container; the viewBox keeps the grid's aspec
 </LiveDemo>
 
 `anchor` aligns the grid to the real calendar: the first column pads down to the weekday of the given day (UTC), so rows
-read as weekdays — Monday first by default (`weekStart={0}` for Sunday).
+read as weekdays. Weeks start on Monday by default (`weekStart={1}`, matching the ISO calendar); `weekStart={0}`
+switches to Sunday without touching the data. Cells fill column-major — each column is a week, top to bottom — which is
+what makes the grid read as a calendar rather than an arbitrary sequence.
 
 <LiveDemo
   label="calendar-aligned"
@@ -135,23 +139,12 @@ read as weekdays — Monday first by default (`weekStart={0}` for Sunday).
 
 <FourContexts slug="activity-grid" />
 
-## Why this default
-
-Five levels (the empty track plus four intensity steps) matches the five steps HeatCell and HeatStrip default to, and
-the four intensity steps share their exact opacity ramp — one calibration means "how intense" reads the same across the
-library, and a reader never has to relearn a color scale per chart. Only level 0 differs: here it is a faint empty
-track, because an activity slot with no activity is genuinely empty, not a bottom-of-scale value. Levels are discrete,
-never a continuous gradient: a continuous ramp implies precision a handful of pixels can't actually deliver, and
-discrete bins are honest about that. Monday-first weeks (`weekStart={1}`) match the ISO calendar most teams already
-track cadence against; `weekStart={0}` switches to Sunday-first without touching the data. Column-major fill (each
-column is a week, top-to-bottom) is what makes the grid read as a calendar instead of an arbitrary sequence of cells.
-
 ## Accessibility
 
-Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of its total and peak — the
-information survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
-announcing each cell's value as you move. Give it an `anchor` and every cell is a dated day, so the readout names the
-date rather than a position ("Mar 2: 12").
+Intensity is a color channel, so ActivityGrid always pairs it with a numeric summary of its total and peak. That summary
+survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation, announcing each
+cell's value as you move. Give it an `anchor` and every cell is a dated day, so the readout names the date rather than a
+position ("Mar 2: 12").
 
 <InteractionNote slug="activity-grid" />
 

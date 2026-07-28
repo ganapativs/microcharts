@@ -1,14 +1,13 @@
 ---
 title: QuadrantDot
-description: >-
-  React quadrant dot chart — a focal 2-D point against peers on a split cross. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: QuadrantDot shows which quadrant of a 2×2 an item falls in, plotted against the field of peers around it.
 ---
 
-QuadrantDot answers "where does this item sit in the 2×2 — against the field?". A focal dot is placed by 2-D position, a
-hairline cross marks the split (the domain midpoints by default, always overridable but **never hidden**), and the peers
-show as tiny muted ghosts. The read is quadrant **membership** first; exact position is the second read — which is why
-it lives at glyph scale.
+QuadrantDot places a focal dot by its 2-D position, marks the split with a hairline cross, and draws the peers as tiny
+muted ghosts. The split defaults to the domain midpoints and takes an override, but it is never hidden: it renders
+wherever the split truly is. The first read is which quadrant the item sits in against the field; exact position is the
+second read, which is what keeps the chart legible at 24×24. At that size the axes carry no labels, so pass `xLabel`,
+`yLabel`, and a `title` — the accessible name is doing the naming.
 
 <LiveDemo label="QuadrantDot" sizeOf="quadrant-dot">
   <QuadrantDot
@@ -49,9 +48,9 @@ it lives at glyph scale.
 
 ## When to use it
 
-- **Good for** — the classic prioritization 2×2 (one cell per initiative in a table), an effort-vs-impact read in a KPI
-  card, any "which quadrant, against the field" decision.
-- **Avoid for** — a full scatter plot (MicroScatter) or a single ranked list (MiniBar).
+Use it for the classic prioritization 2×2 (one cell per initiative in a table), an effort-vs-impact read in a KPI card,
+and any "which quadrant, against the field" decision. For a full scatter plot use MicroScatter; for a single ranked list
+use MiniBar.
 
 ## Sizing
 
@@ -138,30 +137,22 @@ it lives at glyph scale.
   <QuadrantDot data={{ x: Number.NaN, y: 5 }} title="Bad input" width={72} height={72} />
 </LiveDemo>
 
-When every field value on one axis equals the focal's, that axis's domain collapses to a point — the split line on that
+When every field value on one axis equals the focal's, that axis's domain collapses to a point. The split line on that
 axis is dropped rather than drawn at an arbitrary spot, while the other axis's split still renders. A peer exactly on
 top of the focal is still counted (distance 0) and sorts first in the interactive entry's nearest-first order. A
-non-finite focal position draws no marks at all — no cross, no tint, no peers — and carries the "No data." summary, the
+non-finite focal position draws no marks at all: no cross, no tint, no peers. It carries the "No data." summary, the
 same degenerate path an empty series takes elsewhere in the library.
 
 ## Four homes
 
 <FourContexts slug="quadrant-dot" />
 
-## Why this default
-
-24×24, because the 2×2 is a **position** read, not a scatter plot — you want to know the quadrant at a glance, and the
-exact coordinates only when you look closer. The split is data, not decoration: it renders wherever the split truly is
-and is always overridable, never invisible. With the axes unlabeled at glyph size, the `title` and `summary` are
-load-bearing — skipping them is the one named anti-pattern for this chart, so always pass `xLabel`, `yLabel`, and a
-`title`.
-
 ## Accessibility
 
-The accessible name states the focal position and the axis-relative quadrant — **"Impact 9, effort 3 — in the
-high-impact, low-effort quadrant."** — adding how crowded that quadrant is when a `field` is given, or your own words
-via `quadrants={["quick win", …]}`. The interactive entry starts on the focal, then cycles peers nearest-first — each
-announced with its coordinates and quadrant.
+The accessible name states the focal position and the axis-relative quadrant: **"Impact 9, effort 3 — in the
+high-impact, low-effort quadrant."** With a `field` it adds how crowded that quadrant is, and
+`quadrants={["quick win", …]}` replaces the generated quadrant names with your own. The interactive entry starts on the
+focal, then cycles the peers nearest-first, announcing each one's coordinates and quadrant.
 
 <InteractionNote slug="quadrant-dot" />
 

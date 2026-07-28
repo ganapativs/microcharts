@@ -1,12 +1,13 @@
 ---
 title: Horizon
-description: >-
-  React horizon chart — banded horizon encoding for dense magnitude over time. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  Horizon folds a wide-range series into bands so magnitude reads as layer opacity in a row a few pixels tall.
 ---
 
-Horizon answers "what happened across this wide-range series — in a 14-pixel row?" The series is cut into bands and
-folded: layer opacity carries magnitude, so extremes stay visible at heights where a sparkline would flatten into noise.
+Horizon prints a whole wide-range series in a 14-pixel row. It cuts the series into bands and folds them, so layer
+opacity carries magnitude and extremes stay visible at heights where a sparkline would flatten into noise. Two folds is
+the default, because two read approximately without training; three trade learnability for density, so reserve them for
+ranges that genuinely span them.
 
 **How to read it** — every band rises from the row's bottom edge, positive or negative; darker means farther from the
 baseline, not which direction. Above-baseline values shade in the accent color, below-baseline in the negative color, so
@@ -31,8 +32,8 @@ direction is never color-alone even though both fold upward the same way.
 
 ## When to use it
 
-- **Good for** — dense monitoring rows (dozens stacked), wide-range series in tight cells.
-- **Avoid for** — first-glance audiences (folding needs a key), or a few rows with room (Sparkline).
+Use it for dense monitoring rows (dozens stacked) and wide-range series in tight cells. Folding needs a key, so skip it
+for first-glance audiences; with a few rows and room to spare, use Sparkline.
 
 ## Sizing
 
@@ -69,6 +70,8 @@ direction is never color-alone even though both fold upward the same way.
     height={22}
   />
 </LiveDemo>
+
+`baseline` is authored, never inferred: a fold origin is a claim about what "normal" means.
 
 <LiveDemo
   label="locale"
@@ -115,19 +118,13 @@ the same way; the folded geometry never changes.
 </LiveDemo>
 
 Negative values take the negative token and fold from the same bottom edge as positive values (the default
-`mode="mirror"`) — both directions get darker as they move away from the baseline, so "denser" always means "farther
-from typical," never "which sign." Identical values across the whole row still render as a solid block rather than
-vanishing, keeping "flat" visibly distinct from "no data."
+`mode="mirror"`). Both directions get darker as they move away from the baseline, so density means distance from the
+baseline rather than sign. Identical values across the whole row still render as a solid block rather than vanishing,
+keeping "flat" visibly distinct from "no data."
 
 ## Four homes
 
 <FourContexts slug="horizon" />
-
-## Why this default
-
-Two folds is the default because it needs no training to read approximately; three folds trade learnability for density
-and should be reserved for ranges that genuinely span them. The `baseline` is authored, never inferred — a fold origin
-is a claim about what "normal" means.
 
 ## Accessibility
 

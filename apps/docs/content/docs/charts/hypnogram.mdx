@@ -1,13 +1,13 @@
 ---
 title: Hypnogram
-description: >-
-  React hypnogram chart — categorical step strip of which discrete state held over time. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: Hypnogram draws which discrete state held over time as flat runs joined by right-angle steps.
 ---
 
-Hypnogram answers "which discrete state was the system in over time, and how choppy were the transitions?". It refuses
-interpolation — there are no diagonals, ever — because a state is a fact that holds until the next one, not a sample of
-a continuum a line chart can slope between.
+Hypnogram draws which state a system was in over time: each state is a flat run at its own height, left to right, joined
+by right-angle steps. There are no diagonals: a state holds until the next one, so a sloped line would invent readings
+that never happened. Run lengths and the number of steps carry how choppy the period was. The `states` order sets the
+vertical axis, and order is meaningful. Pass it explicitly for ordinal states like sleep depth or incident severity; for
+nominal states with no rank, `mode="lanes"` keeps the axis from implying one.
 
 <LiveDemo
   label="Hypnogram"
@@ -62,8 +62,8 @@ a continuum a line chart can slope between.
 
 ## When to use it
 
-- **Good for** — sleep stages, deploy / machine / incident state over time.
-- **Avoid for** — continuous signals (Sparkline) or a single current state (StatusDot).
+Use it for sleep stages and for deploy, machine, or incident state over time. For continuous signals use Sparkline; for
+a single current state use StatusDot.
 
 ## Sizing
 
@@ -163,26 +163,21 @@ a continuum a line chart can slope between.
   />
 </LiveDemo>
 
-A single entry holds its state across the whole domain — one flat run, and the summary names it directly — **"1 state,
-no transitions; Deep throughout."** — rather than describing a one-point chart. A state present in the data but missing
-from an explicit `states` order is never dropped: it's appended as its own row (with a dev-only console warning), so the
-strip always accounts for every state it's given.
+A single entry holds its state across the whole domain. That is one flat run, and the summary names it directly: **"1
+state, no transitions; Deep throughout."** A state present in the data but missing from an explicit `states` order is
+never dropped. It is appended as its own row, with a dev-only console warning, so the strip accounts for every state it
+is given.
 
 ## Four homes
 
 <FourContexts slug="hypnogram" />
 
-## Why this default
-
-Right-angle steps with an explicit `states` order are the clinically proven read. Order is meaningful — for ordinal
-states (sleep depth, incident severity) pass it explicitly; for nominal states with no rank, use `mode="lanes"` so the
-vertical axis never implies one. Any smoothing or easing of the step corners would be a lie about the data, so the
-entrance is a left-to-right clip reveal of the finished trace — the steps themselves are never interpolated.
-
 ## Accessibility
 
-The accessible name summarises the shape — **"3 transitions across 4 states; longest run Awake."** The interactive entry
-roves the runs; each announces its state and span (**"Light, from 8 to 22."**).
+The accessible name states the shape: **"3 transitions across 4 states; longest run Awake."** The interactive entry
+roves the runs, and each announces its state and span (**"Light, from 8 to 22."**). Its entrance is a left-to-right clip
+reveal of the finished trace; smoothing or easing the step corners would change what the data says, so the steps are
+never interpolated.
 
 <InteractionNote slug="hypnogram" />
 

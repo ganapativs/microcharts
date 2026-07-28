@@ -1,13 +1,11 @@
 ---
 title: Waveform
-description: >-
-  React waveform chart — signal shape compressed by max-per-bucket at word width. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: Waveform compresses a signal with max-per-bucket so a single spike survives at word width.
 ---
 
-Waveform answers "what is the shape of a high-frequency signal — where are its spikes and silences — at word width?". It
-compresses with max-per-bucket, never a mean, so a single spike survives the squeeze to a sparkline width. The peak is
-disclosed in the accessible summary.
+Waveform buckets a high-frequency signal and draws each bucket's maximum, never its mean, so one spike survives the
+squeeze down to sparkline width. Averaging would erase the spike someone is looking for. The auto domain is symmetric at
+±max|data|, and the peak is disclosed in the accessible summary.
 
 <LiveDemo
   label="Waveform"
@@ -43,8 +41,8 @@ disclosed in the accessible summary.
 
 ## When to use it
 
-- **Good for** — voice-memo / audio scrubbers, high-frequency log or request volume.
-- **Avoid for** — exact values (Sparkline) or categorical state (Hypnogram).
+Use it for voice-memo and audio scrubbers, and for high-frequency log or request volume. For exact values use Sparkline;
+for categorical state use Hypnogram.
 
 ## Sizing
 
@@ -72,7 +70,10 @@ disclosed in the accessible summary.
   <Waveform data={[0.2, 0.5, 0.82, 0.4, 0.1]} locale="de-DE" title="Localized peak" width={90} height={22} />
 </LiveDemo>
 
-With a `locale`, the announced peak follows that locale's own decimal mark — "0,82" in German, not "0.82".
+With a `locale`, the announced peak follows that locale's own decimal mark: "0,82" in German, not "0.82".
+
+Comparing loudness across rows needs an explicit shared `domain`. Without one, each chart fits its own max, and quiet
+data is rescaled to look loud.
 
 ## Edge cases
 
@@ -85,25 +86,18 @@ With a `locale`, the announced peak follows that locale's own decimal mark — "
 </LiveDemo>
 
 A single sample renders as one bucket, top-to-bottom. All-zero data renders every bucket at the shared 0.4-unit "silent"
-tick height, and the accessible summary says **"Silent."** rather than reporting a zero peak. A `null` in the data
-behaves the same as a true zero for any bucket where it's the only sample — `maxPerBucket` skips non-finite values when
-picking the bucket's peak, and a bucket with nothing finite in it falls back to that same silence tick, so a genuine gap
-and real silence render identically here (unlike Sparkline's line break).
+tick height, and the accessible summary says **"Silent."** rather than reporting a zero peak. A `null` behaves the same
+as a true zero for any bucket where it is the only sample: `maxPerBucket` skips non-finite values when picking the
+bucket's peak, and a bucket with nothing finite in it falls back to that same silence tick. A genuine gap and real
+silence therefore render identically here, unlike Sparkline's line break.
 
 ## Four homes
 
 <FourContexts slug="waveform" />
 
-## Why this default
-
-Bars with max-per-bucket are the only compression that can't hide an incident — averaging a bucket would erase the very
-spike someone is looking for. The auto domain is symmetric ±max|data|, which reads shape honestly and discloses the peak
-in the summary; for absolute loudness comparison across rows, pass an explicit shared `domain` so quiet data is never
-silently rescaled to look loud.
-
 ## Accessibility
 
-The accessible name discloses the peak — **"Peak 0.398 at 50% through 200 samples."** Pure silence reads **"Silent."**
+The accessible name discloses the peak: **"Peak 0.398 at 50% through 200 samples."** Pure silence reads **"Silent."**
 rather than blank. The interactive entry roves the buckets, announcing each bucket's position and peak amplitude.
 
 <InteractionNote slug="waveform" />

@@ -1,13 +1,11 @@
 ---
 title: EventTimeline
-description: >-
-  React event timeline chart — sparse events on a compact timeline you can scan inline. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: EventTimeline places instants as diamonds and durations as rects on one compact row.
 ---
 
-EventTimeline answers "what happened when, and for how long?" — uptime windows, on-call shifts, release spans and
-incident points on one row. Diamonds mark instants, rects mark durations: the type distinction is a shape, so it
-survives 12 px where color coding wouldn't.
+An API had a freeze window overnight, nine healthy hours, an incident at 11:00, and a release at 20:00. EventTimeline
+puts all of it on one row: diamonds mark instants, rects mark durations. The type distinction is a shape, so it survives
+12 px where color coding wouldn't. Duration is length on a linear time axis, never log or compressed time.
 
 <LiveDemo
   label="EventTimeline"
@@ -50,8 +48,8 @@ survives 12 px where color coding wouldn't.
 
 ## When to use it
 
-- **Good for** — per-service uptime rows, on-call shifts and release windows in cards.
-- **Avoid for** — more than ~12 items, or aggregated durations (MiniBar of totals).
+Use it for per-service uptime rows, and for on-call shifts and release windows in cards. Avoid it past roughly 12 items;
+for aggregated durations use a MiniBar of the totals.
 
 ## Sizing
 
@@ -164,21 +162,20 @@ survives 12 px where color coding wouldn't.
   />
 </LiveDemo>
 
+A span that crosses the domain boundary is cut flat at the edge rather than rescaled to fit, so you see the part inside
+the window and nothing more. An item that falls entirely outside the domain is excluded, with a dev-only console
+warning. Spans that overlap render translucent in data order; that translucency is a legibility device rather than an
+encoding, and the exact intervals are in the announcements.
+
 ## Four homes
 
 <FourContexts slug="event-timeline" />
 
-## Why this default
-
-Duration is length on a linear time axis — never log or compressed time. Items that overlap the window edge are clipped
-flat (honest partial visibility); fully-outside items are excluded with a dev warning. Overlapping spans render
-translucent in data order — a legibility device, not an encoding; the exact intervals live in the announcements.
-
 ## Accessibility
 
-The accessible name is the coverage read — **"2 spans covering 46% of the window; 0 events."** — where coverage merges
-intervals first, so overlaps never double-count. The interactive entry cycles items chronologically: spans announce
-**"Freeze: Jun 3, 01:00 to Jun 3, 05:00 — 4h."**, instants **"Incident: Jun 3, 11:00."**
+The accessible name is the coverage read: **"2 spans covering 46% of the window; 0 events."** Coverage merges intervals
+first, so overlaps never double-count. The interactive entry cycles items chronologically: spans announce **"Freeze: Jun
+3, 01:00 to Jun 3, 05:00 — 4h."**, instants **"Incident: Jun 3, 11:00."**
 
 <InteractionNote slug="event-timeline" />
 

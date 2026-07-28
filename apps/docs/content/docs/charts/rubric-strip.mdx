@@ -1,14 +1,14 @@
 ---
 title: RubricStrip
-description: >-
-  React rubric strip chart — weighted criteria against a shared pass target. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  RubricStrip scores each criterion as a bar whose length is the score and whose thickness is its share of the weight.
 ---
 
-RubricStrip answers "how did this thing score per criterion — with each criterion's importance visible — without a fake
-composite number?". Each bar's length is its score and its thickness is its weight share, so the things that matter most
-are literally the biggest marks. There is no total bar, and none may be added — the type exists to resist collapsing
-quality into one number.
+RubricStrip encodes each criterion twice: bar length is the score, bar thickness is that criterion's share of the total
+weight. A heavy criterion scoring poorly therefore carries more ink than a light one scoring well, which a table of the
+same numbers hides. There is no total bar and none can be added; the summary names the highest and lowest criterion
+instead of a weighted average, because one number throws away the structure. A `target` draws a single pass line across
+every row.
 
 <LiveDemo
   label="RubricStrip"
@@ -50,8 +50,8 @@ quality into one number.
 
 ## When to use it
 
-- **Good for** — model / code-review scorecards, weighted vendor comparison.
-- **Avoid for** — a single criterion (Bullet) or parts of a whole (SegmentedBar).
+Use it for model and code-review scorecards and for weighted vendor comparison. For a single criterion use Bullet; for
+parts of a whole use SegmentedBar.
 
 ## Sizing
 
@@ -99,22 +99,18 @@ quality into one number.
   <RubricStrip data={[{ label: "Overall fit", score: 0.83 }]} title="Single criterion" width={200} height={16} />
 </LiveDemo>
 
+A score outside the domain clamps to a full-length bar rather than overflowing the track, and the component logs a dev
+warning. Omit `weight` and every criterion carries the same thickness, which is what the unweighted variant above shows.
+
 ## Four homes
 
 <FourContexts slug="rubric-strip" />
 
-## Why this default
-
-Weight-as-thickness keeps "importance" visible where a table hides it — a light criterion that scores well can't
-visually outweigh a heavy one that scores poorly. The summary names the extremes, never a weighted average, because the
-whole point is that a single number throws away the structure. A `target` draws one honest pass line across every row
-instead.
-
 ## Accessibility
 
-The accessible name names the extremes — **"4 criteria; highest Lint (1), lowest Docs (0.5)."** The interactive entry
-roves the criteria, announcing each one's score and its weight share of the total (**"Coverage: 0.78, weight 29% of
-total."**).
+The accessible name reports the count and the extremes: **"4 criteria; highest Lint (1), lowest Docs (0.5)."** The
+interactive entry roves the criteria, announcing each one's score and its weight share of the total (**"Coverage: 0.78,
+weight 29% of total."**).
 
 <InteractionNote slug="rubric-strip" />
 

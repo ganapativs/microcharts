@@ -1,14 +1,14 @@
 ---
 title: ParetoStrip
 description: >-
-  React pareto strip chart — sorted causes with a cumulative reference line. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+  ParetoStrip ranks causes by size and marks where their cumulative share crosses the threshold.
 ---
 
-ParetoStrip answers "what should we fix first?". It sorts the categories descending and overlays a **cumulative-share
-line on a fixed 0–100% scale** that spans the full height and is never rescaled to steepen the curve. The bars up to the
-threshold crossing are accent — the **vital few** — and the rest are muted, because the chart's one job is to say where
-to stop reading. 80% is a working reference, not a law, and `Other` never re-enters the ranking.
+Give it a list of causes with their counts and ParetoStrip sorts them descending, then overlays a **cumulative-share
+line on a fixed 0–100% scale** that shows how few of them you would have to fix to account for most of the total. That
+scale spans the full plot height and is never rescaled, so the curve can't be steepened. Bars up to the threshold
+crossing are accent — the **vital few** — and the rest are muted, which is how the chart says where to stop reading. The
+80% default is a reference you can move or turn off, not a law.
 
 <LiveDemo label="ParetoStrip" sizeOf="pareto-strip">
   <ParetoStrip
@@ -41,9 +41,9 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
 
 ## When to use it
 
-- **Good for** — a "fix these three" read in a KPI card, incident causes or support tags in a tab header, any long-tail
-  composition where a few dominate.
-- **Avoid for** — a plain ranking (MiniBar) or parts of a single whole (SegmentedBar).
+Use it for a "fix these three" read in a KPI card, incident causes or support tags in a tab header, and any long-tail
+composition where a few categories dominate. For a plain ranking use MiniBar; for parts of a single whole use
+SegmentedBar.
 
 ## Sizing
 
@@ -97,6 +97,9 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
   </span>
 </LiveDemo>
 
+`maxItems` rolls the tail into `Other`, drawn at its true size but always last and never counted among the vital few. If
+`Other` towers over the top cause, `maxItems` is set too aggressively.
+
 ## Edge cases
 
 <LiveDemo
@@ -139,20 +142,12 @@ to stop reading. 80% is a working reference, not a law, and `Other` never re-ent
 
 <FourContexts slug="pareto-strip" />
 
-## Why this default
-
-The accent stops at the crossing, because the chart's one job is to say where to stop reading. The cumulative scale is
-fixed 0–100% and shares the full plot height — never rescaled to make the curve look steeper — and 80% is a
-**reference** default you can move or turn off, never a claimed law. `Other` is rendered honestly at its true size but
-always last and never counted among the vital few; if it towers over the top cause, that usually means `maxItems` is set
-too aggressively.
-
 ## Accessibility
 
 The accessible name states the vital-few count and its cumulative — **"Top 1 of 3 causes account for 90% of
 incidents."** — or, when there is no threshold (or no ranked cause reaches it), the top cause and its share, as in the
 rolled-up demo above: **"Timeouts leads at 39%."** The interactive entry steps the bars and announces each bar's share
-and running cumulative; **T** jumps to the crossing bar.
+and running cumulative. **T** jumps to the crossing bar.
 
 <InteractionNote slug="pareto-strip" />
 

@@ -1,14 +1,14 @@
 ---
 title: GardenGrid
-description: >-
-  React garden grid chart — many small states as a garden of cells in one glance. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: GardenGrid encodes an activity rhythm as dot area in a single ink, so it survives grayscale and print.
 ---
 
-GardenGrid answers "what's the rhythm of activity over time?" the way ActivityGrid does — but with a single ink. Instead
-of color, dot **area** carries a five-step ordinal, so the rhythm reads in grayscale and print where a color heatmap
-would collapse. The radius is √-quantized so perceived area steps evenly. A zero cell is a hairline ring (present, but
-quiet); a `null` cell is nothing at all, because "missing" is not "zero".
+GardenGrid shows the rhythm of activity over time the way ActivityGrid does, in a single ink. Dot **area** carries a
+five-step ordinal, so the rhythm reads in grayscale and print where a color heatmap would collapse. The radius is
+√-quantized so perceived area steps evenly; a linear radius map would exaggerate the highs quadratically. A zero cell is
+a hairline ring, present but quiet, and a `null` cell is nothing at all, since print and grayscale otherwise lose the
+zero-versus-missing distinction color grids get for free. The steps are ordinal rather than values: `ActivityGrid` is
+the color twin when exact values matter.
 
 <LiveDemo label="GardenGrid" sizeOf="garden-grid">
   <GardenGrid
@@ -29,9 +29,9 @@ quiet); a `null` cell is nothing at all, because "missing" is not "zero".
 
 ## When to use it
 
-- **Good for** — a contribution or activity rhythm you print or read in grayscale, a per-repo or per-team activity
-  strip, or any calendar-shaped intensity where color isn't available.
-- **Avoid for** — exact per-cell values (ActivityGrid with hover, or HeatStrip) or trends (Sparkline).
+Use it for a contribution or activity rhythm you print or read in grayscale, a per-repo or per-team activity strip, or
+any calendar-shaped intensity where color isn't available. For exact per-cell values use ActivityGrid with hover or
+HeatStrip; for trends, Sparkline.
 
 ## Sizing
 
@@ -80,19 +80,11 @@ quiet); a `null` cell is nothing at all, because "missing" is not "zero".
 
 <FourContexts slug="garden-grid" />
 
-## Why this default
-
-Rings for zero are the default because print and grayscale lose the zero-versus-missing distinction that color grids get
-for free — this chart exists for exactly that medium, so it makes "present but quiet" visible. The radius is √-quantized
-so **area** carries the ordinal; a linear radius map would exaggerate the highs quadratically. The steps are ordinal,
-not values — the interactive entry announces a cell's step rather than implying a precise read, and `ActivityGrid` is
-the color twin when exact values matter.
-
 ## Accessibility
 
-The accessible name summarizes the rhythm — **"12 periods; peak 34, 10 active."** The interactive entry walks the grid
-in 2-D with the arrow keys (or hover), announcing each cell as its ordinal step — **"3 of 21: 8, step 2 of 5."** — never
-a false-precise value, since dot area reads to a step, not a number.
+The accessible name summarizes the rhythm: **"12 periods; peak 34, 10 active."** The interactive entry walks the grid in
+2-D with the arrow keys (or hover), announcing each cell as its ordinal step — **"3 of 21: 8, step 2 of 5."** — because
+dot area reads to a step rather than a number.
 
 <InteractionNote slug="garden-grid" />
 

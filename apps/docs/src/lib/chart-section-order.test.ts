@@ -12,6 +12,9 @@ import { describe, expect, it } from "vitest";
 // ("Motion, and reduced motion", "Reading the barb", "The state contract"), and
 // several do. What it may not do is reshuffle the ten it shares with every other
 // page, or drop one.
+// "Why this default" was dissolved in the 2026-07 voice pass: its
+// behavior-relevant rationale folded into each page's opener or Edge cases,
+// so it is no longer part of the shared shape.
 const CANONICAL = [
   "Install",
   "Try it",
@@ -20,7 +23,6 @@ const CANONICAL = [
   "Variants",
   "Edge cases",
   "Four homes",
-  "Why this default",
   "Accessibility",
   "Props",
 ] as const;

@@ -1,14 +1,14 @@
 ---
 title: CalibrationStrip
-description: >-
-  React calibration strip chart — predicted vs observed probability against the identity diagonal. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  "Predicted against observed probability per bin, read against the identity diagonal, with low-support bins faded."
 ---
 
-CalibrationStrip answers "when this model says 70%, does it happen 70% of the time — and where is there enough data to
-even ask?". Each bin is a dot at its predicted probability and its observed frequency, read against the identity
-diagonal, with a quiet support lane underneath. Bins with too little data render open and faded, so a confident-looking
-dot is never backed by three samples.
+CalibrationStrip draws one dot per bin at its predicted probability and its observed frequency, read against the
+identity diagonal, with a support lane underneath. Bins with too little data render open and faded, so a
+confident-looking dot is never backed by three samples. The support lane is always on and the count can't be disabled: a
+reliability read without support disclosure is the failure this chart exists to prevent. There is deliberately no
+single-number calibration score (ECE) rendered or announced, because one number would hide the per-bin structure.
 
 <LiveDemo label="CalibrationStrip" sizeOf="calibration-strip">
   <CalibrationStrip
@@ -40,9 +40,8 @@ dot is never backed by three samples.
 
 ## When to use it
 
-- **Good for** — classifier reliability / trust, probability-forecast auditing.
-- **Avoid for** — a single accuracy number (Delta) or where the errors go
-  ([ConfusionGrid](/docs/charts/confusion-grid)).
+Use it for classifier reliability and trust, and for probability-forecast auditing. For a single accuracy number use
+Delta; for where the errors go use [ConfusionGrid](/docs/charts/confusion-grid).
 
 ## Sizing
 
@@ -155,16 +154,12 @@ bins." — the locale's own decimal mark, not "0.7".
   />
 </LiveDemo>
 
+`minSupport` defaults to `max(10, 2% of total)`. Bins below it render open and faded, and the summary counts them, so a
+strip where every bin is sparse reads as one with no reliable bins rather than as a calibrated model.
+
 ## Four homes
 
 <FourContexts slug="calibration-strip" />
-
-## Why this default
-
-Dots plus an always-on support lane because "how sure" and "based on how much" must travel together — a reliability read
-without support disclosure is exactly the failure this chart exists to prevent. Low-support bins are drawn open and
-faded and the count is never disableable. There is deliberately no single-number calibration score (ECE) rendered or
-announced: one number would hide precisely the per-bin structure the chart exists to show.
 
 ## Accessibility
 

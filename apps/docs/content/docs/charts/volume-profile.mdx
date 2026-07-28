@@ -1,14 +1,12 @@
 ---
 title: VolumeProfile
-description: >-
-  React volume profile chart — activity by price level, turned perpendicular to the trend axis. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: VolumeProfile shows where activity concentrated by level, accenting the point of control.
 ---
 
-VolumeProfile answers "at which _level_ did activity concentrate — not when?". It is a histogram turned perpendicular to
-the usual trend axis: the level runs vertically and bars extend horizontally by the mass of activity at each level. The
-modal level — the point of control, or POC — is accented, and the value area (the levels holding most of the activity)
-is shaded.
+Activity piled up somewhere in the 140s, and a time axis cannot tell you which level. VolumeProfile is a histogram
+turned perpendicular to the usual trend axis: the level runs vertically, and bars extend horizontally by the mass of
+activity at each level. The modal level, the point of control or POC, is the only accented mark. The value area (the
+levels holding most of the activity) is shaded behind it.
 
 <LiveDemo
   label="VolumeProfile"
@@ -49,8 +47,8 @@ weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 1
 
 ## When to use it
 
-- **Good for** — volume-at-price, level-of-activity distributions, load by tier.
-- **Avoid for** — a time series (Sparkline) or when the timing is what matters.
+Use it for volume-at-price, level-of-activity distributions, and load by tier. For a time series, or whenever the timing
+is what matters, use Sparkline.
 
 ## Sizing
 
@@ -86,6 +84,9 @@ weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 1
   />
 </LiveDemo>
 
+`valueArea` defaults to `0.7`, and the summary states the fraction it used. It is a stated convention, not an implied
+confidence interval.
+
 ## Edge cases
 
 <LiveDemo
@@ -109,16 +110,9 @@ weight: 18 }, { level: 142, weight: 26 }, { level: 144, weight: 20 }, { level: 1
 
 <FourContexts slug="volume-profile" />
 
-## Why this default
-
-A perpendicular histogram because "where" is a different question from "when", and no time-axis chart can answer it. The
-value area is a stated convention — `valueArea` defaults to `0.7`, and the fraction is stated in the summary — not an
-implied confidence interval. The modal bin is the only accented mark, because "where did activity pile up" is the one
-question the shape is built to answer.
-
 ## Accessibility
 
-The accessible name states where activity concentrates — **"Activity concentrates at 142.33 (POC); 70% within
+The accessible name states where activity concentrates: **"Activity concentrates at 142.33 (POC); 70% within
 140.33–145.67."** (the right-aligned demo's 5-level profile, default 12 bins). An even distribution reads **"Activity is
 evenly spread."** The interactive entry roves the levels with ↑/↓, announcing each level's activity mass alongside its
 share and flagging the POC.

@@ -1,35 +1,21 @@
 ---
 title: MCP server
 description:
-  Add @microcharts/mcp to Claude Desktop, Claude Code, Cursor, or VS Code and your assistant can find the right
-  word-sized chart, read its exact props, and render a finished SVG with real alt text — over stdio, on your machine.
+  A local stdio MCP server that lets an assistant find a chart type, read its exact props, and render it to SVG with the
+  generated alt text attached.
 ---
 
-The rest of this site is about a model **writing** microcharts: a grammar it emits, a catalog it reads. This page is
-about a model **calling** them. `@microcharts/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server
-that exposes three tools — find a chart for a question, get its exact props, render it to SVG — backed by the real
-library, not by a description of it.
+`@microcharts/mcp` is a [Model Context Protocol](https://modelcontextprotocol.io) server that gives an assistant three
+tools: find a chart for a question, get its exact props, render it to SVG. It calls the real library, so what comes back
+is the mark the component draws.
 
 It runs on your machine over stdio. Nothing is hosted, there is no key, and no data leaves the process your client
 spawns.
 
-## Emit, read, call
-
-Three ways a model can end up with a correct chart. They stack; none replaces the others.
-
-| Verb     | Surface                                                    | The model gets                                        |
-| -------- | ---------------------------------------------------------- | ----------------------------------------------------- |
-| **Emit** | [The grammar](/docs/ai#the-grammar)                        | A fenced block your app parses into a component.      |
-| **Read** | [`/llms.txt`](/llms.txt), [`/catalog.json`](/catalog.json) | The true API, so the code it writes compiles.         |
-| **Call** | This server                                                | A rendered mark, plus the sentence that describes it. |
-
-Emit is for a surface you control, where you can map a block to a component. Call is for a surface you don't — a chat
-reply, a terminal, an email draft — where the model needs the finished artwork rather than an instruction to draw it.
-
 ## Add it to your client
 
-The package ships a `microcharts-mcp` binary, so every client below spawns the same thing. No install step of your own —
-`npx` fetches it on first run.
+The package ships a `microcharts-mcp` binary, so every client below spawns the same thing. There is no install step of
+your own: `npx` fetches it on first run.
 
 <Tabs items={["Claude Desktop", "Claude Code", "Cursor", "VS Code"]}>
 
@@ -96,17 +82,30 @@ In `.vscode/mcp.json`:
 </Tabs>
 
 <Callout type="info">
-  Node 20 or newer. The server brings its own copy of `@microcharts/react` — you do not need microcharts installed to
+  Node 20 or newer. The server brings its own copy of `@microcharts/react`, so you do not need microcharts installed to
   use it, and it does not touch a project that already has it.
 </Callout>
 
+## Emit, read, call
+
+Three ways a model can end up with a correct chart. They stack; none replaces the others.
+
+| Verb     | Surface                                                    | The model gets                                        |
+| -------- | ---------------------------------------------------------- | ----------------------------------------------------- |
+| **Emit** | [The grammar](/docs/ai#the-grammar)                        | A fenced block your app parses into a component.      |
+| **Read** | [`/llms.txt`](/llms.txt), [`/catalog.json`](/catalog.json) | The true API, so the code it writes compiles.         |
+| **Call** | This server                                                | A rendered mark, plus the sentence that describes it. |
+
+Emit is for a surface you control, where you can map a block to a component. Call is for a surface you don't control — a
+chat reply, a terminal, an email draft — where the model needs the finished mark rather than an instruction to draw one.
+
 ## The three tools
 
-They're designed to be called in order, but each stands alone.
+Call them in order, or one at a time.
 
 ### `find_microchart`
 
-You know the question; you don't know which of the 106 chart types answers it. Rank them.
+Rank the 106 chart types against a question written in plain language.
 
 ```json title="call"
 { "question": "is the error budget burning down?", "limit": 3 }
@@ -131,13 +130,13 @@ You know the question; you don't know which of the 106 chart types answers it. R
 ]
 ```
 
-`why` is not a generated explanation — it's the `bestFor` phrase that actually matched, quoted back. An optional
-`dataShape` argument filters to the shape you already have.
+`why` is the `bestFor` phrase that matched, quoted back rather than generated. An optional `dataShape` argument filters
+to the shape you already have.
 
 ### `get_microchart`
 
 Everything needed to wire one chart: import paths, its own props plus the
-[shared grammar](/docs/quickstart#the-shared-grammar), best/avoid guidance, a copy-runnable example — and `sample`, that
+[shared grammar](/docs/quickstart#the-shared-grammar), best/avoid guidance, a copy-runnable example, and `sample` — that
 same example as JSON props.
 
 ```json title="call"
@@ -157,9 +156,9 @@ same example as JSON props.
 }
 ```
 
-The two example forms exist for two different readers. `example.code` is JSX, for a human to paste. `sample` is JSON,
-for the model to hand straight to `render_microchart` — every chart takes its own shape, and guessing between
-`number[]`, `{ label, value }[]`, and `{ open, high, low, close }[]` is exactly where a model goes wrong.
+The two example forms serve two readers. `example.code` is JSX, for a human to paste. `sample` is JSON, for the model to
+hand straight to `render_microchart`. Every chart takes its own shape, and guessing between `number[]`,
+`{ label, value }[]`, and `{ open, high, low, close }[]` is where a model goes wrong.
 
 ### `render_microchart`
 
@@ -180,15 +179,15 @@ Render to a self-contained SVG plus its generated alt text — for a surface tha
 }
 ```
 
-That's this, as a real component on this page — the same geometry, the same summary:
+Here is that same call as a component on this page, with the same geometry and the same summary:
 
 <Sparkline data={[132, 148, 141, 165, 159, 182]} width={160} height={40} title="Weekly revenue" />
 
-The default `format: "svg"` embeds the stylesheet inside the SVG, so the mark is correct dropped into a surface with no
-CSS of its own. Pass `format: "bare"` when the page already loads `@microcharts/react/styles.css`.
+The default `format: "svg"` embeds the stylesheet inside the SVG, so the mark renders correctly on a surface with no CSS
+of its own. Pass `format: "bare"` when the page already loads `@microcharts/react/styles.css`.
 
-`summary` is not written by the tool. It is the chart's own accessible name, read back out of the rendered markup — the
-same sentence a screen reader speaks. See [Accessibility](/docs/accessibility) for how it's generated.
+The tool does not write `summary`. It reads the chart's own accessible name back out of the rendered markup, the same
+sentence a screen reader speaks. See [Accessibility](/docs/accessibility) for how it's generated.
 
 ## Two resources
 
@@ -208,8 +207,8 @@ Alongside the tools, the server publishes two read-only resources:
 ### Render, on a surface that can't run React
 
 You're talking through last quarter's numbers in a desktop assistant. Instead of describing the trend, it calls
-`render_microchart` and puts a real sparkline in the reply — with alt text attached, so the sentence and the mark say
-the same thing. The model isn't hoping a client renders its grammar; it has the mark.
+`render_microchart` and puts a real sparkline in the reply, with the alt text attached, so the sentence and the mark
+carry the same reading. Nothing on the client side has to understand the grammar.
 
 </Step>
 
@@ -218,8 +217,8 @@ the same thing. The model isn't hoping a client renders its grammar; it has the 
 ### Build, in a coding agent
 
 You're adding an SLO panel in Cursor. The agent calls `find_microchart("error budget")`, gets `error-budget` and
-`bullet`, calls `get_microchart("bullet")` for the props and a valid `sample`, and scaffolds the real component against
-the real API — no invented props to correct in review.
+`bullet`, calls `get_microchart("bullet")` for the props and a valid `sample`, then scaffolds the component against the
+real API. There are no invented props to correct in review.
 
 </Step>
 
@@ -240,13 +239,13 @@ The `ai` package is an optional peer on that subpath, so nothing pulls it into t
 
 ## How it behaves
 
-A model mid-reply cannot promise clean numbers, and a tool that guesses is worse than one that refuses. The rule here is
-that every call ends in one of two places: an honest mark, or a named error. Never a plausible wrong answer.
+A model mid-reply rarely has clean numbers. Every call therefore ends in one of two places: a rendered mark, or a named
+error. The server never guesses a value to make a call succeed.
 
 ### Messy data still renders
 
-Degenerate input is a documented case, not a failure. The chart renders and the summary says what actually happened —
-these are the real generated sentences:
+Degenerate input is a documented case. The chart renders and the summary reports what the data was. These are the real
+generated sentences:
 
 | You send                | You get back                                                                        |
 | ----------------------- | ----------------------------------------------------------------------------------- |
@@ -257,8 +256,8 @@ these are the real generated sentences:
 | `[NaN, 3, Infinity]`    | Non-finite values are dropped — `"Single value 3."`                                 |
 | `[-4, -2, -8]`          | `"Trending down 100%. Range -8 to -2. Last value -8."`                              |
 
-The chart never invents a number to fill a hole, and the sentence never claims more than the data supports. Same
-guarantees as the components — see [Accessibility](/docs/accessibility) for the full matrix.
+A gap is never filled with an invented number, and the sentence never claims more than the data supports. These are the
+same guarantees the components make; [Accessibility](/docs/accessibility) has the full matrix.
 
 ### Calls it refuses, and what it says
 
@@ -276,21 +275,20 @@ retrying blind:
 | More data than a word-sized mark holds       | `data exceeds 5000 points`, or a size limit on the payload or the rendered markup              |
 | Props that would produce an unrenderable box | ``"sparkline" produced an invalid -5×20 box — check that `width`/`height` … are positive``     |
 
-The size limits are deliberate. A microchart is a word-sized mark; a series big enough to produce megabytes of markup is
-a mistake upstream, and returning it would blow the model's context rather than help it.
+The size limits are deliberate. A series big enough to produce megabytes of markup is a mistake upstream, and returning
+it would fill the model's context instead of helping.
 
 ### What comes back
 
 Every render carries `role="img"` and the generated accessible name, so the mark is usable the moment it lands.
 
-- **`format: "svg"` (default)** embeds the stylesheet inside the SVG. The result is genuinely standalone — and because
-  the real stylesheet comes with it, the mark still answers `prefers-color-scheme`, `forced-colors`, and
-  `prefers-reduced-motion` in whatever surface it ends up in. A chart pasted into a dark-themed client is drawn for
-  dark.
-- **`format: "bare"`** drops the embedded CSS for a page that already loads `@microcharts/react/styles.css`. Far smaller
-  per response, and the right choice inside your own app.
+- **`format: "svg"` (default)** embeds the stylesheet inside the SVG, so the result stands alone. Because the embedded
+  CSS is the real stylesheet, the mark still answers `prefers-color-scheme`, `forced-colors`, and
+  `prefers-reduced-motion` wherever it lands: a chart pasted into a dark-themed client is drawn for dark.
+- **`format: "bare"`** drops the embedded CSS for a page that already loads `@microcharts/react/styles.css`. It is much
+  smaller per response, and the right choice inside your own app.
 - **`mimeType`** is `image/svg+xml` for most charts. `Delta` and `TokenConfidence` are inline **text** marks, so they
-  come back as `text/html` with `width`/`height` of `0` — they size to the font around them, not to a pixel box.
+  come back as `text/html` with `width`/`height` of `0`: they size to the font around them, not to a pixel box.
 - **`library`** is the `@microcharts/react` version that drew it.
 
 ### Props that do cross a tool call
@@ -302,15 +300,15 @@ Anything JSON can express: `data`, `value`, `domain`, `title`, `summary`, `color
 - **`format`** — the `Intl.NumberFormatOptions` half of the union works: `{ "style": "currency", "currency": "EUR" }`
   yields `"Range €1,200.00 to €1,800.00."`. The callback half does not (see below).
 
-Passing `id` switches the chart from `aria-label` to `<title>`/`<desc>` + `aria-labelledby`, exactly as the component
-does; `summary` still comes back correct.
+Passing `id` switches the chart from `aria-label` to `<title>`/`<desc>` + `aria-labelledby`, as the component does;
+`summary` still comes back correct.
 
 ## What it can't do
 
-Worth knowing before you reach for it, so you reach for the component instead:
+Reach for the component instead when you need any of these:
 
 - **It renders the static chart.** No hover, keyboard roving, touch scrub, or selection, and `animate` has no meaning.
-  Those live on the [`/interactive` entry](/docs/quickstart#add-interactivity) — `get_microchart` returns
+  Those live on the [`/interactive` entry](/docs/quickstart#add-interactivity); `get_microchart` returns
   `interactiveImport` so an agent can wire it up in code.
 - **No annotations.** `Threshold`, `TargetZone`, `Marker`, and `Callout` are [React children](/docs/annotations); JSON
   has no children.
@@ -318,12 +316,12 @@ Worth knowing before you reach for it, so you reach for the component instead:
   options object for numbers, or set `summary` to supply the sentence yourself.
 - **No raster output.** You get an SVG or HTML string, never a PNG. Anything that renders SVG will show it; anything
   that won't needs a converter on your side.
-- **stdio only.** The server is spawned by your client on your machine. There is no hosted endpoint and no HTTP
-  transport, by design — it is also why nothing you chart leaves the process.
+- **stdio only.** Your client spawns the server on your machine. There is no hosted endpoint and no HTTP transport, by
+  design, which is also why nothing you chart leaves the process.
 - **It doesn't touch your project.** No files written, no dependencies installed. To wire the library into a repo, use
   the [agent setup prompt](/docs/quickstart#set-up-with-an-ai-agent) instead.
-- **Chart props are a closed set.** Arbitrary `data-*` or `aria-*` attributes are not forwarded — a deliberate library
-  decision, not a transport limit.
+- **Chart props are a closed set.** Arbitrary `data-*` or `aria-*` attributes are not forwarded. That is a library
+  decision, not a limit of the transport.
 
 ## Versioning and compatibility
 
@@ -337,8 +335,8 @@ automatically. Pin the server, not the library, if you need a reproducible rende
 ## Adding a chart
 
 For contributors: nothing about a new chart is written by hand here. The server's catalog is generated from the same
-chart registry that drives this site, and a test re-derives it from those sources on every run — so a chart that lands
-in the library without the snapshot being regenerated fails CI rather than shipping a server that has never heard of it.
+chart registry that drives this site, and a test re-derives it from those sources on every run. A chart that lands in
+the library without the snapshot being regenerated fails CI instead of shipping a server whose catalog is missing it.
 The rendered sample for every stable chart is exercised in that same suite.
 
 ---

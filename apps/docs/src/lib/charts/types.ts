@@ -147,7 +147,7 @@ export interface ChartModuleStatic {
 
 /**
  * Static half plus interactive twin. Composed in `<slug>.live.tsx`; reachable
- * ONLY via lazy maps (`modules.generated`, `preview-live.generated`, hero-modules)
+ * ONLY via lazy maps (`modules.generated`, `preview-live.generated`)
  * so interactive entries land in async chunks, not the route's eager graph.
  */
 export interface ChartModule extends ChartModuleStatic {

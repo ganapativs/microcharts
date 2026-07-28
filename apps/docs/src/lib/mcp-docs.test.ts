@@ -70,9 +70,9 @@ describe("the MCP page matches the server it documents", () => {
 });
 
 describe("every MCP entry point on the site points at the canonical page", () => {
-  it("the AI-native guide carries the call-it pillar", () => {
+  it("the AI-native guide carries the MCP pillar", () => {
     expect(docs.ai).toContain("/docs/mcp");
-    expect(docs.ai).toMatch(/## Call it/);
+    expect(docs.ai).toMatch(/## The MCP server/);
   });
 
   it("the Quickstart offers the server beside the agent prompt", () => {

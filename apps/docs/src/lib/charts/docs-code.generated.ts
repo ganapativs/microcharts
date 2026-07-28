@@ -1342,11 +1342,11 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
   },
   "retention-curve": {
     playground:
-      'import { RetentionCurve } from "@microcharts/react/retention-curve/interactive";\n\n<RetentionCurve\n  data={cohort}\n  benchmark={industry}\n/>',
+      'import { RetentionCurve } from "@microcharts/react/retention-curve/interactive";\n\n<RetentionCurve\n  data={cohort}\n  compare={industry}\n/>',
     recipes: [
       {
         label: "vs industry benchmark",
-        code: "<RetentionCurve data={cohort} benchmark={industry} />",
+        code: "<RetentionCurve data={cohort} compare={industry} />",
       },
       {
         label: "smooth (editorial)",

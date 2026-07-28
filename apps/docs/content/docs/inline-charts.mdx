@@ -1,16 +1,15 @@
 ---
 title: Inline charts
 description:
-  Word-sized inline React charts for sentences, table cells, KPI cards, tabs, and streamed replies — zero runtime
-  dependencies, accessible by default, RSC-safe static SVG. Where a full chart library would be too heavy and too loud.
+  Where word-sized React charts go — a sentence, a table cell, a KPI card, a tab — with the code for each placement.
 ---
 
-Word-sized charts sit _inside_ the interface you already ship: a trend in a table cell, a sparkline after a number, a
-bullet in a KPI, a mark in a streamed reply — not a chart page you navigate to. That is what `@microcharts/react` is
-built for. Full dashboard canvases belong with [full chart libraries](/docs/full-chart-libraries).
+`@microcharts/react` renders charts small enough to sit _inside_ the interface you already ship: a trend in a table
+cell, a sparkline after a number, a bullet in a KPI, a mark in a streamed reply. For a full dashboard canvas, reach for
+a [full chart library](/docs/full-chart-libraries) instead.
 
-<CatalogTotal /> types, one grammar. Size band: <SizeMarketing />. Static entries ship **zero client JavaScript** from a
-React Server Component. Accessible by default — each chart is an `img` with a summary generated from the data.
+<CatalogTotal /> types, one grammar, zero runtime dependencies. Size band: <SizeMarketing />. Static entries ship **zero
+client JavaScript** from a React Server Component. Every chart is an `img` with a summary generated from the data.
 
 ## One mark, four homes
 
@@ -73,14 +72,14 @@ Wrap with `mc-inline`, drop endpoint dots, mark decorative when the sentence alr
 
 ### In a KPI / tab
 
-Attainment and cadence marks stay tiny on purpose — [Bullet](/docs/charts/bullet), [Progress](/docs/charts/progress),
-[Delta](/docs/charts/delta), [StatusDot](/docs/charts/status-dot).
+Attainment and cadence marks stay small enough for a card or a tab header: [Bullet](/docs/charts/bullet),
+[Progress](/docs/charts/progress), [Delta](/docs/charts/delta), [StatusDot](/docs/charts/status-dot).
 
 Exact placement recipes: [Composition](/docs/composition). Broader fit: [When to use microcharts](/docs/when-to-use).
 
 ## Server-component safe
 
-Static charts are hook-free and listener-free — they render to HTML with zero client JavaScript. Add interactivity only
+Static charts are hook-free and listener-free, so they render to HTML with zero client JavaScript. Interactivity comes
 from a separate `/interactive` subpath.
 
 ```tsx

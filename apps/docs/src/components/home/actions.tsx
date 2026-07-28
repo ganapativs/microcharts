@@ -8,9 +8,6 @@ import { CopyLine } from "./copy-line";
  * The page's two action rows: a primary door, a secondary door, the install
  * command and the AI setup link. `SETUP_HREF` is exported from one place
  * site-wide so the AI door cannot drift.
- *
- * The hierarchy is carried in type and ink, not in filled pills — this page has
- * no filled surfaces, shadows or rounded buttons anywhere else.
  */
 
 function Door({
@@ -49,8 +46,7 @@ function SetupLink() {
   );
 }
 
-/** Act I: start, or go and look at the catalog first. No count on the second
- *  door — the rotating claim above already prints it. */
+/** Act I: start, or browse the catalog. Install + AI setup under the doors. */
 export function HeroActions() {
   return (
     <div className="mt-9 grid justify-items-start gap-6 sm:mt-10">
@@ -60,14 +56,8 @@ export function HeroActions() {
         </Door>
         <Door href="/charts">Browse the catalog</Door>
       </div>
-      {/* Two rows on a phone, one row from `sm` up. The slash only means
-          anything between two things on the same line, so it is dropped where
-          they stack. */}
       <div className="grid justify-items-start gap-y-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3.5">
         <CopyLine text={`pnpm add ${SITE.pkg}`} />
-        {/* Pulled 6px left of centre: the boxes either side are an equal 14px,
-            but the copy button carries 12px of its own padding after its icon, so
-            the INK measured 26px left against 14px right. */}
         <span
           aria-hidden
           className="hidden select-none sm:-ml-1.5 sm:mr-1.5 sm:inline"
@@ -81,8 +71,7 @@ export function HeroActions() {
   );
 }
 
-/** The colophon: the same doors, in the order a reader who reached the end wants
- *  them — the agent path first, the reference second. */
+/** Colophon: agent path first, docs second. */
 export function ClosingActions() {
   return (
     <div className="mt-9 grid justify-items-start gap-6 sm:mt-12">

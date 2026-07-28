@@ -1,14 +1,14 @@
 ---
 title: EnsembleGhosts
-description: >-
-  React ensemble ghosts chart — faint ensemble paths with an emphasised median-like member. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: EnsembleGhosts draws simulated paths as a faint bundle with one representative member emphasized.
 ---
 
-EnsembleGhosts answers "what could happen, across the simulated futures?". It draws a faint bundle of member paths with
-one emphasized representative — because a mean line hides that futures disagree in **shape**, not just endpoint. Ghost
-selection is fully deterministic (evenly spaced endpoint-rank quantiles), so the same input renders identically every
-time.
+EnsembleGhosts draws a faint bundle of member paths with one emphasized representative, so you can see where the
+simulated futures disagree in **shape** and not only at the endpoint. Two ensembles can share an average and a final
+range while running completely different routes to get there, which is what a mean line hides. The emphasized path
+defaults to the real member closest to the pointwise median, so the representative is a path the simulation produced;
+`emphasis="median"` draws the synthetic pointwise median instead. Ghost selection is evenly spaced endpoint-rank
+quantiles, so the same input renders identically every time.
 
 <LiveDemo
   label="EnsembleGhosts"
@@ -49,9 +49,9 @@ time.
 
 ## When to use it
 
-- **Good for** — a KPI card that shows the futures, not the average; Monte-Carlo / simulation output where paths
-  disagree in shape; showing that outcomes fan out.
-- **Avoid for** — interval precision (ForecastCone) or a single path (Sparkline).
+Use it for a KPI card that shows the futures rather than the average, for Monte-Carlo and simulation output where paths
+disagree in shape, and for showing that outcomes fan out. When you need interval precision, use ForecastCone; for a
+single path, use Sparkline.
 
 ## Sizing
 
@@ -110,6 +110,9 @@ time.
   </span>
 </LiveDemo>
 
+`endpoints` marks where each ghost lands. `label="end"` is the default and states the emphasized path's landing value in
+a right gutter; `label="none"` drops it.
+
 ## Edge cases
 
 <LiveDemo label="single member" code={`<EnsembleGhosts data={[[40, 43, 47, 52, 56, 61]]} />`}>
@@ -140,34 +143,21 @@ time.
   />
 </LiveDemo>
 
-With one member, there is no bundle to show — the chart draws that single path as the representative, and the summary
-states its ending value rather than a spread. A member that contains a non-finite value (`NaN`, `Infinity`) is excluded
-entirely from ghost selection and the median, not gapped mid-path — a dev-only console warning flags it, since a
-partially invalid future usually means bad simulation output.
+With one member there is no bundle to draw, so the chart renders that single path as the representative and the summary
+states its ending value rather than a spread. A member containing a non-finite value (`NaN`, `Infinity`) is excluded
+from ghost selection and from the median entirely, rather than gapped mid-path, and a dev-only console warning flags it:
+a partially invalid future usually means bad simulation output.
 
 ## Four homes
 
 <FourContexts slug="ensemble-ghosts" />
 
-## Why this default
-
-A few faint paths and one emphasized, because a mean line hides that futures disagree in shape, not just endpoint — two
-ensembles can share an average and a final range while telling completely different stories along the way. The
-emphasized path defaults to the **real member** closest to the pointwise median, so the representative is an outcome
-that actually happened in the simulation, not a synthetic average of paths that never occurred (`emphasis="median"`
-draws that synthetic path instead). Selection and emphasis are deterministic — nothing about this chart varies between
-renders of the same data. `label="end"` (default) states the emphasized path's landing value in a right gutter; pass
-`label="none"` to drop it.
-
-The static frame is not a hypothetical-outcome plot. The **loop** — flipping through the members one at a time on hover
-— is the HOP, and it lives only in the interactive entry, gated on reduced motion with arrow-key stepping as the
-non-animated equivalent.
-
 ## Accessibility
 
-The accessible name states the endpoint spread and the typical path — **"5 simulated paths end between 28 and 61;
-typical path ends near 50."** The interactive entry flips through the members (the HOP loop) on hover; with reduced
-motion, ←/→ step them discretely, and each member is announced with its endpoint.
+The accessible name states the endpoint spread and the typical path: **"5 simulated paths end between 28 and 61; typical
+path ends near 50."** The static frame is not a hypothetical-outcome plot. The HOP loop, which flips through the members
+one at a time on hover, lives only in the interactive entry; with reduced motion, ←/→ step the members discretely
+instead, and each one is announced with its endpoint.
 
 <InteractionNote slug="ensemble-ghosts" />
 

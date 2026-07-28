@@ -1,14 +1,12 @@
 ---
 title: TreeRings
-description: >-
-  React tree rings chart — per-period growth as concentric rings, oldest at the center. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: TreeRings draws one ring per period, oldest at the center, with each ring's thickness set by its value.
 ---
 
-TreeRings answers "how did growth accumulate, period over period?" like the rings of a tree: the oldest period is at the
-centre and each new period adds a ring outward, whose **thickness** is that period's value. The channel is thickness,
-not area — equal thickness at a larger radius spans more area (the ring illusion), so read the thicknesses, not the
-wedges; exact per-period reads steer to `SparkBar`.
+TreeRings shows how growth accumulated period over period, the way a tree records it: one ring per period, oldest at the
+center, each ring's **thickness** carrying that period's value. The channel is thickness, not area: equal thickness at a
+larger radius spans more area (the ring illusion), so read the thicknesses rather than the wedges. The current period is
+drawn 1.5× heavier in the accent color, weight and color together. For exact per-period reads use `SparkBar`.
 
 <LiveDemo label="TreeRings" sizeOf="tree-rings">
   <TreeRings
@@ -31,9 +29,8 @@ wedges; exact per-period reads steer to `SparkBar`.
 
 ## When to use it
 
-- **Good for** — account or company age at a glance, a cohort-age marker in a table cell, or a per-period growth story
-  in a KPI card.
-- **Avoid for** — exact per-period reads (SparkBar), many periods (over twenty-four), or non-cumulative series.
+Use it for account or company age, a cohort-age marker in a table cell, or a per-period growth story in a KPI card.
+Avoid it for exact per-period reads (SparkBar), for more than twenty-four periods, and for non-cumulative series.
 
 ## Sizing
 
@@ -53,6 +50,10 @@ wedges; exact per-period reads steer to `SparkBar`.
     <TreeRings data={[8, 12, 10, 18, 22, 15, 20, 14]} total={200} size={44} />
   </span>
 </LiveDemo>
+
+Stroke rings are the default: at twenty-four pixels, hairlines keep the disc quiet and let the accent ring stay loud.
+`rings="fill"` draws filled annuli instead. Pass `total` for the cohort-age story, and the disc fills only Σdata/total
+of the radius, so a young account reads as part-grown.
 
 <LiveDemo
   label="locale — the last-value label and the summary both follow it"
@@ -74,23 +75,17 @@ wedges; exact per-period reads steer to `SparkBar`.
   <TreeRings data={[]} title="New account" size={44} />
 </LiveDemo>
 
+TreeRings enforces no minimum visual thickness. A near-zero period looks near-zero, and a zero-value period collapses
+its two boundaries onto each other.
+
 ## Four homes
 
 <FourContexts slug="tree-rings" />
 
-## Why this default
-
-Stroke rings are the default because at twenty-four pixels hairlines keep the disc quiet and let the accent ring — the
-current period, drawn 1.5× heavier in the accent color (weight and color, never color alone) — stay loud. The channel is
-radial **thickness**, and the docs say so explicitly, because equal thickness at a larger radius spans more area.
-TreeRings never enforces a minimum visual thickness: a near-zero period looks near-zero, and a zero-value period
-collapses its two boundaries onto each other. Pass `total` for the cohort-age story — the disc then fills only
-Σdata/total of the radius, so a young account reads as part-grown.
-
 ## Accessibility
 
-The accessible name summarizes the growth — **"8 periods; latest 14, biggest 22 in period 5."** The interactive entry
-steps the rings from the centre out with ←/→ (or hover), announcing each period as "Year 5: 22."
+The accessible name summarizes the growth: **"8 periods; latest 14, biggest 22 in period 5."** The interactive entry
+steps the rings from the center out with ←/→ (or hover), announcing each period as "Year 5: 22."
 
 <InteractionNote slug="tree-rings" />
 

@@ -1,14 +1,12 @@
 ---
 title: CitySkyline
-description: >-
-  React city skyline chart — group size as building height and activation as lit windows. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: CitySkyline draws each group as a building, with size as height and activation as the lit-window fraction.
 ---
 
-CitySkyline answers "how do these groups compare on size, and how activated is each?" — two variables in one row.
-**Height** is the primary, precise channel (zero-anchored bars, like a MiniBar); the **lit-window fraction** is a
-secondary, low-precision channel you read as "mostly lit, half lit, or dark", not a number. Omit `lit` everywhere and
-it's a plain, honest bar row.
+CitySkyline compares a handful of groups on two variables at once: how big each one is, and how activated it is.
+**Height** is the primary, precise channel: zero-anchored bars, like a MiniBar. The **lit-window fraction** is a
+secondary, low-precision channel you read as "mostly lit, half lit, or dark", not as a number. Omit `lit` everywhere and
+you get a plain bar row.
 
 <LiveDemo
   label="CitySkyline"
@@ -30,15 +28,18 @@ it's a plain, honest bar row.
 
 ## When to use it
 
-- **Good for** — team or region size plus an activation read, an org KPI where two variables are the story, or a per-BU
-  comparison with utilization.
-- **Avoid for** — a single variable (that's `MiniBar`), precise activation reads, or more than about eight groups.
+Use it for team or region size plus an activation read, an org KPI where two variables are the story, or a per-BU
+comparison with utilization. For a single variable reach for `MiniBar`; skip it when you need a precise activation read,
+or when you have more than about eight groups.
 
 ## Sizing
 
 <Sizing chart="city-skyline" />
 
 ## Variants
+
+Windows appear whenever `lit` is present. Heights stay zero-anchored bars either way, and nothing is encoded in building
+width: width, roof, and ground are constants.
 
 <LiveDemo
   label="plain bars (no lit) + values"
@@ -118,24 +119,20 @@ it's a plain, honest bar row.
   />
 </LiveDemo>
 
+All-equal values render as a flat roofline; no variation is added to make the row look busier. Lit windows are quantized
+to the window count and filled bottom-up, so activation reads as a fill level. The secondary channel drops out before
+the primary: a building too short for one window row renders as a solid tower, and its `lit` still shows in the
+per-building readout on hover or keyboard focus.
+
 ## Four homes
 
 <FourContexts slug="city-skyline" />
 
-## Why this default
-
-Windows come on when `lit` is present, because the two-variable read is exactly why this beats a `MiniBar`. Heights are
-always zero-anchored bars; the lit windows are quantized to the window count and filled bottom-up, so the activation
-reads as a fill level. There is no roofline variation, no antennas, and nothing encoded in building width — width, roof,
-and ground are constants, because every mark must earn its place. The secondary channel drops out before the primary: a
-building too short for any window row is a solid tower, and its `lit` still shows in the per-building readout on hover
-or keyboard focus.
-
 ## Accessibility
 
-The accessible name names the count and the tallest — **"3 groups; tallest A at 46."** The interactive entry roves the
-buildings with ←/→ (or hover), announcing each on its own: on the team demo at the top of this page, Platform reads
-"Platform: 46; 70% lit." — the size precisely, the activation as a percent.
+The accessible name gives the count and the tallest: **"3 groups; tallest A at 46."** The interactive entry roves the
+buildings with ←/→ or hover and announces each one. On the team demo at the top of this page, Platform reads "Platform:
+46; 70% lit."
 
 <InteractionNote slug="city-skyline" />
 

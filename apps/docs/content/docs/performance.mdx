@@ -1,95 +1,88 @@
 ---
 title: Performance
-description:
-  Zero dependencies, budget-gated sizes, and server rendering with no client JavaScript — 106 chart types at ~2–7 kB
-  interactive · ~1–4 kB static, static SSR median about 0.03 ms each. Every number here is reproducible from one
-  command.
+description: >-
+  Where the size and speed numbers come from: 106 chart types at ~2–7 kB interactive · ~1–4 kB static, a static server
+  render of about 0.03 ms each, and the commands that regenerate every figure.
 ---
 
-Performance isn't a marketing line here — it's a build gate. Every figure on this page is produced by a command you can
-run yourself, checked against the shipped `dist` in CI, and regenerated on every release so it can never drift from
-reality.
+Every figure on this page comes from a command you can run yourself. Each one is measured against the shipped `dist`,
+re-checked in CI, and regenerated on every release.
 
 <ThroughputSummary />
 
 ## Size
 
-Each chart is imported from its own subpath, so a bundle ships only the charts it uses — importing `Sparkline` never
-pulls in the other 105. Sizes are gzip, measured by `pnpm size` and gated: a chart that grows past its budget fails the
-build.
+Each chart imports from its own subpath, so a bundle ships only the charts it uses: importing `Sparkline` never pulls in
+the other 105. Sizes are gzip, measured by `pnpm size` and gated, so a chart that grows past its budget fails the build.
 
 <SizeDistribution />
 
-The interactive catalog lands between **2.17 kB and 6.75 kB** gzip, with a **median of 5.07 kB** — hover, roving
-keyboard focus, select-to-pin, touch scrub, and live announcements from the `/interactive` subpath. The static twin
-lands between **1 kB and 4.07 kB**, with a **median of 2.64 kB** — pure SVG, zero client JavaScript. A page pays for
-interactivity only where it actually uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which
-the per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
+The `/interactive` subpath lands between **2.17 kB and 6.75 kB** gzip, with a **median of 5.07 kB**. That buys hover,
+roving keyboard focus, select-to-pin, touch scrub, and live announcements. Its static twin is pure SVG with zero client
+JavaScript, and lands between **1 kB and 4.07 kB**, with a **median of 2.64 kB**. A page pays for interactivity only
+where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the per-subpath gate measures
+standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
 Twenty-seven charts sit above the 3 kB static reference line, none of them by more than 1.07 kB. Sparkline, the most
-configurable primitive in the set, is the largest; most of the rest are value-series charts that host annotations
+configurable primitive in the set, is the largest. Most of the rest are value-series charts that host annotations
 (ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
 SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, ShiftHistogram, StackedArea, ABStrips,
-PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, GradedBand and LikertStrip — the last two crossed
+PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, GradedBand and LikertStrip; the last two crossed
 the line when their percent labels moved onto a real `Intl` formatter. The annotation hosts carry a small shared walker
-that resolves `Threshold`, `Marker`, and the rest against the chart's scale — you pay for it only on those charts, and
-each is still smaller than a single icon font.
+that resolves `Threshold`, `Marker`, and the rest against the chart's scale, and you pay for it only on those charts.
 
 ### Splitting the stylesheet
 
-`@microcharts/react/styles.css` is one artifact for the whole catalog, and importing it once is the right default — it
-is small, it caches, and it never grows with the number of charts you use. If you ship exactly one or two charts and
-want the rules for the rest gone, there is an opt-in split: `@microcharts/react/styles/core.css` carries everything
-shared, and `@microcharts/react/styles/<slug>.css` carries the rules specific to a single chart. Only the charts with
-chart-specific CSS have a file; the rest need `core.css` alone.
+`@microcharts/react/styles.css` is one artifact for the whole catalog, and importing it once is the right default: it is
+small, it caches, and it never grows with the number of charts you use. If you ship one or two charts and want the rules
+for the rest gone, there is an opt-in split. `@microcharts/react/styles/core.css` carries everything shared, and
+`@microcharts/react/styles/<slug>.css` carries the rules specific to a single chart. Only the charts with chart-specific
+CSS have a file; the rest need `core.css` alone.
 
 ```ts
 import "@microcharts/react/styles/core.css";
 import "@microcharts/react/styles/sparkline.css";
 ```
 
-`core.css` plus the slugs you import is equivalent to the matching subset of `styles.css` — same rules, same `@layer`
-membership, same cascade order — so the split is a byte trade, never a behavior change. Import one or the other, not
-both.
+`core.css` plus the slugs you import is equivalent to the matching subset of `styles.css`: same rules, same `@layer`
+membership, same cascade order. The split trades bytes and changes no behavior. Import one or the other, not both.
 
 ## Server rendering
 
-Static charts are hook-free and listener-free, so a React Server Component renders them to plain SVG on the server —
+Static charts are hook-free and listener-free, so a React Server Component renders them to plain SVG on the server and
 **zero client JavaScript** reaches the browser. Throughput, measured by `pnpm bench` rendering _N_ sparklines to an SVG
 string:
 
 <ScalingTable />
 
-A table of **500 sparklines becomes HTML in under six milliseconds**, streams as part of the document, and ships nothing
-to hydrate. Across all 106 chart types the median **static** SSR render is about **0.03 ms per chart** — the heavier
-expressive and frontier instruments cost more geometry, the simple strips cost almost nothing.
+A table of **500 sparklines becomes HTML in under six milliseconds**, streams as part of the document, and hydrates
+nothing. Across all 106 chart types the median **static** SSR render is about **0.03 ms per chart**. The heavier
+expressive and frontier instruments cost more geometry; the simple strips cost close to nothing.
 
-The core summary kernel is just as cheap: `describeSeries`, which writes every chart's accessible sentence, runs at
-roughly **892,000 calls per second** (24-point series, measured by `pnpm bench`), so accessibility is never the thing
-that slows a render down.
+The summary kernel is just as cheap: `describeSeries` runs at roughly **892,000 calls per second** on a 24-point series,
+measured by `pnpm bench`. It writes the accessible sentence for every chart, so accessibility is not what slows a render
+down.
 
 ## Why it's fast
 
-The speed isn't a trick — it's the absence of one.
-
 - **No chart engine.** No D3, no layout runtime, no virtual DOM diff for a static chart. Scales, paths, and stats are a
-  few hundred lines of pure functions, and the output is a handful of SVG nodes — typically six or fewer per chart.
-- **Zero runtime dependencies.** `dependencies: {}`, enforced by CI, forever. Nothing to resolve, nothing to audit,
-  nothing to bloat a lockfile.
+  few hundred lines of pure functions, and the output is a handful of SVG nodes, typically six or fewer per chart.
+- **Zero runtime dependencies.** `dependencies: {}`, enforced by CI, forever. There is no transitive tree to resolve, to
+  audit, or to carry in a lockfile.
 - **Integer geometry, crisp marks.** Coordinates are rounded at generation and rectilinear marks use
-  `shape-rendering: crispEdges`, so the browser does less work rasterising them.
+  `shape-rendering: crispEdges`, so the browser does less work rasterizing them.
 - **One stylesheet, one cascade layer.** Theming is CSS custom properties in a low-specificity `@layer`, not inline
   styles recomputed per instance.
 - **A scrub costs one render per unit crossed, not one per pointer move.** Interactive entries put a single listener on
-  the wrapper and resolve the unit with pure math, then bail out when the unit hasn't changed — so a sweep across a
+  the wrapper and resolve the unit with pure math, then bail out when the unit hasn't changed, so a sweep across a
   24-point Sparkline re-renders at most 24 times no matter how many pointer events the browser delivers.
 
 ### Re-rendering many charts
 
-Static entries are hook-free — that's what keeps them RSC-safe — so they can't memoise internally: a parent re-render
-re-runs each chart's geometry. That's cheap per chart, but it adds up in a table of hundreds.
+Static entries are hook-free, which is what keeps them RSC-safe, so they can't memoize internally: a parent re-render
+re-runs each chart's geometry. That is cheap per chart, but it adds up in a table of hundreds.
 
 If you render many charts inside a component that re-renders for unrelated reasons, wrap them and keep `data`
 referentially stable:
@@ -98,31 +91,31 @@ referentially stable:
 const Spark = memo(Sparkline);
 ```
 
-The catch is that `memo` only helps when props are actually stable — pass a fresh array literal (`data={[1, 2, 3]}`) or
-JSX children and it misses every time, and you pay the comparison on top of the render you were going to do anyway.
-Hoist the array, or skip it.
+`memo` only helps when the props are stable. Pass a fresh array literal (`data={[1, 2, 3]}`) or JSX children and it
+misses every time, and you pay the comparison on top of the render you were going to do anyway. Hoist the array, or skip
+`memo`.
 
-We don't ship `memo` on the charts themselves for exactly that reason: it would tax the common case to speed up a
-specific one, and it's your call, not ours.
+The charts don't ship wrapped in `memo` for that reason: it would tax the common case to speed up a narrow one, and the
+call is yours to make.
 
-## Honest caveats
+## Caveats
 
-- **The bench is one process, and that used to bite.** Measuring 106 components in sequence let earlier charts leave the
-  later ones cold, and a median over windows short enough for one GC pause produced bimodal numbers — the same chart
-  read 140 and 35 rows/ms on consecutive runs of identical code. `pnpm bench` now warms each component immediately
-  before timing it and reports the fastest window, since GC and scheduler noise only ever slow a window down. Every
-  chart clears its floor; if one stops, `pnpm bench` exits non-zero and names it.
-- **Interactive entries do ship JavaScript.** The `/interactive` subpath adds a client component and a small set of
-  listeners on the wrapper — pointer, keyboard, and touch — plus the shared picker kernel that resolves them to a unit
-  with pure math. There is still never a listener per data point, so a 30-point chart and a 365-cell grid cost the same.
-  It's tiny, but it isn't zero — reach for the static entry unless a chart genuinely needs hover, keyboard, selection,
-  or live announcements.
-- **These numbers are one machine, one Node.** They measure _relative_ cost honestly and reproduce on your hardware;
-  treat them as a floor to reproduce, not an absolute to quote.
+- **The bench runs in one process, and that used to skew it.** Measuring 106 components in sequence left the later ones
+  cold, and a median over windows short enough for one GC pause produced bimodal numbers: the same chart read 140 and 35
+  rows/ms on consecutive runs of identical code. `pnpm bench` now warms each component immediately before timing it and
+  reports the fastest window, since GC and scheduler noise only ever slow a window down. Every chart clears its floor;
+  if one stops, `pnpm bench` exits non-zero and names it.
+- **Interactive entries do ship JavaScript.** The `/interactive` subpath adds a client component, a small set of
+  pointer, keyboard, and touch listeners on the wrapper, and the shared picker kernel that resolves them to a unit with
+  pure math. There is still never a listener per data point, so a 30-point chart and a 365-cell grid cost the same. It
+  is small but it isn't zero, so reach for the static entry unless a chart needs hover, keyboard, selection, or live
+  announcements.
+- **These numbers come from one machine and one Node.** They measure _relative_ cost and reproduce on your hardware;
+  treat them as a floor to reproduce rather than an absolute to quote.
 
 ## Reproduce it
 
-Every figure above regenerates from the repo. Nothing is hand-keyed — the docs read the measured output directly.
+Every figure above regenerates from the repo. Nothing is hand-keyed; the docs read the measured output directly.
 
 ```bash
 git clone https://github.com/ganapativs/microcharts

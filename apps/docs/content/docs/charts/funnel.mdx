@@ -1,12 +1,12 @@
 ---
 title: Funnel
-description: >-
-  React funnel chart — stage drop-off as a narrowing word-sized funnel. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description:
+  Funnel draws each pipeline stage as a zero-anchored stepped rectangle, so the drop between stages is the read.
 ---
 
-Funnel answers "where does the pipeline leak?". Stepped rectangles, zero-anchored — never the classic tapered
-silhouette, which interpolates data that doesn't exist. The drop _between_ neighbors is the read.
+Funnel prints one stepped rectangle per stage — 12,400 visitors, 5,704 signups, 2,730 activated, 1,116 paid — each
+anchored at zero, so the drop _between_ neighbors is the read: the biggest one is where the pipeline leaks. It never
+draws the classic tapered silhouette, which interpolates data that doesn't exist.
 
 <LiveDemo label="Funnel" sizeOf="funnel">
   <Funnel
@@ -32,8 +32,8 @@ silhouette, which interpolates data that doesn't exist. The drop _between_ neigh
 
 ## When to use it
 
-- **Good for** — per-campaign funnels in table cells, conversion bridges in cards.
-- **Avoid for** — unordered categories (MiniBar) or more than 6 stages.
+Use it for per-campaign funnels in table cells and conversion bridges in cards. For unordered categories use MiniBar,
+and keep a funnel to 6 stages or fewer.
 
 ## Sizing
 
@@ -65,6 +65,8 @@ silhouette, which interpolates data that doesn't exist. The drop _between_ neigh
     height={66}
   />
 </LiveDemo>
+
+`mode="rate"` always normalizes to stage 1, never to the previous stage: per-stage rates hide compounding loss.
 
 <LiveDemo
   label="the leak"
@@ -126,20 +128,18 @@ silhouette, which interpolates data that doesn't exist. The drop _between_ neigh
   />
 </LiveDemo>
 
+A single stage renders as one full-height column with no connector slats, at an overall 100%. A stage larger than its
+predecessor renders at its true size, as re-engagement funnels do, and the summary appends the inversion.
+
 ## Four homes
 
 <FourContexts slug="funnel" />
 
-## Why this default
-
-`rate` always normalizes to stage 1, never to the previous stage — per-stage rates hide compounding loss. A stage larger
-than its predecessor (re-engagement funnels) renders truthfully and the summary appends the inversion. The connectors
-and zero-anchored columns keep the read a measurement, not a shape.
-
 ## Accessibility
 
-The accessible name is the conversion story — **"4 stages, 12,400 to 1,116 — overall 9%."**, plus **"Stage 3 exceeds
-stage 2."** when a pipeline inverts. The interactive entry roves stages (**"Activated: 2,730 — 22% of Visitors."**).
+The accessible name states the span and the overall rate: **"4 stages, 12,400 to 1,116 — overall 9%."** It appends
+**"Stage 3 exceeds stage 2."** when a pipeline inverts. The interactive entry roves stages, announcing each as
+**"Activated: 2,730 — 22% of Visitors."**
 
 <InteractionNote slug="funnel" />
 

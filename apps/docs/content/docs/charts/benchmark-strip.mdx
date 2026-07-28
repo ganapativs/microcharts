@@ -1,13 +1,13 @@
 ---
 title: BenchmarkStrip
-description: >-
-  React benchmark strip chart — one value against its cohort's empirical quantiles, with percentile stated. Tiny
-  accessible SVG microchart; RSC-safe static or /interactive.
+description:
+  "One value against its peer group's own empirical quantile bands, with the percentile stated in the summary."
 ---
 
-BenchmarkStrip answers "is this value normal for its peer group?". A focal dot sits on a common scale against the peers'
-own **empirical** quantile bands — never a fitted distribution. There is no axis: the band is the reference frame. Small
-samples fall back to min–max so tail quantiles are never fiction.
+BenchmarkStrip reads one value against a list of peer values: a focal dot on a common scale, placed against the peers'
+own **empirical** quantile bands, so you can tell whether the value is ordinary for that cohort or out at the tail. The
+bands come from the measured peers and never from a fitted distribution, so the strip never implies a normal curve the
+data doesn't back up. There is no axis: the band is the reference frame, and the dot's position in it is the whole read.
 
 <LiveDemo
   label="BenchmarkStrip"
@@ -42,8 +42,8 @@ samples fall back to min–max so tail quantiles are never fiction.
 
 ## When to use it
 
-- **Good for** — a value against its cohort, per-row peer comparison in tables, SLA context.
-- **Avoid for** — a single trend (Sparkline) or two groups head-to-head (ABStrips).
+Use it for a value against its cohort, per-row peer comparison in tables, and SLA context. For a single trend use
+Sparkline; for two groups head-to-head use ABStrips.
 
 ## Sizing
 
@@ -146,18 +146,13 @@ summary's numbers follow that locale's own grouping and decimal marks: the value
   />
 </LiveDemo>
 
+Below 8 peers, tail quantiles (p5/p95) are statistically unreliable, so the outer band falls back to the observed
+min–max automatically; `range` forces either band at any sample size. A value outside the plotted `domain` clamps to the
+edge and draws a small directional wedge instead of disappearing.
+
 ## Four homes
 
 <FourContexts slug="benchmark-strip" />
-
-## Why this default
-
-Bands come from the peers' own empirical quantiles, never a fitted distribution — the strip never implies a normal curve
-that the data doesn't back up. There is no axis: the band itself is the reference frame, so the focal dot's position
-against it is the whole read. Below 8 peers, tail quantiles (p5/p95) are statistically unreliable, so the outer band
-falls back to the observed min–max automatically — a deliberate honesty trade the `range` prop can also force at any
-sample size. A value that falls outside the plotted domain clamps to the edge and draws a small wedge rather than
-silently disappearing.
 
 ## Accessibility
 

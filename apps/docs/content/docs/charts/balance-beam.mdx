@@ -1,14 +1,13 @@
 ---
 title: BalanceBeam
-description: >-
-  React balance beam chart — which of two sides outweighs, with area-true weights. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: "A beam that tilts toward the heavier of two sides, with area-true weights and a tilt that saturates."
 ---
 
-BalanceBeam answers "which of two sides outweighs, and roughly by how much?" A beam tilts toward the heavier side; the
-direction is instant and the angle grows with the imbalance, but it **saturates** — read it as direction plus rough
-magnitude, not an exact ratio. The two weights are area-true (their area, not their width, is proportional to value).
-For a precise comparison, reach for `PairedBars` or `Delta`; this is for the glance.
+BalanceBeam takes two values and tilts a beam toward the heavier one, so which side wins reads instantly. Inflow is 620,
+outflow is 480, and the beam tilts toward inflow. The angle grows with the imbalance, but it **saturates** at `maxTilt`
+degrees: past that point a steeper beam would imply a precision the eye can't extract, so read the tilt as direction
+plus rough magnitude. The two weights are area-true — their area, not their width, is proportional to value. For a
+precise comparison, use `PairedBars` or `Delta`.
 
 <LiveDemo label="BalanceBeam" sizeOf="balance-beam">
   <BalanceBeam
@@ -33,15 +32,19 @@ For a precise comparison, reach for `PairedBars` or `Delta`; this is for the gla
 
 ## When to use it
 
-- **Good for** — a buy vs sell or in vs out read in a sentence, a pro vs con weight in a KPI card, or an A-vs-B pair
-  where direction is the story.
-- **Avoid for** — exact ratios (PairedBars / Delta), more than two items (MiniBar), or trends.
+Use it for a buy vs sell or in vs out read in a sentence, a pro vs con weight in a KPI card, or an A-vs-B pair where
+direction is the point. For exact ratios use PairedBars or Delta, for more than two items MiniBar, and for trends a
+time-series chart.
 
 ## Sizing
 
 <Sizing chart="balance-beam" />
 
 ## Variants
+
+`mode="ratio"` is the default, because most two-sided comparisons are share-of-whole questions. `mode="difference"`
+scales the imbalance by a shared `domain`, so rows on the same scale tilt comparably. Square weights are the default
+because circles under-read area at this size; `shape="round"` swaps them.
 
 <LiveDemo
   label="round weights + balanced"
@@ -130,25 +133,18 @@ For a precise comparison, reach for `PairedBars` or `Delta`; this is for the gla
 </LiveDemo>
 
 Equal values level the beam and report **"balanced"** rather than picking an arbitrary heavier side. Two zeros are the
-same case — the beam stays level and both weights shrink to nothing, which is honest: there is nothing to weigh.
+same case: the beam stays level and both weights shrink to zero area.
 
 ## Four homes
 
 <FourContexts slug="balance-beam" />
 
-## Why this default
-
-Ratio mode is the default because most two-sided comparisons are share-of-whole questions, and square weights are the
-default because circles under-read area at this size. The tilt saturates at `maxTilt` degrees — a deliberate honesty
-choice: past a point, a steeper beam would imply a precision the eye can't extract, so the angle levels off. Direction
-and rough magnitude always agree, and the two channels (tilt and weight area) never disagree. For same-scale rows that
-should tilt comparably, `mode="difference"` scales the imbalance by a shared `domain`.
-
 ## Accessibility
 
 The accessible name states both sides and the winner — **"Inflow 620 vs Outflow 480; Inflow heavier."** — or "…;
-balanced." when they match. The interactive entry eases the beam to its new tilt, reveals a side's value on hover or
-←/→, and announces when the heavier side flips.
+balanced." when they match. The two channels always agree: the tilt direction and the larger weight area point at the
+same side. The interactive entry eases the beam to its new tilt, reveals a side's value on hover or ←/→, and announces
+when the heavier side flips.
 
 <InteractionNote slug="balance-beam" />
 

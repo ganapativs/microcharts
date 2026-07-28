@@ -1,20 +1,19 @@
 ---
 title: React sparklines
 description:
-  Word-sized React sparklines with @microcharts/react — accessible by default, RSC-safe static SVG, zero runtime
-  dependencies. For sentences, table cells, and KPIs. Full API on the Sparkline chart page.
+  What a sparkline is, how to render one in React with @microcharts/react, and how it compares to the legacy
+  react-sparklines package.
 ---
 
-A **sparkline** is a trend small enough to sit in a sentence: direction and shape at a glance — not a dashboard panel
-with axes. In React, that means a word-sized SVG mark next to a number or inside a table cell, where a full chart
-library would be too heavy and too loud.
-
-This page covers that mark in `@microcharts/react`. Props, variants, and edge cases live on
-[Sparkline](/docs/charts/sparkline).
+A **sparkline** is a trend small enough to sit in a sentence: enough line to read direction and shape, with no axes,
+legend, or panel around it. In React that means a word-sized SVG mark next to a number or inside a table cell.
 
 <LiveDemo label="Sparkline" sizeOf="sparkline">
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
 </LiveDemo>
+
+This page covers that mark in `@microcharts/react`. Props, variants, and edge cases live on
+[Sparkline](/docs/charts/sparkline).
 
 ## Install
 
@@ -31,8 +30,8 @@ import "@microcharts/react/styles.css"; // once, at the app root
 
 Measured size for this chart: <ChartSize slug="sparkline" /> gzip (CI-enforced). Catalog-wide band:
 
-<SizeMarketing />. The default export is static — RSC-safe, zero client JavaScript. Add
-`@microcharts/react/sparkline/interactive` only when hover, keyboard, touch, or selection is needed.
+<SizeMarketing />. The default export is static, so it renders from an RSC with zero client JavaScript. Add
+`@microcharts/react/sparkline/interactive` when you need hover, keyboard, touch, or selection.
 
 ## Where it sits
 
@@ -45,15 +44,16 @@ Placement recipes: [Composition](/docs/composition). When this library fits vs a
 
 ## About `react-sparklines`
 
-Many searches still land on [`react-sparklines`](https://www.npmjs.com/package/react-sparklines) (Boris Yankov) — about
-**250k downloads** in the week ending **2026-07-21**, last npm publish **2017-07-27** (`1.7.0`). Same visual idea; a
-different era of React (class-component patterns, `prop-types`, no generated accessible summary, not aimed at RSC). The
-measured side-by-side lives at [microcharts vs react-sparklines](/docs/vs-react-sparklines).
+Many searches still land on [`react-sparklines`](https://www.npmjs.com/package/react-sparklines) (Boris Yankov), which
+still pulls about **250k downloads** in the week ending **2026-07-21** on a last npm publish of **2017-07-27**
+(`1.7.0`). It's the same visual idea from a different era of React: class-component patterns, `prop-types`, no generated
+accessible summary, and no RSC story. The measured side-by-side lives at
+[microcharts vs react-sparklines](/docs/vs-react-sparklines).
 
-microcharts is not that package rewritten. It is a word-sized catalog — <CatalogTotal /> types, one grammar — where
-Sparkline is one chart: `data` alone renders, accessible by default (`role="img"` + a summary from the data), static RSC
-entry, **zero runtime dependencies**. If `react-sparklines` still fits your stack, that is a valid choice. If you want
-the contract above, start here.
+microcharts isn't that package rewritten. It's a word-sized catalog of <CatalogTotal /> types under one grammar, and
+Sparkline is one chart in it: `data` alone renders, accessibility is on by default (`role="img"` plus a summary from the
+data), the static entry is RSC-safe, and there are **zero runtime dependencies**. If `react-sparklines` still fits your
+stack, keep it. If you want the contract above, start here.
 
 ## When not to use a sparkline
 

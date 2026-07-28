@@ -1,12 +1,13 @@
 ---
 title: Ohlc
 description: >-
-  React OHLC chart — per-period open–high–low–close in a table cell, never averaged. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+  Ohlc draws the open, high, low, and close of each period as one mark, sized to sit in a table cell.
 ---
 
-Ohlc answers "what was the price action per period?" — open, high, low, close, in a cell. Direction is encoded by
-valence color AND body geometry, never color alone.
+Four numbers per period, in one table cell: open, high, low, close. Together they say how far a session ran and which
+way it closed, one row per instrument. Direction comes from valence color and from the body geometry, so it never rests
+on color alone. `maxPeriods` renders the most recent N sessions and warns in development past that — extra periods are
+dropped visibly, never averaged into composite candles.
 
 <LiveDemo
   label="Ohlc"
@@ -46,8 +47,8 @@ close: 144.9 }, { open: 144.5, high: 145.2, low: 140.1, close: 141.4 }, { open: 
 
 ## When to use it
 
-- **Good for** — watchlist table rows, ticker KPI cards.
-- **Avoid for** — a single close series (Sparkline), or more than ~20 periods.
+Use it for watchlist table rows and ticker KPI cards. For a single close series use Sparkline, and keep the count under
+about 20 periods.
 
 ## Sizing
 
@@ -134,14 +135,12 @@ const sessions = [
   <Ohlc data={[{ open: 100, high: 104, low: 97, close: 103 }]} title="Single period" width={60} height={26} />
 </LiveDemo>
 
+A session that opens and closes at the same price renders neutral and keeps a minimum 1-unit body height, so a flat
+period stays visible instead of collapsing to a hairline. A single period renders its own bar against its own range.
+
 ## Four homes
 
 <FourContexts slug="ohlc" />
-
-## Why this default
-
-`maxPeriods` renders the most recent N sessions and warns in development past it — data is truncated visibly, never
-averaged into fake candles. Bodies keep a minimum 1-unit height so doji sessions stay visible.
 
 ## Accessibility
 

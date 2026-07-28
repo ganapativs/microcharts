@@ -1,14 +1,11 @@
 ---
 title: DicePips
-description: >-
-  React dice pips chart — a small integer as die pips (or a numeral above six). Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: DicePips renders a small count of 0–6 as die pips, and shows the exact numeral above six.
 ---
 
-DicePips answers "what is this small count or severity?" the way dice do — a face you read without counting. The brain
-subitizes the canonical 1–6 patterns instantly. Zero is an empty face (zero, not missing); above six there is no
-subitizable pattern, so the face shows the exact numeral rather than inventing a seven-pip layout. The face never
-pretends.
+DicePips prints a small count as a die face: five pips for `5`, an empty face for `0`. The canonical 1–6 patterns are
+subitizable, so you read them without counting. Zero means zero, not missing data. Above six there is no pattern to
+subitize, so the face shows the exact numeral instead of inventing a seven-pip layout.
 
 <LiveDemo label="DicePips" sizeOf="dice-pips">
   <span className="inline-flex gap-3 items-center">
@@ -31,9 +28,8 @@ pretends.
 
 ## When to use it
 
-- **Good for** — a severity or rating 0–6 in a cell, an at-a-glance small count in a sentence, or an incident-severity
-  badge.
-- **Avoid for** — counts above six (TallyMarks), magnitudes (MiniBar), or proportions (Progress).
+Use it for a severity or rating 0–6 in a cell, a small count in a sentence, or an incident-severity badge. For counts
+above six use TallyMarks, for magnitudes MiniBar, and for proportions Progress.
 
 ## Sizing
 
@@ -51,6 +47,10 @@ pretends.
     <DicePips value={9} size={22} />
   </span>
 </LiveDemo>
+
+The face outline is on by default because it keeps a lone die legible on any surface. `face={false}` drops it for a
+repeated table column, where the header already frames the column. The second demo is the numeral fallback at
+`value={9}`.
 
 ## Edge cases
 
@@ -70,20 +70,12 @@ pretends.
 
 <FourContexts slug="dice-pips" />
 
-## Why this default
-
-The face outline keeps a lone die legible on any surface, so it is on by default; `face={false}` drops it for repeated
-table columns where the header already frames the column. Six is the ceiling because pip patterns above six are not
-subitizable — asking the reader to count invented pips would be slower than reading a number, so the chart refuses and
-shows the numeral instead. That numeral fallback is the documented honesty rule, shown live at `value={9}`.
-
 ## Accessibility
 
-The accessible name states the value against its range — **"4 out of 6."** — and drops the frame to just the exact
-number once past six (**"9."**). Zero reads "0 out of 6." (a real zero), and an invalid value reads "No data." The
-interactive entry pops the pips into place on change (a short scale-up with a per-pip stagger, skipped under
-`prefers-reduced-motion`) and announces the new face through a polite live region; the pips are one value, so there is
-no cursor to move.
+The accessible name states the value against its range: **"4 out of 6."** Past six it drops the range and gives the
+number alone (**"9."**). Zero reads "0 out of 6." and an invalid value reads "No data." The interactive entry pops the
+pips into place on change — a short scale-up with a per-pip stagger, skipped under `prefers-reduced-motion` — and
+announces the new face through a polite live region. The pips are one value, so there is no cursor to move.
 
 <InteractionNote slug="dice-pips" />
 

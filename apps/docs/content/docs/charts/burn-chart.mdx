@@ -1,14 +1,13 @@
 ---
 title: BurnChart
-description: >-
-  React burn chart chart — sprint plan vs actual with a provisional projection to the deadline. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: "Sprint plan against actual, with a dotted linear projection to the deadline and the signed schedule gap."
 ---
 
-BurnChart answers "will we finish on time?". It draws the **plan** line (dashed, full length to the deadline), the
-**actual** line to today, and a **dotted projection** whose slope is a plain linear fit over the last few actual points
-— provisional by construction, never a smoothed or optimistic curve. The gap label states the signed schedule landing,
-because "will we finish" is a number, not a vibe.
+Six days into an eleven-day sprint, 19 points are done against 20 planned. BurnChart draws the **plan** line (dashed,
+full length to the deadline), the **actual** line to today, and a **dotted projection** whose slope is a plain linear
+fit over the last `max(2, ⌈actual/3⌉)` actual points. History is solid and exact; the projection is dotted and muted,
+and its method is stated rather than smoothed into an optimistic curve. The gap label states the signed schedule
+landing.
 
 <LiveDemo
   label="BurnChart"
@@ -41,9 +40,8 @@ because "will we finish" is a number, not a vibe.
 
 ## When to use it
 
-- **Good for** — a sprint burndown in a tab header, will-we-finish in a KPI card, plan vs actual with a projected
-  landing.
-- **Avoid for** — a single progress number (Progress) or a plain series (Sparkline).
+Use it for a sprint burndown in a tab header, will-we-finish in a KPI card, and plan vs actual with a projected landing.
+For a single progress number use Progress; for a plain series use Sparkline.
 
 ## Sizing
 
@@ -127,21 +125,14 @@ With a `locale`, the accessible summary's numbers follow that locale's own group
   <BurnChart data={{ plan: [40, 36, 32, 28, 24, 20], actual: [40] }} title="Day one" width={220} height={28} />
 </LiveDemo>
 
-With no plan (`plan: []`), the projection still runs — the fitted slope only needs `actual` — but there's nothing to
-compare it to, so the summary drops the "vs planned" clause. A stalled burn (`actual` flat) never reaches zero, so
-`finishes` is `false` and the summary states that plainly rather than extrapolating a fake landing. A single `actual`
-point draws no projection at all (the fit needs at least two).
+With no plan (`plan: []`), the projection still runs, since the fitted slope only needs `actual`, but there is no plan
+to compare against, so the summary drops the "vs planned" clause. A stalled burn (`actual` flat) never reaches zero, so
+`finishes` is `false` and the summary says so outright ("not finishing at the current pace") rather than extrapolating a
+landing date. A single `actual` point draws no projection at all: the fit needs at least two.
 
 ## Four homes
 
 <FourContexts slug="burn-chart" />
-
-## Why this default
-
-The gap label, because "will we finish" is a number, not a vibe. History is drawn solid and exact; the projection is
-dotted, muted, and computed as a linear fit over the last `max(2, ⌈actual/3⌉)` actual points — a stated method, never an
-optimistic hand-drawn curve. When the recent burn flattens, the projection never reaches zero and the summary says so
-outright ("not finishing at the current pace"), rather than implying a landing that isn't coming.
 
 ## Accessibility
 

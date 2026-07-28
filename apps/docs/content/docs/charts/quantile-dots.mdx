@@ -1,14 +1,14 @@
 ---
 title: QuantileDots
-description: >-
-  React quantile dots chart — sample or posterior as quantile dots against a decision threshold. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  QuantileDots draws a sample or posterior as countable quantile dots and reports the odds past a threshold as a
+  frequency.
 ---
 
-QuantileDots answers "what are the odds?" — in **countable** form. It's a quantile dotplot: each dot is an
-equal-probability quantile, so a dot is roughly a **1-in-N chance**, not a raw observation. Add a `threshold` and the
-plot turns from shape into odds: the dots past the line are re-inked and ringed, and the summary reads **"N in 20"** —
-because odds you can count beat odds you must trust, and a frequency reads truer than a bare percentage.
+QuantileDots draws a sample or a posterior as 20 dots, each one an equal-probability quantile. A dot is therefore about
+a **1-in-N chance**, not a raw observation. Add a `threshold` and the dots past the line are re-inked and ringed, and
+the summary reports the answer as a frequency ("10 in 20") rather than a percentage. Two cues carry the count, so it
+survives grayscale, print, and forced-colors.
 
 <LiveDemo label="QuantileDots" sizeOf="quantile-dots">
   <QuantileDots
@@ -33,9 +33,9 @@ because odds you can count beat odds you must trust, and a frequency reads truer
 
 ## When to use it
 
-- **Good for** — a "will we miss the SLA?" read in a sentence, odds you can count in a KPI card, a posterior
-  communicated as frequency rather than percent.
-- **Avoid for** — a precise distribution shape (HistogramStrip) or one estimate's interval (GradedBand).
+Use it for a "will we miss the SLA?" read in a sentence, countable odds in a KPI card, and a posterior communicated as a
+frequency rather than a percent. For a precise distribution shape use HistogramStrip; for one estimate's interval use
+GradedBand.
 
 ## Sizing
 
@@ -120,25 +120,21 @@ grouping and decimal marks.
   />
 </LiveDemo>
 
-Empty data draws nothing and the summary says so plainly. An all-equal sample collapses every dot into one column —
-genuine certainty, not a rendering glitch. A threshold outside the observed range reads as 0 in N (or N in N) — the
-count is always honest about what fraction of the field it's actually catching.
+Empty data draws nothing and the summary says so. An all-equal sample collapses every dot into one column: that is
+certainty in the sample, not a rendering glitch. A threshold outside the observed range reads as 0 in N (or N in N), so
+the count always reports the fraction of the field it catches.
+
+Use `count` to change how many dots the sample is quantized into; 20 is the default because a reader subitizes a handful
+of highlighted dots faster than they parse "48%".
 
 ## Four homes
 
 <FourContexts slug="quantile-dots" />
 
-## Why this default
-
-20 dots, because odds you can count beat odds you must trust — a reader subitizes a handful of highlighted dots faster
-than they parse "48%". Each dot is an equal-probability quantile, **not** a raw observation, and the summary always
-frames the answer as a frequency ("10 in 20"), never a bare percentage. Dots past the threshold are re-inked **and**
-ringed, so the count survives grayscale, print, and forced-colors.
-
 ## Accessibility
 
-The accessible name states the odds in frequency form — **"8 in 15 chances above 15 min."** — or, without a threshold,
-"Most likely …; range …". The interactive entry is a probe: hovering or arrowing moves a live threshold and the count
+The accessible name states the odds as a frequency: **"8 in 15 chances above 15 min."** Without a `threshold` it reads
+"Most likely …; range …" instead. In the interactive entry, hovering or arrowing moves a live threshold and the count
 past it recomputes as you go.
 
 <InteractionNote slug="quantile-dots" />

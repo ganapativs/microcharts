@@ -1,14 +1,13 @@
 ---
 title: ShiftHistogram
-description: >-
-  React shift histogram chart — before/after distributions on mirrored shared bins. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  ShiftHistogram mirrors before and after distributions on shared bins and states the median shift between them.
 ---
 
-ShiftHistogram answers "did the fix actually change the distribution?". It mirrors two histograms around a center line —
-**before** upward (muted), **after** downward (accent) — on **shared bin edges**, with the median shift as the precise
-takeaway. Bar heights are per-side proportions on one shared scale, so a bigger sample on one side can't fake a shift.
-The mirror carries **identity**, not valence (up isn't "good") — that's the whole point of the symmetry.
+ShiftHistogram mirrors two histograms around a center line: **before** upward (muted), **after** downward (accent), on
+**shared bin edges**. Bar heights are per-side proportions (each side's counts over its own n) on one shared scale, so a
+bigger sample on one side cannot fake a shift. The mirror carries **identity**, not valence — up is "before", not
+"good". The median shift is the precise takeaway, and the medians are never smoothed or trimmed.
 
 <LiveDemo label="ShiftHistogram" sizeOf="shift-histogram">
   <ShiftHistogram
@@ -33,9 +32,8 @@ The mirror carries **identity**, not valence (up isn't "good") — that's the wh
 
 ## When to use it
 
-- **Good for** — a "the fix, proven" read in a KPI card, before/after distributions in an experiments table, showing a
-  change is real (not just a mean move).
-- **Avoid for** — a single distribution (HistogramStrip) or two labelled arms (ABStrips).
+Use it for a "the fix, proven" read in a KPI card, before/after distributions in an experiments table, and showing that
+a change is more than a mean move. For a single distribution use HistogramStrip; for two labelled arms use ABStrips.
 
 ## Sizing
 
@@ -92,8 +90,9 @@ const after = Array.from({ length: 100 }, (_, i) => 96 + (i % 40) - 20);
   />
 </LiveDemo>
 
-The median shift label and accessible summary follow `format`/`locale` — the before median above reads "12.400" under
-`de-DE` rather than the English "12,400".
+The median shift label and accessible summary follow `format`/`locale`. Under `de-DE` the before median above reads
+"12.400" rather than the English "12,400". `mode="overlay"` draws the after bins above the axis as an outline over the
+before fill instead of mirroring them below it; the bins stay shared either way.
 
 ## Edge cases
 
@@ -124,27 +123,20 @@ const before = Array.from({ length: 100 }, (_, i) => 120 + (i % 40) - 20);
   <ShiftHistogram data={{ before: [], after: [] }} title="No data yet" width={200} height={26} />
 </LiveDemo>
 
-With one side empty the chart still renders the populated side's bins alone, and the summary names the gap directly —
-**"Median 116 ms; no after sample."** — never a fabricated shift. With both sides empty nothing is plottable and the
+With one side empty the chart still renders the populated side's bins alone, and the summary names the gap: **"Median
+116 ms; no after sample."** It never reports a fabricated shift. With both sides empty nothing is plottable and the
 accessible name says **"No data."**
 
 ## Four homes
 
 <FourContexts slug="shift-histogram" />
 
-## Why this default
-
-Mirror, because before/after symmetry makes the shift a visible displacement. The only normalization allowed is per-side
-proportions — each side's counts over its own n — on one shared height scale, so unequal sample sizes never fake a
-shift, and the rule is stated. The bins are shared across both sides always, and the medians are never smoothed or
-trimmed. Side identity rides on position (up vs before, down vs after) so it survives grayscale and forced-colors; the
-summary names the direction and, when the sample sizes differ, carries both.
-
 ## Accessibility
 
-The accessible name states the median shift plainly — **"Median fell from 116 ms to 92 ms."** — appending "On N / M
-samples" when the sizes differ. The interactive entry steps the bins and announces each bin's before/after proportions;
-**M** jumps to the two median bins.
+Side identity rides on position (up is before, down is after), so it survives grayscale and forced-colors. The
+accessible name states the median shift: **"Median fell from 116 ms to 92 ms."** It appends "On N / M samples" when the
+sample sizes differ. The interactive entry steps the bins and announces each bin's before/after proportions; **M** jumps
+to the two median bins.
 
 <InteractionNote slug="shift-histogram" />
 

@@ -1,15 +1,15 @@
 ---
 title: Annotations
 description:
-  Declarative reference context for React microcharts — thresholds, target zones, moment markers, and callouts, written
-  as children and rendered identically inside every host.
+  Thresholds, target zones, markers, and callouts are written as children and drawn in the host chart's own coordinate
+  space.
 ---
 
-Annotations answer "what should the reader compare this against?". They're plain children — `<Threshold>`,
-`<TargetZone>`, `<Marker>`, `<Callout>` — that the host chart draws in its own coordinate space, so the same child lands
-identically on any chart that accepts it. Reference ink whispers: the hairlines stroke at 0.7 opacity, labels take the
-muted `--mc-neutral` label ink, and a target band uses the same faint `--mc-band` fill the charts do — so the data never
-competes with its context.
+Annotations give the reader something to compare the data against: a limit, a normal range, the moment a deploy landed.
+They're plain children (`<Threshold>`, `<TargetZone>`, `<Marker>`, `<Callout>`) that the host chart draws in its own
+coordinate space, so the same child lands identically on any chart that accepts it. Reference ink stays quieter than
+data ink: hairlines stroke at 0.7 opacity, labels take the muted `--mc-neutral` label ink, and a target band uses the
+same faint `--mc-band` fill the charts do.
 
 <LiveDemo
   label="Annotations"
@@ -37,8 +37,8 @@ import { Threshold, TargetZone, Marker } from "@microcharts/react/annotations";
 
 ## Install
 
-The annotation layer is its own ~1.5 kB entry. A host that renders no annotations pays only a tiny children walker; the
-mark renderers ship with this import.
+The annotation layer is its own ~1.5 kB entry. The mark renderers ship with this import, so a host that renders no
+annotations pays only a small children walker.
 
 ```tsx
 import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annotations";
@@ -51,12 +51,12 @@ import { Threshold, TargetZone, Marker, Callout } from "@microcharts/react/annot
 - **`<Marker x={8} label="deploy" />`** — a vertical moment mark; `x` addresses the host's primary axis (the data
   **index** on index-based charts like Sparkline and SparkBar).
 - **`<Marker x={8} celebrate />`** — six deterministic particles burst once on entrance, for milestone crossings only;
-  under reduced motion they rest as a quiet starburst.
-- **`<Callout x={5} y={45} label="dip" />`** — one narrated point on an elbow hairline. `label` is required; `y` is
+  under reduced motion they render as a static starburst.
+- **`<Callout x={5} y={45} label="dip" />`** — a labeled point on an elbow hairline. `label` is required; `y` is
   optional and defaults to the frame's mid-height.
 
 `label` is optional on the other three, and all four take a `color` to override the reference ink on that one mark. A
-fragment works as a container — `<><Threshold … /><Marker … /></>` — the host's walker unwraps it.
+fragment works as a container (`<><Threshold … /><Marker … /></>`); the host's walker unwraps it.
 
 <LiveDemo
   label="celebrate — a milestone crossing"
@@ -84,8 +84,8 @@ fragment works as a container — `<><Threshold … /><Marker … /></>` — the
 
 ## The same child, any host
 
-The children don't know which chart drew them — they resolve against the host's scale. Move the exact `<TargetZone>` and
-`<Threshold>` from a line onto bars and they land in the same data-space, unchanged.
+Annotation children carry no chart-specific geometry; they resolve against the host's scale. Move the exact
+`<TargetZone>` and `<Threshold>` from a line onto bars and they land in the same data-space, unchanged.
 
 <LiveDemo
   label="identical annotations on SparkBar"
@@ -103,42 +103,41 @@ The children don't know which chart drew them — they resolve against the host'
 
 ## Every value-series host
 
-Every **value-series** chart hosts annotations — the charts with a continuous value axis and an index / slot / time
-x-axis, so a data-space `x` and `y` map cleanly onto the frame. That's Sparkline, SparkBar, MiniBar, CyclePlot,
+Every **value-series** chart hosts annotations: the charts with a continuous value axis and an index / slot / time
+x-axis, where a data-space `x` and `y` map cleanly onto the frame. That's Sparkline, SparkBar, MiniBar, CyclePlot,
 CitySkyline, ChangePoint, DualSparkline, SpreadBand, ForecastCone, ControlStrip, QueueDepth, BurnChart, Waterfall,
 PercentileTrace, RetentionCurve, WinProbWorm, ErrorBudget, NetFlow, Horizon, EnsembleGhosts, PairedBars (vertical), and
 Slope. The same `<Threshold>` or `<Marker>` lands in each chart's own data-space, unchanged. (MiniBar and PairedBars
 host in their default **vertical** orientation, where value lives on the y-axis; a horizontal layout flips the axes, so
 annotation children pass through.)
 
-Charts without a single continuous value-y don't host them, by design — there's no shared `y` for a `<Threshold>` to
-land on:
+Charts without a single continuous value axis don't host them: there's no shared `y` for a `<Threshold>` to land on.
 
 | Why it can't host             | Examples                                 |
 | ----------------------------- | ---------------------------------------- |
 | Scalar readout — no axis      | Delta, FatDigits, StatusDot, Thermometer |
 | Part-to-whole — y is a share  | MicroDonut, SegmentedBar, Funnel         |
-| Value encoded as colour       | HeatStrip, ActivityGrid, the calendars   |
+| Value encoded as color        | HeatStrip, ActivityGrid, the calendars   |
 | Value against value           | QuadrantDot, MicroScatter, BiasStrip     |
 | Pure timeline — no value axis | the event/phase timelines                |
 
-Most still accept children as a plain pass-through, so an annotation placed inside one renders nothing and warns in dev;
-a few — Delta among them — take no children at all, and it's a type error.
+Most still accept children as a plain pass-through, so an annotation placed inside one renders nothing and warns in dev.
+A few take no children at all, Delta among them, and passing one is a type error.
 
 <AnnotationHostShowcase />
 
-## Honesty rules
+## Rendering rules
 
-- A coordinate outside the host's domain **clamps to the edge at 0.4 opacity** — visibly off-scale, never silently
-  dropped.
-- Annotations never touch the auto summary: the data description stays pure. To narrate an annotation on a static chart,
-  pass an explicit `summary` string.
+- A coordinate outside the host's domain **clamps to the edge at 0.4 opacity**, so it reads as off-scale instead of
+  being dropped.
+- Annotations never change the auto summary, which describes the data alone. To describe an annotation on a static
+  chart, pass an explicit `summary` string.
 - `celebrate` particles are seeded from the marker's `x` and the host's size, never `Math.random`, so server and client
   render the same burst.
-- A `label` you supply is the one text the containment rule can't pre-reserve a gutter for, so it's kept inside the
-  chart by one of two mechanisms. `Threshold`, `TargetZone` and `Callout` **truncate**: a label longer than its
-  available run is cut and given a trailing `…`. `Marker` instead **flips its anchor** — a label near the right edge
-  draws leftward from the mark rather than off the chart — so a moment mark never loses characters.
-- Reference hairlines draw at a fixed 1-unit weight, deliberately exempt from `--mc-density`, so tightening the density
-  never thickens the context ink along with the data. The one exception is the `Callout` elbow, drawn a shade lighter at
-  0.75, because it's a leader line pointing at data rather than a reference the reader measures against.
+- A `label` you supply is the one text the containment rule can't pre-reserve a gutter for, so two mechanisms keep it
+  inside the chart. `Threshold`, `TargetZone` and `Callout` **truncate**: a label longer than its available run is cut
+  and given a trailing `…`. `Marker` **flips its anchor** instead, drawing a label near the right edge leftward from the
+  mark, so a moment mark never loses characters.
+- Reference hairlines draw at a fixed 1-unit weight, exempt from `--mc-density`, so tightening the density never
+  thickens the context ink along with the data. The `Callout` elbow is the exception, drawn a shade lighter at 0.75,
+  because it's a leader line pointing at data rather than a reference the reader measures against.
