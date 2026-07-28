@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CHART_MODULE_LAZY } from "./modules.generated";
 
@@ -35,8 +36,8 @@ describe("static ↔ interactive preview parity", () => {
       const spec = mod.playground;
 
       if (mod.Preview && mod.PreviewLive) {
-        const live = box(renderToStaticMarkup(mod.PreviewLive({})));
-        const stat = box(renderToStaticMarkup(mod.Preview()));
+        const live = box(renderToStaticMarkup(createElement(mod.PreviewLive)));
+        const stat = box(renderToStaticMarkup(createElement(mod.Preview)));
         if (both(live, stat)) expect(live, "gallery preview").toBe(stat);
       }
       if (spec?.renderInteractive) {

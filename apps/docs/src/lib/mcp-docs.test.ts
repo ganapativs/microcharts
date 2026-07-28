@@ -34,7 +34,7 @@ const docs = {
   ai: readFileSync(resolve(process.cwd(), "content/docs/ai.mdx"), "utf8"),
   quickstart: readFileSync(resolve(process.cwd(), "content/docs/quickstart.mdx"), "utf8"),
   index: readFileSync(resolve(process.cwd(), "content/docs/index.mdx"), "utf8"),
-  home: readFileSync(resolve(process.cwd(), "src/components/home/home-models-section.tsx"), "utf8"),
+  home: readFileSync(resolve(process.cwd(), "src/components/home/fence-beat.tsx"), "utf8"),
   llms: readFileSync(resolve(process.cwd(), "src/app/llms.txt/route.ts"), "utf8"),
 };
 
@@ -83,9 +83,10 @@ describe("every MCP entry point on the site points at the canonical page", () =>
     expect(docs.index).toContain("/docs/mcp");
   });
 
-  it("the homepage models band links it and names the real tools", () => {
-    expect(docs.home).toContain("/docs/mcp");
-    for (const t of TOOLS) expect(docs.home, `homepage omits "${t}"`).toContain(t);
+  it("the homepage prints the install line under the server's real name", () => {
+    // The page carries no tool register — it hands over the one command and
+    // /docs/mcp owns the detail. A package rename must still break this.
+    expect(docs.home).toContain(`npx -y ${pkg.name}`);
   });
 
   it("/llms.txt advertises the server with its real tools and resources", () => {

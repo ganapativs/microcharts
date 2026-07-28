@@ -207,7 +207,7 @@ export function AppearanceMenu() {
                 {/* Sparkline uses --accent; SegmentedBar uses derived cats. */}
                 <div
                   key={accent + preset}
-                  className="mc-morph hv-theme-stage flex w-full flex-col items-center gap-2"
+                  className="mc-morph theme-stage flex w-full flex-col items-center gap-2"
                 >
                   <Sparkline
                     data={[6, 9, 7, 12, 10, 15, 13, 18, 16, 22]}

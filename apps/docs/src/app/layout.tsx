@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@/components/analytics";
+import { LabelCodeRegions } from "@/components/label-code-regions";
 import { Provider } from "@/components/provider";
 import { SITE } from "@/lib/site";
 import {
@@ -20,21 +21,30 @@ const sans = Hanken_Grotesk({
   display: "swap",
 });
 
-// Mona Sans (GitHub × Degarism, SIL OFL — licence kept beside the file) is
-// self-hosted because it isn't on Google Fonts. The shipped file is a latin
-// subset of `MonaSansVF[opsz,wght]` with the weight axis clipped to 400–800:
-// 66 kB, roughly half what Bricolage's latin subset cost, and it keeps the
-// optical-size axis, which is the point — the type scale is small now, so
-// small sizes need the sturdier optical cut and headings the finer one.
-// Regenerate with fontTools: instancer `wght=400:800`, then subset to the
-// Google latin unicode range with kern,liga,calt,ccmp,locl,mark,mkmk,tnum.
+// Open Runde (a rounded cut of Inter, SIL OFL — licence beside the files) is the
+// site's display face, self-hosted because it isn't on Google Fonts. It ships as
+// statics, not a variable font, so only the three weights the site actually sets
+// are here: 500 for headings and doc titles, 600 for the landing sections and
+// the footer wordmark, 700 for the two landing bookends. 20 kB each.
+// Regenerate with fontTools from the Fontsource latin statics:
+//   python3 -m fontTools.subset open-runde-latin-<w>-normal.woff2 \
+//     --unicodes=<google latin range> \
+//     --layout-features=kern,liga,calt,ccmp,locl,mark,mkmk \
+//     --flavor=woff2 --no-hinting --desubroutinize
+//
+// `adjustFontFallback` makes Next emit a metric-matched, size-adjusted local
+// fallback, so a display line occupies the same box before and after the swap —
+// without it the first heading reflows on font load.
 const display = localFont({
-  src: "../fonts/MonaSans-latin.woff2",
+  src: [
+    { path: "../fonts/OpenRunde-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/OpenRunde-600-latin.woff2", weight: "600", style: "normal" },
+    { path: "../fonts/OpenRunde-700-latin.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-display-src",
   display: "swap",
-  weight: "400 800",
-  style: "normal",
-  declarations: [{ prop: "font-optical-sizing", value: "auto" }],
+  adjustFontFallback: "Arial",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
 const mono = JetBrains_Mono({
@@ -45,20 +55,6 @@ const mono = JetBrains_Mono({
 
 // Apply saved accent + chart preset before first paint.
 const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
-
-// Predict the hero's live-mode layout before first paint, so the panel is born
-// its final size instead of growing into it.
-//
-// `LanguageModel.availability()` is async and settles well after paint — that
-// lateness is the whole problem. But the *presence* of the API is synchronous,
-// and whether the model is actually on disk is stable across visits, so one
-// remembered bit plus one sync check predicts the layout precisely: the API has
-// to exist here AND Nano has to have been installed last time. Both true ->
-// reserve. A visitor without Chrome's AI never matches and pays one `typeof`.
-//
-// The flag is written and cleared by use-live-model.ts against the real
-// availability answer, so an uninstalled model self-heals on the next load.
-const LIVE_SCRIPT = `try{if(typeof LanguageModel!=="undefined"&&localStorage.getItem("mc-live")==="1")document.documentElement.dataset.mcLive="1"}catch(e){}`;
 
 // Console easter egg — unicode blocks of the hero sparkline series [3,5,4,8,6,9,7,11].
 const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-size:15px;letter-spacing:1.5px","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
@@ -149,14 +145,18 @@ export default function Layout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        {/* The site's ground, on every route. Fixed and at `z-index: -1`, so no
+            page layout has to make room for them or stack above them. */}
+        <div aria-hidden className="site-grain" />
+        <div aria-hidden className="site-wash" />
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: LIVE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
         <script type="application/ld+json">{jsonLdScript(organizationJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareSourceCodeJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(softwareApplicationJsonLd())}</script>
         <Analytics />
+        <LabelCodeRegions />
         <Provider>{children}</Provider>
       </body>
     </html>

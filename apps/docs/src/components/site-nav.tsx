@@ -28,8 +28,10 @@ const links = [
   { href: "/charts", label: "Charts" },
   { href: "/examples", label: "Examples" },
   { href: "/docs/ai", label: "AI-native" },
-  { href: "/brand", label: "Brand" },
 ];
+// Brand is NOT here, and was: it is a guidelines page a reader visits once, and
+// it was taking a fifth of a masthead whose other four entries are the site's
+// working doors. It lives on the footer's licence line now — see the note there.
 
 /** Documentation claims all of /docs except /docs/ai, which the AI entry owns. */
 function isActive(href: string, pathname: string): boolean {

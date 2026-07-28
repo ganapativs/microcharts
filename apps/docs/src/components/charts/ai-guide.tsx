@@ -168,7 +168,10 @@ export function GrammarExplorer() {
             <CopyButton text={emitted} />
           </div>
           <div className="code-inset flex-1 px-4 py-3">
-            <pre className="overflow-x-auto whitespace-pre font-mono text-[0.8rem] leading-relaxed text-fd-muted-foreground">
+            <pre
+              tabIndex={0}
+              className="overflow-x-auto whitespace-pre font-mono text-[0.8rem] leading-relaxed text-fd-muted-foreground"
+            >
               {emitted}
             </pre>
           </div>
@@ -196,7 +199,10 @@ export function GrammarExplorer() {
           <CopyButton text={spec.jsx} />
         </div>
         <div className="code-inset px-4 py-3">
-          <pre className="overflow-x-auto whitespace-pre font-mono text-[0.8rem] leading-relaxed text-fd-muted-foreground">
+          <pre
+            tabIndex={0}
+            className="overflow-x-auto whitespace-pre font-mono text-[0.8rem] leading-relaxed text-fd-muted-foreground"
+          >
             {spec.jsx}
           </pre>
         </div>

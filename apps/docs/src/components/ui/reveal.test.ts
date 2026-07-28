@@ -52,15 +52,6 @@ describe("first paint is never gated on JS, and entrance choreography stays dead
     expect(hidingSelectors).toEqual([]);
   });
 
-  it("the hero stream starts on hydration, with no added hold", () => {
-    // The panel is server-rendered; hydration is already the late moment. A
-    // startDelay on top of it (900ms, sized to a headline animation that no
-    // longer exists) read as the section being broken.
-    const vignette = read("../home/stream-vignette.tsx");
-    expect(vignette).not.toMatch(/startDelay/);
-    expect(read("../home/home-hero.tsx")).toMatch(/<StreamVignette serif \/>/);
-  });
-
   it("route fades and gallery entrances stay removed", () => {
     for (const file of srcFiles()) {
       const text = readFileSync(file, "utf8");
@@ -79,37 +70,14 @@ describe("first paint is never gated on JS, and entrance choreography stays dead
     }
   });
 
-  it("live mode's late arrival is predicted, not just animated", () => {
-    // `LanguageModel.availability()` settles after paint, so the composer and
-    // the taller reply floor both land late. Landing them instantly snapped the
-    // hero panel 315px -> 536px and shoved the caption under it (CLS 0.05).
-    // The prediction is what gets that to zero for a returning visitor.
-    expect(read("../../app/layout.tsx")).toMatch(
-      /typeof LanguageModel!=="undefined"&&localStorage\.getItem\("mc-live"\)==="1"/,
-    );
-    expect(css).toMatch(/\[data-mc-live="1"\] \.hv-composer/);
-    expect(css).toMatch(/\[data-mc-live="1"\] \.hv-reply-floor/);
-    // …and the animated growth stays as the first-visit fallback.
-    expect(css).toMatch(/\.hv-reply-floor\s*\{[^}]*transition:\s*min-height/);
-
-    const live = read("../home/use-live-model.ts");
-    // A stale flag must self-heal, or a visitor who uninstalled Nano keeps
-    // reserving space nothing will ever fill.
-    expect(live).toMatch(/localStorage\.removeItem\(LIVE_HINT_KEY\)/);
-    expect(live).toMatch(/delete document\.documentElement\.dataset\.mcLive/);
-  });
-
-  it("the always-mounted composer stays collapsed and out of reach", () => {
-    const vignette = read("../home/stream-vignette.tsx");
-    // Rendered unconditionally so `1fr` can reserve its true height — which
-    // means it must be inert when live is off, or the chips and the input are
-    // tabbable inside a zero-height box for every visitor.
-    expect(vignette).toMatch(/inert=\{!live\.supported\}/);
-    // Under border-box sizing a grid item never shrinks below its own padding,
-    // so the padded element must NOT be the direct child of the grid — that
-    // leaked 27px into every collapsed panel.
-    expect(vignette).toMatch(
-      /className="hv-composer"[\s\S]{0,140}?>\s*<div>\s*<div className="border-t/,
-    );
+  it("the on-device model is offered, never downloaded", () => {
+    // `availability()` returning "downloadable" must NOT light the tab up: that
+    // would put a multi-gigabyte model download one click away from a docs page.
+    const live = read("../charts/use-live-model.ts");
+    expect(live).toMatch(/a === "available"/);
+    expect(live).not.toMatch(/"downloadable"\s*(?:===|\)|\|\|)/);
+    // The tab exists only once the answer is in, so nothing is reserved for a
+    // visitor who will never see it.
+    expect(read("../charts/stream-demo.tsx")).toMatch(/live\.supported && tab\(LIVE_ID/);
   });
 });

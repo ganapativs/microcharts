@@ -5,6 +5,7 @@ import { abs } from "@/lib/site";
 import { SHOWCASE } from "@/lib/showcase";
 
 const HOME = "apps/docs/src/app/(home)";
+const LANDING = "apps/docs/src/app/(landing)";
 
 export const dynamic = "force-static";
 
@@ -19,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Per-route lastmod from the source file's real git-commit date, so an
   // unchanged rebuild/redeploy doesn't bump `<lastmod>` (build-time `now` did).
   const staticRoutes = [
-    { path: "/", priority: 1, changeFrequency: "weekly" as const, src: `${HOME}/page.tsx` },
+    { path: "/", priority: 1, changeFrequency: "weekly" as const, src: `${LANDING}/page.tsx` },
     {
       path: "/charts",
       priority: 0.9,

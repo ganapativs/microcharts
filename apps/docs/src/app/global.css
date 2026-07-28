@@ -104,30 +104,6 @@
     0 6px 18px -12px color-mix(in oklab, #17233c 11%, transparent);
   --glass-shadow-lift: 0 12px 30px -16px color-mix(in oklab, #17233c 17%, transparent);
 
-  /* Optical field — real colour and light for the glass to bend and tint. Kept
-     to the corners so central reading stays calm; richer than a flat wash. */
-  --field:
-    radial-gradient(
-      58% 52% at 4% -8%,
-      color-mix(in oklab, var(--accent) 17%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      52% 52% at 100% 2%,
-      color-mix(in oklab, #86a2e6 24%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      82% 72% at 50% 122%,
-      color-mix(in oklab, #9fb1de 32%, transparent),
-      transparent 64%
-    ),
-    radial-gradient(
-      44% 44% at 84% 74%,
-      color-mix(in oklab, #e6b48f 13%, transparent),
-      transparent 72%
-    );
-
   /* Bind microcharts tokens to the SITE theme (next-themes class), not the OS.
      The library keys its dark values off @media(prefers-color-scheme) with
      zero specificity; these :root overrides (higher specificity) win, so a
@@ -224,28 +200,6 @@
     0 1px 1px color-mix(in oklab, #000 30%, transparent),
     0 7px 18px -11px color-mix(in oklab, #000 40%, transparent);
   --glass-shadow-lift: 0 14px 32px -14px color-mix(in oklab, #000 52%, transparent);
-
-  --field:
-    radial-gradient(
-      58% 52% at 6% -10%,
-      color-mix(in oklab, var(--accent) 28%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      52% 48% at 100% 0%,
-      color-mix(in oklab, #2bb3a6 16%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      88% 78% at 50% 124%,
-      color-mix(in oklab, #16365f 46%, transparent),
-      transparent 64%
-    ),
-    radial-gradient(
-      44% 44% at 82% 70%,
-      color-mix(in oklab, var(--accent) 14%, transparent),
-      transparent 72%
-    );
 
   /* microcharts dark tokens, bound to the site theme (see :root note). Matte,
      never neon — the deep field gives ample contrast headroom. */
@@ -538,16 +492,55 @@ html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+/* The page ground lives on `html` so the two fixed layers below can sit at
+   `z-index: -1` — behind every in-flow element, in front of the ground itself.
+   `body` must stay transparent and must not create a stacking context, or the
+   negative layer would be trapped behind it. */
+html {
+  background-color: var(--color-fd-background);
+}
 body {
   font-feature-settings: "cv01", "ss01";
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* The optical depth field — calm layered light so frosted glass has real
-     substance to refract. Fixed so it stays put under scroll. */
-  background-color: var(--color-fd-background);
-  background-image: var(--field);
-  background-attachment: fixed;
+  background-color: transparent;
+}
+
+/* The site's ground, on every route: paper grain over everything, and one angled
+   accent wash over the top-left. Both are FIXED — the tint stays where the light
+   is rather than sliding up and off, and the grain does not tile against scroll.
+
+   The wash stops at 55%, so the far corner resolves to nothing well inside the
+   viewport. It is driven by `--mc-accent`, so the accent picker and the chart
+   presets move it with everything else. */
+.site-grain,
+.site-wash {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.site-grain {
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+.site-wash {
+  background: linear-gradient(
+    152deg,
+    color-mix(in oklab, var(--mc-accent) 7%, transparent) 0%,
+    transparent 55%
+  );
+}
+/* Fixed layers have no meaning on a sheet — under a paginated medium they paint
+   on every page. */
+@media print {
+  .site-grain,
+  .site-wash {
+    display: none;
+  }
 }
 ::selection {
   background: color-mix(in oklab, var(--signal) 22%, transparent);
@@ -591,16 +584,49 @@ body {
 
 /* ---- Identity primitives ------------------------------------------------- */
 
-/* The signature voice (Mona Sans, optical). Weight 500 rather than 600: Mona
-   carries an industrial-grotesque sturdiness that 600 turns into shouting, and
-   the whole scale came down with it. Leading opens from 0.98 to 1.06 — 0.98 was
-   compensating for headline sizes we no longer set. */
+/* The signature voice. Weight 500, not 600: the display face is rounded and
+   sturdy, and 600 at heading sizes reads as shouting. */
 .display {
   font-family: var(--font-display);
-  font-optical-sizing: auto;
   font-weight: 500;
   letter-spacing: -0.016em;
   line-height: 1.06;
+}
+
+/* The footer wordmark's face. The canvas draws "microcharts" itself, so it reads
+   `fontFamily` off this host and hands the string to `ctx.font` — it needs a
+   family it can name. Separate from `.display` because that class is the site's
+   heading voice and carries a weight and tracking the canvas must not inherit. */
+.wordmark-face {
+  font-family: var(--font-display);
+}
+
+/* The on-device tab's "thinking" mark: the model can take seconds before its
+   first token, and a still box under the question reads as nothing happening.
+   One dot on the accent, breathing. */
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--accent);
+  animation: live-dot 1.4s ease-in-out infinite;
+}
+@keyframes live-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+    opacity: 0.7;
+  }
 }
 
 /* Small mono metadata: section markers, sizes, coordinates. */
@@ -701,9 +727,8 @@ body {
       transform 0.32s var(--ease-out-quint);
   }
   /* Gate the hover lift behind a real pointer — a touch tap fires :hover and
-     would leave the card lifted mid-navigation (matches .hx-tile, which is
-     already gated). Colour/shadow-only hover is fine on touch; the transform
-     is the part that must not fire without a hovering cursor. */
+     would leave the card lifted mid-navigation. Colour/shadow-only hover is fine
+     on touch; the transform is the part that must not fire without a cursor. */
   @media (hover: hover) and (pointer: fine) {
     .glass-lift:hover {
       border-color: color-mix(in oklab, var(--accent) 42%, var(--hairline));
@@ -1788,16 +1813,7 @@ body {
 /* One keyboard focus ring for the whole control canon — the accent, offset so
    it reads on glass in both themes. :where() keeps specificity at zero so any
    component can override. Charts keep the library's own focus treatment. */
-:where(
-  .cta-accent,
-  .cta-ghost,
-  .ghost-ctrl,
-  .seg-opt,
-  .mc-range,
-  .link-underline,
-  .hx-slot-link,
-  .hx-tile-link
-):focus-visible {
+:where(.cta-accent, .cta-ghost, .ghost-ctrl, .seg-opt, .mc-range, .link-underline):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
@@ -2700,7 +2716,6 @@ div:where(
 /* editorial display section headings inside docs prose */
 .prose h2 {
   font-family: var(--font-display);
-  font-optical-sizing: auto;
   font-weight: 500;
   letter-spacing: -0.014em;
 }
@@ -2756,406 +2771,36 @@ div:where(
   }
 }
 
-/* ---- Home concept: /elements --------------------------------------------- */
+/* ---- Shared surfaces kept from the earlier marketing pages ---------------- */
 @layer components {
-  /* A live chart sitting inside display type. The SVG scales with the font
-     (the viewBox carries geometry; vector-effect keeps strokes crisp), so the
-     mark reads as a word in the sentence, not a figure beside it. */
-  .hx-word {
-    display: inline-flex;
-    align-items: center;
-    margin-inline: 0.09em;
-    vertical-align: -0.03em;
+  /* Lexed code snippets (lib/jsx-lex.ts). Token colours ride the theme — accent
+     for tags, positive ink for strings — so both modes read. */
+  .tok-tag {
+    color: var(--accent);
   }
-  .hx-word svg {
-    height: 0.56em;
-    width: auto;
-    overflow: visible;
+  .tok-attr {
+    color: var(--color-fd-muted-foreground);
   }
-  /* strip-shaped marks (cell rows, bands) sit lower than stroke marks —
-     x-height, not cap-height, or they read as blocks instead of words */
-  .hx-word--band svg {
-    height: 0.32em;
+  .tok-str {
+    color: var(--mc-positive);
   }
-  /* Subtle hover scale on headline charts. */
-  @media (hover: hover) and (pointer: fine) {
-    .hx-word svg {
-      transition: scale 0.22s var(--ease-out-quint);
-    }
-    .hx-word:hover svg {
-      scale: 1.07;
-    }
+  .tok-num {
+    color: var(--mc-negative);
   }
 
-  /* Hero living-catalog tiles. */
-  .hx-slot {
-    position: relative;
-    z-index: 2; /* above the .hx-tile-link cover so the mark keeps hover/scrub */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: visible;
-  }
-  /* The real link: a transparent anchor covering the tile — crawlable, status-
-     bar URL, right-click "Open in new tab" / "Copy link", native modifier-click.
-     Sits above the name row + dead tile (default z) but BELOW the raised chart
-     slot (z-index 2), so the interactive mark keeps hover/scrub and the focusable
-     chart is never nested inside the `<a>`. Slot clicks are handled by the tile's
-     pointer discrimination (short click navigates; a scrub does not). */
-  .hx-tile-link {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    border-radius: 14px;
-    text-decoration: none;
-  }
-  /* Scale wide Previews down so nothing clips. */
-  .hx-slot svg {
-    max-width: 100%;
-    height: auto;
-  }
-  /* Tile: transparent rim at rest; accent frost on hover/focus. */
-  .hx-tile {
-    border: 1px solid transparent;
-    transition:
-      background-color 0.2s var(--ease-out-quint),
-      border-color 0.2s var(--ease-out-quint);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .hx-tile:hover {
-      background-color: var(--glass-surface);
-      border-color: color-mix(in oklab, var(--accent) 34%, var(--hairline));
-    }
-  }
-  /* Surface carousel: the incoming surface rises + de-blurs, and its rows settle
-     in a short hand-dealt stagger while the outgoing one fades under it. */
-  .hx-surface-in {
-    animation: hx-surface-in 0.58s var(--ease-out-expo) both;
-  }
-  @keyframes hx-surface-in {
-    from {
-      opacity: 0;
-      transform: translateY(14px) scale(0.985);
-      filter: blur(4px);
-    }
-  }
-  .hx-surface-in > * > * {
-    animation: hx-surface-row 0.46s var(--ease-out-quint) both;
-  }
-  @keyframes hx-surface-row {
-    from {
-      opacity: 0;
-      transform: translateY(9px);
-    }
-  }
-  .hx-surface-in > * > *:nth-child(1) {
-    animation-delay: 0.05s;
-  }
-  .hx-surface-in > * > *:nth-child(2) {
-    animation-delay: 0.1s;
-  }
-  .hx-surface-in > * > *:nth-child(3) {
-    animation-delay: 0.15s;
-  }
-  .hx-surface-in > * > *:nth-child(4) {
-    animation-delay: 0.2s;
-  }
-  .hx-surface-in > * > *:nth-child(n + 5) {
-    animation-delay: 0.25s;
-  }
-  .hx-slot-name {
-    transition:
-      color 0.18s var(--ease-out-quint),
-      opacity 0.18s var(--ease-out-quint);
-  }
-  /* heartbeat keyframes — kept only for the (currently unused) instrument-grid
-     nodes below; no shipped surface pulses ambiently since the calm pass */
-  @keyframes hx-pulse {
-    0%,
-    100% {
-      opacity: 0.45;
-      scale: 0.82;
-    }
-    50% {
-      opacity: 1;
-      scale: 1;
-    }
-  }
-
-  /* Stream vignette: emitted grammar text settles into the shipped chart.
-     Same rule as .mc-stream-chart — start part-visible, not at zero. The raw
-     grammar vanishes the frame the chart mounts, so fading up from 0 over
-     0.42s left a gap the eye reads as a freeze. */
-  .hx-morph-in {
-    animation: hx-morph-in 0.26s var(--ease-out-expo);
-  }
-  @keyframes hx-morph-in {
-    from {
-      opacity: 0.45;
-      transform: translateY(2px) scale(0.992);
-    }
-  }
-
-  /* ── Instrument grid behind the cluster ──────────────────────────────────
-     One vertical axis, three horizontal rules (one under each chart row), and
-     nodes at the two row gaps (no border, no centre hub). Soft accent signals
-     travel down the vertical axis AND across each horizontal, so the board
-     reads like a live instrument. Paint-only (background-position on 1px
-     lines); matte, low-opacity. The rounded bound lives on the outer bloom
-     layer (inline style), not here. */
-  .hx-cross-line {
-    position: absolute;
-    overflow: hidden;
-    background: color-mix(in oklab, var(--hairline) 46%, transparent);
-  }
-  .hx-cross-v {
-    left: 50%;
-    top: 7%;
-    bottom: 7%;
-    width: 1px;
-    transform: translateX(-0.5px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
-  }
-  /* horizontal rules — full width, feathered at both ends; `top` set inline */
-  .hx-cross-h {
-    left: 5%;
-    right: 5%;
-    height: 1px;
-    transform: translateY(-0.5px);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
-  }
-  /* travelling signals — a bright band sliding along each axis */
-  .hx-cross-v::after,
-  .hx-cross-h::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-repeat: no-repeat;
-  }
-  .hx-cross-v::after {
-    background-image: linear-gradient(
-      to bottom,
-      transparent,
-      color-mix(in oklab, var(--accent) 72%, transparent),
-      transparent
-    );
-    background-size: 100% 30%;
-    animation: hx-thread-v 6.5s ease-in-out infinite;
-  }
-  .hx-cross-h::after {
-    background-image: linear-gradient(
-      to right,
-      transparent,
-      color-mix(in oklab, var(--accent) 72%, transparent),
-      transparent
-    );
-    background-size: 26% 100%;
-    animation: hx-thread-h 7.5s ease-in-out infinite;
-    /* per-row delay set inline so the three don't sweep in lockstep */
-  }
-  @keyframes hx-thread-v {
-    0% {
-      background-position: 0 -30%;
-    }
-    100% {
-      background-position: 0 130%;
-    }
-  }
-  @keyframes hx-thread-h {
-    0% {
-      background-position: -30% 0;
-    }
-    100% {
-      background-position: 130% 0;
-    }
-  }
-  /* the two nodes on the vertical axis at the row gaps; `top` set inline */
-  .hx-cross-node {
-    position: absolute;
-    left: 50%;
-    width: 4px;
-    height: 4px;
-    translate: -50% -50%;
-    border-radius: 9999px;
-    background: color-mix(in oklab, var(--accent) 60%, transparent);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 10%, transparent);
-    animation: hx-pulse 2.6s ease-in-out infinite;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hx-morph-in,
-  .hx-cross-v::after,
-  .hx-cross-h::after,
-  .hx-cross-node {
-    animation: none;
-  }
-  .hx-tile {
-    transition: none;
-  }
-  .hx-word svg {
-    transition: none;
-  }
-}
-
-/* ---- Home v2: "The Typeset Answer" ---------------------------------------- */
-@layer components {
-  /* The reading serif — the streamed reply + the italic emphasis words. */
-  .hv-serif {
-    font-family: var(--font-serif);
-  }
-  .hv-em {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 500;
-    letter-spacing: 0;
-  }
-
-  /* The streamed reply reads in the serif; grammar stays mono via .mono-label
-     and <code> rules. Applied to the reply container so the height-reserving
-     ghosts and the live overlay share metrics (zero CLS holds). */
-  .hv-reply-body {
-    font-family: var(--font-serif);
-    --hv-reply-size: 1.05rem;
-  }
-  /* Delta's glyph-vs-digit optical centering is tuned for the default sans;
-     Newsreader's digits sit taller. Serif-scoped lift via the public token —
-     same as Sizing → `--mc-glyph-nudge`. */
-  .hv-reply-body {
-    --mc-glyph-nudge: -0.05em;
-  }
-
-  /* Live mode arriving. `LanguageModel.availability()` settles well after first
-     paint, so on a Chrome that has Nano installed the panel gains two things at
-     once — the composer, and the taller reply floor that hands the chips'
-     reclaimed space back to the answer. Landing both instantly snapped the
-     panel 315px -> 536px and shoved the caption below it (CLS 0.05 in one
-     frame).
-
-     Two layers of defence, in this order:
-
-     1. PREDICT (the real fix). `[data-mc-live]` is set before first paint by
-        app/layout.tsx when this Chrome has the API and Nano was installed on a
-        previous visit. The panel is then born its final height and NOTHING
-        moves — only the content fades in.
-     2. ANIMATE (the fallback). First visit, cleared storage, or a model
-        installed since: the size still has to arrive, so it grows on a curve
-        instead of teleporting. The floor leads by a hair so the box is already
-        opening as the composer shows — one gesture, not two events.
-
-     The composer is always in the DOM (collapsed to 0fr and inert when live is
-     off). That is what makes the reservation exact at any width: `1fr` resolves
-     to the real content height, so there is no magic number to drift. */
-  .hv-reply-floor {
-    transition: min-height 0.52s var(--ease-out-quint);
-  }
-  /* Live floor sits just above the ghost-reserved tour height (~231px): long
-     Nano answers scroll in place, so a taller reservation only buys dead space
-     under a settled reply and pushes the panel past the left column's height
-     (user feedback 2026-07-25 — was 297px). */
-  .hv-reply-floor[data-live],
-  [data-mc-live="1"] .hv-reply-floor {
-    min-height: 240px;
-  }
-
-  .hv-composer {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows 0.46s var(--ease-out-quint) 0.06s,
-      opacity 0.34s ease-out 0.18s;
-  }
-  .hv-composer > * {
-    overflow: hidden;
-    min-height: 0;
-  }
-  .hv-composer[data-open] {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-  /* Predicted: open from the first frame, so only opacity has anywhere to go.
-     Must follow [data-open] — equal specificity, later wins. If the prediction
-     turns out wrong (Nano uninstalled), use-live-model.ts drops the attribute
-     and this collapses back on the curve above, once. */
-  [data-mc-live="1"] .hv-composer {
-    grid-template-rows: 1fr;
-    transition: opacity 0.34s ease-out;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hv-reply-floor,
-    .hv-composer {
-      transition: none;
-    }
-  }
-
-  /* 07 · theming demo: when a swatch/preset changes the --mc-* vars, ease the
-     chart marks from the old palette to the new one so the live re-theme reads
-     as an intentional state change, not a hard flip. Scoped to the demo only.
-     Valence marks (Delta) don't change colour with the accent, so they stay
-     put while everything else eases — motion that says "good and bad never
-     move". Static entries here, so no conflict with WAAPI draw entrances. */
-  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+  /* Appearance menu preview: when a swatch or preset changes the --mc-* vars,
+     ease the chart marks from the old palette to the new one so the re-theme
+     reads as an intentional state change, not a hard flip. Valence marks don't
+     change colour with the accent, so they stay put while everything else eases. */
+  .theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
     transition:
       fill 0.4s var(--ease-out-quint),
       stroke 0.4s var(--ease-out-quint);
   }
-
-  /* 05 · the dark band — dark in BOTH site themes (an inverted light band on
-     the dark site was tried and rejected; the section keeps one identity). */
-  .hv-band {
-    background-color: var(--color-fd-background);
-  }
-
-  /* 03 · catalog tile tagline — one reserved line so hover never shifts. */
-  .hv-tile-tag {
-    max-width: 100%;
-    font-size: 0.72rem;
-    line-height: 1.3;
-    height: 0.94rem;
-    color: var(--color-fd-muted-foreground);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    opacity: 0;
-    transition: opacity 0.25s var(--ease-out-quint);
-  }
-  .hx-tile:hover .hv-tile-tag,
-  .hx-tile:focus-visible .hv-tile-tag {
-    opacity: 0.75;
-  }
-
-  /* 02 · grammar demo: typed JSX, lightly highlighted. Token colors ride the
-     theme (accent for tags, positive ink for strings) so both modes read. */
-  .hv-tok-tag {
-    color: var(--accent);
-  }
-  .hv-tok-attr {
-    color: var(--color-fd-muted-foreground);
-  }
-  .hv-tok-str {
-    color: var(--mc-positive);
-  }
-  .hv-tok-num {
-    color: var(--mc-negative);
-  }
-  /* 04 · the refusals — struck through, dashed, quietly confident. */
-  .hv-refusal {
-    border: 1px dashed color-mix(in oklab, var(--hairline) 85%, transparent);
-    border-radius: var(--radius-panel);
-  }
-  /* Quiet strikethrough — muted ink, not the negative red (read as aggressive). */
-  .hv-refusal-name {
-    text-decoration: line-through;
-    text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(in oklab, var(--color-fd-muted-foreground) 55%, transparent);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hv-theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
+  .theme-stage svg :is(path, rect, circle, line, polyline, polygon) {
     transition: none;
   }
 }

@@ -125,10 +125,10 @@ function PreviewPane({
       <span className={cn("mono-label absolute left-2.5 top-2 text-[0.5rem] !text-current", dim)}>
         {label}
       </span>
-      {/* hv-theme-stage eases fill/stroke between palettes, so a swatch change
+      {/* theme-stage eases fill/stroke between palettes, so a swatch change
           reads as an intentional re-theme, not a hard flip (shared with the
           home widget). Three marks: accent line, derived categories, valence. */}
-      <div className="hv-theme-stage flex w-full flex-1 flex-col justify-center gap-2">
+      <div className="theme-stage flex w-full flex-1 flex-col justify-center gap-2">
         <Sparkline
           data={PREVIEW_SERIES}
           width={200}

@@ -5,7 +5,7 @@
  * `CEILING_CLAIM` is the only thing the v3 hero reads from here — the number its
  * sentence quotes. The hero's mark used to PLOT this series, which is what this
  * note used to say; seven near-identical values read as an underscore at 132×30,
- * so it draws a demo shape now (`HERO_TREND` in `home-v3/v3-data.ts`).
+ * so it draws a demo shape now (`HERO_TREND` in `components/home/home-data.ts`).
  *
  * Provenance: `apps/docs/src/lib/chart-sizes.json` and
  * `apps/docs/src/lib/charts/entries.generated.json` read at each

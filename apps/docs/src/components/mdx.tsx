@@ -219,6 +219,14 @@ export function getMDXComponents(components?: MDXComponents) {
       ) : (
         <FdLink prefetch={false} {...props} />
       ),
+    // Fumadocs wraps every markdown table in an `overflow-auto` div with no
+    // tabindex, so a table wide enough to scroll is unreachable by keyboard
+    // (axe: `scrollable-region-focusable`). Same wrapper, one attribute more.
+    table: (props: ComponentProps<"table">) => (
+      <div tabIndex={0} className="prose-no-margin relative my-6 overflow-auto">
+        <table {...props} />
+      </div>
+    ),
     // microcharts primitives — usable directly in any .mdx page
     Sparkline,
     SparkBar,
