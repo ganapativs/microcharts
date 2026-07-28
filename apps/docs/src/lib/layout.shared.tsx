@@ -6,7 +6,7 @@ function Wordmark() {
   return (
     <span className="flex items-center gap-2.5">
       <Brandmark size={22} />
-      <span className="font-semibold tracking-[-0.01em]">{appName}</span>
+      <span className="font-display font-semibold tracking-[-0.016em]">{appName}</span>
     </span>
   );
 }

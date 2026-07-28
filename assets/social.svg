@@ -1,4 +1,4 @@
-<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif">
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Open Runde', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif">
   <!-- Design language: the microcharts.dev marketing surface — flat #0a0b0f field,
        one 152° accent wash + film grain ground, Open Runde display, Hanken body,
        JetBrains mono metadata. Every chart is the REAL shipped component:
@@ -100,5 +100,5 @@
 
   <!-- footer: stat line + url, centered + stacked -->
   <text x="640" y="556" text-anchor="middle" xml:space="preserve" font-size="14" fill="#e9e8e3" opacity="0.5" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan opacity="0.55">   ·   </tspan>0 dependencies<tspan opacity="0.55">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan opacity="0.55">   ·   </tspan>RSC-safe<tspan opacity="0.55">   ·   </tspan>accessible by default</text>
-  <text x="640" y="598" text-anchor="middle" font-size="17" fill="#528dff" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">microcharts.dev</text>
+  <text x="640" y="598" text-anchor="middle" font-size="17" fill="#528dff" font-family="\'Open Runde\', ui-sans-serif, system-ui, sans-serif" font-weight="500">microcharts.dev</text>
 </svg>

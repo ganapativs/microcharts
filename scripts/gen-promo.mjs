@@ -196,10 +196,14 @@ async function loadSharp() {
 const sharp = await loadSharp();
 const { chromium } = await import("playwright");
 
+// Fonts are embedded as base64 data: URIs — a setContent() page has no origin,
+// so Chromium rejects file:// font requests with a NetworkError and silently
+// falls back to the system face. data: URIs always load.
 const fontFaces = FONTS.map(({ family, file, weight }) => {
   const path = join(ROOT, "assets/fonts", file);
   if (!existsSync(path)) throw new Error(`missing ${path}`);
-  return `@font-face{font-family:'${family}';src:url('${pathToFileURL(path).href}') format('woff2');font-weight:${weight};font-style:normal}`;
+  const b64 = readFileSync(path).toString("base64");
+  return `@font-face{font-family:'${family}';src:url(data:font/woff2;base64,${b64}) format('woff2');font-weight:${weight};font-style:normal}`;
 }).join("\n");
 const chartCss = readFileSync(join(ROOT, "dist/styles.css"), "utf8");
 
@@ -219,9 +223,19 @@ try {
     // Dark theme + the site's cobalt accent — the same tokens the docs ship.
     await page.setContent(
       `<style>${fontFaces}\n${chartCss}\nhtml,body{margin:0;background:transparent}svg{display:block}</style>` +
-        `<div data-mc-theme="dark" style="--mc-accent:#528dff;--mc-font:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif">${svg}</div>`,
+        `<div data-mc-theme="dark" style="--mc-accent:#528dff;--mc-font:'Open Runde','Hanken Grotesk',ui-sans-serif,system-ui,sans-serif">${svg}</div>`,
     );
-    await page.evaluate(() => document.fonts.ready);
+    // Force-load every face and fail loudly — a fallback face must never make
+    // it into a shipped banner silently.
+    const failed = await page.evaluate(async (faces) => {
+      for (const f of faces)
+        await document.fonts.load(`${f.weight.split(" ")[0]} 16px '${f.family}'`).catch(() => {});
+      await document.fonts.ready;
+      return [...document.fonts]
+        .filter((f) => f.status !== "loaded")
+        .map((f) => `${f.family} ${f.weight}: ${f.status}`);
+    }, FONTS);
+    if (failed.length) throw new Error(`fonts failed to load: ${failed.join(", ")}`);
     const raw = await page.screenshot({ omitBackground: true });
     await page.close();
 

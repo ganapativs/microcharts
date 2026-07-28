@@ -19,8 +19,9 @@ function Door({
   primary?: boolean;
   children: React.ReactNode;
 }) {
+  // Default prefetch: these are the home page's primary exits (few links).
   return (
-    <Link prefetch={false} href={href} className="door group" data-primary={primary || undefined}>
+    <Link href={href} className="door group" data-primary={primary || undefined}>
       <span className="door-label">{children}</span>
       <ArrowRight
         aria-hidden
@@ -34,7 +35,6 @@ function Door({
 function SetupLink() {
   return (
     <Link
-      prefetch={false}
       href={SETUP_HREF}
       className="ulink group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.08em]"
       style={{ color: "var(--ink-2)" }}

@@ -40,16 +40,13 @@ function isActive(href: string, pathname: string): boolean {
 }
 
 function Wordmark() {
+  // Masthead links keep default App Router prefetch (production only). Dense
+  // surfaces (docs sidebar, gallery cards, MDX) stay on prefetch={false}.
   return (
-    <Link
-      prefetch={false}
-      href="/"
-      className="group flex items-center gap-2.5"
-      aria-label={`${SITE.name} home`}
-    >
+    <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} home`}>
       <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
       {/* Wordmark sits ~1px low vs links (lowercase + size); nudge up. */}
-      <span className="-translate-y-px text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
+      <span className="font-display -translate-y-px text-[0.98rem] font-semibold tracking-[-0.016em] text-fd-foreground">
         microcharts
       </span>
     </Link>
@@ -103,7 +100,6 @@ export function SiteNav() {
             const active = isActive(l.href, pathname);
             return (
               <Link
-                prefetch={false}
                 key={l.href}
                 href={l.href}
                 className={cn(
@@ -165,7 +161,6 @@ export function SiteNav() {
               const active = isActive(l.href, pathname);
               return (
                 <Link
-                  prefetch={false}
                   key={l.href}
                   href={l.href}
                   className={cn(

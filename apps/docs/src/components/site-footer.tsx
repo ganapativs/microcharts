@@ -99,7 +99,7 @@ export function SiteFooter() {
               <Link
                 prefetch={false}
                 href="/"
-                className="text-[0.95rem] font-semibold tracking-tight transition-colors hover:text-fd-primary"
+                className="font-display text-[0.95rem] font-semibold tracking-[-0.016em] transition-colors hover:text-fd-primary"
               >
                 microcharts
               </Link>

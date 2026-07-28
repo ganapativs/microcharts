@@ -205,12 +205,12 @@ Object.assign(Callout, ChartCallout);
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
-    // No eager prefetch on in-content links: a guide that mentions a few chart
-    // pages would otherwise pull each target route's whole chunk graph on load.
-    // Next still prefetches on hover/press, so navigation stays fast. Machine
-    // surfaces (/catalog.json, /llms.txt, …) are files, not app routes — the
-    // client router would 404 fetching route metadata for them, so they get a
-    // plain anchor.
+    // No prefetch on in-content links: App Router `prefetch={false}` disables
+    // viewport and hover prefetch, so a guide that mentions chart pages won't
+    // pull each target's chunk graph on load. Masthead + home doors keep the
+    // default. Machine surfaces (/catalog.json, /llms.txt, …) are files, not
+    // app routes — the client router would 404 fetching route metadata for
+    // them, so they get a plain anchor.
     a: (props: ComponentProps<"a">) =>
       /\.(json|txt|xml|md)$/.test(props.href ?? "") ? (
         <a {...props} />

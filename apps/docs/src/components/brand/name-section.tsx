@@ -19,7 +19,7 @@ export function BrandNameSection() {
             <div className="flex items-center gap-3">
               <Brandmark size={30} />
               <span
-                className="text-2xl font-semibold leading-none tracking-[-0.01em]"
+                className="font-display text-2xl font-semibold leading-none tracking-[-0.016em]"
                 style={{ color: "var(--ink)" }}
               >
                 microcharts
