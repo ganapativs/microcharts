@@ -32,19 +32,26 @@ function findInput(): HTMLInputElement | null {
   return document.querySelector<HTMLInputElement>(INPUT);
 }
 
-/** Set a controlled React input the way a user would, so onChange fires. */
+/**
+ * Set a controlled React input the way a user would, so onChange fires.
+ *
+ * Nothing scrolls. An earlier version pulled the grid into view on every chip,
+ * which was wrong twice: the reader is already looking at the row they clicked,
+ * and once a query has cut the catalog to five cards the grid is shorter than
+ * the viewport, so "scroll the grid to the top" threw the page at the footer.
+ * Filtering is the whole response — the count in the dock and the cards under
+ * the cursor both change where the reader is already looking.
+ *
+ * `preventScroll` for the same reason: focusing a control fixed to the bottom of
+ * the viewport is not a request to move the document.
+ */
 function setSearch(value: string) {
   const input = findInput();
   if (!input) return;
   const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
   setter?.call(input, value);
   input.dispatchEvent(new Event("input", { bubbles: true }));
-  if (value) input.focus();
-  const smooth =
-    typeof matchMedia === "undefined" || !matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document
-    .querySelector(".g2-grid")
-    ?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
+  if (value) input.focus({ preventScroll: true });
 }
 
 export function ChartQuestions() {
@@ -85,9 +92,9 @@ export function ChartQuestions() {
   }, []);
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2">
-      <span className="mono-label inline-flex items-center gap-1.5 text-fd-muted-foreground">
-        <Search className="size-3.5" aria-hidden />
+    <div className="mt-5 flex flex-wrap items-center gap-2">
+      <span className="kicker inline-flex items-center gap-1.5">
+        <Search className="size-3" aria-hidden />
         Find by question
       </span>
       {QUESTIONS.map(({ label, q }) => {
@@ -98,16 +105,13 @@ export function ChartQuestions() {
             type="button"
             aria-pressed={on}
             onClick={() => setSearch(on ? "" : q)}
-            // Quieter than the collection nav above it: no hard border at rest
-            // (a faint surface), so the primary nav stays the louder row; active
-            // gets a soft accent wash, not a heavy outline.
-            className={
-              on
-                ? "rounded-full bg-[color-mix(in_oklab,var(--accent)_13%,transparent)] px-2.5 py-1 text-[0.78rem] font-medium text-fd-primary transition-colors"
-                : "rounded-full bg-[color-mix(in_oklab,var(--color-fd-foreground)_5%,transparent)] px-2.5 py-1 text-[0.78rem] text-fd-muted-foreground transition-colors hover:text-fd-foreground"
-            }
+            // Quieter than the collection row above it, so the primary filter
+            // stays the louder one. State is never carried by colour alone: the
+            // live query takes the ink AND grows the accent rule under it.
+            className="q-chip"
           >
             {label}
+            <span className="toggle-rule" data-state={on ? "on" : "off"} />
           </button>
         );
       })}

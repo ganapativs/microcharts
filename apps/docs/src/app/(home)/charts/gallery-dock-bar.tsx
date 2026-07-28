@@ -50,8 +50,12 @@ export function GalleryDockBar({
   if (!mounted) return null;
 
   return createPortal(
+    // `surface` carries the token scope. The dock is portalled to `document.body`
+    // (a transformed ancestor would trap `position: fixed`), so it lands OUTSIDE
+    // the route's `.surface` wrapper and has to declare the ladder itself — the
+    // page and its control rail must not resolve `--ink` differently.
     <div
-      className="g2-dock"
+      className="surface g2-dock"
       role="region"
       aria-label="Gallery controls"
       data-hidden={dockHidden || undefined}

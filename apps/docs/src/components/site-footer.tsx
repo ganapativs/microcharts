@@ -6,13 +6,15 @@ import { FooterMark } from "@/components/footer-mark";
 /** Sized to the byline it sits in, not to the other two marks.
  *
  *  The X glyph fills ~81% of its 24×24 box (y 2.25→21.8), so at 14px its ink was
- *  11.3px tall against a 10.88px mono line whose caps are ~7.8px — half again as
- *  tall as the letters it sits beside, which is what read as unaligned. At 11px
- *  the ink is ~8.9px: a shade over cap height, which is where a logo has to sit
- *  to hold its weight without becoming the loudest thing on the line. */
+ *  11.3px tall against a 10.88px mono line whose caps measure 8.06px — half again
+ *  as tall as the letters it sits beside, which is what read as unaligned. 11px
+ *  brought the ink to 8.96px and 10px brings it to 8.15px: cap height plus 1%,
+ *  i.e. the mark is now the same size as the letters rather than "a shade over"
+ *  them. The shade over was the wrong call — this is a byline, and the one glyph
+ *  in it that is a logo should not be the biggest thing on the line. */
 function XMark() {
   return (
-    <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden>
+    <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden>
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817-5.966 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
     </svg>
   );
@@ -143,17 +145,38 @@ export function SiteFooter() {
             {/* The byline belongs to the brand block, not to the bar across the
                 bottom. Down there it was the only thing on the left of a rule the
                 wordmark also sits on, so it read as a caption for the canvas; here
-                it closes the column that already says who and what this is. */}
+                it closes the column that already says who and what this is.
+
+                It is set on the LICENCE line's rhythm, because the two are the
+                same kind of line two rows apart: mono label, interpunct between
+                tokens, one 6px gap everywhere. It used to run its tokens on bare
+                flex gaps with a `ml-0.5` nudge on the name — three different
+                spacings on one line (8px, 6px, and ~13px to the X's ink, which
+                sits centred in a 24px box), and no separators to explain any of
+                them, so the year, the name and the mark read as three loose
+                objects rather than one line. */}
             <span className="mono-label mt-3 flex items-center gap-1.5 text-fd-muted-foreground">
-              <span>© 2026</span>
+              {/* No © glyph. In this mono at 0.68rem the sign's ink is ~5.5px
+                  against a 7.9px cap band — a smaller, rounder mark than every
+                  letter beside it, and the one thing on the line that could not
+                  be made to match by sizing, because it is drawn small inside
+                  its own em. The year alone carries the same meaning: a bare
+                  year beside a name IS the copyright line.
+
+                  Measured, not guessed: at 10.88px the cap band is 8.06px and
+                  the sign's ink is 6.85px (ascent 8.05, descent −1.2), so it
+                  ran 85% of the letters around it. */}
+              <span>2026</span>
+              <span aria-hidden>·</span>
               <a
                 href={SITE.authorUrl}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="ml-0.5 underline decoration-fd-border underline-offset-[3px] transition-colors hover:text-fd-foreground hover:decoration-fd-muted-foreground"
+                className="underline decoration-fd-border underline-offset-[3px] transition-colors hover:text-fd-foreground hover:decoration-fd-muted-foreground"
               >
                 {SITE.author}
               </a>
+              <span aria-hidden>·</span>
               {/* NO nudge, and that is the fix rather than the absence of one.
                   `items-center` centres this on the line box and the un-nudged
                   result is already right: ink 531.7→540.6 against a cap band of
@@ -164,13 +187,27 @@ export function SiteFooter() {
                   (11 + 3 = 14px here, not 10.88) — so the "baseline" came out
                   1.8px low and the mark was pushed down below the real one, which
                   is what made it hang under the S. Measure half-leading as
-                  `(lineHeight - (ascent + descent)) / 2` or do not measure. */}
+                  `(lineHeight - (ascent + descent)) / 2` or do not measure.
+
+                  The `-my-1.5` is a separate matter and is about the LINE, not
+                  the mark: a 24px control box in a 16.3px mono line makes this
+                  row 24px tall, so the byline alone breaks the column's row
+                  rhythm and drifts away from the licence line above it. The
+                  negative margin takes only the box's CONTRIBUTION down to 12px
+                  — under the line height, so the row measures 16.3px like its
+                  neighbours — while the hit target stays a full 24px.
+
+                  `-ml-1.5` is the same argument sideways. The mark's ink is
+                  10px centred in that 24px box, so a 6px flex gap puts 13px of
+                  air between the interpunct and the glyph where every other gap
+                  on the line reads 6. Pulling the box back by its own padding
+                  spaces the line by INK, like the letters either side of it. */}
               <a
                 href={SITE.authorX}
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`${SITE.author} on X`}
-                className="ghost-ctrl size-6"
+                className="ghost-ctrl -my-1.5 -ml-1.5 size-6"
               >
                 <XMark />
               </a>

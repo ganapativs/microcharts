@@ -15,15 +15,17 @@ export default function GalleryRedirect() {
     <>
       {/* React 19 hoists this into <head>; browsers honor it on any static host. */}
       <meta httpEquiv="refresh" content="0; url=/charts" />
-      <div className="mx-auto max-w-shell px-4 py-24 text-center sm:px-6">
-        <p className="text-fd-muted-foreground">
-          The gallery is now{" "}
-          <Link href="/charts" className="underline underline-offset-4 hover:text-fd-primary">
-            Charts
-          </Link>
-          . Redirecting…
-        </p>
-      </div>
+      <section className="act-open">
+        <div className="shell">
+          <p className="lead">
+            The gallery is now{" "}
+            <Link href="/charts" className="ulink">
+              Charts
+            </Link>
+            . Redirecting…
+          </p>
+        </div>
+      </section>
     </>
   );
 }

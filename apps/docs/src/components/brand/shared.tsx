@@ -35,14 +35,13 @@ export function readAsset(file: string): { src: string; bytes: number } {
   return { src, bytes: Buffer.byteLength(src, "utf8") };
 }
 
-export function SectionMark({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-8 flex items-center gap-3">
-      <span className="h-px flex-1 bg-hairline" />
-      <span className="mono-label">{children}</span>
-    </div>
-  );
-}
+/* There is no `SectionMark`. Every section on this page used to open with a mono
+   label above its heading — "The mark", "Logo variants", "Color", "Type" — and
+   every one of them restated the heading directly under it. It also is not how
+   this surface works: the landing page spends `.kicker` on captions and data
+   labels (a figcaption, a table header, a plate's count) and never once sets one
+   above a heading. Eight of them on one page is the templated rhythm that makes
+   a page read as generated. The headings say what the sections are. */
 
 export function markInner(fill: string, cellFill = CELL_FILL, cellOpacity = true) {
   return (

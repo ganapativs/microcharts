@@ -19,6 +19,13 @@ import { SHARES, CHECKOUT_P95, DEGRADE, FENCE_SERIES } from "./home-data";
 const dir = resolve(process.cwd(), "src/components/home");
 const routeDir = resolve(process.cwd(), "src/app/(landing)");
 
+/** The design language itself lives in `surface.css`, shared with /charts,
+ *  /examples and /brand; `home.css` is what only this route has. Guards about
+ *  the LANGUAGE read both; guards about a landing component read `home.css`. */
+const surfacePath = resolve(process.cwd(), "src/app/surface.css");
+const styles = () =>
+  `${readFileSync(surfacePath, "utf8")}\n${readFileSync(join(routeDir, "home.css"), "utf8")}`;
+
 const sources = () =>
   [
     ...readdirSync(dir)
@@ -190,7 +197,7 @@ describe("every figure resolves from measured data", () => {
 
 describe("nothing on the page animates itself except the specimen", () => {
   it("declares no keyframes, and hides nothing the server painted", () => {
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     const rules = css.replace(/\/\*[\s\S]*?\*\//g, "");
     // The page ships static. Every ENTRANCE this route tried — scroll reveals, a
     // staggered hero, the library's own draw — could only hide something the
@@ -233,7 +240,7 @@ describe("nothing on the page animates itself except the specimen", () => {
   });
 
   it("keeps the transitions it does have to hover and focus only", () => {
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     // A transition is a response to the reader. Anything longer than a third of a
     // second stops reading as feedback and starts reading as choreography.
     //
@@ -568,10 +575,11 @@ describe("the masthead is the site's, not a second one", () => {
   });
 
   it("shares one measure with the nav, so the first line starts under the wordmark", () => {
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     // `.shell` is the nav's own container: --container-shell + the nav's gutters.
-    expect(css).toMatch(/\.home \.shell \{[^}]*max-width: var\(--container-shell\)/s);
-    expect(css).toMatch(/\.home \.shell \{[^}]*padding-inline: 1rem/s);
+    // It lives in surface.css now, so /charts and /examples share the same axis.
+    expect(css).toMatch(/\.surface \.shell \{[^}]*max-width: var\(--container-shell\)/s);
+    expect(css).toMatch(/\.surface \.shell \{[^}]*padding-inline: 1rem/s);
     // And no section may reintroduce the private gutter this replaced. (Card
     // padding like `sm:px-5` is not a page gutter and is none of this test's
     // business — `lg:px-10` and a second `max-w-shell` are exactly what drifted.)
@@ -605,7 +613,7 @@ describe("the page invents no editorial furniture", () => {
 
 describe("rules stay quiet and controls stay still", () => {
   it("keeps both rule weights faint and draws no rule in the lattice at all", () => {
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     for (const m of css.matchAll(/--rule-2: color-mix\(in oklab, #[0-9a-f]{6} (\d+)%/g)) {
       expect(Number(m[1]), "the emphasis rule is structure, not a mark").toBeLessThanOrEqual(20);
     }
@@ -696,15 +704,15 @@ describe("the close is a door, not a second colophon", () => {
     expect(src).toContain('from "@/components/ui/setup-with-ai"');
     expect(src).not.toMatch(/quickstart#set-up/);
     // And it is this page's language: no filled pill, no shadow.
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     expect(css).not.toMatch(/\.ctrl-accent/);
-    expect(css).toMatch(/\.home \.door\[data-primary\]/);
+    expect(css).toMatch(/\.surface \.door\[data-primary\]/);
   });
 });
 
 describe("the display face keeps its floor", () => {
   it("never sets the display family below 40px and never on a numeral", () => {
-    const css = readFileSync(join(routeDir, "home.css"), "utf8");
+    const css = styles();
     // Each rule that uses var(--fd) declares a clamp whose LOWER bound is the
     // smallest size it can render. `.display-2` may go under 40 on a phone, where a
     // 48px heading would not fit the measure — but nothing else may.
@@ -718,8 +726,9 @@ describe("the display face keeps its floor", () => {
       expect(min, rule.slice(0, 60)).toBeDefined();
       expect(Number(min), rule.slice(0, 60)).toBeGreaterThanOrEqual(30);
     }
-    // No figure is ever set in it: every number in running text is `.num`,
-    // which is the mono family.
-    expect(css).toMatch(/\.home \.num \{[^}]*var\(--fm\)/s);
+    // No figure is ever set in it: every number in running text is `.num` and
+    // every number that IS the statement is `.figure`, both the mono family.
+    expect(css).toMatch(/\.surface \.num \{[^}]*var\(--fm\)/s);
+    expect(css).toMatch(/\.surface \.figure \{[^}]*var\(--fm\)/s);
   });
 });

@@ -7,7 +7,6 @@ import { getGalleryMode, subscribeGalleryMode, type GalleryMode } from "./galler
 export type GalleryDensity = "comfortable" | "compact";
 export type GallerySort = "catalog" | "name";
 const DENSITY_KEY = "mc-gallery2-density";
-const TILT_MAX = 3;
 
 function initialState(): {
   q: string;
@@ -182,57 +181,11 @@ export function useGalleryDock(
     };
   }, []);
 
-  useEffect(() => {
-    const grid = document.querySelector<HTMLElement>(".g2-grid");
-    if (!grid) return;
-    const fine = window.matchMedia("(pointer: fine)");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!fine.matches || reduce.matches) return;
-
-    let active: HTMLElement | null = null;
-    let frame = 0;
-    let nx = 0.5;
-    let ny = 0.5;
-
-    const paint = () => {
-      frame = 0;
-      if (!active) return;
-      active.style.setProperty("--rx", `${(nx - 0.5) * 2 * TILT_MAX}deg`);
-      active.style.setProperty("--ry", `${-(ny - 0.5) * 2 * TILT_MAX}deg`);
-      active.style.setProperty("--mx", `${nx * 100}%`);
-      active.style.setProperty("--my", `${ny * 100}%`);
-    };
-    const reset = (card: HTMLElement | null) => {
-      if (!card) return;
-      card.removeAttribute("data-live");
-      for (const p of ["--rx", "--ry", "--mx", "--my"]) card.style.removeProperty(p);
-    };
-    const onMove = (e: PointerEvent) => {
-      const card = (e.target as HTMLElement).closest<HTMLElement>(".g2-card");
-      if (card !== active) {
-        reset(active);
-        active = card;
-        active?.setAttribute("data-live", "true");
-      }
-      if (!active) return;
-      const r = active.getBoundingClientRect();
-      nx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      ny = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      if (!frame) frame = requestAnimationFrame(paint);
-    };
-    const onLeave = () => {
-      reset(active);
-      active = null;
-    };
-    grid.addEventListener("pointermove", onMove);
-    grid.addEventListener("pointerleave", onLeave);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      reset(active);
-      grid.removeEventListener("pointermove", onMove);
-      grid.removeEventListener("pointerleave", onLeave);
-    };
-  }, []);
+  /* There is no pointer tilt and no cursor spotlight. Both were removed with the
+     rest of the plane's elevation: nothing on this surface lifts, glows or
+     rotates, and a hundred cards each running a rAF loop under the cursor is the
+     one place that cost was also measurable. Hover is a step up the surface
+     ladder, and that is all. */
 
   useEffect(() => {
     // Re-query every run: hub navigations swap the SSR grid without remounting the dock.

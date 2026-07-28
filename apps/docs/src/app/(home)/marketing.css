@@ -1,0 +1,947 @@
+/*
+ * The marketing routes' own layer: /charts, /examples, /brand.
+ *
+ * `surface.css` is the language — the surface ladder, the three inks, the two
+ * rules, the four gaps, the type ramp, the doors. This file is the handful of
+ * components only these three pages have: the catalog plane and its dock, the
+ * example plates and their screenshots, the brand specimen grounds.
+ *
+ * Everything here reads from the `.surface` tokens, so a palette change, a
+ * preset switch or a theme flip lands on these pages exactly as it lands on the
+ * landing page. Nothing paints its own background, casts a shadow, tilts, or
+ * lifts: on this surface hierarchy is carried by ink and space, and a card that
+ * rises reads as a widget from another site.
+ *
+ * The `g2-` prefix is historical — it is the catalog plane, and the dock's
+ * client (`use-gallery-dock.ts`) selects on those names.
+ */
+
+/* ══ the catalog plane ═════════════════════════════════════════════════════ */
+
+/* The nav auto-hides while the catalog is mounted (the dock's client sets
+   [data-g2-mounted] on <html> and flips [data-g2-nav]) — the dock is a second
+   control rail, and two of them on a phone leaves no page. */
+:root[data-g2-mounted] header.glass-rail {
+  transition: transform 0.4s var(--ease-out-quint);
+}
+:root[data-g2-mounted][data-g2-nav="hidden"] header.glass-rail {
+  transform: translateY(-100%);
+}
+
+.surface .g2-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--g2-min, 16rem), 1fr));
+  /* The same 6px the landing's 106-cell sheet is separated by. The gap IS the
+     rule here: 106 cells ruled on four sides is ~220 edges, and the eye sorts
+     the chrome before it reaches the ink. */
+  gap: 6px;
+}
+.surface .g2-grid[data-density="compact"] {
+  --g2-min: 12rem;
+}
+
+/* ── wayfinding: a slim label opens each collection while browsing ───────────
+   Shown ONLY when browsing the whole catalog; the dock removes [data-browse]
+   the moment you filter or search, where the label would be redundant noise. */
+.surface .g2-group {
+  display: none;
+}
+.surface .g2-grid[data-browse] .g2-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  grid-column: 1 / -1;
+  padding: var(--sp-block) 2px 0.6rem;
+  border-bottom: 1px solid var(--rule);
+  /* The rule belongs to the LABEL, not to the row of cards under it. At the
+     grid's own 6px gap the two touched, and the first row read as if it were
+     ruled off at the top while every other row was not. The margin buys the
+     shelf its own air; the grid gap then separates cards from cards only. */
+  margin-bottom: 1.25rem;
+}
+/* The first group sits right under the header, which already opened the page. */
+.surface .g2-grid[data-browse] .g2-group:first-child {
+  padding-top: 0.2rem;
+}
+.surface .g2-group-blurb {
+  font: 400 0.8rem/1.4 var(--fs);
+  color: var(--ink-3);
+}
+.surface .g2-group-n {
+  margin-left: auto;
+  color: var(--ink-3);
+}
+@media (max-width: 32rem) {
+  .surface .g2-group-blurb {
+    display: none;
+  }
+}
+
+/* Off-screen cells are skipped. Half this page's element count is in one grid —
+   106 cells, ~2,300 nodes, 136 SVGs — and without this the browser lays out and
+   paints all of it on every invalidation: measured at 18ms for one full-grid
+   layout, which is a dropped frame every time the filter toggles a card.
+
+   This used to be impossible and the reason is worth recording, because it is
+   the payoff for a design decision rather than a trick: `content-visibility`
+   forces `contain: paint`, and the old card painted OUTSIDE its own box — a
+   hover lift-shadow, a 3-D pointer tilt, an accent bloom. None of those exist on
+   this surface now, so nothing is left to clip. The one thing that still wanted
+   to escape was the focus ring, and that is drawn inset instead (below).
+
+   `auto` on the intrinsic size, not the fixed 204px: the card is shorter in
+   compact density and the browser remembers each cell's last-rendered height, so
+   the scrollbar is honest either way. Skipped content stays findable by Ctrl+F
+   and `.focus()`, which is what the dock's roving cursor relies on. */
+.surface .g2-cell {
+  min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 204px;
+}
+.surface .g2-cell[hidden] {
+  display: none;
+}
+
+/* The card is a FIELD, not a box: same grouping as a bordered plate with no line
+   ink at all, separated by its gap. It carries no shadow, no pointer tilt and no
+   accent bloom — the plane is 106 specimens, and any one of those devices
+   multiplied by 106 is the page.
+
+   Hover is the surface's `.field-cell` answer, which is why the declaration is
+   the same one: an inset accent edge, no field change, no layout change. */
+.surface .g2-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  color: inherit;
+  text-decoration: none;
+  background: var(--field-1);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition:
+    box-shadow 0.18s var(--e),
+    scale 0.12s var(--e);
+}
+.surface .g2-cell:focus-within .g2-card,
+.surface .g2-card:hover {
+  box-shadow: inset 0 0 0 1px var(--edge-accent);
+}
+/* A navigation that takes a moment to start reads as a click that missed. The
+   tile presses in — `scale`, not a translate, so the mark inside stays centred
+   on the cell it was centred on. */
+.surface .g2-card:active {
+  scale: 0.99;
+}
+
+/* The real link: a transparent anchor covering the card — crawlable, status-bar
+   URL, right-click "Open in new tab" / "Copy link", native modifier-click.
+   Ordering is by z-index: the cover (z 2) sits ABOVE the meta shelf (z 1) so
+   title clicks navigate, but BELOW the stage (z 3) so the interactive mark still
+   gets hover/scrub, and the focusable chart is never nested inside the `<a>`. */
+.surface .g2-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+}
+.surface .g2-cover:focus:not(:focus-visible) {
+  outline: none;
+}
+/* Drawn INSIDE the card, unlike the surface's default 3px-offset ring. The cell
+   is `content-visibility: auto`, which implies `contain: paint`, so an outset
+   ring would be clipped at the box edge and half of it would vanish. Inset is
+   also the more consistent read here: hover is an inset accent edge, and focus
+   is the same edge one step louder. */
+.surface .g2-cover:focus-visible {
+  outline-offset: -2px;
+}
+
+/* The specimen stage. No graph paper: the landing's sheet dropped it for the
+   same reason this one does — across a hundred stages a texture you can count
+   competes with the marks, and the marks are the content. */
+.surface .g2-stage {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--g2-stage-h, 8.5rem);
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+.surface .g2-grid[data-density="compact"] .g2-stage {
+  --g2-stage-h: 6rem;
+}
+.surface .g2-stage svg {
+  height: auto;
+  max-width: 100%;
+}
+
+/* The meta shelf. Separated by space, not by a rule — one tinted field with a
+   mark in the top half and its name in the bottom needs no line between them. */
+.surface .g2-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.9rem 0.85rem;
+}
+/* Mono, like every other specimen label on the site: these are type NAMES, and
+   the display face never appears under 40px. */
+.surface .g2-name {
+  display: block;
+  min-width: 0;
+  font: 500 13px/1.2 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.18s var(--e);
+}
+.surface .g2-cell:focus-within .g2-name,
+.surface .g2-card:hover .g2-name {
+  color: var(--mc-accent);
+}
+/* Tagline + collection tag share the second line: the tag flows, the label sits
+   top-right so the name above stays full-width and never truncates. */
+.surface .g2-subrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+/* Its two-line space is ALWAYS reserved (fixed height) so hover never grows the
+   card or shifts a neighbour. It is legible at rest — a description that fades
+   in on hover is a description a touch reader never gets. */
+.surface .g2-tag {
+  flex: 1;
+  min-width: 0;
+  font: 400 0.8rem/1.35 var(--fs);
+  height: 2.16rem; /* 2 lines × 1.35 × 0.8rem */
+  color: var(--ink-3);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.surface .g2-coll {
+  margin-left: auto;
+  margin-top: 0.16rem; /* optically align its cap with the tagline's first line */
+  flex: none;
+  font: 400 0.6rem/1 var(--fm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* When a single collection is filtered, every card's tag says the same thing —
+   the active filter already tells you, so drop it as redundant. */
+.surface .g2-grid[data-collection-filter]:not([data-collection-filter="all"]) .g2-coll {
+  display: none;
+}
+/* Compact is a dense scan — the chart + name carry it; the description is noise
+   at this size (and its reserved height is dead weight). The card's aria-label
+   still carries the tagline. */
+.surface .g2-grid[data-density="compact"] .g2-tag {
+  display: none;
+}
+.surface .g2-grid[data-density="compact"] .g2-meta {
+  padding-bottom: 0.7rem;
+}
+.surface .g2-grid[data-density="compact"] .g2-coll {
+  margin-left: 0;
+  margin-top: 0.1rem;
+}
+
+/* The plane's one live pulse — a solid accent dot, no loop. */
+.surface .g2-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--ink-3);
+}
+.surface .g2-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mc-accent);
+}
+html[data-g2-mode="static"] .g2-live {
+  display: none;
+}
+
+/* A reply to the control that produced it, so it sits where the reader is still
+   looking rather than centred in a field of nothing. The grid is `hidden` at
+   this point, so the wrapper's own `u-block` is the only space above it. */
+.surface .g2-empty {
+  color: var(--ink-2);
+}
+
+/* ── the collection row ─────────────────────────────────────────────────────
+   The page's primary filter, and it is TYPE, not a row of pills. State is never
+   colour alone here: the live collection takes the ink and grows the accent rule
+   under it, the same mark the landing's domain toggle uses. */
+.surface .coll-link {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  padding-bottom: 5px;
+  font: 400 0.86rem/1.2 var(--fs);
+  color: var(--ink-3);
+  transition: color 0.18s var(--e);
+}
+.surface .coll-link:hover {
+  color: var(--ink);
+}
+.surface .coll-link[data-on] {
+  color: var(--ink);
+  font-weight: 500;
+}
+/* Pressed, not released — same rule as the doors and the cards. */
+.surface .coll-link:active,
+.surface .q-chip:active {
+  scale: 0.97;
+}
+.surface .coll-n {
+  font: 400 0.68rem/1 var(--fm);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+/* ── the question row ───────────────────────────────────────────────────────
+   Eight decisions the catalog answers, driving the same search the dock does.
+   Quieter than the collection row above it, so the primary filter stays the
+   louder one.
+
+   Eight of them at the specimen cards' own tone was eight more white blocks
+   above a plane of white blocks, so they carry no field at rest: the row is
+   type, the hover is one step up the ladder, and the live query takes the ink
+   and the accent rule. */
+.surface .q-chip {
+  position: relative;
+  padding: 0.3rem 0.55rem 0.4rem;
+  border-radius: 7px;
+  font: 400 0.78rem/1.3 var(--fs);
+  color: var(--ink-3);
+  transition:
+    background-color 0.18s var(--e),
+    color 0.18s var(--e),
+    scale 0.12s var(--e);
+}
+.surface .q-chip:hover {
+  background: var(--field-1);
+  color: var(--ink);
+}
+.surface .q-chip[aria-pressed="true"] {
+  color: var(--ink);
+  background: var(--field-1);
+}
+/* The rule sits inside the chip's radius, so it reads as belonging to the chip
+   rather than underlining the row. */
+.surface .q-chip .toggle-rule {
+  inset-inline: 0.55rem;
+  bottom: 4px;
+}
+
+/* ══ the dock ══════════════════════════════════════════════════════════════
+   A floating control rail. It keeps the site nav's frosted shell — the two are
+   the same kind of object and the reader meets them together — and drops the
+   filled pills: a control that is ON takes the ink and the accent rule, exactly
+   like the collection row it mirrors. */
+.g2-dock {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(0.9rem, 3vh, 1.75rem);
+  z-index: 45;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 1.5rem);
+  transition:
+    transform 0.3s var(--e),
+    opacity 0.3s var(--e);
+}
+/* Slips out of the way once the footer is reached, so it never covers it. */
+.g2-dock[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 160%);
+}
+.g2-dock-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* Wider at the ends than between the controls. The bar is a pill, so its
+     corners curve away from its content: at an even 0.4rem the first pill's
+     active rule ran into the curve and the last control sat on it. The extra
+     inline padding is the pill's own optical inset, not decoration. */
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background-color: color-mix(in oklab, var(--color-fd-background) 78%, transparent);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+  border: 1px solid var(--rule);
+}
+.g2-dock-bar::-webkit-scrollbar {
+  display: none;
+}
+.g2-dock .g2-seg {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.15rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+}
+/* One ink step up from the same control on the page. Everything in this bar sits
+   on a blurred, translucent surface with the catalog moving underneath it, and
+   the quietest ink in the ladder was tuned against a solid field: over a
+   backdrop that changes as you scroll it loses its footing. The resting label is
+   `--ink-2` here and `--ink-3` in the page's own filter row, which is the same
+   reading in two different materials rather than two different readings. */
+.g2-dock .g2-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  padding: 0.4rem 0.55rem 0.45rem;
+  font-size: 0.82rem;
+  color: var(--ink-2);
+  transition: color 0.18s var(--e);
+}
+.g2-dock .g2-pill:hover {
+  color: var(--ink);
+}
+.g2-dock .g2-pill[aria-pressed="true"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+.g2-dock .g2-pill[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.55rem;
+  bottom: 2px;
+  height: 1.5px;
+  background: var(--mc-accent);
+}
+.g2-dock .g2-pill:disabled {
+  color: color-mix(in oklab, var(--ink-3) 50%, transparent);
+  cursor: default;
+}
+.g2-dock .g2-pill-n {
+  font-family: var(--fm);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+.g2-dock .g2-pill:focus-visible,
+.g2-dock .g2-icon-btn:focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: 2px;
+}
+.g2-dock-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.g2-dock-search input {
+  flex: none; /* a proper field — let the dock scroll rather than squish it */
+  width: 8.5rem;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem 0.4rem 2rem;
+  font-size: 0.82rem;
+  color: var(--ink);
+  outline: none;
+  transition:
+    width 0.3s var(--e),
+    padding 0.3s var(--e),
+    border-color 0.18s var(--e);
+}
+/* ONE edge, and it is the field's own border taking the accent. The dock's
+   buttons carry an offset outline because they have no edge of their own; a
+   field does, and giving it both drew two concentric rings with a gap of page
+   between them — the loudest object in a rail whose whole job is to stay quiet.
+   Declared on `:focus`, not `:focus-visible`, because clicking into a search box
+   is exactly when you want to see that it took the click. */
+.g2-dock-search input:focus {
+  width: 11rem;
+  border-color: var(--mc-accent);
+  outline: none;
+}
+/* `/` shortcut hint — sits at the field's right edge, fades out on focus. */
+.g2-dock-kbd {
+  position: absolute;
+  right: 0.5rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.3rem;
+  font: 400 0.7rem/1 var(--fm);
+  color: var(--ink-3);
+  background: var(--field-2);
+  border-radius: 5px;
+  pointer-events: none;
+  transition: opacity 0.18s var(--e);
+}
+.g2-dock-search:focus-within .g2-dock-kbd {
+  opacity: 0;
+}
+.g2-dock-search svg {
+  position: absolute;
+  left: 0.65rem;
+  pointer-events: none;
+  color: var(--ink-2);
+  transition:
+    left 0.3s var(--e),
+    transform 0.3s var(--e);
+}
+.g2-dock-div {
+  width: 1px;
+  align-self: stretch;
+  margin-block: 0.2rem;
+  background: var(--rule);
+}
+.g2-dock .g2-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--ink-2);
+  transition:
+    color 0.18s var(--e),
+    background-color 0.18s var(--e),
+    opacity 0.3s var(--e);
+}
+.g2-dock .g2-icon-btn:hover {
+  color: var(--ink);
+  background-color: var(--field-2);
+}
+.g2-dock .g2-icon-btn[aria-pressed="true"] {
+  color: var(--mc-accent);
+  background-color: var(--field-2);
+}
+/* Tactile press for every dock control — instant scale on pointer-down (the
+   dock is the catalog's most-clicked surface). */
+.g2-dock .g2-pill:not(:disabled):active,
+.g2-dock .g2-icon-btn:active {
+  scale: 0.94;
+}
+.g2-dock .g2-top {
+  opacity: 0;
+  width: 0;
+  padding: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition:
+    opacity 0.3s var(--e),
+    width 0.3s var(--e);
+}
+.g2-dock .g2-top[data-show] {
+  opacity: 1;
+  width: 2rem;
+  pointer-events: auto;
+}
+.g2-dock-count {
+  padding-inline: 0.5rem 0.35rem;
+  font: 400 0.66rem/1 var(--fm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+/* Fingers need bigger targets than a cursor — grow the dock controls to the
+   44px minimum on touch, without bloating the mouse layout. */
+@media (pointer: coarse) {
+  .g2-dock .g2-pill {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.9rem;
+  }
+  .g2-dock .g2-icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  /* "/" is desktop-only — in the collapsed touch field it stacks on the icon. */
+  .g2-dock-kbd {
+    display: none;
+  }
+  /* On touch, search is a centred icon button that expands on tap — a squished
+     half-field with a left-pinned icon read as "off-centre". */
+  .g2-dock-search input {
+    width: 2.75rem;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    color: transparent;
+  }
+  .g2-dock-search svg {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .g2-dock-search:focus-within input,
+  .g2-dock-search:has(input:not(:placeholder-shown)) input {
+    width: 11rem;
+    padding: 0.6rem 0.75rem 0.6rem 2rem;
+    color: var(--ink);
+  }
+  .g2-dock-search:focus-within svg,
+  .g2-dock-search:has(input:not(:placeholder-shown)) svg {
+    left: 0.7rem;
+    transform: none;
+  }
+}
+/* Phones: the dock spans a full-width bar. */
+@media (max-width: 34rem) {
+  .g2-dock {
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    transform: none;
+    max-width: none;
+  }
+  .g2-dock[data-hidden] {
+    transform: translateY(160%);
+  }
+}
+
+/* ══ example plates ════════════════════════════════════════════════════════
+   One example app per plate: a chrome strip naming its host, the app's own hero
+   screenshot (theme-swapped via --shot-l / --shot-d, so only the active scheme's
+   image is ever fetched), and a meta shelf. No tilt and no lift — Act IV's
+   plates on the landing page are flush, and these are the same seven apps. */
+.surface .shot {
+  display: block;
+  aspect-ratio: 16 / 10;
+  background-image: var(--shot-l);
+  background-size: cover;
+  background-position: top center;
+  transform-origin: top center;
+  /* The one image on these pages that moves, and it moves a whisper: the plate
+     is a window onto a running app, and a still screenshot under a cursor reads
+     as a picture of one. */
+  transition: scale 0.3s var(--e);
+}
+html.dark .surface .shot {
+  background-image: var(--shot-d);
+}
+@media (hover: hover) and (pointer: fine) {
+  .surface a.plate:hover .shot {
+    scale: 1.015;
+  }
+}
+/* Offscreen plates don't render (or fetch their screenshots) until scrolled
+   near — ~40 kB × 6 saved from first load. */
+.surface .plate--defer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
+}
+.surface .plate-chrome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.surface .plate-shelf {
+  border-top: 1px solid var(--rule);
+}
+/* A chip naming one chart type inside a plate — a field, never an outline: a
+   row of eight outlined pills is eight rectangles competing with the marks. */
+.surface .chip {
+  padding: 0.25rem 0.45rem;
+  border-radius: 6px;
+  background: var(--field-2);
+  font: 400 0.62rem/1 var(--fm);
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+}
+
+/* The flagship: chrome across the top, then the screenshot beside the meta
+   column on wide viewports, so it reads as a product window. */
+@media (min-width: 1024px) {
+  .surface .plate--wide {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+    overflow: clip;
+  }
+  .surface .plate--wide .plate-chrome {
+    grid-column: 1 / -1;
+  }
+  .surface .plate--wide .shot {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 340px;
+    border-right: 1px solid var(--rule);
+  }
+  .surface .plate--wide .plate-shelf {
+    border-top: 0;
+    justify-content: center;
+  }
+}
+
+/* ══ one example, walked through ═══════════════════════════════════════════ */
+
+/* The hero screenshot is a link to the live app: the frame holds the clip and
+   the edge, the inner `.shot` holds the image. */
+.surface .shot-frame {
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  transition: border-color 0.18s var(--e);
+}
+@media (hover: hover) and (pointer: fine) {
+  .surface .shot-frame:hover {
+    border-color: var(--edge-accent);
+  }
+  .surface .shot-frame:hover .shot {
+    scale: 1.015;
+  }
+}
+
+/* The marks an app fields, each one live and linked to its own page. Same field
+   grammar as the catalog plane, one step smaller. */
+.surface .ex-marks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 6px;
+}
+.surface .ex-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.85rem 0.75rem 0.7rem;
+  border-radius: 10px;
+  background: var(--field-1);
+  box-shadow: inset 0 0 0 1px transparent;
+  transition:
+    box-shadow 0.18s var(--e),
+    scale 0.12s var(--e);
+  /* Same trade as the catalog plane: an app can field 35 of these, and laying
+     out the whole grid measured 6.6ms. Nothing paints outside the tile — the
+     hover edge is inset and so is the focus ring — so `contain: paint` costs
+     nothing here either. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px;
+}
+.surface .ex-mark:hover {
+  box-shadow: inset 0 0 0 1px var(--edge-accent);
+}
+.surface .ex-mark:focus-visible {
+  outline-offset: -2px;
+}
+.surface .ex-mark:active {
+  scale: 0.99;
+}
+/* The preview sits in a fixed centred band so two dozen different marks line up
+   on a grid — constrained on BOTH axes, so a tall mark (dot plots, ladders)
+   scales down to fit instead of clipping. */
+.surface .ex-mark-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 5.5rem;
+  padding: 0.2rem;
+  overflow: hidden;
+}
+.surface .ex-mark-body svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+/* HTML-based previews (Delta, FatDigits…) aren't SVGs to axis-scale — cap them
+   so a big-type mark can't overflow the band. */
+.surface .ex-mark-body > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+.surface .ex-mark-name {
+  font: 400 0.62rem/1.2 var(--fm);
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--ink-3);
+  transition: color 0.18s var(--e);
+}
+.surface .ex-mark:hover .ex-mark-name {
+  color: var(--ink);
+}
+
+/* Prev / next through the showcase. Type on the page, no field and no edge: the
+   name is the door, the kicker says which way, and the rule above the pair is
+   what places them. */
+.surface .ex-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.surface .ex-step-name {
+  font: 500 15px/1.2 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  box-shadow: inset 0 -1px 0 0 var(--rule-2);
+  transition:
+    color 0.18s var(--e),
+    box-shadow 0.18s var(--e);
+}
+.surface .ex-step:hover .ex-step-name {
+  color: var(--mc-accent);
+  box-shadow: inset 0 -1px 0 0 currentColor;
+}
+/* The underline is on the WORD, so it has to stop at the word. A flex column
+   stretches its children to the full track, which drew the rule the whole width
+   of the column and read as a divider rather than as a link. */
+.surface .ex-step-name,
+.surface .ex-step .kicker,
+.surface .ex-step .mono {
+  align-self: start;
+}
+.surface .ex-step.items-end .ex-step-name,
+.surface .ex-step.items-end .kicker,
+.surface .ex-step.items-end .mono {
+  align-self: end;
+}
+
+/* ══ the brand sheet ═══════════════════════════════════════════════════════ */
+
+/* A specimen ground. The graph paper stays HERE and only here: on this page the
+   grid is a measuring instrument — clear space and cell geometry are the
+   subject — rather than texture behind a chart. */
+.surface .bk-stage {
+  position: relative;
+  display: flex;
+  min-height: 9.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--rule) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--rule) 40%, transparent) 1px, transparent 1px);
+  background-size: 12px 12px;
+  background-position: -1px -1px;
+}
+/* The two grounds the deliverable must read on are FIXED, not themed: a mono
+   mark for dark ink is being shown against the paper it is for. */
+.surface .bk-stage[data-tile="light"] {
+  background-color: #e9edf4;
+}
+.surface .bk-stage[data-tile="dark"] {
+  background-color: #0a0b0f;
+}
+.surface .bk-stage[data-tile="auto"] {
+  background-color: transparent;
+  background-image: linear-gradient(135deg, #e9edf4 49.5%, #0a0b0f 50.5%);
+  background-size: 100% 100%;
+}
+.surface .bk-badge {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--mc-negative) 88%, #000);
+  color: #fff;
+  font: 700 0.65rem/1 var(--fm);
+}
+
+/* The hero's ground is a FIELD the mark sits in, not a tile it sits on. Inside a
+   card the grid can stop at an edge, because the edge is the subject's frame;
+   out here on the open page a rectangle of ruled paper ending in mid-air reads
+   as a missing image, and its outermost rules ran straight into the mark — which
+   is the one thing on this page that has a clear-space rule.
+
+   So it is drawn larger than its box and masked away toward every side. Two
+   masks, intersected: a radial that opens the middle, and a linear pair that
+   guarantees the top and bottom rules are gone before they reach the mark's
+   band. `mask-composite: intersect` is what makes the corners fade rather than
+   the sides only. */
+.surface .bk-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 16px 16px;
+  background-position: center;
+  /* Its own ink, a step up from the tile's. `--rule` is already an alpha token,
+     so a 40% mix of it left nothing visible once the mask had faded it a second
+     time: a field that is going to be faded out has to start stronger. */
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--ink-3) 34%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--ink-3) 34%, transparent) 1px, transparent 1px);
+  -webkit-mask-image: radial-gradient(closest-side, #000 26%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 26%, transparent 100%);
+}
+
+/* ══ preferences ═══════════════════════════════════════════════════════════ */
+
+/* The dock is the one frosted thing on these pages. When a reader opts out of
+   translucency it goes fully solid — a control rail's legibility must never
+   depend on the frost. */
+@media (prefers-reduced-transparency: reduce) {
+  .g2-dock-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: var(--glass-solid);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface .g2-card,
+  .surface .ex-mark,
+  .surface .shot,
+  .surface .q-chip,
+  .surface .field-cell {
+    transition: none;
+  }
+}
+
+/* Forced colors (Windows High Contrast): the field tints all drop out, so pin
+   the reads that MUST survive to system colors — a visible card edge, a legible
+   dock, and a real active-filter indication (a color-mix background vanishes,
+   and so does an accent rule). */
+@media (forced-colors: active) {
+  .surface .g2-card,
+  .surface .ex-mark {
+    border: 1px solid CanvasText;
+  }
+  .surface .g2-card:hover,
+  .surface .g2-cell:focus-within .g2-card,
+  .surface .ex-mark:hover {
+    border-color: Highlight;
+  }
+  .surface .g2-name,
+  .surface .ex-mark-name {
+    color: LinkText;
+  }
+  .g2-dock-bar {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+  .g2-dock .g2-seg,
+  .g2-dock-search input {
+    border-color: CanvasText;
+  }
+  .g2-dock .g2-pill[aria-pressed="true"],
+  .g2-dock .g2-icon-btn[aria-pressed="true"],
+  .surface .q-chip[aria-pressed="true"],
+  .surface .coll-link[data-on] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+  .g2-dock .g2-pill:focus-visible,
+  .g2-dock .g2-icon-btn:focus-visible,
+  .g2-dock-search input:focus-visible {
+    outline-color: Highlight;
+  }
+}

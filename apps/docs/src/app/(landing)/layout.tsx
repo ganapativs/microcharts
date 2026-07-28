@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Source_Serif_4 } from "next/font/google";
 import { HomeShell } from "@/components/home/home-shell";
+import "../surface.css";
 import "./home.css";
 
 // The reading serif — demo prose only: the living hero sentence, the paper

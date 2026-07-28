@@ -78,9 +78,10 @@ const Cell = memo(function Cell({
       <span aria-hidden className="cell-name">
         {item.slug}
       </span>
-      {/* Shown only where the readout is gone: a touch screen has no cursor for
-          the band to follow. `aria-hidden` — the cell's own label already reads
-          "SparkBar, 5.67 kB". */}
+      {/* The size belongs to the specimen, not to the cursor: it is a fixed
+          property of the type, so it reads in the cell at every width rather
+          than only in the band a pointer happens to be dragging. `aria-hidden` —
+          the cell's own label already reads "SparkBar, 5.67 kB". */}
       <span aria-hidden className="cell-kb">
         {item.kb}
       </span>
@@ -141,17 +142,19 @@ export function SpecimenLattice({
       {/* Fixed height and a clamped tagline: the text changes on every cell the
           pointer crosses, so a self-sizing band would move the lattice under the
           cursor. `top` lives in home.css, never inline — an inline offset cannot
-          be answered by the small-screen media query. */}
+          be answered by the small-screen media query.
+
+          No size here: it is printed in the cell instead (`.cell-kb`), at every
+          width. The band's job is the readings a cell has no room for — the
+          sentence, the channel, the precision — and the component's PascalCase
+          name against the cell's slug. */}
       <div className="readout sticky z-20 flex flex-col justify-center">
         <div className="min-w-0">
           <div
             className="font-mono text-[13px] font-medium leading-[1.3] tracking-[-0.03em]"
             style={{ color: "var(--ink)" }}
           >
-            {active.name}{" "}
-            <span className="font-normal" style={{ color: "var(--ink-3)" }}>
-              {active.kb}
-            </span>
+            {active.name}
           </div>
           {/* One polite region for the whole sheet. Roving focus changes the
               reading, so the announcement follows the cursor rather than

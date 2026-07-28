@@ -65,7 +65,7 @@ export function LeftOut({ ceilingPx }: { ceilingPx: number }) {
           . Each one has a replacement that answers the same question.
         </p>
 
-        <div className="u-ruled border-t pt-6" style={{ borderColor: "var(--rule)" }}>
+        <div className="u-ruled">
           <div className="kicker">same five shares · {SHARES.join(" ")}</div>
 
           <div className="mt-6 grid gap-7 sm:grid-cols-[repeat(2,minmax(0,max-content))] sm:gap-x-12 lg:gap-x-[4.5rem]">
@@ -124,7 +124,7 @@ export function LeftOut({ ceilingPx }: { ceilingPx: number }) {
         </div>
 
         <p
-          className="lead u-ruled border-t pt-7"
+          className="lead u-ruled"
           style={{ maxWidth: "var(--m-lead)", borderColor: "var(--rule-2)" }}
         >
           {/* A literal apostrophe, not `&rsquo;`: SWC glues a text node that

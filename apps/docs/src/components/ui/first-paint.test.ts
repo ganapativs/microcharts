@@ -15,32 +15,30 @@ function* findFiles(dir: URL): Generator<string> {
   }
 }
 
-const reveal = read("./reveal.tsx");
 const css = read("../../app/global.css");
 const srcFiles = () =>
   [...findFiles(new URL("../../", import.meta.url))].filter(
     (f) => /\.(tsx|ts|css)$/.test(f) && !f.includes(".test."),
   );
 
-/** First paint ungated on JS; no scroll/route entrance choreography. */
+/**
+ * First paint is never gated on JS, and entrance choreography stays dead.
+ *
+ * This used to be `reveal.test.ts`, and `<Reveal>` used to be the wrapper it
+ * guarded: a scroll-reveal that had already been reduced to a plain server-side
+ * `<div>` because hiding server HTML until hydration is a flicker, not an
+ * entrance. The marketing surface then adopted the home page's no-entrance rule
+ * outright, which left the wrapper with no call sites and nothing to wrap, so it
+ * is gone. The rules it existed to enforce are not.
+ */
 describe("first paint is never gated on JS, and entrance choreography stays dead", () => {
-  it("Reveal is a plain server-rendered wrapper", () => {
-    // No client boundary, no state, no observer: a wrapper that needs hydration
-    // to become visible is the bug this file guards against.
-    expect(reveal).not.toMatch(/"use client"/);
-    expect(reveal).not.toMatch(/useState|useEffect|IntersectionObserver/);
-  });
-
-  it("the deferred opt-out stays gone", () => {
-    // `deferred` hid its subtree in the server HTML. Nothing may re-adopt it.
-    // Prose may explain why it's gone; a prop, default, or type may not.
-    expect(reveal).not.toMatch(/deferred\s*[?:=]/);
-    const callSites = srcFiles()
-      .filter((f) => f.endsWith(".tsx") && !f.endsWith("reveal.tsx"))
-      .filter((file) => /<Reveal[^>]*\sdeferred[\s/>]/.test(readFileSync(file, "utf8")))
-      .map((f) => f.replace(/^.*\/src\//, "src/"))
-      .sort();
-    expect(callSites).toEqual([]);
+  it("has no scroll-reveal wrapper to re-adopt", () => {
+    const files = srcFiles().map((f) => f.replace(/^.*\/src\//, "src/"));
+    expect(files).not.toContain("components/ui/reveal.tsx");
+    for (const file of srcFiles()) {
+      if (!file.endsWith(".tsx")) continue;
+      expect(readFileSync(file, "utf8"), file).not.toMatch(/<Reveal[\s/>]/);
+    }
   });
 
   it("no CSS rule hides a reveal", () => {

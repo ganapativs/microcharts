@@ -465,6 +465,24 @@ export function useFooterMarkCanvas(
       mctx.textAlign = "left";
       mctx.textBaseline = "alphabetic";
       mctx.fillStyle = "#fff";
+      // The mark is a letter of the lockup, so it is knocked out of the field
+      // exactly like one: the mask is what lets the charts read THROUGH the ink
+      // (the composite at the end draws field ∩ mask at full strength), and a
+      // mark left out of it reads as an opaque slab beside translucent letters.
+      // It also knocks the mark out of the pointer torch for free.
+      if (markSize > 0) {
+        const m = markState(pw);
+        if (m.a > 0.004) {
+          const s = markSize / 32;
+          mctx.save();
+          mctx.translate(markX, markY + m.dy);
+          mctx.scale(s, s);
+          mctx.globalAlpha = m.a;
+          // oxlint-disable-next-line unicorn/no-array-fill-with-reference-type -- canvas Path2D fill, not Array#fill
+          mctx.fill(squircle);
+          mctx.restore();
+        }
+      }
       for (let i = 0; i < letters.length; i++) {
         const { a, dy } = letterState(i, pw);
         if (a <= 0.004) continue;
