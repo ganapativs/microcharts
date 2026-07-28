@@ -96,16 +96,15 @@ landing page declares exactly one `@keyframes`, by name.
 
 ### Voice
 
-Plain declaratives that could have been typed by the person who built it. The tells to cut, every time: bulleted feature
-grids, poetic closers, cliffhangers, rule-of-three cadence, tidy symmetry, filler intensifiers ("genuinely", "truly"),
-marketing adjectives, and duration or effort claims. Keep honest asides, modesty, contractions, uneven rhythm, and a
-real concession where there is one. A heading describes; it never teases. Numbers are always measured and current — the
-marketing pages read every figure from `docs-facts.ts` / `stats.ts` / `showcase.ts`, so a page cannot quote a size the
-build did not measure.
+The canonical writing register for every prose surface in the repo lives in the root `CLAUDE.md` under "Writing voice" —
+this file defers to it. The 2026-07-29 voice pass applied it to all 129 docs pages and the root README; the exemplars
+are `content/docs/{index,quickstart,ai}.mdx` and `README.md`.
 
-**These voice rules are not marketing-only.** They apply to every sentence the site ships, `/docs/**` included. Docs
-prose additionally never invents mechanism: a claim about behavior quotes what the build measured or what a test asserts
-(`docs-claims.test.ts`, `summary-claims.test.ts`, `chart-a11y-claims.test.ts` hold that line).
+Site-specific additions on top of that contract: a heading describes, it never teases; no duration or effort claims;
+numbers are always measured and current — the marketing pages read every figure from `docs-facts.ts` / `stats.ts` /
+`showcase.ts`, so a page cannot quote a size the build did not measure. Docs prose additionally never invents mechanism:
+a claim about behavior quotes what the build measured or what a test asserts (`docs-claims.test.ts`,
+`summary-claims.test.ts`, `chart-a11y-claims.test.ts` hold that line).
 
 ## Type
 
@@ -146,7 +145,9 @@ test-locked (`preset-parity.test.ts`, `accent-palettes.test.ts`) — never hand-
 ## Bringing the docs into the language
 
 The next pass restyles `/docs/**` onto the marketing language. This section is the contract for it: what crosses over
-unchanged, what the docs keep by design, and the inventory of what has to change.
+unchanged, what the docs keep by design, and the inventory of what has to change. (The prose register is already unified
+— the 2026-07-29 voice pass covered every docs page — so this pass is visual only. The two surfaces keeping different
+chrome and density is the standing decision, not drift.)
 
 ### What crosses over (rules, not suggestions)
 
@@ -173,7 +174,9 @@ unchanged, what the docs keep by design, and the inventory of what has to change
    `size-footprint-card.tsx` become mono figures (`.figure` / `.num` equivalents), and `.display text-lg` in
    `chooser.tsx` becomes a Hanken sub-head.
 7. **One easing token, ≤ 0.3 s** for every hover/focus transition.
-8. **Voice** — the tells list above, applied to every doc page and every panel label. Headings describe.
+8. **Voice** — DONE (2026-07-29): the corpus voice pass rewrote all 129 doc pages, plus the README, onto the `CLAUDE.md`
+   "Writing voice" contract. What remains of this pass is visual only; panel labels and any NEW copy follow the same
+   contract.
 
 ### What the docs keep (decided, not pending)
 
