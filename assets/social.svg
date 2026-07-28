@@ -1,17 +1,27 @@
-<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <!-- Design language: the microcharts.dev marketing surface — flat #0a0b0f field,
+       one 152° accent wash + film grain ground, Open Runde display, Hanken body,
+       JetBrains mono metadata. Rasterized by scripts/gen-promo.mjs (Chromium). -->
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#151924"/>
-      <stop offset="1" stop-color="#0e111a"/>
+    <linearGradient id="wash" x1="0.15" y1="0" x2="0.62" y2="1">
+      <stop offset="0" stop-color="#528dff" stop-opacity="0.09"/>
+      <stop offset="0.55" stop-color="#528dff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#528dff" stop-opacity="0.24"/>
       <stop offset="1" stop-color="#528dff" stop-opacity="0"/>
     </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
   </defs>
 
-  <rect width="1280" height="640" fill="url(#bg)"/>
-  <rect x="0.5" y="0.5" width="1279" height="639" fill="none" stroke="#faf7f1" stroke-opacity="0.06"/>
+  <!-- ground: field + wash + grain (the site's `.site-wash` / `.site-grain`) -->
+  <rect width="1280" height="640" fill="#0a0b0f"/>
+  <rect width="1280" height="640" fill="url(#wash)"/>
+  <rect width="1280" height="640" filter="url(#grain)" opacity="0.055" style="mix-blend-mode:overlay"/>
+  <rect x="0.5" y="0.5" width="1279" height="639" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
 
   <!-- brand mark -->
   <g transform="translate(72,64) scale(1.9)">
@@ -21,42 +31,42 @@
     <rect x="19" y="9" width="4" height="4" rx="1.2" fill="#faf7f1"/>
   </g>
 
-  <!-- wordmark + tagline -->
-  <text x="150" y="108" font-size="56" font-weight="700" letter-spacing="-0.02em" fill="#f4f1ea">microcharts</text>
-  <text x="74" y="168" font-size="24" fill="#9aa3b6">Word-sized charts for React — built for AI, and for the people reading what it writes.</text>
+  <!-- wordmark + tagline — Open Runde display, Hanken body -->
+  <text x="150" y="111" font-family="'Open Runde', ui-sans-serif, system-ui, sans-serif" font-size="56" font-weight="600" letter-spacing="-0.016em" fill="#e9e8e3">microcharts</text>
+  <text x="74" y="168" font-size="24" fill="#e9e8e3" opacity="0.58">Word-sized charts for React — built for AI, and for the people reading what it writes.</text>
 
   <!-- ===================== specimen band ===================== -->
   <!-- 5 cards: x0=72 w=208 step=232, y=216 h=248 -->
   <g>
     <!-- 1 · SPARKLINE -->
     <g transform="translate(72,216)">
-      <rect x="0" y="0" width="208" height="248" rx="18" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <rect x="0.5" y="0.5" width="207" height="247" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1"/>
       <path d="M24 150 L52 128 L80 138 L108 92 L136 108 L164 58 L184 78 L184 196 L24 196 Z" fill="url(#spark)"/>
       <path d="M24 150 L52 128 L80 138 L108 92 L136 108 L164 58 L184 78" fill="none" stroke="#528dff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="184" cy="78" r="5.5" fill="#528dff"/>
-      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
+      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
     </g>
 
     <!-- 2 · SPARKBAR win/loss -->
     <g transform="translate(304,216)">
-      <rect x="0" y="0" width="208" height="248" rx="18" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <rect x="0.5" y="0.5" width="207" height="247" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1"/>
       <g>
-        <rect x="26" y="88" width="14" height="40" rx="2.5" fill="#2dd4a7"/>
+        <rect x="26" y="88" width="14" height="40" rx="2.5" fill="#45a385"/>
         <rect x="46" y="128" width="14" height="38" rx="2.5" fill="#df7856"/>
-        <rect x="66" y="74" width="14" height="54" rx="2.5" fill="#2dd4a7"/>
-        <rect x="86" y="88" width="14" height="40" rx="2.5" fill="#2dd4a7"/>
+        <rect x="66" y="74" width="14" height="54" rx="2.5" fill="#45a385"/>
+        <rect x="86" y="88" width="14" height="40" rx="2.5" fill="#45a385"/>
         <rect x="106" y="128" width="14" height="30" rx="2.5" fill="#df7856"/>
-        <rect x="126" y="64" width="14" height="64" rx="2.5" fill="#2dd4a7"/>
+        <rect x="126" y="64" width="14" height="64" rx="2.5" fill="#45a385"/>
         <rect x="146" y="128" width="14" height="24" rx="2.5" fill="#df7856"/>
-        <rect x="166" y="80" width="14" height="48" rx="2.5" fill="#2dd4a7"/>
-        <line x1="22" y1="128" x2="184" y2="128" stroke="#faf7f1" stroke-opacity="0.14"/>
+        <rect x="166" y="80" width="14" height="48" rx="2.5" fill="#45a385"/>
+        <line x1="22" y1="128" x2="184" y2="128" stroke="#ffffff" stroke-opacity="0.14"/>
       </g>
-      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
+      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
     </g>
 
     <!-- 3 · ACTIVITY GRID -->
     <g transform="translate(536,216)">
-      <rect x="0" y="0" width="208" height="248" rx="18" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <rect x="0.5" y="0.5" width="207" height="247" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1"/>
       <g transform="translate(26,64)" fill="#528dff">
         <rect x="0" y="0" width="13" height="13" rx="3" opacity="0.15"/><rect x="18" y="0" width="13" height="13" rx="3" opacity="0.35"/><rect x="36" y="0" width="13" height="13" rx="3" opacity="0.6"/><rect x="54" y="0" width="13" height="13" rx="3" opacity="0.2"/><rect x="72" y="0" width="13" height="13" rx="3" opacity="0.85"/><rect x="90" y="0" width="13" height="13" rx="3" opacity="0.5"/><rect x="108" y="0" width="13" height="13" rx="3" opacity="1"/><rect x="126" y="0" width="13" height="13" rx="3" opacity="0.3"/><rect x="144" y="0" width="13" height="13" rx="3" opacity="0.7"/>
         <rect x="0" y="18" width="13" height="13" rx="3" opacity="0.4"/><rect x="18" y="18" width="13" height="13" rx="3" opacity="0.2"/><rect x="36" y="18" width="13" height="13" rx="3" opacity="0.75"/><rect x="54" y="18" width="13" height="13" rx="3" opacity="0.9"/><rect x="72" y="18" width="13" height="13" rx="3" opacity="0.35"/><rect x="90" y="18" width="13" height="13" rx="3" opacity="0.6"/><rect x="108" y="18" width="13" height="13" rx="3" opacity="0.25"/><rect x="126" y="18" width="13" height="13" rx="3" opacity="1"/><rect x="144" y="18" width="13" height="13" rx="3" opacity="0.5"/>
@@ -64,35 +74,35 @@
         <rect x="0" y="54" width="13" height="13" rx="3" opacity="0.25"/><rect x="18" y="54" width="13" height="13" rx="3" opacity="0.55"/><rect x="36" y="54" width="13" height="13" rx="3" opacity="0.8"/><rect x="54" y="54" width="13" height="13" rx="3" opacity="0.4"/><rect x="72" y="54" width="13" height="13" rx="3" opacity="1"/><rect x="90" y="54" width="13" height="13" rx="3" opacity="0.6"/><rect x="108" y="54" width="13" height="13" rx="3" opacity="0.3"/><rect x="126" y="54" width="13" height="13" rx="3" opacity="0.7"/><rect x="144" y="54" width="13" height="13" rx="3" opacity="0.5"/>
         <rect x="0" y="72" width="13" height="13" rx="3" opacity="0.5"/><rect x="18" y="72" width="13" height="13" rx="3" opacity="0.3"/><rect x="36" y="72" width="13" height="13" rx="3" opacity="0.65"/><rect x="54" y="72" width="13" height="13" rx="3" opacity="0.85"/><rect x="72" y="72" width="13" height="13" rx="3" opacity="0.4"/><rect x="90" y="72" width="13" height="13" rx="3" opacity="0.7"/><rect x="108" y="72" width="13" height="13" rx="3" opacity="0.2"/><rect x="126" y="72" width="13" height="13" rx="3" opacity="0.9"/><rect x="144" y="72" width="13" height="13" rx="3" opacity="0.55"/>
       </g>
-      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
+      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
     </g>
 
     <!-- 4 · BULLET -->
     <g transform="translate(768,216)">
-      <rect x="0" y="0" width="208" height="248" rx="18" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <rect x="0.5" y="0.5" width="207" height="247" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1"/>
       <g transform="translate(24,86)">
-        <rect x="0" y="0" width="160" height="26" rx="5" fill="#faf7f1" opacity="0.08"/>
-        <rect x="0" y="0" width="100" height="26" rx="5" fill="#faf7f1" opacity="0.14"/>
+        <rect x="0" y="0" width="160" height="26" rx="5" fill="#ffffff" opacity="0.08"/>
+        <rect x="0" y="0" width="100" height="26" rx="5" fill="#ffffff" opacity="0.14"/>
         <rect x="0" y="7" width="122" height="12" rx="3.5" fill="#528dff"/>
-        <line x1="140" y1="-8" x2="140" y2="34" stroke="#f4f1ea" stroke-width="3"/>
+        <line x1="140" y1="-8" x2="140" y2="34" stroke="#e9e8e3" stroke-width="3"/>
       </g>
-      <text x="24" y="176" xml:space="preserve" font-size="18" font-weight="600" fill="#f4f1ea" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">76<tspan fill="#7f889b"> / 80</tspan></text>
-      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">BULLET</text>
+      <text x="24" y="176" xml:space="preserve" font-size="18" font-weight="600" fill="#e9e8e3" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">76<tspan opacity="0.45"> / 80</tspan></text>
+      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">BULLET</text>
     </g>
 
     <!-- 5 · DELTA -->
     <g transform="translate(1000,216)">
-      <rect x="0" y="0" width="208" height="248" rx="18" fill="#191d28" stroke="#faf7f1" stroke-opacity="0.07"/>
+      <rect x="0.5" y="0.5" width="207" height="247" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1"/>
       <g transform="translate(30,92)">
-        <path d="M11 0 L22 18 L0 18 Z" fill="#2dd4a7"/>
-        <text x="36" y="18" font-size="34" font-weight="700" fill="#f4f1ea" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">+12.4%</text>
+        <path d="M11 0 L22 18 L0 18 Z" fill="#45a385"/>
+        <text x="36" y="18" font-size="34" font-weight="600" fill="#e9e8e3" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">+12.4%</text>
       </g>
-      <text x="30" y="152" font-size="15" fill="#7f889b">1,240 → 1,394</text>
-      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#7f889b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
+      <text x="30" y="152" font-size="15" fill="#e9e8e3" opacity="0.45">1,240 → 1,394</text>
+      <text x="24" y="228" font-size="13" letter-spacing="0.09em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
     </g>
   </g>
 
   <!-- footer: stat line + url, centered + stacked -->
-  <text x="640" y="540" text-anchor="middle" xml:space="preserve" font-size="14" fill="#8b93a6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan fill="#5b6377">   ·   </tspan>0 dependencies<tspan fill="#5b6377">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan fill="#5b6377">   ·   </tspan>RSC-safe<tspan fill="#5b6377">   ·   </tspan>accessible by default</text>
-  <text x="640" y="586" text-anchor="middle" font-size="17" fill="#528dff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">microcharts.dev</text>
+  <text x="640" y="540" text-anchor="middle" xml:space="preserve" font-size="14" fill="#e9e8e3" opacity="0.5" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan opacity="0.55">   ·   </tspan>0 dependencies<tspan opacity="0.55">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan opacity="0.55">   ·   </tspan>RSC-safe<tspan opacity="0.55">   ·   </tspan>accessible by default</text>
+  <text x="640" y="586" text-anchor="middle" font-size="17" fill="#528dff" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">microcharts.dev</text>
 </svg>
