@@ -25,7 +25,11 @@ export function biasLayout(
   label: string,
   r: number | undefined,
 ): { rad: number; outlierRad: number; fontSize: number; captionPad: number } {
-  const rad = clamp(r ?? 1.5, 1, 3);
+  // `clamp` is NaN-transparent by design (see core/scale.ts), so an `r` of NaN
+  // sailed straight through it and poisoned every cx/cy/r, the band rect, and
+  // the `--mc-seat` variable — a chart that paints nothing and unseats itself
+  // on the text line. Anything unusable falls back to the documented default.
+  const rad = clamp(isFiniteValue(r) ? r : 1.5, 1, 3);
   const fontSize = labelFont(height, 0.28);
   const captionPad = label === "bias" && width >= 40 && height >= 3 * fontSize ? fontSize + 2 : 0;
   return { rad, outlierRad: round2(rad + 0.3), fontSize, captionPad };
@@ -67,7 +71,7 @@ export function biasStripGeometry(opts: {
   width: number;
   height: number;
   data: readonly BiasPair[];
-  /** k in bias ± k·σ (default 1.96 ≈ 95% limits of agreement). */
+  /** k in bias ± k·σ. Non-finite or negative → 1.96 (≈ 95% limits). */
   limits: number;
   /** Dot radius (used only to pad the plot so marks never clip). */
   rad: number;
@@ -96,17 +100,30 @@ export function biasStripGeometry(opts: {
   }
 
   // stats over EVERY finite pair (display down-sampling never moves the band).
-  // sd is only consumed through upper/lower when hasBand (n ≥ 5), so the n === 1
-  // NaN it produces is never read — no guard needed.
   const diffs = finite.map((p) => p.diff);
   const bias = diffs.reduce((s, d) => s + d, 0) / n;
   const sd = Math.sqrt(diffs.reduce((s, d) => s + (d - bias) ** 2, 0) / (n - 1));
 
+  // k has to be finite and non-negative. `bias ± k·σ` is symmetric, so a
+  // negative k names the same band while making `d >= lower && d <= upper`
+  // unsatisfiable — every pair is re-inked as an outlier and the summary
+  // announces 0% within. A non-finite k is worse: it poisons the symmetric
+  // y-domain below, `scaleLinear` degenerates to its midpoint, every dot stacks
+  // on the zero line, and the summary still announces a within-limits share for
+  // limits the chart never painted.
+  const k = isFiniteValue(limits) && limits >= 0 ? limits : 1.96;
+  const upper = bias + k * sd;
+  const lower = bias - k * sd;
+
   // micro-box precedent: with fewer than 5 pairs the limits aren't meaningful —
-  // show the dots and the zero reference only.
-  const hasBand = n >= 5;
-  const upper = bias + limits * sd;
-  const lower = bias - limits * sd;
+  // show the dots and the zero reference only. The same degradation covers
+  // unpaintable limits, and the test is the SPAN, not each end: a k of 1e308
+  // leaves both ends finite but overflows the symmetric domain 2m, and
+  // `scaleLinear` then maps every dot onto one midpoint while the summary still
+  // announces "100% within". Dropping the band keeps the domain on the diffs,
+  // so the cloud stays readable and the summary claims only what it painted.
+  // It is also what keeps the n === 1 `sd` of NaN off every coordinate.
+  const hasBand = n >= 5 && isFiniteValue(upper - lower);
   // integer percentage — the summary renders it verbatim (no re-rounding)
   const withinPct = hasBand
     ? Math.round((diffs.filter((d) => d >= lower && d <= upper).length / n) * 100)

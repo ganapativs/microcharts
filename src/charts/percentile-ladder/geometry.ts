@@ -22,7 +22,9 @@ interface LadderTick {
 export interface PercentileLadderGeometry {
   track: { x0: number; x1: number; y: number };
   ticks: LadderTick[];
-  /** last tick value / first tick value, 2-dp; 0 when the first is 0. */
+  /** The sample's median — what "× the median" measures against, in both entries. Unrounded. */
+  median: number;
+  /** last tick value / the median, 2-dp; 0 when the median is 0. */
   ratio: number;
   /** Log scale actually applied (falls back to linear on any value ≤ 0). */
   log: boolean;
@@ -39,6 +41,7 @@ export interface PercentileLadderGeometry {
 }
 
 const LADDER_MAX_PS = 4;
+const DEFAULT_PS = [50, 90, 99];
 
 export function percentileLadderGeometry(opts: {
   width: number;
@@ -57,17 +60,32 @@ export function percentileLadderGeometry(opts: {
   const finite = opts.data.filter(isFiniteValue);
   if (finite.length === 0) return null;
 
-  const psRaw = (opts.ps ?? [50, 90, 99]).filter((p) => Number.isFinite(p));
-  const ps = [...new Set(psRaw)].sort((a, b) => a - b).slice(0, LADDER_MAX_PS);
-  if (ps.length === 0) return null;
+  // Percentiles outside (0, 100) are DROPPED, not clamped: `quantiles` clamps p
+  // into the sample, so a `p200` tick PAINTED the maximum while the summary
+  // announced "p200 … — the slowest -100%". NaN fails both comparisons, so this
+  // is also the finiteness filter. A `ps` that filters down to nothing is a
+  // config mistake, not an absent sample (`ps={[]}`, `ps={[0, 100]}`, a NaN out
+  // of an empty number input): returning null announced "No data." over a
+  // perfectly good series, so fall back to the documented default.
+  const asked = [...new Set((opts.ps ?? DEFAULT_PS).filter((p) => p > 0 && p < 100))]
+    .sort((a, b) => a - b)
+    .slice(0, LADDER_MAX_PS);
+  const ps = asked.length > 0 ? asked : DEFAULT_PS;
+  const k = ps.length;
 
-  const vals = quantiles(
-    finite,
-    ps.map((p) => p / 100),
-  )!;
+  // One sort for the ticks AND the reference: the summary and the probe both
+  // say "× the median", so that is the sample's p50 — not vals[0], which
+  // announced p99/p25 under the median's name whenever p50 was not the lowest
+  // requested percentile, and disagreed with the interactive readout.
+  const qs = quantiles(finite, [...ps.map((p) => p / 100), 0.5])!;
+  const vals = qs.slice(0, k);
+  const median = qs[k]!;
   const dataMax = maxOf(vals, 0);
   const dataMin = minOf(vals);
-  const collapsed = dataMax === dataMin;
+  // One requested percentile is not "all percentiles equal at X" — a single
+  // tick trivially equals itself, and the flat phrasing stated a fact about the
+  // distribution that was never checked.
+  const collapsed = k > 1 && dataMax === dataMin;
 
   // log only when every sample value is > 0 (a single ≤ 0 makes log a lie)
   const log = opts.scale === "log" && finite.every((v) => v > 0) && dataMax > 0;
@@ -99,7 +117,6 @@ export function percentileLadderGeometry(opts: {
     x = (v) => round2(clamp(s(v), x0, width - pad));
   }
 
-  const k = ps.length;
   const maxHalf = round2(Math.min(3, height * 0.28));
   const ticks: LadderTick[] = ps.map((p, i) => ({
     p,
@@ -109,8 +126,7 @@ export function percentileLadderGeometry(opts: {
     half: round2(maxHalf * (k === 1 ? 1 : 0.6 + 0.4 * (i / (k - 1)))),
   }));
 
-  const first = vals[0]!;
-  const quotient = first === 0 ? 0 : vals[k - 1]! / first;
+  const quotient = median === 0 ? 0 : vals[k - 1]! / median;
   // round2 multiplies by 100 first, so a finite-but-huge quotient (denormal
   // inputs → e.g. 1.8e306) overflows to Infinity — guard the ROUNDED result
   const rounded = round2(quotient);
@@ -119,6 +135,10 @@ export function percentileLadderGeometry(opts: {
   return {
     track: { x0: round2(x0), x1: round2(width - pad), y },
     ticks,
+    // unrounded on purpose: it is a divisor, never a painted coordinate, and
+    // round2 (×100 first) overflows a denormal-scale sample to Infinity —
+    // which would turn every announced multiple into 0×
+    median,
     ratio,
     log,
     logTag: showTag ? { x: round2(pad - 2), y } : null,

@@ -7,13 +7,13 @@ description:
 
 ## Set up
 
-Prefer an agent — paste the prompt once. It installs the package, imports the stylesheet at your app root, records the
+Prefer an agent: paste the prompt once. It installs the package, imports the stylesheet at your app root, records the
 conventions in your agent-rules file, and verifies with a first chart. Or do the two steps yourself under
 [Set up manually](#set-up-manually).
 
 ### Set up with an AI agent
 
-Hand the prompt below to your coding agent — **Cursor, Claude Code, GitHub Copilot, Codex**, or any model, large or
+Hand the prompt below to your coding agent: **Cursor, Claude Code, GitHub Copilot, Codex**, or any model, large or
 small. Works on a fresh repo or an existing one. It's also served verbatim at [`/agent-setup.md`](/agent-setup.md).
 
 <div className="agent-prompt">
@@ -87,27 +87,27 @@ the page rendering the test chart.
 </div>
 
 The prompt fetches small, targeted files — the [`/llms.txt`](/llms.txt) index first, then one chart's `.md` page at a
-time — so it stays inside the context window of smaller models and works from today's real API instead of a memorized
-guess. The rules are inlined too, so it still works when the agent can't reach the network.
+time — so it stays inside the context window of smaller models and reads today's real API. The rules are inlined too, so
+it still works when the agent can't reach the network.
 
 <Callout type="info">
   **Does your assistant speak MCP?** Add the server instead of pasting the prompt, and it can search the catalog and
   render charts as tool calls rather than reading docs: `npx -y @microcharts/mcp`. Per-client config and the tool
-  reference are in [MCP server](/docs/mcp) — the two are complementary, not alternatives: the prompt wires the library
-  into your repo, the server answers chart questions while you work.
+  reference are in [MCP server](/docs/mcp). Use both: the prompt wires the library into your repo, the server answers
+  chart questions while you work.
 </Callout>
 
 ### Set up manually
 
-Two steps, once, at your app root — package plus stylesheet. Both are required, and both fit in the next minute.
+Two steps, once, at your app root: install the package, import the stylesheet. Both are required.
 
 **1 · Install.** React 18 or 19 is a peer dependency; there are no other runtime dependencies.
 
 <PackageTabs />
 
-**2 · Import the stylesheet once** at the root of your app — it carries every theming token and chart style in a
-low-specificity cascade layer, so your own styles always win. Where "root" means depends on your framework — anywhere
-that runs once, before any chart renders:
+**2 · Import the stylesheet once** at the root of your app. It carries every theming token and chart style in a
+low-specificity cascade layer, so your own styles always win. What counts as the root depends on your framework:
+anywhere that runs once, before any chart renders.
 
 <Tabs items={["Next.js", "Vite / CRA / other React apps"]}>
 
@@ -146,8 +146,8 @@ Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/th
 
 ## Your first chart
 
-Every series chart renders from `data` alone — single-value charts take `value`. Either way it works in a React Server
-Component with **zero client JavaScript** — it's pure SVG, and its accessible name is generated from the data.
+Every series chart renders from `data` alone; single-value charts take `value`. Either way it works in a React Server
+Component with **zero client JavaScript**: it's pure SVG, and its accessible name is generated from the data.
 
 <LiveDemo
   label="Static · RSC-safe"
@@ -165,8 +165,8 @@ return <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 
 ### Try it live
 
-No install needed to feel it out. Open a full Vite + React app with the package installed in StackBlitz — static and
-interactive charts, inline and block, four themes, running in your browser.
+No install needed. Open a full Vite + React app with the package installed in StackBlitz — static and interactive
+charts, inline and block, four themes, running in your browser.
 
 <StackBlitzSandbox />
 
@@ -184,16 +184,16 @@ renders something correct; everything else is opt-in.
 | `title`    | `string`                                    | Names the chart — an SVG `<title>`, so it becomes the accessible name and the hover tooltip, not visible text.                                                            |
 | `summary`  | `string \| false`                           | Override the auto-generated accessible sentence, or pass `false` to drop it — with no `title` that marks the chart decorative — see [Accessibility](/docs/accessibility). |
 | `format`   | `Intl.NumberFormatOptions \| (n) => string` | How numbers render in labels and summaries — see [Formatting & scale](/docs/formatting).                                                                                  |
-| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows point the honest way (lower latency is `"down"`).                                                                            |
+| `positive` | `"up" \| "down"`                            | Which direction is good, so color and arrows agree with it (lower latency is `"down"`).                                                                                   |
 | `label`    | _per chart_                                 | A short direct label next to the mark, in a reserved gutter — never an axis or legend.                                                                                    |
 | `dots`     | _per chart_                                 | Which individual points to emphasize (e.g. `"minmax"` on a line).                                                                                                         |
 
-Not every prop applies to every chart — a bar chart has no `dots`, and the single-value charts take `value` rather than
-`data` — but wherever a concept exists, its prop name and meaning are always these. Each one has a deeper home:
+Not every prop applies to every chart: a bar chart has no `dots`, and the single-value charts take `value` in place of
+`data`. But wherever a concept exists, its prop name and meaning are always these. Each one has a deeper home:
 [Formatting & scale](/docs/formatting) owns `format` and `domain`, [Theming](/docs/theming) owns `color`, and
 [Accessibility](/docs/accessibility) owns `summary`.
 
-Alongside the grammar sit the layout props — `className` and `style` on every chart, plus `width` and `height` on the
+Alongside the grammar sit the layout props: `className` and `style` on every chart, plus `width` and `height` on the
 charts whose geometry is sized that way (the fixed-glyph ones size from `style` or their own `size` / `cell` knob) and
 `id`, which opts into `<title>`/`<desc>` + `aria-labelledby` naming; see [Sizing](/docs/sizing). The i18n props are
 `locale` (BCP-47, for number and date formatting) and `strings` (the summary/label templates), plus `seriesStrings` on
@@ -205,11 +205,10 @@ on one shared scale with `SparkGroup` — see [Composition](/docs/composition). 
 ## Add interactivity
 
 Need hover, keyboard navigation, touch, or live announcements? Import the same chart from its `/interactive` entry. The
-rendered output and the accessible name are identical — the interactive entry composes its static twin rather than
-re-implementing it — and it **adds** props rather than changing any: the interaction callbacks below, plus `animate`,
-`strings` on the charts whose static entry doesn't take it, `live` on the single-value charts, and `onWindowChange` on
-MinimapStrip. The interactive entry **is** a client component: in a Next.js App Router page, render it from a file with
-`"use client"` at the top (or anywhere inside one).
+rendered output and the accessible name are identical, because the interactive entry composes its static twin. It only
+**adds** props: the interaction callbacks below, plus `animate`, `strings` on the charts whose static entry doesn't take
+it, `live` on the single-value charts, and `onWindowChange` on MinimapStrip. The interactive entry **is** a client
+component: in a Next.js App Router page, render it from a file with `"use client"` at the top (or anywhere inside one).
 
 ```tsx
 "use client";
@@ -236,9 +235,9 @@ its own.
 | `readout`              | `boolean`                             | Show the floating value chip on hover (default `true`). `false` hides only the chip. |
 
 `MicroDatum` is `{ index, value, label?, formatted? }`. Two of the fields carry the value in different forms, so you
-pick the one that fits: **`value`** is the raw primary number — compute with it (`null` when the unit encodes nothing);
-**`formatted`** is the ready-to-display string the chart's own readout would show, built with your `format`/`locale` —
-render it. For a plain chart that's just the value (`"$0.53"`); for a two-part unit it's the whole readout
+pick the one that fits. **`value`** is the raw primary number, for computing (`null` when the unit encodes nothing).
+**`formatted`** is the ready-to-display string the chart's own readout would show, built with your `format`/`locale`,
+for rendering. For a plain chart that's just the value (`"$0.53"`); for a two-part unit it's the whole readout
 (`"48 → 68 (up 42%)"`). `index` identifies the unit (point, bar, cell, segment…), and `label` is its human name where
 one exists (`"Berlin"`, `"Checkout"`). Same shape on every chart and both callbacks.
 
@@ -255,16 +254,16 @@ Scalar charts with a single unit — Delta, Progress, StatusDot, Bullet and the 
 the one unit is still hovered, focused and activated, so the `readout={false}` pattern above works there as well. What
 they don't take is `selectedIndex`/`defaultSelectedIndex` — there's no cursor to move and no index to point it at.
 Fifteen of them also take `live` (default `true`): as the value updates, the new reading is announced through a polite
-live region, throttled so a streaming number never spams a screen reader. Not all of them do — Bullet's only interaction
-prop is `onSelect` — so check the chart's own page. Two charts opt out of the picker on purpose: `MinimapStrip` is a
+live region, throttled so a streaming number never spams a screen reader. Not all of them do (Bullet's only interaction
+prop is `onSelect`), so check the chart's own page. Two charts opt out of the picker on purpose: `MinimapStrip` is a
 range slider with its own `onWindowChange([lo, hi])`, and `TokenConfidence` moves real focus through inline text spans.
 Full detail, including the live-region behavior, is on [Accessibility](/docs/accessibility#one-interaction-contract).
 
 ## Animate on mount (optional)
 
-Interactive entries also take an `animate` prop — the chart draws on instead of appearing instantly. It's off by
-default, and inert on the server and on hydrated server HTML, so it never fights SSR or flashes over painted content; a
-fresh client-side mount is what plays it. Wire the engine once, client-side, then opt in per chart:
+Interactive entries also take an `animate` prop: the chart draws on instead of appearing instantly. It's off by default,
+and inert on the server and on hydrated server HTML, so it never fights SSR or flashes over painted content; a fresh
+client-side mount is what plays it. Wire the engine once, client-side, then opt in per chart:
 
 ```tsx
 "use client";
@@ -275,8 +274,8 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" animate />;
 ```
 
-`prefers-reduced-motion` wins unconditionally — a reader who asked for less motion gets the finished chart, never the
-entrance.
+`prefers-reduced-motion` wins unconditionally: a reader who asked for less motion gets the finished chart with no
+entrance animation.
 
 ## Import paths
 
@@ -301,4 +300,4 @@ Every other chart uses the same shape (WindBarb ships static-only, with no `/int
 - **Server-component and SSR-safe.** Static entries are hook-free and listener-free, so they render to plain SVG on the
   server with zero client JavaScript — no `"use client"` needed unless you import from `/interactive`.
 - **Browser floor: evergreen, ES2022.** That includes Safari from version 16.4 — a couple of ES2022 array methods used
-  internally crash on older Safari, so that's the practical minimum, not just a `tsconfig` setting.
+  internally crash on older Safari, so 16.4 is the practical minimum regardless of your `tsconfig`.

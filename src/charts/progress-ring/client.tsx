@@ -8,6 +8,7 @@ import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import { ringLabelSize } from "./geometry.js";
 import { ProgressRing as StaticProgressRing, type ProgressRingProps } from "./index.js";
 
 export interface InteractiveProgressRingProps extends ProgressRingProps {
@@ -96,6 +97,12 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       ? pctFmt(Math.max(0, 1 - fraction))
       : pctFmt(fraction);
 
+  // `readoutText` is character-for-character what the static entry prints in
+  // the hole (both modes, and "—" for no data), so its length is the fit budget
+  // geometry weighs.
+  const printsLabel =
+    rest.label === "percent" && ringLabelSize(rest.size, rest.weight, readoutText.length) > 0;
+
   // One arc, one selectable unit (index 0): the fraction it sweeps. One builder,
   // so `onActive` and `onSelect` can never report a different number or a
   // different string than the chip paints.
@@ -136,8 +143,11 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {/* An arc is a rough gauge — the percent is invisible unless
           `label="percent"` prints it inside the ring. Hover/focus reveals it,
-          the same reveal Bullet and Thermometer ship. */}
-      {readout && hover && rest.label !== "percent" ? (
+          the same reveal Bullet and Thermometer ship. Asking for the label is
+          not the same as getting it: geometry drops the figure when the hole is
+          too small (a 16px ring), and gating on the request alone left the
+          percent painted nowhere while the name still announced it. */}
+      {readout && hover && !printsLabel ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readoutText}
         </span>

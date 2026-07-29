@@ -1,12 +1,12 @@
 ---
 title: HistogramStrip
-description: >-
-  React histogram strip chart — mode, spread, and skew from raw observations in uniform bins. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  HistogramStrip turns raw observations into up to 12 uniform, zero-anchored bins for a distribution read at word size.
 ---
 
-HistogramStrip answers "what does the distribution look like?". Raw observations in, ≤ 12 uniform bins out — counts
-zero-anchored, never density-smoothed. Pre-aggregated counts are not supported; that's SparkBar's contract.
+HistogramStrip sorts raw observations into uniform bins and draws the counts zero-anchored, never density-smoothed, so a
+distribution's mode, spread, and skew read off one strip. The bin count is √n capped at 12: enough shape to see skew,
+few enough bars to survive 60 px. Pre-aggregated counts are not supported; that's SparkBar's contract.
 
 <LiveDemo label="HistogramStrip" sizeOf="histogram-strip">
   <HistogramStrip
@@ -26,8 +26,8 @@ zero-anchored, never density-smoothed. Pre-aggregated counts are not supported; 
 
 ## When to use it
 
-- **Good for** — latency clusters in a sentence, distributions per table row.
-- **Avoid for** — raw marks (RugStrip) or series over time (Sparkline).
+Use it for latency clusters in a sentence and distributions per table row. For raw marks use RugStrip; for a series over
+time, Sparkline.
 
 ## Sizing
 
@@ -52,6 +52,8 @@ zero-anchored, never density-smoothed. Pre-aggregated counts are not supported; 
     style={{ width: 220, height: 56 }}
   />
 </LiveDemo>
+
+`markValue` marks the bin its value falls in and never re-bins around it.
 
 <LiveDemo
   label="locale"
@@ -82,22 +84,17 @@ The accessible summary states the modal bin's edges through `format`/`locale` �
 </LiveDemo>
 
 An empty series renders zero bars and an accessible name of "No data." rather than a misleading flat line. A constant
-series collapses to ONE full-height bin instead of the usual up-to-12 slivers a naive equal-width binner would draw for
-a zero-span domain.
+series collapses to ONE full-height bin instead of the usual up-to-12 slivers an equal-width binner would draw for a
+zero-span domain, and an explicit `bins` count collapses to the observation count when you ask for more bins than you
+have values.
 
 ## Four homes
 
 <FourContexts slug="histogram-strip" />
 
-## Why this default
-
-Auto bin count is √n capped at 12 — enough shape to see skew, few enough bars to survive 60 px. All values identical
-collapse to ONE bin (never twelve slivers); explicit bin counts collapse to the observation count. `markValue` marks the
-bin of a value and never re-bins around it.
-
 ## Accessibility
 
-The accessible name names the modal bin — **"120 values, most between 42.09 and 47.36."** The interactive entry roves
+The accessible name names the modal bin: **"120 values, most between 42.09 and 47.36."** The interactive entry roves
 bins with range announcements (**"42.09 to 47.36: 26 values."**).
 
 <InteractionNote slug="histogram-strip" />

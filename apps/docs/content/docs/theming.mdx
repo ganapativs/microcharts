@@ -1,19 +1,17 @@
 ---
 title: Theming
 description:
-  Theme microcharts with a couple dozen CSS custom properties, named presets, and a defineTheme() builder — override a
-  token at any scope, derive a full palette from one brand colour, switch presets with a data attribute, keep semantic
-  colors meaning what they say, and get hand-tuned dark mode and forced-colors support for free.
+  How to theme microcharts by setting a --mc-* custom property at any scope, applying a named preset, or deriving a
+  whole palette from one accent with defineTheme().
 ---
 
-microcharts theming is CSS custom properties, all the way down. There's no theme provider you _have_ to wire up and no
-Tailwind requirement — set a `--mc-*` variable at any scope and every chart inside it retunes, with zero re-render and
-no build step. (Prefer a React component to a raw attribute? [`MicroProvider`](#a-component-api-if-you-prefer) wraps the
-same contract.)
+microcharts theming is CSS custom properties. There's no theme provider to wire up and no Tailwind requirement: set a
+`--mc-*` variable at any scope and every chart inside it retunes, with zero re-render and no build step. (Prefer a React
+component to a raw attribute? [`MicroProvider`](#a-component-api-if-you-prefer) wraps the same contract.)
 
-Two ideas carry the whole system: **a token** is one variable you set, and **a scope** is where you set it. Learn those
-two and the rest of this page is just the vocabulary — every colour, weight, and timing you can reach for, and a studio
-that hands you any combination as ready-to-paste CSS.
+Two ideas carry the system. A **token** is one variable you set; a **scope** is where you set it. The rest of this page
+is the vocabulary: every color, weight, and timing you can set, plus a studio that hands you any combination as
+ready-to-paste CSS.
 
 ## Override a token
 
@@ -24,8 +22,8 @@ that hands you any combination as ready-to-paste CSS.
 }
 ```
 
-Every chart inside `.brand` now draws with that accent and stroke weight. Precedence is predictable: a **prop** wins
-over a **CSS-variable scope**, which wins over a **preset**, which wins over the built-in default.
+Every chart inside `.brand` now draws with that accent and stroke weight. Precedence runs one way: a **prop** wins over
+a **CSS-variable scope**, which wins over a **preset**, which wins over the built-in default.
 
 <LiveDemo
   label="Per-instance color"
@@ -40,8 +38,8 @@ over a **CSS-variable scope**, which wins over a **preset**, which wins over the
 
 ## Scope it anywhere
 
-Because the tokens cascade, the scope is yours to choose — the whole app, one brand section, a single card, or one
-chart. Set a token high and every chart below inherits it; override it lower and only that subtree changes.
+Because the tokens cascade, you choose the scope: the whole app, one brand section, a single card, or one chart. Set a
+token high and every chart below inherits it; override it lower and only that subtree changes.
 
 ```tsx
 // app-wide, once
@@ -53,38 +51,38 @@ chart. Set a token high and every chart below inherits it; override it lower and
 </div>
 ```
 
-Bind `--mc-accent` to your existing brand variable and the charts follow your design system automatically — no per-chart
-props, no duplicated color values.
+Bind `--mc-accent` to your existing brand variable and every chart follows your design system without a per-chart prop
+or a duplicated color value.
 
 ## The token set
 
-That's the whole mechanism. What's left is the vocabulary: about two dozen custom properties cover the entire surface,
-and setting any of them at any scope retunes every chart inside. Here are the colour tokens with their built-in light
-and dark values — every chip is the real shipped default, click to copy the hex:
+That's the whole mechanism; the rest is vocabulary. About two dozen custom properties cover the entire surface, and
+setting any of them at any scope retunes every chart inside. Here are the color tokens with their built-in light and
+dark values. Every chip is the shipped default; click one to copy the hex.
 
 <TokenSwatches />
 
-Below is the same set as raw CSS — the colours plus the geometry, motion, and readout-surface tokens — ready to paste
-and override. (Want a specific style or accent instead of the bare defaults? The [studio](#copy-tokens) a little further
-down builds any combination for you.)
+Below is the same set as raw CSS: the colors plus the geometry, motion, and readout-surface tokens, ready to paste and
+override. Want a specific style or accent instead of the bare defaults? The [studio](#copy-tokens) further down builds
+any combination for you.
 
 ```css
 :root {
-  /* Semantic colour */
+  /* Semantic color */
 
   /* Default ink: lines, bars, labels. Dark mode is hand-tuned, not inverted. */
   --mc-stroke: #1a1917;
 
-  /* Good direction — colour-blind-safe viridian; pair with ▲. */
+  /* Good direction — color-blind-safe viridian; pair with ▲. */
   --mc-positive: #0e7a5f;
 
-  /* Bad direction — colour-blind-safe terracotta; pair with ▼. */
+  /* Bad direction — color-blind-safe terracotta; pair with ▼. */
   --mc-negative: #bd4b2d;
 
   /* No-signal marks: baselines, inactive points, empty cells. */
   --mc-neutral: #8a8986;
 
-  /* Emphasis colour — rebind to your brand. */
+  /* Emphasis color — rebind to your brand. */
   --mc-accent: #1f6091;
 
   /* Normal-range shading, derived from the ink. */
@@ -99,8 +97,8 @@ down builds any combination for you.)
   --mc-cat-2: #5b9fd4;
   --mc-cat-3: #2e8c66;
   --mc-cat-4: #285788;
-  --mc-cat-5: #c2543a;
-  --mc-cat-6: #a85c8c;
+  --mc-cat-5: #bc5138;
+  --mc-cat-6: #a55a89;
 
   /* Geometry */
 
@@ -157,19 +155,18 @@ down builds any combination for you.)
 
 ## Semantic vs categorical color
 
-The colour tokens split into two groups, and knowing which is which is what keeps a theme honest.
+The color tokens split into two groups, and the split decides what a theme is allowed to change.
 
-**Semantic tokens keep their meaning.** Swapping `--mc-accent` retints the one emphasis color, but
-`--mc-positive`/`--mc-negative` still mean up and down — so a preset can restyle a chart without ever changing what it
-says. Color encodes; it never merely decorates.
+**Semantic tokens keep their meaning.** Swapping `--mc-accent` retints the one emphasis color; `--mc-positive` and
+`--mc-negative` still mean up and down. A preset can restyle a chart without changing what it says.
 
 **Categorical colors are a last resort.** Most microcharts show one series and never touch the palette. When a chart
-genuinely needs several, the six `--mc-cat-*` hues are lightness-ordered for grayscale and colour-vision separation, and
-gold leads because true yellow is too low-contrast on a light surface.
+needs several, the six `--mc-cat-*` hues are lightness-ordered for grayscale and color-vision separation. Gold leads
+because true yellow is too low-contrast on a light surface.
 
-To recolour the series on _one_ instance without touching the global palette, the categorical charts (`SegmentedBar`,
-`StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`) take a `colors` array — cycled per series, overriding
-`--mc-cat-*` just there. A rolled-up "Other" segment stays neutral rather than taking a series colour.
+To recolor the series on _one_ instance without touching the global palette, the categorical charts (`SegmentedBar`,
+`StackedArea`, `PartitionStrip`, `Hypnogram`, `MicroDonut`) take a `colors` array. It cycles per series and overrides
+`--mc-cat-*` for that instance only. A rolled-up "Other" segment stays neutral instead of taking a series color.
 
 <LiveDemo
   label="Per-instance colors[]"
@@ -185,15 +182,15 @@ To recolour the series on _one_ instance without touching the global palette, th
     colors={["#2563eb", "#db2777", "#65a30d", "#f59e0b"]}
     width={220}
     height={16}
-    title="Custom series colours"
+    title="Custom series colors"
   />
 </LiveDemo>
 
 ## Presets
 
-Setting tokens by hand is one path; a **preset** is a whole look bundled under one name, applied with a `data-mc-theme`
-attribute — pure CSS, zero JavaScript. They change how charts _look_, never what the data _means_. `modern` is what you
-get with no attribute at all: it's the base token set, not a bundle layered on top, so there's nothing to apply.
+A **preset** is a whole look bundled under one name, applied with a `data-mc-theme` attribute. It's pure CSS with zero
+JavaScript, and it changes how charts look, never what the data means. `modern` is what you get with no attribute at
+all: it's the base token set rather than a bundle layered on top, so it needs no attribute.
 
 <LiveDemo
   label="Presets"
@@ -216,50 +213,48 @@ get with no attribute at all: it's the base token set, not a bundle layered on t
   </div>
 </LiveDemo>
 
-What each preset retunes — every other token stays at its default:
+What each preset retunes; every other token stays at its default:
 
 <PresetDeltas />
 
-The last two — `print` and `eink` — are output-context bundles rather than a look you'd ship on screen. `print` pins a
-near-black ink, deepens the valence colours for CMYK, and thins the stroke to `1.25`; `eink` drops to grayscale and lets
+The last two, `print` and `eink`, are output-context bundles rather than a look you'd ship on screen. `print` pins a
+near-black ink, deepens the valence colors for CMYK, and thins the stroke to `1.25`. `eink` drops to grayscale and lets
 sign ride lightness (positive black, negative gray) with a `2` stroke for a low-refresh e-paper panel. Apply them the
-same way — `data-mc-theme="print"` on the region you're about to render. Both pin a fixed light-surface ink, so both
-also ship hand-tuned dark twins: on a dark viewer `eink` flips to true night mode (white ink on black) and `print` lifts
-to a dark-paper ink, while the stroke weight and band identity carry over.
+same way: `data-mc-theme="print"` on the region you're about to render. Both pin a fixed light-surface ink, so both also
+ship hand-tuned dark twins. On a dark viewer `eink` flips to white ink on black and `print` lifts to a dark-paper ink,
+while the stroke weight and band identity carry over.
 
-The look presets — `editorial`, `mono`, `vivid`, `print`, `eink` — also answer to `data-mc-preset`, the page-global
-form: set it once on `<html>` for an app shell, and a nearer `data-mc-theme` still wins by proximity. `dark` is the
-exception, matching `data-mc-theme="dark"` only, because it's a colour-scheme scope rather than a look you'd pin
-app-wide.
+The look presets (`editorial`, `mono`, `vivid`, `print`, `eink`) also answer to `data-mc-preset`, the page-global form:
+set it once on `<html>` for an app shell, and a nearer `data-mc-theme` still wins by proximity. `dark` is the exception,
+matching `data-mc-theme="dark"` only, because it's a color-scheme scope rather than a look you'd pin app-wide.
 
 <Callout type="info">
-  Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) lets you pair any preset
-  with your own accent and copy the result for both modes. This site's appearance menu (the palette icon in the nav)
-  applies the same bundles live across every page — and picking an accent there re-hues every chart on the site,
-  including the categorical palette, because it derives one with [`defineTheme`](#build-a-theme-from-one-colour) exactly
-  like the studio does. It's the exact token contract you'd use in your own app.
+  Every preset above carries a **Copy tokens** button, and the [studio below](#copy-tokens) pairs any preset with your
+  own accent and copies the result for both modes. This site's appearance menu (the palette icon in the nav) applies the
+  same bundles live across every page. Picking an accent there re-hues every chart on the site, including the
+  categorical palette, because it derives one with [`defineTheme`](#build-a-theme-from-one-colour) the way the studio
+  does. It's the same token contract you'd use in your own app.
 </Callout>
 
 ## Copy the tokens [#copy-tokens]
 
-Everything above, in one place — the live studio. Pick a style, add your brand accent, choose a mode, and copy the exact
-`--mc-*` block, light and hand-tuned dark together, ready to paste into your app. The preview renders real charts in
-both modes and names each role it paints, so a choice shows up the instant you make it: the emphasis line takes your
-accent _and_ the categorical bars re-hue to a matched palette **derived from it** by
-[`defineTheme`](#build-a-theme-from-one-colour) — the same engine the nav's appearance menu uses to re-theme the whole
-site. What you preview is exactly what you copy, and exactly what the library ships — never an approximation.
+The studio puts everything above in one place. Pick a style, add your brand accent, choose a mode, and copy the `--mc-*`
+block, light and hand-tuned dark together, ready to paste into your app. The preview renders real charts in both modes
+and names each role it paints, so a choice shows up as you make it: the emphasis line takes your accent, and the
+categorical bars re-hue to a matched palette **derived from it** by [`defineTheme`](#build-a-theme-from-one-colour), the
+same engine the nav's appearance menu uses to re-theme the whole site. What you preview is what you copy, and what the
+library ships.
 
 <TokenStudio />
 
 Paste the CSS into any stylesheet and every chart in scope retunes. Prefer the component API? Switch the format to a
-tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer) — or reach for
+tokens object and spread it onto [`MicroProvider`](#a-component-api-if-you-prefer), or call
 [`defineTheme`](#build-a-theme-from-one-colour) directly to derive that matched palette in code.
 
-## A component API, if you prefer
+## The MicroProvider component [#a-component-api-if-you-prefer]
 
-Everything above works through plain attributes and CSS variables — but if you'd rather set the theme in JSX,
-`MicroProvider` wraps the same contract in a component. It's hook-free and RSC-safe, so it works in Server Components
-too.
+Everything above works through plain attributes and CSS variables. If you'd rather set the theme in JSX, `MicroProvider`
+wraps the same contract in a component. It's hook-free and RSC-safe, so it works in Server Components.
 
 ```tsx
 import { MicroProvider } from "@microcharts/react";
@@ -270,18 +265,18 @@ import { MicroProvider } from "@microcharts/react";
 ```
 
 It renders a single `<div>` that sets `data-mc-theme` (the preset) plus any `tokens` as inline `--mc-*` custom
-properties — identical to writing them by hand. `theme="modern"` writes no attribute, since modern _is_ the base token
+properties, identical to writing them by hand. `theme="modern"` writes no attribute, since modern _is_ the base token
 set. `theme` takes any preset (`modern`, `editorial`, `mono`, `vivid`, `dark`, plus the output-context `print` and
-`eink`); `tokens` takes any `--mc-*` overrides. Reach for whichever reads better in your code — it's the same cascade
-underneath.
+`eink`); `tokens` takes any `--mc-*` overrides. Both forms resolve to the same cascade, so use whichever reads better in
+your code.
 
-## Build a theme from one colour
+## Build a theme from one color [#build-a-theme-from-one-colour]
 
-Setting a token or two by hand is the common case. For a whole brand theme — a matched categorical palette _and_
-hand-tuned dark twins for every colour — reach for `defineTheme` from `@microcharts/react/theme`. Hand it your brand
-accent and it derives the rest in OKLCH: a harmonized, colour-blind-safe categorical palette and a lifted dark-mode twin
-for each token. It never nudges the positive/negative hues off their CVD-safe green/vermillion split, so a derived theme
-stays as honest as the defaults.
+Setting a token or two by hand is the common case. For a whole brand theme, with a matched categorical palette and
+hand-tuned dark twins for every color, use `defineTheme` from `@microcharts/react/theme`. Give it your brand accent and
+it derives the rest in OKLCH: a harmonized, color-blind-safe categorical palette and a lifted dark-mode twin for each
+token. It never moves the positive/negative hues off their CVD-safe green/vermillion split, so a derived theme encodes
+direction the way the defaults do.
 
 ```tsx
 import { defineTheme } from "@microcharts/react/theme";
@@ -298,7 +293,7 @@ const brand = defineTheme({ accent: "#6d28d9" });
 const css = brand.css(":root");
 ```
 
-One accent, a full derived palette (these are the real values `defineTheme` returns):
+One accent, a full derived palette. These are the values `defineTheme` returns:
 
 <LiveDemo
   label="defineTheme({ accent: '#6d28d9' })"
@@ -374,9 +369,9 @@ It's pure, dependency-free, and tree-shaken out of any bundle that never imports
 
 ## Density
 
-`--mc-density` is a single scalar that scales stroke weight, label size, and small-multiple gap together — one knob for
-compact tables (`< 1`) or an airier standalone layout (`> 1`). It tunes the ink and type, not the box: the plot size
-still comes from `width`/`height`, so nothing reflows unexpectedly.
+`--mc-density` is a single scalar that scales stroke weight, label size, and small-multiple gap together: one knob for
+compact tables (`< 1`) or an airier standalone layout (`> 1`). It tunes the ink and type, not the box. The plot size
+still comes from `width`/`height`, so nothing reflows.
 
 ```css
 /* a denser table of sparklines */
@@ -385,24 +380,22 @@ still comes from `width`/`height`, so nothing reflows unexpectedly.
 }
 ```
 
-One asymmetry worth knowing: **stroke and gap scale without limit, but the label stops scaling at 1.25.** Direct labels
-sit in a gutter the chart reserves from a character-count estimate while it draws — server-side, where text cannot be
-measured. That reservation is fixed at render time and cannot see a CSS variable set later, so past about 1.25 the text
-outgrows the space held for it and paints outside the chart. Below `1` there is no such limit: the label shrinks inside
-a gutter already reserved for something bigger, which is always safe.
+One asymmetry: **stroke and gap scale without limit, but the label stops scaling at 1.25.** Direct labels sit in a
+gutter the chart reserves from a character-count estimate while it draws, server-side, where text cannot be measured.
+That reservation is fixed at render time and cannot see a CSS variable set later, so past about 1.25 the text outgrows
+the space held for it and paints outside the chart. Below `1` there is no such limit: the label shrinks inside a gutter
+already reserved for something bigger, which is safe.
 
-So `--mc-density: 2` gives you double-weight strokes and double gaps, with labels at 1.25×. If you want genuinely larger
-text, scale the chart — `width`/`height`, or `--mc-label-size` — rather than leaning on density.
+So `--mc-density: 2` gives you double-weight strokes and double gaps, with labels at 1.25×. For larger text, scale the
+chart with `width`/`height` or `--mc-label-size` instead of leaning on density.
 
 ## The font
 
-`--mc-font` defaults to `inherit`, so charts adopt the font of whatever contains them and read as part of your
-interface. That means the rule is really about your page, not the library: if the surrounding page sets a `font-family`,
-charts follow it for free. If it doesn't — as in some minimal starters and code sandboxes — SVG text falls back to the
-browser default (usually a serif), and labels come out looking wrong.
+`--mc-font` defaults to `inherit`, so charts adopt the font of whatever contains them. If the surrounding page sets a
+`font-family`, charts follow it with no configuration. If it doesn't, as in some minimal starters and code sandboxes,
+SVG text falls back to the browser default (usually a serif) and labels come out looking wrong.
 
-Two fixes, either works: give your page a font the normal way, or font the charts directly by pointing `--mc-font` at a
-stack.
+Two fixes, either works: give your page a font the normal way, or point `--mc-font` at a stack for the charts alone.
 
 ```css
 :root {
@@ -411,10 +404,10 @@ stack.
 }
 ```
 
-Numbers always render with `tabular-nums` regardless, so columns of figures stay aligned in any font. Want the figures
-in a dedicated face — a tabular numeric font, or a mono for a data-dense KPI — without changing the label font? Point
-`--mc-font-numeric` at it; it defaults to `--mc-font`, so leaving it alone keeps everything on one typeface.
-`--mc-label-weight` (default `400`) does the same for label weight.
+Numbers always render with `tabular-nums`, so columns of figures stay aligned in any font. Want the figures in a
+dedicated face, a tabular numeric font or a mono for a data-dense KPI, without changing the label font? Point
+`--mc-font-numeric` at it. It defaults to `--mc-font`, so leaving it alone keeps everything on one typeface.
+`--mc-label-weight` (default `400`) sets label weight the same way.
 
 ```css
 :root {
@@ -425,17 +418,16 @@ in a dedicated face — a tabular numeric font, or a mono for a data-dense KPI �
 
 ## The readout surface
 
-The only opaque plane in the whole library is the value chip an interactive chart shows for its active unit — under the
-pointer, under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its three `--mc-surface*` tokens
-default to the system `Canvas`, so it adapts to light, dark, and forced-colors with no configuration. Point them at your
-popover tokens when you want the chip to match a themed surface exactly — one set of tokens covers the hovered, focused,
-and pinned states alike.
+The one opaque plane in the library is the value chip an interactive chart shows for its active unit: under the pointer,
+under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its three `--mc-surface*` tokens default to
+the system `Canvas`, so the chip adapts to light, dark, and forced-colors with no configuration. Point them at your
+popover tokens to match a themed surface. One set of tokens covers the hovered, focused, and pinned states alike.
 
 ## Dark mode and forced colors
 
-Dark values are hand-tuned per token — never auto-inverted, so overriding one light value can't quietly break the dark
-surface. microcharts follows `prefers-color-scheme` out of the box, and you can force a scope with
-`data-mc-theme="dark"`. Charts never paint their own background, so they always sit cleanly on your surface.
+Dark values are hand-tuned per token, never auto-inverted, so overriding one light value can't break the dark surface.
+microcharts follows `prefers-color-scheme` by default, and you can force a scope with `data-mc-theme="dark"`. Charts
+never paint their own background, so they sit on whatever surface you give them.
 
 If your app toggles theme with a **class** (next-themes `.dark`, a `[data-theme]` attribute, …) rather than the OS media
 query, rebind the tokens under that class the same way you bind accent — the library's media-query defaults are
@@ -456,13 +448,13 @@ query, rebind the tokens under that class the same way you bind accent — the l
 
 ### Frosted or translucent surfaces
 
-Default valence inks clear 4.5:1 on opaque white and near-black. On a frosted glass / tinted panel the composited
-backdrop is quieter, so deepen `--mc-stroke` / `--mc-positive` / `--mc-negative` / `--mc-neutral` on that surface until
-contrast holds — don't patch chart CSS. (This docs site does exactly that under `:root` / `.dark` so marks stay legible
-on glass.)
+Default valence inks clear 4.5:1 on opaque white and near-black. On a frosted-glass or tinted panel the composited
+backdrop is quieter, so deepen `--mc-stroke`, `--mc-positive`, `--mc-negative`, and `--mc-neutral` on that surface until
+contrast holds. Rebind the tokens rather than patching chart CSS. (This docs site does that under `:root` and `.dark` so
+marks stay legible on glass.)
 
-Under Windows High Contrast (`forced-colors`), the semantic tokens defer to system colors — ink to `CanvasText`, accent
-to `Highlight`, muted marks to `GrayText` — so a chart stays legible even when your palette is overridden entirely.
+Under Windows High Contrast (`forced-colors`), the semantic tokens defer to system colors: ink to `CanvasText`, accent
+to `Highlight`, muted marks to `GrayText`. A chart stays legible even when your palette is overridden entirely.
 
 `prefers-contrast: more` is handled too: charts bump `--mc-stroke-width` to `2` and deepen `--mc-band` from an 8% to a
 16% mix of the ink, so lines and normal-range shading both gain weight without you configuring anything.

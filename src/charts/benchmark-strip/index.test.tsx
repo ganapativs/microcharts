@@ -37,6 +37,29 @@ describe("<BenchmarkStrip>", () => {
     expect(down.querySelector("circle")!.getAttribute("fill")).toContain("--mc-negative");
   });
 
+  it("label='value' reserves the gutter its own text needs, clearing the plot box", () => {
+    const peers = [-1e6, -2e6, -3e6, -4e6, -5e6, -6e6, -7e6, -8e6];
+    const { container } = draw(
+      <BenchmarkStrip data={peers} value={-1234567.89} label="value" width={80} height={12} />,
+    );
+    const text = container.querySelector("text")!;
+    const vbWidth = Number(container.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
+    // text-anchor="end" pins the run's right edge at the viewBox edge, so it
+    // grows leftwards; at a fixed 4-char gutter it reached back over the bands
+    // and painted across the focal dot. `textGutter`'s own 0.62/char estimate.
+    const fontSize = Number(text.getAttribute("font-size"));
+    const runLeft = vbWidth - [...text.textContent!].length * fontSize * 0.62;
+    expect(runLeft).toBeGreaterThanOrEqual(80);
+  });
+
+  it("the percentile gutter is fixed, so the box holds still as the reading moves", () => {
+    const box = (v: number) =>
+      draw(<BenchmarkStrip data={PEERS} value={v} />)
+        .container.querySelector("svg")!
+        .getAttribute("viewBox");
+    expect(box(1)).toBe(box(40));
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<BenchmarkStrip data={PEERS} value={20} title="Latency vs peers" />);
     await expectNoA11yViolations(container);

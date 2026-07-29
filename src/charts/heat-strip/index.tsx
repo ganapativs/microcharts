@@ -60,15 +60,18 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
 
   return (
     <Chart
-      width={width}
-      height={height}
+      // the RESOLVED box, never the raw props: a `width` a host computed as
+      // NaN sized the frame from `<Chart>`'s own clamp while the cells were
+      // laid out against the raw number, so the two disagreed about the strip
+      width={geo.width}
+      height={geo.height}
       title={title}
       summary={accName}
       id={id}
       // A row of calibrated swatches: intensity is colour, never height, so
       // there is no floor. The cell band is centred in the box by construction
       // (geometry insets it equally top and bottom), so the box is the seat.
-      seat={{ mode: "center", top: 0, bottom: height }}
+      seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-heat-strip ${className}` : "mc-heat-strip"}
       style={style}
     >
@@ -84,6 +87,7 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             width={c.w}
             height={c.h}
             rx={c.rx}
+            shapeRendering={geo.crisp ? "crispEdges" : undefined}
             fill="none"
             data-mc-ink="muted"
             data-mc-w="hair"
@@ -104,7 +108,9 @@ export function HeatStrip(props: HeatStripProps): ReactNode {
             data-mc-cell-mix=""
             style={
               {
-                "--mc-cell-mix": String(valueStepMixPct(c.step, steps)),
+                // geo.steps, never the raw prop: the ramp has to run over the
+                // same bin count the cells were bucketed against
+                "--mc-cell-mix": String(valueStepMixPct(c.step, geo.steps)),
                 ...(color ? { "--mc-cell-color": color } : undefined),
               } as CSSProperties
             }

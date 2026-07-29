@@ -6,33 +6,36 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
-import { isFiniteValue } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 import { funnelGeometry } from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type FunnelDatum = MiniBarDatum;
 
-/** Stages + overall conversion. */
+/**
+ * Stages + overall conversion. Resolves each stage exactly as the plot does — a
+ * missing or negative stage keeps its slot at zero — so the announced stage
+ * count, endpoints and inversion positions are the ones on screen. Dropping
+ * those stages instead made `[-5, 10]` paint two columns and announce "1 stage,
+ * 10 to 10 — overall 100%", a conversion between a stage and itself.
+ */
 export function funnelSummary(
   data: readonly FunnelDatum[],
   fmt: (n: number) => string,
   pctFmt: (n: number) => string,
   strings: CompositionStrings,
 ): string {
-  const finite = data.filter((d) => isFiniteValue(d.value) && d.value >= 0) as {
-    label: string;
-    value: number;
-  }[];
-  if (finite.length === 0) return strings.noData;
-  const first = finite[0]!.value;
-  const last = finite.at(-1)!.value;
+  // "all slots empty" is still no data; a genuine zero stage is not.
+  if (!data.some((d) => isFiniteValue(d.value) && d.value >= 0)) return strings.noData;
+  const values = data.map((d) => (isFiniteValue(d.value) && d.value >= 0 ? d.value : 0));
+  const first = values[0]!;
+  const last = values.at(-1)!;
   const overall = first > 0 ? last / first : 0;
-  let out = strings.funnel(finite.length, fmt(first), fmt(last), pctFmt(overall));
-  for (let i = 1; i < finite.length; i++) {
-    if (finite[i]!.value > finite[i - 1]!.value) {
+  let out = strings.funnel(values.length, fmt(first), fmt(last), pctFmt(overall));
+  for (let i = 1; i < values.length; i++) {
+    if (values[i]! > values[i - 1]!) {
       out += ` ${strings.funnelInversion(i + 1, i)}`;
     }
   }
@@ -90,15 +93,17 @@ export function Funnel(props: FunnelProps): ReactNode {
     devWarn(`<Funnel> ${data.length} stages — past 6 the drops blur (documented cap).`);
   }
 
-  const fontSize = label === "none" ? 0 : labelFont(height, 0.35);
+  // The box, and the label size that fits it, are resolved once in geometry —
+  // the viewBox, the seat and the marks all have to agree on them.
   const geo = funnelGeometry({
     width,
     height,
     values: data.map((d) => d.value),
     mode,
     connectors,
-    fontSize,
+    label,
   });
+  const { fontSize } = geo;
   const fmt = makeFormatter(format, locale);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => funnelSummary(data, fmt, pctFmt, strings));
@@ -109,29 +114,38 @@ export function Funnel(props: FunnelProps): ReactNode {
   // be sized for a font the browser never paints (see label-containment tests).
   const rootStyle =
     fontSize > 0 ? { ...style, "--mc-label-size": `${fontSize}px` } : (style as CSSProperties);
+  const slatPath = geo.slats.map((s) => s.d).join("");
 
   return (
     <Chart
-      width={width}
-      height={height}
+      width={geo.width}
+      height={geo.height}
       title={title}
       summary={accName}
       id={id}
-      // Stage columns are zero-anchored and every one ends at `height`, slats
-      // included; the label gutter geometry reserves is at the TOP, so nothing
-      // eats into the floor and the columns sit on the baseline.
-      seat={{ mode: "floor", bottom: height }}
+      // Stage columns are zero-anchored and every one ends at the box floor,
+      // slats included; the label gutter geometry reserves is at the TOP, so
+      // nothing eats into the floor and the columns sit on the baseline.
+      seat={{ mode: "floor", bottom: geo.height }}
       className={className ? `mc-funnel ${className}` : "mc-funnel"}
       style={rootStyle}
     >
-      {geo.slats.map((s, i) => (s.d ? <path key={`s${i}`} d={s.d} data-mc-ink="band" /> : null))}
+      {/* One path, not n−1. The slats carry identical paint, sit under every
+          other mark and are excluded from the entrance (which selects the
+          column rects), so nothing needs them addressable — same idiom as the
+          Waterfall's connectors. */}
+      {slatPath ? <path d={slatPath} data-mc-ink="band" /> : null}
       {geo.stages.map((st) => {
         const d = data[st.index]!;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === st.index);
-        const text =
-          label === "percent"
+        // A stage with no data has no share to report: it drops its label rather
+        // than painting a fabricated "0%" over an empty slot — the same rule the
+        // `value` labels and the interactive readout ("Trials —") already follow.
+        const text = !isFiniteValue(d.value)
+          ? undefined
+          : label === "percent"
             ? pctFmt(st.share)
-            : label === "value" && isFiniteValue(d.value)
+            : label === "value"
               ? fmt(d.value)
               : undefined;
         return (
@@ -149,8 +163,8 @@ export function Funnel(props: FunnelProps): ReactNode {
             ) : null}
             {text !== undefined && geo.labelsFit(text.length) ? (
               <text
-                x={st.x + st.w / 2}
-                y={fontSize * 0.9}
+                x={round2(st.x + st.w / 2)}
+                y={round2(fontSize * 0.9)}
                 fontSize={fontSize}
                 textAnchor="middle"
                 data-mc-ink="label"

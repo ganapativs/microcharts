@@ -41,6 +41,52 @@ describe("tapeGaugeGeometry", () => {
     }
   });
 
+  // Every position on the tape divides by `span`. A window that cannot be
+  // represented has to stop BOTH generators — the tick loop already refused,
+  // the zone stripe did not and emitted y="NaN" height="NaN".
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, 0, -5])(
+    "span %p draws no marks rather than NaN ones",
+    (span) => {
+      const geo = tapeGaugeGeometry({
+        value: 142,
+        span,
+        zones: ZONES,
+        tick: null,
+        width: 28,
+        height: 48,
+        orientation: "vertical",
+      });
+      expect(geo.zoneRects).toEqual([]);
+      expect(geo.tickPath).toBe("");
+      expect(geo.tickLabels).toEqual([]);
+      expect(geo.pointer.path).not.toMatch(/NaN|Infinity/);
+    },
+  );
+
+  // `Chart` clamps the frame it renders; the marks have to be laid out against
+  // the same clamped box or they land outside a perfectly valid viewBox.
+  it("a non-finite box falls back to the default 46×60", () => {
+    const bad = tapeGaugeGeometry({
+      value: 142,
+      span: 25,
+      zones: ZONES,
+      tick: null,
+      width: Number.NaN,
+      height: Number.POSITIVE_INFINITY,
+      orientation: "vertical",
+    });
+    const good = tapeGaugeGeometry({
+      value: 142,
+      span: 25,
+      zones: ZONES,
+      tick: null,
+      width: 46,
+      height: 60,
+      orientation: "vertical",
+    });
+    expect(bad).toEqual(good);
+  });
+
   test.prop([
     fc.double({ min: -1000, max: 1000, noNaN: true }),
     fc.double({ min: 1, max: 200, noNaN: true }),

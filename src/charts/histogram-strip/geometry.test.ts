@@ -32,6 +32,37 @@ describe("histogramGeometry", () => {
     expect(with_.bars.map((b) => b.x1)).toEqual(without.bars.map((b) => b.x1));
   });
 
+  // A non-finite `domain`/`bins` used to reach uniformBins: the domain came back
+  // as bin edges of NaN (nothing painted, name still read "…between NaN and
+  // NaN"), the bin count collapsed the array to empty ("No data." over real
+  // observations). Both now fall back to the auto path.
+  it("non-finite domain/bins fall back to the auto binning", () => {
+    const values = [1, 2, 2, 3, 3, 3, 4, 9];
+    const auto = histogramGeometry({ ...base, values });
+    for (const opts of [
+      { domain: [NaN, NaN] as const },
+      { domain: [0, NaN] as const },
+      { domain: [-Infinity, Infinity] as const },
+      { bins: NaN },
+      { bins: Infinity },
+    ]) {
+      const geo = histogramGeometry({ ...base, values, ...opts });
+      expect(geo.total).toBe(auto.total);
+      expect(geo.bars.map((b) => [b.x0, b.x1])).toEqual(auto.bars.map((b) => [b.x0, b.x1]));
+      for (const b of geo.bars) {
+        expect(Number.isFinite(b.x0) && Number.isFinite(b.x1)).toBe(true);
+      }
+    }
+  });
+
+  it("a finite domain still fixes the edges", () => {
+    const geo = histogramGeometry({ ...base, values: [1, 2, 3], domain: [0, 10], bins: 2 });
+    expect(geo.bars.map((b) => [b.x0, b.x1])).toEqual([
+      [0, 5],
+      [5, 10],
+    ]);
+  });
+
   test.prop([fc.array(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { maxLength: 200 })])(
     "containment: ≤ 12 bars inside the box",
     (values) => {

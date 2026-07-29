@@ -72,7 +72,14 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     () => gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: PAD }),
     [data, rows, cell, gap, steps, domain],
   );
-  const stepPx = cell + gap;
+  // Pitch, row count and bin count come off the geometry, not the raw props —
+  // the pointer map, the roving walk and the announcement all have to be built
+  // on the same numbers the static entry painted. A repaired `rows`/`cell`/`gap`
+  // moves the cells and leaves hit-testing behind, and a repaired `steps` made
+  // the live region say "step 2 of 1" over a grid bucketed into 2.
+  const stepPx = geo.cell + geo.gap;
+  const gridRows = geo.rows;
+  const bins = geo.steps;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Pointer (viewBox space) → cell index by pure grid math (column-major, the
@@ -81,10 +88,10 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     (x: number, y: number) => {
       const col = Math.floor((x - PAD) / stepPx);
       const row = Math.floor((y - PAD) / stepPx);
-      const i = col * rows + row;
-      return row >= 0 && row < rows && i >= 0 && i < geo.cells.length ? i : null;
+      const i = col * gridRows + row;
+      return row >= 0 && row < gridRows && i >= 0 && i < geo.cells.length ? i : null;
     },
-    [stepPx, rows, geo],
+    [stepPx, gridRows, geo],
   );
 
   // 2-D roving: all four arrows are intercepted (a grid must never fall back to
@@ -99,29 +106,29 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       // Nothing active yet: the first arrow lands on cell 0 (kernel contract).
       const first = cur < 0;
       const c = first ? 0 : cur;
-      const col = Math.floor(c / rows);
-      const row = c % rows;
+      const col = Math.floor(c / gridRows);
+      const row = c % gridRows;
       const clamp = (i: number) => (i >= 0 && i < n ? i : null);
       let next: number;
       switch (key) {
         case "ArrowDown":
-          next = row < rows - 1 ? (clamp(c + 1) ?? c) : c;
+          next = row < gridRows - 1 ? (clamp(c + 1) ?? c) : c;
           break;
         case "ArrowUp":
           next = row > 0 ? (clamp(c - 1) ?? c) : c;
           break;
         case "ArrowRight":
-          next = clamp((col + 1) * rows + row) ?? c;
+          next = clamp((col + 1) * gridRows + row) ?? c;
           break;
         case "ArrowLeft":
-          next = clamp((col - 1) * rows + row) ?? c;
+          next = clamp((col - 1) * gridRows + row) ?? c;
           break;
         default:
           return null;
       }
       return first ? 0 : next;
     },
-    [rows, geo],
+    [gridRows, geo],
   );
 
   // index = data index (cells are 1:1 with `data`); value = the cell's number
@@ -135,10 +142,10 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         formatted:
           cell == null || cell.value === null
             ? "—"
-            : `${fmt(cell.value)}, step ${cell.step}/${steps}`,
+            : `${fmt(cell.value)}, step ${cell.step}/${bins}`,
       };
     },
-    [geo, fmt, steps],
+    [geo, fmt, bins],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -185,7 +192,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
     ? ""
     : c.value === null
       ? strings.gardenCellEmpty(c.index + 1, geo.cells.length)
-      : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, steps);
+      : strings.gardenCell(c.index + 1, geo.cells.length, fmt(c.value), c.step, bins);
 
   return (
     <span ref={hostRef} {...wrap("mc-garden-live", className, style)} {...named(label)} {...bind}>

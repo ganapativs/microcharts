@@ -81,8 +81,11 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       domain: props.domain,
     });
     const showLabel = (props.label ?? "gap") === "gap" && base?.landing != null;
+    // `[...unit][0]` matches the static's gutter arithmetic exactly — charAt
+    // would split a surrogate pair into two units of width and drift the
+    // pointer map from the rendered viewBox.
     const gutterCh = showLabel
-      ? `${base!.landing!.delta > 0 ? "+" : ""}${base!.landing!.delta} ${unit.charAt(0)}`.length
+      ? `${base!.landing!.delta > 0 ? "+" : ""}${base!.landing!.delta} ${[...unit][0] ?? ""}`.length
       : 0;
     return burnGeometry({
       width,
@@ -107,7 +110,9 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
           : burnSummary(
               geo,
               fmt,
-              { unit, work: workWord, mode, elapsed: data.actual.length, total: data.plan.length },
+              // Geometry counts, not prop lengths — see the static entry: the
+              // non-finite entries it drops are days the mark never draws.
+              { unit, work: workWord, mode, elapsed: geo.elapsed, total: geo.total },
               strings,
             );
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;

@@ -144,12 +144,12 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         Seat occupancy{" "}
         <span className="mc-inline">
-          <Honeycomb value={34} total={40} unit="seats" cell={8} summary={false} />
+          <Honeycomb value={34} total={40} rows={2} cell={3} unit="seats" summary={false} />
         </span>{" "}
         — 34 of 40 taken, one row left.
       </p>
     ),
-    code: '<p>\n  Seat occupancy{" "}\n  <span className="mc-inline">\n    <Honeycomb value={34} total={40} summary={false} />\n  </span>{" "}\n  — 34 of 40 taken, one row left.\n</p>',
+    code: '<p>\n  Seat occupancy{" "}\n  <span className="mc-inline">\n    <Honeycomb value={34} total={40} rows={2} summary={false} />\n  </span>{" "}\n  — 34 of 40 taken, one row left.\n</p>',
   },
   cell: {
     render: () => (
@@ -163,7 +163,8 @@ export const contexts: ChartContexts = {
                   value={row.data.at(-1)!}
                   total={40}
                   unit="seats"
-                  cell={9}
+                  rows={2}
+                  cell={3}
                   summary={false}
                 />
               </td>
@@ -173,7 +174,7 @@ export const contexts: ChartContexts = {
         </tbody>
       </table>
     ),
-    code: "<td>\n  <Honeycomb value={34} total={40} />\n</td>",
+    code: "<td>\n  <Honeycomb value={34} total={40} rows={2} />\n</td>",
   },
   kpi: {
     render: () => (
@@ -185,7 +186,7 @@ export const contexts: ChartContexts = {
             <span className="mb-1 text-fd-muted-foreground text-xs">seats taken</span>
           </div>
         </div>
-        <Honeycomb value={34} total={40} unit="seats" cell={12} summary={false} />
+        <Honeycomb value={34} total={40} unit="seats" cell={5} summary={false} />
       </>
     ),
     code: '<div className="kpi">\n  <span className="figure">34/40</span>\n  <span className="unit">seats taken</span>\n  <Honeycomb value={34} total={40} />\n</div>',
@@ -204,14 +205,14 @@ export const contexts: ChartContexts = {
               total={12}
               unit="seats"
               rows={2}
-              cell={7}
+              cell={4}
               summary={false}
             />
           </span>
         ))}
       </div>
     ),
-    code: '<button className="tab">\n  Room A <Honeycomb value={34} total={40} />\n</button>',
+    code: '<button className="tab">\n  Room A <Honeycomb value={10} total={12} rows={2} />\n</button>',
   },
 };
 

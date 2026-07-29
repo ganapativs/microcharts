@@ -1,0 +1,585 @@
+/*
+ * THE MARKETING SURFACE — one design language for every customer-facing page.
+ *
+ * This is the home page's own layer, promoted. It started life as `home.css`,
+ * scoped to `.home` and used by exactly one route; the language it encodes (a
+ * surface ladder, three inks, two rules, four gaps, one measure, doors instead
+ * of buttons) is what makes that page read the way it does, so every non-docs
+ * route now opens on it. `/`, `/charts`, `/examples` and `/brand` are the same
+ * page with different content, and a reader moving between them should feel
+ * nothing change but the words.
+ *
+ * Scoped to `.surface` so nothing here can leak into the docs. The landing page
+ * carries `.surface .home` — this file is its foundation, `(landing)/home.css`
+ * is the eleven components only that page has.
+ *
+ * Every non-typographic value is an ALIAS onto a token global.css already owns,
+ * so theme switching, the accent picker and the six chart presets keep working
+ * through the site's own machinery and a palette change lands here for free.
+ *
+ *   --field / --field-1..3   surface ladder → the fd background/card/muted/accent ladder
+ *   --ink / --ink-2 / --ink-3  three type steps → foreground / muted / muted-mixed
+ *   --rule / --rule-2        two rule weights → --hairline and a doubled mix
+ *   --paper / --paper-ink    the one inversion — flips WITH the theme
+ *   --m-lead / --m-prose / --m-note   the three absolute measure edges (px, not ch)
+ */
+
+.surface {
+  /* ---- surface ladder — four graded levels, never one flat black ---- */
+  --field: var(--color-fd-background);
+  --field-1: var(--color-fd-card);
+  --field-2: var(--color-fd-muted);
+  --field-3: var(--color-fd-accent);
+
+  /* ---- type ink — hierarchy from contrast, not weight ----
+     Three steps, and the QUIETEST one is the docs' own muted foreground rather
+     than something mixed further toward the field. A third step built by fading
+     past `muted-foreground` measures under 4.5:1, and everything it carries here
+     is small text (10–12px kickers, figures, footnotes). So the ladder is built
+     the other way: step 2 is pulled UP toward the foreground and step 3 is the
+     muted token itself. Measured light / dark: 15.5 / 16.0 · 9.2 / 9.5 ·
+     5.3 / 6.0 — all AA, in every preset. */
+  --ink: var(--color-fd-foreground);
+  --ink-2: color-mix(in srgb, var(--color-fd-foreground) 45%, var(--color-fd-muted-foreground));
+  --ink-3: var(--color-fd-muted-foreground);
+
+  /* ---- rules — two weights only, and both quiet ----
+     `--rule` is the docs' own hairline; `--rule-2` is the emphasis weight, for
+     the few edges that separate one *kind* of thing from another (a table head
+     from its body, a control from the field). It is composed from the same base
+     ink the hairline uses rather than derived from it, because color-mix on an
+     already transparent token cannot darken it.
+
+     Both are deliberately faint. An early pass drew --rule-2 at 30% and the page
+     read as a wireframe: once a dozen structural edges are all visible at once,
+     the rules compete with the marks, and the marks are the content. Structure
+     here is carried by space and alignment first; a rule appears only where
+     space alone would be ambiguous. */
+  --rule: var(--hairline);
+  --rule-2: color-mix(in oklab, #1a2438 17%, transparent);
+
+  /* The THIRD edge, and the only one that carries meaning rather than structure:
+     "you are on this one". It is the accent at a weight that reads as an edge and
+     not as a highlight, and it is a token rather than a value at each call site
+     because every reachable object on this surface — a catalog card, a mark tile,
+     a colour chip, a specimen cell — has to answer a cursor the same way, in both
+     themes. Dark needs more of the accent to clear the same perceived weight
+     against a near-black field. */
+  --edge-accent: color-mix(in oklab, var(--mc-accent) 42%, transparent);
+
+  /* ---- the inversion pair: a section may end on the opposite surface ---- */
+  --paper: var(--color-fd-foreground);
+  --paper-ink: var(--color-fd-background);
+
+  /* ---- measure ladder: three absolute edges, one left axis ----
+     px and not ch on purpose — ch scales with font size, so a 66ch body column
+     and a 66ch mono note render at different widths, which is what makes the
+     left-right rhythm illegible. Three edges is a rhythm a reader perceives. */
+  --m-lead: 560px;
+  --m-prose: 680px;
+  --m-head: 680px;
+  --m-note: 820px;
+
+  /* ---- faces ---- */
+  --fd: var(--font-display);
+  --fs: var(--font-sans);
+  --fm: var(--font-mono);
+  --fr: var(--font-serif);
+
+  /* FOUR steps, and only four, so a gap MEANS something — a reader learns four
+     distances, not fourteen ad-hoc Tailwind margins.
+
+       --sp-act    section  → section          141
+       --sp-sub    block    → block, in one    ~94
+       --sp-block  text     → the thing it introduces  ~43
+       --sp-lede   heading  → its own paragraph  24
+
+     (The landing's fold keeps `--sp-beat` for its own internal padding; it is
+     not a gap between two things, it is the fold's frame.) */
+  --sp-act: clamp(6rem, 11vw, 12.5rem);
+  --sp-beat: clamp(3rem, 5.5vw, 5.5rem);
+  --sp-sub: clamp(4rem, 6.5vw, 6.5rem);
+  --sp-block: clamp(2rem, 3vw, 2.75rem);
+  --sp-lede: 1.5rem;
+
+  --e: var(--ease-out-expo);
+  /* The site nav's height (`h-14`), which anything sticky offsets itself by. A
+     constant, not a measurement: the rail is a fixed-height flex row on every
+     breakpoint. */
+  --hdr: 56px;
+
+  /* NO background. The site's ground (`.site-grain` / `.site-wash`, painted from
+     the root layout at `z-index: -1`) is behind every page, and an opaque fill
+     here would hide it. `--field` stays a TOKEN — the surface ladder below reads
+     from it — it just is not painted on the wrapper. */
+  color: var(--ink);
+  font-family: var(--fs);
+}
+
+.dark .surface {
+  --rule-2: color-mix(in oklab, #ece0cf 19%, transparent);
+  --edge-accent: color-mix(in oklab, var(--mc-accent) 62%, transparent);
+}
+
+/* ── the shell ──────────────────────────────────────────────────────────────
+   ONE measure for the whole surface, and it is the site nav's measure exactly:
+   `max-w-shell` with the nav's own gutters. A page's first line has to start on
+   the same vertical as the wordmark above it — when routes carried their own
+   wider gutter at `lg`, every heading sat 16px inboard of the masthead and the
+   whole column read subtly untrue. Change this in one place or not at all. */
+.surface .shell {
+  width: 100%;
+  max-width: var(--container-shell);
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+@media (min-width: 640px) {
+  .surface .shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* The page ends on the same gap the last section opened with. That section is an
+   `.act`, so `--sp-act` sits above it; the footer contributes its own `pt-14`
+   and draws no rule, so subtracting that from `--sp-act` makes the space under
+   the closing line equal the space over it. */
+.surface-main {
+  padding-bottom: calc(var(--sp-act) - 3.5rem);
+}
+
+/* ONE gap, applied by class. Padding-TOP only: a section owns the space above
+   it, so removing a section can never collapse two gaps into one.
+
+   A two-tier rhythm (`--sp-act` between acts, `--sp-beat` inside one) read as
+   sloppiness rather than as a rhythm: across nine sections the reader has no way
+   to learn which boundary means what. One gap everywhere, and the SECTIONS are
+   separated by their display headings, which is the stronger signal. */
+.surface .act {
+  padding-top: var(--sp-act);
+}
+/* The first section on a page that has no fold above it. A full `--sp-act`
+   under a 56px nav is a screen of nothing before the page has said anything;
+   the landing earns it with a hero, an index page does not. */
+.surface .act-open {
+  padding-top: clamp(2.75rem, 6vw, 5rem);
+}
+
+/* The three sub-gaps as classes, so a component names the RELATIONSHIP it is
+   expressing rather than picking a number. Changing the rhythm is then one edit
+   here instead of forty across the route. */
+.surface .u-sub {
+  margin-top: var(--sp-sub);
+}
+.surface .u-block {
+  margin-top: var(--sp-block);
+}
+.surface .u-lede {
+  margin-top: var(--sp-lede);
+}
+/* A sub-block that draws its own rule. The rule is already doing the separating,
+   so the space does not have to do it a second time — `--sp-sub` above a visible
+   hairline reads as a gap that lost its nerve. One step down, and the rule
+   carries the boundary.
+
+   The class owns all three parts — the gap, the rule and the space under it —
+   because every call site was writing `u-ruled border-t pt-6` with an inline
+   border colour, which is three chances for two of these to disagree. The space
+   UNDER the rule is one step smaller than the space over it: a rule belongs to
+   the block it opens, and equal space either side reads as a divider floating
+   between two things. Override `border-color` inline for the emphasis weight. */
+.surface .u-ruled {
+  margin-top: var(--sp-block);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--sp-lede);
+}
+
+/* ── the inversion ──────────────────────────────────────────────────────────
+   An inverted surface. Only the SURFACE lives here — chart ink on an inverted
+   sheet is emitted per preset by the landing's `preset-scope-style.tsx` from the
+   library's own token maps, so flipping the masthead switch re-themes the sheet
+   along with everything else instead of leaving a stale accent on it.
+
+   Read the pair as "which sheet is this?", not "which theme is the page in": in
+   light mode the sheet is dark; in dark mode the sheet is light. */
+.surface [data-invert] {
+  background: var(--paper);
+  color: var(--paper-ink);
+  --paper-rule: color-mix(in oklab, #ece0cf 16%, transparent);
+  --paper-faint: #928d84;
+}
+.dark .surface [data-invert] {
+  --paper-rule: color-mix(in oklab, #1a2438 17%, transparent);
+  --paper-faint: #5a616f;
+}
+
+/* ── type ramp ─────────────────────────────────────────────────────────────
+   The display face is 40px and up ONLY, and never carries a numeral — every
+   figure on the surface is Iosevka. display-1 is spent on the opening
+   claim and the closing aphorism of the landing page, and nowhere else. */
+.surface .display-1 {
+  font: 700 clamp(44px, 2.2rem + 5.6vw, 108px) / 0.9 var(--fd);
+  letter-spacing: -0.035em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.surface .display-2 {
+  font: 600 clamp(30px, 1.5rem + 2.1vw, 48px) / 1.12 var(--fd);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+/* Sub-heads are Hanken Grotesk 600, not the display face: at this step the
+   display face would breach its own 40px floor.
+   Tracking is SIZE-SPECIFIC: letters read further apart the larger they get, so
+   the correction eases off as the type comes down — -0.035em at display, -0.02em
+   at section head, and this between that and the body's zero. */
+.surface .h3 {
+  font: 600 clamp(21px, 1.05rem + 0.8vw, 27px) / 1.24 var(--fs);
+  letter-spacing: -0.013em;
+  color: var(--ink);
+}
+.surface .sentence {
+  font: 400 clamp(19px, 1rem + 0.66vw, 26px) / 1.55 var(--fr);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+.surface .lead {
+  font: 400 clamp(17px, 0.95rem + 0.5vw, 22px) / 1.56 var(--fs);
+  color: var(--ink);
+  text-wrap: pretty;
+}
+/* ---- reading sizes are rem; drawing sizes stay px ----
+   The split is by JOB, not by size, so a reader who raised their browser's
+   default text size is answered. Text you READ is rem. Text that is part of a
+   DRAWING stays px — a label inside a diagram whose collision-free geometry is
+   declared up front cannot scale without breaking the diagram.
+
+   The rem values are the pixel values at a 16px root, so nothing moves at the
+   default: 1.03rem is 16.48px against 16.5px. */
+.surface .prose {
+  font: 400 1.03rem/1.62 var(--fs);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.surface .mono {
+  font: 400 0.78rem/1.55 var(--fm);
+  letter-spacing: -0.03em;
+}
+.surface .mono-s {
+  font: 400 0.6875rem/1.5 var(--fm);
+  letter-spacing: -0.02em;
+}
+.surface .kicker {
+  font: 400 0.625rem/1 var(--fm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* every figure in running text */
+.surface .num {
+  font: 500 0.84em/1 var(--fm);
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+/* A figure that IS the statement — a count above its own label. Mono, because
+   the display face never carries a numeral, and tabular so a row of them lines
+   up on the decimal. */
+.surface .figure {
+  font: 500 clamp(26px, 1.2rem + 1.4vw, 38px) / 1 var(--fm);
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ── links ──────────────────────────────────────────────────────────────────
+   Scoped to the page body, not `.surface`: the shared footer lives inside the
+   same token wrapper and styles its own links with utilities that a
+   `.surface a` rule would outrank. */
+.surface-main a {
+  color: inherit;
+  text-decoration: none;
+}
+.surface .ulink {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-2);
+  transition: color 0.18s var(--e);
+}
+.surface .ulink:hover {
+  color: var(--mc-accent);
+  text-decoration-color: currentColor;
+}
+.surface :focus-visible {
+  outline: 2px solid var(--mc-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ── plates: one edge, no elevation. §11 bans hairline + diffuse shadow. ── */
+.surface .plate {
+  background: var(--field-1);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+}
+/* A plate that is also a link. The edge takes the accent on hover — it does not
+   lift, glow, tilt or cast: nothing on this surface has elevation, so one card
+   that rises reads as a widget from another site. */
+.surface a.plate {
+  transition:
+    border-color 0.18s var(--e),
+    background-color 0.18s var(--e);
+}
+.surface a.plate:hover {
+  border-color: var(--edge-accent);
+}
+
+/* A FIELD, not a box: same grouping as a plate with no line ink at all,
+   separated by its gap. This is what a grid of many small things is built from —
+   ruling all four sides of a hundred cells costs ~220 edges, and the eye sorts
+   the chrome before it reaches the ink.
+
+   HOVER IS AN ACCENT EDGE, not a step up the surface ladder. Stepping the field
+   one tone was the first answer and it was the wrong one twice over: in light
+   mode the tile went grey, which reads as disabled rather than as reachable, and
+   in dark mode the two steps are close enough that the tile appeared not to
+   respond at all. An edge in the accent says the same thing the selected swatch
+   in the theme menu says, in both modes, at the same weight.
+
+   It is an INSET ring rather than a border, so the edge costs no layout: a
+   border that appears on hover moves the content inside it by a pixel, which on
+   a grid of a hundred cells is a hundred marks twitching under the cursor. */
+.surface .field-cell {
+  background: var(--field-1);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px transparent;
+  transition:
+    box-shadow 0.18s var(--e),
+    scale 0.12s var(--e);
+}
+.surface .field-cell:hover,
+.surface .field-cell:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--edge-accent);
+}
+/* A navigation that takes a moment to start reads as a click that missed. The
+   tile presses in — `scale`, not a translate, so the mark inside stays centred
+   on the cell it was centred on. */
+.surface .field-cell:active {
+  scale: 0.99;
+}
+
+/* ── touch targets ──────────────────────────────────────────────────────────
+   Some controls on this surface are deliberately small objects: a rail dot is a
+   6px mark, an install command is a 14px line of mono. Their SIZE is the design
+   — none of them may grow — but a 14px-tall button is a miss waiting to happen
+   with a finger, and 24px only clears the AA target size by nothing at all.
+
+   So the hit box grows and the mark does not: a transparent pseudo-element,
+   absolutely positioned and centred on the control, takes the row to 44px. It is
+   out of flow, so it adds no height, moves no baseline and cannot push the
+   optical centring these controls are placed by.
+
+   Vertical ONLY, and that is the constraint that makes it safe: a rail's dots
+   sit on a 26px pitch, so a 44px-WIDE box would overlap its neighbours and a tap
+   near an edge would land on the wrong claim. Every one of these controls has at
+   least 24px of clear space above and below it, and nothing else to steal. */
+.surface .tap {
+  position: relative;
+}
+.surface .tap::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  height: max(100%, 44px);
+}
+
+/* The controls that are TYPE rather than objects — a door, a collection in the
+   filter row, a question chip — measure 22–31px tall, because that is what the
+   type they are made of measures. With a cursor that is correct and the design;
+   with a finger it is a miss waiting to happen.
+
+   These grow instead of getting a `.tap` box, and that is the difference between
+   the two: `.tap` is for a control whose SIZE is load-bearing and which has
+   clear space above and below to borrow (a 6px rail dot, a 14px command line).
+   These have neither — the chips wrap into rows 8px apart, so an out-of-flow
+   44px box would overlap the row above — so the honest fix is real height, only
+   where a finger is doing the pointing. */
+@media (pointer: coarse) {
+  .surface .door {
+    padding-block: 7px 12px;
+  }
+  .surface .coll-link {
+    padding-block: 11px 16px;
+  }
+  .surface .q-chip {
+    padding-block: 0.6rem 0.7rem;
+  }
+}
+
+/* ── doors ──────────────────────────────────────────────────────────────────
+   The surface's actions. No filled pill and no outline: hierarchy comes from
+   type size and ink, the same two things every other level here is built from.
+   The rule under a door is its affordance — 2px on the accent for the primary,
+   a hairline one ink step back for the secondary — and it grows on hover rather
+   than lighting up, so the row stays still.
+
+   No filled buttons: this surface has no filled surfaces, shadows or rounded
+   buttons anywhere else, so two in a fold read as a widget from another site. */
+.surface .door {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font: 500 clamp(16px, 0.95rem + 0.28vw, 19px) / 1.2 var(--fs);
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+  padding-bottom: 5px;
+  transition: color 0.18s var(--e);
+}
+.surface .door-label {
+  box-shadow: inset 0 -1px 0 0 var(--rule-2);
+  display: inline-block;
+  transition:
+    box-shadow 0.18s var(--e),
+    scale 0.12s var(--e);
+}
+.surface .door:hover {
+  color: var(--ink);
+}
+.surface .door:hover .door-label {
+  box-shadow: inset 0 -1px 0 0 currentColor;
+}
+/* Acknowledged on PRESS, not on release. Everything else on this surface that
+   can be clicked already does this — a card presses in, the install command's
+   icon dips — and a door that waits for the navigation to start is the one
+   control that feels dead under the finger. The label carries it rather than the
+   whole door, so the arrow beside it does not swim. */
+.surface .door:active .door-label {
+  scale: 0.985;
+}
+.surface .door[data-primary] {
+  color: var(--mc-accent);
+  font-weight: 600;
+  font-size: clamp(18px, 1rem + 0.5vw, 22px);
+}
+.surface .door[data-primary] .door-label {
+  box-shadow: inset 0 -2px 0 0 var(--mc-accent);
+}
+.surface .door[data-primary]:hover {
+  color: color-mix(in oklab, var(--mc-accent) 82%, var(--ink));
+}
+/* A door at the size of the text around it — a "back to the index" or a
+   "next" that must not compete with the heading it sits under. */
+.surface .door[data-quiet] {
+  font-size: 0.78rem;
+  font-family: var(--fm);
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+}
+/* The surface has ONE easing token, and arrows were the only things on it moving
+   to something else: Tailwind's `transition-transform` default curve is an
+   ease-IN-out, so the arrow hesitated before it moved while the label's colour
+   under the same cursor left immediately. Same curve as everything else. */
+.surface .door svg,
+.surface .ulink svg {
+  transition-timing-function: var(--e);
+}
+
+/* The install command: a quiet meta row under the doors. No field, no border —
+   mono type and the shared `hv-tok-*` syntax colours are what mark it as a
+   command, and they recolour with the accent like every mark does. A hairline
+   pill here made three outlined rectangles in one row, none of which looked more
+   important than the others. The hover lives on the copy icon. */
+.surface .cmd {
+  display: inline-flex;
+  align-items: center;
+  /* The line is 14px tall and it is a BUTTON. See `.tap`: the hit row is 44px and
+     it is drawn out of flow, so the command still occupies exactly the space the
+     mono links beside it do. */
+  position: relative;
+  gap: 10px;
+  font: 400 13px/1 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  /* No padding, no background, no negative margin. It shares a row with plain mono
+     links, and box padding pushed its text off their baseline — the command looked
+     like it had been dropped in from a different row. Nothing here occupies space
+     the links don't. */
+  transition: color 0.18s var(--e);
+}
+.surface .cmd::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  translate: 0 -50%;
+  height: 44px;
+}
+.surface .cmd svg {
+  color: var(--ink-3);
+  transition:
+    color 0.18s var(--e),
+    scale 0.12s var(--e);
+}
+/* The command line cannot move on press — it shares a baseline with the mono
+   links beside it — so the icon takes the press on its own. */
+.surface .cmd:active svg {
+  scale: 0.86;
+}
+.surface .cmd:hover svg {
+  color: var(--mc-accent);
+}
+
+/* ── the toggle rule ────────────────────────────────────────────────────────
+   State is never carried by colour alone. A control that is ON grows an accent
+   rule under it; `scaleX` from the CENTRE, so the direction of travel is never
+   wrong — growing from the left edge reads as the mark moving right, which is
+   true going one way and backwards going the other. */
+.surface .toggle-rule {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--mc-accent);
+  transform-origin: center;
+  transition: transform 0.18s var(--e);
+}
+.surface .toggle-rule[data-state="off"] {
+  transform: scaleX(0);
+}
+.surface .toggle-rule[data-state="on"] {
+  transform: scaleX(1);
+}
+
+/* ── on paper ───────────────────────────────────────────────────────────────
+   These pages are read on screens, but a catalog is exactly the kind of thing
+   someone prints. The sheet keeps the ink and drops the chrome. */
+@media print {
+  /* Fill IS the reading on a mark and on an inverted sheet. */
+  .surface [data-invert],
+  .surface .plate-mark {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* A specimen split across a page break is two half-specimens. */
+  .surface .plate,
+  .surface .field-cell,
+  .surface figure,
+  .surface tr {
+    break-inside: avoid;
+  }
+  .surface .display-1,
+  .surface .display-2,
+  .surface .h3,
+  .surface .kicker {
+    break-after: avoid;
+  }
+  /* Viewport-sized gaps are a screen's frame, not a sheet's. */
+  .surface .act,
+  .surface .act-open,
+  .surface-main > section {
+    min-height: 0;
+    padding-top: 2.5rem;
+  }
+}

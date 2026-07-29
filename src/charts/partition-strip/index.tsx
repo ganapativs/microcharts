@@ -4,12 +4,18 @@
 // channel. Two levels max — grandchildren are ignored with a dev warning.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, proseCharsThatFit } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
-import { partitionStripGeometry, parentValue, type PartitionNode } from "./geometry.js";
+import {
+  partitionBox,
+  partitionStripGeometry,
+  parentValue,
+  type PartitionNode,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { round2 } from "../../core/types.js";
 
 export type PartitionStripDatum = PartitionNode;
 
@@ -83,8 +89,8 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
     emphasis,
     labels = true,
     colors,
-    width = 120,
-    height = 24,
+    width: widthProp = 120,
+    height: heightProp = 24,
     strings = EN_PARTITION,
     title,
     summary,
@@ -99,6 +105,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       "<PartitionStrip> depth > 2 — grandchildren ignored (two levels max is the honesty feature).",
     );
 
+  const [width, height] = partitionBox(widthProp, heightProp);
   const geo = partitionStripGeometry({ data, width, height, gap: 1 });
   const fontSize = labelFont(height, 0.42);
   const inset = 0.5;
@@ -131,32 +138,45 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
         // (the craft gate + containment estimates read it).
         let ink: Record<string, string | number | undefined>;
         let opacity: number | undefined;
+        // A label on a muted segment steps back to the ordinary label ink
+        // (TraceFold's `data-mc-dim`), because the knockout `--mc-on-cat` is
+        // sized for a saturated category fill: on `--mc-neutral` at 0.55 the
+        // dark ink reads 2.9:1 in dark mode, and under forced-colors a `Canvas`
+        // knockout on `GrayText` disappears in both themes.
+        let dim = false;
         if (emphasis) {
           if (seg.label === emphasis) {
             ink = { "data-mc-ink": "accent" };
             opacity = undefined;
           } else if (seg.group === emphGroup) {
             ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };
-            opacity = seg.row === 0 ? 0.85 : 0.55;
+            opacity = seg.row === 0 ? 1 : 0.55;
           } else {
             ink = { "data-mc-ink": "neutral" };
             opacity = 0.55;
+            dim = true;
           }
         } else {
           ink = { "data-mc-cat": (seg.group % CAT_N) + 1 };
-          opacity = seg.row === 0 ? 0.9 : 0.55;
+          opacity = seg.row === 0 ? 1 : 0.55;
         }
         const catFill =
           colors && ink["data-mc-cat"] !== undefined
             ? colors[seg.group % colors.length]
             : undefined;
         // seat gate: wide enough for the text AND a parent row tall enough to
-        // hold the floor font without bleeding — else labels drop out cleanly
+        // hold the floor font without bleeding — else labels drop out cleanly.
+        // The width test goes through `proseCharsThatFit`: these are
+        // caller-supplied group names, not figures this library formatted, and
+        // the digits rate this used to inline (0.6/char) seats a label the
+        // browser paints at up to 0.95/char. Measured: "WWWW" in a 27-unit
+        // leading segment painted 5.3 units past the viewBox, and `.mc-root` is
+        // `overflow: visible`, so that is a spill into the page, not a clip.
         const fits =
           labels &&
           seg.row === 0 &&
           rowH >= fontSize + 0.8 &&
-          seg.width >= seg.label.length * fontSize * 0.6 + 2;
+          seg.label.length <= proseCharsThatFit(seg.width, fontSize, 2);
         const key = `${seg.row}-${seg.label}-${seg.x}`;
         const nodes = [
           <rect
@@ -179,6 +199,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={fontSize}
+              data-mc-dim={dim ? "" : undefined}
             >
               {seg.label}
             </text>,
@@ -188,8 +209,4 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

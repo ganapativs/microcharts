@@ -6,10 +6,44 @@
 // transform, so containment is honest at generation time. The barb starts at the
 // disc rim, per the real station model. 2-dp.
 import { round2 } from "../../core/types.js";
-import { labelFont, textGutter } from "../../core/labels.js";
+import { labelFont, textGutter, textGutterProse } from "../../core/labels.js";
 import { windBarbGeometry, type Seg, type WindBarbGeometry } from "../wind-barb/geometry.js";
 
 const TAU = Math.PI * 2;
+
+/**
+ * Resolved barb quantum. `step` is host-computed as often as it is typed —
+ * `Number(field.value)` on an empty input is NaN — and every non-positive value
+ * broke the encoding in a different way: NaN dropped the barb while the summary
+ * still announced the wind, 0 left the shaft with no feathers at all, and a
+ * negative step quantized 15 into four full barbs (a reading of 45 at the
+ * documented quantum). Non-finite or non-positive falls back to the documented
+ * 10, and the summary resolves through here too, so announced speed and painted
+ * feather count are always the same scale.
+ */
+export function resolveStep(step: number | undefined): number {
+  return step != null && Number.isFinite(step) && step > 0 ? step : 10;
+}
+
+/** Resolved glyph square. A non-finite `size` put NaN in the viewBox, the seat
+ *  and every coordinate; ≤ 0 collapsed the box to a few units. Default 48. */
+export function resolveSize(size: number | undefined): number {
+  return size != null && Number.isFinite(size) && size > 0 ? size : 48;
+}
+
+/**
+ * Is there a drawable wind? A barb is an ANGLE plus a feather count, so a
+ * non-finite direction has no honest glyph — it used to emit `MNaN NaN` for the
+ * shaft while the accessible name read "wind undefined 15", because
+ * `compass8[octant(NaN)]` is `undefined`. It now takes the answer a non-finite
+ * magnitude already got: the wind field is absent, in the paint and in the
+ * summary alike.
+ */
+export function hasWind<T extends { direction: number; magnitude: number }>(
+  wind: T | null | undefined,
+): wind is T {
+  return !!wind && Number.isFinite(wind.direction) && Number.isFinite(wind.magnitude);
+}
 
 /** Minimal sky-cover pie (12 o'clock start, clockwise) — avoids pulling the
  *  whole arc module into this leaf chart's bundle. "" clear, closed disc full. */
@@ -43,6 +77,9 @@ export interface StationLayout {
   yOff: number;
   /** Gap between the disc rim and a numeral. */
   gap: number;
+  /** Resolved glyph square edge — the barb box derives from this, never from
+   *  the raw `size` prop, so a hostile size cannot desync the two. */
+  box: number;
   /** Top edge of the plot box — the square holding the disc + barb. The numeral
    *  gutters sit outside it, one equal band above and below. */
   y0: number;
@@ -56,17 +93,24 @@ export interface StationLayout {
  *
  * The three numerals are figures this chart formatted itself (`makeFormatter`),
  * so `textGutter`'s digits rate is the right estimator — the shared one, never a
- * re-derived `* 0.62` (see core/labels.ts). Caller PROSE would need
- * `textGutterProse`; the only prose the glyph draws is the `station` id, which
- * reserves nothing at all (top-left corner, outside these gutters).
+ * re-derived `* 0.62` (see core/labels.ts).
+ *
+ * The `station` id is the one piece of caller PROSE the glyph draws. It sits in
+ * the top band, outside the numeral gutters, and used to reserve nothing at all
+ * — so a name longer than the numerals painted straight out of the viewBox, and
+ * `.mc-root` is `overflow: visible`, so that spills into the page rather than
+ * clipping. It now widens the box rightward at the prose rate
+ * (`textGutterProse`); the disc center is pinned to the LEFT gutter, so a wider
+ * box never moves the glyph.
  */
 export function stationLayout(opts: {
-  size: number;
+  size: number | undefined;
   temp: string | null;
   dew: string | null;
   pressure: string | null;
+  station?: string | null | undefined;
 }): StationLayout {
-  const { size } = opts;
+  const size = resolveSize(opts.size);
   const font = labelFont(size, 0.24);
   const gap = 3;
   const gutW = (s: string | null): number => (s ? textGutter(s.length, font, gap) : 1);
@@ -74,13 +118,15 @@ export function stationLayout(opts: {
   const padXR = round2(gutW(opts.pressure) + 0.5);
   const padY = round2(font + 2);
   const r = round2(size * 0.24);
+  const idW = opts.station ? textGutterProse(opts.station.length, font, 1) : 0;
   return {
-    width: round2(padXL + size + padXR),
+    width: round2(Math.max(padXL + size + padXR, idW)),
     height: round2(size + padY * 2),
     font,
     cx: round2(padXL + size / 2),
     cy: round2(padY + size / 2),
     r,
+    box: size,
     // push temp/dew toward the top/bottom of the disc (where it is narrowest and
     // the radial barb is furthest away), so they clear both disc and barb
     yOff: round2(r * 0.78),
@@ -115,14 +161,15 @@ export function stationGlyphGeometry(opts: {
   coreR: number;
   barbBox: number;
 }): StationGlyphGeometry {
-  const { cloud, wind, step, cx, cy, coreR, barbBox } = opts;
+  const { cloud, wind, cx, cy, coreR, barbBox } = opts;
+  const step = resolveStep(opts.step);
 
   const f = cloud == null || !Number.isFinite(cloud) ? 0 : Math.max(0, Math.min(1, cloud));
   const oktaIndex = Math.round(f * 4);
   const cloudPath = skyPie(cx, cy, coreR, f);
 
   let barb: WindBarbGeometry | null = null;
-  if (wind && Number.isFinite(wind.magnitude) && Math.abs(wind.magnitude) >= step / 4) {
+  if (hasWind(wind) && Math.abs(wind.magnitude) >= step / 4) {
     const local = windBarbGeometry({
       direction: wind.magnitude < 0 ? wind.direction + 180 : wind.direction,
       magnitude: Math.abs(wind.magnitude),

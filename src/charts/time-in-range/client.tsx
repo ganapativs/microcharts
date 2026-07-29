@@ -15,6 +15,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
+import { chartSide } from "../../core/types.js";
 import { EN_TIME_IN_RANGE } from "../../core/strings-time-in-range.js";
 import { timeInRangeGeometry } from "./geometry.js";
 import {
@@ -38,8 +39,8 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   const {
     data,
     orientation = "horizontal",
-    width = 80,
-    height = 12,
+    width: widthProp = 80,
+    height: heightProp = 12,
     locale,
     strings = EN_TIME_IN_RANGE,
     title,
@@ -55,6 +56,10 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
     ...rest
   } = props;
   const horizontal = orientation !== "vertical";
+  // Same clamp the static applies, or the picker hit-tests a scale the frame
+  // never had: a NaN side would paint zones at 80×12 and locate them at NaN.
+  const width = chartSide(widthProp, 80);
+  const height = chartSide(heightProp, 12);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // A composition bar should ASSEMBLE, not fade in place: each zone grows from

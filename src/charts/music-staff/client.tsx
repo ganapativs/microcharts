@@ -4,7 +4,6 @@
 // click / Enter / Space selects (onSelect). EN.point announcements.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -19,7 +18,7 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
-import { musicStaffGeometry } from "./geometry.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, musicStaffFrame, musicStaffGeometry } from "./geometry.js";
 import { MusicStaff as StaticMusicStaff, type MusicStaffProps } from "./index.js";
 
 export interface InteractiveMusicStaffProps extends MusicStaffProps, PickerProps {
@@ -52,8 +51,8 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     mode = "ledger",
     label = "none",
     domain,
-    width = 60,
-    height = 28,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     title,
@@ -83,14 +82,16 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   useEntrance(hostRef, "trail", animate, { order: "x", link: 'path[data-mc-w="tick"]' });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  // fontSize + gutter mirror the static entry EXACTLY (same default rule), so
-  // both entries compute identical note geometry and the rings cannot drift.
-  const fontSize = props.fontSize ?? labelFont(height);
+  // Box + label metrics come from the SAME resolver the static entry calls, so
+  // the two cannot disagree about the note positions the rings sit on.
   const last = lastFinite(data);
-  const gutter =
-    label === "last" && isFiniteValue(last)
-      ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 2)
-      : 0;
+  const labelText = label === "last" && isFiniteValue(last) ? fmt(last) : undefined;
+  const { width, height, fontSize, gutter } = musicStaffFrame({
+    width: widthProp,
+    height: heightProp,
+    fontSize: props.fontSize,
+    labelText,
+  });
   const geo = useMemo(
     () => musicStaffGeometry({ values: data, domain, width: width - gutter, height, mode, pad: 2 }),
     [data, domain, width, gutter, height, mode],
@@ -140,8 +141,10 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     defaultSelectedIndex,
   });
 
+  // `strings` names the wrapper as well as the announcements: without it a host
+  // that localized the roving readout still shipped an English accessible name.
   const accName =
-    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
+    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale, strings }));
   const shown = active ?? selected;
   const shownNote = shown !== null ? geo.notes.find((n) => n.index === shown) : undefined;
   const shownPos = shown !== null ? stops.indexOf(shown) + 1 : 0;

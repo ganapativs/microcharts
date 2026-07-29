@@ -1,13 +1,12 @@
 ---
 title: ProgressRing
 description: >-
-  React progress ring chart — progress from a fixed 12-o'clock start — never a needle gauge. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+  ProgressRing draws a fraction as an arc from a fixed 12 o'clock start, for slots where a bar doesn't fit.
 ---
 
-ProgressRing answers "how complete is this?" at icon size, where a linear bar doesn't fit. The start angle is fixed at
-12 o'clock and the caps are butt-cut — the two quiet ways rings inflate progress, both removed. It is never a gauge: no
-needle, no red zone.
+A backup is 68% done and the only room for it is a tab header. ProgressRing draws that fraction as an arc from a start
+angle fixed at 12 o'clock, with butt-cut caps: rounded caps overstate small fractions, and a variable start angle makes
+identical fractions look different. It is not a gauge — no needle, no red zone.
 
 <LiveDemo
   label="ProgressRing"
@@ -29,8 +28,8 @@ needle, no red zone.
 
 ## When to use it
 
-- **Good for** — tab headers, KPI card corners, cooldowns and retry timers (`sweep`).
-- **Avoid for** — precise reads (Progress — the % label is the datum there).
+Use it for tab headers, KPI card corners, and cooldowns or retry timers (`sweep`). For a precise read use Progress,
+where the percent label is the datum.
 
 ## Sizing
 
@@ -77,20 +76,19 @@ needle, no red zone.
   <ProgressRing value={Number.NaN} label="percent" title="Unknown" size={40} style={{ width: 56, height: 56 }} />
 </LiveDemo>
 
+Past 100% the ring clamps full while the center label carries the true percent, the same contract as Progress. A
+non-finite `value` announces no data instead of a fraction. A full circle is drawn as two half-arcs, since SVG cannot
+draw a single 360° arc.
+
 ## Four homes
 
 <FourContexts slug="progress-ring" />
 
-## Why this default
-
-Butt caps and a fixed start: rounded caps overstate small fractions, and variable start angles make identical fractions
-look different. Past 100% the ring clamps while the center label carries the true percent — same contract as Progress. A
-full circle is drawn as two half-arcs (SVG cannot draw a single 360° arc).
-
 ## Accessibility
 
 The accessible name reuses the progress wording — **"68% complete."**, or **"32% remaining."** in sweep mode. The
-interactive entry announces only at 25/50/75/100% threshold crossings — a streaming value never spams the screen reader.
+interactive entry announces only at 25/50/75/100% threshold crossings, so a streaming value never spams the screen
+reader.
 
 <InteractionNote slug="progress-ring" />
 

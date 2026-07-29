@@ -150,12 +150,17 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
+      {/* The mirror axis takes the `muted` ROLE rather than a literal
+          `stroke="var(--mc-neutral)"`: `.mc-root` sets `forced-color-adjust:
+          none`, so the fixed warm gray survived verbatim into High Contrast
+          Mode — a 0.4-opacity #8a8986 against whatever background the user
+          chose. The role paints identically here and maps to GrayText there. */}
       <line
         x1={0}
         y1={geo.centerY}
         x2={width}
         y2={geo.centerY}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
@@ -182,6 +187,12 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           overlay ? (
             // overlay after-bins render ABOVE the axis (like before bins), so
             // they too grow up from the center line → pin the bottom edge.
+            // The literal stroke stays: rect isn't in the accent role's
+            // path/line/polyline element-split, so `data-mc-ink="accent"` here
+            // would beat this fill="none" and paint solid accent blocks over
+            // the before side. Same trade ConfusionGrid's ring documents — it
+            // costs the forced-colors mapping until that split covers hollow
+            // rects.
             <rect
               key={`a${b.x}`}
               x={b.x}
@@ -196,28 +207,38 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             />
           ) : (
             // mirror after-bins hang BELOW the axis → pin the top edge so they
-            // grow downward out of the shared center line.
+            // grow downward out of the shared center line. The accent ink ROLE
+            // paints the same var(--mc-accent) the inline fill used to, but an
+            // inline fill outranks the forced-colors mapping (`.mc-root` sets
+            // forced-color-adjust: none) — the after side kept the brand hex in
+            // High Contrast Mode while the before side mapped to system ink. A
+            // caller `color` still wins inline; that one is theirs to own.
             <rect
               key={`a${b.x}`}
               x={b.x}
               y={geo.centerY}
               width={b.width}
               height={b.down}
-              data-mc-ink="bar"
+              data-mc-ink="accent"
               data-mc-origin="top"
               shapeRendering="crispEdges"
-              style={{ fill: afterFill }}
+              style={color ? { fill: color } : undefined}
             />
           )
         ) : null,
       )}
+      {/* The two median rules are the precise takeaway, so they carry the ink
+          ROLES their sides are drawn in (data / accent) instead of literal
+          token strokes — same paint, and the pair now maps to system ink in
+          High Contrast Mode instead of painting two fixed hexes over it. The
+          width role still wins the stroke-width. */}
       {geo.medians.before ? (
         <line
           x1={geo.medians.before.x}
           y1={round2(geo.centerY - (height / 2 - 2))}
           x2={geo.medians.before.x}
           y2={geo.centerY}
-          stroke="var(--mc-stroke)"
+          data-mc-ink="data"
           data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />
@@ -228,9 +249,10 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           y1={geo.centerY}
           x2={geo.medians.after.x}
           y2={round2(geo.centerY + (height / 2 - 2))}
-          stroke={afterFill}
+          data-mc-ink="accent"
           data-mc-w="support"
           vectorEffect="non-scaling-stroke"
+          style={color ? { stroke: color } : undefined}
         />
       ) : null}
       {showLabel ? (
@@ -241,7 +263,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

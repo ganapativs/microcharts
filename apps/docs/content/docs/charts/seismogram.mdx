@@ -1,14 +1,13 @@
 ---
 title: Seismogram
-description: >-
-  React seismogram chart — high-frequency amplitude trace at word width. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: Seismogram traces when events happened and how hard, as ticks centered on a midline.
 ---
 
-Seismogram answers "when did things happen, and how hard?". Ticks read as a seismograph trace — centered on a midline
-and flaring symmetrically: presence is density texture, length is intensity. Long series collapse via max-per-bucket
-only — the spike is the chart's whole job, so it always survives, and the summary is always computed from the raw
-values, never the buckets.
+Errors arrive in bursts, and the question is when they hit and how hard. Seismogram centers its ticks on a midline and
+flares them symmetrically: density is presence, length is intensity. The centered trace keeps the strip from inviting
+the bar-to-bar magnitude comparison it is too small to support, and keeps it visually distinct from SparkBar. Long
+series collapse via max-per-bucket only, so a spike always survives, and the summary is computed from the raw values
+rather than the buckets.
 
 <LiveDemo
   label="Seismogram"
@@ -37,8 +36,8 @@ values, never the buckets.
 
 ## When to use it
 
-- **Good for** — error bursts per service, alert density, activity texture in rows.
-- **Avoid for** — level tracking (Sparkline) or labeled events (EventTimeline).
+Use it for error bursts per service, alert density, and activity texture in table rows. For level tracking use
+Sparkline; for labeled events use EventTimeline.
 
 ## Sizing
 
@@ -62,6 +61,8 @@ values, never the buckets.
     height={22}
   />
 </LiveDemo>
+
+In `barcode` mode every tick is the same length: it records presence and carries no magnitude.
 
 <LiveDemo
   label="signed shocks"
@@ -94,6 +95,9 @@ values, never the buckets.
     height={36}
   />
 </LiveDemo>
+
+`anomaly` flags spikes at or above its threshold in the alert token, on top of the tick length that already shows them,
+so the flag never rests on color alone.
 
 <LiveDemo
   label="locale"
@@ -145,23 +149,18 @@ peak is localized.
   />
 </LiveDemo>
 
+All-zero data renders the baseline at rest rather than a blank hole. A series longer than the pixel width collapses by
+max-per-bucket, so a single sharp spike is never averaged away.
+
 ## Four homes
 
 <FourContexts slug="seismogram" />
 
-## Why this default
-
-A centered seismograph trace over bottom-anchored bars: the symmetric flare reads as event intensity rather than
-inviting the bar-to-bar magnitude comparison the strip is too small to support — and it stays visually distinct from
-SparkBar. Barcode mode is documented as presence-only — a uniform tick is not intensity. `anomaly` flags spikes at or
-above a threshold in the alert token; the flag is redundant with tick length, never color alone. A quiet strip renders
-its baseline at rest, never a blank hole.
-
 ## Accessibility
 
-The accessible name counts the events — **"29 events, peak 11."**, or **"No events."** for a quiet strip. The
-interactive entry steps slots with position readouts ("Point 2 of 5: 3."). A quiet slot reads as the zero it is ("Point
-1 of 5: 0.") — only a missing sample announces "no data" — and Home/End jump to the first/last event.
+The accessible name counts the events: **"29 events, peak 11."**, or **"No events."** for a quiet strip. The interactive
+entry steps slots with position readouts ("Point 2 of 5: 3."). A quiet slot reads as the zero it is ("Point 1 of 5:
+0."), and only a missing sample announces "no data". Home and End jump to the first and last event.
 
 <InteractionNote slug="seismogram" />
 

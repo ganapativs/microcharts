@@ -31,6 +31,20 @@ export interface PartitionSegment {
 
 const SEGMENT_CAP = 24;
 
+/**
+ * The box `<Chart>` will actually paint: it clamps a non-finite or non-positive
+ * viewBox side to 1. Both entries have to resolve `width`/`height` the same way
+ * or they lay the strip out against a box nobody drew — `width={NaN}` (a size
+ * read off an unmounted element) put `width="NaN"` on every segment rect and
+ * `--mc-seat: NaN` on the root, under a clean viewBox and a correct summary.
+ */
+export function partitionBox(width: number, height: number): readonly [number, number] {
+  return [
+    Number.isFinite(width) && width > 0 ? width : 1,
+    Number.isFinite(height) && height > 0 ? height : 1,
+  ];
+}
+
 /** Parent value = own value or the sum of its children (children win on mismatch). */
 export function parentValue(p: PartitionNode): number {
   if (p.children && p.children.length > 0) {
@@ -48,7 +62,8 @@ export function partitionStripGeometry(opts: {
   height: number;
   gap: number;
 }): { segments: PartitionSegment[]; total: number; groups: number } {
-  const { data, width, gap } = opts;
+  const [width] = partitionBox(opts.width, opts.height);
+  const { data, gap } = opts;
   const inset = 0.5;
 
   const parents = data.filter((p) => parentValue(p) > 0);
@@ -57,7 +72,14 @@ export function partitionStripGeometry(opts: {
   const segments: PartitionSegment[] = [];
   if (total === 0) return { segments, total: 0, groups: 0 };
 
-  const usableW = width - inset * 2 - gap * Math.max(0, parents.length - 1);
+  const frame = width - inset * 2;
+  // The gap is fixed per pair, so past ~`frame` groups the gaps alone outrun the
+  // frame and every segment came out NEGATIVE — `width="-0.2"` is an SVG error,
+  // so browsers drop the rect and the strip paints nothing at all. Thinning the
+  // gap keeps at least half the frame for the marks, which degrades to a dense
+  // strip instead of a blank one. Normal group counts never reach the clamp.
+  const g = Math.min(gap, frame / Math.max(1, parents.length - 1) / 2);
+  const usableW = frame - g * Math.max(0, parents.length - 1);
   let x = inset;
   let segCount = 0;
   parents.forEach((p, gi) => {
@@ -105,7 +127,7 @@ export function partitionStripGeometry(opts: {
       }
     }
 
-    x += share * usableW + gap;
+    x += share * usableW + g;
   });
 
   return { segments, total: round2(total), groups: parents.length };

@@ -6,7 +6,11 @@
 // Non-monotone drift renders as-is, never sorted or smoothed. Coords 2-dp.
 import { linePath } from "../../core/path.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
+
+/** Documented box, shared by the geometry and both entries. */
+export const DEFAULT_WIDTH = 80;
+export const DEFAULT_HEIGHT = 20;
 
 /** How the entity's standing moved relative to the middle half (p25–75). */
 type PercentileMovement =
@@ -45,6 +49,10 @@ export interface PercentileGeometry {
   movement: PercentileMovement;
   /** Fixed population bands: inner = p25–75, outer = p5–95. */
   bands: { inner: BandRect; outer: BandRect };
+  /** Left edge of the plot box — reading 0 sits here. */
+  x0: number;
+  /** Right edge of the plot box — the last reading. Excludes the label gutter. */
+  x1: number;
   /** Top edge of the plot box — the p100 end of the locked axis. */
   y0: number;
   /** Bottom edge of the plot box — the p0 end. Also the inline seat's floor. */
@@ -68,14 +76,27 @@ export function percentileGeometry(opts: {
   data: readonly Value[];
   pad?: number | undefined;
 }): PercentileGeometry | null {
-  const { width, height, data } = opts;
+  const { data } = opts;
+  // The box is a caller prop like any other — a CSS var read back, a collapsed
+  // flex measurement. `Chart` clamps only what it puts in the viewBox, so a raw
+  // `height={NaN}` left NaN band/trace coords inside a valid 80×1 frame, and
+  // `width={-40}` painted x=-42 — and `.mc-root` is overflow: visible, so that
+  // spills into the page. Resolve to the documented box instead.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
+
   const pad = opts.pad ?? 2;
+  // Below `2 * pad` the padded plot inverts and `clamp(v, 2, -1)` returns the
+  // upper bound — the trace sat below a 1-unit-tall box. Half the box is the
+  // pad's floor.
+  const padX = Math.min(pad, width / 2);
+  const padY = Math.min(pad, height / 2);
   const n = data.length;
 
-  const xScale = scaleLinear([0, Math.max(1, n - 1)], [pad, width - pad]);
-  const yScale = scaleLinear([0, 100], [height - pad, pad]);
+  const xScale = scaleLinear([0, Math.max(1, n - 1)], [padX, width - padX]);
+  const yScale = scaleLinear([0, 100], [height - padY, padY]);
   const x = (i: number) => round2(xScale(i));
-  const y = (v: number) => round2(clamp(yScale(v), pad, height - pad));
+  const y = (v: number) => round2(clamp(yScale(v), padY, height - padY));
 
   // one pass: clamp each finite reading into [0,100], flag any that needed it,
   // build both the gap-preserving line path and the finite-only point list
@@ -118,8 +139,10 @@ export function percentileGeometry(opts: {
     delta,
     movement,
     bands: { inner: band(25, 75), outer: band(5, 95) },
-    y0: round2(pad),
-    y1: round2(height - pad),
+    x0: round2(padX),
+    x1: round2(width - padX),
+    y0: round2(padY),
+    y1: round2(height - padY),
     clamped,
   };
 }

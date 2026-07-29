@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { tokenTierCounts, tokenTiers } from "./geometry.js";
+import { DEFAULT_TIERS, splitToken, tokenTierCounts, tokenTiers } from "./geometry.js";
 
 describe("tokenTiers", () => {
   it("maps confidence to three discrete tiers", () => {
@@ -29,6 +29,40 @@ describe("tokenTiers", () => {
       tiers: [0.5, 0.8],
     });
     expect(t.map((x) => x.tier)).toEqual(["confident", "unsure"]);
+  });
+
+  // `[null, null]` off a JSON config compared as `[0, 0]` and called every token
+  // confident: the chart flagged nothing and looked right doing it.
+  it("a non-finite cutoff falls back to its default, not to 0", () => {
+    const data = [
+      { token: "a", confidence: 0.95 },
+      { token: "b", confidence: 0.62 },
+      { token: "c", confidence: 0.2 },
+    ];
+    const expected = tokenTiers({ data, tiers: DEFAULT_TIERS }).map((x) => x.tier);
+    for (const tiers of [
+      [Number.NaN, Number.NaN],
+      [null, null],
+      [undefined, undefined],
+      [],
+      [-Infinity, Infinity],
+    ] as unknown as Array<readonly [number, number]>)
+      expect(tokenTiers({ data, tiers }).map((x) => x.tier)).toEqual(expected);
+    // one bad endpoint only replaces that endpoint
+    expect(
+      tokenTiers({ data, tiers: [Number.NaN, 0.9] as readonly [number, number] }).map(
+        (x) => x.tier,
+      ),
+    ).toEqual(["confident", "unsure", "guessing"]);
+  });
+
+  it("splitToken keeps whitespace outside the marked word", () => {
+    expect(splitToken(" France ")).toEqual([" ", "France", " "]);
+    expect(splitToken("The")).toEqual(["", "The", ""]);
+    expect(splitToken("   ")).toEqual(["   ", "", ""]);
+    expect(splitToken("")).toEqual(["", "", ""]);
+    // internal spaces belong to the word — the mark spans the whole token
+    expect(splitToken(", founded ")).toEqual(["", ", founded", " "]);
   });
 
   it("counts partition the tokens exactly", () => {

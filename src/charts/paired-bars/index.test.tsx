@@ -48,6 +48,37 @@ describe("<PairedBars>", () => {
     expect(warn).toHaveBeenCalled();
   });
 
+  // Regression: no COMPLETE pair meant "No data." — announced over a value bar
+  // that was painted and visible.
+  it("value with no ref names the bar instead of announcing an empty chart", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = draw(<PairedBars data={[{ label: "East", value: 940, ref: null }]} />);
+    expect(container.querySelectorAll("rect").length).toBe(1);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "East: 940, no reference.",
+    );
+  });
+
+  it("no ref anywhere → the longest bar leads, as the largest gap does", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = draw(
+      <PairedBars
+        data={[
+          { label: "a", value: 5, ref: null },
+          { label: "b", value: -40, ref: null },
+        ]}
+      />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "b: -40, no reference.",
+    );
+  });
+
+  it("nothing plottable at all still announces the empty summary", () => {
+    const { container } = draw(<PairedBars data={[{ label: "a", value: null, ref: null }]} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+  });
+
   it("positive tints the value bar by over/under reference", () => {
     const { container } = draw(<PairedBars data={DATA.slice(0, 2)} positive="up" />);
     const inks = [...container.querySelectorAll("[data-mc-ink]")].map((el) =>
@@ -55,6 +86,26 @@ describe("<PairedBars>", () => {
     );
     expect(inks).toContain("negative"); // East under ref
     expect(inks).toContain("positive"); // West over ref
+  });
+
+  // Regression: `color` used to repaint valence bars too, so `positive` and
+  // `color` together rendered over- and under-reference identically.
+  it("color never overrides the valence tint", () => {
+    const { container } = draw(
+      <PairedBars data={DATA.slice(0, 2)} positive="up" color="rebeccapurple" />,
+    );
+    const painted = [
+      ...container.querySelectorAll('[data-mc-ink="positive"], [data-mc-ink="negative"]'),
+    ];
+    expect(painted.length).toBe(2);
+    for (const el of painted) expect(el.getAttribute("style")).toBeNull();
+  });
+
+  it("color repaints the neutral bar when there is no valence to protect", () => {
+    const { container } = draw(<PairedBars data={DATA.slice(0, 2)} color="rebeccapurple" />);
+    const bars = [...container.querySelectorAll('[data-mc-ink="bar"]')];
+    expect(bars.length).toBe(2);
+    for (const el of bars) expect(el.getAttribute("style")).toContain("rebeccapurple");
   });
 
   it("overlay halves the footprint: ghost behind the value bar", () => {

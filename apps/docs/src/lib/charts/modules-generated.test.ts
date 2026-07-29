@@ -3,7 +3,6 @@ import { extname, join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CHART_MODULE_LAZY } from "./modules.generated";
 import { CHART_MODULES } from "./registry";
-import { HERO_MODULES, POOL } from "@/components/home/hero-modules";
 
 /**
  * These guards protect the docs site's biggest measured performance property:
@@ -13,8 +12,8 @@ import { HERO_MODULES, POOL } from "@/components/home/hero-modules";
  * import costs a route ~311 kB gzip of chart code it will never render.
  *
  * Client code resolves modules through `CHART_MODULE_LAZY` (one chunk per
- * chart) or a hand-written narrow map like `HERO_MODULES`. If either drifts
- * from the registry, a chart silently disappears from a page — hence these.
+ * chart). If that map drifts from the registry, a chart silently disappears
+ * from a page — hence these.
  */
 describe("lazy chart module map", () => {
   it("covers exactly the registry's slugs", () => {
@@ -29,20 +28,6 @@ describe("lazy chart module map", () => {
   it("resolves a slug to that chart's module", async () => {
     const mod = await CHART_MODULE_LAZY.sparkline!();
     expect(mod.default.entry.slug).toBe("sparkline");
-  });
-});
-
-describe("homepage narrow module map", () => {
-  it("deals only slugs it actually ships a module for", () => {
-    // POOL is derived from the map's keys, so this can only break if that
-    // derivation is replaced by a hand-written list again.
-    expect([...POOL].sort()).toEqual(Object.keys(HERO_MODULES).sort());
-  });
-
-  it("stays a strict subset of the catalog — no invented slugs", () => {
-    for (const slug of Object.keys(HERO_MODULES)) {
-      expect(CHART_MODULES[slug], `${slug} is not a real chart`).toBeDefined();
-    }
   });
 });
 
@@ -76,7 +61,7 @@ describe("the registry never crosses the client boundary", () => {
     expect(
       offenders,
       `client files must resolve modules via CHART_MODULE_LAZY (use-chart-module) ` +
-        `or a narrow static map like HERO_MODULES, never the full registry`,
+        `or a narrow hand-written map, never the full registry`,
     ).toEqual([]);
   });
 });

@@ -37,6 +37,18 @@ const OPACITY: Record<2 | 3, readonly number[]> = {
   3: [0.35, 0.65, 0.9],
 };
 
+/**
+ * `folds` → a fold count the opacity table actually has. `OPACITY` is indexed
+ * by the prop, so a JS caller's `folds={4}` (or a config-driven `2.5`/`NaN`)
+ * handed back `undefined` and the first band read `undefined[0]` — a TypeError
+ * that took down the whole render, not just the mark. `folds={Infinity}` was
+ * worse: the band loop is `fold <= folds`, so it never ended and the tab ran
+ * out of memory. Anything off the table falls back to the documented 2.
+ */
+export function resolveFolds(folds: number | undefined): 2 | 3 {
+  return folds === 3 ? 3 : 2;
+}
+
 export function horizonGeometry(opts: {
   width: number;
   height: number;
@@ -46,7 +58,8 @@ export function horizonGeometry(opts: {
   mode: "mirror" | "offset";
   domain?: readonly [number, number] | undefined;
 }): HorizonGeometry {
-  const { width, height, values, folds, mode } = opts;
+  const { width, height, values, mode } = opts;
+  const folds = resolveFolds(opts.folds);
   const baseline = Number.isFinite(opts.baseline) ? opts.baseline : 0;
   const n = values.length;
   const pad = 0.5;
@@ -58,17 +71,25 @@ export function horizonGeometry(opts: {
 
   // fold size from the max |deviation| across folds
   const devs = values.filter(isFiniteValue).map((v) => Math.abs(v - baseline));
+  const dataDev = extent(devs)?.[1] ?? 1;
   const domainDev =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))
       ? Math.max(Math.abs(opts.domain[0] - baseline), Math.abs(opts.domain[1] - baseline))
-      : (extent(devs)?.[1] ?? 1);
-  const foldSize = Math.max(domainDev / folds, 1e-9);
+      : dataDev;
+  // Both bounds can be finite and their distance from `baseline` still overflow
+  // — `domain={[-1e308, 1e308]}` against a far-off baseline is Infinity — and an
+  // infinite foldSize makes fold 1's floor `0 * Infinity`, i.e. NaN. Every band
+  // coordinate then came out NaN, browsers drop an invalid path, and the strip
+  // went blank while the summary kept announcing a real trend. Fall back to the
+  // data's own extent, same as an omitted domain. (`extent` skips non-finite
+  // deviations, so `dataDev` is always a usable number.)
+  const foldSize = Math.max((Number.isFinite(domainDev) ? domainDev : dataDev) / folds, 1e-9);
 
   const xFor = (i: number) => round2(n > 1 ? pad + (i * (width - pad * 2)) / (n - 1) : width / 2);
 
   const bands: HorizonBand[] = [];
-  const signs: (1 | -1)[] = mode === "mirror" ? [1, -1] : [1, -1];
-  for (const sign of signs) {
+  // Both modes walk both signs; only the y mapping below differs.
+  for (const sign of [1, -1] as const) {
     for (let fold = 1; fold <= folds; fold++) {
       // this fold's slice of |deviation|: ((fold-1)..fold] × foldSize
       const lo = (fold - 1) * foldSize;

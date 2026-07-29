@@ -116,6 +116,38 @@ describe("<GradeProfile> edge cases", () => {
     });
   }
 
+  it("unusable bins repaint nothing — the route keeps its default quantization", () => {
+    const roles = (ui: React.ReactElement) =>
+      [...draw(ui).container.querySelectorAll("path")].map(
+        (p) => p.getAttribute("data-mc-ink") ?? `cat${p.getAttribute("data-mc-cat")}`,
+      );
+    const fallback = roles(
+      <GradeProfile data={TRAIL} bins={[Number.NaN, Number.NaN, Number.NaN]} width={120} />,
+    );
+    expect(fallback).toEqual(roles(<GradeProfile data={TRAIL} width={120} />));
+    expect(fallback).toContain("band"); // the descent still reads as gentle
+  });
+
+  it("an unrepresentable pitch never reaches the accessible name", () => {
+    // `Intl` renders a non-finite percent as "∞", which the /NaN|Infinity/
+    // sweep above cannot see. Nothing announces it, and no summit callout
+    // paints it either.
+    const { container } = draw(
+      <GradeProfile
+        data={[
+          { d: 0, elev: 0 },
+          { d: Number.MIN_VALUE, elev: 1 },
+          { d: 200, elev: 0 },
+        ]}
+        title="Wall"
+        width={120}
+        height={40}
+      />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).not.toMatch(/∞/);
+    expect(container.querySelector("text")).toBeNull();
+  });
+
   it("flat and descent-only routes report no real climb", () => {
     const flat = gradeProfileGeometry({
       data: cases["flat route"]!,

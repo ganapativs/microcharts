@@ -91,6 +91,60 @@ describe("<CalendarStrip>", () => {
     expect(Number(r.getAttribute("x"))).toBeGreaterThan(0);
   });
 
+  // The no-record cell is the whole "empty ≠ zero" claim. Its `fill: none` comes
+  // from the muted ink role, but under forced-colors that role maps to
+  // `fill: GrayText` — only the literal attribute keeps the hollow-mark rule
+  // holding it back. Without it a day with no record filled solid in High
+  // Contrast Mode and outweighed a real low day.
+  it("empty cells declare a literal fill='none' (forced-colors hollow-mark rule)", () => {
+    const { container } = draw(<CalendarStrip data={DATA} end={END} />);
+    const empty = [...container.querySelectorAll('rect[data-mc-ink="muted"]')];
+    expect(empty.length).toBe(24);
+    expect(empty.every((r) => r.getAttribute("fill") === "none")).toBe(true);
+    // value/zero cells stay filled — the attribute is the hollow signal, not decor
+    expect(container.querySelector('rect[data-mc-ink="cell"]')!.getAttribute("fill")).toBeNull();
+  });
+
+  // Announced scale === painted scale. `weeks` used to reach the summary raw,
+  // so a floored/clamped/capped prop named a calendar that was never drawn.
+  it("the summary names the painted window, not the raw `weeks`", () => {
+    const label = (weeks: number) =>
+      draw(<CalendarStrip data={DATA} end={END} weeks={weeks} />)
+        .container.querySelector("svg")!
+        .getAttribute("aria-label");
+    expect(label(4.7)).toBe("Active 3 of 28 days over 4 weeks.");
+    expect(label(NaN)).toBe("Active 1 of 7 days over 1 week.");
+    expect(label(Infinity)).toBe("Active 1 of 7 days over 1 week.");
+    expect(label(0)).toBe("Active 1 of 7 days over 1 week.");
+  });
+
+  it("hostile scalars never reach the markup", () => {
+    for (const props of [
+      { steps: NaN },
+      { steps: Infinity },
+      { cell: NaN },
+      { gap: NaN },
+      { cell: Infinity },
+      { domain: [NaN, NaN] as const },
+    ]) {
+      const { container } = draw(<CalendarStrip data={DATA} end={END} {...props} />);
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+      // a poisoned length used to reach <Chart> as viewBox="0 0 NaN NaN"
+      expect(container.querySelector("svg")!.getAttribute("viewBox")).toMatch(
+        /^0 0 \d+(\.\d+)? \d+(\.\d+)?$/,
+      );
+    }
+  });
+
+  it("a non-finite `steps` keeps the intensity ramp (no dropped fill-opacity)", () => {
+    const { container } = draw(<CalendarStrip data={DATA} end={END} steps={NaN} />);
+    const ramp = [...container.querySelectorAll('rect[data-mc-ink="cell"]')].map((r) =>
+      r.getAttribute("fill-opacity"),
+    );
+    expect(ramp).not.toContain("NaN");
+    expect(new Set(ramp).size).toBeGreaterThan(1); // still stepped, not flat
+  });
+
   it("axe clean", async () => {
     const { container } = draw(<CalendarStrip data={DATA} end={END} title="Deploy cadence" />);
     await expectNoA11yViolations(container);

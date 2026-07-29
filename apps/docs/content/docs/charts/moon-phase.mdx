@@ -1,14 +1,13 @@
 ---
 title: MoonPhase
-description: >-
-  React moon phase chart — lunar phase as an honest illuminated disk — fraction lit, not decoration. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: MoonPhase lights a fraction of a disc, with the lit area exactly equal to the value.
 ---
 
-MoonPhase answers "how far through the cycle or period are we?" with a form almost everyone reads without a legend: the
-illuminated fraction of a disc. The lit **area** equals the value exactly — a closed-form terminator, not the
-phase-angle approximation that under-lights mid-cycle — so 50% genuinely lights half the disc. Progress mode fills
-monotonically; cycle mode maps the real lunar sequence.
+MoonPhase lights a fraction of a disc, a form most people read without a legend. The lit **area** equals the value
+exactly, via a closed-form terminator rather than the phase-angle approximation that under-lights mid-cycle, so 50%
+lights half the disc. Progress mode is the default and fills monotonically, the way a sprint, quota, or billing period
+does. The real lunar cycle waxes and then wanes, so `mode="cycle"` is a separate, explicit data-semantic switch rather
+than a preset. Area is a medium-precision channel: for exact reads use `Progress`.
 
 <LiveDemo label="MoonPhase" sizeOf="moon-phase">
   <span className="inline-flex gap-3 items-center">
@@ -30,9 +29,8 @@ monotonically; cycle mode maps the real lunar sequence.
 
 ## When to use it
 
-- **Good for** — sprint or quota progress in a sentence, a billing-period or release-cycle marker, or any 0–1 completion
-  that reads at a glance.
-- **Avoid for** — exact percentages (Progress), trends (Sparkline), or comparisons (MiniBar).
+Use it for sprint or quota progress in a sentence, a billing-period or release-cycle marker, or any 0–1 completion. For
+exact percentages use Progress, for trends use Sparkline, and for comparisons use MiniBar.
 
 ## Sizing
 
@@ -66,23 +64,17 @@ monotonically; cycle mode maps the real lunar sequence.
   </span>
 </LiveDemo>
 
+Values outside 0–1 clamp instead of overflowing: −0.4 draws a new, dark disc and 1.6 a full, lit one.
+
 ## Four homes
 
 <FourContexts slug="moon-phase" />
 
-## Why this default
-
-Progress mode is the default because period-progress is the common need — a sprint or quota filling from new to full,
-monotonically. Pretending the real lunar cycle is monotonic would lie (it waxes then wanes), so `mode="cycle"` is a
-separate, explicit data-semantic switch, not a preset. The lit area is always exactly the value via the closed form —
-never the phase-angle shortcut. Area is a medium-precision channel, so steer exact reads to `Progress`; MoonPhase is for
-the glance.
-
 ## Accessibility
 
-The accessible name states the fraction — **"0% of the cycle complete."** in progress mode, or "0% through the cycle."
-in cycle mode. The interactive entry fades the lit region back in on change with a slight bloom (opacity plus a small
-scale, never a path interpolation, and skipped entirely under `prefers-reduced-motion`), reveals the exact percent on
+The accessible name states the fraction: **"0% of the cycle complete."** in progress mode, or "0% through the cycle." in
+cycle mode. The interactive entry fades the lit region back in on change with a slight bloom — opacity plus a small
+scale, never a path interpolation, and skipped entirely under `prefers-reduced-motion`. It reveals the exact percent on
 hover or focus, and announces changes through a polite live region throttled to at most once a second.
 
 <InteractionNote slug="moon-phase" />

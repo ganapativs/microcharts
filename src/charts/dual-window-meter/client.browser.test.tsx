@@ -20,6 +20,17 @@ describe("interactive <DualWindowMeter>", () => {
     await expect.poll(() => live.textContent).toMatch(/fast .+, slow .+, target 75\./);
   });
 
+  // Same guard as the static summary: a host-derived target arrives NaN, and
+  // the live region announced "target NaN" on every rove.
+  it("announces an unknown target as —, never NaN", async () => {
+    const screen = await render(<DualWindowMeter data={D} target={Number.NaN} windows={[2, 3]} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}{ArrowRight}");
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toMatch(/target —\.$/);
+  });
+
   it("onActive reports the focused datum (data index + slow value); null on clear", async () => {
     const seen: unknown[] = [];
     const screen = await render(

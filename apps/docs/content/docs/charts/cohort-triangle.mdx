@@ -1,13 +1,12 @@
 ---
 title: CohortTriangle
-description: >-
-  React cohort triangle chart — retention by vintage × age as a shaded triangle heatmap. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: CohortTriangle shades retention by vintage and age so you can compare every cohort at the same maturity.
 ---
 
-CohortTriangle stacks retention cohorts as rows and ages as columns, shading each cell by a discrete retention level.
-Because newer vintages have been observed for fewer ages, the block takes the classic **triangle** shape — and reading
-down a column compares every cohort at the **same maturity**, which is where "who retains worst" actually lives.
+At month 1, the March vintage retains worst: 47%. Reading down a column compares every cohort at the **same maturity**,
+which is the question this chart is for. CohortTriangle stacks cohorts as rows and ages as columns, shading each cell by
+a discrete retention level. Newer vintages have been observed for fewer ages, which gives the block its **triangle**
+shape.
 
 <LiveDemo label="CohortTriangle" sizeOf="cohort-triangle">
   <CohortTriangle
@@ -34,11 +33,9 @@ down a column compares every cohort at the **same maturity**, which is where "wh
 
 ## When to use it
 
-- **Good for** — monthly or weekly cohorts side by side, spotting which vintage decays worst, reading retention at equal
-  maturity in a KPI card.
-- **Avoid for** — exact per-cell values (color intensity is deliberately approximate; pair it with a number when
-  precision matters), or a single cohort's decay, where [RetentionCurve](/docs/charts/retention-curve) draws the curve
-  directly.
+Use it for monthly or weekly cohorts side by side, spotting which vintage decays worst, or reading retention at equal
+maturity in a KPI card. Color intensity is deliberately approximate, so pair it with a number when you need exact
+per-cell values. For a single cohort, [RetentionCurve](/docs/charts/retention-curve) draws the decay directly.
 
 ## Sizing
 
@@ -50,8 +47,9 @@ roughly an 8-unit cell.
 
 ## Variants
 
-Row labels are on by default. Turn them off for a dense, glanceable block, or `highlight` one vintage to anchor the
-equal-maturity comparison.
+Rows are cohorts in input order and columns are age. Row labels are on by default; turn them off for a denser block, or
+`highlight` one vintage to anchor the equal-maturity comparison. No worst-vintage flag is painted onto the grid — the
+summary names the laggard in words instead.
 
 <LiveDemo
   label="highlight a vintage vs dense, no labels"
@@ -144,29 +142,22 @@ cohort period is.
   />
 </LiveDemo>
 
-A single cohort skips the comparison and just states its first reading. A `null` (or any non-finite) value renders as an
-outlined **gap** slot — a "measured nothing here" cell, never a shaded 0%. `data` accepts either a 0–1 fraction or a
-0–100 percent series — whichever the max value implies — so a raw percent export renders identically to its fraction
-form. With a `locale`, every announced number follows that locale's own formatting.
+A single cohort skips the comparison and states its first reading. A `null` (or any non-finite) value renders as an
+outlined **gap** slot, a "measured nothing here" cell, never a shaded 0%. `data` accepts either a 0–1 fraction or a
+0–100 percent series, whichever the max value implies, so a raw percent export renders identically to its fraction form.
+With a `locale`, every announced number follows that locale's own formatting.
 
 ## Four homes
 
 <FourContexts slug="cohort-triangle" />
 
-## Why this default
-
-Rows are cohorts in input order and columns are age, because the decision — _which vintage retains worst_ — is a
-**vertical** read at a fixed age, and the ragged right edge falls out naturally from newer cohorts simply having fewer
-observed ages. Intensity is quantized to five discrete levels (never a continuous ramp): a smooth gradient would imply a
-precision a handful of pixels cannot deliver. A worst-vintage flag is **off** by default — the marks stay honest and the
-summary names the laggard in words instead of painting a verdict onto the grid.
-
 ## Accessibility
 
-Intensity is a color channel, so CohortTriangle always pairs it with a numeric summary that compares at equal maturity —
-**"5 cohorts; at month 1, Mar retains worst (47%); newest May starts at 100%."**. Direction is stated in words, never by
-color alone, so it survives forced-colors and color-blind viewing. The interactive entry adds 2-D arrow-key navigation,
-announcing each cell as _"Feb cohort, month 1: 58%"_ as you move.
+Intensity is quantized to five discrete levels rather than a continuous ramp, since a smooth gradient would imply a
+precision a handful of pixels cannot deliver. It is still a color channel, so CohortTriangle always pairs it with a
+numeric summary that compares at equal maturity: **"5 cohorts; at month 1, Mar retains worst (47%); newest May starts at
+100%."**. Direction is stated in words, never by color alone, so it survives forced-colors and color-blind viewing. The
+interactive entry adds 2-D arrow-key navigation, announcing each cell as _"Feb cohort, month 1: 58%"_ as you move.
 
 <InteractionNote slug="cohort-triangle" />
 

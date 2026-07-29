@@ -25,6 +25,11 @@ function catalogCounts() {
   return counts;
 }
 
+/**
+ * The catalog, in the site's own language: the `.shell` measure the masthead
+ * sets, a mono kicker over a display heading, one lede, and then the plane —
+ * 106 specimens as fields rather than as cards.
+ */
 export function GalleryView({
   collection = null,
 }: {
@@ -49,82 +54,90 @@ export function GalleryView({
           ),
         )}
       </script>
-      <div className="g2">
-        <header className="g2-head">
-          <span className="mono-label text-fd-primary">
-            {hub ? (
-              <>
-                <Link prefetch={false} href="/charts" className="hover:text-fd-foreground">
-                  The catalog
-                </Link>
-                <span className="text-hairline"> / </span>
-                {hub.label}
-              </>
-            ) : (
-              "The catalog"
-            )}
-          </span>
-          <h1 className="display mt-3 text-fluid-h2 text-[length:var(--text-fluid-h2)]">
+
+      <section className="act-open">
+        <div className="shell">
+          {/* A breadcrumb on a hub, and NOTHING on the catalog itself. The
+              landing page never sets a mono label above a heading — it spends
+              `.kicker` on captions and data labels — and "The catalog" over "106
+              React microcharts" was a label restating the sentence under it and
+              the nav item above it. Here the kicker earns its place because it
+              is the way back. */}
+          {hub && (
+            <p className="kicker">
+              <Link prefetch={false} href="/charts" className="ulink tap">
+                The catalog
+              </Link>
+              <span style={{ color: "var(--rule-2)" }}> / </span>
+              {hub.label}
+            </p>
+          )}
+          <h1 className={`display-2${hub ? " mt-3" : ""}`} style={{ maxWidth: "var(--m-head)" }}>
             {hub ? hub.title : `${STABLE_CHARTS.length} React microcharts, at true size`}
           </h1>
-          <p className="mt-3 max-w-3xl text-fd-muted-foreground">
+          <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
             {hub ? (
               hub.intro
             ) : (
               <>
-                Every chart at the size it lives (in a sentence, a table cell, a KPI card), beside
-                the decision it answers. Browse by collection or search. They render live: hover a
-                mark to scrub, or switch to Static in the dock if you want stillness.
+                Every chart is drawn at the size it gets used at, with the question it answers
+                underneath. Browse the four collections, or search if you already know the shape you
+                want.
               </>
             )}
           </p>
-          {/* Glanceable "these are alive" signal — the page's one live pulse.
-              Hidden in static mode; the prose above carries it for a reader. */}
-          {!hub && (
-            <p className="g2-live-chip mt-3" aria-hidden>
-              <span className="g2-live-chip-dot" />
-              live · hover any mark to scrub
-            </p>
-          )}
+
+          {/* A spec line, not a second paragraph — so it takes the mono step
+              rather than a hand-picked size between the two reading sizes. */}
           {hub ? (
-            <p className="mt-3 max-w-3xl text-sm text-fd-muted-foreground">
-              <span className="text-fd-foreground">Good for.</span> {hub.goodFor}{" "}
-              <span className="text-fd-foreground">Not for.</span> {hub.notFor}
+            <p className="mono u-lede" style={{ maxWidth: "var(--m-note)", color: "var(--ink-2)" }}>
+              <span style={{ color: "var(--ink)" }}>Good for.</span> {hub.goodFor}{" "}
+              <span style={{ color: "var(--ink)" }}>Not for.</span> {hub.notFor}
             </p>
           ) : null}
+
+          {/* The one place liveness is claimed, because it is the only one that
+              can tell the truth about it: the dock's static mode hides this, and
+              a sentence in the paragraph above would go on claiming it. */}
+          {!hub && (
+            <p className="g2-live kicker mt-5" aria-hidden>
+              <span className="g2-live-dot" />
+              live · hover a mark to scrub it
+            </p>
+          )}
+
           <nav
-            className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm"
+            className="mt-6 flex flex-wrap items-baseline gap-x-5 gap-y-1"
             aria-label="Chart collections"
           >
             <Link
               prefetch={false}
               href="/charts"
-              className={
-                active === "all"
-                  ? "font-medium text-fd-foreground"
-                  : "text-fd-muted-foreground hover:text-fd-foreground"
-              }
+              className="coll-link"
+              data-on={active === "all" || undefined}
             >
-              All <span className="tabular-nums opacity-70">{counts.all}</span>
+              All <span className="coll-n">{counts.all}</span>
+              {active === "all" && <span className="toggle-rule" data-state="on" />}
             </Link>
             {COLLECTIONS.map((c) => (
               <Link
                 key={c.key}
                 prefetch={false}
                 href={`/charts/${c.key}`}
-                className={
-                  active === c.key
-                    ? "font-medium text-fd-foreground"
-                    : "text-fd-muted-foreground hover:text-fd-foreground"
-                }
+                className="coll-link"
+                data-on={active === c.key || undefined}
               >
-                {c.label} <span className="tabular-nums opacity-70">{counts[c.key] ?? 0}</span>
+                {c.label} <span className="coll-n">{counts[c.key] ?? 0}</span>
+                {active === c.key && <span className="toggle-rule" data-state="on" />}
               </Link>
             ))}
           </nav>
-          <ChartQuestions />
-        </header>
 
+          <ChartQuestions />
+        </div>
+      </section>
+
+      <div className="shell u-block">
         <div
           className="g2-grid"
           data-density="comfortable"
@@ -140,15 +153,19 @@ export function GalleryView({
               <Fragment key={c.slug}>
                 {newGroup && group && (
                   <div className="g2-group" data-group-label>
+                    {/* `.tap` and not a padded box: the label is 10px of mono on
+                        a baseline-aligned row, so growing it would move the row
+                        it names. It has the shelf's own space above and below to
+                        borrow, which is exactly what `.tap` is for. */}
                     <Link
                       prefetch={false}
                       href={`/charts/${group.key}`}
-                      className="g2-group-name mono-label text-fd-primary hover:underline"
+                      className="kicker ulink tap"
                     >
                       {group.label}
                     </Link>
                     <span className="g2-group-blurb">{group.blurb}</span>
-                    <span className="g2-group-n mono-label">{counts[c.collection]}</span>
+                    <span className="g2-group-n kicker">{counts[c.collection]}</span>
                   </div>
                 )}
                 <article
@@ -173,9 +190,9 @@ export function GalleryView({
         </div>
 
         <div className="g2-empty" data-gallery-empty hidden>
-          <p className="text-sm">
+          <p className="prose">
             Nothing in the catalog answers{" "}
-            <span data-empty-q className="text-fd-foreground">
+            <span data-empty-q style={{ color: "var(--ink)" }}>
               that
             </span>{" "}
             yet. Try another term, or clear the filter.

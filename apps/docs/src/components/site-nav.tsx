@@ -24,11 +24,11 @@ function GithubMark() {
 // the sidebar's "Reference" section — so the visible label "Charts" is unique
 // and never collides with a second "Charts" in the docs tree.
 const links = [
-  { href: "/docs", label: "Documentation" },
-  { href: "/charts", label: "Charts" },
-  { href: "/examples", label: "Examples" },
-  { href: "/docs/ai", label: "AI-native" },
-  { href: "/brand", label: "Brand" },
+  { href: "/docs", label: "Documentation", analytics: "nav-docs" },
+  { href: "/charts", label: "Charts", analytics: "nav-charts" },
+  { href: "/examples", label: "Examples", analytics: "nav-examples" },
+  { href: "/docs/ai", label: "AI-native", analytics: "nav-ai" },
+  { href: "/brand", label: "Brand", analytics: "nav-brand" },
 ];
 
 /** Documentation claims all of /docs except /docs/ai, which the AI entry owns. */
@@ -38,16 +38,18 @@ function isActive(href: string, pathname: string): boolean {
 }
 
 function Wordmark() {
+  // Masthead links keep default App Router prefetch (production only). Dense
+  // surfaces (docs sidebar, gallery cards, MDX) stay on prefetch={false}.
   return (
     <Link
-      prefetch={false}
       href="/"
       className="group flex items-center gap-2.5"
       aria-label={`${SITE.name} home`}
+      data-analytics="cta:nav-home"
     >
       <Brandmark size={28} className="shrink-0 transition-transform group-hover:-translate-y-px" />
       {/* Wordmark sits ~1px low vs links (lowercase + size); nudge up. */}
-      <span className="-translate-y-px text-[0.98rem] font-semibold tracking-[-0.01em] text-fd-foreground">
+      <span className="font-display -translate-y-px text-[0.98rem] font-semibold tracking-[-0.016em] text-fd-foreground">
         microcharts
       </span>
     </Link>
@@ -101,9 +103,9 @@ export function SiteNav() {
             const active = isActive(l.href, pathname);
             return (
               <Link
-                prefetch={false}
                 key={l.href}
                 href={l.href}
+                data-analytics={`cta:${l.analytics}`}
                 className={cn(
                   "relative rounded-md px-2.5 py-1.5 text-[0.82rem] font-medium transition-colors",
                   active
@@ -163,9 +165,9 @@ export function SiteNav() {
               const active = isActive(l.href, pathname);
               return (
                 <Link
-                  prefetch={false}
                   key={l.href}
                   href={l.href}
+                  data-analytics={`cta:${l.analytics}`}
                   className={cn(
                     "rounded-md px-2.5 py-2.5 text-[0.95rem] font-medium transition-colors",
                     active

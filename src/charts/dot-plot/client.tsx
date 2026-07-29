@@ -2,8 +2,8 @@
 // Interactive <DotPlot>. useActivePicker owns interaction: one pointer listener
 // + row-by-y-band lookup (rows are the axis here) — ↑/↓ (or ←/→) rove rows,
 // announcing each category with its rank ("Ada: 88 — 2nd of 5."); click / Enter
-// / Space selects a row (onSelect).the
-// SVG is
+// / Space selects a row (onSelect). The SVG is the static entry with the focus
+// ring passed in as children — never a second implementation of it.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {

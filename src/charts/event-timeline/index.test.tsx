@@ -100,6 +100,54 @@ describe("<EventTimeline>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-hidden")).toBe("true");
   });
 
+  // `width`/`height` are the props a host computes rather than types — a
+  // measured container, a `Number("")` from an input. <Chart> clamps its own
+  // viewBox, so a bad box used to paint NaN marks under a clean frame and a
+  // perfectly correct accessible name.
+  describe("a hostile box never contradicts the accessible name", () => {
+    const NUMERIC = /(?:d|x|y|x1|x2|y1|y2|width|height|font-size)="([^"]*)"/g;
+
+    it.each([
+      ["NaN width", { width: NaN }],
+      ["NaN height", { height: NaN }],
+      ["infinite width", { width: Infinity }],
+      ["zero height", { height: 0 }],
+      ["negative height", { height: -20 }],
+    ])("%s emits no non-finite coordinate", (_name, box) => {
+      const { container } = draw(<EventTimeline data={DATA} domain={WINDOW} {...box} />);
+      const bad = [...container.innerHTML.matchAll(NUMERIC)]
+        .map((m) => m[1]!)
+        .filter((v) => /NaN|Infinity/.test(v));
+      expect(bad).toEqual([]);
+      expect(container.querySelector("svg")!.getAttribute("style")).not.toMatch(/NaN/);
+    });
+
+    it("spans stay visible in a lane too short for the full bar", () => {
+      // `height - 4` reached 0 at height 4 and went negative below it; a <rect>
+      // height of 0 or less is dropped by the renderer, so the two spans the
+      // summary announces used to paint nothing at all.
+      const { container } = draw(<EventTimeline data={DATA} domain={WINDOW} height={4} />);
+      const heights = [...container.querySelectorAll("rect")].map((r) =>
+        Number(r.getAttribute("height")),
+      );
+      expect(heights.length).toBe(2);
+      for (const h of heights) expect(h).toBeGreaterThan(0);
+    });
+
+    it("label='spans' drops the labels a short lane cannot seat", () => {
+      // labelFont floors at 7, and a centred label owns a full em-box: below a
+      // 7-unit lane the text crossed both viewBox edges (`overflow: visible`).
+      const short = draw(
+        <EventTimeline data={DATA} domain={WINDOW} label="spans" width={220} height={6} />,
+      );
+      expect(short.container.querySelectorAll("text").length).toBe(0);
+      const tall = draw(
+        <EventTimeline data={DATA} domain={WINDOW} label="spans" width={220} height={14} />,
+      );
+      expect(tall.container.querySelectorAll("text").length).toBeGreaterThan(0);
+    });
+  });
+
   it("axe clean", async () => {
     const { container } = draw(<EventTimeline data={DATA} domain={WINDOW} title="api uptime" />);
     await expectNoA11yViolations(container);

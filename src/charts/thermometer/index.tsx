@@ -48,6 +48,20 @@ const PAD = 2;
  */
 const MIN_ACROSS = 8;
 
+/**
+ * The calibrated range this chart will actually draw. `domain` is a caller
+ * prop; a non-finite bound is not a range, and the summary used to format it
+ * straight into the accessible name ("50 on a NaN–100 scale") while the tube
+ * beside it rendered a perfectly ordinary 0–100 instrument. Announced scale and
+ * painted scale have to be the same scale, so both resolve through here and a
+ * missing bound falls back to the documented default.
+ */
+export function resolveThermometerDomain(
+  domain: readonly [number, number] = [0, 100],
+): readonly [number, number] {
+  return [isFiniteValue(domain[0]) ? domain[0] : 0, isFiniteValue(domain[1]) ? domain[1] : 100];
+}
+
 export function thermometerSummary(
   value: number,
   opts: {
@@ -58,7 +72,8 @@ export function thermometerSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { domain = [0, 100], target, strings = EN_THERMOMETER, format, locale } = opts;
+  const { target, strings = EN_THERMOMETER, format, locale } = opts;
+  const domain = resolveThermometerDomain(opts.domain);
   if (!isFiniteValue(value)) return strings.noData;
   const fmt = makeFormatter(format, locale);
   const [lo, hi] = [fmt(domain[0]), fmt(domain[1])];
@@ -74,7 +89,6 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     ticks = 5,
     orientation = "vertical",
     bulb = true,
-    domain = [0, 100],
     label = "none",
     color,
     fontSize = 8,
@@ -89,6 +103,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     children,
   } = props;
 
+  const domain = resolveThermometerDomain(props.domain);
   const vertical = orientation === "vertical";
   const wantLabel = label === "value" && isFiniteValue(value);
   const valueText = wantLabel ? makeFormatter(format, locale)(value) : "";

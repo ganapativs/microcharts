@@ -66,10 +66,23 @@ describe("<TrendArrow>", () => {
     expect(container.querySelectorAll("svg *").length).toBeLessThanOrEqual(2);
   });
 
+  it("an unknown glyph renders the arrow rather than crashing the tree", () => {
+    const arrow = draw(<TrendArrow value={1} glyph="arrow" />).container;
+    // `glyph` is typed, but arrives untyped off JSON config; "constructor" used
+    // to resolve through Object.prototype and throw inside geometry.
+    for (const bogus of ["blob", "constructor", "__proto__"]) {
+      const { container } = draw(<TrendArrow value={1} glyph={bogus as "arrow"} />);
+      expect(pathOf(container), bogus).toBe(pathOf(arrow));
+    }
+  });
+
   it("showValue → widened viewBox with the value in a right gutter (containment)", () => {
     const { container } = draw(<TrendArrow value={42} showValue />);
     const svg = container.querySelector("svg")!;
     const text = container.querySelector("text")!;
+    // The label ink role carries the forced-colors mapping (CanvasText); the
+    // bare `.mc-root text` fallback is a literal hex that survives HCM.
+    expect(text.getAttribute("data-mc-ink")).toBe("label");
     const [, , w] = svg.getAttribute("viewBox")!.split(" ").map(Number);
     expect(w!).toBeGreaterThan(16);
     expect(text.textContent).toBe("42");

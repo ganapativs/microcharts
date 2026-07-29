@@ -63,6 +63,8 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
   // non-monotonic funnel still animates in stage order.
   useEntrance(hostRef, "rise", animate, { selector: STAGE_SELECTOR, order: "x", window: 450 });
 
+  // Same call the static entry makes — a hardcoded label size here would lay the
+  // stages out on a different plot than the one painted underneath.
   const geo = useMemo(
     () =>
       funnelGeometry({
@@ -71,7 +73,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         values: data.map((d) => d.value),
         mode,
         connectors,
-        fontSize: label === "none" ? 0 : 5,
+        label,
       }),
     [width, height, data, mode, connectors, label],
   );
@@ -109,10 +111,13 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
     [data, geo, fmt, pctFmt],
   );
 
+  // The resolved box, not the raw props: pointer coords are scaled into the
+  // viewBox the static entry actually wrote, so a hostile `width` can't leave
+  // the hit box on a different scale than the marks.
   const { active, selected, bind } = useActivePicker({
     count: geo.stages.length,
-    width,
-    height,
+    width: geo.width,
+    height: geo.height,
     locate,
     datum,
     onActive,
@@ -137,7 +142,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         x={s.x - 0.5}
         y={-0.5}
         width={s.w + 1}
-        height={height + 1}
+        height={geo.height + 1}
         fill="none"
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}
@@ -186,7 +191,10 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
       {/* A stage with no value keeps its band and its "no data" announcement,
           so it reads out as an em dash — a share of nothing is not 0%. */}
       {readout && st && stDatum ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(st.x + st.w / 2, width)}>
+        <span
+          className="mc-spark-readout"
+          style={crosshairReadoutStyle(st.x + st.w / 2, geo.width)}
+        >
           {isFiniteValue(stDatum.value)
             ? `${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`
             : `${stDatum.label} —`}

@@ -44,6 +44,23 @@ describe("interactive <SpreadBand>", () => {
     await expect.poll(() => fig.querySelector('line[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  // An inline `fill: var(--mc-neutral)` outranks the forced-colors mapping
+  // (`.mc-root` is forced-color-adjust: none), so this dot stayed warm gray in
+  // High Contrast Mode while the crosshair beside it went system-ink.
+  it("the crosshair reference dot carries the neutral role, not an inline fill", async () => {
+    const screen = await render(<SpreadBand data={D} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    // The static endpoint dot plus the crosshair's own reference dot; both are
+    // r=1.5, and neither may paint inline.
+    await expect.poll(() => fig.querySelectorAll('circle[r="1.5"]').length).toBe(2);
+    for (const dot of fig.querySelectorAll('circle[r="1.5"]')) {
+      expect(dot.getAttribute("data-mc-ink")).toBe("neutral");
+      expect(dot.getAttribute("style")).toBeNull();
+    }
+  });
+
   it("controlled selectedIndex pins the mark with no interaction", async () => {
     const screen = await render(<SpreadBand data={D} selectedIndex={2} />);
     const fig = screen.getByRole("img").element() as HTMLElement;

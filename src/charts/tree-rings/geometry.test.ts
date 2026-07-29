@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { treeRingsGeometry } from "./geometry.js";
+import { treeRingsGeometry, treeRingsSize, TREE_SIZE } from "./geometry.js";
 
-const g = (values: number[], total?: number) =>
-  treeRingsGeometry({ values, size: 24, pad: 1, total });
+const g = (values: number[], total?: number, size = 24) =>
+  treeRingsGeometry({ values, size, pad: 1, total });
 
 describe("treeRingsGeometry — radial thickness", () => {
   it("one ring per period; radii march outward", () => {
@@ -43,4 +43,40 @@ describe("treeRingsGeometry — radial thickness", () => {
       }
     },
   );
+});
+
+describe("hostile config resolves to the documented default", () => {
+  it("a non-finite or non-positive size falls back to the default box", () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 0, -20, undefined]) {
+      expect(treeRingsSize(bad)).toBe(TREE_SIZE);
+    }
+    expect(treeRingsSize(40)).toBe(40);
+  });
+
+  it("a NaN size no longer emits NaN radii", () => {
+    const geo = g([5, 5], undefined, Number.NaN);
+    expect(geo.center.cx).toBe(12);
+    for (const r of geo.rings) {
+      expect(Number.isFinite(r.rOuter)).toBe(true);
+      expect(Number.isFinite(r.rInner)).toBe(true);
+    }
+  });
+
+  it("an infinite total scales like no total, never to a blank disc", () => {
+    // `total > 0` passed for Infinity, drove every thickness to 0, and left the
+    // disc empty while the summary still announced the periods.
+    const inf = g([10, 10], Number.POSITIVE_INFINITY);
+    expect(inf.rings[1]!.rOuter).toBeCloseTo(g([10, 10]).rings[1]!.rOuter, 2);
+  });
+
+  test.prop([
+    fc.integer({ min: 1, max: 400 }),
+    fc.array(fc.integer({ min: 0, max: 30 }), { minLength: 1, maxLength: 12 }),
+  ])("the span never runs backwards, at any size", (size, values) => {
+    const geo = treeRingsGeometry({ values, size, pad: 1 });
+    expect(geo.maxR).toBeGreaterThanOrEqual(geo.r0);
+    // the centre dot (r0/2) is the innermost paint; it has to fit the box
+    expect(geo.r0 / 2).toBeLessThanOrEqual(geo.center.cx + 0.02);
+    for (const r of geo.rings) expect(r.rOuter).toBeGreaterThanOrEqual(r.rInner);
+  });
 });

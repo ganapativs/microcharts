@@ -1,14 +1,15 @@
 ---
 title: BubbleRow
-description: >-
-  React bubble row chart — circle area for a few magnitudes — honest low-precision part-to-whole. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  "A row of circles with area proportional to value, for a few magnitudes where the number is printed alongside."
 ---
 
-BubbleRow answers "roughly how do these few magnitudes compare?" with physical presence — a row of circles whose
-**area** (not width) is proportional to value. Area is the weakest common channel, so this is the catalog's honest
-low-precision exemplar: **for a precise comparison, use `MiniBar`.** The value numerals are on by default, because a
-low-precision channel owes the reader the number.
+BubbleRow sizes up a handful of magnitudes against each other: one circle per item, with **area** (not width)
+proportional to value. That is `r ∝ √value`, with no exceptions, since a linear-radius map would overstate every
+difference by roughly its square. Area is the weakest common channel, so this is the catalog's low-precision exemplar:
+**for a precise comparison, use `MiniBar`.** The value numerals are on by default, because a bubble twice the diameter
+is four times the area and the eye can't reliably invert that. The LOW precision rating and the MiniBar steer are
+printed in the catalog, in `/catalog.json`, and in this page's header.
 
 <LiveDemo label="BubbleRow" sizeOf="bubble-row">
   <BubbleRow
@@ -33,15 +34,17 @@ low-precision channel owes the reader the number.
 
 ## When to use it
 
-- **Good for** — a few magnitudes with physical presence in a sentence, a market-size or segment impression in a KPI
-  card, or an editorial callout where the number is printed too.
-- **Avoid for** — precise comparison (that's `MiniBar`), trends (Sparkline), or more than about eight items.
+Use it for a few magnitudes with physical presence in a sentence, a market-size or segment impression in a KPI card, or
+an editorial callout that prints the number too. For precise comparison use `MiniBar`; for trends, Sparkline. Keep it
+under about eight items.
 
 ## Sizing
 
 <Sizing chart="bubble-row" />
 
 ## Variants
+
+There is no sorting prop. The row renders in your data's order, so sort the data yourself when you want a ranked row.
 
 <LiveDemo
   label="baseline align + labels"
@@ -92,22 +95,12 @@ low-precision channel owes the reader the number.
   />
 </LiveDemo>
 
-Empty data draws just the frame with "No data." as the summary. A `null` value still holds its place with a small
-presence ring (never a zero-radius void, and never skipped from the row) but drops its numeral — a missing figure is
-visibly present yet explicitly unlabeled, never faked as a zero.
+Empty data draws just the frame with "No data." as the summary. A `null` value keeps its slot with a small presence ring
+and drops its numeral: it is neither removed from the row nor drawn as a zero-radius circle.
 
 ## Four homes
 
 <FourContexts slug="bubble-row" />
-
-## Why this default
-
-Value numerals are on by default because area lies quietly — a bubble twice the diameter is four times the area, and the
-eye can't reliably invert that, so the number keeps the read honest. The radius is always `r ∝ √value` with no
-exceptions; a linear-radius map would be a roughly squared lie. There is no sorting prop: the order is your data's
-order, because reordering is your statement, not the chart's. The LOW precision rating and the MiniBar steer are printed
-in the catalog, the machine `/catalog.json`, and this page's header — BubbleRow is the catalog's worked example of an
-honest low-precision admission.
 
 ## Accessibility
 

@@ -171,6 +171,67 @@ describe("parseLiveReply — text hygiene", () => {
   });
 });
 
+describe("what a small model actually gets wrong", () => {
+  // Both of these were emitted by Gemini Nano on /docs/ai and rendered as a
+  // wall of raw grammar mid-sentence. The prompt argues against them; the
+  // parser has to survive them anyway.
+  it("promotes a fence-only type written inline, when the data is there", () => {
+    const segs = parseLiveReply(
+      "spike at the password step `microchart seismogram Abandonment per step 2 1 3 18 24 9 4 2`. That tracks.",
+    );
+    const c = charts(segs);
+    expect(c).toHaveLength(1);
+    expect(c[0]!.spec).toEqual({
+      type: "seismogram",
+      title: "Abandonment per step",
+      values: [2, 1, 3, 18, 24, 9, 4, 2],
+    });
+    // …and it lays out as a block, not inside the sentence
+    expect(c[0]!.block).toBe(true);
+  });
+
+  it("drops a chart tag it cannot fill rather than printing it at the reader", () => {
+    const segs = parseLiveReply(
+      'the "payment details" step `microchart seismogram Drop-off Rate by Step`. It seems the flow is confusing.',
+    );
+    expect(charts(segs)).toHaveLength(0);
+    const spoken = segs.map((s) => (s.kind === "text" ? s.text : "")).join("");
+    expect(spoken).not.toContain("microchart");
+    expect(spoken).toContain("payment details");
+    expect(spoken).toContain("confusing");
+  });
+
+  it("takes the numbers off the end when a title is written where data belongs", () => {
+    const c = charts(parseLiveReply("`microchart sparkline Weekly signups 12 18 9 22 30`"));
+    expect(c[0]!.spec).toEqual({ type: "sparkline", values: [12, 18, 9, 22, 30] });
+  });
+
+  it("reads a categorical body written on one inline line", () => {
+    const c = charts(parseLiveReply("`microchart mini-bar Spend NA 48 EU 39 APAC 22`"));
+    expect(c[0]!.spec).toEqual({
+      type: "mini-bar",
+      title: "Spend",
+      items: [
+        { label: "NA", value: 48 },
+        { label: "EU", value: 39 },
+        { label: "APAC", value: 22 },
+      ],
+    });
+  });
+
+  it("accepts an inline-form type that was fenced instead", () => {
+    const c = charts(
+      parseLiveReply("```microchart bullet Eval accuracy\nvalue=94 target=90 bands=70,95\n```"),
+    );
+    expect(c[0]!.spec).toEqual({ type: "bullet", value: 94, target: 90, bands: [70, 95] });
+  });
+
+  it("still refuses a chart it would have to invent data for", () => {
+    const c = charts(parseLiveReply("`microchart sparkline 12 18`"));
+    expect(c[0]!.spec).toBeNull();
+  });
+});
+
 describe("few-shot examples round-trip through the parser", () => {
   it("every chart in every example parses to a valid spec", () => {
     const assistant = LIVE_FEW_SHOTS.filter((m) => m.role === "assistant");

@@ -1,14 +1,13 @@
 ---
 title: PolarClock
 description: >-
-  React polar clock chart — cyclic magnitudes around a clock-like ring. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+  PolarClock draws a 24-hour or 7-day cycle as radial bars at fixed angles, growing from an inner baseline.
 ---
 
-PolarClock answers "what's the shape of the day or week cycle — when is it busy?" Each value in the cycle becomes a
-radial bar at its fixed angle, growing outward from an inner baseline; longer bars are busier times. Midnight (or your
-week-start) sits at 12 o'clock and the cycle runs clockwise, so the rhythm of a metric across the cycle is immediately
-legible.
+PolarClock turns each value in a cycle into a radial bar at its fixed angle, growing outward from an inner baseline and
+zero-anchored there. Longer bars are busier times. Midnight (or your week start) sits at 12 o'clock and the cycle runs
+clockwise. The channel is length, not sector area: equal-value bars at the rim cover more area than ones near the hub,
+which is why the inner radius is nonzero. Compare lengths, not wedges.
 
 <LiveDemo label="PolarClock" sizeOf="polar-clock">
   <PolarClock
@@ -29,10 +28,9 @@ legible.
 
 ## When to use it
 
-- **Good for** — the shape of a 24-hour or 7-day cycle, when a metric is busy across the cycle, or a compact seasonal
-  read in a KPI card.
-- **Avoid for** — exact value comparison (unroll the cycle into a `SparkBar`), a non-cyclic trend (`Sparkline`), or more
-  than a few dozen segments.
+Use it for the shape of a 24-hour or 7-day cycle, for when a metric is busy across that cycle, and for a compact
+seasonal read in a KPI card. For exact value comparison unroll the cycle into a `SparkBar`; for a non-cyclic trend use
+`Sparkline`. Keep it under a few dozen segments.
 
 ## Sizing
 
@@ -59,6 +57,9 @@ const week = [120, 200, 180, 210, 260, 90, 60];
   </span>
 </LiveDemo>
 
+At very small sizes, where length is hard to judge, `mode="opacity"` switches the channel to a five-step fill — a radial
+`ActivityGrid`. That is a named change of encoding, not a cosmetic one.
+
 <LiveDemo
   label="ticks off — pattern-only reads where the axis doesn't matter"
   code={`const byHour = Array.from({ length: 24 }, (_, h) => (h === 14 ? 312 : h === 4 ? 20 : 80 + h));
@@ -72,6 +73,10 @@ const week = [120, 200, 180, 210, 260, 90, 60];
     summary={false}
   />
 </LiveDemo>
+
+The four cardinal ticks default on because a bare ring of bars is rotationally ambiguous: without a mark for 12 o'clock
+there is no way to tell where the cycle starts. They are merged into one path, so the orientation cue costs a single
+node. Set `labels={false}` only when the shape itself is the whole story and the axis genuinely doesn't matter.
 
 <LiveDemo
   label="locale — the peak numeral and the summary both follow it"
@@ -98,24 +103,12 @@ const week = [120, 200, 180, 210, 260, 90, 60];
   <PolarClock data={Array(24).fill(50)} title="Steady" size={56} />
 </LiveDemo>
 
+A `null` segment leaves a gap and the baseline ring shows the hole, because missing is not the same as zero. A cycle
+where every value is equal draws every bar at the same length.
+
 ## Four homes
 
 <FourContexts slug="polar-clock" />
-
-## Why this default
-
-The channel is radial **length from the inner baseline**, not sector area. Equal-value bars at the rim span more area
-than ones near the hub, so an area reading would exaggerate the outer segments — the inner radius is nonzero precisely
-to curb that distortion, and the docs ask you to compare lengths, not wedges. Bars are always zero-anchored at that
-baseline. For very small sizes where length is hard to judge, `mode="opacity"` switches the channel to a five-step fill
-— a radial `ActivityGrid` — which is a deliberate, named change of encoding, not a cosmetic one. A `null` segment leaves
-a gap (the baseline ring shows the hole) because missing is not the same as zero.
-
-The four cardinal ticks default **on** because a bare ring of bars is rotationally ambiguous — without a mark for "12
-o'clock" there is no way to tell where the cycle starts, so "when is it busy" can't be answered from the static frame
-alone. The four ticks are merged into one path (a single node), so the orientation cue is free of the usual
-label-drop-out tradeoff — set `labels={false}` only when the shape itself is the whole story and the axis genuinely
-doesn't matter.
 
 ## Accessibility
 

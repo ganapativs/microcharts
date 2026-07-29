@@ -1,13 +1,13 @@
 ---
 title: MicroScatter
-description: >-
-  React micro scatter chart — 2-D scatter with honest Pearson r in the summary. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: MicroScatter plots two variables against each other and reports Pearson r beside any relationship word.
 ---
 
-MicroScatter answers "are these two variables related?" — the relationship story no other micro chart tells. Dots render
-at 75% opacity so overplot reads as density instead of lying by occlusion, and duplicates are never jittered: position
-is the encoding.
+MicroScatter plots one dot per x/y pair to show whether two metrics move together. Dots render at 75% opacity, so
+overplot reads as density instead of hiding points behind each other. Duplicates are never jittered, because position is
+the encoding. Axes go unlabeled at this scale, so `title` has to name both variables, the way the demo below does. The
+summary's relationship words come from a documented heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and
+wherever a relationship word appears, r appears beside it.
 
 <LiveDemo label="MicroScatter" sizeOf="micro-scatter">
   <span className="text-lg">
@@ -31,8 +31,8 @@ is the encoding.
 
 ## When to use it
 
-- **Good for** — correlation in a sentence, two-metric relationships in KPI cards.
-- **Avoid for** — more than 60 points (bin instead) or ordered time series (Sparkline).
+Use it for correlation in a sentence and two-metric relationships in KPI cards. Past 60 points, bin the data instead;
+for ordered time series use Sparkline.
 
 ## Sizing
 
@@ -94,26 +94,20 @@ is the encoding.
   />
 </LiveDemo>
 
-Empty data draws just the frame with "No data." as the summary. Under 3 points (or a zero-variance cloud) states the
-count and stops — no correlation claim without enough evidence to back it. Coincident points are never jittered apart:
-they overlap exactly, and at 75% dot opacity the overlap itself reads as extra density rather than hiding a point.
+Empty data draws just the frame, with "No data." as the summary. Under 3 points, or with a zero-variance cloud, the
+summary states the count and stops: no correlation claim without enough evidence behind it. Coincident points are never
+jittered apart. They overlap exactly, and at 75% dot opacity the overlap reads as extra density rather than hiding a
+point.
 
 ## Four homes
 
 <FourContexts slug="micro-scatter" />
 
-## Why this default
-
-Axes are unlabeled at this scale, so `title` must name both variables, the way the hero demo above does. The summary's
-relationship words are a documented heuristic on |r| (≥ 0.7 strong, ≥ 0.4 moderate, ≥ 0.2 weak), and whenever a
-relationship word appears, r appears beside it: claim and evidence travel together. Fewer than 3 points, or a
-zero-variance cloud, makes no claim at all.
-
 ## Accessibility
 
-The accessible name is the count plus the evidence-backed relationship — **"24 points. Strong positive relationship (r
-0.93)."** — or just **"2 points."** when no claim is honest. The interactive entry steps points ordered by x and
-announces each formatted pair.
+The accessible name is the count plus the evidence-backed relationship: **"24 points. Strong positive relationship (r
+0.93)."** With fewer than 3 points, or a zero-variance cloud, it makes no claim at all and reads just **"2 points."**
+The interactive entry steps points ordered by x and announces each formatted pair.
 
 <InteractionNote slug="micro-scatter" />
 

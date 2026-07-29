@@ -1,12 +1,11 @@
 ---
 title: Waterfall
-description: >-
-  React waterfall chart — signed steps that bridge a start total to an end total. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: Waterfall bridges a start total to an end total with one signed bar per step.
 ---
 
-Waterfall answers "how did the deltas compose into the total?" — the P&L bridge, in a cell. Sign is encoded by vertical
-direction from the running level AND by valence color, never color alone.
+60 opening, five signed steps, 87 at the close. Waterfall is the P&L bridge in a table cell: one bar per delta, each
+starting where the last one left off. Sign is encoded by vertical direction from the running level AND by valence color,
+never color alone.
 
 <LiveDemo label="Waterfall" sizeOf="waterfall">
   <Waterfall
@@ -34,8 +33,8 @@ direction from the running level AND by valence color, never color alone.
 
 ## When to use it
 
-- **Good for** — P&L bridges in table cells, net-change decomposition in KPI cards.
-- **Avoid for** — unordered category comparison (MiniBar), or more than ~8 steps.
+Use it for P&L bridges in table cells and net-change decomposition in KPI cards. For unordered category comparison use
+MiniBar, and keep any one bridge under about 8 steps.
 
 ## Sizing
 
@@ -82,6 +81,9 @@ direction from the running level AND by valence color, never color alone.
     />
   </span>
 </LiveDemo>
+
+The zero-anchored total bar stays on by default, because floating bars alone can't be checked against a real total.
+Hairline connectors carry the running level between steps without adding ink.
 
 <LiveDemo
   label="costs: down is good"
@@ -170,14 +172,9 @@ direction from the running level AND by valence color, never color alone.
 
 <FourContexts slug="waterfall" />
 
-## Why this default
-
-The zero-anchored total bar stays on by default: a waterfall without a grounded total is unverifiable — floating bars
-alone can't be checked against reality. Hairline connectors carry the running level between steps without adding ink.
-
 ## Accessibility
 
-The accessible name states the endpoints and the split — **"From 60 to 87 over 5 steps: +65 gains, −38 losses."** The
+The accessible name states the endpoints and the split: **"From 60 to 87 over 5 steps: +65 gains, −38 losses."** The
 interactive entry steps through the bridge (**"Refunds: −12, running 108."**).
 
 <InteractionNote slug="waterfall" />

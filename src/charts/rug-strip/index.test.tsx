@@ -46,6 +46,40 @@ describe("<RugStrip>", () => {
     expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 10 60");
   });
 
+  it("a non-finite or non-positive box never reaches the marks or the seat", () => {
+    const boxes = [{ width: Number.NaN }, { height: Number.NaN }, { width: 0 }, { height: -10 }];
+    for (const box of boxes)
+      for (const orientation of ["horizontal", "vertical"] as const) {
+        const { container } = draw(
+          <RugStrip data={[3.1, 5.2, 9.7]} markValue={5} orientation={orientation} {...box} />,
+        );
+        const svg = container.querySelector("svg")!;
+        const [, , vbW, vbH] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+        expect(svg.outerHTML).not.toMatch(/NaN|Infinity/);
+        for (const el of container.querySelectorAll("path, line")) {
+          for (const n of (el.getAttribute("d") ?? "").match(/-?[\d.]+/g) ?? [])
+            expect(Number(n)).toBeGreaterThanOrEqual(0);
+          for (const [a, limit] of [
+            ["x1", vbW!],
+            ["x2", vbW!],
+            ["y1", vbH!],
+            ["y2", vbH!],
+          ] as const) {
+            const v = el.getAttribute(a);
+            if (v !== null) expect(Number(v)).toBeLessThanOrEqual(limit);
+          }
+        }
+      }
+  });
+
+  it("a reversed domain is a window: ticks stay left-to-right", () => {
+    const { container } = draw(<RugStrip data={[2, 8]} domain={[10, 0]} />);
+    const xs = [...container.querySelectorAll('path[data-mc-ink="data"]')].flatMap((p) =>
+      [...p.getAttribute("d")!.matchAll(/M([\d.]+)/g)].map((m) => Number(m[1])),
+    );
+    expect(xs).toEqual([12.3, 47.7]);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<RugStrip data={[3, 5, 8]} title="Salaries" />);
     await expectNoA11yViolations(container);

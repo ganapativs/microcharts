@@ -9,7 +9,12 @@ import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
-import { balanceBeamGeometry, type BeamMode, type BeamShape } from "./geometry.js";
+import {
+  balanceBeamGeometry,
+  DEFAULT_MAX_TILT,
+  type BeamMode,
+  type BeamShape,
+} from "./geometry.js";
 
 export interface BeamDatum {
   label: string;
@@ -65,7 +70,7 @@ export function balanceBeamSummary(
     b: r.value,
     width: 48,
     height: 20,
-    maxTilt: 12,
+    maxTilt: DEFAULT_MAX_TILT,
     mode,
     domain,
     pad: PAD,
@@ -80,7 +85,7 @@ export function balanceBeamSummary(
 export function BalanceBeam(props: BalanceBeamProps): ReactNode {
   const {
     data,
-    maxTilt = 12,
+    maxTilt = DEFAULT_MAX_TILT,
     shape = "square",
     mode = "ratio",
     domain,
@@ -141,14 +146,15 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
 
   // The heavier pan is accented — the "which side wins" read is instant, and it
   // only reinforces the tilt (never the sole cue), so direction stays legible
-  // without colour. An explicit `color` overrides both pans (user intent wins);
-  // otherwise the fill comes from the accent/point ink roles.
+  // without colour. An explicit `color` overrides the fill (user intent wins)
+  // but never replaces the ink role: `data-mc-ink` is also what the interactive
+  // entrance selector and the forced-colors mapping key off, and dropping it
+  // left a coloured beam with weights that never settled in.
+  const fillStyle = color ? ({ fill: color } as CSSProperties) : undefined;
   const weightMark = (w: { cx: number; cy: number; half: number }, key: string, heavy: boolean) => {
-    const inkProps = color
-      ? { style: { fill: color } }
-      : { "data-mc-ink": heavy ? "accent" : "point" };
+    const ink = heavy ? "accent" : "point";
     return shape === "round" ? (
-      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} {...inkProps} />
+      <circle key={key} cx={w.cx} cy={w.cy} r={w.half} data-mc-ink={ink} style={fillStyle} />
     ) : (
       <rect
         key={key}
@@ -156,7 +162,8 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
         y={w.cy - w.half}
         width={w.half * 2}
         height={w.half * 2}
-        {...inkProps}
+        data-mc-ink={ink}
+        style={fillStyle}
       />
     );
   };

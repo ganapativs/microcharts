@@ -1,13 +1,12 @@
 ---
 title: PairedBars
 description: >-
-  React paired bars chart — two related magnitudes side by side from zero. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+  PairedBars sets a value against its reference, category by category, on one zero-anchored domain.
 ---
 
-PairedBars answers "how does actual compare to expected, category by category?". Value and reference always share one
-zero-anchored domain — comparing bars on different scales is the cardinal grouped-bar lie — and the reference is muted
-by two structural cues (opacity _and_ width), never color alone.
+East came in at 940 against a plan of 1,200, West a little over its own: PairedBars draws each value beside its
+reference, category by category. Both bars in a pair share one zero-anchored domain, so their lengths are always
+comparable. The reference is muted by two structural cues, opacity _and_ width, never color alone.
 
 <LiveDemo
   label="PairedBars"
@@ -41,8 +40,8 @@ by two structural cues (opacity _and_ width), never color alone.
 
 ## When to use it
 
-- **Good for** — budget vs actual per region, target vs result rows.
-- **Avoid for** — data without a reference series (MiniBar) or more than 5 pairs.
+Use it for budget vs actual per region and target vs result rows. For data without a reference series use MiniBar, and
+keep it to 5 pairs or fewer.
 
 ## Sizing
 
@@ -72,6 +71,9 @@ by two structural cues (opacity _and_ width), never color alone.
     height={44}
   />
 </LiveDemo>
+
+Grouped is the default because overlapping bars hide small overshoots. Reach for `mode="overlay"` when the cell is too
+tight for two bars per pair.
 
 <LiveDemo
   label="valence"
@@ -129,19 +131,13 @@ The gap named in the summary follows `format`/`locale` — 12000 reads "12.000" 
   <PairedBars data={[{ label: "East", value: 940, ref: 1200 }]} title="Single pair" width={80} height={44} />
 </LiveDemo>
 
-A pair whose `ref` is `null` draws its value bar alone — no ghost, no zero-width placeholder — and the interactive entry
-announces it as **"East: 940, no reference."** rather than pretending a comparison exists. Past 5 pairs the grouped read
-blurs into noise, so the component still renders every pair but logs a dev warning.
+A pair whose `ref` is `null` draws its value bar alone, with no ghost and no zero-width placeholder, and the interactive
+entry announces it as **"East: 940, no reference."** A chart where _every_ reference is missing dev-warns and points you
+to MiniBar. Past 5 pairs the grouped read blurs, so the component still renders every pair and logs a dev warning.
 
 ## Four homes
 
 <FourContexts slug="paired-bars" />
-
-## Why this default
-
-Grouped over overlay by default — overlap hides small over-shoots, so the denser overlay form is the variant you choose
-for tight cells, not the analytical default. A pair with a missing reference renders the value bar alone and announces
-"no reference"; a chart where _every_ reference is missing dev-warns and steers to MiniBar.
 
 ## Accessibility
 

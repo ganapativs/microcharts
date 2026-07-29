@@ -1,15 +1,14 @@
 ---
 title: Hourglass
-description: >-
-  React hourglass chart — sand area that splits elapsed and remaining, area-true. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: Hourglass splits a countdown into elapsed and remaining sand, with both chamber areas true to the fraction.
 ---
 
-Hourglass answers "how much time is gone _and_ how much remains?" — the two-sided story a progress bar can't tell. Sand
-fills the top chamber (remaining) and the bottom (elapsed), and both areas are **area-true**: a naive linear-height fill
-in a triangular bulb would overstate early progress by up to 2×, so the geometry solves for true proportional area. A
-thin stream at the neck marks "running"; it disappears at both ends, because finished and not-started are shape-distinct
-states.
+A session expires in nine minutes, and you need both halves of that: how much is gone and how much is left. Hourglass
+shows both. Sand fills the top chamber for remaining and the bottom for elapsed, and both areas are **area-true**: a
+linear-height fill in a triangular bulb would overstate early progress by up to 2×, so the geometry solves for true
+proportional area instead. `value` is the elapsed fraction, the same polarity as `Progress`, so the two compose in one
+product without re-learning which way is which. A thin stream at the neck renders while `0 < value < 1` and marks the
+running state; it disappears at both ends, so finished and not-started are shape-distinct.
 
 <LiveDemo label="Hourglass" sizeOf="hourglass">
   <span className="inline-flex gap-4 items-center">
@@ -29,9 +28,9 @@ states.
 
 ## When to use it
 
-- **Good for** — a deadline or session-expiry read in a sentence, a TTL cell where remaining is the story, or a
-  time-boxed tab or countdown.
-- **Avoid for** — exact percentages (Progress), trends (Sparkline), or non-time fractions.
+Use it for a deadline or session-expiry read in a sentence, a TTL cell where remaining is the story, or a time-boxed tab
+or countdown. For exact percentages use Progress, for trends use Sparkline, and for fractions that aren't time use a
+chart that doesn't imply a clock.
 
 ## Sizing
 
@@ -73,22 +72,19 @@ states.
   <Hourglass value={Number.NaN} title="Invalid" height={36} />
 </LiveDemo>
 
+Out-of-range values clamp to 0–1 in the drawing and in the accessible name, and `NaN` renders as 0 elapsed. Both ends
+drop the neck stream, so a not-started or finished glyph never reads as a running timer. In the static entry the stream
+is a state mark and is never animated.
+
 ## Four homes
 
 <FourContexts slug="hourglass" />
 
-## Why this default
-
-`value` is the elapsed fraction — the same polarity as `Progress` — so the two compose in one product without
-re-learning which way is which. The area-true solve is the load-bearing honesty rule: in an inherently nonlinear
-container, the sand areas are exactly proportional to elapsed and remaining. The stream is a binary state mark, not
-decoration, and is never animated in the static entry — it simply renders while `0 < value < 1`.
-
 ## Accessibility
 
-The accessible name carries both sides — a glyph above reads **"70% elapsed, 30% remaining."** The interactive entry
-cross-fades the sand levels on change (opacity plus a scale-from-the-floor settle, never a path interpolation) and
-announces only when the value crosses a documented threshold (50 / 90 / 100%), so a streaming value never spams.
+The accessible name carries both sides: a glyph above reads **"70% elapsed, 30% remaining."** The interactive entry
+cross-fades the sand levels on change, with opacity plus a scale-from-the-floor settle rather than a path interpolation.
+It announces only when the value crosses 50, 90, or 100%, so a streaming value never floods a screen reader.
 
 <InteractionNote slug="hourglass" />
 

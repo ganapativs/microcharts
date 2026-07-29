@@ -1,80 +1,79 @@
 ---
 title: Design notes
 description:
-  The reasoning behind microcharts' defaults — direct labels over chrome, static-first architecture, one grammar,
-  summaries as a first-class feature, budgets as build gates, and a strict bar for admitting a new chart type.
+  Why microcharts defaults the way it does — no axes or legends, static-first entries, one shared grammar, generated
+  summaries, size budgets as CI gates, and the bar a new chart type has to clear.
 ---
 
-microcharts has opinions, and they're baked into the defaults so you rarely have to think about them. Here's the
-reasoning behind the ones that shaped the library, in case you're curious.
+These are the decisions baked into the defaults, so you rarely have to make them yourself. Each one below explains what
+the library does and why it does it that way.
 
 ## Direct labels beat chrome
 
-At this size, an axis, a legend, and a gridline all cost more ink than they return — so there are none. A value sits at
-the end of the line; a min and max mark themselves. The chart is almost all data, which is exactly what you want a
-reader to spend their attention on.
+At word size, an axis, a legend, and a gridline each cost more ink than they return, so there are none. A value sits at
+the end of the line. A min and a max mark themselves. What's left is almost all data.
 
 ## Areas anchor at zero
 
-A filled Sparkline always measures from zero, because an area floating on an arbitrary baseline exaggerates change.
-Length should mean magnitude, honestly — the chart never says more than the numbers do.
+A filled Sparkline always measures from zero. An area floating on an arbitrary baseline exaggerates change: the fill
+grows faster than the numbers do. Anchoring at zero keeps length proportional to magnitude.
 
 ## Color encodes, never decorates
 
 There's one accent per context, and a color change always means a change in meaning. Positive and negative come from a
-color-blind-safe pair, and they're always doubled by a glyph or a position, so the chart survives with no color at all.
-A preset can restyle a chart without ever changing what it says.
+color-blind-safe pair, doubled by a glyph or a position, so a chart still reads with no color at all. A preset restyles
+a chart without changing what it says.
 
 ## Static first, interactivity opt-in
 
-Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG — hook-free, listener-free,
+Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG: hook-free, listener-free,
 safe inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover, roving keyboard focus,
 touch scrub, select-to-pin, and live announcements live in a separate `/interactive` subpath you import only where you
-need them. The line between the two is never blurred, so you never pay for interactivity you didn't ask for, and a
-static chart can never accidentally drag a listener into your server bundle.
+need them. The two entries never mix, so you pay for interactivity only where you ask for it, and a static chart can't
+drag a listener into your server bundle.
 
-The interactive entry composes the static one rather than re-implementing it, so the interactive rendering can't drift
-from the static one. Every multi-unit chart resolves a gesture to a navigable _unit_ through the same kernel — so
-interaction is one thing to learn across the catalog, not one dialect per chart. Single-unit charts have nothing to rove
-between, so they take the hover/select half of that contract without the index half.
+The interactive entry composes the static one rather than re-implementing it, so the two renderings can't drift. Every
+multi-unit chart resolves a gesture to a navigable _unit_ through the same kernel, so interaction is one thing to learn
+across the catalog. Single-unit charts have nothing to rove between and take the hover/select half of that contract
+without the index half.
 
 ## One grammar, not an options bag
 
 `data` alone always renders something correct. A prop name means the same thing on every chart — `title`, `color`,
 `domain`, `format`, `summary` — so what you learn on one chart transfers to all of them. Variants are props; a genuinely
-different data shape is a different component rather than a deeper options object. Annotations — a threshold, a target
-zone, a marker — are children you nest, not configuration you pass. The result is an API you can mostly guess.
+different data shape is a different component rather than a deeper options object. Annotations are children you nest: a
+threshold, a target zone, a marker. The result is an API you can mostly guess.
 
-## Summaries are a feature, not an afterthought
+## Generated summaries
 
-The natural-language sentence each chart generates from its data is the product, not a compliance checkbox. It's the
-accessible name a screen reader speaks, the text a crawler indexes, and the string a model can quote — one deterministic
-sentence doing all three jobs. It degrades honestly on empty, single, and flat data instead of describing a chart that
-isn't there. See [Accessibility](/docs/accessibility) for the details.
+Each chart generates a natural-language sentence from its data, and that one deterministic sentence does three jobs: it
+is the accessible name a screen reader speaks, the text a crawler indexes, and the string a model can quote back. It
+degrades on empty, single, and flat data instead of describing a chart that isn't there. See
+[Accessibility](/docs/accessibility) for the details.
 
-## Small is a material, not a limit
+## Small is a design material
 
-Composition, contrast, and the auto-summary all have to survive the smallest supported size. That constraint is what
-makes the charts calm: there's no room for anything that isn't carrying information, so nothing decorative gets in.
+Composition, contrast, and the auto-summary all have to survive the smallest supported size. At that size there's no
+room for a mark that isn't carrying information, so decoration never gets in.
 
-## Motion lives in the interactive build, not on every chart
+## Motion lives in the interactive build
 
 Static charts have no `animate` prop and run no animation JavaScript. Two things move inside a static host, both pure
 CSS and both stilled by reduced motion: `<Marker celebrate>`, a one-shot burst on a milestone crossing, and
-`StatusDot pulse` — the catalog's one looping animation, and its one documented exemption from the rule below. A
-monitoring dot that pulses says "this feed is live", and the same dot holding still says it stopped; the loop is the
-reading rather than decoration, which is why it is opt-in per instance and off by default. Only the `/interactive`
-entries can play an entrance, and only when you opt in with `animate` (off by default). It runs through the Web
-Animations API, gated on `prefers-reduced-motion`. Every entrance follows the logic of the data it draws: a line draws
-left-to-right along its time axis, bars grow from the baseline, a donut fills clockwise from twelve o'clock, and labels
-arrive last — they annotate marks that already exist. Marks decelerate into place; they never bounce, loop, or draw the
-eye away from the data. Motion is a property of the interactive build, not a knob bolted onto the static one, so it
-can't leak into a server render or turn into decoration.
+`StatusDot pulse`, the catalog's one looping animation and its one documented exemption from the rule below. A
+monitoring dot that pulses reads as a live feed, and the same dot holding still reads as a stopped one, so the loop
+carries the reading. It's opt-in per instance and off by default.
+
+Only the `/interactive` entries play an entrance, and only when you opt in with `animate` (off by default). It runs
+through the Web Animations API, gated on `prefers-reduced-motion`. Every entrance follows the logic of the data it
+draws: a line draws left-to-right along its time axis, bars grow from the baseline, a donut fills clockwise from twelve
+o'clock, and labels arrive last, because they annotate marks that already exist. Marks decelerate into place. They never
+bounce, loop, or pull the eye away from the data.
 
 ## Budgets are build gates
 
-Size isn't an aspiration here — it's a CI gate. A chart that grows past its gzip budget fails the build, the same way a
-failing test does, and the SSR benchmark exits non-zero when a chart drops below its render floor. The numbers on the
+Size is a CI gate. A chart that grows past its gzip budget fails the build, the same way a failing test does, and the
+SSR benchmark exits non-zero when a chart drops below its render floor. The numbers on the
 [Performance](/docs/performance) page are never hand-typed: the sizes are re-measured from the built `dist/` on every CI
 run, and the throughput figures are derived from the checked-in benchmark result, so a claim can't drift from what was
 measured.
@@ -82,8 +81,8 @@ measured.
 ## One package
 
 All the chart types ship from a single package, `@microcharts/react`, each behind its own subpath so you only bundle
-what you import. The catalog's collections — core, decision, expressive, frontier — are just metadata for browsing;
-they're never package or import boundaries. There's no plugin to install, no engine to configure.
+what you import. The catalog's collections — core, decision, expressive, frontier — are metadata for browsing, never
+package or import boundaries. There's no plugin to install and no engine to configure.
 
 The root barrel (`@microcharts/react`, no subpath) carries only the shared pieces, so importing it pulls in no chart
 code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>` with the viewBox, `title`, and generated
@@ -96,15 +95,14 @@ code: the `Chart` root wrapper every chart composes — a `role="img"` `<svg>` w
 
 A new chart earns its place only if it clears a real bar: it reads at word size (roughly 200×60 px), it tells a data
 story the catalog can't already tell well, it has one honest primary encoding channel, and a first-time reader can read
-it back without training. "It looks cool" isn't a reason. This is why the catalog prefers uncommon _questions_ over
-uncommon _shapes_.
+it back without training. This is why the catalog prefers uncommon _questions_ over uncommon _shapes_.
 
 ## What we don't ship
 
 No pie, no needle gauge, no battery, no waffle, no violin, no 3-D, no gradients-as-decoration, no drop shadows on data,
-no looping animation (with the one exemption noted above, where the loop is the reading rather than decoration). These
-aren't theme options you can switch on — they're designed out, because at a glance they mislead more than they inform.
-Where a rejected chart answered a real question, the catalog ships a faster replacement: [Bullet](/docs/charts/bullet)
-or [TapeGauge](/docs/charts/tape-gauge) instead of a speedometer, [SegmentedBar](/docs/charts/segmented-bar) for
+no looping animation (with the one exemption noted above, where the loop carries the reading). These aren't theme
+options you can switch on. They're designed out, because at word size they mislead more than they inform. Where a
+rejected chart answered a real question, the catalog ships a replacement: [Bullet](/docs/charts/bullet) or
+[TapeGauge](/docs/charts/tape-gauge) instead of a speedometer, [SegmentedBar](/docs/charts/segmented-bar) for
 comparative part-to-whole, [MicroDonut](/docs/charts/micro-donut) as a capped icon-size mix when a glyph is specifically
-wanted, [MicroBox](/docs/charts/micro-box) instead of a violin.
+wanted, and [MicroBox](/docs/charts/micro-box) instead of a violin.

@@ -1,4 +1,4 @@
-import { SizeFootprintCard } from "@/components/home/size-footprint-card";
+import { SizeFootprintCard } from "@/components/ui/size-footprint-card";
 import { CATALOG, SIZE, BENCH, SIZE_SPAN, sizeRow } from "@/lib/docs-facts";
 import { getChart } from "@/lib/catalog";
 

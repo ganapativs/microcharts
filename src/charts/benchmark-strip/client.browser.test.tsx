@@ -71,6 +71,28 @@ describe("interactive <BenchmarkStrip>", () => {
       .not.toBeNull();
   });
 
+  it("label='value' keeps the readout anchored to the static's viewBox", async () => {
+    // The gutter a long readout reserves widens the viewBox, and the client
+    // computes its own copy of the geometry. Both entries must reserve the
+    // same gutter: the chip's `left` is a percentage of the client's
+    // totalWidth, so a stale hardcoded 4 would park it off its own tick.
+    const screen = await render(
+      <BenchmarkStrip
+        data={[-1e6, -2e6, -3e6, -4e6, -5e6, -6e6, -7e6, -8e6]}
+        value={-1234567.89}
+        label="value"
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-benchmark-strip-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "Home");
+    await expect.poll(() => document.querySelector(".mc-spark-readout")).not.toBeNull();
+    const chip = document.querySelector(".mc-spark-readout") as HTMLElement;
+    const tickX = Number(wrap.querySelector("svg line[data-mc-ink='accent']")!.getAttribute("x1"));
+    const vbWidth = Number(wrap.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
+    expect(Number.parseFloat(chip.style.left)).toBeCloseTo((tickX / vbWidth) * 100, 4);
+  });
+
   it("controlled selectedIndex pins the tick without focus", async () => {
     const screen = await render(<BenchmarkStrip data={PEERS} value={20} selectedIndex={2} />);
     expect(screen.container.querySelector('line[data-mc-w="tick"]')).not.toBeNull();

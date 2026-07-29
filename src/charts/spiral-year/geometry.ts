@@ -6,10 +6,31 @@
 // so the node count is O(steps). not O(days). All coords 2-dp.
 import { arcPath, polarPoint } from "../../core/arc.js";
 import { monthStartDays } from "../../core/calendar-grid.js";
-import { round2, type Value } from "../../core/types.js";
+import { chartSide, round2, type Value } from "../../core/types.js";
 import { maxOf, minOf } from "../../core/scale.js";
 
 const TAU = Math.PI * 2;
+
+/** Documented default `size`, and the fallback for an unusable one. */
+const DEFAULT_SIZE = 24;
+
+/** Ring of empty space outside the outermost turn; shared so the seat, the
+ *  static entry and the interactive entry all wind the same spiral. */
+export const SPIRAL_PAD = 1;
+
+/**
+ * The coil's box, resolved once. `size` is a caller prop, and a non-finite or
+ * non-positive one is uniquely destructive: `size={NaN}` sent every radius to
+ * NaN, so the marks painted as `d="MNaN NaN…"` and the chart showed nothing
+ * inside the 1×1 viewBox `Chart` had clamped to — under a confident
+ * "52 weeks; peak 480 in week 30" accessible name. `size={0}` was worse: the
+ * radii went negative and the marks painted OUTSIDE the box. Rounded because
+ * the viewBox carries integers, and the coil has to be centred on the box that
+ * ships rather than on the raw prop.
+ */
+function spiralBox(size: number): number {
+  return Math.max(1, Math.round(chartSide(size, DEFAULT_SIZE)));
+}
 
 export interface SpiralYearGeometry {
   marks: { cx: number; cy: number; r: number; step: number; index: number }[];
@@ -42,11 +63,23 @@ export function spiralYearGeometry(opts: {
   mark?: "dot" | "arc" | undefined;
   markR?: number | undefined;
 }): SpiralYearGeometry {
-  const { size, steps, cadence, pad } = opts;
-  const mark = opts.mark ?? "dot";
+  const { cadence, pad } = opts;
+  const size = spiralBox(opts.size);
+  // `steps` is documented as 3 or 5, and a host that computes it can hand over
+  // anything: `Array.from({ length: Infinity })` threw RangeError and took the
+  // render down, `1e6` allocated a million buckets per render, and NaN / 0 / -1
+  // all made zero buckets — a blank chart under a summary naming the peak.
+  const steps = opts.steps === 3 ? 3 : 5;
+  const mark = opts.mark === "arc" ? "arc" : "dot";
   const cx = round2(size / 2);
   const cy = round2(size / 2);
-  const rMax = size / 2 - pad;
+  const markR = Number.isFinite(opts.markR) ? opts.markR! : Math.max(0.5, size * 0.028);
+  // The outer ring reserves whichever is larger, the pad or a mark radius: a dot
+  // is centred ON the spiral, so at size 64 (markR 1.79 against pad 1) the rim
+  // dots painted outside the viewBox, which never clips. Floored at 0 too —
+  // below `2 * pad` the plot inverts, and a negative radius throws the marks to
+  // the far side of the centre and out of the box.
+  const rMax = Math.max(0, size / 2 - Math.max(pad, markR));
   const n = opts.values.length;
   const periodsPerTurn = cadence === "week" ? 52 : 365;
   const startIndex = Number.isFinite(opts.startIndex)
@@ -62,7 +95,7 @@ export function spiralYearGeometry(opts: {
     minIndex: -1,
     turns: 0,
     cadence,
-    size: Math.max(1, Math.round(size)),
+    size,
   };
   if (n === 0) return empty;
 
@@ -94,10 +127,9 @@ export function spiralYearGeometry(opts: {
   }
 
   const turns = Math.max(1, Math.ceil((startIndex + n) / periodsPerTurn));
-  const r0 = Math.min(rMax * 0.28, rMax - 1);
+  const r0 = Math.max(0, Math.min(rMax * 0.28, rMax - 1));
   const k = (rMax - r0) / turns; // radial growth per full turn
 
-  const markR = opts.markR ?? Math.max(0.5, size * 0.028);
   const marks: SpiralYearGeometry["marks"] = [];
   const buckets: string[] = Array.from({ length: steps }, () => "");
   for (let i = 0; i < n; i++) {
@@ -129,7 +161,7 @@ export function spiralYearGeometry(opts: {
       : Array.from({ length: 12 }, (_, mo) => (mo / 12) * TAU);
   const monthTicksPath = monthAngles
     .map((a) => {
-      const inR = rMax - 1.2;
+      const inR = Math.max(0, rMax - 1.2);
       const outR = rMax + 0.4;
       const x1 = round2(cx + inR * Math.sin(a));
       const y1 = round2(cy - inR * Math.cos(a));
@@ -148,6 +180,6 @@ export function spiralYearGeometry(opts: {
     minIndex,
     turns,
     cadence,
-    size: Math.max(1, Math.round(size)),
+    size,
   };
 }

@@ -5,8 +5,8 @@
 // Flows are magnitudes: a negative input is invalid and coerced to 0. Coords
 // 2-dp, integer viewBox.
 import { linePath } from "../../core/path.js";
-import { clamp, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type XY } from "../../core/types.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
+import { chartSide, isFiniteValue, round2, type XY } from "../../core/types.js";
 
 // A zero-anchored area, linear only (importing core/areaPath would drag in the
 // smooth + step curve builders this chart never uses — ~0.5 kB). Baseline under
@@ -85,11 +85,22 @@ export function netFlowGeometry(opts: {
   gutterCh?: number | undefined;
   fontSize?: number | undefined;
 }): NetFlowGeometry | null {
-  const { width, height, data } = opts;
+  const { data } = opts;
   const n = data.length;
   if (n === 0) return null;
 
+  // The box is a caller prop like any other. `Chart` clamps what it puts in the
+  // viewBox; geometry laid its marks out against the RAW prop, so `width={-40}`
+  // painted x=-42 inside a perfectly valid `viewBox="0 0 1 20"` — and `.mc-root`
+  // is overflow: visible, so that spills into the page.
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
+
   const pad = opts.pad ?? 2;
+  // Below `2 * pad` the padded plot inverts, and `clamp(v, 2, -1)` returns the
+  // upper bound — the areas painted above y=0. Half the box is the pad's floor.
+  const padX = Math.min(pad, width / 2);
+  const padY = Math.min(pad, height / 2);
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
@@ -100,30 +111,35 @@ export function netFlowGeometry(opts: {
   const outs = data.map((d) => mag(d.out));
   const nets = ins.map((v, i) => v - outs[i]!);
 
+  // maxOf, not `Math.max(0, ...ins, ...outs)`: `data` is caller-sized and the
+  // spread pushes one argument per period onto the stack — it throws RangeError
+  // past ~125k, so a long ledger crashed the render instead of drawing it.
   const maxMag =
     opts.domain && Number.isFinite(opts.domain[1]) && opts.domain[1] > 0
       ? opts.domain[1]
-      : Math.max(0, ...ins, ...outs);
+      : maxOf(outs, maxOf(ins, 0));
   const degenerate = maxMag === 0;
 
-  const plotL = pad;
-  const plotR = width - pad;
+  const plotL = padX;
+  const plotR = width - padX;
   const zeroY = round2(height / 2);
-  const half = height / 2 - pad;
+  const half = height / 2 - padY;
   const scale = scaleLinear([0, maxMag || 1], [0, half]);
-  const up = (v: number) => round2(clamp(zeroY - scale(v), pad, height - pad));
+  const up = (v: number) => round2(clamp(zeroY - scale(v), padY, height - padY));
 
   // area/line points span the plot edge-to-edge (line-chart geometry);
   const lineX = (i: number) =>
     n === 1 ? (plotL + plotR) / 2 : plotL + ((plotR - plotL) * i) / (n - 1);
   const slotW = (plotR - plotL) / n;
-  const barW = round2(Math.max(0.5, slotW * 0.66));
+  // The 0.5 floor keeps a column visible in a dense series; capping at the box
+  // stops that floor from being wider than the chart in a sub-unit one.
+  const barW = round2(Math.min(width, Math.max(0.5, slotW * 0.66)));
   const barCenter = (i: number) => plotL + slotW * (i + 0.5);
 
   const inPts: XY[] = ins.map((v, i) => [round2(lineX(i)), up(v)]);
   const outPts: XY[] = outs.map((v, i) => [
     round2(lineX(i)),
-    round2(clamp(zeroY + scale(v), pad, height - pad)),
+    round2(clamp(zeroY + scale(v), padY, height - padY)),
   ]);
   const netPts: XY[] = nets.map((v, i) => [round2(lineX(i)), up(v)]);
 
@@ -138,7 +154,7 @@ export function netFlowGeometry(opts: {
     height: round2(scale(v)),
   }));
 
-  const down = (v: number) => round2(clamp(zeroY + scale(v), pad, height - pad));
+  const down = (v: number) => round2(clamp(zeroY + scale(v), padY, height - padY));
   const points: FlowPoint[] = data.map((_, i) => ({
     x: round2(mode === "bars" ? barCenter(i) : lineX(i)),
     in: ins[i]!,
@@ -171,8 +187,8 @@ export function netFlowGeometry(opts: {
 
   return {
     zeroY,
-    y0: round2(pad),
-    y1: round2(height - pad),
+    y0: round2(padY),
+    y1: round2(height - padY),
     inArea: { d: degenerate ? "" : zeroArea(inPts, zeroY) },
     outArea: { d: degenerate ? "" : zeroArea(outPts, zeroY) },
     netLine: { d: degenerate ? "" : linePath(netPts) },
@@ -188,6 +204,6 @@ export function netFlowGeometry(opts: {
     labelY: zeroY,
     totalWidth: width + gutter,
     domain: [-(maxMag || 1), maxMag || 1],
-    yFor: scaleLinear([-(maxMag || 1), maxMag || 1], [height - pad, pad]),
+    yFor: scaleLinear([-(maxMag || 1), maxMag || 1], [height - padY, padY]),
   };
 }

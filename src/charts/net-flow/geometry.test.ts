@@ -81,6 +81,51 @@ describe("netFlowGeometry", () => {
     expect(netFlowGeometry({ ...base, data: [] })).toBeNull();
   });
 
+  // `Chart` clamps the box it puts in the viewBox. Geometry laid its marks out
+  // against the RAW prop, so a host that passed `Number(input)` from an empty
+  // field painted NaN — or, for a negative width, x=-42 inside a valid
+  // `viewBox="0 0 1 20"`, and `.mc-root` is overflow: visible.
+  it.each([
+    ["width NaN", { width: Number.NaN, height: 20 }],
+    ["height NaN", { width: 80, height: Number.NaN }],
+    ["width Infinity", { width: Number.POSITIVE_INFINITY, height: 20 }],
+    ["negative width", { width: -40, height: 20 }],
+    ["zero height", { width: 80, height: 0 }],
+    ["height below 2*pad (the padded plot inverts)", { width: 80, height: 3 }],
+  ])("clamps a hostile box: %s stays finite and inside the frame", (_name, box) => {
+    const geo = netFlowGeometry({ ...box, data: SAMPLE })!;
+    const w = Number.isFinite(box.width) && box.width > 0 ? box.width : 1;
+    const h = Number.isFinite(box.height) && box.height > 0 ? box.height : 1;
+
+    const coords = [...geo.inArea.d.matchAll(/(-?[\d.]+) (-?[\d.]+)/g)];
+    expect(coords.length).toBeGreaterThan(0);
+    for (const m of coords) {
+      const [x, y] = [Number(m[1]), Number(m[2])];
+      expect(Number.isFinite(x) && Number.isFinite(y)).toBe(true);
+      expect(x).toBeGreaterThanOrEqual(-0.01);
+      expect(x).toBeLessThanOrEqual(w + 0.01);
+      expect(y).toBeGreaterThanOrEqual(-0.01);
+      expect(y).toBeLessThanOrEqual(h + 0.01);
+    }
+    for (const b of [...geo.inBars, ...geo.outBars]) {
+      expect(b.x).toBeGreaterThanOrEqual(-0.01);
+      expect(b.x + b.width).toBeLessThanOrEqual(w + 0.01);
+      expect(b.y).toBeGreaterThanOrEqual(-0.01);
+      expect(b.y + b.height).toBeLessThanOrEqual(h + 0.01);
+    }
+    expect(Number.isFinite(geo.yFor(1))).toBe(true);
+  });
+
+  // `Math.max(0, ...ins, ...outs)` threw RangeError here — the spread puts one
+  // argument per period on the stack, and a long ledger crashed the render.
+  it("a ledger past the spread's argument limit still scales", () => {
+    const data = Array.from({ length: 150_000 }, (_, i) => ({ in: i % 97, out: i % 53 }));
+    const geo = netFlowGeometry({ ...base, data })!;
+    expect(geo.n).toBe(150_000);
+    expect(geo.degenerate).toBe(false);
+    expect(Number.isFinite(geo.last!.net)).toBe(true);
+  });
+
   test.prop([
     fc.array(
       fc.record({

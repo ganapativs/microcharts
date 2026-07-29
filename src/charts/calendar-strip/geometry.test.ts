@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { calendarStripGeometry } from "./geometry.js";
+import { calendarStripGeometry, CALENDAR_MAX_WEEKS } from "./geometry.js";
 
 const entries = (pairs: [string, number][]) => new Map(pairs);
 
@@ -83,6 +83,47 @@ describe("calendarStripGeometry", () => {
     const by = new Map(geo.cells.map((c) => [c.date, c]));
     expect(by.get("2026-07-04")!.step).toBe(4);
     expect(by.get("2026-07-03")!.step).toBe(1);
+  });
+
+  // Hostile config: `weeks`/`steps`/`cell`/`gap` are caller scalars, and the
+  // grid the summary names has to be the grid that was built.
+  it("weeks is floored, clamped and capped — rows report what was built", () => {
+    const rows = (weeks: number) =>
+      calendarStripGeometry({ ...BASE, weeks, entries: entries([]) })!.rows;
+    expect(rows(4.7)).toBe(4);
+    expect(rows(0)).toBe(1);
+    expect(rows(-3)).toBe(1);
+    expect(rows(NaN)).toBe(1);
+    expect(rows(Infinity)).toBe(1);
+    expect(rows(1e6)).toBe(CALENDAR_MAX_WEEKS); // unclamped this allocated 7M days
+  });
+
+  it("non-finite steps falls back to the default ramp (never a NaN bucket)", () => {
+    for (const steps of [NaN, Infinity, -Infinity]) {
+      const geo = calendarStripGeometry({
+        ...BASE,
+        steps,
+        entries: entries([["2026-07-04", 100]]),
+      })!;
+      expect(geo.steps).toBe(5);
+      expect(geo.cells.find((c) => c.date === "2026-07-04")!.step).toBe(4);
+    }
+    expect(calendarStripGeometry({ ...BASE, steps: 1, entries: entries([]) })!.steps).toBe(2);
+    expect(calendarStripGeometry({ ...BASE, steps: 5.5, entries: entries([]) })!.steps).toBe(5);
+  });
+
+  it("non-finite cell/gap fall back to the documented defaults", () => {
+    for (const bad of [NaN, Infinity, undefined]) {
+      const geo = calendarStripGeometry({ ...BASE, cell: bad, gap: bad, entries: entries([]) })!;
+      expect(geo.cell).toBe(7);
+      expect(geo.gap).toBe(1);
+      expect(geo.width).toBe(55);
+      expect(geo.height).toBe(31);
+    }
+    // negative lengths clamp to 0 rather than emitting a negative viewBox
+    const neg = calendarStripGeometry({ ...BASE, cell: -5, gap: -2, entries: entries([]) })!;
+    expect(neg.width).toBe(0);
+    expect(neg.height).toBe(0);
   });
 
   test.prop([

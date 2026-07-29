@@ -46,6 +46,12 @@ describe("<Progress>", () => {
     expect(widths[2]!).toBeCloseTo(widths[0]! / 2, 1);
   });
 
+  it("node budget: no wrapper group per slot", () => {
+    const { container } = draw(<Progress value={3} max={5} segments={5} label="none" />);
+    expect(container.querySelectorAll("svg g").length).toBe(0);
+    expect(container.querySelectorAll("svg *").length).toBe(8); // 5 tracks + 3 fills
+  });
+
   it("positive='down' → burn-down wording, bar unchanged", () => {
     const { container } = draw(<Progress value={0.68} positive="down" />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("32% remaining.");
@@ -83,6 +89,58 @@ describe("<Progress>", () => {
 });
 
 valueEdgeSuite("Progress", (value) => <Progress value={value} title="Edge" />);
+
+// `segments` was read raw by the summary and again by the geometry, so the two
+// could describe different tracks — the accessible name announced a stepped
+// track nobody painted, or a step count nobody could count.
+describe("<Progress> announces the track it paints", () => {
+  it("a non-finite `segments` is the continuous bar, and says so", () => {
+    for (const segments of [Number.POSITIVE_INFINITY, Number.NaN]) {
+      const { container } = draw(<Progress value={0.68} segments={segments} />);
+      expect(container.querySelectorAll('[data-mc-ink="band"]').length).toBe(1);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("68% complete.");
+    }
+  });
+
+  it("under two steps there is nothing to step between — value/max, not '0/1'", () => {
+    const { container } = draw(<Progress value={0.68} segments={1.5} label="fraction" />);
+    expect(container.querySelectorAll('[data-mc-ink="band"]').length).toBe(1);
+    expect(container.querySelector("text")!.textContent).toBe("0.68/1");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("68% complete.");
+  });
+
+  it("a saturated count announces the slots it drew, not the ones it was given", () => {
+    const { container } = draw(
+      <Progress value={0.68} segments={1e9} label="fraction" width={480} />,
+    );
+    const slots = container.querySelectorAll('[data-mc-ink="band"]').length;
+    const done = container.querySelectorAll('[data-mc-ink="accent"]').length;
+    expect(slots).toBe(200); // the drawn-slot ceiling in geometry.ts
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `${done} of ${slots} steps.`,
+    );
+    expect(container.querySelector("text")!.textContent).toBe(`${done}/${slots}`);
+  });
+
+  it("steps done ride the bar, which clamps at both ends", () => {
+    const over = draw(<Progress value={200} max={100} segments={5} label="fraction" />).container;
+    expect(over.querySelectorAll('[data-mc-ink="accent"]').length).toBe(5);
+    expect(over.querySelector("svg")!.getAttribute("aria-label")).toBe("5 of 5 steps.");
+    expect(over.querySelector("text")!.textContent).toBe("5/5");
+
+    const under = draw(<Progress value={-50} max={100} segments={5} label="fraction" />).container;
+    expect(under.querySelectorAll('[data-mc-ink="accent"]').length).toBe(0);
+    expect(under.querySelector("svg")!.getAttribute("aria-label")).toBe("0 of 5 steps.");
+    expect(under.querySelector("text")!.textContent).toBe("0/5");
+  });
+
+  it("every slot keeps a positive width at the ceiling (a negative rect draws nothing)", () => {
+    const { container } = draw(<Progress value={0.68} segments={1e9} label="none" />);
+    for (const r of container.querySelectorAll("rect")) {
+      expect(Number(r.getAttribute("width"))).toBeGreaterThan(0);
+    }
+  });
+});
 
 describe("<Progress> degrades at small sizes", () => {
   // labelFont floors at 7; the percent sits on the track midline, so below one

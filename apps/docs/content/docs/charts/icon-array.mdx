@@ -1,14 +1,14 @@
 ---
 title: IconArray
-description: >-
-  React icon array chart — part-to-whole as a countable array of icons. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: IconArray makes a stated rate countable — filled units in a fixed grid, with the denominator on show.
 ---
 
-IconArray answers "how likely is this, really?". A stated rate becomes countable: filled units in a fixed N-unit grid,
-with the denominator visible. Two moves kill denominator neglect — the ratio label and the fixed grid. Fill order is
-contiguous reading-order (scattered is harder to count), and there are **no partial-unit fills ever**: a sub-unit rate
-is flagged, never faked.
+IconArray makes a stated rate countable: it prints **3 in 20** beside a grid of twenty units with three of them filled.
+`total={20}` and `label="ratio"` are the default pairing because "3 in 20" reads faster for a lay audience than "15%",
+and the ratio label plus the fixed grid keep the denominator on the page instead of in the reader's head. Units fill in
+contiguous reading order from the top-left: medical-risk-communication research finds scattered fills measurably harder
+to count, and counting is the whole point of this chart. There are **no partial-unit fills ever**. A 37% rate is never a
+unit drawn 37% full, and a rate too small to fill one unit is flagged rather than faked.
 
 <LiveDemo label="IconArray" sizeOf="icon-array">
   <IconArray value={0.15} total={20} title="Adverse events" width={140} height={30} />
@@ -24,8 +24,8 @@ is flagged, never faked.
 
 ## When to use it
 
-- **Good for** — risk in a sentence, uptake / adoption rates, lay-audience probabilities.
-- **Avoid for** — a trend (Sparkline) or a full distribution (QuantileDots).
+Use it for risk in a sentence, uptake and adoption rates, and lay-audience probabilities. For a trend use Sparkline; for
+a full distribution use QuantileDots.
 
 ## Sizing
 
@@ -75,28 +75,19 @@ is flagged, never faked.
   <IconArray value={1} total={20} title="All affected" width={140} height={30} />
 </LiveDemo>
 
-A rate of exactly 0 draws every unit hollow. A rate that is real but rounds to 0 whole units (`note: "sub"`) still shows
-a hollow grid but the summary says so explicitly — never a fractional unit standing in for "almost none." `value` is
-clamped to `[0, 1]` and non-finite input renders as 0, so a bad upstream number never breaks the grid.
+A rate of exactly 0 draws every unit hollow. A rate that is real but rounds to 0 whole units (`note: "sub"`) also shows
+a hollow grid, and the summary says so rather than standing a fractional unit in for "almost none." `value` is clamped
+to `[0, 1]` and non-finite input renders as 0, so a bad upstream number never breaks the grid.
 
 ## Four homes
 
 <FourContexts slug="icon-array" />
 
-## Why this default
-
-`total={20}` and `label="ratio"` are the default pairing because "3 in 20" reads faster and more honestly for a lay
-audience than "15%" — the denominator stays visible instead of being computed in the reader's head. Units fill in
-reading order from the top-left, never scattered: medical-risk-communication research finds scattered fills measurably
-harder to count at a glance, and counting is the whole point of this chart. There is no partial-unit fill — a 37% rate
-is never drawn as a unit that's 37% full, because a sub-pixel sliver of color is a precision claim this chart doesn't
-make.
-
 ## Accessibility
 
-The accessible name states the count and the rate — **"3 in 20. About 15%."** — and degenerate rates say so plainly ("0
-in 20", "20 in 20 — all."). The interactive entry roves the grid in reading order with the arrow keys (2-D, row-major)
-and announces each unit's state plus the running count: **"Unit 1 of 20 — filled. 3 of 20 filled."**
+The accessible name gives the count and the rate: **"3 in 20. About 15%."** Degenerate rates are spelled out too ("0 in
+20", "20 in 20 — all."). The interactive entry roves the grid in reading order with the arrow keys (2-D, row-major),
+announcing each unit's state and the running count: **"Unit 1 of 20 — filled. 3 of 20 filled."**
 
 <InteractionNote slug="icon-array" />
 

@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { makeFormatter } from "../../core/format.js";
 import { progressModel, type ProgressProps } from "../progress/index.js";
-import { ringGeometry } from "./geometry.js";
+import { ringGeometry, ringSize } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface ProgressRingProps extends Pick<
@@ -40,9 +40,8 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     value,
     max = 1,
     sweep = false,
-    weight = 3,
+    weight,
     label = "none",
-    size = 24,
     positive,
     color,
     format,
@@ -56,22 +55,32 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     children,
   } = props;
 
+  // The box the summary describes has to be the box we paint: resolved once,
+  // here and in geometry, from the one place that owns the default.
+  const size = ringSize(props.size);
   // reuse Progress's resolved model (fraction/clamp/label semantics)
   const model = progressModel({ value, max, positive, format, locale, strings, label: "percent" });
-  const showLabel = label === "percent" && model.display !== undefined;
+  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  // In `sweep` mode the arc paints what is LEFT and the name speaks what is
+  // left, but the centre figure kept printing what was DONE — one glyph carried
+  // two numbers ("68%" over a 32% wedge, announced "32% remaining"). One string
+  // feeds the label and the name now, so they cannot drift apart again.
+  const left =
+    sweep && Number.isFinite(model.fraction) ? pctFmt(Math.max(0, 1 - model.fraction)) : undefined;
+  const display = left ?? model.display;
+  const showLabel = label === "percent" && display !== undefined;
   const geo = ringGeometry({
     size,
     fraction: model.clamped,
     weight,
     sweep,
-    labelChars: showLabel ? model.display!.length : 0,
+    labelChars: showLabel ? display.length : 0,
   });
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
 
   const auto = !Number.isFinite(model.fraction)
     ? strings.noData
-    : sweep
-      ? strings.remaining(pctFmt(Math.max(0, 1 - model.fraction)))
+    : left !== undefined
+      ? strings.remaining(left)
       : model.summary;
   const accName = resolveSummary(summary, () => auto);
 
@@ -114,7 +123,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
           dominantBaseline="central"
           textAnchor="middle"
         >
-          {model.display}
+          {display}
         </text>
       ) : null}
       {children}

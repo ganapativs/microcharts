@@ -1,14 +1,13 @@
 ---
 title: StreakSpark
-description: >-
-  React streak spark chart — consecutive outcomes as a compact streak spark. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  StreakSpark collapses a run of pass/fail outcomes into bars whose width is run length, with a tick on the record.
 ---
 
-StreakSpark answers "how long is the current run, and how does it compare to the record?". A sequence of pass/fail
-outcomes collapses into **runs** — each run a bar whose width is its length on one shared scale. Streak runs sit low and
-translucent, breaks sit thin and saturated, and the **current** run is the loud accent bar at the right. The record
-streak wears a small triangle tick, so "are we near our best" reads without counting.
+StreakSpark collapses a sequence of pass/fail outcomes into **runs**, each run a bar whose width is its length on one
+shared scale. Streak runs sit low and translucent, breaks sit thin and saturated, and the **current** run is the accent
+bar at the right. The record streak carries a small triangle tick, so "are we near our best" reads without counting.
+Height and opacity encode run type, never magnitude, which leaves width as the only channel answering how long a run is.
 
 <LiveDemo
   label="StreakSpark"
@@ -42,8 +41,8 @@ streak wears a small triangle tick, so "are we near our best" reads without coun
 
 ## When to use it
 
-- **Good for** — pass/fail run histories, uptime and incident-free streaks, the current run against a record.
-- **Avoid for** — a continuous magnitude (SparkBar) or a single completion ratio (Progress).
+Use it for pass/fail run histories, uptime and incident-free streaks, and the current run against a record. A continuous
+magnitude belongs in SparkBar and a single completion ratio in Progress.
 
 ## Sizing
 
@@ -129,7 +128,7 @@ breaks the run and starts a fresh one. Everything else is a prop.
   />
 </LiveDemo>
 
-With a `locale`, the count label and the accessible summary follow that locale's own grouping — a 1,204-build streak
+With a `locale`, the count label and the accessible summary follow that locale's own grouping: a 1,204-build streak
 reads **"1.204"** in German. The outcome words come from `strings`, so the whole summary localizes together.
 
 ## Edge cases
@@ -138,8 +137,8 @@ reads **"1.204"** in German. The outcome words come from `strings`, so the whole
   <StreakSpark data={[1]} title="One build" width={160} height={24} />
 </LiveDemo>
 
-A lone outcome is one current run of length 1, and it is trivially its own record — the summary reads **"Current run 1
-passing, unbroken."**
+A lone outcome is one current run of length 1, and it is its own record: the summary reads **"Current run 1 passing,
+unbroken."**
 
 <LiveDemo label="all failing" code={`<StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" />`}>
   <StreakSpark data={[0, 0, 0, 0, 0]} title="Rough week" width={200} height={24} />
@@ -152,20 +151,12 @@ summary reads **"Current run 5 failing; no completed streak."**
 
 <FourContexts slug="streak-spark" />
 
-## Why this default
-
-Runs, not per-outcome ticks, because the decision is about _length_ — "how long have we held" and "how does that compare
-to our best". Width encodes run length on one shared scale, so a wide bar is a genuinely long run and the eye compares
-them honestly. Height and opacity encode run _type_ (streak, break, current) — never magnitude — so the ribbon never
-implies a size it doesn't have. The record tick and the accented current bar answer the two questions the raw list
-can't, at a glance.
-
 ## Accessibility
 
-The accessible name states the current run, the record, and how often the streak broke — **"Current run 3 passing;
-record 9; broke 2 times."** The interactive entry roves runs with ← →, announcing each run's length, outcome, and
-whether it is the record (**"Run 3 of 5: 4 passing."**). Direction is carried by height, opacity, and color together,
-never color alone.
+The accessible name states the current run, the record, and how often the streak broke: **"Current run 3 passing; record
+9; broke 2 times."** The interactive entry roves runs with ← →, announcing each run's length, outcome, and whether it is
+the record (**"Run 3 of 5: 4 passing."**). Direction is carried by height, opacity, and color together, never color
+alone.
 
 <InteractionNote slug="streak-spark" />
 

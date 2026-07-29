@@ -40,23 +40,26 @@ describe("docs-facts derivations", () => {
   it("marketing band is interactive-first and covers measured ranges", () => {
     expect(SIZE_MARKETING).toBe("~2–7 kB interactive · ~1–4 kB static");
     expect(SIZE.interactiveMin).toBeGreaterThanOrEqual(1.5);
-    expect(SIZE.interactiveMax).toBeLessThanOrEqual(6.8);
+    expect(SIZE.interactiveMax).toBeLessThanOrEqual(7);
     expect(SIZE.min).toBeGreaterThanOrEqual(0.5);
     expect(SIZE.max).toBeLessThanOrEqual(4.5);
   });
 
-  // performance.mdx prose names these explicitly ("Twenty-seven charts sit above the
+  // performance.mdx prose names these explicitly ("Thirty-two charts sit above the
   // 3 kB reference line … Sparkline is the largest"). If the measured sizes shift,
   // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(27);
+    expect(SIZE.over3).toHaveLength(32);
     // over3 is largest-first — Sparkline leads.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
-    // None is more than 1.07 kB over the 3 kB line (sparkline 4.07).
-    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBeLessThan(4.07 + 0.001);
+    // The prose quotes how far the largest sits over the line; docs-claims.test.ts
+    // derives that figure from SIZE.max, so pin the two to the same chart here
+    // rather than repeating the number and letting it rot.
+    expect(Math.max(...SIZE.over3.map((c) => c.kB))).toBe(SIZE.max);
     const over3Slugs = SIZE.over3.map((c) => c.slug).sort();
     expect(over3Slugs).toEqual([
       "ab-strips",
+      "benchmark-strip",
       "burn-chart",
       "change-point",
       "constellation",
@@ -65,11 +68,14 @@ describe("docs-facts derivations", () => {
       "dual-sparkline",
       "dumbbell",
       "ensemble-ghosts",
+      "event-timeline",
       "forecast-cone",
       "graded-band",
       "likert-strip",
+      "mini-bar",
       "net-flow",
       "percentile-ladder",
+      "percentile-trace",
       "polar-clock",
       "queue-depth",
       "retention-curve",
@@ -81,6 +87,7 @@ describe("docs-facts derivations", () => {
       "stacked-area",
       "station-glyph",
       "tape-gauge",
+      "volume-profile",
       "waterfall",
       "win-prob-worm",
     ]);

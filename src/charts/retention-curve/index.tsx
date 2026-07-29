@@ -48,7 +48,12 @@ export interface RetentionCurveProps {
   unit?: string | undefined;
   /** `"last"` states the final retention in a right gutter. */
   label?: "last" | "none" | undefined;
-  /** Overrides the honest `[0,1]` frame — the docs say why you shouldn't. */
+  /**
+   * Overrides the honest `[0,1]` frame — the docs say why you shouldn't.
+   * Always in retained FRACTIONS, whichever unit `data` arrives in: `data`
+   * accepts 0–1 or 0–100 and is normalised to fractions, so `[0, 100]` here is
+   * a hundred-fold frame, not "percent".
+   */
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -181,13 +186,18 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
         />
       ) : null}
       {geo.plateau ? (
+        // `ghost` (a derived context mark behind the data, like ChangePoint's
+        // regime means) resolves to the same neutral at the same 0.5 opacity
+        // this used to set inline — but `.mc-root` sets `forced-color-adjust:
+        // none`, so an inline half-opacity warm gray survived verbatim into
+        // High Contrast Mode and the plateau, which is half of what this chart
+        // answers, went invisible. The role earns the GrayText mapping.
         <line
           x1={geo.plateau.fromX}
           y1={geo.plateau.y}
           x2={width}
           y2={geo.plateau.y}
-          stroke="var(--mc-neutral)"
-          strokeOpacity={0.5}
+          data-mc-ink="ghost"
           strokeDasharray="1 1.5"
           data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
@@ -200,7 +210,16 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={{ stroke: lineColor }}
       />
-      <circle cx={geo.last.x} cy={geo.last.y} r={1.8} style={{ fill: lineColor }} />
+      {/* The role paints the same `--mc-accent` the inline default did, and it
+          keeps the endpoint mapped to Highlight under forced-colors; `color`
+          still wins, inline, when the caller sets one. */}
+      <circle
+        cx={geo.last.x}
+        cy={geo.last.y}
+        r={1.8}
+        data-mc-ink="accent"
+        style={color ? { fill: color } : undefined}
+      />
       {showLabel ? (
         <text
           x={geo.labelX}
@@ -209,7 +228,6 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

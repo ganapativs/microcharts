@@ -1,14 +1,15 @@
 ---
 title: SpiralYear
-description: >-
-  React spiral year chart — a full year of values wound as a spiral by day or week. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  SpiralYear winds a year of daily or weekly values onto a spiral and encodes each value as a five-step opacity.
 ---
 
-SpiralYear answers "how did the year breathe?" It winds a calendar series onto an Archimedean spiral: the angle is the
-position in the year (January at 12 o'clock, running clockwise) and each turn outward is the next year. The value
-becomes a five-step opacity, so busy stretches read as darker arcs of the spiral. This is a **pattern instrument** —
-opacity is the weakest ordered channel, so for an exact day's value reach for `ActivityGrid` or `HeatStrip`.
+SpiralYear winds a calendar series onto an Archimedean spiral. The angle is the position in the year (January at 12
+o'clock, running clockwise) and each turn outward is the next year, so the radius encodes time only, never value: an
+outer mark is a later date, not a bigger number. The value becomes a five-step opacity, and busy stretches render as
+darker arcs. Two adjacent turns place different years at the same angle; read that radial adjacency as calendar
+alignment. This is a **pattern instrument**: opacity is the weakest ordered channel, so for an exact day's value reach
+for `ActivityGrid` or `HeatStrip`.
 
 <LiveDemo label="SpiralYear" sizeOf="spiral-year">
   <SpiralYear
@@ -31,16 +32,19 @@ opacity is the weakest ordered channel, so for an exact day's value reach for `A
 
 ## When to use it
 
-- **Good for** — the seasonal shape of a year at a glance, spotting a busy season or a quiet stretch, or a compact "the
-  year in one square".
-- **Avoid for** — reading an exact day's value (`ActivityGrid` / `HeatStrip`), a non-cyclic trend (`Sparkline`), or more
-  than about three years.
+Use it for the seasonal shape of a year, for spotting a busy season or a quiet stretch, or as a compact "the year in one
+square". For an exact day's value use `ActivityGrid` or `HeatStrip`, and for a non-cyclic trend use `Sparkline`. Past
+about three years the turns pack too tightly to read.
 
 ## Sizing
 
 <Sizing chart="spiral-year" />
 
 ## Variants
+
+Month ticks are on by default: without a temporal anchor the spiral is texture, and the ticks are what make "when"
+readable. Five opacity steps is the ceiling, since ordered opacity supports about five discriminable levels; `steps={3}`
+drops to three for tiny sizes.
 
 <LiveDemo
   label="arc marks, or three steps for tiny sizes"
@@ -74,8 +78,8 @@ opacity is the weakest ordered channel, so for an exact day's value reach for `A
   </span>
 </LiveDemo>
 
-`locale` doesn't change any in-chart mark — opacity steps carry the value, never a printed number — but it does localize
-the peak and low values named in the accessible summary:
+`locale` changes no in-chart mark, since opacity steps carry the value and no number is printed. It does localize the
+peak and low values named in the accessible summary:
 
 <LiveDemo
   label="locale — the accessible summary follows it (no visible mark changes)"
@@ -110,25 +114,18 @@ the peak and low values named in the accessible summary:
   <SpiralYear data={[]} title="Empty" size={56} />
 </LiveDemo>
 
+A `null` day or week leaves a gap in the spiral, distinct from a faint step-one mark, because missing is not the same as
+low.
+
 ## Four homes
 
 <FourContexts slug="spiral-year" />
 
-## Why this default
-
-Month ticks are on by default because without a temporal anchor the spiral is just texture — the ticks are what make
-"when" readable. Five steps is the ceiling: ordered opacity supports about five discriminable levels, and more would be
-false precision. The spiral **radius encodes time only, never value** — an outer mark is simply a later date, not a
-bigger number. Two adjacent turns place different years at the same angle; that radial adjacency is calendar alignment,
-not similarity, and the chart never asks you to compare across it. A `null` day leaves a gap in the spiral, distinct
-from a faint step-one mark, because missing is not the same as low.
-
 ## Accessibility
 
-The accessible name states the count, the peak, and the low — **"52 weeks; peak 1.480 in week 30, low in week 48."**
-(the `de-DE` localized demo). The interactive entry lets you arrow along the spiral chronologically, each mark announced
-with its period and value through a polite live region. Because the channel is ordinal opacity, the docs and summary
-steer any exact read to `ActivityGrid`.
+The accessible name states the count, the peak, and the low: **"52 weeks; peak 1.480 in week 30, low in week 48."** (the
+`de-DE` localized demo). The interactive entry lets you arrow along the spiral chronologically, and announces each mark
+with its period and value through a polite live region.
 
 <InteractionNote slug="spiral-year" />
 

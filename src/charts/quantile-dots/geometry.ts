@@ -5,7 +5,7 @@
 // counted on the true quantile value, never the bin. Coords 2-dp, integer viewBox.
 import { quantileDotplot } from "../../core/quantile.js";
 import { clamp, maxOf, minOf } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 
 export type ThresholdSide = "above" | "below";
 
@@ -19,7 +19,10 @@ export interface QuantileDotsGeometry {
   mode: { lo: number; hi: number };
   min: number;
   max: number;
-  /** Data-space frame — lets the interactive probe invert pointer x → value. */
+  /**
+   * Data-space frame — the fixed `domain` when one is given, else the dotplot's
+   * own span. Lets the interactive probe invert pointer x → value.
+   */
   x0: number;
   range: number;
   columns: number;
@@ -30,6 +33,22 @@ export interface QuantileDotsGeometry {
 }
 
 const FLOOR_R = 1.25;
+const DEFAULT_COUNT = 20;
+
+/**
+ * Dots to lay out, clamped to the documented 1–25. Hosts compute this (an empty
+ * number field's `Number("")`, a config lookup), and a non-finite one used to
+ * survive both clamps: `quantileDotplot` then laid out ZERO dots while the
+ * accessible name still announced "0 in NaN chances above 15" over a
+ * normal-looking plot. Not a count, so fall back to the documented default.
+ * Exported because the interactive entry sizes its odds gutter off the same
+ * number — resolving it twice let the two disagree about the box.
+ */
+export function resolveCount(count: number | undefined): number {
+  return count !== undefined && Number.isFinite(count)
+    ? Math.max(1, Math.min(25, Math.round(count)))
+    : DEFAULT_COUNT;
+}
 
 /**
  * Width reserved to the right of the plot for the "N in count" odds label.
@@ -52,11 +71,14 @@ export function quantileDotsGeometry(opts: {
   gutterCh?: number | undefined;
   fontSize?: number | undefined;
 }): QuantileDotsGeometry | null {
-  const count = Math.max(1, Math.min(25, Math.round(opts.count ?? 20)));
+  const count = resolveCount(opts.count);
   const plot = quantileDotplot(opts.data, count);
   if (plot === null) return null;
 
-  const { width, height } = opts;
+  // `Chart` clamps the viewBox, but marks laid out against a raw non-finite
+  // width/height land as NaN coordinates inside a valid frame (see `chartSide`).
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const pad = opts.pad ?? 2;
   const gutter = oddsGutter(opts.gutterCh ?? 0, opts.fontSize ?? 0);
   const side = opts.side ?? "above";
@@ -65,16 +87,34 @@ export function quantileDotsGeometry(opts: {
   const plotH = height - 2 * pad;
   const baseline = height - pad;
 
-  const range = plot.binWidth * plot.columns;
+  // The value→x frame. `domain` fixes it so dotplots stacked down a table read
+  // on one scale; a non-finite or inverted pair is not a domain (a host's
+  // `Math.min` over a series holding a NaN), so it falls back to the plot's own
+  // span like every other chart in the grammar. Dots, threshold and the
+  // interactive probe's inversion all read this one frame.
+  const span = plot.binWidth * plot.columns;
+  const dom = opts.domain;
+  const fixed =
+    dom && Number.isFinite(dom[0]) && Number.isFinite(dom[1]) && dom[1] > dom[0] ? dom : null;
+  const x0 = fixed ? fixed[0] : plot.x0;
+  const range = fixed ? fixed[1] - fixed[0] : span;
+
   // data value → x (column centers fall out of this same linear map)
   const dataToX = (v: number): number =>
-    range === 0 ? pad + plotW / 2 : pad + clamp((v - plot.x0) / range, 0, 1) * plotW;
-  const colX = (c: number): number =>
-    range === 0 ? pad + plotW / 2 : pad + ((c + 0.5) / plot.columns) * plotW;
+    range === 0 ? pad + plotW / 2 : pad + clamp((v - x0) / range, 0, 1) * plotW;
+  const colX = (c: number): number => dataToX(plot.x0 + (c + 0.5) * plot.binWidth);
 
-  // radius fits both the column width and the tallest stack
-  const colW = plot.columns > 0 ? plotW / plot.columns : plotW;
-  const rFit = Math.min(colW * 0.46, (plotH / plot.maxStack) * 0.46);
+  // Radius fits the column width, the tallest stack, and the distance to the
+  // frame edge — under a fixed domain the columns cover only part of the plot,
+  // so a `plotW / columns` width would overlap the dots, and a column parked
+  // against the edge would paint outside the viewBox (`.mc-root` never clips).
+  const colW = plot.binWidth > 0 && range > 0 ? (plot.binWidth / range) * plotW : plotW;
+  let edge = plotW;
+  for (let c = 0; c < plot.columns; c++) {
+    const cx = colX(c);
+    edge = Math.min(edge, cx, width - cx);
+  }
+  const rFit = Math.min(colW * 0.46, (plotH / plot.maxStack) * 0.46, edge);
   const r = round2(Math.max(FLOOR_R, rFit));
   // The radius floor can make a tall stack taller than the plot. Tighten the row
   // step so the column spans the plot (dots touch, then overlap) instead of the
@@ -118,7 +158,7 @@ export function quantileDotsGeometry(opts: {
     mode: { lo: round2(modeLo), hi: round2(modeHi) },
     min: round2(minOf(values)),
     max: round2(maxOf(values)),
-    x0: round2(plot.x0),
+    x0: round2(x0),
     range: round2(range),
     columns: plot.columns,
     pad,

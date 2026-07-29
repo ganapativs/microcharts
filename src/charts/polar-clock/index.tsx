@@ -8,9 +8,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import type { Value } from "../../core/types.js";
-import { polarClockGeometry } from "./geometry.js";
+import { labelFont, textGutter } from "../../core/labels.js";
+import { isFiniteValue, type Value } from "../../core/types.js";
+import { POLAR_PAD, polarClockGeometry } from "./geometry.js";
 
 export interface PolarClockProps {
   data: readonly Value[];
@@ -43,7 +43,38 @@ export interface PolarClockProps {
   children?: ReactNode | undefined;
 }
 
-const PAD = 1;
+/**
+ * The peak numeral and the bottom band it sits in, resolved together with the
+ * type size that decides both.
+ *
+ * Exported because the interactive entry maps the pointer over this same box.
+ * It used to re-derive the band from the raw `fontSize` prop, so the two
+ * disagreed whenever the numeral was dropped or the prop was unusable, and the
+ * dial answered with the wrong segment.
+ *
+ * Two things are resolved rather than trusted. A host-computed `fontSize`
+ * (`Number(field.value)` on an empty input → NaN) reached the band and left the
+ * whole chart one unit tall. And the numeral is centred with the dial's own
+ * width as its only budget: nothing measures text on the server, so a per-char
+ * over-estimate decides, and a numeral that would not fit is dropped instead of
+ * painted into the margin (`.mc-root` is overflow: visible).
+ */
+export function polarClockLabel(opts: {
+  data: readonly Value[];
+  peakIndex: number;
+  box: number;
+  fontSize: number | undefined;
+  label: "max" | "none";
+  fmt: (n: number) => string;
+}): { text: string | null; band: number; fontSize: number } {
+  const { fontSize: asked, box } = opts;
+  const fontSize = isFiniteValue(asked) && asked > 0 ? asked : labelFont(box);
+  const peak = opts.label === "max" && opts.peakIndex >= 0 ? opts.data[opts.peakIndex] : undefined;
+  if (!isFiniteValue(peak)) return { text: null, band: 0, fontSize };
+  const text = opts.fmt(peak);
+  if (textGutter(text.length, fontSize, 0) > box) return { text: null, band: 0, fontSize };
+  return { text, band: Math.ceil(fontSize * 1.35), fontSize };
+}
 
 function defaultSegmentLabel(strings: PolarClockStrings) {
   return (index: number, n: number): string => {
@@ -105,20 +136,26 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(size);
 
-  const geo = polarClockGeometry({ values: data, size, inner, origin, pad: PAD, mode, now });
+  const geo = polarClockGeometry({ values: data, size, inner, origin, pad: POLAR_PAD, mode, now });
   const accName =
     summary === false
       ? false
       : (summary ?? polarClockSummary(data, { segmentFormat, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
 
-  const labelBand = label === "max" ? Math.ceil(fontSize * 1.35) : 0;
-  const peakText =
-    label === "max" && geo.peakIndex >= 0 && typeof data[geo.peakIndex] === "number"
-      ? fmt(data[geo.peakIndex] as number)
-      : null;
+  const {
+    text: peakText,
+    band: labelBand,
+    fontSize,
+  } = polarClockLabel({
+    data,
+    peakIndex: geo.peakIndex,
+    box: geo.size,
+    fontSize: props.fontSize,
+    label,
+    fmt,
+  });
 
   return (
     <Chart
@@ -130,7 +167,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       // The dial is the mark, and it's radially symmetric — centre it on the cap
       // band. Seating the dial rather than the viewBox matters here: `label="max"`
       // appends a text band below, which would otherwise drag the dial upward.
-      seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
+      seat={{ mode: "center", top: POLAR_PAD, bottom: geo.size - POLAR_PAD }}
       className={className ? `mc-polar ${className}` : "mc-polar"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >

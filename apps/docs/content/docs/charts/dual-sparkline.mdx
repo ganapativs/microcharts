@@ -1,13 +1,12 @@
 ---
 title: DualSparkline
-description: >-
-  React dual sparkline chart — two related trends sharing one word-sized frame. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: DualSparkline draws a series and its benchmark on one shared domain in a single word-sized frame.
 ---
 
-DualSparkline answers "how is this series doing against its benchmark?" Exactly two series, ever — three overlapped
-lines at 16 px are unreadable (SparkGroup for that). The benchmark whispers: dashed, thinner, neutral — never
-distinguished by color alone.
+Conversion is up 75% and the market it trades against is up 33%. DualSparkline puts both lines in one word-sized frame
+so the gap between them is the read. Exactly two series, ever: three overlapped lines at 16 px are unreadable, and
+SparkGroup is the chart for that. The benchmark renders dashed, thinner, and neutral, so it is never distinguished by
+color alone. Both series share one domain, so there are no dual axes and no per-series normalization.
 
 <LiveDemo label="DualSparkline" sizeOf="dual-sparkline">
   <DualSparkline
@@ -29,8 +28,8 @@ distinguished by color alone.
 
 ## When to use it
 
-- **Good for** — metric-vs-benchmark in table cells, actual-vs-plan in KPI cards.
-- **Avoid for** — 3+ series (SparkGroup), or different units per series (never dual axes).
+Use it for metric-vs-benchmark in table cells and actual-vs-plan in KPI cards. For 3 or more series use SparkGroup, and
+for series in different units use two charts, since this one never draws dual axes.
 
 ## Sizing
 
@@ -114,23 +113,19 @@ distinguished by color alone.
   />
 </LiveDemo>
 
-Each series carries its own gaps independently — a `null` in `data` breaks only the primary line at that index, a `null`
-in `compare` only the benchmark, and the nearest-x hover still reports both values (or "no data" for whichever side is
-missing). With a `locale`, the endpoint label and both hover values follow that locale's grouping.
+Each series carries its own gaps. A `null` in `data` breaks only the primary line at that index, a `null` in `compare`
+breaks only the benchmark, and the nearest-x hover still reports both values (or "no data" for whichever side is
+missing). A benchmark shorter than the primary series ends where its data ends; stretching it to span the frame would
+fake a correlation. Endpoints that land on the same point dedupe to one dot. With a `locale`, the endpoint label and
+both hover values follow that locale's grouping.
 
 ## Four homes
 
 <FourContexts slug="dual-sparkline" />
 
-## Why this default
-
-One shared domain across both series — the entire point is comparability, so there are no dual axes and no per-series
-normalization. A shorter benchmark simply ends; stretching it would fake correlation. Coincident endpoints dedupe to one
-dot so ink never doubles.
-
 ## Accessibility
 
-The accessible name reads both trends and both endpoints — **"Trending up 75% vs benchmark up 33%. Last 21 vs 16."**
+The accessible name reads both trends and both endpoints: **"Trending up 75% vs benchmark up 33%. Last 21 vs 16."**
 Identical series read "Matching benchmark." The interactive entry announces pairs (**"Point 9 of 12: 17 vs 15."**).
 
 <InteractionNote slug="dual-sparkline" />

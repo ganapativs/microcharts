@@ -8,9 +8,9 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { isFiniteValue } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
-import { UNIT_DOMAIN, starSpokeGeometry } from "./geometry.js";
+import { UNIT_DOMAIN, resolveDomain, starBox, starSpokeGeometry } from "./geometry.js";
 
 export interface StarSpokeDatum {
   label: string;
@@ -76,8 +76,8 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     guides = true,
     compare,
     labels = true,
-    domain = UNIT_DOMAIN,
-    size = 80,
+    domain: domainProp = UNIT_DOMAIN,
+    size: sizeProp = 80,
     format,
     locale,
     strings = EN_STAR_SPOKE,
@@ -88,6 +88,13 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Resolve the two scale props ONCE, and lay out against the resolved pair —
+  // the box the frame ships and the domain the marks are drawn on. Both reach
+  // this component straight off a host computation, and a broken one used to
+  // paint a plausible (or empty) star under a normal accessible name.
+  const size = starBox(sizeProp);
+  const domain = resolveDomain(domainProp);
 
   if (data.length > 0 && data.length < 3)
     devWarn("<StarSpoke> fewer than 3 metrics — use PairedBars/MiniBar for a cleaner read.");
@@ -107,7 +114,11 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
   });
   const cmp = compare
     ? starSpokeGeometry({
-        values: compare.slice(0, data.length),
+        // Indexed off `data`, not sliced off `compare`: the spoke angle is
+        // `i / n`, so a baseline shorter than the profile got its own smaller
+        // `n` and every ghost landed on the wrong axis — Speed's baseline
+        // drawn over Range. A missing entry collapses to the hub instead.
+        values: data.map((_d, i) => compare[i] ?? NaN),
         domain,
         width: size,
         height: size,
@@ -150,6 +161,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
           d={cmp.spokePath}
           data-mc-ink="ghost"
           strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
           style={{ strokeWidth: "calc(var(--mc-sw) * 1.4)" }}
         />
       ) : null}
@@ -162,13 +174,17 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
       />
       {dots === "tips" ? (
+        // Data ink, not accent. A tip dot encodes exactly what the spoke end
+        // already encodes, so a second hue is decoration — and the inline fill
+        // that carried it outranked the `point` role's forced-colors mapping,
+        // so High Contrast Mode kept painting the brand hex against whatever
+        // background the user chose. Bare role, same as Sparkline's endpoints.
         <path
           d={circlesPath(
             geo.spokes.map((s) => ({ x: s.tx, y: s.ty })),
             Math.max(0.8, size * 0.045),
           )}
           data-mc-ink="point"
-          style={{ fill: "var(--mc-accent)" }}
         />
       ) : null}
       {showLabels
@@ -217,8 +233,4 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

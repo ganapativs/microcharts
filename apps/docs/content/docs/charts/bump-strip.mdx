@@ -1,12 +1,12 @@
 ---
 title: BumpStrip
-description: >-
-  React bump strip chart — rank trajectory over time — #1 on top, gaps for unranked periods. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: "Rank over time on an inverted ordinal scale, with #1 on top and gaps for unranked periods."
 ---
 
-BumpStrip answers "where do we rank, and which way is it moving?" — position on an inverted ordinal scale, so #1 sits on
-top and climbing draws upward. Ranks are not values: Sparkline would lie about the distance between #2 and #3.
+BumpStrip plots one entrant's rank over a run of periods on an inverted ordinal scale, so #1 sits on top and climbing
+draws upward. Ranks are not values: a Sparkline would treat the gap between #2 and #3 as a real distance. End labels
+("#5" → "#1") anchor the ordinal read without an axis, and change dots mark only the periods where rank moved, so flat
+runs stay quiet and the eye lands on the transitions.
 
 <LiveDemo label="BumpStrip" sizeOf="bump-strip">
   <BumpStrip data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]} title="Category rank" width={220} height={26} />
@@ -22,8 +22,8 @@ top and climbing draws upward. Ranks are not values: Sparkline would lie about t
 
 ## When to use it
 
-- **Good for** — leaderboard rows, category-rank trends in KPI cards.
-- **Avoid for** — continuous values (Sparkline), or more than ~15 rank levels.
+Use it for leaderboard rows and category-rank trends in KPI cards. For continuous values use Sparkline, and keep it
+under about 15 rank levels.
 
 ## Sizing
 
@@ -33,7 +33,7 @@ top and climbing draws upward. Ranks are not values: Sparkline would lie about t
 
 <LiveDemo
   label="unranked gaps"
-  code={`// null = unranked that period — the line breaks, honestly
+  code={`// null = unranked that period — the line breaks
 <BumpStrip data={[2, null, null, 3, 1, 1]} />`}
 >
   <BumpStrip data={[2, null, null, 3, 1, 1]} title="With unranked weeks" width={220} height={26} />
@@ -71,19 +71,13 @@ top and climbing draws upward. Ranks are not values: Sparkline would lie about t
   <BumpStrip data={[3, 3, 3, 3, 3]} title="Steady at #3" width={140} height={26} />
 </LiveDemo>
 
-A single ranked period draws its two end labels with no visible line — there is no trajectory to show yet. An all-`null`
-series renders the frame with neither line nor labels; the accessible name reports it directly rather than describing a
-blank chart. A flat run (rank never changes) draws a level line with zero change dots, since `dots="changes"` only marks
-the periods where rank actually moved.
+A single ranked period draws its two end labels with no visible line, because there is no trajectory yet. An all-`null`
+series renders the frame with neither line nor labels, and the accessible name reports that directly. A flat run draws a
+level line with zero change dots, because `dots="changes"` marks only the periods where rank moved.
 
 ## Four homes
 
 <FourContexts slug="bump-strip" />
-
-## Why this default
-
-Change dots mark only the periods where rank actually moved — flat runs stay quiet, so the eye lands on the transitions.
-End labels ("#5" → "#1") anchor the ordinal read without an axis.
 
 ## Accessibility
 

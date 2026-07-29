@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
+import type { GradeProfileStrings } from "../../core/strings-grade-profile.js";
 import { GradeProfile } from "./client.js";
 
 const TRAIL = [
@@ -86,6 +87,38 @@ describe("interactive <GradeProfile>", () => {
       }),
     );
     await expect.poll(() => seen.at(-1)).toMatchObject({ index: 0, value: 10 });
+  });
+
+  it("datum.formatted is the localized chip text, not hand-composed English", async () => {
+    // `formatted` used to be built a second time with a literal " gained", so a
+    // KPI card fed from onActive read English while the chip beside it read the
+    // translation.
+    const strings: GradeProfileStrings = {
+      noData: "Aucune donnée.",
+      gradeProfile: (d, g, p, a) => `${d}, ${g} ; max ${p} à ${a}.`,
+      gradeProfileFlat: (d) => `${d}, plat.`,
+      gradeProfileAt: (at, grade, gain) => `${at} : ${grade}, ${gain} de dénivelé.`,
+      gradeMax: (g) => `${g} max`,
+    };
+    const seen: { formatted?: string | undefined }[] = [];
+    const screen = await render(
+      <GradeProfile
+        data={TRAIL}
+        strings={strings}
+        width={200}
+        height={40}
+        onActive={(d) => {
+          if (d) seen.push(d);
+        }}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-grade-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("100 : 9%, 9 de dénivelé");
+    expect(seen.at(-1)!.formatted).toBe("100 : 9%, 9 de dénivelé");
   });
 
   it("controlled selectedIndex pins the chord without focus", async () => {

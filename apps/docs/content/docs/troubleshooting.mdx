@@ -1,33 +1,31 @@
 ---
 title: Troubleshooting
-description:
-  The predictable failures — unstyled charts, a chart invisible on a dark panel, a 'use client' error from the
-  /interactive entry, the removed onPointFocus callback, an animate prop that does nothing, a chart that won't fill its
-  container, and fonts that look wrong — each with its one-line fix.
+description: >-
+  Fixes for the common microcharts failures: unstyled charts, a chart invisible on a dark panel, a 'use client' error,
+  the removed onPointFocus callback, an inert animate prop, a chart that won't fill its container, and serif labels.
 ---
 
-Most issues trace back to one of a handful of causes. This page is the fast path to each fix; the full explanation for
-each one lives on its own guide page, linked below.
+Most issues trace back to one of a handful of causes. Each fix is below, with a link to the guide page that explains it
+in full.
 
 ## Charts render with no color, no strokes, just plain shapes
 
-The stylesheet isn't loaded. Every visual property — color, stroke weight, label size, the whole theme — comes from
-`styles.css`, imported once:
+The stylesheet isn't loaded. Every visual property comes from `styles.css`: color, stroke weight, label size, the whole
+theme. Import it once:
 
 ```tsx
 import "@microcharts/react/styles.css";
 ```
 
-Without it, a chart is still valid, accessible SVG (the markup and the accessible name are both there), it just has no
-styling applied — geometry with no ink. See [Quickstart](/docs/quickstart#compatibility) for where to put the import in
-your framework.
+Without it a chart is still valid, accessible SVG: the markup and the accessible name are both there, with no styling
+applied. See [Quickstart](/docs/quickstart#compatibility) for where the import goes in your framework.
 
 ## A chart is invisible (or nearly) on a colored or dark panel
 
-Charts never paint their own background — they're transparent SVG, always. On a plain light or dark page this is
-invisible because the built-in light/dark tokens track `prefers-color-scheme`. It breaks when a chart sits on a surface
-whose color doesn't match the _page's_ color scheme — a dark-branded card on an otherwise light page, or a colored KPI
-tile — because the tokens don't know that scope looks dark; they only know what the OS/browser reports.
+Charts never paint their own background; they render transparent SVG. On a plain light or dark page you never notice,
+because the built-in light and dark tokens track `prefers-color-scheme`. It breaks when a chart sits on a surface whose
+color doesn't match the _page's_ color scheme: a dark-branded card on an otherwise light page, or a colored KPI tile.
+The tokens don't know that scope looks dark; they only know what the OS or browser reports.
 
 Fix it by rebinding the token scope to match the surface, not the page:
 
@@ -56,19 +54,19 @@ You imported a chart's `/interactive` entry into a Server Component:
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
 ```
 
-Two ways out: render the static default entry instead if you don't actually need hover, keyboard, touch, or selection —
+Two ways out. Render the static default entry if you don't need hover, keyboard, touch, or selection:
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline";
 ```
 
-— or, if you do need interactivity, move the import into a component marked `"use client"` and render that component
-from your server tree. See [Quickstart](/docs/quickstart#add-interactivity) for the static-vs-interactive split.
+Or, if you do need interactivity, move the import into a component marked `"use client"` and render that component from
+your server tree. See [Quickstart](/docs/quickstart#add-interactivity) for the static-vs-interactive split.
 
 ## `onPointFocus` / `onRunFocus` no longer fire
 
 They were removed when every interactive chart moved onto one shared contract. The replacement is `onActive`, which
-fires for the same reason on every chart in the catalog rather than under a different name per chart:
+fires for the same reason on every chart in the catalog:
 
 ```tsx
 // ❌ removed
@@ -78,12 +76,11 @@ fires for the same reason on every chart in the catalog rather than under a diff
 <Sparkline data={data} onActive={(d) => setHovered(d?.index ?? null)} />
 ```
 
-The payload is a `MicroDatum` — `{ index, value, label?, formatted? }` (`value` is the raw number, `formatted` the
-chart's ready-to-display string) — or `null` when the chart clears. `onPointFocus` on Sparkline and SparkBar and
-StreakSpark's `onRunFocus` map across directly. Note that `index` identifies the chart's _navigable unit_, which isn't
-always a series index: on Waveform it's a bucket, on Hypnogram a run, on SegmentedBar a segment. Each chart's page names
-its own unit. If you also want click-to-pin, add `onSelect` — see
-[Accessibility](/docs/accessibility#one-interaction-contract).
+The payload is a `MicroDatum`, `{ index, value, label?, formatted? }`, where `value` is the raw number and `formatted`
+is the chart's ready-to-display string; it's `null` when the chart clears. `onPointFocus` on Sparkline and SparkBar and
+StreakSpark's `onRunFocus` map across directly. `index` identifies the chart's _navigable unit_, which isn't always a
+series index: on Waveform it's a bucket, on Hypnogram a run, on SegmentedBar a segment. Each chart's page names its own
+unit. For click-to-pin, add `onSelect`; see [Accessibility](/docs/accessibility#one-interaction-contract).
 
 ## `animate` does nothing
 
@@ -94,32 +91,32 @@ import you add once, anywhere in your client bundle:
 import "@microcharts/react/motion";
 ```
 
-In development the chart logs exactly this to the console when the engine is missing. Three other reasons `animate` is
-correctly inert, none of them bugs: the reader has `prefers-reduced-motion: reduce`, the chart is a static entry
-(`animate` is an `/interactive`-only prop), or the markup came from the server and is being hydrated rather than freshly
-mounted — an entrance would mean animating content the reader can already see. The entrance also runs once per mount by
-design; remount with a changed `key` to replay it.
+In development the chart logs this to the console when the engine is missing. Three other reasons `animate` is inert,
+none of them bugs: the reader has `prefers-reduced-motion: reduce`, the chart is a static entry (`animate` is an
+`/interactive`-only prop), or the markup came from the server and is being hydrated rather than freshly mounted, where
+an entrance would animate content the reader can already see. The entrance runs once per mount by design; remount with a
+changed `key` to replay it.
 
 ## The chart won't stretch to fill its container
 
-`.mc-root` — the chart's own `<svg>` — is `display: inline-block` by default, so it flows next to text instead of
+`.mc-root`, the chart's own `<svg>`, is `display: inline-block` by default, so it flows next to text instead of
 stretching. Give it fluid sizing explicitly:
 
 ```tsx
 <Sparkline data={data} style={{ width: "100%", height: "auto" }} />
 ```
 
-and make sure the _parent_ is block-level (a flex or grid item, or a `div`) — a chart can't grow past an inline parent
-no matter what you set on the chart itself. This is identical for `…/interactive` entries: `style`, `className`, and
+and make sure the _parent_ is block-level (a flex or grid item, or a `div`). A chart can't grow past an inline parent no
+matter what you set on the chart itself. Interactive entries behave identically: `style`, `className`, and
 `width`/`height` size an interactive chart exactly the way they size its static twin, and hit-testing stays exact at any
-size — the crosshair tracks the cursor and a touch drag scrubs the unit under the finger. Full recipes, including the
+size, so the crosshair tracks the cursor and a touch drag scrubs the unit under the finger. Full recipes, including the
 inline-in-a-sentence case, are on [Sizing & scaling](/docs/sizing).
 
 ## A chart stacks on its own line instead of sitting inline with text
 
 This is usually a CSS reset, not a microcharts bug. `.mc-root`'s `display: inline-block` is declared inside a
-zero-specificity `:where()` so your styles always win — including ones you didn't mean to apply. Tailwind's Preflight
-sets a plain `svg { display: block; ... }` rule, which has _higher_ specificity than any `:where()` selector and so
+zero-specificity `:where()` so your styles always win, including ones you didn't mean to apply. Tailwind's Preflight
+sets a plain `svg { display: block; ... }` rule, which has _higher_ specificity than any `:where()` selector and
 overrides it, dropping the chart onto its own block-level line. Re-assert the layout you want at the call site:
 
 ```tsx

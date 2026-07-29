@@ -5,7 +5,7 @@
 // apex to height h=H·√r; bottom bulb apex-up, elapsed e=value fills from the base
 // to h=H·(1−√(1−e)). All coords 2-dp.
 import { clamp } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 export interface HourglassGeometry {
   /** Curved glass silhouette (concave bulbs meeting at the neck). */
@@ -25,13 +25,50 @@ export interface HourglassGeometry {
   y1: number;
 }
 
+/** Documented default box height (`HourglassProps.height`). */
+const DEFAULT_HEIGHT = 24;
+/**
+ * Smallest box whose own chrome still fits inside it: a pad plus a 1.5-unit cap
+ * plate at each end leaves the neck landing exactly on the plates. Below it the
+ * bottom plate crosses the viewBox floor, and `.mc-root` is `overflow: visible`,
+ * so it paints onto the page rather than clipping.
+ */
+const MIN_HEIGHT = 6;
+/** Below this the cap plates, which overhang the glass by `pad`, invert. */
+const MIN_WIDTH = 4;
+
+/**
+ * The instrument box, resolved once — every coordinate below derives from these
+ * two numbers, never from the raw prop. `width`/`height` arrive from a host as
+ * often as from a literal (a CSS var read back, a collapsed flex measurement, an
+ * empty numeric input → `Number("")` → NaN), and an unresolved one reached the
+ * DOM verbatim: `height={NaN}` emitted a frame of `M1 NaNL…` inside the 1×1
+ * viewBox `Chart` clamps to, and `width={-20}` drew the glass at x=-21 under a
+ * plate of `width="-21"`. The accessible name read normally through both.
+ */
+export function resolveHeight(height: number | undefined): number {
+  return isFiniteValue(height) ? Math.max(MIN_HEIGHT, height) : DEFAULT_HEIGHT;
+}
+
+/**
+ * Glass width. Unset, it tracks height so the instrument keeps a natural
+ * hourglass proportion at any size — a fixed width made tall demos read as a
+ * thin sliver.
+ */
+export function resolveGlassWidth(width: number | undefined, height: number): number {
+  if (isFiniteValue(width)) return Math.max(MIN_WIDTH, width);
+  return Math.max(12, Math.round(height * 0.66));
+}
+
 export function hourglassGeometry(opts: {
   value: number;
-  width: number;
+  width?: number | undefined;
   height: number;
   pad: number;
 }): HourglassGeometry {
-  const { width, height, pad } = opts;
+  const { pad } = opts;
+  const height = resolveHeight(opts.height);
+  const width = resolveGlassWidth(opts.width, height);
   const e = clamp(Number.isFinite(opts.value) ? opts.value : 0, 0, 1); // elapsed
   const r = 1 - e; // remaining
   const cx = round2(width / 2);
@@ -83,8 +120,16 @@ export function hourglassGeometry(opts: {
     bottomSand = `M${L} ${bot}L${R} ${bot}L${botRight(yFill)} ${yFill}L${botLeft(yFill)} ${yFill}Z`;
   }
 
+  // The falling-sand cue is a fraction of the CHAMBER, not a fixed 5 units. The
+  // constant did not survive either end of the size range: at height 8 it put y2
+  // a unit past the viewBox floor (`.mc-root` is `overflow: visible`, so that
+  // painted onto the page), and at height 48 it was a nub floating in a chamber
+  // five times its length. These ratios reproduce the tuned 24-unit glass
+  // exactly, and both ends now stay inside the glass at every size.
   const stream =
-    e > 0.005 && e < 0.995 ? { x: cx, y1: round2(neck - 1), y2: round2(neck + 4) } : null;
+    e > 0.005 && e < 0.995
+      ? { x: cx, y1: round2(neck - H * 0.11), y2: round2(neck + H * 0.44) }
+      : null;
 
   return { frame, caps, topSand, bottomSand, stream, y0: round2(pad), y1: round2(height - pad) };
 }

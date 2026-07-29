@@ -18,7 +18,9 @@ const RULE = OG.rule;
 const ACCENT = OG.accent;
 const POS = "#0e7a5f";
 const NEG = "#bd4b2d";
-const CAT = ["#c2410c", "#0e7a5f", "#2f52d4", "#b45309"] as const;
+// The site's real cobalt-derived categorical ramp (defineTheme light .vars),
+// same values the base :root carries in global.css.
+const CAT = ["#6b87cb", "#8c548c", "#c26e65", "#876701"] as const;
 
 const BARS = [
   { id: "b0", h: 12 },

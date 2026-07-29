@@ -39,6 +39,39 @@ describe("<DualSparkline>", () => {
     expect(warn).toHaveBeenCalled();
   });
 
+  it("the reference endpoint dot is neutral ink, never an inline paint", () => {
+    // An inline fill outranks the forced-colors mapping and would keep a warm
+    // gray in High Contrast Mode (`.mc-root` is forced-color-adjust: none).
+    const { container } = draw(<DualSparkline data={YOU} compare={PLAN} />);
+    const dots = [...container.querySelectorAll("circle")];
+    expect(dots.map((c) => c.getAttribute("data-mc-ink"))).toEqual(["neutral", "accent"]);
+    for (const c of dots) expect(c.getAttribute("style")).toBeNull();
+  });
+
+  it("an endpoint label wider than the box drops instead of dragging the plot out of it", () => {
+    const { container } = draw(
+      <DualSparkline data={[1, 1234567890123]} compare={[1, 2]} label="last" />,
+    );
+    expect(container.querySelector("text")).toBeNull();
+    for (const el of container.querySelectorAll("circle")) {
+      expect(Number(el.getAttribute("cx"))).toBeGreaterThanOrEqual(0);
+      expect(Number(el.getAttribute("cx"))).toBeLessThanOrEqual(60);
+    }
+    expect(container.querySelector("path")!.getAttribute("d")).not.toContain("-");
+    // the value is still announced — only the painted figure yielded
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain(
+      "Last 1,234,567,890,123",
+    );
+  });
+
+  it("an affordable endpoint label is painted, seated inside the box", () => {
+    const { container } = draw(<DualSparkline data={YOU} compare={PLAN} label="last" />);
+    const text = container.querySelector("text")!;
+    expect(text.textContent).toBe("17");
+    expect(Number(text.getAttribute("y"))).toBeGreaterThanOrEqual(3.5); // fontSize 7 / 2
+    expect(Number(text.getAttribute("y"))).toBeLessThanOrEqual(12.5);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<DualSparkline data={YOU} compare={PLAN} title="You vs plan" />);
     await expectNoA11yViolations(container);

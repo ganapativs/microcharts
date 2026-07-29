@@ -89,9 +89,17 @@ export function GalleryStage({ slug, children }: { slug: string; children: React
   // Upgrade only once the card has been near the viewport — 106 tiles fetching
   // their interactive twins at mount would flood the load window; offscreen
   // cards stay pure server SVG until scrolled toward.
+  //
+  // The observed element is the CELL, not the sentinel below. Two reasons, and
+  // both are about not observing something that may not be rendered: the
+  // sentinel is a 0×0 span, which is a fragile target for an observer, and it
+  // sits inside `.g2-cell`, which is `content-visibility: auto` — a skipped
+  // subtree is not laid out, so its descendants are a worse thing to ask about
+  // than the box that owns the skipping. The cell itself always has a box.
   useEffect(() => {
     if (!host || seen) return;
-    return observeOnce(host, () => setSeen(true));
+    const target = host.closest("[data-gallery-card]") ?? host;
+    return observeOnce(target, () => setSeen(true));
   }, [host, seen]);
 
   useEffect(() => {

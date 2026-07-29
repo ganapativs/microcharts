@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { Thermometer } from "./index.js";
+import { Thermometer, thermometerSummary } from "./index.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
@@ -88,5 +88,20 @@ describe("<Thermometer> degrades at small sizes", () => {
       expect(y - fs / 2).toBeGreaterThanOrEqual(0);
       expect(y + fs / 2).toBeLessThanOrEqual(48);
     }
+  });
+});
+
+describe("hostile `domain` (announced scale == painted scale)", () => {
+  it("a non-finite bound falls back to the documented default, not into the name", () => {
+    const { container } = draw(<Thermometer value={50} domain={[Number.NaN, 100]} />);
+    const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+    expect(label).not.toMatch(/NaN|Infinity/);
+    expect(label).toBe("50 on a 0–100 scale.");
+  });
+
+  it("summary and component resolve the same way", () => {
+    expect(thermometerSummary(50, { domain: [0, Number.POSITIVE_INFINITY] })).toBe(
+      "50 on a 0–100 scale.",
+    );
   });
 });

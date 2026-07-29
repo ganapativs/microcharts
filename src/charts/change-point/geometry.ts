@@ -5,6 +5,7 @@
 // gated on both an SS-reduction ratio and an effect size, recursing up to `max`.
 // Coords 2-dp, integer viewBox.
 import { round2, isFiniteValue } from "../../core/types.js";
+import { scaleLinear } from "../../core/scale.js";
 
 /** A split is accepted only if it cuts the pooled sum-of-squares by > this. */
 export const BREAK_SS_RATIO = 0.2;
@@ -32,13 +33,29 @@ function segStat(prefix: Stat[], lo: number, hi: number): { mean: number; ss: nu
 }
 
 /**
- * Detect up to `max` mean-shift breaks (indices where a new regime starts).
- * A labelled heuristic — never call this statistical significance.
+ * Detect up to `max` mean-shift breaks — indices into `values` where a new
+ * regime starts. A labelled heuristic — never call this statistical
+ * significance.
  */
 export function detectBreaks(values: readonly number[], max = 2, minSeg?: number): number[] {
-  const finite = values.filter(isFiniteValue);
+  // Detection runs over the finite subsequence, so a candidate split is an index
+  // into THAT array; `at` carries it back to the caller's index space. Skipping
+  // the round-trip put every marker (and every announced regime mean) one point
+  // to the left per preceding gap — on `[null×4, …20 lows, 20 highs]` the shift
+  // at 24 was drawn at 20 and announced as "+333%" instead of "+400%".
+  const finite: number[] = [];
+  const at: number[] = [];
+  for (let i = 0; i < values.length; i++) {
+    if (isFiniteValue(values[i])) {
+      finite.push(values[i]!);
+      at.push(i);
+    }
+  }
   const n = finite.length;
-  const cap = Math.max(1, Math.min(3, Math.round(max)));
+  // A non-finite `maxItems` made `cap` NaN, and `length < NaN` is false: the
+  // search loop never ran and the chart reported no shift at all.
+  const rounded = Math.round(max);
+  const cap = Number.isFinite(rounded) ? Math.max(1, Math.min(3, rounded)) : 2;
   const seg = minSeg ?? Math.max(3, Math.ceil(n / BREAK_MIN_SEG_DIVISOR));
   if (n < 2 * seg) return [];
 
@@ -91,7 +108,7 @@ export function detectBreaks(values: readonly number[], max = 2, minSeg?: number
     bounds.push(pick);
     bounds.sort((x, y) => x - y);
   }
-  return breaks.sort((x, y) => x - y);
+  return breaks.sort((x, y) => x - y).map((k) => at[k]!);
 }
 
 export interface ChangePointGeometry {
@@ -125,12 +142,14 @@ export function changePointGeometry(opts: {
     }
   if (lo === Infinity) return null;
 
-  const [d0, d1] = opts.domain ?? [lo, hi];
-  const plotH = height - 2 * pad;
   const plotW = width - 2 * pad;
-  // inlined linear scales (avoids the `scaleLinear` import); degenerate → mid
-  const sy = (v: number): number =>
-    d1 === d0 ? height / 2 : height - pad - ((v - d0) / (d1 - d0)) * plotH;
+  // `scaleLinear`, not an inlined `(v − d0)/(d1 − d0)`: it is the one place that
+  // maps a domain it cannot use to the range midpoint. A `domain` of
+  // `[NaN, NaN]` or `[-Infinity, Infinity]` — and data whose own span overflows,
+  // e.g. ±1e308 — otherwise emitted `NaN` for every y while the summary went on
+  // announcing an ordinary shift. Degenerate (d0 === d1) still lands mid.
+  const sy = scaleLinear(opts.domain ?? [lo, hi], [height - pad, pad]);
+  // x is inlined (no domain to defend — it maps index space to the plot box)
   const lastX = Math.max(1, n - 1);
   const sx = (i: number): number => pad + (i / lastX) * plotW;
 

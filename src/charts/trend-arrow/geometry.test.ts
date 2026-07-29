@@ -21,6 +21,20 @@ describe("trendArrowGeometry", () => {
     }
   });
 
+  it("an unknown glyph name falls back to the arrow instead of throwing", () => {
+    const arrow = trendArrowGeometry({ width: 16, height: 16, direction: "up", glyph: "arrow" });
+    // Untyped config keys, including the ones Object.prototype answers for.
+    for (const bogus of ["blob", "constructor", "toString", "__proto__"]) {
+      const geo = trendArrowGeometry({
+        width: 16,
+        height: 16,
+        direction: "up",
+        glyph: bogus as TrendGlyph,
+      });
+      expect(geo.d, bogus).toBe(arrow.d);
+    }
+  });
+
   it("flat is one shared shape across glyph families", () => {
     const [a, b, c] = GLYPHS.map(
       (glyph) => trendArrowGeometry({ width: 16, height: 16, direction: "flat", glyph }).d,

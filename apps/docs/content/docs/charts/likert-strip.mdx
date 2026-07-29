@@ -1,12 +1,13 @@
 ---
 title: LikertStrip
-description: >-
-  React likert strip chart — ordinal survey responses on a shared strip. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: LikertStrip stacks ordinal survey responses either side of a center line and reads which way they lean.
 ---
 
-LikertStrip answers "does the response lean agree or disagree — and how hard?" — the valence + balance read that
-SegmentedBar (unvalenced composition) cannot say. The center line is the question; everything else is the answer.
+LikertStrip stacks ordinal responses on either side of a center line: disagree to the left, agree to the right. Graded
+opacity encodes ordinal distance from neutral, never magnitude. Where SegmentedBar shows composition without valence,
+this reads the lean and how hard it leans. Both neutral conventions ship. `neutral="split"` straddles the center line,
+the canonical placement; `neutral="omit"` takes neutral out of the bar for a cleaner pole comparison, and its share is
+still counted in the total and spoken in the accessible summary.
 
 <LiveDemo label="LikertStrip" sizeOf="likert-strip">
   <LikertStrip
@@ -33,8 +34,8 @@ SegmentedBar (unvalenced composition) cannot say. The center line is the questio
 
 ## When to use it
 
-- **Good for** — survey question rows (share one scale via SparkGroup), sentiment in cards.
-- **Avoid for** — more than 7 levels, or exact per-level values (MiniBar).
+Use it for survey question rows (share one scale via SparkGroup) and sentiment in cards. Avoid it past 7 levels; for
+exact per-level values use MiniBar.
 
 ## Sizing
 
@@ -121,29 +122,21 @@ SegmentedBar (unvalenced composition) cannot say. The center line is the questio
   />
 </LiveDemo>
 
-Empty data, or data whose values all resolve to 0, has nothing to divide into a diverging read — no bar draws, and the
+Empty data, or data whose values all resolve to 0, has nothing to divide into a diverging read. No bar draws, and the
 accessible name says so plainly: **"No responses."** When every non-zero response lands on the neutral level, the bar is
 entirely the center segment and the summary reads **"All responses neutral."** instead of forcing a lean out of no
-signal. Negative counts are treated as 0 rather than pushed the wrong direction across the center line — a chart that
-lies about which side a count is on is worse than one that drops it — and the static entry logs a dev warning when it
-happens.
+signal. Negative counts are treated as 0 rather than pushed across the center line onto the wrong side, and the static
+entry logs a dev warning when it happens.
 
 ## Four homes
 
 <FourContexts slug="likert-strip" />
 
-## Why this default
-
-Both neutral conventions are supported honestly: `split` straddles the center (the canonical placement), `omit` removes
-neutral from the bar for cleaner pole comparison — but its share is ALWAYS still counted in the total and spoken in the
-accessible summary; neutral is never silently dropped. Graded opacity encodes ordinal distance from neutral, never
-magnitude.
-
 ## Accessibility
 
-The accessible name is the full valence read — **"62% agree, 24% disagree, 14% neutral. Leans positive."** A |net| under
-5 points reads "Balanced." The interactive entry steps levels in data order, carrying the response count beside the
-share it was computed from (**"Disagree: 14% (14), level 2 of 5."**).
+The accessible name carries the full valence read: **"62% agree, 24% disagree, 14% neutral. Leans positive."** A |net|
+under 5 points reads "Balanced." The interactive entry steps the levels in data order and announces the response count
+beside the share it was computed from: **"Disagree: 14% (14), level 2 of 5."**
 
 <InteractionNote slug="likert-strip" />
 

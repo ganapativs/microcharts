@@ -1,12 +1,12 @@
 ---
 title: DotPlot
-description: >-
-  React dot plot chart — values as dots on a shared scale for precise comparison. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: DotPlot compares a few named values as dots on one shared scale, with or without stems to zero.
 ---
 
-DotPlot answers "how do a few named values compare on one scale?" with the minimum ink per comparison. Dots over bars
-when the scale doesn't start at zero — position lies less than truncated bar length.
+DotPlot places each named value as a dot on one shared scale, which is the minimum ink per comparison. Reach for it over
+bars when the scale doesn't start at zero: position stays readable where a truncated bar length would overstate the
+difference. Without `stem` the domain fits the data and position is the read; with `stem` the domain is forced through
+zero and the read becomes magnitude.
 
 <LiveDemo
   label="DotPlot"
@@ -40,8 +40,8 @@ when the scale doesn't start at zero — position lies less than truncated bar l
 
 ## When to use it
 
-- **Good for** — KPI leaderboards, named comparisons in cards, rows where a truncated bar would lie.
-- **Avoid for** — more than 7 rows or time series (Sparkline).
+Use it for KPI leaderboards, named comparisons in cards, and rows where a truncated bar would overstate the difference.
+Avoid it above 7 rows; for a time series use Sparkline.
 
 ## Sizing
 
@@ -115,26 +115,22 @@ when the scale doesn't start at zero — position lies less than truncated bar l
 </LiveDemo>
 
 An empty series has nothing to compare, so no dots draw and the accessible name reads **"No data."** A single category
-still renders normally — one dot, one label — with the summary's "category"/"categories" wording matching the count
+still renders normally, one dot and one label, with the summary's "category"/"categories" wording matching the count
 (**"1 category. Highest Only 42, lowest Only 42."**). A `null` value draws no dot and no label for its row, but the row
-still occupies its slot in the vertical rhythm — the real values around it keep the same spacing they'd have in a fully
-populated set — and it's excluded from the category count in the summary, not counted as a comparison with nothing.
+still occupies its slot in the vertical rhythm, so the real values around it keep the spacing they'd have in a fully
+populated set. It is also excluded from the category count in the summary.
+
+Two dots that would land on the same spot on adjacent rows de-overlap by half a unit. Labels truncate by character count
+and drop entirely once rows get dense. Both are arithmetic on the layout; nothing is measured from the rendered text.
 
 ## Four homes
 
 <FourContexts slug="dot-plot" />
 
-## Why this default
-
-Without `stem` the domain fits the data (a position read); with `stem` the domain is forced through zero (a magnitude
-read) — the prop flips the honesty regime, and the docs say so. Coincident dots on adjacent rows de-overlap by half a
-unit; labels truncate by character count and drop entirely when rows get too dense — all pure arithmetic, nothing
-measured.
-
 ## Accessibility
 
-The accessible name carries count and extremes — **"3 categories. Highest Ada 96, lowest Kim 41."** The interactive
-entry roves rows and announces each with its rank (**"Ada: 96 — 1st of 3."**).
+The accessible name carries the count and the extremes: **"3 categories. Highest Ada 96, lowest Kim 41."** The
+interactive entry roves rows and announces each one with its rank (**"Ada: 96 — 1st of 3."**).
 
 <InteractionNote slug="dot-plot" />
 

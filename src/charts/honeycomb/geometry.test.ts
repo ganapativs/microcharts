@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { honeycombGeometry, hexPath, HONEYCOMB_MAX_CELLS } from "./geometry.js";
+import {
+  honeycombGeometry,
+  hexPath,
+  HONEYCOMB_MAX_CELLS,
+  HONEYCOMB_TOTAL,
+  resolveTotal,
+  resolveValue,
+  resolveCell,
+} from "./geometry.js";
 
 const g = (value: number, total: number, rows: number | "auto" = "auto") =>
   honeycombGeometry({ value, total, rows, cellR: 4, pad: 1 });
@@ -47,6 +55,72 @@ describe("honeycombGeometry — hex occupancy", () => {
       expect(nums[i + 1]!).toBeGreaterThanOrEqual(-0.5);
       expect(nums[i + 1]!).toBeLessThanOrEqual(geo.height + 0.5);
     }
+  });
+
+  it("sizes from the rows the comb OCCUPIES, not the rows asked for", () => {
+    // 12 cells over 5 rows is 3 columns — 4 rows. The 5th was reserved anyway,
+    // leaving a dead band under the comb and dragging the inline seat with it.
+    expect(g(5, 12, 5).height).toBe(g(5, 12, 4).height);
+    expect(g(5, 12, 100).height).toBe(g(5, 12, 12).height);
+    expect(g(5, 12, 1e6).height).toBe(g(5, 12, 12).height);
+  });
+
+  it("the seat's bottom edge is the last row's hex bottom", () => {
+    for (const rows of [1, 2, 5, 7, 100] as const) {
+      const geo = g(5, 12, rows);
+      const maxCy = geo.cells.reduce((m, c) => Math.max(m, c.cy), 0);
+      expect(geo.y1).toBeCloseTo(maxCy + 4, 5); // + circumradius
+      expect(geo.height).toBeGreaterThanOrEqual(geo.y1);
+    }
+  });
+
+  describe("hostile config — the comb is laid out on the numbers it announces", () => {
+    it("resolvers repair a computed prop", () => {
+      // `Number(field.value)` on an empty field; `seats / perFloor` at perFloor 0.
+      expect(resolveTotal(Number.NaN)).toBe(HONEYCOMB_TOTAL);
+      expect(resolveTotal(Number.POSITIVE_INFINITY)).toBe(HONEYCOMB_TOTAL);
+      expect(resolveTotal(-5)).toBe(0); // a negative capacity is none, not a default
+      expect(resolveTotal(12.7)).toBe(12);
+      expect(resolveValue(Number.NaN)).toBe(0);
+      expect(resolveValue(Number.POSITIVE_INFINITY)).toBe(0);
+      expect(resolveValue(-3)).toBe(0);
+      expect(resolveCell(Number.NaN)).toBe(4);
+      expect(resolveCell(-4)).toBe(4);
+      expect(resolveCell(0)).toBe(0);
+    });
+
+    it.each([
+      ["total", { total: Number.NaN }],
+      ["total ∞", { total: Number.POSITIVE_INFINITY }],
+      ["value", { value: Number.NaN }],
+      ["value ∞", { value: Number.POSITIVE_INFINITY }],
+      ["rows", { rows: Number.NaN }],
+      ["rows ∞", { rows: Number.POSITIVE_INFINITY }],
+      ["cell", { cell: Number.NaN }],
+      ["cell ∞", { cell: Number.POSITIVE_INFINITY }],
+      ["cell −4", { cell: -4 }],
+    ])("%s never reaches a coordinate", (_name, hostile) => {
+      const o = { value: 5, total: 12, rows: "auto" as number | "auto", cell: 4, ...hostile };
+      const geo = honeycombGeometry({
+        value: o.value,
+        total: o.total,
+        rows: o.rows,
+        cellR: o.cell,
+        pad: 1,
+      });
+      expect(geo.filledPath + geo.emptyPath).not.toMatch(/NaN|Infinity/);
+      for (const n of [geo.width, geo.height, geo.y0, geo.y1, geo.cell]) {
+        expect(Number.isFinite(n)).toBe(true);
+      }
+      // and nothing paints outside the box `.mc-root` does not clip
+      const nums = (geo.filledPath + geo.emptyPath).match(/-?\d+\.?\d*/g)?.map(Number) ?? [];
+      for (let i = 0; i < nums.length; i += 2) {
+        expect(nums[i]!).toBeGreaterThanOrEqual(-0.5);
+        expect(nums[i]!).toBeLessThanOrEqual(geo.width + 0.5);
+        expect(nums[i + 1]!).toBeGreaterThanOrEqual(-0.5);
+        expect(nums[i + 1]!).toBeLessThanOrEqual(geo.height + 0.5);
+      }
+    });
   });
 
   // the clamp itself is covered by the explicit 1e15 test above; here just sweep

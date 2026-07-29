@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
+import {
+  likertBarHeight,
+  likertBox,
+  likertFont,
+  likertGutter,
+  likertLabels,
+  likertStripGeometry,
+} from "./geometry.js";
 
 const base = { width: 60, height: 14, neutral: "split" as const };
 
@@ -72,11 +79,44 @@ describe("likertStripGeometry", () => {
   });
 });
 
+describe("likertBox (the box <Chart> actually paints)", () => {
+  it("clamps a non-finite or non-positive side to 1, like <Chart>", () => {
+    expect(likertBox(60, 14)).toEqual([60, 14]);
+    expect(likertBox(NaN, 14)).toEqual([1, 14]);
+    expect(likertBox(60, Infinity)).toEqual([60, 1]);
+    expect(likertBox(0, -14)).toEqual([1, 1]);
+  });
+
+  it("bar thickness insets the strip and floors at 3", () => {
+    expect(likertBarHeight(14)).toBe(10);
+    expect(likertBarHeight(1)).toBe(3);
+  });
+});
+
 describe("likertGutter (shared static/interactive gutter)", () => {
   it("is 0 without end labels and a deterministic 4-char reserve with them", () => {
     const font = likertFont(14);
     expect(likertGutter(false, font)).toBe(0);
     expect(likertGutter(true, font)).toBe(Math.ceil(4 * font * 0.62) + 4);
+  });
+
+  it("drops the labels AND their gutter once the plot is thinner than the bar", () => {
+    const font = likertFont(14);
+    const arg = { labelled: true, height: 14, fontSize: font, widest: 4 };
+    // 60×14: two 22-unit reserves leave 16 units of plot against a 10-unit bar.
+    expect(likertLabels({ ...arg, width: 60 })).toEqual({ show: true, gutter: 22 });
+    // 40×14: the reserves are wider than the box. Every segment used to come out
+    // negative-width and vanish, leaving two percents stacked on empty plot.
+    expect(likertLabels({ ...arg, width: 40 })).toEqual({ show: false, gutter: 0 });
+    expect(likertLabels({ ...arg, width: 53 }).show).toBe(false);
+    expect(likertLabels({ ...arg, width: 54 }).show).toBe(true); // plot 10 = barH 10
+  });
+
+  it("a caller format wide enough to swallow the plot drops the labels", () => {
+    // `format={(n) => `${n * 100} percent`}` → a 14-char reserve either side.
+    const font = likertFont(14);
+    const fit = likertLabels({ labelled: true, width: 90, height: 14, fontSize: font, widest: 14 });
+    expect(fit).toEqual({ show: false, gutter: 0 });
   });
 
   it("shrinks the plot — both entries must pass the same value", () => {

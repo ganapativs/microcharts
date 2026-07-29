@@ -101,3 +101,47 @@ describe("<ABStrips> degrades at small sizes", () => {
     expect(outerX(17)).toBeLessThan(outerX(18));
   });
 });
+
+describe("<ABStrips> survives hostile identities and magnitudes", () => {
+  it("a long seriesLabels drops the tags instead of pushing the marks out", () => {
+    // The lead gutter used to grow with the identity until it crossed
+    // `width - pad`: the scale's range inverted and every mark clamped to a
+    // coordinate outside a viewBox that does not clip.
+    const { container } = draw(
+      <ABStrips
+        data={{ a: A, b: B }}
+        width={80}
+        height={40}
+        seriesLabels={["Control cohort 2024", "Treatment cohort"]}
+      />,
+    );
+    const svg = container.querySelector("svg")!;
+    const [, , vbWidth] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+    expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual(["-9%"]);
+    for (const r of container.querySelectorAll("rect")) {
+      const right = Number(r.getAttribute("x")) + Number(r.getAttribute("width"));
+      expect(right).toBeLessThanOrEqual(vbWidth!);
+    }
+    for (const c of container.querySelectorAll("circle")) {
+      expect(Number(c.getAttribute("cx"))).toBeLessThanOrEqual(vbWidth!);
+    }
+    // the identities still name the arms where there is room for prose
+    expect(svg.getAttribute("aria-label")).toMatch(/^Treatment cohort median/);
+  });
+
+  it("a magnitude past round2's headroom announces numbers, not ∞ or NaN", () => {
+    const { container } = draw(<ABStrips data={{ a: [1e307, 2e307], b: [-1e307, 3e307] }} />);
+    const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+    expect(label).not.toMatch(/NaN|∞|Infinity/);
+    expect(label).toContain("(-33%)");
+    const delta = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(delta).toContain("-33%");
+  });
+
+  it("a base too small to take a percentage of states the delta in its own units", () => {
+    const { container } = draw(<ABStrips data={{ a: [0.005, 0.005], b: [1e308, 1e308] }} />);
+    const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+    expect(label).not.toMatch(/NaN|∞|Infinity/);
+    expect(label).not.toMatch(/%\)/); // not a percentage — the ratio overflows
+  });
+});

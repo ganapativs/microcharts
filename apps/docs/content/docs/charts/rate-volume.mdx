@@ -1,13 +1,13 @@
 ---
 title: RateVolume
-description: >-
-  React rate-volume chart — rate and volume together without dual-axis lies. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  RateVolume plots a rate line over the volume bars behind it, so a rate is never read without its denominator.
 ---
 
-RateVolume answers "the rate moved — on what volume?". A precise rate line rides over deliberately low-precision **ghost
-volume bars** — the denominator. There is no prop to remove the bars: a rate without its denominator is the lie this
-type exists to prevent. A 4.1% conversion rate reads very differently on 38 events than on 3,800.
+RateVolume draws a precise rate line over low-precision **ghost volume bars**, which are the denominator. No prop
+removes the bars: a 4.1% conversion rate reads very differently on 38 events than on 3,800. The bars are muted and
+unlabeled because the question they answer is "enough?", not "how many?". Set `minVolume` and any period below it
+renders its rate point hollow, a shape cue that survives forced-colors and print.
 
 <LiveDemo label="RateVolume" sizeOf="rate-volume">
   <RateVolume
@@ -40,9 +40,9 @@ type exists to prevent. A 4.1% conversion rate reads very differently on 38 even
 
 ## When to use it
 
-- **Good for** — a conversion / error rate with its denominator, a KPI card where the rate is the headline, spotting a
-  big rate move on thin volume.
-- **Avoid for** — volume itself needing a precise read (pair a SparkBar) or a plain series (Sparkline).
+Use it for a conversion or error rate with its denominator, a KPI card where the rate is the headline, and spotting a
+big rate move on thin volume. When volume itself needs a precise read, pair a SparkBar; for a plain series use
+Sparkline.
 
 ## Sizing
 
@@ -121,8 +121,8 @@ type exists to prevent. A 4.1% conversion rate reads very differently on 38 even
   />
 </LiveDemo>
 
-`format` and `volumeFormat` both take `Intl.NumberFormatOptions` and share the same `locale` — the rate label reads "4,1
-%" and volumes group with a period ("3.800") under `de-DE`, matching that locale's own conventions rather than a
+`format` and `volumeFormat` both take `Intl.NumberFormatOptions` and share the same `locale`. Under `de-DE` the rate
+label reads "4,1 %" and volumes group with a period ("3.800"), following that locale's own conventions rather than a
 hardcoded English format.
 
 ## Edge cases
@@ -154,26 +154,20 @@ hardcoded English format.
   <RateVolume data={[]} title="No periods yet" width={140} height={26} />
 </LiveDemo>
 
-A period with zero (or non-finite) volume renders no bar and no rate mark, and the line gaps across it instead of
-interpolating through a period nothing was measured on — the interactive entry announces that period as **"no events"**
-rather than a rate. With no data at all, the chart renders an empty root and the accessible name says **"No data."**
+A period with zero (or non-finite) volume renders no bar and no rate mark. A rate on **zero** volume is undefined
+regardless of the input, so the line gaps across that period instead of interpolating through one nothing was measured
+on, and the interactive entry announces it as **"no events"** rather than a rate. With no data at all, the chart renders
+an empty root and the accessible name says **"No data."**
 
 ## Four homes
 
 <FourContexts slug="rate-volume" />
 
-## Why this default
-
-The volume bars are muted and unlabeled because they answer "enough?", not "how many?". A rate on **zero** volume is
-undefined regardless of the input — the line breaks and no mark is drawn, because a rate nobody generated should never
-be plotted. `minVolume` makes a thin denominator visible right at the mark: below it the rate point renders hollow, a
-shape cue that survives forced-colors and print.
-
 ## Accessibility
 
-The accessible name always pairs the rate with its volume — **"4.1% on 38 events (low volume); up from 2.3% across 5
-periods."**. The interactive entry steps the periods and its live region never states a rate without the volume it
-stands on, announcing "no events" for a zero-volume period.
+The accessible name always pairs the rate with its volume: **"4.1% on 38 events (low volume); up from 2.3% across 5
+periods."** The interactive entry steps the periods, and its live region states the volume with every rate, announcing
+"no events" for a zero-volume period.
 
 <InteractionNote slug="rate-volume" />
 

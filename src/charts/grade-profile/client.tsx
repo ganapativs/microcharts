@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_GRADE_PROFILE } from "../../core/strings-grade-profile.js";
-import { gradeLayout, gradeProfileGeometry } from "./geometry.js";
+import { DEFAULT_BINS, gradeLayout, gradeProfileGeometry } from "./geometry.js";
 import {
   GradeProfile as StaticGradeProfile,
   gradePercent,
@@ -24,14 +24,17 @@ import {
   type GradeProfileProps,
 } from "./index.js";
 
-const DEFAULT_BINS = [3, 6, 10] as const;
-
 // Segments quantize into 4 grade bins; bin 1 ("moderate") carries no ink
 // attribute at all (only data-mc-cat="1"), so every bin needs a term. The
 // ridge line (ink="data") is excluded — scaling a winding profile line via
 // scaleY would squash it; it simply fades in with the base svg opacity.
 const SEGMENT_SELECTOR =
   'path[data-mc-ink="band"], path[data-mc-ink="negative"], path[data-mc-ink="bar"], path[data-mc-cat="1"]';
+
+/** Chip/callback form of an announcement: the localized sentence, minus its
+ *  full stop. Never hand-compose English for either — "gained" and its word
+ *  order live in `strings.gradeProfileAt`. */
+const chipText = (s: string | undefined): string | undefined => s?.replace(/[.。]$/, "");
 
 export interface InteractiveGradeProfileProps extends GradeProfileProps, PickerProps {
   /**
@@ -107,16 +110,25 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     },
     [geo],
   );
-  const datum = useCallback(
-    (i: number) => {
+  // One localized sentence per segment, used three ways: announced whole,
+  // painted in the chip minus its stop, and handed to `onActive` as
+  // `datum.formatted`. It used to be hand-composed a second time for the
+  // callback, which both drifted from the chip and pinned English ("gained")
+  // into a consumer's KPI card while the chip itself stayed translated.
+  const sentence = useCallback(
+    (i: number): string | undefined => {
       const s = geo.segments[i];
-      return {
-        index: i,
-        value: s?.grade ?? null,
-        formatted: s ? `${fmt(s.dEnd)}: ${pct(s.grade)}, ${fmt(s.cumGain)} gained` : undefined,
-      };
+      return s ? strings.gradeProfileAt(fmt(s.dEnd), pct(s.grade), fmt(s.cumGain)) : undefined;
     },
-    [geo, fmt, pct],
+    [geo, strings, fmt, pct],
+  );
+  const datum = useCallback(
+    (i: number) => ({
+      index: i,
+      value: geo.segments[i]?.grade ?? null,
+      formatted: chipText(sentence(i)),
+    }),
+    [geo, sentence],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -160,9 +172,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
 
   const shown = active ?? selected;
   const seg = shown !== null ? geo.segments[shown] : undefined;
-  const announced = seg
-    ? strings.gradeProfileAt(fmt(seg.dEnd), pct(seg.grade), fmt(seg.cumGain))
-    : "";
+  const announced = shown !== null ? (sentence(shown) ?? "") : "";
   const midX = seg ? (seg.x0 + seg.x1) / 2 : 0;
 
   return (
@@ -192,10 +202,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
       <LiveRegion>{announced}</LiveRegion>
       {readout && seg ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(midX, width)}>
-          {/* The localized sentence minus its full stop — never hand-compose
-              English in a VISIBLE chip (i18n canon); "gained" lives in
-              `strings.gradeProfileAt`. */}
-          {announced.replace(/[.。]$/, "")}
+          {chipText(announced)}
         </span>
       ) : null}
     </span>

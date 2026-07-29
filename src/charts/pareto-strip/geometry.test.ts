@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { paretoGeometry } from "./geometry.js";
+import { paretoGeometry, resolveMaxItems, resolveThreshold } from "./geometry.js";
 
 const base = { width: 80, height: 20 };
 const CAUSES = [
@@ -115,6 +115,56 @@ describe("paretoGeometry", () => {
       // bar fill floor seats flush with the box bottom (y = height)
       expect(round(b.y + b.height)).toBeLessThanOrEqual(20.01);
     }
+  });
+});
+
+// A host computes `threshold`, `maxItems` and the box — `Number("")` is NaN, a
+// config fetch can hand back anything — and each of those used to paint: a NaN
+// hairline announced as "no threshold", a single rolled-up "Other" bar, or NaN
+// coords inside the frame `Chart` had already clamped.
+describe("paretoGeometry hostile config", () => {
+  it("resolveThreshold: non-finite → the documented 80, out-of-range → the edge", () => {
+    for (const bad of [NaN, Infinity, -Infinity]) expect(resolveThreshold(bad)).toBe(80);
+    expect(resolveThreshold(undefined)).toBe(80);
+    expect(resolveThreshold(150)).toBe(100);
+    expect(resolveThreshold(-50)).toBe(0);
+    expect(resolveThreshold(60)).toBe(60);
+    expect(resolveThreshold(false)).toBeNull(); // still the documented opt-out
+  });
+
+  it("resolveMaxItems: non-finite → 8, and the 1–12 cap still holds", () => {
+    for (const bad of [NaN, Infinity, -Infinity]) expect(resolveMaxItems(bad)).toBe(8);
+    expect(resolveMaxItems(0)).toBe(1);
+    expect(resolveMaxItems(99)).toBe(12);
+    expect(resolveMaxItems(2.6)).toBe(3);
+  });
+
+  it("a non-finite threshold draws the scale the summary announces", () => {
+    const bad = paretoGeometry({ ...base, data: CAUSES, threshold: NaN })!;
+    const good = paretoGeometry({ ...base, data: CAUSES, threshold: 80 })!;
+    expect(bad.thresholdY).toBe(good.thresholdY);
+    expect(bad.vitalCount).toBe(good.vitalCount);
+    expect(bad.crossing).toEqual(good.crossing);
+  });
+
+  it("an out-of-range threshold clamps to the box edge, never past it", () => {
+    for (const t of [150, -50, 0, 100]) {
+      const geo = paretoGeometry({ ...base, data: CAUSES, threshold: t })!;
+      expect(geo.thresholdY).toBeGreaterThanOrEqual(0);
+      expect(geo.thresholdY).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it("maxItems={NaN} keeps the ranking instead of rolling it all into Other", () => {
+    const geo = paretoGeometry({ ...base, data: CAUSES, maxItems: NaN })!;
+    expect(geo.bars[0]!.label).toBe("Timeouts");
+    expect(geo.other).toBeNull(); // 6 causes, default cap 8 — nothing to roll up
+  });
+
+  it("a non-finite box lays out in the documented 80×20 one", () => {
+    const geo = paretoGeometry({ width: NaN, height: Infinity, data: CAUSES })!;
+    expect(geo.bars).toEqual(paretoGeometry({ ...base, data: CAUSES })!.bars);
+    expect(geo.totalWidth).toBe(80);
   });
 });
 

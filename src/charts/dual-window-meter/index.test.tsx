@@ -42,6 +42,44 @@ describe("<DualWindowMeter>", () => {
     expect(warn).toHaveBeenCalled();
   });
 
+  // The 1.3/0.7 stroke pair IS the encoding, so both traces have to be
+  // scale-invariant: with only the slow one pinned, the fast trace overtook it
+  // past ~1.9× and read as the sustained window.
+  it("both traces hold their width ratio at any display scale", () => {
+    const { container } = draw(<DualWindowMeter data={NOISE} target={75} />);
+    for (const p of container.querySelectorAll("path"))
+      expect(p.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+  });
+
+  // Hostile CONFIG (not data): a target computed from an empty field arrives
+  // NaN or undefined. It used to announce "target NaN" — or throw — over a
+  // chart whose dashed line sat at y1="NaN".
+  it("a non-finite target reads as an unknown one, and drops its line", () => {
+    for (const target of [Number.NaN, Infinity, undefined as unknown as number]) {
+      const { container } = draw(<DualWindowMeter data={NOISE} target={target} />);
+      expect(container.querySelector("line[stroke-dasharray]")).toBeNull();
+      expect(container.querySelector('[role="img"]')!.getAttribute("aria-label")).toBe(
+        "Slow window 74.7 vs target —; fast 74.7.",
+      );
+    }
+    expect(dualWindowSummary(20.4, 23.1, Number.NaN, EN_DUAL_WINDOW, fmt)).toBe(
+      "Slow window 23.1 vs target —; fast 20.4.",
+    );
+  });
+
+  it("an unusable domain or corridor never paints NaN", () => {
+    for (const ui of [
+      () => <DualWindowMeter data={NOISE} target={75} domain={[Number.NaN, Number.NaN]} />,
+      () => <DualWindowMeter data={NOISE} target={75} domain={[-Infinity, Infinity]} />,
+      () => <DualWindowMeter data={NOISE} target={75} band={[Number.NaN, 78]} />,
+    ]) {
+      const { container } = draw(ui());
+      for (const el of container.querySelectorAll("*"))
+        for (const a of el.getAttributeNames())
+          expect(el.getAttribute(a), `<${el.tagName} ${a}>`).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<DualWindowMeter data={NOISE} target={75} title="Loudness" />);
     await expectNoA11yViolations(container);

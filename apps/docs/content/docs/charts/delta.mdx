@@ -1,12 +1,11 @@
 ---
 title: Delta
-description: >-
-  React delta chart — inline signed change with direction double-encoded by glyph and color. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: Delta renders a signed change as inline text, with direction carried by both a glyph and a color.
 ---
 
-Delta is a text-first metric: a signed number with a direction glyph. It reads inline, next to a KPI, or inside a table
-cell. Direction is always doubled — a triangle _and_ a color — so it never relies on color alone.
+Delta prints a signed number with a direction glyph: `+12.4%` with an up triangle, `−8%` with a down one. It is
+text-first, so it reads inline, next to a KPI, or inside a table cell. Direction is always doubled, a triangle _and_ a
+color, so it never relies on color alone: a red/green-only read fails for color-blind viewers and under `forced-colors`.
 
 <LiveDemo label="Delta" sizeOf="delta">
   <span className="text-lg">
@@ -24,8 +23,8 @@ cell. Direction is always doubled — a triangle _and_ a color — so it never r
 
 ## When to use it
 
-- **Good for** — a KPI's change, period-over-period percent, inline metric movement.
-- **Avoid for** — showing a series or comparing magnitudes across items.
+Use it for a KPI's change, a period-over-period percent, or inline metric movement. Skip it for showing a series or
+comparing magnitudes across items.
 
 ## Sizing
 
@@ -36,8 +35,10 @@ the surrounding type: inline, it inherits the sentence; beside a KPI figure, lif
 
 ## Variants
 
-`from` derives a percent change; `positive="down"` flips only the color for metrics where down is good (latency, churn,
-cost).
+`from` derives a percent change. `positive="down"` flips which color means "good" for metrics where down is good
+(latency, churn, cost); it never changes which way the glyph points, so such a metric still shows a down-pointing
+triangle in the "good" color. Percent is the default format, since most deltas are relative change rather than raw
+magnitude. Pass `format` for currency, counts, or any other unit.
 
 <LiveDemo label="percent" code={`<Delta value={0.124} />`}>
   <span className="text-lg">
@@ -100,22 +101,13 @@ library's own `+` / `−`, so it reads the same in every locale.
   </span>
 </LiveDemo>
 
-A zero delta shows the flat glyph and **"No change."** — never a `+0%`/`−0%` that implies a direction with nothing
-behind it. `NaN` and `±Infinity` degrade the same way: the flat glyph, an em dash instead of a number, and **"No
-change."** rather than a misleading `NaN%`.
+A zero delta shows the flat glyph and **"No change."**, never a `+0%`/`−0%` that implies a direction with nothing behind
+it. `NaN` and `±Infinity` degrade the same way: the flat glyph, an em dash in place of a number, and **"No change."**
+rather than a misleading `NaN%`.
 
 ## Four homes
 
 <FourContexts slug="delta" />
-
-## Why this default
-
-Direction is always double-encoded — the triangle's shape carries it as much as the color does — because a
-red/green-only read fails for color-blind viewers and under `forced-colors`. `positive` flips only which color means
-"good"; it never changes which way the glyph points, so a metric where down is good (latency, churn, cost) still shows
-an honest down-pointing triangle, just in the "good" color. Percent is the default format because most deltas are
-relative change, not raw magnitude — pass `format` for currency, counts, or any other unit. Non-finite input renders as
-an em dash rather than `NaN%`, because a broken number should read as "nothing to report," not as a fabricated value.
 
 ## Accessibility
 

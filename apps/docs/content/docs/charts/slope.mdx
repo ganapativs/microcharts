@@ -1,13 +1,13 @@
 ---
 title: Slope
-description: >-
-  React slope chart — who rose and who fell between two moments, crossings readable at a glance. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  Slope connects each category's before and after value on one shared scale, so rises, falls, and crossings read
+  directly.
 ---
 
-Slope answers "who rose and who fell between two moments — and did the order change?". Lines stay neutral until you
-declare `positive`: a rank change is not automatically good or bad. Both columns share one y-domain — per-column
-normalization would fake convergence.
+Slope draws one line per category between two moments: East 40 to 47, West 55 to 41, and any crossing between them. Both
+columns share one y-domain, since per-column normalization would fake convergence. Lines stay neutral until you declare
+`positive`, because a rank change is not automatically good or bad.
 
 <LiveDemo
   label="Slope"
@@ -41,8 +41,8 @@ normalization would fake convergence.
 
 ## When to use it
 
-- **Good for** — before/after experiments, rank shuffles, two-moment comparisons.
-- **Avoid for** — the path between the moments (Sparkline) or more than 7 categories.
+Use it for before/after experiments, rank shuffles, and two-moment comparisons, up to about 7 categories. A two-point
+line says nothing about the path between the moments, so use Sparkline when that path is the point.
 
 ## Sizing
 
@@ -87,6 +87,11 @@ normalization would fake convergence.
     />
   </span>
 </LiveDemo>
+
+End labels drop deterministically rather than by measurement: when the rows are denser than the label font (height ÷
+count), and when the reserved label gutters would squeeze the two columns under ~35% of the width. The reclaimed room
+goes back to the lines. Endpoints that would collide inside a column are nudged apart to a full glyph pitch instead of
+overlapping.
 
 ## Edge cases
 
@@ -140,25 +145,17 @@ normalization would fake convergence.
   />
 </LiveDemo>
 
-A row missing one side (`from` or `to` as `NaN`) draws a short dashed stub toward the end it does have, rather than a
-full line — there's no second point to connect to, so nothing is interpolated. With a `locale`, both column labels and
-the announced values follow that locale's own grouping.
+A row missing one side (`from` or `to` as `NaN`) draws a short dashed stub toward the end it does have rather than a
+full line. There is no second point to connect to, so nothing is interpolated, and the row is announced as "incomplete".
+With a `locale`, both column labels and the announced values follow that locale's own grouping.
 
 ## Four homes
 
 <FourContexts slug="slope" />
 
-## Why this default
-
-A two-point line implies nothing about the path between — the docs steer to Sparkline when the journey matters. End
-labels drop deterministically, never by measurement: when the rows are denser than the label font (height ÷ count), and
-when the reserved label gutters would squeeze the two columns under ~35% of the width — in which case the reclaimed room
-goes back to the lines. Endpoints that would collide inside a column are nudged apart to a full glyph pitch instead of
-overlapping. A missing end renders a dashed stub and is announced "incomplete", never interpolated.
-
 ## Accessibility
 
-The accessible name counts directions and leads with the biggest mover — **"3 categories: 2 up, 1 down. Largest change
+The accessible name counts directions and leads with the biggest mover: **"3 categories: 2 up, 1 down. Largest change
 Mid, up 75%."** The interactive entry finds the nearest line under the pointer and roves categories ordered by their
 after-value, announcing each slope (**"East: 40 to 47, up 18%."**).
 

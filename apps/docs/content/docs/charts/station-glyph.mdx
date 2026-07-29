@@ -1,14 +1,13 @@
 ---
 title: StationGlyph
-description: >-
-  React station glyph chart — transit-style station mark for status in a network. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: StationGlyph packs sky cover, wind, and three corner numerals into one station-model glyph.
 ---
 
-StationGlyph packs a full point observation into one character, the way a meteorologist's station model does: the center
-disc fills with sky cover, a wind barb gives direction and quantized speed, and up to three corner numerals carry
-temperature, dew point, and pressure. Five fields, one glyph, no legend — dense enough to tile a map, legible enough to
-read in a table cell.
+A weather table has one row per station and five fields to fit in each cell. StationGlyph packs the whole observation
+into one character, the way a meteorologist's station model does: the center disc fills with sky cover, a wind barb
+gives direction and quantized speed, and up to three corner numerals carry temperature, dew point, and pressure. Each
+field rides its own channel, so nothing has to be inferred from a shared one, and the numerals sit where a forecaster
+expects them.
 
 <LiveDemo label="StationGlyph" sizeOf="station-glyph">
   <StationGlyph
@@ -32,8 +31,8 @@ read in a table cell.
 
 ## When to use it
 
-- **Good for** — a dense weather station model, or any multi-field reading that must fit one cell.
-- **Avoid for** — a single value (Delta) or a trend over time (Sparkline).
+Use it for a dense weather station model, or any multi-field reading that has to fit one cell. A single value belongs in
+Delta and a trend over time in Sparkline.
 
 ## Sizing
 
@@ -99,28 +98,25 @@ read in a table cell.
   />
 </LiveDemo>
 
-`format`/`locale` flow through every corner numeral (temp, dew point, pressure) and the wind speed and numerals named in
-the accessible summary — one formatter, one locale, no per-field overrides.
+Sky cover is disc area and wind is the barb: direction as angle, speed quantized into barbs so the per-barb quantum
+holds. Wind speed is quantized rather than drawn to scale for the same reason WindBarb quantizes it, that a barb count
+reads exactly where a tiny length difference does not. Below the quarter-step threshold no barb is drawn at all. Absent
+fields don't render: no barb, no numeral, and no stop for the keyboard. The disc is the one field with no absent state,
+so omitting `cloud` looks and reads exactly like a clear sky.
+
+`format`/`locale` flow through every corner numeral (temp, dew point, pressure) and through the wind speed and numerals
+named in the accessible summary: one formatter, one locale, no per-field overrides.
 
 ## Four homes
 
 <FourContexts slug="station-glyph" />
 
-## Why this default
-
-Each field rides its own channel, so nothing is inferred from a shared one: sky cover is disc area, wind is the barb
-(direction as angle, speed quantized into barbs so the per-barb quantum is honest), and the numerals are placed where a
-forecaster expects them. Wind speed is quantized rather than drawn to scale for the same reason WindBarb quantizes it —
-a barb count reads exactly, a tiny length does not. Absent fields simply don't render — no barb, no numeral, and no stop
-for the keyboard. The one field with no "absent" state is the disc itself: omitting `cloud` looks and reads exactly like
-a clear sky.
-
 ## Accessibility
 
-The accessible name is the whole observation — **"KJFK, wind northwest 45; sky overcast, 4° / 2°, 988."** The
-interactive entry roves the _present_ fields with ←/→ so a screen-reader user can step through station, wind, sky,
-temperature, dew point, and pressure one at a time — an omitted prop is not a stop — and Escape clears the focus back to
-the whole-observation reading.
+The accessible name is the whole observation: **"KJFK, wind northwest 45; sky overcast, 4° / 2°, 988."** The interactive
+entry roves the _present_ fields with ←/→, so a screen-reader user can step through station, wind, sky, temperature, dew
+point, and pressure one at a time; an omitted prop is not a stop. Escape clears the focus back to the whole-observation
+reading.
 
 <InteractionNote slug="station-glyph" />
 

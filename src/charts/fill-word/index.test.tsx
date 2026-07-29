@@ -61,6 +61,34 @@ describe("<FillWord>", () => {
     expect(container.querySelector("svg")!.getAttribute("style")).toContain("--mc-label-size");
   });
 
+  // A host computes fontSize (`base * scale`, `Number("")` from a cleared
+  // field). Every coordinate here descends from it, and the summary does not —
+  // so the chart announced "62% complete." over `font-size="NaN"` and a NaN seat.
+  it.each([NaN, Infinity, -Infinity, 0, -12])("a hostile fontSize (%s) paints no NaN", (fs) => {
+    const { container } = draw(
+      <FillWord word="uploading" value={0.62} fontSize={fs} label="value" />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.outerHTML).not.toMatch(/NaN|Infinity/);
+    // …and it falls back to the documented default rather than to a blank box
+    expect(svg.getAttribute("viewBox")).toBe(
+      draw(<FillWord word="uploading" value={0.62} label="value" />)
+        .container.querySelector("svg")!
+        .getAttribute("viewBox"),
+    );
+    expect(svg.getAttribute("style")).toContain("--mc-label-size: 12px");
+  });
+
+  // `.mc-root` sets forced-color-adjust: none, so an inline fade would reach High
+  // Contrast Mode verbatim; a presentation attribute loses to the stylesheet.
+  it("the muted track word fades by attribute, not by inline style", () => {
+    const { container } = draw(<FillWord word="quota" value={0.5} />);
+    const track = container.querySelector('text[data-mc-ink="label"]')!;
+    expect(track.getAttribute("fill-opacity")).toBe("0.4");
+    expect(track.hasAttribute("data-mc-dim")).toBe(true);
+    expect(track.getAttribute("style")).toBeNull();
+  });
+
   it("summary={false} hides it from assistive tech", () => {
     const { container } = draw(<FillWord word="sync" value={0.5} summary={false} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();

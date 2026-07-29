@@ -1,14 +1,13 @@
 ---
 title: ControlStrip
-description: >-
-  React control strip chart — process readings against control limits for out-of-control signals. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: ControlStrip plots process readings against Shewhart control limits and rings the out-of-control points.
 ---
 
-ControlStrip answers "is the process in control — or did something leave the band?". It's a Shewhart individuals chart:
-the control band is the process center ± 3σ̂, where **σ̂ = mean moving range ÷ 1.128** — the individuals estimator, stated
-outright (sample SD is not used; it inflates the limits under drift). In-control points are bare vertices; only
-out-of-control points are marked (ringed, in the negative color), because an in-control process should look boring.
+Thirty fill-weight readings off a production line, two of them outside the band. ControlStrip separates ordinary process
+variation from a genuine excursion: it is a Shewhart individuals chart, and the control band is the process center ± 3σ̂,
+where **σ̂ = mean moving range ÷ 1.128** — the individuals estimator, stated outright (sample SD is not used; it inflates
+the limits under drift). In-control points are bare vertices. Only out-of-control points are marked, ringed in the
+negative color, so the eye lands on the exception instead of scanning every dot.
 
 <LiveDemo
   label="ControlStrip"
@@ -37,16 +36,19 @@ out-of-control points are marked (ringed, in the negative color), because an in-
 
 ## When to use it
 
-- **Good for** — a production line or metric in a table cell, an SPC control chart in a KPI card, flagging
-  out-of-control excursions at a glance.
-- **Avoid for** — a plain trend (Sparkline) or a strongly trending series (ChangePoint — control limits assume a
-  stationary process).
+Use it for a production line or metric in a table cell, an SPC control chart in a KPI card, or flagging out-of-control
+excursions. For a plain trend reach for Sparkline; for a strongly trending series, ChangePoint, since control limits
+assume a stationary process.
 
 ## Sizing
 
 <Sizing chart="control-strip" />
 
 ## Variants
+
+`rules="we"` adds the implemented Western Electric subset, enumerated so none of them fires silently: WE-1 (a point
+beyond 3σ), WE-2 (two of three beyond 2σ), and WE-4 (eight on one side). `dots="all"` draws every point rather than only
+the excursions, and `limits="percentile"` swaps the ±3σ̂ band for stated quantiles, for skewed processes.
 
 <LiveDemo
   label="Western Electric rules + all dots"
@@ -97,8 +99,9 @@ out-of-control points are marked (ringed, in the negative color), because an in-
   />
 </LiveDemo>
 
-The chart draws no in-chart numbers, so `format`/`locale` shape the accessible summary and the interactive announcements
-— the strip above reads "All 12 points within control limits (center 2,5, limits 2,1–2,9)." with German decimal commas.
+The chart draws no in-chart numbers, so `format`/`locale` shape the accessible summary and the interactive
+announcements. The strip above reads "All 12 points within control limits (center 2,5, limits 2,1–2,9)." with German
+decimal commas.
 
 ## Edge cases
 
@@ -120,23 +123,19 @@ The chart draws no in-chart numbers, so `format`/`locale` shape the accessible s
   <ControlStrip data={[5, 5, 5, 5]} title="Constant" width={160} height={22} />
 </LiveDemo>
 
+Below 10 points there are too few moving ranges to trust σ̂, so the band gets a dashed outline and the summary appends
+"Limits provisional (n=6)". A constant series has MR̄ = 0 and therefore σ̂ = 0: the band collapses into the center
+hairline rather than painting a fake zero-height zone.
+
 ## Four homes
 
 <FourContexts slug="control-strip" />
 
-## Why this default
-
-Flag only the out-of-band points, because an in-control process should look boring — the eye should land on the
-exception, not scan every dot. The σ̂ estimator is the moving-range one (`MR̄ / 1.128`), never a vague "±3 sigma";
-`limits="percentile"` states its exact quantiles for skewed processes. Western Electric rules are conventions, so the
-implemented subset is enumerated (WE-1 beyond 3σ, WE-2 two-of-three beyond 2σ, WE-4 eight on one side) and none fires
-silently. With fewer than 10 points the band is dashed and the summary says "limits provisional".
-
 ## Accessibility
 
-The accessible name states the excursion count, the center, and the limits — **"2 of 30 points outside control limits
-(center 74.17, limits 67.84–80.49)."**; an in-control run reads "All N points within control limits …". The interactive
-entry steps the points and out-of-control points announce which limit they crossed.
+The accessible name states the excursion count, the center, and the limits: **"2 of 30 points outside control limits
+(center 74.17, limits 67.84–80.49)."** An in-control run reads "All N points within control limits …". The interactive
+entry steps the points, and out-of-control points announce which limit they crossed.
 
 <InteractionNote slug="control-strip" />
 

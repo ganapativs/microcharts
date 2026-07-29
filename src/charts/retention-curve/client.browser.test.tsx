@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { RetentionCurve } from "./client.js";
 import { retentionGeometry } from "./geometry.js";
+import { pointerAway } from "../../test/pointer.js";
 
 const SAMPLE = [1, 0.71, 0.52, 0.43, 0.37, 0.344, 0.341, 0.34];
 const BENCH = [1, 0.6, 0.44, 0.37, 0.33, 0.3, 0.29, 0.28];
@@ -85,6 +86,28 @@ describe("interactive <RetentionCurve>", () => {
     const pinned = await render(<RetentionCurve data={GAPPY} selectedIndex={2} />);
     const pin = pinned.container.querySelector('circle[data-mc-w="tick"]')!;
     expect(pin.getAttribute("cx")).toBe(String(expected.x));
+  });
+
+  it("a box too short to seat the readout drops its gutter from the hit map too", async () => {
+    // The static drops the last-value readout under a ~7-unit-tall box and
+    // hands the reserved gutter back to the plot. Mirroring only `label` here
+    // kept paying for that gutter, so the picker mapped the cursor across a
+    // viewBox ~20 units wider than the SVG under it: the midpoint of the mark
+    // resolved to period 4 instead of 3.
+    const screen = await render(<RetentionCurve data={SAMPLE} unit="week" width={80} height={6} />);
+    const wrap = screen.container.querySelector(".mc-retention-curve-live") as HTMLElement;
+    const r = wrap.querySelector("svg")!.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        clientX: r.left + r.width / 2,
+        clientY: r.top + r.height / 2,
+        bubbles: true,
+        pointerType: "mouse",
+      }),
+    );
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("week 3: 43% retained.");
+    await pointerAway();
   });
 
   it("controlled selectedIndex pins the mark with no interaction", async () => {

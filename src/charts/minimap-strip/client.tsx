@@ -8,7 +8,14 @@ import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { crosshairReadoutStyle, fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
-import { minimapDomain, minimapWindow } from "./geometry.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  minimapDomain,
+  minimapFog,
+  minimapWindow,
+} from "./geometry.js";
+import { chartSide } from "../../core/types.js";
 import {
   MinimapStrip as StaticMinimapStrip,
   minimapSummary,
@@ -35,8 +42,8 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
   const {
     data,
     domain: domainProp,
-    width = 120,
-    height = 16,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_MINIMAP,
@@ -49,6 +56,11 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
     style,
     ...rest
   } = props;
+
+  // Same resolution the static entry makes, for the same reason: the chip's x
+  // is computed here, and a non-finite `width` put it at `NaN%`.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
@@ -105,12 +117,16 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
   );
 
   const liveData = { ...data, window: win };
+  // The fog is painted by the composed static from the same `known`, but the
+  // name here passed a flat 0 — the interactive strip showed 8% of itself
+  // hatched as unknown and told a screen reader nothing about it.
+  const unknownShare = useMemo(() => minimapFog(data.known, domain).unknownShare, [data, domain]);
   const accName =
     summary === false
       ? undefined
       : typeof summary === "string"
         ? summary
-        : minimapSummary(liveData, domain, 0, strings, fmt, pctFmt);
+        : minimapSummary(liveData, domain, unknownShare, strings, fmt, pctFmt);
   // `label` doubles as the aria-label fallback below: a slider must always have
   // a name, even when the summary is opted out and no title is given.
   const label = [title, strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))]

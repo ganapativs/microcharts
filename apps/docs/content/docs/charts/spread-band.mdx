@@ -1,13 +1,12 @@
 ---
 title: SpreadBand
-description: >-
-  React spread band chart — central tendency with a spread band around it. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: SpreadBand fills the signed gap between two series and marks where they last crossed.
 ---
 
-SpreadBand answers "which of two series leads, by how much, and since when?" The signed gap between a subject and its
-reference is filled and split at every crossing, so who is ahead and when it last flipped both read at a glance. The
-reference whispers: dashed, thinner, neutral — direction is carried by the fill sign and the text, never color alone.
+The gutter of the chart below reads **+8**: Organic is eight ahead of Paid, and it took that lead at point 3. SpreadBand
+fills the signed gap between a subject and its reference and splits the fill at every crossing, so the current lead and
+the last flip both render. The reference line is dashed, thinner, and neutral. Direction is carried by the sign of the
+fill and by the text, never by color alone. Both series share one domain: no dual axes, no per-series normalization.
 
 <LiveDemo label="SpreadBand" sizeOf="spread-band">
   <SpreadBand
@@ -42,8 +41,8 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
 
 ## When to use it
 
-- **Good for** — lead-vs-reference in KPI cards, actual-vs-plan where the flip matters.
-- **Avoid for** — 3+ series (SparkGroup), or unpaired series / different units (never dual axes).
+Use it for lead-vs-reference in KPI cards, and for actual-vs-plan where the flip matters. Three or more series belong in
+SparkGroup; unpaired series or different units belong in separate charts, never on dual axes.
 
 ## Sizing
 
@@ -144,7 +143,7 @@ reference whispers: dashed, thinner, neutral — direction is carried by the fil
   />
 </LiveDemo>
 
-The gutter label and the hover readout follow the `locale`'s grouping — the German build reads the current gap as
+The gutter label and the hover readout follow the `locale`'s grouping: the German build reads the current gap as
 **+8.000** and the summary as "Organic leads Paid by 8.000; last crossed at point 5."
 
 ## Edge cases
@@ -203,25 +202,20 @@ The gutter label and the hover readout follow the `locale`'s grouping — the Ge
   />
 </LiveDemo>
 
-A `null` in either series is a gap in **both** — the gap is undefined where a reading is missing, so the fill and both
-lines break at that index rather than inventing a value. Identical series read "The two series are level — no gap." and
-a subject that never falls behind reports "never crossed."
+A `null` in either series is a gap in **both**: the gap is undefined where a reading is missing, so the fill and both
+lines break at that index instead of inventing a value. Identical series read "The two series are level — no gap." A
+subject that never falls behind reports "never crossed." The fill splits exactly at the interpolated crossings, so a
+flip lands where the lines cross, even when that falls between two samples.
 
 ## Four homes
 
 <FourContexts slug="spread-band" />
 
-## Why this default
-
-One shared domain across both series — comparability is the whole point, so there are no dual axes and no per-series
-normalization. The gap is filled and split exactly at the interpolated crossings, so the eye lands on the flip without
-hunting. The reference whispers and the leader's sign is stated in text, so direction never rides on color alone.
-
 ## Accessibility
 
-The accessible name states the lead, the current gap, and where the lines last crossed — **"Organic leads Paid by 8;
-last crossed at point 3."** Identical series read "The two series are level — no gap." The interactive entry announces
-the lead at each point (**"Point 12 of 12: Organic +8 over Paid."**).
+The accessible name states the lead, the current gap, and where the lines last crossed: **"Organic leads Paid by 8; last
+crossed at point 3."** Identical series read "The two series are level — no gap." The interactive entry announces the
+lead at each point (**"Point 12 of 12: Organic +8 over Paid."**).
 
 <InteractionNote slug="spread-band" />
 

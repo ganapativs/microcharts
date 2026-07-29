@@ -8,8 +8,8 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { round2 } from "../../core/types.js";
-import { constellationGeometry } from "./geometry.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
+import { constellationGeometry, DEFAULT_HEIGHT, DEFAULT_R, DEFAULT_WIDTH } from "./geometry.js";
 
 export interface ConstellationPoint {
   /** Time (the x axis; required, never jittered). */
@@ -65,25 +65,32 @@ export function constellationSummary(
   const pts = data.filter((p) => Number.isFinite(p.x));
   if (pts.length === 0) return strings.noData;
 
-  let first = pts[0]!;
-  let last = pts[0]!;
-  for (const p of pts) {
+  // The DRAWN set, mirroring the geometry: once any point carries a value the
+  // chart is in value mode, and a point without one is never painted. Counting
+  // it here announced a count and a span the reader could not find.
+  const vals = pts.filter((p) => isFiniteValue(p.y));
+  const ev = vals.length ? vals : pts;
+
+  let first = ev[0]!;
+  let last = ev[0]!;
+  for (const p of ev) {
     if (p.x < first.x) first = p;
     if (p.x > last.x) last = p;
   }
 
-  // Largest = max magnitude, else max value, else the last event.
-  const mags = pts.filter((p) => typeof p.m === "number" && Number.isFinite(p.m));
-  const vals = pts.filter((p) => typeof p.y === "number" && Number.isFinite(p.y));
+  // Largest = max magnitude, else max value, else the last event. `m > 0` is the
+  // geometry's own test for "magnitude is encoded" — a zero or negative m sizes
+  // nothing, so ranking by it would ring one star and name another.
+  const mags = ev.filter((p) => isFiniteValue(p.m) && p.m > 0);
   let largest = last;
   if (mags.length) {
     largest = mags.reduce((a, b) => (b.m! > a.m! ? b : a));
   } else if (vals.length) {
-    largest = vals.reduce((a, b) => (b.y! > a.y! ? b : a));
+    largest = ev.reduce((a, b) => (b.y! > a.y! ? b : a));
   }
 
-  if (pts.length === 1) return strings.constellationOne(xFmt(first.x));
-  return strings.constellation(pts.length, xFmt(first.x), xFmt(last.x), xFmt(largest.x));
+  if (ev.length === 1) return strings.constellationOne(xFmt(first.x));
+  return strings.constellation(ev.length, xFmt(first.x), xFmt(last.x), xFmt(largest.x));
 }
 
 export function Constellation(props: ConstellationProps): ReactNode {
@@ -95,9 +102,9 @@ export function Constellation(props: ConstellationProps): ReactNode {
     xDomain,
     xFormat,
     color,
-    width = 60,
-    height = 20,
-    rBase = 1.6,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT,
+    rBase = DEFAULT_R,
     format,
     locale,
     strings = EN_CONSTELLATION,
@@ -108,7 +115,6 @@ export function Constellation(props: ConstellationProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height);
 
   const geo = constellationGeometry({
     points: data,
@@ -120,6 +126,10 @@ export function Constellation(props: ConstellationProps): ReactNode {
     rBase,
     pad: PAD,
   });
+  // Sized off the RESOLVED box, and only from a finite override: a non-finite
+  // fontSize otherwise reached the DOM as `--mc-label-size: NaNpx` and silently
+  // dropped the numeral (every placement test fails against NaN).
+  const fontSize = isFiniteValue(props.fontSize) ? props.fontSize : labelFont(geo.height);
   const accName =
     summary === false
       ? false
@@ -133,7 +143,10 @@ export function Constellation(props: ConstellationProps): ReactNode {
   // the top edge is tight; nudged in horizontally at the sides).
   let maxLabel: { x: number; y: number; text: string; anchor: "middle" } | null = null;
   if (label === "max" && largest) {
-    const n = Number.isFinite(largest.m) ? largest.m : largest.value;
+    // The number that RANKED it, not whichever field happens to be present: with
+    // no positive magnitude the star is chosen by value, and printing its m
+    // (often 0, or negative) put a numeral on the chart that encodes nothing.
+    const n = geo.byMagnitude ? largest.m : largest.value;
     if (Number.isFinite(n)) {
       const t = fmt(n);
       const textW = t.length * 0.62 * fontSize;

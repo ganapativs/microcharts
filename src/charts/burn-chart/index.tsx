@@ -18,6 +18,10 @@ export function burnSummary(
   opts: { unit: string; work: string; mode: BurnMode; elapsed: number; total: number },
   strings: BurnStrings,
 ): string {
+  // No actual points at all (empty, or every entry non-finite): there is no
+  // measured remainder to report. Splicing `nowActual` here announced
+  // "0 points remain" — "done" — for work nobody has recorded yet.
+  if (opts.elapsed === 0) return strings.noData;
   const verb = opts.mode === "down" ? strings.burnRemain : strings.burnDone;
   const nowActual = fmt(geo.nowActual);
   if (geo.nowPlan === null)
@@ -99,7 +103,10 @@ export function BurnChart(props: BurnChartProps): ReactNode {
   const { plan, actual } = data;
 
   const probe = burnGeometry({ width, height, plan, actual, mode, projection, domain });
-  const gapText = (delta: number) => `${delta > 0 ? "+" : ""}${delta} ${unit.charAt(0)}`;
+  // `[...unit][0]`, not `charAt(0)`: charAt splits a surrogate pair, so a unit
+  // noun starting outside the BMP put half a code point in the gutter.
+  const unitInitial = [...unit][0] ?? "";
+  const gapText = (delta: number) => `${delta > 0 ? "+" : ""}${delta} ${unitInitial}`;
   // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
   // box a line of text cannot be seated inside the plot at all. The readout
   // DROPS rather than spilling past the viewBox, and because the gutter is
@@ -147,19 +154,27 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         burnSummary(
           geo,
           fmt,
-          { unit, work: workWord, mode, elapsed: actual.length, total: plan.length },
+          // Counts come from the geometry, not the props: the geometry drops
+          // non-finite entries before scaling, so the raw lengths describe a
+          // longer series than the one on screen.
+          { unit, work: workWord, mode, elapsed: geo.elapsed, total: geo.total },
           strings,
         ));
   const lineColor = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
   // gap valence: late (positive delta) is bad, early is good — double-encoded
-  // with the sign in the text, so the color never carries direction alone
-  const gapColor =
+  // with the sign in the text, so the color never carries direction alone.
+  // An ink ROLE, not an inline fill: `.mc-root` sets forced-color-adjust: none,
+  // so an inline `var(--mc-negative)` survived verbatim into High Contrast Mode
+  // (#BD4B2D reads 4.2:1 on a black Canvas, under the 4.5:1 text floor) and a
+  // consumer could not restyle the numeral either. The role paints the same
+  // tokens in the default themes and earns the forced-colors mapping.
+  const gapInk =
     geo.landing && geo.landing.delta > 0
-      ? "var(--mc-negative)"
+      ? "negative"
       : geo.landing && geo.landing.delta < 0
-        ? "var(--mc-positive)"
-        : "var(--mc-neutral)";
+        ? "positive"
+        : "label";
 
   // annotations host contract: Marker x = period index, Threshold/TargetZone y =
   // data values on the zero-anchored burn scale. Frame width is the plot `width`
@@ -226,7 +241,11 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           style={{ stroke: lineColor }}
         />
       ) : null}
-      {actual.length > 0 ? (
+      {/* geo.elapsed, not actual.length: with every entry non-finite the
+          geometry plots nothing, and the raw length still painted a today-dot
+          sitting on the zero floor — a mark reading "burned down to nothing"
+          for work that was never recorded. */}
+      {geo.elapsed > 0 ? (
         <circle cx={geo.today.x} cy={geo.today.y} r={1.8} style={{ fill: lineColor }} />
       ) : null}
       {showLabel ? (
@@ -236,7 +255,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           textAnchor="start"
           dominantBaseline="central"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums", fill: gapColor }}
+          data-mc-ink={gapInk}
         >
           {labelText}
         </text>

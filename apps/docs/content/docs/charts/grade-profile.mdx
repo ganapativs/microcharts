@@ -1,17 +1,17 @@
 ---
 title: GradeProfile
-description: >-
-  React grade profile chart — distance vs elevation with grade readable as slope. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: GradeProfile colors each segment of a route by its grade and labels the steepest pitch.
 ---
 
-GradeProfile answers "how hard is this route, and where does it bite?" Each segment between two points is filled from
-the baseline and coloured by its grade — gentle to brutal — with the elevation ridge riding on top. The steepest pitch
-is called out, so the wall in the route is the first thing you see.
+A stage climbs 67 m over 900, and the wall sits at 800. GradeProfile shows where. Each segment between two points is
+filled from the baseline and colored by its grade, from gentle to brutal, with the elevation ridge riding on top, and
+the steepest pitch is labeled so the hardest moment isn't buried.
 
-**How to read it** — colour is a _quantized_ grade bin, never a smooth ramp: flats and every descent take the faint
-band, then a mid tone, the negative colour, and the darkest fill for the brutal pitches. Height is the elevation ridge
-for shape; the encoded channel is the colour, and the interactive readout gives the exact grade.
+**How to read it** — color is a _quantized_ grade bin, never a smooth ramp: flats and every descent take the faint band,
+then a mid tone, the negative color, and the darkest fill for the brutal pitches. The default `bins` of `[3, 6, 10]`
+percent match how climbs are described, so a route reads as gentle, rolling, steep, or wall. Height is the elevation
+ridge for shape; the encoded channel is the color, and the interactive readout gives the exact grade. Below 72 pixels
+wide the four bins collapse to a flat-versus-climb read, because the finer classes stop being separable there.
 
 <LiveDemo label="GradeProfile" sizeOf="grade-profile">
   <GradeProfile
@@ -44,8 +44,8 @@ be monotonic; the values themselves can be any scale.
 
 ## When to use it
 
-- **Good for** — route and climb profiles (cycling, running, hiking); showing _where_ the hard pitches fall.
-- **Avoid for** — a single elevation series (Sparkline), or an unordered track (distance must be monotonic).
+Use it for route and climb profiles in cycling, running, and hiking, and to show _where_ the hard pitches fall. For a
+single elevation series use Sparkline; distance must be monotonic, so an unordered track won't work.
 
 ## Sizing
 
@@ -175,30 +175,21 @@ the decimal mark: the alpine profile above reads **"12.000, 1.250 gain; steepest
   />
 </LiveDemo>
 
-A descent-only route has no climb to grade, so no pitch is emphasised and the summary reports **"600 m, no real
-climb."** — climbing difficulty is the whole story, so descents always take the gentlest colour rather than borrowing a
-climb's. A non-finite elevation breaks the profile into a gap: the segments touching it drop out and the ridge splits,
-so a missing reading never invents a grade. A flat route reports the "no real climb" sentence too, and a single point
-has no segment to grade at all, so its accessible name falls back to **"No data."**
+A descent-only route has no climb to grade, so no pitch is emphasized and the summary reports **"600 m, no real
+climb."** Descents always take the gentlest color rather than borrowing a climb's, because climbing difficulty is what
+the chart grades. A non-finite elevation breaks the profile into a gap: the segments touching it drop out and the ridge
+splits, so a missing reading never invents a grade. A flat route reports the "no real climb" sentence too, and a single
+point has no segment to grade at all, so its accessible name falls back to **"No data."**
 
 ## Four homes
 
 <FourContexts slug="grade-profile" />
 
-## Why this default
-
-Two decisions carry the chart. Grade is **quantized** into bins, not drawn as a continuous colour ramp — a route reads
-as "gentle / rolling / steep / wall", categories a rider can act on, instead of a gradient nobody can decode at a
-glance. And the default `bins` of `[3, 6, 10]` percent match how climbs are actually described, with the steepest pitch
-labelled so the hardest moment is never buried. Below 72 pixels wide the four bins collapse to a simple
-flat-versus-climb read, because the finer classes stop being separable there.
-
 ## Accessibility
 
-The accessible name states the route's shape in words — **"900, 67 gain; steepest 16% at 800."** — distance, total
-climb, and where the hardest pitch falls, none of it dependent on colour. The interactive entry announces each pitch as
-you rove it (`←`/`→`), giving the true grade and the cumulative climb, so the encoding never has to be learned to be
-used.
+The accessible name gives the distance, the total climb, and where the hardest pitch falls: **"900, 67 gain; steepest
+16% at 800."** None of it depends on color. The interactive entry announces each pitch as you rove it (`←`/`→`), with
+the true grade and the cumulative climb.
 
 <InteractionNote slug="grade-profile" />
 

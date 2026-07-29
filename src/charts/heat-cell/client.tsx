@@ -9,7 +9,7 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { heatCellGeometry } from "./geometry.js";
+import { heatCellGeometry, HEAT_CELL_LABEL_SIZE } from "./geometry.js";
 import { HeatCell as StaticHeatCell, heatCellSummary, type HeatCellProps } from "./index.js";
 
 export interface InteractiveHeatCellProps extends HeatCellProps {
@@ -22,7 +22,8 @@ export interface InteractiveHeatCellProps extends HeatCellProps {
   animate?: boolean;
   /**
    * Show the floating value chip on hover/focus (default `true`). `false`
-   * suppresses only the chip. Inert when `label="value"` already prints it.
+   * suppresses only the chip. Inert when `label="value"` already paints the
+   * numeral on the cell — a value too wide to fit still gets the chip.
    */
   readout?: boolean;
   /**
@@ -62,7 +63,9 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const [active, setActive] = useState(false);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = heatCellGeometry({ width: 12, height: 12, value, domain, steps, shape });
-  const text = heatCellSummary(value, geo.step, steps, fmt, strings);
+  // `geo.steps`, not the prop: the static bins and paints against the resolved
+  // count, and the chip has to name the same scale the cell was binned on.
+  const text = heatCellSummary(value, geo.step, geo.steps, fmt, strings);
 
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
@@ -71,7 +74,17 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   // alone doesn't name the step). Its own `strings` token, never an inline
   // template — a chip is rendered text, so English in it is untranslatable.
   // Suppressed when `label="value"` already prints the number on the cell.
-  const chip = geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, steps) : fmt(value);
+  const chip =
+    geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, geo.steps) : fmt(value);
+
+  // The static DROPS the numeral when it is wider than the cell, so
+  // `label="value"` alone was the wrong suppression test: a wide value painted
+  // no numeral and got no chip either, leaving an announcement with nothing on
+  // screen. Ask geometry the same question the static asks.
+  const numeralPainted =
+    props.label === "value" &&
+    geo.step !== null &&
+    geo.labelFits(fmt(value).length, HEAT_CELL_LABEL_SIZE);
 
   // Cell value (readout number). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({
@@ -121,7 +134,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
         summary={false}
       />
       <LiveRegion>{active ? text : ""}</LiveRegion>
-      {readout && active && geo.step !== null && props.label !== "value" ? (
+      {readout && active && geo.step !== null && !numeralPainted ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {chip}
         </span>

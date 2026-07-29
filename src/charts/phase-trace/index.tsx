@@ -7,8 +7,15 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_PHASE_TRACE, type PhaseTraceStrings } from "../../core/strings-phase-trace.js";
-import { isFiniteValue } from "../../core/types.js";
-import { phaseTraceGeometry, type Heading, type Pt } from "./geometry.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_TAIL,
+  DEFAULT_WIDTH,
+  phaseTraceGeometry,
+  type Heading,
+  type Pt,
+} from "./geometry.js";
 
 export type PhaseTraceDatum = Pt;
 
@@ -35,18 +42,6 @@ export interface PhaseTraceProps {
   className?: string | undefined;
   style?: CSSProperties | undefined;
   children?: ReactNode | undefined;
-}
-
-function extent(vals: number[]): readonly [number, number] {
-  let lo = Infinity;
-  let hi = -Infinity;
-  for (const v of vals) {
-    if (v < lo) lo = v;
-    if (v > hi) hi = v;
-  }
-  if (!Number.isFinite(lo)) return [0, 1];
-  if (lo === hi) return [lo - 1, hi + 1];
-  return [lo, hi];
 }
 
 /** Shared summary — the current point + heading (named axes). */
@@ -77,11 +72,11 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
     yLabel = "y",
     xDomain,
     domain,
-    tail = 0.25,
+    tail = DEFAULT_TAIL,
     startDot = false,
     grid = false,
-    width = 40,
-    height = 32,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_PHASE_TRACE,
@@ -96,11 +91,13 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
   if (title && (props.xLabel == null || props.yLabel == null))
     devWarn("<PhaseTrace> axes unnamed — pass xLabel/yLabel so the summary can read them.");
 
-  const finite = data.filter((p) => isFiniteValue(p.x) && isFiniteValue(p.y));
-  const xd = xDomain ?? extent(finite.map((p) => p.x));
-  const yd = domain ?? extent(finite.map((p) => p.y));
+  // One resolved box for the frame, the marks and the grid — geometry rejects
+  // the same non-finite props against the same defaults, so the viewBox and
+  // what is drawn inside it can never describe two different boxes.
+  const w = chartSide(width, DEFAULT_WIDTH);
+  const h = chartSide(height, DEFAULT_HEIGHT);
   const fmt = makeFormatter(format, locale);
-  const geo = phaseTraceGeometry({ data, xDomain: xd, yDomain: yd, tail, width, height });
+  const geo = phaseTraceGeometry({ data, xDomain, yDomain: domain, tail, width: w, height: h });
   const accName =
     summary === false
       ? false
@@ -108,8 +105,8 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
 
   return (
     <Chart
-      width={width}
-      height={height}
+      width={w}
+      height={h}
       title={title}
       summary={accName}
       id={id}
@@ -120,13 +117,16 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
       className={className ? `mc-phase ${className}` : "mc-phase"}
       style={style}
     >
+      {/* Quadrant hairlines, spelled like QuadrantDot's split cross: the muted
+          ink role carries the neutral, so High Contrast Mode remaps it instead
+          of preserving a fixed warm gray against the user's own background. */}
       {grid ? (
         <path
-          d={`M${width / 2} 1V${height - 1}M1 ${height / 2}H${width - 1}`}
-          fill="none"
-          stroke="var(--mc-neutral)"
-          strokeOpacity={0.18}
+          d={`M${w / 2} 1V${h - 1}M1 ${h / 2}H${w - 1}`}
+          data-mc-ink="muted"
           data-mc-w="hair"
+          fill="none"
+          strokeOpacity={0.18}
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
@@ -134,10 +134,10 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
         <path
           d={geo.trailPath}
           data-mc-ink="muted"
+          data-mc-w="full"
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "var(--mc-sw)" }}
         />
       ) : null}
       {geo.tailPath ? (
@@ -151,14 +151,11 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
         />
       ) : null}
+      {/* A filled neutral dot, so it takes the FILLED neutral role rather than
+          the stroked muted one it had to override inline — an inline fill wins
+          over the forced-colors mapping and painted #8a8986 verbatim there. */}
       {startDot && geo.start ? (
-        <circle
-          cx={geo.start.x}
-          cy={geo.start.y}
-          r={1.3}
-          data-mc-ink="muted"
-          style={{ fill: "var(--mc-neutral)", stroke: "none" }}
-        />
+        <circle cx={geo.start.x} cy={geo.start.y} r={1.3} data-mc-ink="neutral" />
       ) : null}
       {geo.arrow ? (
         <path
@@ -170,7 +167,9 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           style={{ strokeWidth: "calc(var(--mc-sw) * 1.1)" }}
         />
       ) : null}
-      {geo.end ? <circle cx={geo.end.x} cy={geo.end.y} r={1.6} fill="var(--mc-accent)" /> : null}
+      {/* "Now": the same flag role the arrowhead carries, so the accent comes
+          from the ink role and maps to the system Highlight in forced colors. */}
+      {geo.end ? <circle cx={geo.end.x} cy={geo.end.y} r={1.6} data-mc-ink="flag" /> : null}
       {children}
     </Chart>
   );

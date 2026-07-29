@@ -47,6 +47,36 @@ describe("<RetentionCurve>", () => {
     expect(none.querySelector("text")).toBeNull();
   });
 
+  it("plateau period in the name matches the marker's x (gaps included)", () => {
+    const gappy = [1, Number.NaN, Number.NaN, 0.5, 0.34, 0.341, 0.34, 0.339];
+    const { container } = draw(<RetentionCurve data={gappy} unit="week" />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "34% retained after 8 weeks; curve plateaus from week 5.",
+    );
+    // …and the rule starts at that same period, not two gaps to its left.
+    expect(container.querySelector("line")!.getAttribute("x1")).toBe("56.29");
+  });
+
+  // `.mc-root` sets forced-color-adjust: none, so any inline paint survives
+  // High Contrast Mode verbatim. Both marks carry an ink role instead, and the
+  // label leaves tabular-nums to styles.css (inline would defeat the :where()
+  // consumer-override contract).
+  it("plateau rule + endpoint paint through ink roles, not inline color", () => {
+    const { container } = draw(<RetentionCurve data={SAMPLE} />);
+    const rule = container.querySelector("line")!;
+    expect(rule.getAttribute("data-mc-ink")).toBe("ghost");
+    expect(rule.getAttribute("stroke")).toBeNull();
+    const dot = container.querySelector("circle")!;
+    expect(dot.getAttribute("data-mc-ink")).toBe("accent");
+    expect(dot.getAttribute("style")).toBeNull();
+    expect(container.querySelector("text")!.style.fontVariantNumeric).toBe("");
+  });
+
+  it("an explicit color still overrides the endpoint inline", () => {
+    const { container } = draw(<RetentionCurve data={SAMPLE} color="rebeccapurple" />);
+    expect(container.querySelector("circle")!.style.fill).toBe("rebeccapurple");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<RetentionCurve data={SAMPLE} title="W12 cohort" />);
     await expectNoA11yViolations(container);

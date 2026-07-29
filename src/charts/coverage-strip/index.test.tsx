@@ -41,6 +41,30 @@ describe("<CoverageStrip>", () => {
     expect(container.querySelectorAll("svg *").length).toBe(5);
   });
 
+  it("a hostile `expected` never blanks the strip or the count", () => {
+    const data = [1, 1, null, 1, null, null, 1];
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY]) {
+      const { container } = draw(<CoverageStrip data={data} expected={bad} />);
+      expect(container.querySelectorAll("rect").length).toBe(7);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+        "4 of 7 slots measured (57%); longest gap 2 slots.",
+      );
+    }
+  });
+
+  it("a hostile `steps` never reaches the intensity ramp", () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY]) {
+      const { container } = draw(
+        <CoverageStrip data={[0, null, 100]} mode="intensity" steps={bad} domain={[0, 100]} />,
+      );
+      const ops = [...container.querySelectorAll('rect[data-mc-ink="cell"]')].map((r) =>
+        r.getAttribute("fill-opacity"),
+      );
+      // the geometry falls back to 5 steps, so the paint must too
+      expect(ops).toEqual(["0.25", "1"]);
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<CoverageStrip data={[1, null, 3]} title="Sensor uptime" />);
     await expectNoA11yViolations(container);

@@ -9,6 +9,7 @@ import { labelFont, labelFitsY, textGutterProse } from "../../core/labels.js";
 import { sproutRowGeometry, stageGlyph } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 import { maxOf } from "../../core/scale.js";
+import { chartSide } from "../../core/types.js";
 
 export interface SproutDatum {
   label: string;
@@ -36,6 +37,30 @@ export interface SproutRowProps {
 }
 
 const PAD = 2;
+/** Slot pitch when the caller sets none. */
+const DEFAULT_STEP = 16;
+/** Labels stagger onto two tiers below the soil, so a named row starts taller. */
+const defaultHeight = (labels: boolean): number => (labels ? 40 : 20);
+
+/**
+ * Box and type size, resolved ONCE from the caller's props.
+ *
+ * Both are host-computed as often as typed, and a non-finite or non-positive one
+ * is destructive in a way a bad datum is not: `height={NaN}` painted
+ * `d="M9.55 NaN…"` glyphs and `--mc-seat: NaN` inside a viewBox `Chart` had
+ * already clamped to 1, and `fontSize={-3}` put a negative `font-size` on every
+ * name. Exported because the interactive entry needs the same two numbers —
+ * deriving them from the raw props again is how its focus ring leaves the glyph.
+ */
+export function sproutBox(
+  labels: boolean,
+  height?: number | undefined,
+  fontSize?: number | undefined,
+): { height: number; fontSize: number } {
+  const h = chartSide(height ?? defaultHeight(labels), defaultHeight(labels));
+  const auto = labelFont(h, 0.3);
+  return { height: h, fontSize: chartSide(fontSize ?? auto, auto) };
+}
 
 export function sproutRowSummary(
   data: readonly SproutDatum[],
@@ -79,7 +104,9 @@ export function sproutLayout(
         0,
       )
     : 0;
-  const s = Math.max(step ?? 16, Math.ceil(catExtent / 2));
+  // A NaN pitch walked every slot centre to NaN inside a valid frame, and a
+  // negative one marched the row leftwards out of the box.
+  const s = Math.max(chartSide(step ?? DEFAULT_STEP, DEFAULT_STEP), Math.ceil(catExtent / 2));
   // Side gutter so the outermost name (half its extent past its centre) never
   // clips the viewBox edge.
   const padX = labels ? Math.max(PAD, Math.ceil(catExtent / 2 - s / 2)) : PAD;
@@ -110,9 +137,6 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     labels = false,
     label = "none",
     color,
-    // Labels stagger onto two tiers below the soil, so the default row is taller
-    // when names are shown (glyphs still get the upper half).
-    height = labels ? 40 : 20,
     strings = EN_SPROUT,
     title,
     summary,
@@ -121,7 +145,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize);
   // A name costs a band below the soil; keep it only while the glyph still has
   // room to grow above that band. Under it the row would be all text and no
   // sprout, with the names spilling out of the box — so they drop, and the band

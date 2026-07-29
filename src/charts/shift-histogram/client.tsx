@@ -72,7 +72,17 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
   // sweeps the sequence left-to-right. `rect` alone covers before (neutral
   // fill) and after (filled in mirror mode, outlined in overlay mode) — no
   // other rects live in this chart.
-  useEntrance(hostRef, "rise", animate, { selector: "rect", order: "x" });
+  // `defer` keeps the two median rules on ONE beat. They carry the ink roles of
+  // the sides they mark, and the cast splits on those roles — accent is voice,
+  // data is stage — so without this the after rule arrived a beat after the
+  // before rule and the pair stopped reading as one movement. Deferred, both
+  // land with the shift label, after the bins they summarize. The center
+  // hairline is `muted` and stays in the opening stage, where the axis belongs.
+  useEntrance(hostRef, "rise", animate, {
+    selector: "rect",
+    order: "x",
+    defer: 'line[data-mc-ink="data"], line[data-mc-ink="accent"]',
+  });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // Bin SHARES are percents of their own sample, so they take `locale` but never

@@ -85,7 +85,12 @@ export function ensembleGeometry(opts: {
       if (v < lo) lo = v;
       if (v > hi) hi = v;
     }
-  const [d0, d1] = opts.domain ?? [lo, hi];
+  // A host-computed domain can carry a NaN (`Math.min(...series)` over a series
+  // holding one) or an ±Infinity seed. Both make every `sy()` NaN, so the whole
+  // bundle vanishes while the summary still announces the endpoint spread —
+  // announced scale and painted scale have to be the same scale.
+  const [d0, d1] =
+    opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : [lo, hi];
   const plotH = height - 2 * pad;
   const plotW = width - 2 * pad;
   const lastX = Math.max(1, maxLen - 1);
@@ -95,7 +100,12 @@ export function ensembleGeometry(opts: {
   const pathOf = (m: readonly number[]): string =>
     m.map((v, i) => `${i ? "L" : "M"}${sx(i)} ${sy(v)}`).join(" ");
 
-  const k = Math.max(1, Math.min(12, Math.round(opts.ghosts ?? 8)));
+  // `ghosts` from an empty input field is `Number("")` → NaN, and NaN survives
+  // Math.round and both clamp comparisons — `k = NaN` made the selection loop
+  // never run, so the bundle disappeared entirely while the summary announced N
+  // paths. ±Infinity is meaningful ("all of them" / "one") and still clamps.
+  const rounded = Math.round(opts.ghosts ?? 8);
+  const k = clamp(Number.isNaN(rounded) ? 8 : rounded, 1, 12);
   const picked = selectGhosts(data, k);
   const ghostPaths = picked.map((member) => ({ d: pathOf(data[member]!), member }));
 

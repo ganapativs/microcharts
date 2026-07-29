@@ -20,6 +20,23 @@ interface StackLayerGeo {
   index: number;
 }
 
+/**
+ * Is there vertical room for one endpoint share label per band?
+ *
+ * Lives here, and takes the same three numbers in both entries, because the
+ * answer also decides whether the label GUTTER is reserved. Reserving a gutter
+ * for labels that then drop out is dead space that shifts the plot for nothing
+ * (`core/labels.ts` states the rule): at width 30 / height 8 the 4-char gutter
+ * took 21 of 30 units and painted nothing in them.
+ */
+export function stackedAreaLabelsFit(
+  height: number,
+  seriesCount: number,
+  fontSize: number,
+): boolean {
+  return height / Math.max(1, seriesCount) >= fontSize * 1.1;
+}
+
 export interface StackedAreaGeometry {
   layers: StackLayerGeo[];
   baselineY: number;

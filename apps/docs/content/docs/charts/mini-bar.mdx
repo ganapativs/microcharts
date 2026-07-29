@@ -1,13 +1,13 @@
 ---
 title: MiniBar
-description: >-
-  React mini bar chart — a single magnitude as a compact bar from zero. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: MiniBar compares a handful of categories as zero-anchored bars, in the order the data arrives.
 ---
 
-MiniBar answers "which category is biggest, and by roughly how much?". Bars are always zero-anchored, and the data's own
-order is the default truth — weekday order or funnel order carries meaning that ranking would destroy, so `order` is
-explicit, never silent.
+MiniBar draws one zero-anchored bar per category, in the order the data arrives, so a row of categories reads at a
+glance: which is biggest, and by roughly how much. That order is often information itself: weekday order and funnel
+order carry meaning that ranking would destroy, so sorting is an explicit `order` prop and never silent. An explicit
+`domain` is widened to include zero, because a bar whose length doesn't start at zero misstates its own magnitude, and
+the component refuses to draw one.
 
 <LiveDemo label="MiniBar" sizeOf="mini-bar">
   <MiniBar
@@ -33,8 +33,8 @@ explicit, never silent.
 
 ## When to use it
 
-- **Good for** — per-row category mix in tables, small comparisons in KPI cards.
-- **Avoid for** — more than 8 categories (a full bar chart) or time series (SparkBar).
+Use it for per-row category mix in tables and small comparisons in KPI cards. Past 8 categories reach for a full bar
+chart; for time series use SparkBar.
 
 ## Sizing
 
@@ -128,7 +128,7 @@ explicit, never silent.
   />
 </LiveDemo>
 
-The extremes named in the summary follow `format`/`locale` — 12400 reads "12.400" under `de-DE` rather than the English
+The extremes named in the summary follow `format`/`locale`: 12400 reads "12.400" under `de-DE` rather than the English
 "12,400".
 
 ## Edge cases
@@ -158,26 +158,20 @@ The extremes named in the summary follow `format`/`locale` — 12400 reads "12.4
   <MiniBar data={[{ label: "Only", value: 4 }]} title="Single" width={80} height={36} />
 </LiveDemo>
 
-A `null` value draws no bar but keeps its band, so the two real bars around it stay exactly as far apart as a fully
-populated row — alignment across a column of MiniBars survives missing data. A single category still renders and its
-summary says so plainly ("1 category…") rather than degenerating into a bare-bar special case. Past 8 categories the
-component still renders every bar (nothing is dropped or truncated) but logs a dev warning — MiniBar is a cell chart,
-and a wider comparison belongs in a full bar chart.
+A `null` value draws no bar but keeps its band, so the two real bars around it stay exactly as far apart as in a fully
+populated row, and a column of MiniBars stays aligned through missing data. A single category still renders, and its
+summary says so plainly ("1 category…") rather than degenerating into a bare-bar special case. Past 8 categories every
+bar still renders, with nothing dropped or truncated, but the component logs a dev warning: MiniBar is a cell chart, and
+a wider comparison belongs in a full bar chart.
 
 ## Four homes
 
 <FourContexts slug="mini-bar" />
 
-## Why this default
-
-Unsorted by default: the data's order often IS information. Null values keep their slot as a gap, so a missing category
-never shifts its neighbors. Explicit domains are widened to include zero — a bar whose length doesn't start at zero is a
-lie, so the component refuses to draw one.
-
 ## Accessibility
 
-The accessible name carries count and extremes — **"4 categories. Highest East 940, lowest North 120."** The interactive
-entry announces each bar with its rank: **"East: 940 — 1st of 4."**
+The accessible name gives the count and the extremes: **"4 categories. Highest East 940, lowest North 120."** The
+interactive entry announces each bar with its rank: **"East: 940 — 1st of 4."**
 
 <InteractionNote slug="mini-bar" />
 

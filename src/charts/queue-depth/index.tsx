@@ -82,11 +82,18 @@ export function queueDepthLabels(
 export interface QueueDepthProps {
   /** Backlog depth per period (≥ 0). `null`/`NaN`/`±Infinity` are gaps. */
   data: readonly Value[];
-  /** Steady-state capacity; a dashed hairline + a seat-gated value label. */
+  /**
+   * Steady-state capacity (> 0); a dashed hairline + a seat-gated value label.
+   * Non-finite or non-positive reads as no capacity — no hairline, no breach.
+   */
   capacity?: number | undefined;
   /** Endpoint value + trend glyph (`"last"`, default) or nothing (`"none"`). */
   label?: "last" | "none" | undefined;
-  /** Fixed y-domain `[min, max]`; zero-anchored to the data + capacity otherwise. */
+  /**
+   * Fixed y-domain `[min, max]`; zero-anchored to the data + capacity
+   * otherwise. Honored only as a finite ascending pair — anything else falls
+   * back to the auto domain rather than flattening or inverting the scale.
+   */
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -174,9 +181,14 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
 
   const lineColor = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
-  // breach valence: red is the story, so the endpoint label + dot flip to it —
-  // the trend glyph already double-encodes direction, so color never stands alone
-  const endColor = geo.breached ? "var(--mc-negative)" : lineColor;
+  // Breach valence: red is the story, so the endpoint dot AND its label flip to
+  // it — the trend glyph already double-encodes direction, so color never
+  // stands alone. An ink ROLE, not an inline fill: `.mc-root` sets
+  // forced-color-adjust: none, so an inline `var(--mc-negative)` survived
+  // verbatim into High Contrast Mode and a consumer could not restyle the
+  // numeral either. Only the caller's own `color` stays inline.
+  const endInk = geo.breached ? "negative" : "accent";
+  const endStyle = !geo.breached && color ? { fill: color } : undefined;
 
   return (
     <Chart
@@ -223,13 +235,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      <circle
-        cx={end.x}
-        cy={end.y}
-        r={1.8}
-        data-mc-ink={geo.breached ? "negative" : "accent"}
-        style={!geo.breached && color ? { fill: color } : undefined}
-      />
+      <circle cx={end.x} cy={end.y} r={1.8} data-mc-ink={endInk} style={endStyle} />
       {showCap && geo.capLabelY !== null ? (
         <text
           x={geo.labelX}
@@ -238,7 +244,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           dominantBaseline="central"
           fontSize={FONT}
           data-mc-ink="label"
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {capText}
         </text>
@@ -250,7 +255,8 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           textAnchor="start"
           dominantBaseline="central"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums", fill: endColor }}
+          data-mc-ink={endInk}
+          style={endStyle}
         >
           {endText}
         </text>

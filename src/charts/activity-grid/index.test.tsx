@@ -51,6 +51,66 @@ describe("<ActivityGrid>", () => {
 
 seriesEdgeSuite("ActivityGrid", (data) => <ActivityGrid data={[...data]} title="Edge" />);
 
+describe("<ActivityGrid> hostile config", () => {
+  const NUMERIC = ["x", "y", "width", "height", "rx", "fill-opacity"] as const;
+  const attrs = (container: HTMLElement) => {
+    const svg = container.querySelector("svg")!;
+    const out = [svg.getAttribute("viewBox") ?? ""];
+    for (const r of container.querySelectorAll("rect"))
+      for (const a of NUMERIC) out.push(r.getAttribute(a) ?? "0");
+    return out;
+  };
+  const expectClean = (container: HTMLElement, what: string) =>
+    expect(
+      attrs(container).filter((v) => /NaN|Infinity/.test(v)),
+      `${what} emitted non-finite attributes`,
+    ).toEqual([]);
+
+  it("a non-finite steps/cell/gap/weekStart never reaches an attribute", () => {
+    for (const bad of [NaN, Infinity]) {
+      expectClean(draw(<ActivityGrid data={days} steps={bad} />).container, `steps=${bad}`);
+      expectClean(draw(<ActivityGrid data={days} cell={bad} />).container, `cell=${bad}`);
+      expectClean(draw(<ActivityGrid data={days} gap={bad} />).container, `gap=${bad}`);
+    }
+    expectClean(
+      draw(<ActivityGrid data={days} anchor="1970-01-01" weekStart={NaN as unknown as 0} />)
+        .container,
+      "weekStart=NaN",
+    );
+  });
+
+  // The ramp used the RAW `steps` while the geometry bucketed against a clamped
+  // one, so `steps={1}` painted every non-empty cell at full opacity from a
+  // two-level bucketing — a level scale the cells were never binned against.
+  it("paints the level count the cells were bucketed against", () => {
+    const { container } = draw(<ActivityGrid data={[0, 5, 10]} steps={1} domain={[0, 10]} />);
+    const ops = [...container.querySelectorAll('rect[data-mc-ink="cell"]')].map((r) =>
+      Number(r.getAttribute("fill-opacity")),
+    );
+    // clamped to 2 levels: the empty track, then one full step
+    expect(ops[0]).toBeCloseTo(0.06, 5);
+    expect(ops[1]).toBeCloseTo(1, 5);
+    expect(ops[2]).toBeCloseTo(1, 5);
+  });
+
+  it("a repaired cell/gap still contains every mark in the viewBox", () => {
+    for (const props of [{ cell: NaN }, { gap: -20 }, { cell: -5 }]) {
+      const { container } = draw(<ActivityGrid data={days} {...props} />);
+      const [, , w, h] = container
+        .querySelector("svg")!
+        .getAttribute("viewBox")!
+        .split(" ")
+        .map(Number);
+      for (const r of container.querySelectorAll("rect")) {
+        const n = (a: string) => Number(r.getAttribute(a));
+        expect(n("x")).toBeGreaterThanOrEqual(0);
+        expect(n("x") + n("width")).toBeLessThanOrEqual(w!);
+        expect(n("y") + n("height")).toBeLessThanOrEqual(h!);
+      }
+    }
+  });
+});
+
 describe("<ActivityGrid> shape + calendar alignment", () => {
   it("shape defaults to crisp square (rx 1, crispEdges)", () => {
     const { container } = draw(<ActivityGrid data={[1, 2]} />);

@@ -116,13 +116,12 @@ import { SpreadBand } from "@microcharts/react/spread-band";
 import { BiasStrip } from "@microcharts/react/bias-strip";
 import { PercentileTrace } from "@microcharts/react/percentile-trace";
 import { SparkGroup } from "@microcharts/react";
-import { Instrument } from "@/components/ui/instrument";
 import { LiveDemo } from "@/components/ui/live-demo";
-import { AnnotationHostGallery, AnnotationHostShowcase } from "@/components/annotation-hosts";
-import { InstallCommand } from "@/components/ui/copy";
+import { AnnotationHostShowcase } from "@/components/annotation-hosts";
 import { PackageTabs } from "@/components/ui/package-tabs";
 import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
+import { McpClients } from "@/components/ui/mcp-clients";
 import { CatalogStrip } from "@/components/charts/catalog-strip";
 import { TokenSwatches, PresetDeltas } from "@/components/charts/token-swatches";
 import { TokenStudio } from "@/components/charts/token-studio";
@@ -207,18 +206,26 @@ Object.assign(Callout, ChartCallout);
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
-    // No eager prefetch on in-content links: a guide that mentions a few chart
-    // pages would otherwise pull each target route's whole chunk graph on load.
-    // Next still prefetches on hover/press, so navigation stays fast. Machine
-    // surfaces (/catalog.json, /llms.txt, …) are files, not app routes — the
-    // client router would 404 fetching route metadata for them, so they get a
-    // plain anchor.
+    // No prefetch on in-content links: App Router `prefetch={false}` disables
+    // viewport and hover prefetch, so a guide that mentions chart pages won't
+    // pull each target's chunk graph on load. Masthead + home doors keep the
+    // default. Machine surfaces (/catalog.json, /llms.txt, …) are files, not
+    // app routes — the client router would 404 fetching route metadata for
+    // them, so they get a plain anchor.
     a: (props: ComponentProps<"a">) =>
       /\.(json|txt|xml|md)$/.test(props.href ?? "") ? (
         <a {...props} />
       ) : (
         <FdLink prefetch={false} {...props} />
       ),
+    // Fumadocs wraps every markdown table in an `overflow-auto` div with no
+    // tabindex, so a table wide enough to scroll is unreachable by keyboard
+    // (axe: `scrollable-region-focusable`). Same wrapper, one attribute more.
+    table: (props: ComponentProps<"table">) => (
+      <div tabIndex={0} className="prose-no-margin relative my-6 overflow-auto">
+        <table {...props} />
+      </div>
+    ),
     // microcharts primitives — usable directly in any .mdx page
     Sparkline,
     SparkBar,
@@ -332,11 +339,8 @@ export function getMDXComponents(components?: MDXComponents) {
     OrbitStatus,
     SparkGroup,
     // docs building blocks
-    Instrument,
     LiveDemo,
-    AnnotationHostGallery,
     AnnotationHostShowcase,
-    InstallCommand,
     PackageTabs,
     StreamDemo,
     GrammarExplorer,
@@ -347,6 +351,7 @@ export function getMDXComponents(components?: MDXComponents) {
     TokenStudio,
     ProviderWall,
     SurfaceCards,
+    McpClients,
     Snippet,
     AgentPromptCopy,
     CopyAgentSetup,
@@ -374,5 +379,3 @@ export function getMDXComponents(components?: MDXComponents) {
     ...components,
   } satisfies MDXComponents;
 }
-
-export const useMDXComponents = getMDXComponents;

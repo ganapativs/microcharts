@@ -64,6 +64,42 @@ describe("percentileGeometry", () => {
     expect(geo.points).toHaveLength(1);
   });
 
+  // The box is a caller prop: `Chart` clamps the FRAME, so a raw non-finite or
+  // negative side left NaN / x=-42 coords inside a valid viewBox.
+  it("a non-finite or non-positive box falls back to the documented one", () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 0, -40]) {
+      for (const box of [
+        { width: bad, height: 20 },
+        { width: 80, height: bad },
+      ]) {
+        const geo = percentileGeometry({ ...box, data: SAMPLE })!;
+        expect(geo.line.d).not.toMatch(/NaN|Infinity/);
+        expect(geo.x1).toBe(78);
+        expect(geo.y1).toBe(18);
+      }
+    }
+  });
+
+  it("a box narrower than twice the pad halves the pad instead of inverting", () => {
+    const geo = percentileGeometry({ width: 3, height: 2, data: SAMPLE })!;
+    expect(geo.x0).toBe(1.5);
+    expect(geo.x1).toBe(1.5);
+    expect(geo.y0).toBe(1);
+    expect(geo.y1).toBe(1);
+    // the plot collapses to a point, but nothing leaves the 3×2 box
+    for (const p of geo.points) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThanOrEqual(3);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it("plot box edges match the default padding", () => {
+    const geo = percentileGeometry({ ...base, data: SAMPLE })!;
+    expect([geo.x0, geo.x1, geo.y0, geo.y1]).toEqual([2, 78, 2, 18]);
+  });
+
   it("empty / all-null → null", () => {
     expect(percentileGeometry({ ...base, data: [] })).toBeNull();
     expect(percentileGeometry({ ...base, data: [Number.NaN, null] })).toBeNull();

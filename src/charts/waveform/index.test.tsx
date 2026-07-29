@@ -30,7 +30,12 @@ describe("<Waveform>", () => {
     const paths = container.querySelectorAll("path");
     expect(paths.length).toBe(1);
     expect(paths[0]!.getAttribute("data-mc-ink")).toBe("bar");
-    expect(paths[0]!.getAttribute("style")).toContain("--mc-stroke");
+    // The role carries the paint. It used to set the same colour inline, but an
+    // inline fill beats both the `:where()` consumer-override contract and the
+    // forced-colors mapping, so the envelope kept a theme ink in High Contrast
+    // Mode. Only the opacity stays on the mark.
+    expect(paths[0]!.getAttribute("style")).toBeNull();
+    expect(paths[0]!.getAttribute("fill-opacity")).toBe("0.85");
   });
 
   it("progress splits played (accent) from the rest", () => {

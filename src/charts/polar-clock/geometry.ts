@@ -7,10 +7,29 @@
 // fill opacity carries the value (a radial ActivityGrid for tiny sizes). All
 // coords 2-dp.
 import { annulusSector } from "../../core/arc.js";
-import { round2, type Value } from "../../core/types.js";
+import { chartSide, round2, type Value } from "../../core/types.js";
 import { maxOf, minOf } from "../../core/scale.js";
 
 const TAU = Math.PI * 2;
+
+/** Documented default `size`, and the fallback for an unusable one. */
+const DEFAULT_SIZE = 24;
+
+/** Ring of empty box the dial is inset by — also the gutter the cardinal ticks
+ *  live in. Exported so the interactive entry cannot drift from the paint. */
+export const POLAR_PAD = 1;
+
+/**
+ * The dial's box, resolved once. `size` is a caller prop, and a non-finite one
+ * is uniquely destructive (see `chartSide`): every radius went NaN, so
+ * `annulusSector` returned "" and the chart painted nothing — inside a viewBox
+ * `Chart` had clamped to 1×1, under a correct-sounding accessible name. Rounded
+ * because the viewBox carries integers, and the dial has to be centred on the
+ * box that ships rather than on the raw prop.
+ */
+function polarBox(size: number): number {
+  return Math.max(1, Math.round(chartSide(size, DEFAULT_SIZE)));
+}
 
 /** 5-step opacity ramp for `mode="opacity"` (level 0 = quiet-but-present). */
 const OPACITY_STEPS = [0.15, 0.35, 0.55, 0.75, 1] as const;
@@ -69,11 +88,14 @@ export function polarClockGeometry(opts: {
   mode: "length" | "opacity";
   now?: number | undefined;
 }): PolarClockGeometry {
-  const { size, pad, mode } = opts;
+  const { pad, mode } = opts;
+  const size = polarBox(opts.size);
   const n = opts.values.length;
   const cx = round2(size / 2);
   const cy = round2(size / 2);
-  const rMax = size / 2 - pad;
+  // Floored at 0: below `2 * pad` the plot inverts, and a negative radius is an
+  // invalid SVG attribute — `<circle r="-0.17">` at size 1 was dropped outright.
+  const rMax = Math.max(0, size / 2 - pad);
   const inner = Number.isFinite(opts.inner) ? Math.min(0.9, Math.max(0, opts.inner)) : 0.35;
   const r0 = rMax * inner;
   const start = polarStart(opts.origin, n);
@@ -90,7 +112,7 @@ export function polarClockGeometry(opts: {
     minIndex: -1,
     flat: false,
     domainMax: 0,
-    size: Math.max(1, Math.round(size)),
+    size,
   };
   if (n === 0) return empty;
 
@@ -190,11 +212,15 @@ export function polarClockGeometry(opts: {
 
   // Cardinal ticks at 0, ¼, ½, ¾ of the cycle — hairline marks just outside
   // rMax, merged into one path (the at-rest orientation cue: one node, not four).
+  // They live INSIDE the `pad` gutter and stop at the box edge. A fixed
+  // `rMax + 1.4` outran the 1-unit pad, so all four ticks ended 0.4 units past
+  // the viewBox at every size — and `.mc-root` is overflow: visible, so that
+  // spills into the page instead of clipping.
+  const outR = Math.min(rMax + pad, size / 2);
+  const inR = Math.min(rMax + pad * 0.15, outR);
   const cardinalPath = [0, 0.25, 0.5, 0.75]
     .map((f) => {
       const a = f * TAU;
-      const inR = rMax + 0.3;
-      const outR = rMax + 1.4;
       const x1 = round2(cx + inR * Math.sin(a));
       const y1 = round2(cy - inR * Math.cos(a));
       const x2 = round2(cx + outR * Math.sin(a));
@@ -214,6 +240,6 @@ export function polarClockGeometry(opts: {
     minIndex,
     flat,
     domainMax: round2(max),
-    size: Math.max(1, Math.round(size)),
+    size,
   };
 }

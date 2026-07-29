@@ -32,10 +32,10 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
    JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
    `scripts/size-budgets.json`), never hand-edited. **Two of these ceilings no longer describe the shipped budgets and
-   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 27 statics sit above 3 kB, none by more
-   than 1.07 kB; and `interactive ≤ static + 1 kB` is currently unreachable — 101 of 105 interactive entries are above
-   that delta (most by ~1.8–2.3 kB), because size-limit measures each subpath standalone and so charges every one of
-   them the full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
+   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB, none by more
+   than 1.25 kB; and `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries are above that
+   delta (median ~2.4 kB), because size-limit measures each subpath standalone and so charges every one of them the full
+   shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.
@@ -168,6 +168,26 @@ docs** (`pnpm build:site` does both). The site origin is swappable via `NEXT_PUB
 a real, compiled component (docs-as-tests): `describeSeries` output shown in docs must be the actual generated string.
 The docs also publish machine surfaces — `/llms.txt`, `/llms-full.txt`, and `/catalog.json` — kept in sync with
 `package.json#exports` and gated by tests.
+
+## Writing voice (every prose surface: docs, README, site copy, error messages, PR/issue text)
+
+The 2026-07 voice pass set the register for the whole repo. Exemplars: `apps/docs/content/docs/index.mdx`,
+`quickstart.mdx`, `ai.mdx`, and the root `README.md` — match them. The rules:
+
+- Second person, present tense, active voice. One claim per sentence; short average, varied length. Lead with the
+  working example; explain after.
+- Say what a thing **is**. "X, not Y" contrast only where a reader would genuinely be confused, at most once per page.
+- Never anthropomorphize (charts don't whisper, compete, or tell one story — they render, clamp, announce, warn).
+  Replace virtue-words with the mechanism that earned them; "honest" survives only as the defined term "honest
+  encoding". No epigram closers, no doublets ("nothing to X, nothing to Y"), no chiasmus.
+- Em-dash budget ~1 per 3 paragraphs (list-lead and table dashes don't count). Cut "actually"; "exactly" only for
+  testable guarantees. American spelling (`color`) — except inside existing anchor slugs, which never change.
+- Headings state a task or an answer, never a mood. Meta descriptions: one plain page-specific sentence — multiline
+  frontmatter descriptions use `description: >-` (plain scalars with ": " break YAML; guarded by
+  `apps/docs/src/lib/frontmatter.test.ts`).
+- Precision is never the problem: keep every number, chart name, token, caveat, and literal generated-summary string
+  (many are CI-guarded byte-exact). One dry aside per page maximum — it must survive being read aloud to a senior
+  engineer.
 
 ## Working rules
 

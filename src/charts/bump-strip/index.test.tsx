@@ -30,6 +30,30 @@ describe("<BumpStrip>", () => {
     expect(container.querySelectorAll("circle").length).toBe(1);
   });
 
+  it("an isolated period still paints (a lone step-path M is never stroked)", () => {
+    const { container } = draw(<BumpStrip data={[3, null, 2]} />);
+    expect(container.querySelectorAll("circle").length).toBe(2);
+    const { container: one } = draw(<BumpStrip data={[3]} />);
+    expect(one.querySelectorAll("circle").length).toBe(1);
+    expect(draw(<BumpStrip data={[3]} dots="none" />).container.querySelector("circle")).toBeNull();
+  });
+
+  it("an unusable maxRank paints the scale it announces, with a dev warning", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const auto = draw(<BumpStrip data={RANKS} />)
+      .container.querySelector("path")!
+      .getAttribute("d");
+    for (const bad of [Number.NaN, Infinity, 0]) {
+      const { container } = draw(<BumpStrip data={RANKS} maxRank={bad} />);
+      const path = container.querySelector("path")!;
+      expect(path.getAttribute("d"), `maxRank=${bad}`).toBe(auto);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+        "From #5 to #2 over 12 weeks; best #1.",
+      );
+    }
+    expect(warn).toHaveBeenCalled();
+  });
+
   it("non-integer ranks round with a dev warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     draw(<BumpStrip data={[2.4, 3]} />);

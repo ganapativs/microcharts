@@ -140,6 +140,13 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
   );
   const accent = color ?? "var(--mc-accent)";
 
+  // Every slot line carries identical paint, so they merge into ONE path of
+  // subpaths — one node instead of `period` (up to 366 of them). Each slot keeps
+  // its own `M`, so nothing is joined across a slot boundary. The slot ticks
+  // below stay separate elements on purpose: the `draw` entrance pops the dots
+  // individually as the spine's draw front reaches them.
+  const trendPath = trend ? geo.slots.flatMap((sl) => (sl.line ? [sl.line.d] : [])).join(" ") : "";
+
   // annotations host contract: Marker x = slot index (slot center),
   // Threshold/TargetZone y = data values on the shared value scale.
   const ann = resolveAnnotations(children, {
@@ -165,22 +172,17 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
       style={style}
     >
       {ann.under}
-      {trend
-        ? geo.slots.map((sl) =>
-            sl.line ? (
-              <path
-                key={sl.x0}
-                d={sl.line.d}
-                data-mc-ink="ghost"
-                fill="none"
-                stroke="var(--mc-neutral)"
-                strokeOpacity={0.55}
-                data-mc-w="hair"
-                vectorEffect="non-scaling-stroke"
-              />
-            ) : null,
-          )
-        : null}
+      {trendPath ? (
+        <path
+          d={trendPath}
+          data-mc-ink="ghost"
+          fill="none"
+          stroke="var(--mc-neutral)"
+          strokeOpacity={0.55}
+          data-mc-w="hair"
+          vectorEffect="non-scaling-stroke"
+        />
+      ) : null}
       {spine && geo.spine.d ? (
         <path
           d={geo.spine.d}

@@ -12,12 +12,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import { named, fillFor, wrap, crosshairReadoutStyle } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { orbitStatusGeometry } from "./geometry.js";
+import { orbitLabelBand, orbitStatusGeometry } from "./geometry.js";
 import {
   OrbitStatus as StaticOrbitStatus,
   orbitStatusSummary,
@@ -126,15 +127,21 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
   // the orbit still sits in the left square, so anything positioned as a
-  // percentage of the wrapper must divide by the FULL width, not the square
-  // (mirrors the static entry's reservation, verbatim).
+  // percentage of the wrapper must divide by the FULL width, not the square.
+  // Every term is resolved the way the static entry resolves it — same
+  // `fontSize` fallback, same `labelFitsY` drop, same `orbitLabelBand` — because
+  // a chip placed against a width the SVG did not actually take lands off the
+  // mark. This used to be a hand-copied expression; the shared helper is what
+  // keeps the two in step.
+  const labelFontSize =
+    isFiniteValue(rest.fontSize) && rest.fontSize > 0 ? rest.fontSize : labelFont(geo.size);
   const labelText =
-    rest.label === "latency" && !geo.unknown
+    rest.label === "latency" &&
+    !geo.unknown &&
+    labelFitsY(geo.size / 2 + labelFontSize * 0.34, labelFontSize, geo.size, false)
       ? strings.orbitLatency(fmt(Math.max(0, latency)))
       : null;
-  const vbWidth =
-    geo.size +
-    (labelText ? Math.ceil(labelText.length * 0.7 * (rest.fontSize ?? labelFont(size)) + 2) : 0);
+  const vbWidth = geo.size + (labelText ? orbitLabelBand(labelText.length, labelFontSize) : 0);
 
   // Orbit the satellite (only when motion is allowed and the rate is nonzero).
   useEffect(() => {
@@ -196,8 +203,11 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
         summary={false}
       />
       <LiveRegion>{announced}</LiveRegion>
-      {/* Skip when `label="latency"` already prints the same ms beside the orbit. */}
-      {readout && open && rest.label !== "latency" ? (
+      {/* Skip when the ms numeral is already printed beside the orbit. Keyed on
+          the numeral the static entry actually paints, not on the prop: a box
+          too small to seat it drops it, and asking for `label="latency"` there
+          used to suppress the chip too, leaving nothing to read. */}
+      {readout && open && labelText === null ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(geo.size / 2, vbWidth)}>
           {geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency)))}
         </span>

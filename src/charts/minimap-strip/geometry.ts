@@ -28,6 +28,10 @@ export interface ContentBucket {
   norm: number;
 }
 
+/** The documented box. Both entries resolve a hostile `width`/`height` to it. */
+export const DEFAULT_WIDTH = 120;
+export const DEFAULT_HEIGHT = 16;
+
 /** The viewport window as a usable pair, or null when it is not measurable
  *  (missing, short, null or non-finite endpoint). A window with no position is
  *  not a window at 0 — every caller must branch on it rather than plot it. */
@@ -76,6 +80,35 @@ export function minimapDomain(
   return [lo, hi === lo ? lo + 1 : hi];
 }
 
+/** Fog = the complement of `known` within the domain: the unknown gaps, and the
+ *  share of the domain they cover. One sweep, exported, because the interactive
+ *  entry announces the share and must not re-derive it — it announced a flat 0
+ *  while the composed static painted fog for the same `known`. No `known` at
+ *  all still means "all known": absence of the prop is not absence of data. */
+export function minimapFog(
+  known: readonly (readonly [number, number])[] | undefined,
+  domain: readonly [number, number],
+): { gaps: [number, number][]; unknownShare: number } {
+  const [d0, d1] = domain;
+  const span = d1 - d0 || 1;
+  const knownReal = knownPairs(known ?? []);
+  const sorted = (knownReal.length > 0 ? knownReal : [[d0, d1] as [number, number]]).sort(
+    (p, q) => p[0] - q[0],
+  );
+  const gaps: [number, number][] = [];
+  let coveredSpan = 0;
+  let cursor = d0;
+  for (const [a, b] of sorted) {
+    const lo = Math.max(d0, a);
+    const hi = Math.min(d1, b);
+    if (lo > cursor) gaps.push([cursor, lo]);
+    if (hi > cursor) coveredSpan += hi - Math.max(cursor, lo);
+    cursor = Math.max(cursor, hi);
+  }
+  if (cursor < d1) gaps.push([cursor, d1]);
+  return { gaps, unknownShare: round2(Math.max(0, Math.min(1, 1 - coveredSpan / span))) };
+}
+
 export function minimapGeometry(opts: {
   content: readonly Value[];
   window: MinimapInput["window"];
@@ -105,9 +138,15 @@ export function minimapGeometry(opts: {
   const inset = 1;
   // Top annotation lane scales with height so lane-mode ticks stay legible
   // (a fixed 2u lane vanishes on taller strips), clamped so it never dominates.
-  const laneH = Math.max(2, Math.min(6, round2(height * 0.22)));
-  const contentTop = inset + laneH;
-  const contentH = height - contentTop - inset;
+  // The second clamp is the one that matters on a hairline strip: at height ≤ 3
+  // the 2u floor cost more than the box had, and every content height came out
+  // negative — `height="-1"` is an SVG error, so the fog rect and the bars
+  // stopped rendering and the inline seat went negative with them.
+  const band = Math.max(0, height - inset * 2);
+  const laneH = Math.min(clamp(round2(height * 0.22), 2, 6), round2(band / 2));
+  const contentBottom = round2(height - inset);
+  const contentTop = Math.min(round2(inset + laneH), contentBottom);
+  const contentH = Math.max(0, contentBottom - contentTop);
   const xOf = (v: number): number =>
     round2(inset + ((clamp(v, d0, d1) - d0) / span) * (width - inset * 2));
 
@@ -139,37 +178,13 @@ export function minimapGeometry(opts: {
     height: round2(height - inset + 0.5),
   };
 
-  // fog = complement of known within the domain
-  const knownReal = knownPairs(known);
-  const sorted = (knownReal.length > 0 ? knownReal : [[d0, d1] as [number, number]]).sort(
-    (p, q) => p[0] - q[0],
-  );
-  const fogRects: Rect[] = [];
-  let coveredSpan = 0;
-  let cursor = d0;
-  for (const [a, b] of sorted) {
-    const lo = Math.max(d0, a);
-    const hi = Math.min(d1, b);
-    if (lo > cursor) {
-      fogRects.push({
-        x: xOf(cursor),
-        y: contentTop,
-        width: round2(xOf(lo) - xOf(cursor)),
-        height: round2(contentH),
-      });
-    }
-    if (hi > cursor) coveredSpan += hi - Math.max(cursor, lo);
-    cursor = Math.max(cursor, hi);
-  }
-  if (cursor < d1) {
-    fogRects.push({
-      x: xOf(cursor),
-      y: contentTop,
-      width: round2(xOf(d1) - xOf(cursor)),
-      height: round2(contentH),
-    });
-  }
-  const unknownShare = round2(Math.max(0, Math.min(1, 1 - coveredSpan / span)));
+  const { gaps, unknownShare } = minimapFog(known, domain);
+  const fogRects: Rect[] = gaps.map(([a, b]) => ({
+    x: xOf(a),
+    y: contentTop,
+    width: round2(xOf(b) - xOf(a)),
+    height: round2(contentH),
+  }));
 
   const markX = marks.filter(isFiniteValue).map(xOf);
 
@@ -180,18 +195,30 @@ export function minimapGeometry(opts: {
     fogRects,
     markX,
     unknownShare,
-    contentTop: round2(contentTop),
-    contentBottom: round2(height - inset),
+    contentTop,
+    contentBottom,
   };
 }
 
-/** Diagonal-hatch path across a rect (fog-of-war texture; unknown ≠ zero). */
+/** Diagonal-hatch path across a rect (fog-of-war texture; unknown ≠ zero).
+ *  Past `MAX_HATCH_LINES` the texture coarsens instead of getting denser: the
+ *  rect is as wide as the caller's `width` prop, and walking a 1e6-unit strip
+ *  at 2.5 builds an 8 MB `d` string (1e7 exhausts memory before it paints).
+ *  Widening the step keeps the fog spanning its whole region, and at that scale
+ *  a 2.5u hatch was sub-pixel anyway. Below the cap the step is untouched, so
+ *  every ordinary strip hatches exactly as before. */
+const MAX_HATCH_LINES = 400;
+
 export function hatchPath(r: Rect, step = 2.5): string {
   let d = "";
   const x2 = r.x + r.width;
   const yTop = r.y;
   const yBot = r.y + r.height;
-  for (let x = r.x - r.height; x < x2; x += step) {
+  const from = r.x - r.height;
+  const stride = Math.max(step, (x2 - from) / MAX_HATCH_LINES);
+  // Counted as well as bounded: at the cap the accumulator drifts just under
+  // `x2` and slips in a 401st, zero-length line.
+  for (let x = from, i = 0; x < x2 && i < MAX_HATCH_LINES; x += stride, i++) {
     const ax = Math.max(r.x, x);
     const ay = yBot - (ax - x);
     const bx = Math.min(x2, x + r.height);

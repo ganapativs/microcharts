@@ -42,6 +42,28 @@ describe("heatCellGeometry", () => {
     expect(geo.t).toBe(0.5);
   });
 
+  it("repairs a host-computed `steps` and reports what it binned against", () => {
+    const at = (steps: number) =>
+      heatCellGeometry({
+        width: 12,
+        height: 12,
+        value: 42,
+        domain: [0, 100],
+        steps,
+        shape: "square",
+      });
+    // NaN / ±Infinity / non-positive fall back to the documented default
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, 0, -3]) {
+      expect(at(bad).steps, `steps=${bad}`).toBe(5);
+      expect(at(bad).step, `steps=${bad}`).toBe(2);
+    }
+    // a fractional count rounds to a whole number of bins
+    expect(at(2.5).steps).toBe(3);
+    expect(at(2.5).step).toBe(1);
+    // 1 survives: shared/cell handles the single-bin case on purpose
+    expect(at(1).steps).toBe(1);
+  });
+
   it("non-finite value → null step (designed empty, not a leak)", () => {
     const geo = heatCellGeometry({
       width: 12,
@@ -72,6 +94,7 @@ describe("heatCellGeometry", () => {
     expect(geo.y).toBeGreaterThanOrEqual(0);
     expect(geo.x + geo.w).toBeLessThanOrEqual(size + 0.01);
     expect(geo.y + geo.h).toBeLessThanOrEqual(size + 0.01);
+    expect(geo.steps).toBe(steps);
     if (geo.step !== null) {
       expect(geo.step).toBeGreaterThanOrEqual(0);
       expect(geo.step).toBeLessThan(steps);

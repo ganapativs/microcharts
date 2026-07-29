@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, type RefObject } from "react";
-import { CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
+import { CELL_R, CELL_SIZE, CELLS, SQUIRCLE_INSET, SQUIRCLE_PATH } from "@/lib/brand";
 import {
   clamp01,
   css,
@@ -13,6 +13,38 @@ import {
   parseColor,
   type Palette,
 } from "./footer-mark-draw";
+
+/** Px from the footer's BOTTOM edge up to the word's midline, wide then narrow.
+ *
+ *  Only two numbers set the air around the word, and neither is `h`:
+ *
+ *      air BELOW = WORD_FLOOR       − inkHalf − fs·0.03
+ *      air ABOVE = band − WORD_FLOOR + fs·0.03 − inkHalf
+ *
+ *  — where `band` is the reserved spacer in `footer-mark.tsx`. So this constant
+ *  alone sets the space under the word, and the DIFFERENCE between the band and
+ *  it sets the space above. That is why the two must always be edited as a pair:
+ *  move one and the word slides instead of the air changing.
+ *
+ *  Wide is 198/354 (169/325 until the floor deepened by 29 — the band took the
+ *  same +29, so the pair cancelled and every added pixel landed under the word).
+ *  Narrow is 145/259, which is both airs cut ~30%: below 178 → 125, above 139 →
+ *  97, measured at 390. A phone reads the footer at arm's length in a viewport
+ *  it has none of to spare, and the desktop air made the word look marooned. */
+const WORD_FLOOR = 198;
+const WORD_FLOOR_NARROW = 145;
+/** Tailwind's `sm`, which is what the band's `sm:` prefix switches on. Matched
+ *  as a MEDIA QUERY, not against the host's width: a classic scrollbar makes the
+ *  element ~15px narrower than the viewport, so an element-width test would pair
+ *  a narrow floor with a wide band for a window of widths and drop the word. */
+const WIDE = "(min-width: 640px)";
+/** The vignette's ellipse centres this far BELOW the word's midline. */
+const VIGNETTE_LIFT = 41;
+// probe size for the glyph raster below — big enough that a 1px scan step is
+// ~0.8% of the em, small enough that the whole sweep is a few ms
+const SIDE_PROBE = 128;
+// keyed by `weight|family`; survives remounts, so the raster runs once a face
+const sideCache = new Map<string, { lsb: number; rsb: number }[]>();
 
 export function useFooterMarkCanvas(
   hostRef: RefObject<HTMLDivElement | null>,
@@ -37,6 +69,8 @@ export function useFooterMarkCanvas(
     const WORD = "microcharts";
     let mask: HTMLCanvasElement | null = null;
     let fontSpec = "";
+    // the ALPHABETIC baseline the word is drawn on, not its centre line — see
+    // the note in build() on why `textBaseline: "middle"` cannot be used here
     let textY = 0;
     let fontSize = 0;
     const letters: { ch: string; x: number }[] = [];
@@ -47,6 +81,53 @@ export function useFooterMarkCanvas(
     let markX = 0;
     let markY = 0;
     const squircle = new Path2D(SQUIRCLE_PATH);
+    /** Per-letter ink sidebearings as a fraction of the em, left and right.
+     *
+     *  Measured by rasterising each glyph once and scanning its columns, NOT
+     *  from `measureText` — WebKit answers `actualBoundingBoxLeft/Right` with
+     *  the advance box (left 0, right === width for every glyph), so ink-derived
+     *  spacing silently collapses to zero on Safari. Sidebearings are linear in
+     *  font size, so one probe at `SIDE_PROBE` scales to any `fs`. */
+    const sidebearings = (fam: string, weight: number) => {
+      const key = `${weight}|${fam}`;
+      const hit = sideCache.get(key);
+      if (hit) return hit;
+      const blank = [...WORD].map(() => ({ lsb: 0, rsb: 0 }));
+      const pc = document.createElement("canvas");
+      pc.width = SIDE_PROBE * 4;
+      pc.height = SIDE_PROBE * 2;
+      const p = pc.getContext("2d", { willReadFrequently: true });
+      if (!p) return blank; // no 2d context: fall back to raw advances
+      const inset = SIDE_PROBE; // left margin the glyph is drawn at
+      const baseY = SIDE_PROBE * 1.5;
+      p.font = `${weight} ${SIDE_PROBE}px ${fam}`;
+      p.textAlign = "left";
+      p.textBaseline = "alphabetic";
+      p.fillStyle = "#fff";
+      const out = [...WORD].map((ch) => {
+        const adv = p.measureText(ch).width;
+        p.clearRect(0, 0, pc.width, pc.height);
+        p.fillText(ch, inset, baseY);
+        const d = p.getImageData(0, 0, pc.width, pc.height).data;
+        let left = -1;
+        let right = -1;
+        for (let x = 0; x < pc.width; x++) {
+          for (let y = 0; y < pc.height; y++) {
+            // >8 rather than >0: antialiasing fringe counts as ink, which
+            // errs toward MORE space between letters, never less
+            if (d[(y * pc.width + x) * 4 + 3] > 8) {
+              if (left < 0) left = x;
+              right = x;
+              break;
+            }
+          }
+        }
+        if (left < 0) return { lsb: 0, rsb: 0 }; // blank glyph (never, for this word)
+        return { lsb: (left - inset) / SIDE_PROBE, rsb: (inset + adv - (right + 1)) / SIDE_PROBE };
+      });
+      sideCache.set(key, out);
+      return out;
+    };
     let field: HTMLCanvasElement | null = null;
     let fctx: CanvasRenderingContext2D | null = null;
     let layer: HTMLCanvasElement | null = null;
@@ -137,7 +218,7 @@ export function useFooterMarkCanvas(
     // Palette on theme change only — getComputedStyle in raf forces style recalc.
     let key = "";
     let light = false;
-    let pal: Palette = { accent: "#c2410c", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
+    let pal: Palette = { accent: "#2f52d4", pos: "#0E7A5F", neg: "#BD4B2D", neutral: "#616773" };
     const refreshPalette = () => {
       light = !document.documentElement.classList.contains("dark");
       const cs = getComputedStyle(document.documentElement);
@@ -162,6 +243,8 @@ export function useFooterMarkCanvas(
       w = host.clientWidth;
       h = host.clientHeight;
       if (!w || !h) return;
+      // pairs with the band's `sm:` prefix in `footer-mark.tsx` — see WORD_FLOOR
+      const floor = window.matchMedia(WIDE).matches ? WORD_FLOOR : WORD_FLOOR_NARROW;
       // phones are DPR 3 — allow it there (tiny canvas), cap desktop at 2
       dpr = Math.min(window.devicePixelRatio || 1, w < 800 ? 3 : 2);
       canvas.width = Math.round(w * dpr);
@@ -188,7 +271,7 @@ export function useFooterMarkCanvas(
       // word and dissolves gradually INTO the footer above — never a cut.
       // the vignette centers on the word band near the footer's bottom; the
       // tall ellipse + top fade let the field climb gently behind the links
-      const wordCY = clamp01((h - 128) / h);
+      const wordCY = clamp01((h - (floor - VIGNETTE_LIFT)) / h);
       [vrx, vry, vcy] = w < 640 ? [1.05, 1.25, wordCY] : [0.82, 1.18, wordCY];
       host.style.maskImage = "";
       (host.style as { webkitMaskImage?: string }).webkitMaskImage = "";
@@ -256,38 +339,106 @@ export function useFooterMarkCanvas(
       mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       // the word is centered in the field with equal air above and below;
       // the height cap keeps it clear of the legal bar riding the bottom
+      // The face comes off the host's computed `font-family` (`.wordmark-face`):
+      // a canvas needs a family it can NAME, so this reads the resolved string
+      // rather than inheriting a class.
       const family = getComputedStyle(host).fontFamily || "sans-serif";
       // absolute cap — the canvas is the whole footer, so the word sizes to
       // its reserved band; one size on every page, home included
-      let fs = 88;
-      mctx.font = `620 ${fs}px ${family}`;
+      // 88 × 1.75. Everything in the lockup is expressed as a multiple of `fs`
+      // — mark box (0.72), mark/word gap (0.26), the mark's vertical centering
+      // (0.52), the baseline nudge (0.03) — so the whole thing zooms as one
+      // piece and the mark stays centred on the cap band at any size. The
+      // `avail` fit below still holds it to 86% of the footer width, so narrow
+      // viewports scale it down from here rather than overflowing.
+      let fs = 154;
       const avail = w * 0.86;
+      // The display face ships as statics, so the ask has to be a weight that
+      // exists — 600 — or the browser synthesises one.
+      const WEIGHT = 600;
+      // Per-letter advances with a floor under the ink gap between neighbours.
+      // The word is drawn letter by letter (each rides its own reveal), so the
+      // spacing has to be built here rather than left to the shaper.
+      // The sidebearings come off a RASTER probe, not `measureText`. WebKit
+      // returns the ADVANCE box from `actualBoundingBoxLeft/Right` — measured
+      // on Safari's engine, every glyph reports left 0 and right === width —
+      // so ink-derived sidebearings are all zero there and the floor below
+      // fires on every pair: Safari drew the word 30px wider than Chrome.
+      // Rasterising one glyph and scanning its columns is the same answer in
+      // every engine. It is done once per face at a fixed probe size and
+      // scaled by `fs`, because sidebearings are linear in font size.
+      const side = sidebearings(family, WEIGHT);
+      const measureWord = (size: number) => {
+        const minGap = size * 0.02;
+        mctx.font = `${WEIGHT} ${size}px ${family}`;
+        const advances: number[] = [];
+        let total = 0;
+        for (let i = 0; i < WORD.length; i++) {
+          const adv = mctx.measureText(WORD[i]).width;
+          // ink gap across the pair = this letter's right bearing + the next
+          // letter's left bearing, both in em, brought back to pixels
+          const ink = i < WORD.length - 1 ? (side[i].rsb + side[i + 1].lsb) * size : Infinity;
+          const pad = Math.max(0, minGap - ink);
+          advances.push(adv + pad);
+          total += adv + pad;
+        }
+        return { advances, total };
+      };
       // the brandmark leads the word inside the canvas: mark + gap ≈ 1em,
       // so the fit measures the full lockup, not just the letters
-      let tw = mctx.measureText("microcharts").width;
-      if (tw + fs > avail) fs *= avail / (tw + fs);
-      fontSpec = `620 ${fs}px ${family}`;
-      // bottom-anchored: the word lives in the reserved band above the bar,
-      // with air below matching the air above (grid → word ≈ word → bar)
-      textY = h - 128 + fs * 0.03;
+      let word = measureWord(fs);
+      if (word.total + fs > avail) {
+        fs *= avail / (word.total + fs);
+        word = measureWord(fs);
+      }
+      const tw = word.total;
+      fontSpec = `${WEIGHT} ${fs}px ${family}`;
+      // Bottom-anchored: the word lives in the reserved band above the bar.
+      // `WORD_FLOOR` and the band in `footer-mark.tsx` are tuned together and
+      // neither means much on its own. It is NOT part of the wordmark's type
+      // sizing.
+      const wordMid = h - floor + fs * 0.03;
       fontSize = fs;
       mctx.font = fontSpec;
-      tw = mctx.measureText(WORD).width;
-      // squircle sized to the caps, vertically centered on the baseline band
+      // The word is drawn on its ALPHABETIC baseline, positioned so the ink
+      // band straddles `wordMid`. It used to be drawn with
+      // `textBaseline: "middle"` straight at `wordMid`, which is the second
+      // thing Safari renders differently: the same string at 154px lands 10px
+      // lower in WebKit than in Chromium (probed by rasterising an "x" — ink
+      // band 161–245 vs 171–255). The MARK is placed arithmetically, so it
+      // stayed put while the letters dropped, and the lockup came apart.
+      // Ink ascent/descent, unlike "middle", agree across engines to 0.01px.
+      const wm = mctx.measureText(WORD);
+      const asc = wm.actualBoundingBoxAscent ?? fs * 0.76;
+      const desc = wm.actualBoundingBoxDescent ?? fs * 0.01;
+      textY = wordMid + (asc - desc) / 2;
+      // The squircle STANDS ON THE BASELINE, like a letter — the same seat the
+      // charts take inline (`seat: floor`). Its ink bottom lands on `textY`,
+      // which puts its top a little above the x-height and well under the
+      // ascenders of `h` and `t`.
+      //
+      // It used to be placed at a fixed `wordMid - 0.52 * markSize`, a constant
+      // hand-tuned to land on the baseline that `textBaseline: "middle"` gave
+      // in Chrome. Once the letters moved to a measured baseline the mark
+      // stayed behind and floated. Seating it on `textY` is the same result,
+      // stated as the rule it always was, so it survives a change of face,
+      // size or engine.
       markSize = fs * 0.72;
       const gap = fs * 0.26;
       let lx = (w - (tw + markSize + gap)) / 2;
       markX = lx;
-      markY = textY - markSize * 0.52;
+      // `markY` is the BOX top the draw pass translates to; the ink sits
+      // `SQUIRCLE_INSET` inside it
+      markY = textY - markSize * (1 - SQUIRCLE_INSET);
       lx += markSize + gap;
       // per-letter x origins (left-aligned) for the staggered scroll reveal
       letters.length = 0;
-      for (const ch2 of WORD) {
-        letters.push({ ch: ch2, x: lx });
-        lx += mctx.measureText(ch2).width;
+      for (let i = 0; i < WORD.length; i++) {
+        letters.push({ ch: WORD[i], x: lx });
+        lx += word.advances[i];
       }
       mctx.textAlign = "left";
-      mctx.textBaseline = "middle";
+      mctx.textBaseline = "alphabetic";
       mctx.fillStyle = "#fff";
       maskP = -1; // force a mask render at the current reveal progress
     };
@@ -312,8 +463,26 @@ export function useFooterMarkCanvas(
       mctx.clearRect(0, 0, w, h);
       mctx.font = fontSpec;
       mctx.textAlign = "left";
-      mctx.textBaseline = "middle";
+      mctx.textBaseline = "alphabetic";
       mctx.fillStyle = "#fff";
+      // The mark is a letter of the lockup, so it is knocked out of the field
+      // exactly like one: the mask is what lets the charts read THROUGH the ink
+      // (the composite at the end draws field ∩ mask at full strength), and a
+      // mark left out of it reads as an opaque slab beside translucent letters.
+      // It also knocks the mark out of the pointer torch for free.
+      if (markSize > 0) {
+        const m = markState(pw);
+        if (m.a > 0.004) {
+          const s = markSize / 32;
+          mctx.save();
+          mctx.translate(markX, markY + m.dy);
+          mctx.scale(s, s);
+          mctx.globalAlpha = m.a;
+          // oxlint-disable-next-line unicorn/no-array-fill-with-reference-type -- canvas Path2D fill, not Array#fill
+          mctx.fill(squircle);
+          mctx.restore();
+        }
+      }
       for (let i = 0; i < letters.length; i++) {
         const { a, dy } = letterState(i, pw);
         if (a <= 0.004) continue;
@@ -551,7 +720,7 @@ export function useFooterMarkCanvas(
         // Per-letter outline/fill so each rises with the mask.
         ctx.font = fontSpec;
         ctx.textAlign = "left";
-        ctx.textBaseline = "middle";
+        ctx.textBaseline = "alphabetic";
         ctx.strokeStyle = pal.accent;
         ctx.fillStyle = pal.accent;
         ctx.lineWidth = 1;

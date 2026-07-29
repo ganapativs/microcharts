@@ -84,6 +84,45 @@ export function mergeRuns(data: readonly HypnoEntry[], domainEnd: number): Hypno
   return merged;
 }
 
+/** One merged run, clipped to the window. */
+export interface HypnoSpan {
+  state: string;
+  t0: number;
+  t1: number;
+}
+
+/**
+ * The runs a window actually holds: merge, then CLIP each span to `domain`.
+ *
+ * An explicit `domain` is a window — a caller overfetching around it is normal
+ * — and a run outside it used to be scaled anyway. `.mc-root` is
+ * `overflow: visible`, so it spills across the page rather than clipping:
+ * `domain={[20, 60]}` over a 90-minute night painted x −5 → 211 in a 140-unit
+ * box, and `domain={[-200, -100]}` painted the ENTIRE strip off the right edge
+ * while the accessible name still read "6 transitions across 4 states".
+ *
+ * The state that HOLDS at the window start keeps its row and starts at the
+ * edge — dropping it would misreport what the system was doing at t=d0 — and
+ * the last state still holds to `domain[1]`. Both entries and the summary read
+ * this one list, so the announced run count is the painted run count.
+ */
+export function hypnoSpans(
+  data: readonly HypnoEntry[],
+  domain: readonly [number, number],
+): HypnoSpan[] {
+  const [d0, d1] = domain;
+  const merged = mergeRuns(data, d1);
+  const spans: HypnoSpan[] = [];
+  for (let i = 0; i < merged.length; i++) {
+    const e = merged[i]!;
+    const end = i + 1 < merged.length ? merged[i + 1]!.t : d1;
+    // half-open: a run ending exactly at the window start contributes nothing
+    if (end <= d0 || e.t >= d1) continue;
+    spans.push({ state: e.state, t0: e.t < d0 ? d0 : e.t, t1: end > d1 ? d1 : end });
+  }
+  return spans;
+}
+
 export function hypnogramGeometry(opts: {
   data: readonly HypnoEntry[];
   states: readonly string[];
@@ -104,12 +143,12 @@ export function hypnogramGeometry(opts: {
   y1: number;
 } {
   const { data, states, domain, width, height, style, gutter = 0 } = opts;
-  const merged = mergeRuns(data, domain[1]);
+  const spans = hypnoSpans(data, domain);
   const n0 = Math.max(1, states.length);
   const rowY0 = Array.from({ length: n0 }, (_v, r) =>
     round2(PAD + ((height - PAD * 2) / n0) * (r + 0.5)),
   );
-  if (merged.length === 0)
+  if (spans.length === 0)
     return {
       runs: [],
       path: "",
@@ -121,14 +160,23 @@ export function hypnogramGeometry(opts: {
     };
 
   const [d0, d1] = domain;
-  const span = d1 - d0 || 1;
   const x0 = gutter + PAD;
   const innerW = width - gutter - PAD * 2;
   const innerH = height - PAD * 2;
   const n = Math.max(1, states.length);
   const rowH = innerH / n;
 
-  const xOf = (t: number): number => round2(x0 + ((t - d0) / span) * innerW);
+  // `d1 - d0 || 1` was the old span, and it is not a scale: NaN, 0 and an
+  // overflowing difference all became a span of ONE, so `domain={[0, NaN]}`
+  // painted a 90-minute night ~8700 units wide in a 140-unit box. Callers
+  // resolve the window first (`resolveDomain`); anything that still isn't a
+  // usable span collapses the strip to the box centre, the way core
+  // `scaleLinear` handles a degenerate domain — contained, and visibly wrong.
+  const span = d1 - d0;
+  const usable = Number.isFinite(span) && span > 0 && Number.isFinite(d0);
+  const k = usable ? innerW / span : 0;
+  const mid = round2(x0 + innerW / 2);
+  const xOf = (t: number): number => (usable ? round2(x0 + (t - d0) * k) : mid);
   const rowIndex = (state: string): number => {
     const i = states.indexOf(state);
     return i < 0 ? 0 : i;
@@ -137,18 +185,16 @@ export function hypnogramGeometry(opts: {
   const laneY = (row: number): number => round2(PAD + rowH * row);
   const rowY = Array.from({ length: n }, (_v, r) => stepY(r));
 
-  const runs: HypnoRun[] = merged.map((e, i) => {
-    const t0 = e.t;
-    const t1 = i + 1 < merged.length ? merged[i + 1]!.t : d1;
-    const row = rowIndex(e.state);
+  const runs: HypnoRun[] = spans.map((s) => {
+    const row = rowIndex(s.state);
     return {
-      x0: xOf(t0),
-      x1: xOf(t1),
+      x0: xOf(s.t0),
+      x1: xOf(s.t1),
       y: style === "lanes" ? laneY(row) : stepY(row),
       row,
-      state: e.state,
-      t0,
-      t1,
+      state: s.state,
+      t0: s.t0,
+      t1: s.t1,
     };
   });
 
@@ -175,11 +221,18 @@ export function hypnogramGeometry(opts: {
   };
 }
 
-/** Distinct states in first-appearance order (the default row order). */
+/**
+ * Distinct states in first-appearance order (the default row order).
+ *
+ * Non-finite `t` is filtered here for the same reason `mergeRuns` filters it:
+ * a state that only ever appears at an unplottable time was still given a row,
+ * so the strip drew an empty "B" lane while the accessible name counted one
+ * state. Rows and runs read the same entries.
+ */
 export function firstAppearance(data: readonly HypnoEntry[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const d of [...data].sort((a, b) => a.t - b.t)) {
+  for (const d of [...data].filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t)) {
     if (!seen.has(d.state)) {
       seen.add(d.state);
       out.push(d.state);

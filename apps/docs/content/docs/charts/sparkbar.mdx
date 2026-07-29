@@ -1,13 +1,17 @@
 ---
 title: SparkBar
-description: >-
-  React sparkbar chart — discrete magnitudes from zero, or a win–loss–tie streak. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: SparkBar renders discrete values as zero-anchored bars, or a win–loss–tie streak in winloss mode.
 ---
 
-SparkBar renders discrete values as compact bars from a zero baseline. In `winloss` mode it collapses each value to its
-sign — a streak you can read at a glance: wins above the mid-line, losses below, and a tie (`0`) as a thin neutral dash
-on it.
+SparkBar renders discrete values as compact bars from a zero baseline: one bar per period, always anchored at zero,
+because a bar that starts anywhere else misstates its magnitude. Each period is its own count — a deploy total, a daily
+total — rather than a sample on a continuous curve. In `bar` mode the endpoint bar takes the accent, since "where did it
+land" is usually the first question a run of counts answers.
+
+`winloss` mode discards magnitude on purpose and collapses each value to its sign: wins above the mid-line, losses
+below, and a tie (`0`) as a thin neutral dash on it. There every bar keeps its own win/loss/tie color, endpoint
+included, because the sign is what matters at each position. Sign is doubled by position and color wherever signed data
+appears, so direction survives forced-colors.
 
 <LiveDemo label="SparkBar" sizeOf="sparkbar">
   <SparkBar data={[4, 6, 2, 8, 5, 9]} width={120} height={32} title="Deploys per day" />
@@ -23,9 +27,8 @@ on it.
 
 ## When to use it
 
-- **Good for** — discrete magnitudes, win–loss streaks, period-over-period counts.
-- **Avoid for** — a continuous trend shape (use [Sparkline](/docs/charts/sparkline)) or hundreds of points, where bars
-  become noise.
+Use it for discrete magnitudes, win–loss streaks, and period-over-period counts. For a continuous trend shape use
+[Sparkline](/docs/charts/sparkline), which is also the better choice at hundreds of points, where bars become noise.
 
 ## Sizing
 
@@ -60,7 +63,7 @@ a chart that fills its container — the viewBox keeps the aspect ratio.
   <SparkBar data={[4200, 6100, 2800, 8600]} width={130} height={32} label="last" locale="de-DE" title="Localized" />
 </LiveDemo>
 
-The endpoint label and accessible summary both follow `format`/`locale` — 8600 reads "8.600" under `de-DE` rather than
+The endpoint label and accessible summary both follow `format`/`locale`: 8600 reads "8.600" under `de-DE` rather than
 the English "8,600".
 
 ## Edge cases
@@ -74,27 +77,16 @@ the English "8,600".
 </LiveDemo>
 
 An empty series renders no bars and an accessible name that says so, rather than a flat or invented baseline. A single
-value still renders as one zero-anchored bar — `winloss` mode treats it the same way a longer streak would: a lone win,
-loss, or tie.
+value still renders as one zero-anchored bar, and `winloss` mode treats it the same way a longer streak would: a lone
+win, loss, or tie.
 
 ## Four homes
 
 <FourContexts slug="sparkbar" />
 
-## Why this default
-
-Bars, not a line, because SparkBar's job is discrete magnitudes — deploy counts, daily totals — where each period is its
-own thing, not a sampled point on a continuous curve. Zero-anchored always: a bar whose length doesn't start at zero
-misstates its magnitude. `winloss` mode goes further and discards magnitude entirely on purpose, collapsing each value
-to a three-state streak (win above the mid-line, loss below, tie a thin dash on it) because for a streak, sign is the
-whole story and a magnitude axis would just be noise. Sign is doubled by position AND color everywhere signed data
-appears, so direction survives forced-colors and never depends on color alone. In `bar` mode the endpoint bar takes the
-accent — "where did it land" is usually the first question a run of counts answers; in `winloss` mode it keeps its
-win/loss/tie color instead, because there the sign is what matters at every position, endpoint included.
-
 ## Accessibility
 
-Announced from the data — the example above reads:
+The accessible name is generated from the data. The example above reads:
 
 > Deploys per day. Trending up 125%. Range 2 to 9. Last value 9.
 

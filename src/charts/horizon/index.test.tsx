@@ -46,6 +46,29 @@ describe("<Horizon>", () => {
     expect(container.querySelectorAll("svg *").length).toBeLessThanOrEqual(7);
   });
 
+  it("a fold count off the table renders instead of throwing", () => {
+    // `folds` is typed 2|3, but it arrives from JSON/config/model output. The
+    // opacity table is indexed by it, so `folds={4}` threw on `undefined[0]`
+    // and took down the whole render; `folds={Infinity}` never left the band
+    // loop. Both now fall back to the documented 2 folds.
+    for (const folds of [4, 1, 2.5, NaN, Infinity] as (2 | 3)[]) {
+      const { container } = draw(<Horizon data={SERIES} folds={folds} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.innerHTML).not.toMatch(/NaN|Infinity/);
+      expect(container.querySelectorAll("path").length).toBeGreaterThan(0);
+      expect(container.querySelectorAll("svg *").length).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it("an overflowing domain still paints the strip it announces", () => {
+    const { container } = draw(
+      <Horizon data={[3, 5, 4, 9]} baseline={1e308} domain={[-1e308, 1e308]} />,
+    );
+    const paths = [...container.querySelectorAll("path")];
+    expect(paths.length).toBeGreaterThan(0);
+    for (const p of paths) expect(p.getAttribute("d")).not.toMatch(/NaN|Infinity/);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<Horizon data={SERIES} title="Fleet load" />);
     await expectNoA11yViolations(container);

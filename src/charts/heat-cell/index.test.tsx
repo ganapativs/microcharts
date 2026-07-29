@@ -61,6 +61,27 @@ describe("<HeatCell>", () => {
     expect(overflow.querySelector("text")).toBeNull();
   });
 
+  // A host `steps` (`Number(field)`, `bins / groups`) used to reach the name
+  // verbatim — "42 — level NaN of NaN." over a cell whose `--mc-cell-mix: NaN`
+  // was an invalid declaration, so a real value painted uncalibrated.
+  it("a hostile `steps` never reaches the name or the ramp", () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, 0, -3]) {
+      const { container } = draw(<HeatCell value={42} domain={[0, 100]} steps={bad} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("aria-label"), `steps=${bad}`).toBe("42 — level 3 of 5.");
+      expect(container.querySelector("rect")!.getAttribute("style") ?? "").toContain(
+        "--mc-cell-mix: 55",
+      );
+    }
+  });
+
+  it("announces the step scale the cell was binned against", () => {
+    // 2.5 bins is not a scale anything can be binned on — it rounds to 3, and
+    // the name has to say 3 or it describes a scale that was never painted.
+    const { container } = draw(<HeatCell value={42} domain={[0, 100]} steps={2.5} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("42 — level 2 of 3.");
+  });
+
   it("non-finite → empty track cell + 'No data.'", () => {
     const { container } = draw(<HeatCell value={Number.NaN} />);
     expect(container.querySelector("rect")!.getAttribute("data-mc-ink")).toBe("gap");

@@ -1,12 +1,12 @@
 ---
 title: Bullet
-description: >-
-  React bullet chart — measured value against a target tick and qualitative bands. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: "One measured value against a target tick, over qualitative bands, in a single row."
 ---
 
-Bullet compares one measured value to a target, against a backdrop of qualitative bands (poor / okay / good). It answers
-"are we there yet?" in a single row — ideal for progress, SLAs, budgets, and quotas.
+Quota attainment is 72 against a target of 80. Bullet puts the measure, the target tick, and the qualitative bands (poor
+/ okay / good) on one row, for progress, SLAs, budgets, and quotas. The bands sit lowest and graduate in shade by step,
+because they are context and the measure bar has to read as the loudest mark on the row. The measure is a thin band
+centered in the track (Few's proportion, not a full-height fill), so the bands stay legible on both sides of it.
 
 <LiveDemo label="Bullet" sizeOf="bullet">
   <Bullet value={72} target={80} bands={[50, 90]} width={200} height={22} title="Quota attainment" />
@@ -22,8 +22,8 @@ Bullet compares one measured value to a target, against a backdrop of qualitativ
 
 ## When to use it
 
-- **Good for** — progress to a goal, a value against a target, KPIs with thresholds.
-- **Avoid for** — trends over time (use [Sparkline](/docs/charts/sparkline)) or distributions.
+Use it for progress to a goal, a value against a target, and KPIs with thresholds. For trends over time use
+[Sparkline](/docs/charts/sparkline); it is not a distribution chart.
 
 ## Sizing
 
@@ -69,19 +69,13 @@ them and drive the width from CSS to fill a table cell or card column; the viewB
 
 <FourContexts slug="bullet" />
 
-## Why this default
-
-The qualitative bands sit lowest and graduate in shade by step, because they are context, not the answer — the measure
-bar has to read as the loudest mark on the row. The target is a tick, not a second bar: a distinct shape at a distinct
-position so "value vs target" survives grayscale print and never depends on the two colors staying apart. The measure
-bar itself is a thin band centered in the track (Few's proportion, not a full-height fill) so the bands stay legible on
-both sides of it.
-
 ## Accessibility
 
 Bullet announces its value against its target — **"72 of 80 target."**. No color is required to read whether the target
 was met: the measure's length and the target tick encode it by position, and the qualitative bands sit behind them. The
-interactive entry reads the value and target on hover and focus.
+target is a tick rather than a second bar: a distinct shape at a distinct position, so the comparison survives grayscale
+print and never depends on two colors staying apart. The interactive entry reads the value and target on hover and
+focus.
 
 <InteractionNote slug="bullet" />
 

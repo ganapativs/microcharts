@@ -1,41 +1,19 @@
 ---
 title: Formatting & scale
 description:
-  Control how a chart shows numbers and dates, and what value range it's drawn against — one format prop (Intl options
-  or a function) feeds the direct labels, the accessible summary and the interactive readout alike, locale handles
-  separators and language, and domain fixes the scale. Formatting is cached, so it stays cheap across hundreds of
-  charts.
+  How format, locale, and domain work — one format prop feeds a chart's labels, its accessible summary, and its
+  interactive readout, and domain sets the value range the geometry is drawn against.
 ---
 
-Two orthogonal decisions live here: **how numbers are written** (`format` + `locale`) and **what range they're drawn
-against** (`domain`). Both are part of the one grammar — the same prop name means the same thing on every chart — and
-both are documented per chart, but this page is the whole story in one place, since it's easy to assume a default you
-didn't actually get.
+Two props decide how a chart writes its numbers: `format` and `locale`. A third, `domain`, decides what value range the
+geometry is drawn against. All three mean the same thing on every chart, and every chart's page lists them; this page is
+where their defaults are written down.
 
 ## One formatter, three places
 
-A chart shows numbers in three spots: the **direct labels** it draws, the **accessible summary** a screen reader
-announces, and — on an interactive entry — the **readout** that follows the pointer. `format` feeds _all three_ from a
-single definition — so a currency chart's spoken summary says "$1,240", not "1240". You never format the same number
-twice.
-
-`format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached
-(`Intl.NumberFormat` construction is expensive), keyed by locale plus options, so hundreds of instances sharing one
-format shape build one formatter between them — never build your own `new Intl.NumberFormat` in a component. The cache
-is deliberately small: it holds 64 formatters and empties completely when it fills, on the reasoning that one app uses a
-handful of locale × option shapes, and a bounded cache that occasionally rebuilds beats one that grows forever. Need the
-same formatting _outside_ a chart (a matching KPI label, a table cell)? Import the exported `makeFormatter` helper so
-your prose numbers line up with the chart's exactly, from the same cache:
-
-```tsx
-import { makeFormatter } from "@microcharts/react";
-
-const fmt = makeFormatter({ style: "currency", currency: "USD" }, "en-US");
-fmt(42); // "$42.00"
-```
-
-The arguments are positional — `makeFormatter(format, locale, defaults?)`. The third argument is the fallback used when
-`format` is omitted; it's how a chart supplies its own default (see `Delta` below).
+A chart writes numbers in three places: the **direct labels** it draws, the **accessible summary** a screen reader
+announces, and, on an interactive entry, the **readout** that follows the pointer. `format` feeds all three from one
+definition, so a currency chart's spoken summary says "$1,240", not "1240".
 
 <LiveDemo
   label="Currency label"
@@ -51,10 +29,30 @@ The arguments are positional — `makeFormatter(format, locale, defaults?)`. The
   />
 </LiveDemo>
 
+`format` takes either **`Intl.NumberFormatOptions`** or a **plain function** `(n) => string`. Formatters are cached,
+keyed by locale plus options, so hundreds of instances sharing one format shape build one formatter between them.
+`Intl.NumberFormat` construction is expensive, so never build your own inside a component.
+
+The cache holds 64 formatters and empties completely when it fills. One app uses a handful of locale × option shapes, so
+a bounded cache that occasionally rebuilds costs less than one that grows forever.
+
+You can reuse the same formatting outside a chart: a matching KPI label, a table cell. Import the exported
+`makeFormatter` helper and your prose numbers come out of the same cache as the chart's:
+
+```tsx
+import { makeFormatter } from "@microcharts/react";
+
+const fmt = makeFormatter({ style: "currency", currency: "USD" }, "en-US");
+fmt(42); // "$42.00"
+```
+
+The arguments are positional: `makeFormatter(format, locale, defaults?)`. The third is the fallback used when `format`
+is omitted, which is how a chart supplies its own default (see `Delta` below).
+
 ## Percent, compact, decimals
 
-Anything `Intl.NumberFormat` supports works — percent, compact notation, fixed decimals, sign display. `Delta` even
-defaults to a locale-aware percent, so a raw ratio reads as a change with no config:
+Anything `Intl.NumberFormat` supports works: percent, compact notation, fixed decimals, sign display. `Delta` defaults
+to a locale-aware percent, so a raw ratio reads as a change with no config:
 
 <LiveDemo
   label="Delta formats"
@@ -71,10 +69,9 @@ defaults to a locale-aware percent, so a raw ratio reads as a change with no con
 
 ## A custom function
 
-When `Intl` can't express the unit — milliseconds, "×" multipliers, a domain-specific symbol — pass a function. It
-receives the number and returns the exact string to render. The value is snapped to 12 significant digits before it
-reaches your function, so a number a chart derived internally (`value - target`) arrives as `-3.6`, not
-`-3.5999999999999943` — you write for clean data, not for IEEE arithmetic.
+When `Intl` can't express the unit (milliseconds, "×" multipliers, a domain-specific symbol), pass a function. It
+receives the number and returns the string to render. The value is snapped to 12 significant digits first, so a number
+the chart derived internally (`value - target`) arrives as `-3.6` rather than `-3.5999999999999943`.
 
 <LiveDemo
   label="Custom units"
@@ -94,16 +91,14 @@ reaches your function, so a number a chart derived internally (`value - target`)
 
 Import a chart from its `/interactive` subpath and it gains a readout: a small chip that follows the pointer, or the
 focused datum when you rove with the keyboard. It uses the same `format` and `locale` as everything else, so a currency
-chart's hover value matches its label and its summary exactly.
+chart's hover value matches its label and its summary.
 
-**It is deliberately terse.** The chip names the datum and its value — a Funnel stage reads `Checkout 62% (1,240)`, a
-Slope line reads `Brazil: 44 → 28` — and nothing else. It does not repeat the axis names, the row label already printed
-beside it, or the grid position the cell already occupies. These are word-sized charts; a chip wider than the chart it
-annotates is worse than no chip.
+**The chip is terse.** It names the datum and its value: a Funnel stage reads `Checkout 62% (1,240)`, a Slope line reads
+`Brazil: 44 → 28`. It doesn't repeat the axis names, the row label already printed beside it, or the grid position the
+cell already occupies. At these sizes a chip that carried all that would be wider than the chart it annotates.
 
-The fuller sentence still exists. Everything the chip leaves out — the comparison, the quadrant name, the running total,
-the per-cycle breakdown — is announced in the chart's live region, which is what a screen reader reads. So nothing is
-lost by the chip being short; it is a different audience, not less information.
+The fuller sentence still exists. Everything the chip leaves out (the comparison, the quadrant name, the running total,
+the per-cycle breakdown) is announced in the chart's live region, which is what a screen reader reads.
 
 ```tsx
 import { Sparkline } from "@microcharts/react/sparkline/interactive";
@@ -112,17 +107,17 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 <Sparkline data={revenue} label="last" format={{ style: "currency", currency: "USD" }} />;
 ```
 
-The chip is capped at `max(100%, 14em)` wide and ellipsizes past that, so a long formatted value cannot paint across the
-page. If you see an ellipsis, the value is too long for the chart — shorten it with `format` (`notation: "compact"` is
-usually the answer) rather than widening the chart.
+The chip is capped at `max(100%, 14em)` wide and ellipsizes past that, so a long formatted value can't paint across the
+page. If you see an ellipsis, shorten the value with `format` (`notation: "compact"` usually does it) rather than
+widening the chart.
 
 Its prose comes from `strings`, like every other word the library renders, so a localized bundle localizes the readout
 too. Its colors come from `--mc-surface`, `--mc-surface-ink` and `--mc-surface-edge`; see
 [Theming](/docs/theming#the-readout-surface).
 
-**Put the value somewhere else.** That same terse string is handed to you: every `onActive` / `onSelect` callback
-receives it as `datum.formatted`, formatted with the chart's own `format` and `locale`. So you can suppress the chip and
-render the value in your own layout — the pattern behind a KPI card whose big number tracks a sparkline you hover:
+**Put the value somewhere else.** Every `onActive` / `onSelect` callback receives that same string as `datum.formatted`,
+built with the chart's own `format` and `locale`. Suppress the chip and render it in your own layout: this is the
+pattern behind a KPI card whose big number tracks the sparkline you hover.
 
 ```tsx
 const [reading, setReading] = useState("$1,600");
@@ -137,13 +132,13 @@ const [reading, setReading] = useState("$1,600");
 />;
 ```
 
-`readout={false}` hides only the chip — hover, keyboard roving, touch scrub, the live-region announcements, and both
-callbacks all keep working. Leave `readout` at its default (`true`) and you get the chip and the callback both.
+`readout={false}` hides only the chip. Hover, keyboard roving, touch scrub, the live-region announcements, and both
+callbacks keep working. Leave `readout` at its default (`true`) and you get the chip and the callbacks.
 
 ## Locale: separators, not language
 
 `locale` is a BCP-47 tag (`"de-DE"`, `"ja-JP"`, or an array of fallbacks). It controls how numbers and dates are
-_written_ — the thousands separator, decimal mark, currency placement — matching the reader's conventions.
+_written_: the thousands separator, the decimal mark, currency placement.
 
 <LiveDemo
   label="Same data, two locales"
@@ -171,22 +166,22 @@ _written_ — the thousands separator, decimal mark, currency placement — matc
 </LiveDemo>
 
 <Callout type="info">
-  `locale` sets number/date **formatting**. It does not translate the summary _sentence_ ("Trending up 200%…") — that's
-  the `strings` contract on [Accessibility](/docs/accessibility#internationalization-and-rtl). Pick both for a fully
-  localized chart: `locale` for the figures, translated `strings` for the prose.
+  `locale` sets number and date **formatting**. It does not translate the summary _sentence_ ("Trending up 200%…");
+  that's the `strings` contract on [Accessibility](/docs/accessibility#internationalization-and-rtl). A fully localized
+  chart needs both: `locale` for the figures, translated `strings` for the prose.
 </Callout>
 
 ### Server rendering: pass a `locale` explicitly
 
-Omitting `locale` means `Intl` resolves the _runtime's_ default — and on a server-rendered page that runtime is the
-server. Node typically resolves to the host's locale while the visitor's browser resolves to theirs, so the same chart
-can render `1,600` into the HTML and `1.600` after hydration. React reports that as a hydration mismatch, and the
-mismatched text is not patched up.
+Omit `locale` and `Intl` resolves the _runtime's_ default. On a server-rendered page that runtime is the server: Node
+typically resolves to the host's locale while the visitor's browser resolves to theirs, so the same chart can render
+`1,600` into the HTML and `1.600` after hydration. React reports that as a hydration mismatch, and does not patch up the
+mismatched text.
 
-This is not specific to microcharts — it is how `Intl` defaults work — but charts hit it more often than most UI,
-because the number reaches three places at once: the label, the accessible summary, and the readout.
+This isn't specific to microcharts; it's how `Intl` defaults work. Charts hit it more often than most UI because the
+number reaches three places at once: the label, the accessible summary, and the readout.
 
-The fix is to make the choice explicit rather than ambient:
+The fix is to make the choice explicit:
 
 ```tsx
 // Deterministic: the server and the browser format identically.
@@ -198,9 +193,9 @@ on both sides. If a chart is client-only, the ambient default is fine.
 
 ## Scale: the `domain` decision
 
-`domain` sets the value range the geometry is drawn against — the vertical frame. Omit it and the chart **auto-fits to
-its own data**. Pass `[min, max]` to pin a fixed frame instead — so a 40–60% reading looks like 40–60% of a 0–100 scale,
-not a full-height line.
+`domain` sets the value range the geometry is drawn against: the vertical frame. Omit it and the chart **auto-fits to
+its own data**. Pass `[min, max]` to pin a fixed frame, so a 40–60% reading looks like 40–60% of a 0–100 scale rather
+than a full-height line.
 
 <LiveDemo
   label="Auto-fit vs. fixed frame"
@@ -221,27 +216,27 @@ not a full-height line.
   </div>
 </LiveDemo>
 
-Auto-fit is not the same everywhere. Charts whose marks read as magnitude from a baseline — `Sparkbar`, `MiniBar`,
-`PairedBars`, and `Sparkline` once you turn on `fill` — anchor the auto-fitted domain at **zero**, because a bar cut off
-above zero lies about its own length. Line charts without a fill auto-fit to the data alone. Either way, a completely
-flat series is padded so it still has a band to sit in rather than collapsing to a degenerate scale.
+Auto-fit works differently per chart. Charts whose marks read as magnitude from a baseline (`Sparkbar`, `MiniBar`,
+`PairedBars`, and `Sparkline` once you turn on `fill`) anchor the auto-fitted domain at **zero**, because a bar cut off
+above zero misstates its own length. Line charts without a fill auto-fit to the data alone. Either way, a completely
+flat series is padded so it still has a band to sit in instead of collapsing to a degenerate scale.
 
-This is an **honesty decision**, not cosmetics: auto-fit maximizes detail for a single series, but a fixed domain is
-what makes two charts comparable. To share one scale across several charts at once, use `SparkGroup` — it reads every
-child's `data`, computes one union domain, and injects it into any child that didn't set its own (`zero` anchors that
-shared domain at zero). See [Composition](/docs/composition#small-multiples-one-shared-scale).
+The choice changes what a reader can conclude: auto-fit maximizes detail for a single series, and a fixed domain is what
+makes two charts comparable. To share one scale across several charts at once, use `SparkGroup`: it reads every child's
+`data`, computes one union domain, and injects it into any child that didn't set its own (`zero` anchors that shared
+domain at zero). See [Composition](/docs/composition#small-multiples-one-shared-scale).
 
 ## Dates and times
 
-On calendar and time charts, `format` still means what it means everywhere else: it formats the **numbers**. On
+On calendar and time charts, `format` means what it means everywhere else: it formats the **numbers**. On
 `EventTimeline` that's a share, defaulting to a locale-aware percent. On `CalendarStrip` it's the day's value in the
-hover/focus readout — so it lives on the interactive entry only. The static `CalendarStrip` summary counts days —
-`Active 3 of 28 days over 4 weeks.` — and a count of days is not a number `format` gets to restyle.
+hover/focus readout, so it lives on the interactive entry only. The static `CalendarStrip` summary counts days instead:
+`Active 3 of 28 days over 4 weeks.` A count of days is not a number `format` restyles.
 
 Date and time _strings_ are a separate prop, **`dateFormat`**, taking `Intl.DateTimeFormatOptions` or a
 `(date) => string` function. It lives on the interactive entries (`@microcharts/react/calendar-strip/interactive`,
-`@microcharts/react/event-timeline/interactive`), which are the entries that render a spoken or hovered date at all —
-`locale` applies to it the same way.
+`@microcharts/react/event-timeline/interactive`), the ones that render a spoken or hovered date. `locale` applies to it
+the same way.
 
 ```tsx
 import { CalendarStrip } from "@microcharts/react/calendar-strip/interactive";
@@ -249,7 +244,7 @@ import { CalendarStrip } from "@microcharts/react/calendar-strip/interactive";
 <CalendarStrip data={days} dateFormat={{ month: "short", day: "numeric" }} locale="de-DE" />;
 ```
 
-When you pass options (rather than a function), the formatter defaults to `timeZone: "UTC"`, so the same input renders
-identically in any host timezone — a chart never shifts a day because the viewer is in a different region. Your options
-spread after that default, so `{ timeZone: "America/New_York" }` overrides it deliberately. A `(date) => string`
-function bypasses the default entirely and owns its own timezone handling.
+When you pass options rather than a function, the formatter defaults to `timeZone: "UTC"`, so the same input renders
+identically in any host timezone and a chart never shifts a day because the viewer is in a different region. Your
+options spread after that default, so `{ timeZone: "America/New_York" }` overrides it. A `(date) => string` function
+bypasses the default entirely and handles its own timezone.

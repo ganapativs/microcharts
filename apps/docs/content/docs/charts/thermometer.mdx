@@ -1,14 +1,13 @@
 ---
 title: Thermometer
-description: >-
-  React thermometer chart — progress toward a goal as a vertical fill from zero. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: Thermometer fills a ticked tube from the bottom of a stated domain, with an optional target line.
 ---
 
-Thermometer answers "where does this value sit on a calibrated range, and how close to the goal?" A column fills a
-ticked tube; the ticks calibrate the read, which is what buys the precision. The fill always anchors at the bottom of
-the range — never re-zeroed, never log — and an optional target line crosses the tube to mark the goal. The bulb is
-instrument chrome (always full); it is not data, so its area means nothing.
+Thermometer fills a ticked tube from the bottom of its range, and the ticks calibrate the read, which is what buys the
+precision. The fill always anchors at the bottom of the domain: never re-zeroed, never log. An optional target line
+crosses the tube to mark the goal. `domain` defaults to `[0, 100]` because a calibrated instrument needs a stated range,
+and auto-fitting would move the scale under the reader. The bulb is instrument chrome and always full; it is not data,
+so its area means nothing.
 
 <LiveDemo label="Thermometer" sizeOf="thermometer">
   <Thermometer value={72} target={80} title="Fundraiser" height={56} />
@@ -24,15 +23,19 @@ instrument chrome (always full); it is not data, so its area means nothing.
 
 ## When to use it
 
-- **Good for** — a fundraising or goal-progress read, a capacity or utilization gauge in a cell, or any value against a
-  stated range.
-- **Avoid for** — trends (Sparkline), proportions of a whole (SegmentedBar), or many series.
+Use it for a fundraising or goal-progress read, a capacity or utilization gauge in a cell, or any value against a stated
+range. Trends belong in Sparkline and proportions of a whole in SegmentedBar; it reads a single value, so many series
+need a different chart.
 
 ## Sizing
 
 <Sizing chart="thermometer" />
 
 ## Variants
+
+Vertical with the bulb is the default, since a filling tube reads as progress toward the goal.
+`orientation="horizontal"` fits a table cell where a vertical tube cannot, and `bulb={false}` drops the reservoir where
+the instrument metaphor is too much for the context.
 
 <LiveDemo
   label="horizontal cell + explicit ticks"
@@ -80,24 +83,17 @@ instrument chrome (always full); it is not data, so its area means nothing.
   />
 </LiveDemo>
 
-The accessible summary's value, domain, and target all go through the same locale-aware formatter, so "7,234" becomes
-"7.234" in German grouping.
+A value beyond the domain clamps the fill, and the accessible name still reports the true number, so the reading is
+never silently clipped. The accessible summary's value, domain, and target all go through the same locale-aware
+formatter, so "7,234" becomes "7.234" in German grouping.
 
 ## Four homes
 
 <FourContexts slug="thermometer" />
 
-## Why this default
-
-Vertical with the bulb is the default because the instrument metaphor is the point — a filling tube reads as "toward the
-goal" instantly. Horizontal exists for table cells where a vertical tube cannot fit, and `bulb={false}` drops the
-reservoir when the metaphor runs too warm for the context. The `domain` defaults to `[0, 100]` because a calibrated
-instrument needs a stated range; auto-fitting would silently move the scale under the reader. A value beyond the domain
-clamps the fill but the accessible name always reports the true number — the reading is never silently clipped.
-
 ## Accessibility
 
-The accessible name states the value on its scale — **"62 on a 0–100 scale."** — and appends the goal when a target is
+The accessible name states the value on its scale, **"62 on a 0–100 scale."**, and appends the goal when a target is
 set. The interactive entry reveals the exact value on hover or focus, glides the fill to its new level with a
 reduced-motion-gated transition, and announces each change through a polite live region.
 

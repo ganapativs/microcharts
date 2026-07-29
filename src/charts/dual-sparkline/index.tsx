@@ -8,13 +8,13 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
-import { seriesStats } from "../../core/stats.js";
+import { lastFinite, seriesStats } from "../../core/stats.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import type { Value } from "../../core/types.js";
 import { dualSparklineGeometry } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
-import { scaleLinear } from "../../core/scale.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
 
 /** Trend clause ("up 12%" / "down 4%" / "flat") for one series. */
 function trendClause(values: readonly Value[], strings: SeriesStrings): string {
@@ -108,10 +108,10 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height, 0.4);
-  const lastText =
-    label === "last"
-      ? [...data].reverse().find((v): v is number => Number.isFinite(v ?? Number.NaN))
-      : undefined;
+  // `lastFinite`, not `[...data].reverse().find(…)` — that copied the whole
+  // series to read one value off its end. Whether the gutter this asks for is
+  // affordable is geometry's call (`geo.labelled`).
+  const lastText = label === "last" ? lastFinite(data) : undefined;
   const geo = dualSparklineGeometry({
     width,
     height,
@@ -189,22 +189,26 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
+      {/* `neutral` (a filled no-valence mark), not `muted` + an inline fill:
+          `muted` is fill:none/stroke, so the inline fill was papering over the
+          role — and being INLINE it outranked the forced-colors mapping, keeping
+          a warm gray in High Contrast Mode (`.mc-root` is
+          forced-color-adjust: none). Its stray 1-unit stroke also grew this dot
+          to the accent dot's size, so the reference stopped whispering. */}
       {dots !== "none" && geo.lastCompare && !geo.coincident ? (
-        <circle
-          cx={geo.lastCompare.x}
-          cy={geo.lastCompare.y}
-          r={1.5}
-          data-mc-ink="muted"
-          style={{ fill: "var(--mc-neutral)" }}
-        />
+        <circle cx={geo.lastCompare.x} cy={geo.lastCompare.y} r={1.5} data-mc-ink="neutral" />
       ) : null}
       {dots !== "none" && geo.lastPrimary ? (
         <circle cx={geo.lastPrimary.x} cy={geo.lastPrimary.y} r={2} data-mc-ink="accent" />
       ) : null}
-      {label === "last" && geo.lastPrimary ? (
+      {geo.labelled && geo.lastPrimary ? (
         <text
           x={geo.lastPrimary.x + 6}
-          y={Math.min(Math.max(geo.lastPrimary.y, fontSize * 0.55), height - fontSize * 0.55)}
+          /* `dominant-baseline: central` straddles y by HALF a font each way, so
+             the clamp is symmetric — 0.55 reserved more than the box had and,
+             with `min` applied last, pushed the figure off the TOP of a short
+             viewBox. `geo.labelled` guarantees a valid range here. */
+          y={clamp(geo.lastPrimary.y, fontSize * 0.5, height - fontSize * 0.5)}
           fontSize={fontSize}
           dominantBaseline="central"
           textAnchor="start"

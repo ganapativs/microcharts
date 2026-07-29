@@ -9,7 +9,13 @@ import { isFiniteValue, round2 } from "../../core/types.js";
 export type BeamShape = "square" | "round";
 export type BeamMode = "ratio" | "difference";
 
+/** Degrees at full saturation. The `maxTilt` prop default, and the fallback
+ *  when a caller computes one that isn't a real number. */
+export const DEFAULT_MAX_TILT = 12;
+
 export interface BalanceBeamGeometry {
+  /** The tilt actually painted: `maxTilt` after resolution, and after the cap
+   *  that keeps the ends inside the box. Never opposite in sign to `heavier`. */
   tiltDeg: number;
   beam: { x1: number; y1: number; x2: number; y2: number };
   fulcrum: string;
@@ -51,13 +57,24 @@ export function balanceBeamGeometry(opts: {
     const sum = av + bv;
     norm = sum === 0 ? 0 : clamp((av - bv) / sum, -1, 1);
   }
-  const tiltDeg = round2(norm * maxTilt);
-  const theta = (tiltDeg * Math.PI) / 180;
-
   const pivotX = round2(width / 2);
   // pivot sits ~60% down so the weights have room ABOVE the beam
   const pivotY = round2(height * 0.6);
   const bh = round2(width / 2 - pad - 4); // beam half-length
+
+  // A host-computed maxTilt arrives hostile more often than typed: NaN from an
+  // empty input (`Number("")`) painted NaN endpoints; a negative one tilted the
+  // beam AWAY from the side the summary named heavier; a large one wrapped past
+  // 90° and reversed it the same way. Resolve once, here, so every consumer of
+  // this geometry reads the same tilt the summary describes.
+  const ceilDeg = isFiniteValue(maxTilt) ? clamp(maxTilt, 0, 90) : DEFAULT_MAX_TILT;
+  // The beam is rigid, so the swing is capped as an ANGLE, not by moving an
+  // endpoint: an end may drop as far as the fulcrum's stance and no further.
+  // Without it a wide, short beam (bh far larger than the height) swung both
+  // ends clean out of the box at ordinary tilts.
+  const maxDeg = (Math.asin(clamp((height * 0.4 - pad) / (bh || 1), 0, 1)) * 180) / Math.PI;
+  const tiltDeg = round2(clamp(norm * ceilDeg, -maxDeg, maxDeg));
+  const theta = (tiltDeg * Math.PI) / 180;
 
   // rotate the beam about the pivot (positive tilt → left end DOWN)
   const cos = Math.cos(theta);
@@ -70,7 +87,20 @@ export function balanceBeamGeometry(opts: {
   // area-true weights: half = k·√value. maxHalf is bounded so the largest weight
   // fits both vertically (above the beam) and horizontally (at the beam end).
   const maxV = Math.max(av, bv, 1);
-  const maxHalf = round2(Math.max(1, Math.min((pivotY - 1) / 2, pivotX - bh, bh * 0.4)));
+  // The RAISED end has less headroom than the level beam did, and sizing k from
+  // the box alone let a near-equal pair on a saturated tilt paint its square off
+  // the top edge — reachable with default props in `difference` mode, where a
+  // small domain saturates the tilt while both weights stay large. Both weights
+  // still share one k, so the area ratio between them is untouched.
+  const sa = Math.sqrt(av / maxV);
+  const sb = Math.sqrt(bv / maxV);
+  // 0.52, not 0.5: the extra 0.02 absorbs the three round2 steps between here
+  // and the emitted `y`, which otherwise round the square 0.01 above the edge.
+  const headA = sa > 0 ? (leftY - 0.52) / (2 * sa) : Infinity;
+  const headB = sb > 0 ? (rightY - 0.52) / (2 * sb) : Infinity;
+  const maxHalf = round2(
+    Math.max(1, Math.min((pivotY - 1) / 2, pivotX - bh, bh * 0.4, headA, headB)),
+  );
   const k = maxHalf / Math.sqrt(maxV);
   const halfA = ka ? round2(k * Math.sqrt(av)) : 0;
   const halfB = kb ? round2(k * Math.sqrt(bv)) : 0;

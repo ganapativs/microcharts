@@ -19,7 +19,11 @@ describe("<Waterfall>", () => {
   it("floating bars + connectors + total summary", () => {
     const { container } = draw(<Waterfall data={PL} open={1200} />);
     expect(container.querySelectorAll("rect").length).toBe(5); // 4 steps + total
-    expect(container.querySelectorAll("line").length).toBe(4);
+    // The connectors are ONE path (one move-and-horizontal per gap), never a
+    // <line> per gap — the node count must not track the step count.
+    const connectors = container.querySelector('path[data-mc-ink="muted"]')!;
+    expect(container.querySelectorAll("line").length).toBe(0);
+    expect(connectors.getAttribute("d")!.match(/M/g)).toHaveLength(4);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "From 1,200 to 1,540 over 4 steps: +480 gains, −140 losses.",
     );
@@ -112,4 +116,16 @@ describe("<Waterfall> annotations", () => {
       18,
     );
   });
+});
+
+it("a non-finite `open` never reaches the accessible name", () => {
+  const { container } = draw(<Waterfall data={PL} open={Number.NaN} />);
+  const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+  expect(label).not.toMatch(/NaN|Infinity/);
+  // Same fallback the plot uses, so name and picture agree.
+  expect(label).toBe(
+    draw(<Waterfall data={PL} open={0} />)
+      .container.querySelector("svg")!
+      .getAttribute("aria-label"),
+  );
 });

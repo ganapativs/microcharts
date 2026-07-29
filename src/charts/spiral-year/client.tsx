@@ -2,8 +2,7 @@
 // Interactive <SpiralYear>. useActivePicker owns interaction: one pointer
 // listener + nearest-mark lookup (squared 2-D distance over the precomputed
 // spiral marks). ←/→ step chronologically along the finite marks, click / Enter
-// / Space selects (onSelect).the SVG
-// is
+// / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
@@ -18,7 +17,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";
-import { spiralYearGeometry } from "./geometry.js";
+import { SPIRAL_PAD, spiralYearGeometry } from "./geometry.js";
 import {
   SpiralYear as StaticSpiralYear,
   spiralYearSummary,
@@ -78,7 +77,8 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
   }, [startDate, cadence]);
 
   const geo = useMemo(
-    () => spiralYearGeometry({ values: data, size, steps, cadence, startIndex, pad: 1, mark }),
+    () =>
+      spiralYearGeometry({ values: data, size, steps, cadence, startIndex, pad: SPIRAL_PAD, mark }),
     [data, size, steps, cadence, startIndex, mark],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);

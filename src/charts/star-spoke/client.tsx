@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STAR_SPOKE } from "../../core/strings-star-spoke.js";
-import { UNIT_DOMAIN, starSpokeGeometry } from "./geometry.js";
+import { UNIT_DOMAIN, resolveDomain, starBox, starSpokeGeometry } from "./geometry.js";
 import { StarSpoke as StaticStarSpoke, starSpokeSummary, type StarSpokeProps } from "./index.js";
 
 export interface InteractiveStarSpokeProps extends StarSpokeProps, PickerProps {
@@ -32,8 +32,8 @@ export interface InteractiveStarSpokeProps extends StarSpokeProps, PickerProps {
 export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   const {
     data,
-    domain = UNIT_DOMAIN,
-    size = 80,
+    domain: domainProp = UNIT_DOMAIN,
+    size: sizeProp = 80,
     labels = true,
     format,
     locale,
@@ -53,6 +53,14 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
+
+  // Same two resolvers as the static entry, so a hostile `size`/`domain` can't
+  // put the hit box, the focus mark and the readout on a different scale from
+  // the painted one.
+  const size = starBox(sizeProp);
+  // Memoised for identity, not for cost: a repaired domain is a fresh array,
+  // and the geometry memo below keys on it.
+  const domain = useMemo(() => resolveDomain(domainProp), [domainProp]);
 
   // Mirror the static entry's label ring EXACTLY — a divergent `pad` shifts
   // every spoke, and the focus mark would sit off the drawn spoke.

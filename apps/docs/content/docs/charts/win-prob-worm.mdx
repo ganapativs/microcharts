@@ -1,14 +1,12 @@
 ---
 title: WinProbWorm
-description: >-
-  React win-prob worm chart — win probability over a contest as a worm. Tiny accessible SVG microchart; RSC-safe static
-  or /interactive.
+description: WinProbWorm plots win probability on a fixed 0–100 axis and marks every lead change.
 ---
 
-WinProbWorm answers "who's winning, and when did the lead flip?". It plots one win-probability series on a **fixed 0–100
-axis that is never truncated** — the honesty rule for a probability — and splits the worm at the 50% line: while your
-side leads the line reads accent, when it trails it reads neutral, and a dot marks each lead change. Because a
-win-probability curve is a modelled read, the summary always says so, "per the supplied model".
+A model has the home side at 98% after three lead changes. WinProbWorm plots that series on a **fixed 0–100 axis that is
+never truncated**, so a 2-point edge always looks like a 2-point edge. It splits the worm at the 50% line: while your
+side leads the line reads accent, when it trails it reads neutral, and a dot marks each lead change. A win-probability
+curve is a modelled read, so the summary always says so, "per the supplied model".
 
 <LiveDemo label="WinProbWorm" sizeOf="win-prob-worm">
   <WinProbWorm
@@ -30,9 +28,9 @@ win-probability curve is a modelled read, the summary always says so, "per the s
 
 ## When to use it
 
-- **Good for** — live win or election probability where the lead flips, a modelled forecast whose crossings are the
-  story, and any 0–100 probability you must not truncate.
-- **Avoid for** — a raw score or margin (Sparkline), or a value that isn't a bounded 0–100 probability.
+Use it for live win or election probability where the lead flips, for a modelled forecast whose crossings are the point,
+and for any 0–100 probability you must not truncate. For a raw score or margin use Sparkline, and for a value that isn't
+a bounded 0–100 probability use another chart.
 
 ## Sizing
 
@@ -56,8 +54,8 @@ win-probability curve is a modelled read, the summary always says so, "per the s
   </span>
 </LiveDemo>
 
-At a taller size the biggest single momentum swing gets a hair connector and a signed delta; drop it with
-`markSwing={false}`, and drop the endpoint probability with `label="none"`.
+The endpoint carries the current number. At a taller size the biggest single momentum swing also gets a hair connector
+and a signed delta; drop that with `markSwing={false}`, and drop the endpoint probability with `label="none"`.
 
 <LiveDemo
   label="markSwing and label"
@@ -112,32 +110,23 @@ At a taller size the biggest single momentum swing gets a hair connector and a s
   <WinProbWorm data={[72]} sides={["home", "away"]} title="One reading" width={110} height={24} />
 </LiveDemo>
 
-With a `format` and `locale`, the endpoint label and the summary format their numbers in that locale's own decimal mark
-— `[50, 55.5, 61.2, 58.4, 63.5]` in `de-DE` ends at **"63,5%"**. Values outside 0–100 are clamped to the axis and
-dev-warn — a probability cannot exceed 100. A constant series has no crossing and no swing: an all-50 series reads
+With a `format` and `locale`, the endpoint label and the summary format their numbers in that locale's own decimal mark:
+`[50, 55.5, 61.2, 58.4, 63.5]` in `de-DE` ends at **"63,5%"**. Values outside 0–100 are clamped to the axis and
+dev-warn, since a probability cannot exceed 100. A constant series has no crossing and no swing: an all-50 series reads
 "even… throughout", any other constant reads "…holds X% throughout". A `null` breaks the worm into disconnected runs the
-way a gap should; a single point has no line to draw, so it renders just the endpoint dot and its label; `data={[]}`
+way a gap should. A single point has no line to draw, so it renders just the endpoint dot and its label, and `data={[]}`
 renders the frame with the "no data" summary.
 
 ## Four homes
 
 <FourContexts slug="win-prob-worm" />
 
-## Why this default
-
-The fixed 0–100 axis is the whole point: a win probability that truncated its own scale would exaggerate a lead, so the
-axis never moves and a 2-point edge always looks like a 2-point edge. The 50% split does the reasoning for the reader —
-accent while your side leads, neutral while it trails, a dot at each flip — so "who's ahead, and did it ever change?" is
-answered before the second glance. The endpoint carries the current number, and the biggest momentum swing is marked
-only when there's room for it. The worm is a modelled read, never a fact, so its accessible name is framed "per the
-supplied model" and the chart never editorializes the forecast.
-
 ## Accessibility
 
 The accessible name states the current leader, their probability, the number of lead changes, and the biggest momentum
-swing — **"Per the supplied model, home leads at 98%; 3 lead changes, biggest swing +17 at point 8."** — or, for a
-constant series, "Per the supplied model, even at 50% throughout." The interactive entry roves the points with ←/→
-(Home/End jump to the ends), each announcing the leader and probability at that point, with a live readout chip.
+swing: **"Per the supplied model, home leads at 98%; 3 lead changes, biggest swing +17 at point 8."** A constant series
+reads "Per the supplied model, even at 50% throughout." The interactive entry roves the points with ←/→ (Home/End jump
+to the ends), each announcing the leader and probability at that point, with a live readout chip.
 
 <InteractionNote slug="win-prob-worm" />
 

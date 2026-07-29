@@ -48,6 +48,28 @@ describe("detectBreaks — a labelled heuristic", () => {
     expect(detectBreaks([1, 2, 3, 4, 5])).toEqual([]);
   });
 
+  it("break indices are in the CALLER's index space, not the gap-filtered one", () => {
+    const clean = [...Array(20).fill(10), ...Array(20).fill(50)];
+    expect(detectBreaks(clean)).toEqual([20]);
+    // four leading gaps push the same shift to index 24
+    expect(detectBreaks([NaN, NaN, NaN, NaN, ...clean])).toEqual([24]);
+    // …and gaps INSIDE the first regime shift it just as far
+    const inner = [...Array(20).fill(10), ...Array(20).fill(50)];
+    inner.splice(5, 0, NaN, NaN);
+    expect(detectBreaks(inner)).toEqual([22]);
+  });
+
+  it("a non-finite `max` falls back to the documented default of 2", () => {
+    const three = [
+      ...Array(8).fill(10),
+      ...Array(8).fill(40),
+      ...Array(8).fill(70),
+      ...Array(8).fill(20),
+    ];
+    expect(detectBreaks(three, NaN).length).toBe(2);
+    expect(detectBreaks(three, NaN)).toEqual(detectBreaks(three, 2));
+  });
+
   it("constants are exported and sane", () => {
     expect(BREAK_SS_RATIO).toBe(0.2);
     expect(BREAK_EFFECT_SIZE).toBe(0.8);
@@ -95,6 +117,38 @@ describe("changePointGeometry", () => {
     const geo = changePointGeometry({ ...base, data, breaks: [4] })!;
     expect(geo.segments[0]!.mean).toBe(10); // NaN excluded
     expect(geo.line.d).toContain("M"); // has at least one run
+  });
+
+  it("segment means follow the caller's indices once gaps shift the break", () => {
+    const geo = changePointGeometry({
+      ...base,
+      data: [NaN, NaN, NaN, NaN, ...Array(20).fill(10), ...Array(20).fill(50)],
+    })!;
+    expect(geo.breaks.map((b) => b.index)).toEqual([24]);
+    expect(geo.breaks[0]!.before).toBe(10);
+    expect(geo.breaks[0]!.after).toBe(50); // was 43.33 — four 10s leaked across
+  });
+
+  it("an unusable domain lands mid-plot; it never emits NaN coords", () => {
+    const data = step(10, 10, 50, 10);
+    for (const domain of [
+      [NaN, NaN],
+      [-Infinity, Infinity],
+      [0, Infinity],
+      [5, 5],
+    ] as [number, number][]) {
+      const geo = changePointGeometry({ ...base, data, domain })!;
+      expect(geo.line.d).not.toContain("NaN");
+      for (const s of geo.segments) expect(Number.isFinite(s.meanY)).toBe(true);
+    }
+  });
+
+  it("a span that overflows to Infinity lands mid-plot, not on NaN", () => {
+    const geo = changePointGeometry({
+      ...base,
+      data: [...Array(10).fill(1e308), ...Array(10).fill(-1e308)],
+    })!;
+    expect(geo.line.d).not.toContain("NaN");
   });
 
   it("empty / all-NaN → null", () => {

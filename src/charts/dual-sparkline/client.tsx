@@ -19,6 +19,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
+import { lastFinite } from "../../core/stats.js";
 import { dualSparklineGeometry } from "./geometry.js";
 import {
   DualSparkline as StaticDualSparkline,
@@ -69,17 +70,10 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fontSize = labelFont(height, 0.4);
-  // Last finite primary value — scanned backwards in place (a `[...data]
-  // .reverse()` copies the whole series) and memoised: the interactive entry
-  // re-renders on every unit crossed during a scrub, and this feeds `geo`.
-  const lastText = useMemo(() => {
-    if (label !== "last") return undefined;
-    for (let i = data.length - 1; i >= 0; i--) {
-      const v = data[i];
-      if (Number.isFinite(v ?? Number.NaN)) return v as number;
-    }
-    return undefined;
-  }, [data, label]);
+  // Memoised: the interactive entry re-renders on every unit crossed during a
+  // scrub, and this feeds `geo`. Must stay identical to the static entry's — the
+  // gutter it reserves decides where the crosshair lands.
+  const lastText = useMemo(() => (label === "last" ? lastFinite(data) : undefined), [data, label]);
   const geo = useMemo(
     () =>
       dualSparklineGeometry({
@@ -213,12 +207,16 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
                 data-mc-ink="accent"
               />
             ) : null}
+            {/* `neutral` rather than an inline neutral fill: an inline paint
+                outranks the forced-colors mapping and this dot kept a warm gray
+                in High Contrast Mode, where the crosshair beside it went
+                system-ink. */}
             {geo.comparePoints[shown!] ? (
               <circle
                 cx={geo.comparePoints[shown!]![0]}
                 cy={geo.comparePoints[shown!]![1]}
                 r={1.5}
-                style={{ fill: "var(--mc-neutral)" }}
+                data-mc-ink="neutral"
               />
             ) : null}
           </>

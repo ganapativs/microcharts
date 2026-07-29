@@ -90,6 +90,23 @@ describe("<Delta>", () => {
     expect(container.querySelector(".mc-delta-num")!.textContent).toBe("—");
   });
 
+  it("a ratio that overflows a finite delta takes the em-dash path, not '∞%'", () => {
+    // value − from is finite; dividing by a denormal base overflows the ratio,
+    // and the ratio is what gets painted and announced.
+    const { container } = draw(<Delta value={1} from={Number.MIN_VALUE} />);
+    const el = container.querySelector(".mc-delta")!;
+    expect(el.getAttribute("data-mc-valence")).toBe("flat");
+    expect(el.getAttribute("aria-label")).toBe("No change.");
+    expect(container.querySelector(".mc-delta-num")!.textContent).toBe("—");
+  });
+
+  it("an unrecognised `positive` keeps the documented default (up is good)", () => {
+    // Untyped config ("sideways") used to invert the valence instead of falling
+    // back to the default, painting a rise in the negative color.
+    const { container } = draw(<Delta value={0.1} positive={"sideways" as unknown as "up"} />);
+    expect(container.querySelector(".mc-delta")!.getAttribute("data-mc-valence")).toBe("pos");
+  });
+
   it("summary={false} → decorative: no role; number stays in the text flow", () => {
     const { container } = draw(<Delta value={0.1} summary={false} />);
     const el = container.querySelector(".mc-delta")!;
@@ -106,3 +123,25 @@ describe("<Delta>", () => {
 });
 
 valueEdgeSuite("Delta", (value) => <Delta value={value} title="Edge" />);
+
+// The shared matrix varies `value` only, and `from` is the other half of the
+// number Delta announces — a hostile base leaked "∞" into the accessible name.
+describe("<Delta> hostile `from`", () => {
+  const BASES: Record<string, number> = {
+    NaN: Number.NaN,
+    Infinity: Number.POSITIVE_INFINITY,
+    "-Infinity": Number.NEGATIVE_INFINITY,
+    denormal: Number.MIN_VALUE,
+    "tiny normal": 1e-300,
+    "huge magnitude": 1e308,
+    "negative zero": -0,
+  };
+  for (const [label, from] of Object.entries(BASES)) {
+    it(`${label} → no non-finite reading in the name or the number`, () => {
+      const { container } = draw(<Delta value={1} from={from} title="Edge" />);
+      const el = container.querySelector(".mc-delta")!;
+      expect(el.getAttribute("aria-label")).not.toMatch(/NaN|Infinity|∞/);
+      expect(container.textContent).not.toMatch(/NaN|Infinity|∞|undefined/);
+    });
+  }
+});

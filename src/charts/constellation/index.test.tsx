@@ -55,6 +55,55 @@ describe("<Constellation>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
   });
 
+  it("summary counts, spans, and ranks only the events it paints", () => {
+    // The middle event has no value, so value mode never draws it. The summary
+    // used to count it, take the span from it, and hand it "largest".
+    const MIXED = [
+      { x: 0, y: 10, m: 1 },
+      { x: 5, m: 99 },
+      { x: 2, y: 5, m: 2 },
+    ];
+    const { container } = draw(<Constellation data={MIXED} xFormat={monthFmt} label="max" />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "2 events between Jan and Mar; largest at Mar.",
+    );
+    expect(container.querySelectorAll("circle").length).toBe(3); // 2 events + halo
+    expect(container.querySelector("text")!.textContent).toBe("2"); // the drawn max
+  });
+
+  it('label="max" prints the number that ranked the star, not a dormant magnitude', () => {
+    // No positive magnitude → nothing sizes the dots, so value picks the star
+    // and the numeral has to be that value (it used to print m).
+    const { container } = draw(
+      <Constellation
+        data={[
+          { x: 0, y: 1, m: 0 },
+          { x: 1, y: 8, m: -5 },
+        ]}
+        label="max"
+      />,
+    );
+    expect(container.querySelector("text")!.textContent).toBe("8");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "2 events between 0 and 1; largest at 1.",
+    );
+  });
+
+  it("non-finite width/height/fontSize never reach the DOM", () => {
+    for (const props of [
+      { width: NaN },
+      { height: NaN },
+      { width: Infinity },
+      { fontSize: NaN },
+      { rBase: NaN },
+      { rBase: 0 },
+    ] as const) {
+      const { container } = draw(<Constellation data={EVENTS} label="max" {...props} />);
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+      expect(container.querySelector("svg")!.getAttribute("viewBox")).toMatch(/^0 0 \d+ \d+$/);
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <Constellation data={EVENTS} xFormat={monthFmt} title="Incidents" />,

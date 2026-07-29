@@ -75,6 +75,64 @@ describe("gradeProfileGeometry", () => {
     expect(geo.ridge.match(/M/g)!.length).toBe(2);
   });
 
+  it("unusable bins fall back to the documented defaults", () => {
+    // A host computes thresholds: `Number("")` off an empty field, or a sort
+    // that ran descending. Every comparison against NaN is false, so binOf
+    // used to fall through to the brutal bin for the whole route.
+    const expected = gradeProfileGeometry({ ...base, data: TRAIL }).segments.map((s) => s.bin);
+    for (const bins of [
+      [NaN, NaN, NaN],
+      [3, NaN, 10],
+      [Infinity, Infinity, Infinity],
+      [-Infinity, 6, 10],
+      [10, 6, 3], // descending
+    ] as const) {
+      const geo = gradeProfileGeometry({ ...base, bins, data: TRAIL });
+      expect(
+        geo.segments.map((s) => s.bin),
+        `bins ${bins.join()}`,
+      ).toEqual(expected);
+    }
+  });
+
+  it("a descent stays in the gentlest bin even under thresholds below zero", () => {
+    const geo = gradeProfileGeometry({ ...base, bins: [-5, 0, 5], data: TRAIL });
+    expect(geo.segments.map((s) => s.bin)).toEqual([3, 2, 3, 3, 0, 3]);
+    expect(geo.segments.find((s) => s.grade < 0)!.bin).toBe(0);
+  });
+
+  it("an unrepresentable pitch paints but never becomes the announced steepest", () => {
+    // `rise / run` overflows on a sub-normal run: the wall is real, the number
+    // is not, and `Intl` renders it "∞". The finite 10% pitch stays the
+    // headline; the segment itself still gets a quad.
+    const geo = gradeProfileGeometry({
+      ...base,
+      data: [
+        { d: 0, elev: 0 },
+        { d: Number.MIN_VALUE, elev: 1 },
+        { d: 100, elev: 0 },
+        { d: 200, elev: 10 },
+      ],
+    });
+    expect(geo.segments.length).toBe(3);
+    expect(geo.maxGrade).toBe(10);
+    expect(geo.totalGain).toBe(11);
+  });
+
+  it("an elevation span past 1.8e308 flattens instead of emitting NaN coords", () => {
+    const geo = gradeProfileGeometry({
+      ...base,
+      data: [
+        { d: 0, elev: -1.7e308 },
+        { d: 100, elev: 1.7e308 },
+        { d: 200, elev: 1.7e308 },
+      ],
+    });
+    expect(geo.maxGrade).toBe(0);
+    expect(geo.totalGain).toBe(0);
+    expect([...geo.segments.map((s) => s.path), geo.ridge].join(" ")).not.toMatch(/NaN|Infinity/);
+  });
+
   it("single / empty inputs produce no segments", () => {
     expect(gradeProfileGeometry({ ...base, data: [] }).segments).toEqual([]);
     expect(gradeProfileGeometry({ ...base, data: [{ d: 3, elev: 9 }] }).segments).toEqual([]);

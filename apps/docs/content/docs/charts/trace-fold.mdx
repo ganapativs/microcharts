@@ -1,14 +1,12 @@
 ---
 title: TraceFold
-description: >-
-  React trace fold chart — one rect per span by start, duration, and depth — a folded trace. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: TraceFold lays out trace spans by start, duration, and depth, and accents the critical path.
 ---
 
-TraceFold answers "where did the latency go — which spans, at which depth, on the path that actually determined the
-total?". Each span is a rect placed by its start time, sized by its duration, and stacked by its nesting depth. The
-critical path — the chain of spans that bound the total — is accented and everything else muted, so the answer to "which
-spans mattered" is immediate.
+A request took 214 ms and you need to know which spans set that number. TraceFold draws one rect per span, placed by its
+start time, sized by its duration, and stacked by its nesting depth. Widths sit on one shared linear time scale, never
+normalized per row, so a wide span is a slow span. The critical path, the chain of spans that bound the total, is
+accented and every other span muted.
 
 <LiveDemo
   label="TraceFold"
@@ -60,8 +58,8 @@ spans mattered" is immediate.
 
 ## When to use it
 
-- **Good for** — request traces, flame charts, p95-exemplar latency breakdowns.
-- **Avoid for** — a single duration (Bullet) or a time series (Sparkline).
+Use it for request traces, flame charts, and p95-exemplar latency breakdowns. For a single duration use Bullet; for a
+time series use Sparkline.
 
 ## Sizing
 
@@ -96,6 +94,9 @@ spans mattered" is immediate.
     height={44}
   />
 </LiveDemo>
+
+`emphasis="none"` drops the accent when the nesting, not the latency, is what you are reading. The critical-path walk
+itself is deterministic: ties resolve to the earliest start.
 
 <LiveDemo
   label="locale"
@@ -164,20 +165,15 @@ way; only the announced numbers are localized.
   />
 </LiveDemo>
 
+A zero-duration span keeps a one-unit floor so it stays visible. That is the only width distortion in the chart.
+
 ## Four homes
 
 <FourContexts slug="trace-fold" />
 
-## Why this default
-
-Accenting the critical path because "which spans mattered" is the question a uniform flame strip doesn't answer — the
-eye goes straight to the chain that set the total. Widths are durations on one linear shared time scale, never per-row
-normalized, so a wide span is genuinely a slow span. The only documented width distortion is a one-unit floor for
-zero-duration spans, and the critical-path walk is deterministic (ties resolve to the earliest start).
-
 ## Accessibility
 
-The accessible name names the biggest span and its path status — **"4 spans over 214 ms; longest db.query (86 ms) on the
+The accessible name gives the biggest span and its path status: **"4 spans over 214 ms; longest db.query (86 ms) on the
 critical path."** The interactive entry roves spans within a depth with ←/→ and between depths with ↑/↓, announcing each
 span's duration, share of the total, depth, and whether it is on the critical path.
 

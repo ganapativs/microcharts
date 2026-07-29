@@ -58,9 +58,9 @@ export function deriveCatPalette(
     const t = defineTheme({ extends: preset, cat: INK_PRESET_CATS[preset] });
     return { light: pick(t.vars), dark: pick(t.darkVars) };
   }
-  // Every brand accent — cobalt included — derives its own matched categorical
-  // palette, so the categories always lead with the accent's own hue (cobalt →
-  // blue, ember → warm, …). Consistent across the studio, appearance menu, site,
+  // Every brand accent — the default included — derives its own matched
+  // categorical palette, so the categories always lead with the accent's own hue
+  // (cobalt → blue, ember → warm, …). Consistent across the studio, menu, site,
   // and home widget. `null` only when no accent at all (bare library defaults).
   if (!accent) return null;
   const seed = ACCENTS.find((a) => a.id === accent);
@@ -127,14 +127,14 @@ export const BASE_TOKENS: BaseToken[] = [
   },
   {
     cssVar: "--mc-cat-5",
-    light: "#c2543a",
+    light: "#bc5138",
     dark: "#e07e5e",
     category: "cat",
     note: "Terracotta",
   },
   {
     cssVar: "--mc-cat-6",
-    light: "#a85c8c",
+    light: "#a55a89",
     dark: "#c486b0",
     category: "cat",
     note: "Mauve",
@@ -193,6 +193,48 @@ export const BASE_TOKENS: BaseToken[] = [
     note: "Label ink on a categorical fill (mid-tone, so it wants the opposite ink)",
   },
   {
+    cssVar: "--mc-on-cat-1",
+    light: "rgba(0, 0, 0, 0.9)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-1 (generated: whichever ink clears AA on that fill)",
+  },
+  {
+    cssVar: "--mc-on-cat-2",
+    light: "rgba(0, 0, 0, 0.9)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-2 (generated: whichever ink clears AA on that fill)",
+  },
+  {
+    cssVar: "--mc-on-cat-3",
+    light: "rgba(0, 0, 0, 0.9)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-3 (generated: whichever ink clears AA on that fill)",
+  },
+  {
+    cssVar: "--mc-on-cat-4",
+    light: "rgba(255, 255, 255, 0.96)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-4 (generated: whichever ink clears AA on that fill)",
+  },
+  {
+    cssVar: "--mc-on-cat-5",
+    light: "rgba(255, 255, 255, 0.96)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-5 (generated: whichever ink clears AA on that fill)",
+  },
+  {
+    cssVar: "--mc-on-cat-6",
+    light: "rgba(255, 255, 255, 0.96)",
+    dark: "rgba(0, 0, 0, 0.9)",
+    category: "surface",
+    note: "Label ink on --mc-cat-6 (generated: whichever ink clears AA on that fill)",
+  },
+  {
     cssVar: "--mc-on-fill-dim",
     light: "var(--mc-stroke)",
     category: "surface",
@@ -230,12 +272,12 @@ export const PRESET_DARK_TWINS: Record<string, Record<string, string>> = {
 export type Accent = { id: string; label: string; light: string; dark: string };
 
 // Docs accent bundles (global.css) expressed as the one library token they
-// drive: `--mc-accent`. "ember" is the docs default (base :root); picking any
+// drive: `--mc-accent`. "cobalt" is the docs default (base :root); picking any
 // accent emits an explicit override to that hue. Mirrors `:root[data-accent]` /
-// `.dark[…]`, with Ember also the unscoped base.
+// `.dark[…]`, with Cobalt also the unscoped base.
 export const ACCENTS: Accent[] = [
+  { id: "cobalt", label: "Cobalt", light: "#2f52d4", dark: "#528dff" },
   { id: "ember", label: "Ember", light: "#c2410c", dark: "#f7924e" },
-  { id: "cobalt", label: "Cobalt", light: "#2f52d4", dark: "#7f9cf5" },
   { id: "clay", label: "Clay", light: "#a14a34", dark: "#e08e73" },
   { id: "moss", label: "Moss", light: "#4d7c1e", dark: "#a3c46a" },
   { id: "teal", label: "Teal", light: "#0f766e", dark: "#55c2b3" },

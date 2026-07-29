@@ -7,6 +7,10 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
+// de-DE separates the number from the percent sign with U+00A0, which is
+// indistinguishable from a plain space in source — named, never pasted.
+const NBSP = String.fromCharCode(160);
+
 const MIX = [
   { label: "Chrome", value: 620 },
   { label: "Safari", value: 240 },
@@ -41,6 +45,41 @@ describe("<MicroDonut>", () => {
     const { container } = draw(<MicroDonut data={[{ label: "All", value: 5 }]} />);
     expect(container.querySelectorAll("path").length).toBe(1);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("All 100%.");
+  });
+
+  it("a hostile size paints the default ring — never NaN coords under a full name", () => {
+    for (const size of [Number.NaN, Infinity, 0, -10]) {
+      const { container } = draw(<MicroDonut data={MIX} size={size} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 24 24");
+      // The seat rides on the same numbers; `--mc-seat: NaN` was the tell.
+      expect(svg.getAttribute("style")).not.toContain("NaN");
+      for (const w of container.querySelectorAll("path.mc-donut-wedge")) {
+        expect(w.getAttribute("d")).toMatch(/^M[\d.]/);
+        // A negative stroke-width is an SVG error: the browser drops the wedge.
+        expect(Number((w as SVGElement).style.strokeWidth)).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("maxWedges is a ceiling — a hostile value never lets more wedges through", () => {
+    for (const maxWedges of [Number.NaN, Infinity, 0, -3]) {
+      const { container } = draw(<MicroDonut data={MIX} maxWedges={maxWedges} />);
+      expect(container.querySelectorAll("path.mc-donut-wedge").length).toBe(4);
+    }
+    expect(
+      draw(<MicroDonut data={MIX} maxWedges={2} />).container.querySelectorAll(
+        "path.mc-donut-wedge",
+      ).length,
+    ).toBe(2);
+  });
+
+  it("locale reaches the summary percents (the static entry used to hardcode en-US)", () => {
+    const { container } = draw(<MicroDonut data={MIX} locale="de-DE" />);
+    // de-DE writes a NBSP before the sign; the interactive entry already did.
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `Chrome 62${NBSP}%, Safari 24${NBSP}%, Firefox 9${NBSP}%, Other 5${NBSP}%.`,
+    );
   });
 
   it("is axe-clean", async () => {

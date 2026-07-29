@@ -6,12 +6,10 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
-import { dataDiffGeometry, dataDiffGutter, type DataDiffGeometry } from "./geometry.js";
+import { dataDiffGeometry, dataDiffLayout, type DataDiffGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
-import { maxOf } from "../../core/scale.js";
 
 const signed = (n: number, fmt: (v: number) => string): string =>
   `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
@@ -86,29 +84,21 @@ export function DataDiff(props: DataDiffProps): ReactNode {
       `DataDiff: ${data.length} rows exceeds the 12-row cap; extra rows dropped. Split into a table of DataDiffs (one per group).`,
     );
 
-  const FONT = labelFont(height, 0.4);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-data-diff ${className}` : "mc-data-diff";
 
-  // rows split the plot height — key tags only fit (and the totals footer only
-  // earns its band) when there is vertical room. Drop first under degradation.
+  // Chrome — label font, totals band, key-tag font — resolved in geometry so the
+  // interactive entry reads the same numbers. tagFont 0 = no room for tags, and
+  // their gutter drops with them (`dataDiffGutter` returns 0 on 0 chars).
   const pad = 2;
-  const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
-  const footerH = label === "totals" && height >= 34 ? FONT + 3 : 0;
+  const {
+    font: FONT,
+    footer: footerH,
+    tagFont,
+    keyChars,
+  } = dataDiffLayout({ data, labels, label, maxItems, width, height });
   const showTotals = footerH > 0;
-  const rowH = nRows > 0 ? (height - 2 * pad - footerH) / nRows : 0;
-  // a text glyph box measures ~1.6× its fontSize tall, so a tag must be ≤ half
-  // the row pitch to never touch its neighbour; only draw tags with real room
-  const keyChars = maxOf(
-    data.map((d) => d.key.length),
-    0,
-  );
-  const fitFont = Math.max(5, Math.min(FONT, Math.floor(rowH * 0.5)));
-  // …and horizontally the widest key is the budget: past its share of the box the
-  // tags drop, and their gutter drops with them (`dataDiffGutter` returns 0).
-  const showTags = labels && rowH >= 10 && dataDiffGutter(keyChars, fitFont, width) > 0;
-  const tagFont = showTags ? fitFont : FONT;
-  const gutterCh = showTags ? keyChars : 0;
+  const showTags = tagFont > 0;
 
   // A stack of diverging rows has no floor — added/removed grow sideways from a
   // shared vertical axis — so the row band centres on the cap band. It is the
@@ -123,7 +113,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
     order,
     domain,
     maxItems,
-    gutterCh,
+    gutterCh: showTags ? keyChars : 0,
     fontSize: tagFont,
     footer: footerH,
   });
@@ -201,13 +191,17 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               style={{ fillOpacity: 0.5 }}
             />
           ) : null}
-          {/* Opt-in net tick — not a stand-in for the bars. */}
+          {/* Opt-in net tick — not a stand-in for the bars. It overshoots the
+              bar by 0.8 at each end so it reads as a tick and not a sliver of
+              bar, clamped to the frame: at a punishing row pitch (12 rows in
+              10 units) the overshoot on the first and last rows painted outside
+              the viewBox, and `.mc-root` is `overflow: visible`. */}
           {net && !r.placeholder ? (
             <rect
               x={round2(r.netX - 0.5)}
-              y={round2(r.y - 0.8)}
+              y={round2(Math.max(0, r.y - 0.8))}
               width={1}
-              height={round2(r.height + 1.6)}
+              height={round2(Math.min(height, r.y + r.height + 0.8) - Math.max(0, r.y - 0.8))}
               data-mc-ink="neutral"
             />
           ) : null}
@@ -221,7 +215,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               fontSize={tagFont}
               // inline font-size beats the zero-specificity `:where(.mc-root
               // text)` rule that would otherwise pin every tag to --mc-label-size
-              style={{ fontSize: tagFont, fontVariantNumeric: "tabular-nums" }}
+              style={{ fontSize: tagFont }}
             >
               {r.key}
             </text>
@@ -236,7 +230,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {`+${fmt(geo.totals.added)} / −${fmt(geo.totals.removed)}`}
         </text>

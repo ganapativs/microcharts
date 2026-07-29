@@ -16,6 +16,21 @@ export interface ScatterGeometry {
   dropped: number;
 }
 
+/**
+ * Dot radius: documented default 1.5, clamped to [1, 3].
+ *
+ * `Math.min(3, Math.max(1, r))` — the idiom both entries used — is
+ * NaN-transparent, so `r={NaN}` (or an `Infinity` from a caller's own
+ * arithmetic) collapsed the scale range to `[NaN, NaN]` and every dot, the
+ * trend line, and the inline seat came out `NaN`, behind an accessible name
+ * that still announced the count and r. Announced scale and painted scale have
+ * to be the same scale, so resolve it once, here, and let geometry and both
+ * entries read the result.
+ */
+export function scatterRadius(r: number | undefined): number {
+  return Number.isFinite(r) ? clamp(r as number, 1, 3) : 1.5;
+}
+
 export function microScatterGeometry(opts: {
   width: number;
   height: number;
@@ -26,7 +41,7 @@ export function microScatterGeometry(opts: {
   r?: number | undefined;
 }): ScatterGeometry {
   const { width, height, points, trend } = opts;
-  const rad = opts.r ?? 1.5;
+  const rad = scatterRadius(opts.r);
 
   const finite = points
     .map((p, index) => ({ ...p, index }))

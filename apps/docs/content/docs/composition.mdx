@@ -1,40 +1,20 @@
 ---
 title: Composition
 description:
-  How a microchart sits inside real UI — on your surface, in a sentence, a table cell, a KPI card, or a tab — and how
-  SparkGroup keeps small multiples honest with one shared scale. Every placement decision the gallery makes, written
-  down so you can reproduce it.
+  How to place a chart in a sentence, a table cell, a KPI card, or a tab, and how SparkGroup puts a row of charts on one
+  shared scale.
 ---
 
-microcharts are built to sit _inside_ an interface, not in a chart pane of their own. This page documents the placement
-decisions the gallery demos make — the surface they need, the size and props each context wants, and how to compare
-several at once — so nothing is left implied. If a demo on this site looks right, this is why.
-
-## Charts sit on your surface
-
-Every chart is transparent: it **never paints its own background**. That's deliberate — a chart drops onto whatever
-surface it lands on and picks up the ink color from `--mc-stroke` (which tracks light/dark for you). The one decision
-that's yours: give it a container with real contrast.
-
-- Put the chart on a surface with enough contrast for a 1.5 px line — the data, valence, and accent inks all clear 4.5:1
-  on the built-in light and dark themes. (`--mc-neutral`, the muted context ink for baselines and ghost marks, sits at
-  3.5:1 — comfortably past the 3:1 bar for non-text, and deliberately quieter than the data.)
-- Don't wrap it in a low-contrast tint and expect the chart to compensate; it won't, by design.
-- Need the ink to differ from the page (charts on a colored panel, frosted glass)? Set `--mc-stroke` (and valence tokens
-  if needed) on the container — see [Theming](/docs/theming#frosted-or-translucent-surfaces). Don't override `.mc-root`
-  paint rules.
-
-<Callout type="info">
-  The gallery renders each demo inside a panel with a normal card background and a hairline border. Nothing about that
-  panel is part of the library — it's just a surface. Your app's cards, table rows, and headers are surfaces too.
-</Callout>
+A microchart is built to sit inside an interface rather than in a chart pane of its own. This page has the placement
+recipe for each context the gallery demos use: the size, the props, and the surface each one wants, plus how to compare
+several charts at once.
 
 ## In a sentence
 
-A word-sized chart in running prose scales with the **font** and aligns to the text baseline; drop its endpoint dots and
-it reads as one glyph, not a widget. (There are no axes to drop — no chart in the catalog draws one.) Wrap it in
-`mc-inline` (shipped in `styles.css`), pass `dots="none"`, and mark it decorative with `summary={false}` so a screen
-reader hears the sentence, not a second description.
+A chart in running prose scales with the surrounding **font** and sits on the text baseline. Wrap it in `mc-inline`
+(shipped in `styles.css`) and pass `dots="none"` to drop its endpoint dots so it reads as one glyph. No chart in the
+catalog draws an axis, so there is nothing else to turn off. Pass `summary={false}` as well, so a screen reader hears
+the sentence and not a second description of it.
 
 <LiveDemo
   label="Inline in prose"
@@ -62,8 +42,8 @@ See [Sizing](/docs/sizing#inline-in-a-sentence) for the `em`-based variant that 
 
 ## In a table cell
 
-In a dense table, each row already carries a name and a number — the chart's job is the _shape_ between them. So it goes
-small, with dots off, decorative (`summary={false}`), and the numeric column stays `tabular-nums` so figures line up.
+In a dense table the row already carries a name and a number, so the chart shows the _shape_ between them. Keep it
+small, turn dots off, pass `summary={false}`, and leave the numeric column on `tabular-nums` so the figures line up.
 
 <LiveDemo
   label="Trend column"
@@ -94,8 +74,8 @@ small, with dots off, decorative (`summary={false}`), and the numeric column sta
 
 ## In a KPI card
 
-Here the big number leads and the chart is context beneath it. Give it a little more height, turn `fill` on so it reads
-as a filled area at a glance, and keep it decorative — the figure and label already say what it is.
+The number leads and the chart gives it context. Give the chart a little more height, turn `fill` on so it reads as an
+area, and pass `summary={false}`: the figure and its label already name the value.
 
 <LiveDemo
   label="Figure + trend"
@@ -117,8 +97,8 @@ as a filled area at a glance, and keep it decorative — the figure and label al
 
 ## In a tab or button
 
-A spark beside a label previews what's behind the tab. It goes _tiny_ — the label is the primary read, the chart a hint
-— so drop to a small box with no dots.
+A spark beside a tab label previews what's behind it. The label is the primary read, so the chart goes _tiny_: a small
+box with no dots.
 
 <LiveDemo
   label="Metric tabs"
@@ -145,15 +125,33 @@ A spark beside a label previews what's behind the tab. It goes _tiny_ — the la
   </div>
 </LiveDemo>
 
+## Charts sit on your surface
+
+Every chart is transparent and **never paints its own background**. It takes its ink color from `--mc-stroke`, which
+tracks light and dark for you, and shows through to whatever surface it lands on. The contrast of that surface is your
+decision.
+
+- Put the chart on a surface with enough contrast for a 1.5 px line. The data, valence, and accent inks all clear 4.5:1
+  on the built-in light and dark themes. (`--mc-neutral`, the muted context ink for baselines and ghost marks, sits at
+  3.5:1, past the 3:1 bar for non-text and quieter than the data.)
+- A low-contrast tint stays low-contrast: the chart does not compensate for it.
+- Need the ink to differ from the page (charts on a colored panel, frosted glass)? Set `--mc-stroke`, and the valence
+  tokens if needed, on the container. See [Theming](/docs/theming#frosted-or-translucent-surfaces). Don't override
+  `.mc-root` paint rules.
+
+<Callout type="info">
+  The gallery renders each demo inside a panel with a card background and a hairline border. That panel is not part of
+  the library; it's a surface, like your app's cards, table rows, and headers.
+</Callout>
+
 ## Small multiples: one shared scale
 
-The most important composition decision, and the easiest to get silently wrong: when you place several sparklines in a
-row to _compare_ them, they must share one vertical scale. Auto-scaling each to its own range makes a flat line and a
-spiking one look identical — a real correctness bug.
+When you place several sparklines in a row to _compare_ them, they must share one vertical scale. Auto-scaling each
+chart to its own range makes a flat line and a spiking one look identical, which is a correctness bug and easy to miss.
 
-`SparkGroup` fixes it structurally. It reads every child's `data`, computes **one** domain across all of them, and
-enforces **one** physical size — so a row of charts is honestly comparable. It's hook-free and RSC-safe, and any child's
-own explicit `domain`/`width` still wins.
+`SparkGroup` handles it for you. It reads every child's `data`, computes **one** domain across all of them, and applies
+**one** physical size, so the row is comparable. It's hook-free and RSC-safe, and a child's own explicit
+`domain`/`width` still wins.
 
 <LiveDemo
   label="Shared-scale row"
@@ -176,22 +174,21 @@ import { Sparkline } from "@microcharts/react/sparkline";
 Pass `zero` when the group is bars or areas (so the shared domain anchors at zero), or an explicit `domain={[min, max]}`
 when you want a fixed frame instead of the data's own range (`domain` defaults to `"shared"`).
 
-Two details worth knowing. Only children that actually carry a `data` prop get the scale and size injected — plain
-wrappers, labels, and captions pass through untouched, so you can interleave them without them collecting stray DOM
-attributes. And the group renders one `<div className="mc-group">`, an `inline-flex` row that wraps: its gap is
-`--mc-gap` scaled by `--mc-density`, and `className`/`style` on `SparkGroup` land on that div if you want a different
-layout.
+Two more details. Only children that carry a `data` prop get the scale and size injected; plain wrappers, labels, and
+captions pass through untouched, so you can interleave them without them picking up stray DOM attributes. The group
+renders one `<div className="mc-group">`, an `inline-flex` row that wraps: its gap is `--mc-gap` scaled by
+`--mc-density`, and `className`/`style` on `SparkGroup` land on that div if you want a different layout.
 
-## Decorative vs. summarized — the `summary` decision
+## The `summary` decision
 
-You'll notice `summary={false}` on nearly every demo above. That's a deliberate call, not a habit:
+Nearly every demo above passes `summary={false}`. Here is when that's the right call:
 
 - **Standalone chart** (the one thing in its region): keep the auto-summary on. It's the accessible name a screen reader
-  announces — real, generated from the data.
+  announces, generated from the data.
 - **Repeated or captioned chart** (table rows, tabs, a chart next to a number that already states it): pass
-  `summary={false}`. The surrounding text is the accessible name; a per-chart summary would just make a screen reader
-  read the same thing many times.
+  `summary={false}` to mark it decorative. The surrounding text is the accessible name, and a per-chart summary would
+  make a screen reader read the same thing on every row.
 
-This is the only accessibility lever you routinely touch. Everything else — the `role="img"`, the `<title>`, and the
-whole interaction contract on interactive entries (roving arrow keys, select-to-pin with **Enter** or **Space**, touch
-scrub, live announcements) — is automatic. See [Accessibility](/docs/accessibility).
+`summary` is the only accessibility lever you set by hand. The `role="img"`, the `<title>`, and the interaction contract
+on interactive entries (roving arrow keys, select-to-pin with **Enter** or **Space**, touch scrub, live announcements)
+are automatic. See [Accessibility](/docs/accessibility).

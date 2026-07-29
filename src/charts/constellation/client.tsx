@@ -19,7 +19,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
-import { constellationGeometry } from "./geometry.js";
+import { constellationGeometry, DEFAULT_HEIGHT, DEFAULT_R, DEFAULT_WIDTH } from "./geometry.js";
 import {
   Constellation as StaticConstellation,
   constellationSummary,
@@ -43,9 +43,9 @@ export function Constellation(props: InteractiveConstellationProps): React.React
     domain,
     xDomain,
     xFormat,
-    width = 60,
-    height = 20,
-    rBase = 1.6,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT,
+    rBase = DEFAULT_R,
     format,
     locale,
     strings = EN_CONSTELLATION,

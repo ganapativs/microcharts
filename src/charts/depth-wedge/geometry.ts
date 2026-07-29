@@ -67,18 +67,38 @@ export function depthWedgeGeometry(opts: {
         : lowestAsk;
   const spread = demand.length > 0 && supply.length > 0 ? Math.max(0, lowestAsk - highestBid) : 0;
 
-  // levels = ± level distance from mid to include
+  // levels = ± level distance from mid to include. ABSOLUTE distance: a crossed
+  // book (best bid above best ask) puts both sides' signed extents below zero,
+  // and a negative span mirrored the two wedges onto each other's half — hiding
+  // the crossing instead of showing it.
   const extents: number[] = [];
-  for (const d of demand) extents.push(mid - d.level);
-  for (const s of supply) extents.push(s.level - mid);
+  for (const d of demand) extents.push(Math.abs(mid - d.level));
+  for (const s of supply) extents.push(Math.abs(s.level - mid));
   const autoLevels = extents.length > 0 ? maxOf(extents) : 1;
-  const levels = opts.levels != null && opts.levels > 0 ? opts.levels : autoLevels || 1;
+  // A non-finite `levels` is not a window: `Infinity` collapsed every level onto
+  // the mid, and a denormal (1e-320) overflowed the scale to ±Infinity coords in
+  // the emitted path. Fall back to the data extent, same as an omitted prop.
+  const levels =
+    opts.levels != null && Number.isFinite(opts.levels) && opts.levels > 0
+      ? opts.levels
+      : autoLevels || 1;
 
   const halfW = width / 2 - pad;
   const xOf = (level: number): number => round2(midX + ((level - mid) / levels) * halfW);
 
-  const demandTotal = demand.reduce((s, d) => s + d.amount, 0);
-  const supplyTotal = supply.reduce((s, d) => s + d.amount, 0);
+  // The window FILTERS, it does not merely scale. Rows beyond ±levels used to
+  // keep their step in the path — a level at 4× the range drew at x = -440 in a
+  // 100-wide box, and `.mc-root` is `overflow: visible`, so that is a spill into
+  // the page — while still counting toward the ratio the summary announces
+  // "within the shown range". Dropping them makes both true at once. `mid` and
+  // `spread` stay anchored on the full book: both best levels sit exactly
+  // spread/2 from the mid, so a window either admits both or neither.
+  const inWindow = (level: number): boolean => Math.abs(level - mid) <= levels;
+  const shownDemand = demand.filter((d) => inWindow(d.level));
+  const shownSupply = supply.filter((s) => inWindow(s.level));
+
+  const demandTotal = shownDemand.reduce((s, d) => s + d.amount, 0);
+  const supplyTotal = shownSupply.reduce((s, d) => s + d.amount, 0);
   const maxCum = normalize ? 1 : Math.max(demandTotal, supplyTotal, 1);
   const cumScale = (cum: number, total: number): number =>
     normalize ? (total > 0 ? cum / total : 0) : cum;
@@ -107,8 +127,8 @@ export function depthWedgeGeometry(opts: {
     d += `L${prevX} ${round2(yBase)}Z`;
     return { path: d, steps };
   };
-  const demandWedge = wedge(demand, demandTotal);
-  const supplyWedge = wedge(supply, supplyTotal);
+  const demandWedge = wedge(shownDemand, demandTotal);
+  const supplyWedge = wedge(shownSupply, supplyTotal);
 
   const ratio =
     supplyTotal > 0 && demandTotal > 0

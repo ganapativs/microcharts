@@ -17,13 +17,13 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PHASE_TRACE } from "../../core/strings-phase-trace.js";
-import { phaseTraceGeometry } from "./geometry.js";
+import { DEFAULT_HEIGHT, DEFAULT_TAIL, DEFAULT_WIDTH, phaseTraceGeometry } from "./geometry.js";
 import {
   PhaseTrace as StaticPhaseTrace,
   phaseTraceSummary,
   type PhaseTraceProps,
 } from "./index.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide } from "../../core/types.js";
 
 export interface InteractivePhaseTraceProps extends PhaseTraceProps, PickerProps {
   /**
@@ -34,18 +34,6 @@ export interface InteractivePhaseTraceProps extends PhaseTraceProps, PickerProps
   animate?: boolean;
 }
 
-function extent(vals: number[]): readonly [number, number] {
-  let lo = Infinity;
-  let hi = -Infinity;
-  for (const v of vals) {
-    if (v < lo) lo = v;
-    if (v > hi) hi = v;
-  }
-  if (!Number.isFinite(lo)) return [0, 1];
-  if (lo === hi) return [lo - 1, hi + 1];
-  return [lo, hi];
-}
-
 export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
   const {
     data,
@@ -53,9 +41,9 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     yLabel = "y",
     xDomain,
     domain,
-    tail = 0.25,
-    width = 40,
-    height = 32,
+    tail = DEFAULT_TAIL,
+    width = DEFAULT_WIDTH,
+    height = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_PHASE_TRACE,
@@ -74,19 +62,19 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate, {
-    selector: 'path[data-mc-ink="muted"], path[data-mc-ink="accent"]',
+    // The trajectory only. The quadrant grid shares the muted ink role (it needs
+    // the forced-colors mapping) but it is chrome, so it never takes a beat.
+    selector: 'path[data-mc-ink="muted"]:not([data-mc-w="hair"]), path[data-mc-ink="accent"]',
     order: "index",
   });
 
-  const finite = useMemo(
-    () => data.filter((p) => isFiniteValue(p.x) && isFiniteValue(p.y)),
-    [data],
-  );
-  const xd = useMemo(() => xDomain ?? extent(finite.map((p) => p.x)), [xDomain, finite]);
-  const yd = useMemo(() => domain ?? extent(finite.map((p) => p.y)), [domain, finite]);
+  // Pointer math is measured against the box that actually got painted, and the
+  // static child resolves the same props through the same helper (see chartSide).
+  const w = chartSide(width, DEFAULT_WIDTH);
+  const h = chartSide(height, DEFAULT_HEIGHT);
   const geo = useMemo(
-    () => phaseTraceGeometry({ data, xDomain: xd, yDomain: yd, tail, width, height }),
-    [data, xd, yd, tail, width, height],
+    () => phaseTraceGeometry({ data, xDomain, yDomain: domain, tail, width: w, height: h }),
+    [data, xDomain, domain, tail, w, h],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -136,8 +124,8 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
 
   const { active, selected, bind } = useActivePicker({
     count: geo.points.length,
-    width,
-    height,
+    width: w,
+    height: h,
     locate,
     datum,
     onActive,
@@ -162,11 +150,11 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         data={data}
         xLabel={xLabel}
         yLabel={yLabel}
-        xDomain={xd}
-        domain={yd}
+        xDomain={xDomain}
+        domain={domain}
         tail={tail}
-        width={width}
-        height={height}
+        width={w}
+        height={h}
         format={format}
         locale={locale}
         strings={strings}
@@ -202,8 +190,8 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
         <span
           className="mc-spark-readout"
           style={{
-            ...crosshairReadoutStyle(pt.x, width),
-            top: `${(pt.y / height) * 100}%`,
+            ...crosshairReadoutStyle(pt.x, w),
+            top: `${(pt.y / h) * 100}%`,
             transform: "translate(-50%, -140%)",
             bottom: "auto",
           }}

@@ -1,13 +1,13 @@
 ---
 title: PhaseTrace
 description: >-
-  React phase trace chart — cyclic phase as a compact trajectory on a shared ring. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+  PhaseTrace plots two coupled signals against each other as one trajectory, with an arrowhead at the current state.
 ---
 
-PhaseTrace answers "how do two coupled signals move _together_?". Plotting one against the other as a single trajectory
-turns lag into loops and regimes into clusters — structure that two separate sparklines hide. Path order carries time,
-and the current state is a directed endpoint with an arrowhead, so "now, and how it got here" reads at a glance.
+CPU climbs and latency follows a beat later. PhaseTrace plots the two signals against each other as a single trajectory,
+so the lag becomes a loop and a regime becomes a cluster — structure two separate sparklines hide. Path order carries
+time, and the current state is a directed endpoint with an arrowhead, so you read where the pair is now and how it got
+there. The trail is muted and the recent tail accented, so the eye lands on the recent motion first.
 
 <LiveDemo
   label="PhaseTrace"
@@ -45,8 +45,8 @@ and the current state is a directed endpoint with an arrowhead, so "now, and how
 
 ## When to use it
 
-- **Good for** — coupled-signal phase portraits (CPU × latency, inflation × unemployment).
-- **Avoid for** — reading exact values (DualSparkline) or a single series (Sparkline).
+Use it for coupled-signal phase portraits: CPU × latency, inflation × unemployment. For reading exact values use
+DualSparkline; for a single series use Sparkline.
 
 ## Sizing
 
@@ -80,6 +80,9 @@ and the current state is a directed endpoint with an arrowhead, so "now, and how
   />
 </LiveDemo>
 
+`tail` sets how much of the path is accented, and `startDot` marks the first observation. You can restyle the tail,
+endpoint, and arrowhead, but not remove all three: together they are what makes the time direction recoverable.
+
 <LiveDemo
   label="locale"
   code={`<PhaseTrace
@@ -108,8 +111,9 @@ and the current state is a directed endpoint with an arrowhead, so "now, and how
   />
 </LiveDemo>
 
-With a `locale`, the accessible summary's coordinates follow that locale's own grouping — "1.800" in German, not
-"1,800". In-chart marks carry no text, so only the announced numbers change.
+With a `locale`, the accessible summary's coordinates follow that locale's own grouping: "1.800" in German rather than
+"1,800". In-chart marks carry no text, so only the announced numbers change. The axes are named in the summary and both
+domains are always linear, never silently transformed.
 
 ## Edge cases
 
@@ -140,20 +144,13 @@ With a `locale`, the accessible summary's coordinates follow that locale's own g
   />
 </LiveDemo>
 
-A single observation draws only the accent endpoint dot — there's no history to trail and no motion for an arrowhead to
+A single observation draws only the accent endpoint dot: there is no history to trail and no motion for an arrowhead to
 point along. When every point in the tail window is coincident (or nearly so, within 0.5% of the combined axis span),
 the heading resolves to the fifth, explicit "steady" state rather than a jittery direction from noise.
 
 ## Four homes
 
 <FourContexts slug="phase-trace" />
-
-## Why this default
-
-A muted trail with an accent tail because "now, and how it got here" is the question — the eye lands on the recent
-motion first, then reads the history. Axis and scale choices are stated, never silently transformed: the axes are named
-in the summary, and the domains are always linear. The tail, endpoint, and arrowhead trio may be restyled but never all
-removed, because the recoverable time direction is what separates a phase trace from a scatter.
 
 ## Accessibility
 

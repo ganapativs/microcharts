@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { abStripsGeometry } from "./geometry.js";
+import { abStripsGeometry, abTagChars } from "./geometry.js";
 
 const base = { width: 80, height: 20 };
 const A = Array.from({ length: 60 }, (_, i) => 120 + (i % 20) - 8 + (i % 3) * 4);
@@ -51,6 +51,52 @@ describe("abStripsGeometry", () => {
 
   it("empty arm → null", () => {
     expect(abStripsGeometry({ ...base, a: [], b: B })).toBeNull();
+  });
+
+  it("announced medians stay finite past round2's ×100 headroom", () => {
+    // round2 multiplies by 100 first, so a finite 1e307 came back ±Infinity:
+    // the summary read "median ∞" over a normally painted strip and the delta
+    // gutter printed "NaN%" (∞ ÷ ∞).
+    const geo = abStripsGeometry({ ...base, a: [1e307, 2e307], b: [-1e307, 3e307] })!;
+    for (const n of [geo.aMedian, geo.bMedian, geo.deltaMedian]) expect(n).toBeTypeOf("number");
+    expect(Number.isFinite(geo.aMedian)).toBe(true);
+    expect(Number.isFinite(geo.bMedian)).toBe(true);
+    expect(Number.isFinite(geo.deltaMedian)).toBe(true);
+    for (const r of geo.rows) for (const e of r.edges) expect(Number.isFinite(e.value)).toBe(true);
+  });
+});
+
+describe("abTagChars gates the row tags on BOTH axes", () => {
+  const tags = (o: Partial<Parameters<typeof abTagChars>[0]>) =>
+    abTagChars({ width: 80, height: 20, fontSize: 7, labels: ["A", "B"], ...o });
+
+  it("keeps short tags, and reports the longer identity's length", () => {
+    expect(tags({})).toBe(1);
+    expect(tags({ labels: ["Ctrl", "Test"] })).toBe(4);
+  });
+
+  it("drops them below one em of row pitch", () => {
+    expect(tags({ height: 17 })).toBe(0);
+  });
+
+  it("drops them when their gutter would claim most of the width", () => {
+    expect(tags({ labels: ["Control group", "Treatment"] })).toBe(0);
+    // same identities, four times the room → they fit again
+    expect(tags({ width: 320, labels: ["Control group", "Treatment"] })).toBe(13);
+  });
+});
+
+describe("abStripsGeometry caps the tag gutter", () => {
+  it("a caller that skipped the gate still gets marks inside the box", () => {
+    // An uncapped lead crosses `width - pad`, which inverts scaleLinear's range
+    // and makes clamp pin every x at the lead itself — x=135 in a 108-wide
+    // viewBox, outside a root that is `overflow: visible`.
+    const geo = abStripsGeometry({ ...base, a: A, b: B, labelChars: 20, fontSize: 11 })!;
+    for (const r of geo.rows) {
+      expect(r.outer.x).toBeGreaterThanOrEqual(0);
+      expect(r.outer.x + r.outer.width).toBeLessThanOrEqual(base.width);
+      expect(r.median.x).toBeLessThanOrEqual(base.width);
+    }
   });
 
   test.prop([

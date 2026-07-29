@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { ohlcGeometry } from "./geometry.js";
+import { ohlcGeometry, ohlcLastClose, ohlcWindow } from "./geometry.js";
 
 const base = { width: 80, height: 16, gutterCh: 0, fontSize: 6 };
 const p = (open: number, high: number, low: number, close: number) => ({ open, high, low, close });
@@ -40,6 +40,25 @@ describe("ohlcGeometry", () => {
     const geo = ohlcGeometry({ ...base, periods: many, maxPeriods: 20 });
     expect(geo.truncated).toBe(true);
     expect(geo.marks.length).toBe(20);
+  });
+
+  it("ohlcWindow keeps the most recent N, floor 1 whatever maxPeriods says", () => {
+    const five = [p(1, 2, 0, 1), p(2, 3, 1, 2), p(3, 4, 2, 3), p(4, 5, 3, 4), p(5, 6, 4, 5)];
+    expect(ohlcWindow(five, 3)).toEqual(five.slice(2));
+    expect(ohlcWindow(five, undefined).length).toBe(5);
+    // `slice(-0)` is `slice(0)` and `slice(3)` drops from the FRONT: a client
+    // re-deriving the window from the raw prop read the wrong periods back.
+    expect(ohlcWindow(five, 0)).toEqual([five[4]]);
+    expect(ohlcWindow(five, -3)).toEqual([five[4]]);
+    expect(ohlcGeometry({ ...base, periods: five, maxPeriods: 0 }).marks.length).toBe(1);
+  });
+
+  it("ohlcLastClose skips a corrupt tail — it names the last period that paints", () => {
+    expect(ohlcLastClose([p(10, 15, 8, 13), p(12, 14, 11, 13)])).toBe(13);
+    expect(ohlcLastClose([p(10, 15, 8, 13), p(10, 8, 12, 9)])).toBe(13);
+    expect(ohlcLastClose([p(10, 15, 8, 13), p(10, 12, 8, NaN)])).toBe(13);
+    expect(ohlcLastClose([p(10, 8, 12, 9)])).toBeUndefined();
+    expect(ohlcLastClose([])).toBeUndefined();
   });
 
   test.prop([

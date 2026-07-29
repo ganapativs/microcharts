@@ -3,7 +3,51 @@
 // shape-coded (hollow from → filled to). never color-alone. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { textGutterProse } from "../../core/labels.js";
+import { ROW_LABEL_WIDTH_SHARE_WIDE, rowLabelChars, textGutterProse } from "../../core/labels.js";
+
+/** Dot radius — the plot insets by one at each end, and the gutter guard below
+ *  measures the leftover plot in these units. */
+const R = 2;
+
+/**
+ * Row-name character budget for the left gutter, and the one place the decision
+ * to DROP the names lives. Both entries reserve this gutter — the static
+ * component to place its marks, the interactive one to place its overlay rings —
+ * and they had drifted: only the static path dropped the names under a crowded
+ * pitch, so on a short box the client reserved a 56-unit gutter the painted chart
+ * never had and every focus ring landed a gutter's width off its dot.
+ *
+ * Pure arithmetic: the static path may never measure text.
+ */
+export function dumbbellLabelChars(opts: {
+  width: number;
+  height: number;
+  rows: number;
+  fontSize: number;
+  /** Longest row name in characters; 0 = no row is named. */
+  longest: number;
+}): number {
+  const { width, height, rows, fontSize, longest } = opts;
+  if (longest <= 0 || rows <= 0) return 0;
+  // Rows share the height evenly, so the row pitch IS the vertical room a row
+  // name gets. Once the pitch drops under a line of text the names stack on each
+  // other — the "Paris/Berlin/Rome in a tab header" failure. They drop instead,
+  // all together (the pitch is uniform, so it is never a partial decision), and
+  // the gutter drops with them so the paired dots reclaim the full width.
+  if (height / rows < fontSize + 0.5) return 0;
+  // One shared policy for every row-label chart (core/labels): the same width
+  // share, the same cap, and the same rule that a truncation too short to
+  // identify anything is DROPPED rather than painted. This used to keep 4
+  // characters, which is "San …" — indistinguishable from "San J…".
+  const chars = rowLabelChars(width * ROW_LABEL_WIDTH_SHARE_WIDE, fontSize, longest, 3);
+  if (chars === 0) return 0;
+  // The 4-char floor is a legibility minimum, not evidence the box can pay it. At
+  // width 20 it reserved a 37-unit gutter inside a 20-unit box: plotX0 landed
+  // past plotX1 and both dots, the connector and the name painted outside the
+  // viewBox. `.mc-root` is overflow: visible, so that spills into the page rather
+  // than clipping. A gutter that leaves no room for the pair loses to the pair.
+  return textGutterProse(chars + 1, fontSize, 3) + R <= width - R - 2 * R ? chars : 0;
+}
 
 interface DumbbellRow {
   y: number;
@@ -31,7 +75,7 @@ export function dumbbellGeometry(opts: {
   fontSize: number;
 }): DumbbellGeometry {
   const { width, height, pairs, gutterCh, fontSize } = opts;
-  const r = 2;
+  const r = R;
   // Caller-supplied row label, not a figure we formatted — see textGutterProse.
   const gutter = gutterCh > 0 ? textGutterProse(gutterCh, fontSize, 3) : 0;
   const plotX0 = gutter + r;

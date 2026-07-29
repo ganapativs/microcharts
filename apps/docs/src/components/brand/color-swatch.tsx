@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 
 /**
  * A copyable colour chip for the brand page. The whole tile is the button —
@@ -25,12 +26,13 @@ export function ColorSwatch({
       type="button"
       onClick={() => {
         void navigator.clipboard.writeText(hex).then(() => {
+          track({ name: "copy", kind: "brand" });
           setCopied(true);
           setTimeout(() => setCopied(false), 1200);
         });
       }}
       aria-label={`Copy ${name} ${hex}`}
-      className="group/sw glass glass-lift flex items-center gap-3 p-2.5 text-left"
+      className="field-cell flex items-center gap-3 p-2.5 text-left"
     >
       <span
         className={cn(
@@ -46,12 +48,15 @@ export function ColorSwatch({
           )}
         />
       </span>
-      <span className="min-w-0 leading-5">
-        {role && <span className="mono-label block leading-5 opacity-70">{role}</span>}
-        <span className="block truncate text-sm font-medium leading-5 text-fd-foreground">
+      <span className="min-w-0">
+        {role && <span className="kicker block">{role}</span>}
+        <span
+          className="mt-1.5 block truncate font-mono text-[13px] font-medium tracking-[-0.03em]"
+          style={{ color: "var(--ink)" }}
+        >
           {name}
         </span>
-        <span className="block font-mono text-xs uppercase leading-5 tabular-nums text-fd-muted-foreground">
+        <span className="mono-s block uppercase tabular-nums" style={{ color: "var(--ink-3)" }}>
           {copied ? "copied" : hex}
         </span>
       </span>

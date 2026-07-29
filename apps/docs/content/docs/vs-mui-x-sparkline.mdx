@@ -1,62 +1,54 @@
 ---
 title: microcharts vs MUI X Sparkline — bundle size and RSC comparison
-description:
-  MUI X Charts SparkLineChart against a microcharts Sparkline — measured gzip in and outside a MUI app, required peers,
-  Server Component behavior, and accessibility defaults. If you are on MUI and building a dashboard, SparkLineChart is a
-  fine choice.
+description: >-
+  MUI X's SparkLineChart next to a microcharts Sparkline: measured gzip inside and outside a MUI app, required peer
+  dependencies, Server Component behavior, and accessibility defaults.
 ---
 
-[MUI X Charts](https://mui.com/x/react-charts/) ships `SparkLineChart` — an inline-sized chart from the same family as
-its full Line, Bar, and Pie charts, themed by and integrated with Material UI. If your product is built on MUI and the
-sparkline sits in a MUI dashboard, that integration is a real advantage and this page may talk you out of nothing.
-
-The comparison matters when the mark must be cheap, static, or independent of MUI: a table column of trends, a KPI row
-in an RSC, a chart in a streamed AI reply.
+[MUI X Charts](https://mui.com/x/react-charts/) ships `SparkLineChart`, an inline-sized chart from the same family as
+its full Line, Bar, and Pie charts, themed by and integrated with Material UI. This comparison turns on one question:
+whether your app already ships MUI. Answer it first, because it changes which library is the cheap one. The question
+bites hardest where the mark must be cheap, static, or independent of MUI: a table column of trends, a KPI row in an
+RSC, a chart in a streamed AI reply.
 
 ## The numbers
 
 <VsMuiXTable />
 
-The two MUI scenarios are deliberate: inside a MUI app the Material core is already in your bundle, so the sparkline's
-marginal cost is the smaller figure. Without MUI, `@mui/material` and `@mui/system` are required peer dependencies — you
-install and ship them to render one sparkline.
+The two MUI scenarios are deliberate. Inside a MUI app the Material core is already in your bundle, so the sparkline's
+marginal cost is the smaller figure. Without MUI, `@mui/material` and `@mui/system` are required peer dependencies: you
+install and ship them to render one sparkline. MUI X Charts (community) is MIT and actively maintained, and these sizes
+are dated pins from the published package.
 
-## Where the difference actually shows
+## If your app is already on MUI
 
-**Bundle cost.** `SparkLineChart` shares MUI X's charting core (data providers, interaction plugins, vendored d3). That
-architecture is what makes the full chart family consistent — and it is why one sparkline carries tens of kilobytes.
-microcharts charges per chart subpath: <ChartSize slug="sparkline" /> for Sparkline, catalog band <SizeMarketing />
-gzip.
+`SparkLineChart` is the coherent choice, and this page may talk you out of nothing. You get one vendor for the sparkline
+and the full charts beside it, the same theme object driving both, and the MUI X tooltip, highlighting, and animation
+stack you already use elsewhere. The shared charting core (data providers, interaction plugins, vendored d3) is what
+makes that family consistent, and it is why one sparkline carries tens of kilobytes.
 
-**Server Components.** `SparkLineChart` is marked `'use client'` — the server can emit initial HTML, but the component
-always hydrates and ships its JavaScript. The microcharts default export is hook-free static SVG with zero client JS;
-interactivity is a separate `/interactive` import.
+Two defaults are worth checking even there:
 
-**Accessibility defaults.** As published, the `SparkLineChart` SVG renders with `aria-hidden="true"` and no accessible
-name — the chart is invisible to assistive technology unless you label it yourself. Every microchart defaults to
-`role="img"` with a natural-language summary generated from the data.
+- `SparkLineChart` is marked `'use client'`. The server can emit initial HTML, but the component always hydrates and
+  ships its JavaScript.
+- As published, the `SparkLineChart` SVG renders with `aria-hidden="true"` and no accessible name, so the chart is
+  invisible to assistive technology until you label it yourself.
 
-**Theming.** MUI X charts theme through the MUI theme object — coherent if you live there. microcharts themes through
-`--mc-*` CSS custom properties at near-zero specificity, so it follows any design system, including a MUI one.
+## If it is not on MUI
 
-## Reach for MUI X Sparkline
+The mark then has to justify pulling in MUI, and microcharts is the cheaper answer on four counts:
 
-- Your app is already on MUI and the chart sits among MUI components
-- You want one vendor for the sparkline and the full charts beside it
-- You use MUI X's tooltip, highlighting, and animation stack elsewhere
+- **Bundle.** microcharts charges per chart subpath: <ChartSize slug="sparkline" /> for Sparkline against a catalog band
+  of <SizeMarketing /> gzip, with zero runtime dependencies and no required peers beyond React.
+- **Server Components.** The default export is hook-free static SVG with zero client JS; interactivity is a separate
+  `/interactive` import.
+- **Accessibility.** Every microchart defaults to `role="img"` with a natural-language summary generated from the data,
+  so labeling is not a task per chart.
+- **Coverage.** <CatalogTotal /> word-sized chart types under one grammar, when you need more shapes than a sparkline.
 
-## Reach for microcharts
-
-- The mark must not pull MUI (or anything) into the bundle — zero runtime dependencies
-- You render from RSCs and want zero client JavaScript for static marks
-- Accessibility should be the default, not a labeling task per chart
-- You need chart types beyond sparklines at word size — <CatalogTotal /> types, one grammar
-
-## What this page is not saying
-
-- Not "MUI X is bloated" — the shared core is the price of a consistent full-chart family
-- Not "never use SparkLineChart" — inside a MUI dashboard it is the coherent choice
-- MUI X Charts (community) is MIT and actively maintained; the sizes are dated pins from the published package
+Theming crosses both cases. MUI X charts theme through the MUI theme object, which is coherent if you live there.
+microcharts themes through `--mc-*` CSS custom properties at near-zero specificity, so it follows any design system,
+including a MUI one.
 
 ## Next
 

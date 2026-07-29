@@ -64,6 +64,48 @@ describe("seismogramGeometry", () => {
     expect(geo.ticks.every((t) => t.x <= 60)).toBe(true);
   });
 
+  it("a reversed domain is read as a window, not a mirrored axis", () => {
+    const values = [4, -2, 3];
+    const fwd = seismogramGeometry({ ...base, values, domain: [-10, 10] });
+    const rev = seismogramGeometry({ ...base, values, domain: [10, -10] });
+    expect(rev.ticks).toEqual(fwd.ticks);
+    // …and the ticks still have length: the reversed pair collapsed the domain
+    // to [0, 0], which sent every tick to the scale midpoint — a strip that
+    // painted as empty while its name announced a peak.
+    expect(rev.ticks.every((t) => t.y1 > t.y0)).toBe(true);
+  });
+
+  it("an unusable domain falls back to the data extent, not the scale midpoint", () => {
+    const values = [1, 8, 3];
+    const fit = seismogramGeometry({ ...base, values });
+    // [0, 0] and a window entirely below zero both leave nothing to scale
+    // unsigned magnitudes against; a flat half-length reads as barcode mode.
+    for (const domain of [
+      [0, 0],
+      [-10, -2],
+    ] as const) {
+      const geo = seismogramGeometry({ ...base, values, domain });
+      expect(geo.ticks).toEqual(fit.ticks);
+    }
+    expect(new Set(fit.ticks.map((t) => t.y0)).size).toBe(3); // magnitudes differ
+  });
+
+  it("a non-finite or non-positive box resolves to the documented one", () => {
+    const values = [0, 3, 0, 8];
+    const ref = seismogramGeometry({ ...base, values });
+    for (const box of [
+      { width: NaN },
+      { height: NaN },
+      { height: Infinity },
+      { width: -60 },
+      { width: 0, height: 0 },
+    ]) {
+      const geo = seismogramGeometry({ ...base, values, ...box });
+      expect(geo.ticks).toEqual(ref.ticks);
+      expect(geo.baselineY).toBe(ref.baselineY);
+    }
+  });
+
   it("barcode mode → uniform full-length ticks (presence only)", () => {
     const geo = seismogramGeometry({ ...base, mode: "barcode", values: [1, 8, 3] });
     const tips = new Set(geo.ticks.map((t) => t.y0));

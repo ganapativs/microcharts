@@ -24,8 +24,11 @@ describe("<PercentileLadder>", () => {
 
   it("log scale renders an in-chart tag so the transform is never silent", () => {
     const { container } = draw(<PercentileLadder data={[1, 10, 100, 1000]} scale="log" />);
-    const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
-    expect(texts).toContain("log");
+    const tag = [...container.querySelectorAll("text")].find((t) => t.textContent === "log")!;
+    expect(tag).toBeTruthy();
+    // full label ink — a 0.7 fill-opacity put the tag under the text contrast
+    // floor, and `forced-color-adjust: none` carried the fade into High Contrast
+    expect(tag.style.fillOpacity).toBe("");
   });
 
   it("labels drop below the documented minimum width", () => {
@@ -33,6 +36,50 @@ describe("<PercentileLadder>", () => {
     const narrow = draw(<PercentileLadder data={SAMPLE} width={40} />).container;
     expect(wide.querySelectorAll("text").length).toBeGreaterThan(0);
     expect(narrow.querySelectorAll("text").length).toBe(0);
+  });
+
+  it("a hostile ps announces the ladder that was painted", () => {
+    // p200 painted the maximum (quantiles clamps p) while the name announced
+    // "p200 … the slowest -100%"; an empty ps announced "No data." over a
+    // perfectly good series.
+    const { container } = draw(<PercentileLadder data={SAMPLE} ps={[-10, 200]} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe(
+      "p50 50, p90 90, p99 99 — the slowest 1% take 2× the median.",
+    );
+    expect(container.querySelectorAll("line").length).toBe(4); // track + 3 ticks
+  });
+
+  it("the tail multiple is measured against the median it names", () => {
+    const { container } = draw(<PercentileLadder data={SAMPLE} ps={[25, 90]} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "p25 25, p90 90 — the slowest 10% take 1.8× the median.",
+    );
+  });
+
+  it("a non-finite box clamps the marks, not just the frame", () => {
+    for (const box of [{ width: NaN }, { height: NaN }, { height: Infinity }, { width: 0 }]) {
+      const { container } = draw(<PercentileLadder data={SAMPLE} {...box} />);
+      const attrs = [...container.querySelectorAll("*")].flatMap((el) =>
+        [...el.attributes].map((a) => a.value),
+      );
+      expect(attrs.filter((v) => /NaN|Infinity/.test(v))).toEqual([]);
+    }
+  });
+
+  it("a label too wide for the box drops instead of painting into the margin", () => {
+    // clampX's range inverts once the text is wider than the frame, and
+    // `.mc-root` is overflow: visible — the winning bound spilled onto the page.
+    const wide = [1234567, 2234567, 9234567];
+    const { container } = draw(
+      <PercentileLadder data={wide} label="both" width={56} height={18} />,
+    );
+    for (const t of container.querySelectorAll("text")) {
+      const est = (t.textContent ?? "").length * Number(t.getAttribute("font-size")) * 0.62;
+      const cx = Number(t.getAttribute("x"));
+      expect(cx - est / 2).toBeGreaterThanOrEqual(0);
+      expect(cx + est / 2).toBeLessThanOrEqual(56);
+    }
   });
 
   it("is axe-clean", async () => {

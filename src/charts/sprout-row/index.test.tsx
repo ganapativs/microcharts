@@ -83,6 +83,61 @@ describe("<SproutRow>", () => {
   });
 });
 
+// Every attribute a bad number can hide in — coordinates, the frame, and the
+// inline custom property that carries the label size.
+const nonFinite = (html: string): string[] =>
+  [...html.matchAll(/(?:d|x|y|x1|x2|y1|y2|width|height|font-size|style|viewBox)="([^"]*)"/g)]
+    .map((m) => m[1]!)
+    .filter((v) => /NaN|Infinity/.test(v));
+
+describe("hostile config never reaches the markup", () => {
+  // `height`, `step` and `fontSize` are host-computed as often as typed —
+  // `Number("")` on a cleared input, a container measured mid-collapse. Each of
+  // these painted `d="M9.55 NaN…"` glyphs, an `x2="Infinity"` soil line, or
+  // `--mc-label-size: NaNpx` inside a viewBox `Chart` had already clamped to 1.
+  const cases = {
+    "height=NaN": <SproutRow data={ACCT} height={NaN} />,
+    "height=Infinity": <SproutRow data={ACCT} height={Infinity} />,
+    "height=-5": <SproutRow data={ACCT} height={-5} />,
+    "height=0": <SproutRow data={ACCT} height={0} />,
+    "step=NaN": <SproutRow data={ACCT} step={NaN} />,
+    "step=Infinity": <SproutRow data={ACCT} step={Infinity} />,
+    "step=-4": <SproutRow data={ACCT} step={-4} />,
+    "step=0": <SproutRow data={ACCT} step={0} />,
+    "fontSize=NaN": <SproutRow data={ACCT} fontSize={NaN} label="value" />,
+    "fontSize=-3": <SproutRow data={ACCT} fontSize={-3} labels />,
+    "labels + height=NaN": <SproutRow data={ACCT} labels height={NaN} />,
+  };
+
+  it("emits no non-finite coordinate, size or custom property", () => {
+    for (const [what, ui] of Object.entries(cases)) {
+      const bad = nonFinite(draw(ui).container.innerHTML);
+      expect(bad, `${what} emitted ${bad.slice(0, 2).join(", ")}`).toEqual([]);
+    }
+  });
+
+  it("falls back to the documented default, not merely to something finite", () => {
+    const plain = draw(<SproutRow data={ACCT} />).container.innerHTML;
+    expect(draw(<SproutRow data={ACCT} height={NaN} />).container.innerHTML).toBe(plain);
+    expect(draw(<SproutRow data={ACCT} step={0} />).container.innerHTML).toBe(plain);
+    expect(draw(<SproutRow data={ACCT} fontSize={-3} />).container.innerHTML).toBe(plain);
+  });
+
+  it("a collapsed box sheds the plants rather than painting above the frame", () => {
+    const { container } = draw(<SproutRow data={ACCT} height={2} />);
+    const svg = container.querySelector("svg")!;
+    const h = Number(svg.getAttribute("viewBox")!.split(" ")[3]);
+    const soil = svg.querySelector("line")!;
+    for (const a of ["y1", "y2"]) {
+      const y = Number(soil.getAttribute(a));
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(h);
+    }
+    // no negative arc radius survives into a glyph path
+    for (const p of svg.querySelectorAll("path")) expect(p.getAttribute("d")).not.toMatch(/a-/);
+  });
+});
+
 describe("degrades instead of spilling", () => {
   const NAMED = [
     { label: "Acme", value: 3 },

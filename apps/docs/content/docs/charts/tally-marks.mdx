@@ -1,14 +1,13 @@
 ---
 title: TallyMarks
-description: >-
-  React tally marks chart — counts as five-and-strike tally clusters humans already read. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description:
+  TallyMarks counts in four-and-strike clusters of five, and prints a +N numeral once the count passes the cap.
 ---
 
-TallyMarks answers "how many?" the way a human actually counts — in four-and-strike clusters of five. The count reads
-back exactly: no scale to calibrate, no color to decode. Past `total` the marks stop growing and a `+N` numeral tells
-the truth, so a cell never blows out its width. Marks are never resized to fit — width grows with the count until the
-cap, then the numeral takes over.
+The chart below prints 23 as four clusters of five plus three loose strokes, the way a person counts. The count reads
+back exactly: there is no scale to calibrate and no color to decode. Past `total` the marks stop growing and a `+N`
+numeral carries the rest, so a cell never blows out its width. Marks are never resized to fit; width grows with the
+count until the cap, then the numeral takes over.
 
 <LiveDemo label="TallyMarks" sizeOf="tally-marks">
   <TallyMarks value={23} title="Signatures" height={20} />
@@ -24,15 +23,18 @@ cap, then the numeral takes over.
 
 ## When to use it
 
-- **Good for** — a small running count in a sentence or cell, a live event or score counter, or an editorial
-  hand-tallied context.
-- **Avoid for** — large magnitudes (MiniBar), trends over time (Sparkline), or proportions (Progress).
+Use it for a small running count in a sentence or cell, a live event or score counter, or an editorial hand-tallied
+context. Large magnitudes belong in MiniBar, trends over time in Sparkline, and proportions in Progress.
 
 ## Sizing
 
 <Sizing chart="tally-marks" />
 
 ## Variants
+
+The ruled pen is the default, because evenly ruled strokes count back fastest in a product table. The `drawn` pen adds a
+seeded, deterministic jitter for an editorial voice: the same count always renders identically, on the server and after
+hydration, and the jitter only changes how each stroke is drawn, never the count.
 
 <LiveDemo
   label="hand-drawn pen + capped width"
@@ -65,21 +67,17 @@ cap, then the numeral takes over.
   <TallyMarks value={5000} total={5000} height={20} />
 </LiveDemo>
 
+A negative value clamps to 0 and a non-physical value saturates at the 200-mark ceiling. Past `total`, the default
+`overflow="numeral"` appends a `+N` so the true total survives even when the marks can't; `overflow="clamp"` suppresses
+the numeral for dense columns, and the accessible name still carries the exact count.
+
 ## Four homes
 
 <FourContexts slug="tally-marks" />
 
-## Why this default
-
-The ruled pen is the default because product tables want precision first — evenly ruled strokes count back fastest. The
-`drawn` pen adds a seeded, deterministic jitter (same count always renders identically, on the server and after
-hydration) for the editorial voice, and it only perturbs how each stroke is drawn — the count is never touched. Past
-`total`, the default `overflow="numeral"` appends a `+N` so the true total survives even when the marks can't;
-`overflow="clamp"` suppresses the numeral for dense columns, and the accessible name still carries the exact count.
-
 ## Accessibility
 
-The accessible name is the exact count — **"17 counted."** — always the true value, even when the marks overflow to a
+The accessible name is the exact count, **"17 counted."**, and stays the true value even when the marks overflow to a
 `+N` numeral or clamp. The interactive entry announces the new total through a polite live region on change and draws
 newly added marks in with a brief, reduced-motion-gated sweep. A count has no sub-parts, so focus reads the summary and
 there is no cursor to move.

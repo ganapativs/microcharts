@@ -89,6 +89,28 @@ describe("<BiasStrip>", () => {
     expect(warn).toHaveBeenCalledOnce();
   });
 
+  // Hostile CONFIG, not hostile data — the shared edge matrix covers `data`,
+  // and it also only sweeps a fixed attribute list, so the `--mc-seat` an `r` of
+  // NaN used to poison went unseen. Sweep every attribute on every node.
+  it.each([
+    ["limits NaN", { limits: Number.NaN }],
+    ["limits Infinity", { limits: Number.POSITIVE_INFINITY }],
+    ["limits negative", { limits: -1.96 }],
+    ["r NaN", { r: Number.NaN }],
+  ])("%s: no non-finite attribute, same announcement as the default", (_name, extra) => {
+    const expected = draw(<BiasStrip data={MEASURED} />)
+      .container.querySelector("svg")!
+      .getAttribute("aria-label");
+    const { container } = draw(<BiasStrip data={MEASURED} {...extra} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe(expected);
+    for (const el of container.querySelectorAll("*")) {
+      for (const attr of Array.from(el.attributes)) {
+        expect(attr.value, `<${el.tagName} ${attr.name}>`).not.toMatch(/NaN|Infinity/);
+      }
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<BiasStrip data={MEASURED} title="Device vs reference" />);
     await expectNoA11yViolations(container);

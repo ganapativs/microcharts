@@ -31,7 +31,10 @@ export function calendarOffset(anchor: string | Date | undefined, weekStart: 0 |
   if (anchor === undefined) return 0;
   const t = parseUTCDay(anchor);
   if (t === null) return 0;
-  return (new Date(t).getUTCDay() - weekStart + 7) % 7;
+  // `weekStart` is typed 0 | 1 but arrives from hosts as `Number(setting)` —
+  // an unparseable one made the offset NaN, which put every cell at x=NaN and
+  // (interactive) broke the pointer map's slot math against the painted grid.
+  return (new Date(t).getUTCDay() - (weekStart === 0 ? 0 : 1) + 7) % 7;
 }
 
 /** Total, span, and busiest bin. */
@@ -106,7 +109,10 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
     domain,
     offset: layout === "grid" ? calendarOffset(anchor, weekStart) : 0,
   });
-  const mark = cellMetrics(cell, shape);
+  // Mark metrics and the opacity ramp both read the RESOLVED numbers off the
+  // geometry, never the raw props: a `steps` the geometry clamped but the ramp
+  // did not painted a level scale the cells were never bucketed against.
+  const mark = cellMetrics(geo.cell, shape);
   const fmt = makeFormatter(format, locale);
   const accName = resolveSummary(summary, () => activitySummary(data, fmt, strings));
 
@@ -138,7 +144,7 @@ export function ActivityGrid(props: ActivityGridProps): ReactNode {
           rx={mark.rx}
           shapeRendering={mark.crisp ? "crispEdges" : undefined}
           data-mc-ink="cell"
-          fillOpacity={stepOpacity(c.level, steps)}
+          fillOpacity={stepOpacity(c.level, geo.levels)}
           style={cellFill}
         />
       ))}

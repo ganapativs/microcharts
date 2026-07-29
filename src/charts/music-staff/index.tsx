@@ -6,10 +6,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
-import { musicStaffGeometry } from "./geometry.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, musicStaffFrame, musicStaffGeometry } from "./geometry.js";
 
 export interface MusicStaffProps {
   data: readonly Value[];
@@ -44,8 +43,8 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     label = "none",
     domain,
     color,
-    width = 60,
-    height = 28,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     title,
@@ -56,12 +55,19 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height);
 
   const fmt = makeFormatter(format, locale);
   const last = lastFinite(data);
-  const showLabel = label === "last" && isFiniteValue(last);
-  const gutter = showLabel ? Math.ceil(`${fmt(last as number)}`.length * 0.62 * fontSize + 2) : 0;
+  const labelText = label === "last" && isFiniteValue(last) ? fmt(last) : undefined;
+  // One resolution of the box + label metrics, shared with ./client so the two
+  // entries cannot disagree about where a note sits.
+  const { width, height, fontSize, gutter } = musicStaffFrame({
+    width: widthProp,
+    height: heightProp,
+    fontSize: props.fontSize,
+    labelText,
+  });
+  const showLabel = labelText !== undefined && gutter > 0;
   const geo = musicStaffGeometry({
     values: data,
     domain,
@@ -89,19 +95,30 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
       className={className ? `mc-staff ${className}` : "mc-staff"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
+      {/* Staff + ledger opacity is a presentation ATTRIBUTE, not inline style:
+          `.mc-root` sets `forced-color-adjust: none`, so an inline declaration
+          survives verbatim into High Contrast Mode and no stylesheet rule can
+          lift it back to a legible weight (compare the `unit-off`/`gap` roles,
+          whose forced-colors mapping resets stroke-opacity to 1). */}
       <path
         d={geo.staffYs.map((y) => `M${PAD} ${y}L${width - gutter - PAD} ${y}`).join("")}
         data-mc-ink="muted"
-        style={{ strokeOpacity: 0.4 }}
+        strokeOpacity={0.4}
       />
       {geo.ledger.length ? (
         <path
           d={geo.ledger.map((l) => `M${l.x1} ${l.y}L${l.x2} ${l.y}`).join("")}
           data-mc-ink="muted"
-          style={{ strokeOpacity: 0.7 }}
+          strokeOpacity={0.7}
         />
       ) : null}
-      {/* Contour line — shape only; noteheads carry the values. */}
+      {/* Contour line — shape only; noteheads carry the values. That is the
+          `ghost` role's job description ("low-precision context behind the
+          primary mark"), and Constellation's connector between stars already
+          takes it. It used to paint an inline `var(--mc-accent)` at 0.28, which
+          under `forced-color-adjust: none` reaches High Contrast Mode as a fixed
+          brand hex at 28% — invisible against a forced black background. The
+          role strokes GrayText there instead. `color` still overrides inline. */}
       {geo.notes.length >= 2 ? (
         <path
           d={geo.notes
@@ -113,10 +130,10 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
             })
             .join("")}
           fill="none"
+          data-mc-ink="ghost"
           data-mc-w="tick"
           style={{
-            stroke: paint ?? "var(--mc-accent)",
-            strokeOpacity: 0.28,
+            ...(paint ? { stroke: paint } : null),
             strokeLinecap: "round",
             strokeLinejoin: "round",
           }}
@@ -134,8 +151,14 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
             cy={nt.cy}
             rx={nt.rx}
             ry={nt.ry}
-            data-mc-ink="point"
-            style={paint ? { fill: paint } : isLast ? { fill: "var(--mc-accent)" } : undefined}
+            // The current pitch takes the accent ROLE, not an inline
+            // `fill: var(--mc-accent)`: inline paint survives
+            // `forced-color-adjust: none` verbatim, so the one note that matters
+            // most kept a brand hex in High Contrast Mode while its neighbours
+            // mapped to CanvasText. The role maps it to Highlight instead. Same
+            // shape as DotPlot's highlighted dot.
+            data-mc-ink={isLast && !paint ? "accent" : "point"}
+            style={paint ? { fill: paint } : undefined}
           />
         );
       })}

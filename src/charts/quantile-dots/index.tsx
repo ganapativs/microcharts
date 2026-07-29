@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
+import { chartSide } from "../../core/types.js";
 import { quantileDotsGeometry, type QuantileDotsGeometry, type ThresholdSide } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -57,8 +58,8 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     side = "above",
     label = "count",
     domain,
-    width = 80,
-    height = 20,
+    width: widthProp = 80,
+    height: heightProp = 20,
     color,
     format,
     locale,
@@ -70,6 +71,12 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     style,
     children,
   } = props;
+
+  // The box drives the label font, the seat and the geometry, none of which
+  // `Chart`'s own clamp reaches — a NaN height shipped `--mc-label-size: NaNpx`
+  // and NaN dot centers inside a perfectly valid viewBox (see `chartSide`).
+  const width = chartSide(widthProp);
+  const height = chartSide(heightProp);
 
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
@@ -187,7 +194,6 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

@@ -63,6 +63,44 @@ describe("<Hourglass>", () => {
     expect(vbWidth(de)).toBeGreaterThan(vbWidth(en));
   });
 
+  it("a host-computed box or fontSize never reaches an attribute", () => {
+    // Each of these painted `d="M1 NaNL…"`, `width="-21"` or `font-size="NaN"`
+    // under a perfectly correct accessible name.
+    const boxes = [
+      { width: NaN },
+      { width: -20 },
+      { height: NaN },
+      { height: Infinity },
+      { label: "elapsed" as const, fontSize: NaN },
+      { label: "elapsed" as const, fontSize: 0 },
+    ];
+    for (const box of boxes) {
+      const { container } = draw(<Hourglass value={0.5} {...box} />);
+      const attrs = [...container.querySelectorAll("*")].flatMap((el) =>
+        [...el.attributes].map((a) => a.value),
+      );
+      expect(attrs.filter((v) => /NaN|Infinity|="-/.test(v))).toEqual([]);
+    }
+  });
+
+  it("fontSize falls back to the default rather than collapsing the glass", () => {
+    const ok = draw(<Hourglass value={0.5} label="elapsed" />).container;
+    const bad = draw(<Hourglass value={0.5} label="elapsed" fontSize={NaN} />).container;
+    expect(vbWidth(bad)).toBe(vbWidth(ok));
+    expect(bad.querySelector("text")!.getAttribute("font-size")).toBe("8");
+  });
+
+  it("a glass shorter than the numeral drops the numeral and its gutter", () => {
+    // A centred em-box crosses both viewBox edges below fontSize; the summary
+    // still carries the percent.
+    const { container } = draw(<Hourglass value={0.5} label="elapsed" height={6} fontSize={8} />);
+    expect(container.querySelector("text")).toBeNull();
+    expect(vbWidth(container)).toBe(12); // the glass box, no gutter reserved
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "50% elapsed, 50% remaining.",
+    );
+  });
+
   it("summary={false} hides it from assistive tech", () => {
     const { container } = draw(<Hourglass value={0.5} summary={false} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();

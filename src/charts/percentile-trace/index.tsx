@@ -15,8 +15,13 @@ import {
   EN_PERCENTILE_TRACE,
   type PercentileTraceStrings,
 } from "../../core/strings-percentile-trace.js";
-import { round2, type Polarity, type Value } from "../../core/types.js";
-import { percentileGeometry, type PercentileGeometry } from "./geometry.js";
+import { chartSide, round2, type Polarity, type Value } from "../../core/types.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  percentileGeometry,
+  type PercentileGeometry,
+} from "./geometry.js";
 
 export function percentileSummary(
   geo: PercentileGeometry,
@@ -88,8 +93,8 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
     showBands = true,
     positive = "up",
     label = "last",
-    width = 80,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     format = INT,
     locale,
@@ -101,6 +106,12 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Everything below reads the RESOLVED box, never the prop: `height={NaN}`
+  // set `--mc-label-size: NaNpx` and a NaN seat on a 1×1 frame, and geometry
+  // laid the trace out against the raw prop while `Chart` clamped the viewBox.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const FONT = labelFont(height);
   const fmt = makeFormatter(format, locale);
@@ -122,7 +133,9 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
         title={title}
         summary={accName}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        // No geometry to read the floor off; mirror its pad, halved under a
+        // 4-unit box the same way geometry stops the plot inverting.
+        seat={{ mode: "floor", bottom: height - Math.min(2, height / 2) }}
         className={cls}
         style={style}
       >
@@ -140,21 +153,37 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const gutter = percentileGutter(labelText, height);
 
   const lineColor = color ?? "var(--mc-accent)";
-  // endpoint valence: rising standing is good by default; the line already
-  // carries direction, so this color is a redundant cue
+  // Endpoint valence: rising standing is good by default; the line already
+  // carries direction, so this color is a redundant cue. It rides an ink ROLE
+  // rather than an inline `fill` because inline paint outranks every
+  // stylesheet rule and `.mc-root` sets `forced-color-adjust: none` — the
+  // literal token survived verbatim into High Contrast Mode, painting a matte
+  // green or vermillion against the user's chosen background instead of the
+  // CanvasText/GrayText the valence mapping exists to give it. `color` is a
+  // line override, so it only reaches the dot on a flat trace.
   const good = positive === "down" ? geo.delta < 0 : geo.delta > 0;
-  const dotFill = geo.delta === 0 ? lineColor : good ? "var(--mc-positive)" : "var(--mc-negative)";
+  const flat = geo.delta === 0;
+  const dotInk = flat ? "accent" : good ? "positive" : "negative";
   // `dominant-baseline: central` straddles y by half a font EACH way, so the
   // clamp is symmetric — an asymmetric margin let the bottom of the glyph box
   // hang out of a short viewBox. Below `height < FONT` no clamp exists at all,
   // and `showLabel` above has already dropped the readout.
   const labelY = round2(clamp(geo.last.y, FONT * 0.5, height - FONT * 0.5));
 
+  // outer p5–95 field (faintest, half the band token) then the inner p25–75
+  // middle half painted full-strength on top
+  const bands = [
+    { name: "outer", rect: geo.bands.outer, opacity: 0.5 },
+    { name: "inner", rect: geo.bands.inner, opacity: undefined },
+  ] as const;
+
   // annotations host contract: Marker x = reading index on the locked scale,
-  // Threshold/TargetZone y = percentile ranks on the fixed [0,100] axis.
+  // Threshold/TargetZone y = percentile ranks on the fixed [0,100] axis. Both
+  // scales read the plot box off geometry rather than re-deriving the pad —
+  // under a box narrower than 2·pad the two answers diverged.
   const ann = resolveAnnotations(children, {
-    x: scaleLinear([0, Math.max(1, data.length - 1)], [2, width - 2]),
-    y: scaleLinear([0, 100], [height - 2, 2]),
+    x: scaleLinear([0, Math.max(1, data.length - 1)], [geo.x0, geo.x1]),
+    y: scaleLinear([0, 100], [geo.y1, geo.y0]),
     width,
     height,
     fontSize: annotationFontSize(height),
@@ -175,18 +204,16 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
       style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
     >
       {ann.under}
-      {/* outer p5–95 field (faintest, half the band token) then the inner
-          p25–75 middle half painted full-strength on top */}
       {showBands
-        ? [geo.bands.outer, geo.bands.inner].map((b, i) => (
+        ? bands.map(({ name, rect, opacity }) => (
             <rect
-              key={i}
-              x={b.x}
-              y={b.y}
-              width={b.width}
-              height={b.height}
+              key={name}
+              x={rect.x}
+              y={rect.y}
+              width={rect.width}
+              height={rect.height}
               data-mc-ink="band"
-              fillOpacity={i === 0 ? 0.5 : undefined}
+              fillOpacity={opacity}
             />
           ))
         : null}
@@ -197,7 +224,13 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
         vectorEffect="non-scaling-stroke"
         style={{ stroke: lineColor }}
       />
-      <circle cx={geo.last.x} cy={geo.last.y} r={1.8} style={{ fill: dotFill }} />
+      <circle
+        cx={geo.last.x}
+        cy={geo.last.y}
+        r={1.8}
+        data-mc-ink={dotInk}
+        style={flat && color ? { fill: color } : undefined}
+      />
       {showLabel ? (
         <text
           x={width + 3}

@@ -39,9 +39,24 @@ export function histogramGeometry(opts: {
   // explicit bin counts collapse to the observation count (no empty-comb)
   let finiteCount = 0;
   for (const v of values) if (typeof v === "number" && Number.isFinite(v)) finiteCount++;
+  // Hosts compute both of these: `bins` off an empty input field (`Number("")`
+  // → NaN), `domain` with a Math.min over a series holding a NaN. Passed
+  // through, a non-finite `domain` came back as bin edges of NaN — nothing
+  // painted, and the name still read "14 values, most between NaN and NaN" —
+  // and a non-finite `bins` collapsed the bin array to empty, announcing "No
+  // data." over 14 real observations. Neither is a bin count or a domain, so
+  // fall back to the documented auto behavior.
+  const binCount =
+    opts.bins !== undefined && Number.isFinite(opts.bins)
+      ? Math.max(1, Math.min(opts.bins, finiteCount))
+      : undefined;
+  const domain =
+    opts.domain && Number.isFinite(opts.domain[0]) && Number.isFinite(opts.domain[1])
+      ? opts.domain
+      : undefined;
   const binned = uniformBins(values, {
-    ...(opts.bins !== undefined ? { bins: Math.max(1, Math.min(opts.bins, finiteCount)) } : null),
-    ...(opts.domain ? { domain: opts.domain } : null),
+    ...(binCount !== undefined ? { bins: binCount } : null),
+    ...(domain ? { domain } : null),
   });
   if (!binned || binned.bins.length === 0) {
     return { bars: [], markBin: -1, modalBin: -1, total: 0, pitch: 0 };

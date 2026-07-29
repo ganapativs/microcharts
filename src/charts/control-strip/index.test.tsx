@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ControlStrip } from "./index.js";
@@ -63,6 +63,38 @@ describe("<ControlStrip>", () => {
     const outline = container.querySelector('rect[data-mc-ink="muted"]')!;
     expect(outline.getAttribute("stroke-dasharray")).toBe("2 2");
     expect(outline.getAttribute("data-mc-w")).toBe("hair");
+  });
+
+  // Hostile CONFIG, not hostile data — the shared edge matrix only sweeps
+  // `data`. A scalar config prop can render a perfectly ordinary strip while the
+  // accessible name announces a scale the band was never drawn on.
+  it.each([
+    ["baseline NaN", { baseline: Number.NaN }],
+    ["baseline Infinity", { baseline: Number.POSITIVE_INFINITY }],
+    ["baseline -Infinity", { baseline: Number.NEGATIVE_INFINITY }],
+    ["baseline past the rounder", { baseline: 1e308 }],
+    ["domain NaN", { domain: [Number.NaN, 10] as [number, number] }],
+    ["domain Infinity", { domain: [0, Number.POSITIVE_INFINITY] as [number, number] }],
+    ["domain flat", { domain: [5, 5] as [number, number] }],
+    ["percentile limits", { limits: "percentile" as const }],
+  ])("%s: nothing non-finite reaches the name or an attribute", (_name, extra) => {
+    const { container } = draw(<ControlStrip data={SAMPLE} dots="all" {...extra} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).not.toMatch(/NaN|Infinity|∞/);
+    for (const el of container.querySelectorAll("*")) {
+      for (const attr of Array.from(el.attributes)) {
+        expect(attr.value, `<${el.tagName} ${attr.name}>`).not.toMatch(/NaN|Infinity/);
+      }
+    }
+  });
+
+  it("a long series keys marks by index, not by x (2-dp coords collide)", () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    const many = Array.from({ length: 9000 }, (_, i) => (i % 7) - 3);
+    const { container } = draw(<ControlStrip data={many} dots="all" />);
+    expect(err).not.toHaveBeenCalled();
+    err.mockRestore();
+    expect(container.querySelectorAll("circle").length).toBe(9000);
   });
 
   it("is axe-clean", async () => {

@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
-import { labelFitsBand } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
 import {
   CoverageStrip as StaticCoverageStrip,
@@ -78,9 +78,9 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
     window: 400,
   });
 
-  // must match the static entry's font formula — the label gutter widens
-  // totalWidth, and a mismatched fontSize would drift the readout off-cell
-  const font = Math.min(11, Math.max(7, Math.round(height * 0.62)));
+  // the static entry's font formula itself, not a copy of it — the label gutter
+  // widens totalWidth, and a drifting fontSize hangs the readout off the strip
+  const font = labelFont(height, 0.62);
   // …and its drop rule: the static drops the percent (and its gutter) once the
   // box is shorter than one em, so reserving it here would widen totalWidth past
   // the composed static's and hang the readout off the end of the strip.

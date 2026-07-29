@@ -2,11 +2,50 @@
 // anchored at zero. Shares the placement idiom with
 // the Sparkline but emits rects, not a path. Win-loss collapses magnitude to a
 // three-state win/loss/tie glyph (tie = thin mid-line dash). Coords 2-dp via the kernel.
-import { niceDomain, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { clamp, niceDomain, scaleLinear } from "../../core/scale.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
 
 export type SparkBarMode = "bar" | "winloss";
+
+export const DEFAULT_WIDTH = 80;
+export const DEFAULT_HEIGHT = 20;
+/** Documented `gap` range and default — see `SparkBarGeometryOptions#gap`. */
+const DEFAULT_GAP = 0.25;
+const MAX_GAP = 0.9;
+
+/**
+ * A gap comes off a slider or a computed density, so `Number("")` → NaN and a
+ * negative are both one keystroke away. NaN made every bar `x="NaN"
+ * width="NaN"` — nothing painted, while the accessible name still read the
+ * whole series out — and a negative widened bars past the slot until they
+ * started at `x="-23.37"`, outside a frame that does not clip.
+ */
+function resolveGap(gap: number | undefined): number {
+  return Number.isFinite(gap) ? clamp(gap as number, 0, MAX_GAP) : DEFAULT_GAP;
+}
+
+/**
+ * An explicit domain is usually a host's own min/max over several series so a
+ * row of sparkbars shares one scale; a gap in any of them yields NaN, and the
+ * scale then flattens every bar onto the midline under a summary that still
+ * names the real range. Each bound falls back to the auto fit on its own, so a
+ * half-usable domain keeps its usable half.
+ */
+function resolveDomain(
+  domain: readonly [number, number] | undefined,
+  data: readonly Value[],
+): readonly [number, number] {
+  if (!domain) return niceDomain(data, true);
+  const [d0, d1] = domain;
+  if (isFiniteValue(d0) && isFiniteValue(d1) && Number.isFinite(d1 - d0)) return domain;
+  const auto = niceDomain(data, true);
+  const lo = isFiniteValue(d0) ? d0 : auto[0];
+  const hi = isFiniteValue(d1) ? d1 : auto[1];
+  // A span past the float range divides every value to zero — bars vanish under
+  // a summary that still names them, the same silent lie in a different shape.
+  return Number.isFinite(hi - lo) ? [lo, hi] : auto;
+}
 
 /** Endpoint-label metrics, anchored (never measures text — unmeasurable
  *  server-side). fontSize in viewBox units; gutter over-estimates width so the
@@ -79,7 +118,13 @@ export function sparkBarGeometry(
   data: readonly Value[],
   opts: SparkBarGeometryOptions,
 ): SparkBarGeometry {
-  const { width, height, mode = "bar", gap = 0.25, pad = 1, gutterRight = 0 } = opts;
+  const { mode = "bar", pad = 1, gutterRight = 0 } = opts;
+  // Read the RESOLVED box, never the prop: `Chart` clamps the frame with the
+  // same function, so geometry reading `height={NaN}` raw emitted NaN
+  // coordinates inside a viewBox that was already valid.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
+  const gap = resolveGap(opts.gap);
   const x0 = pad;
   const y0 = pad;
   // Bar mode seats its zero baseline flush with the box bottom (y = height) so
@@ -104,7 +149,12 @@ export function sparkBarGeometry(
   if (mode === "winloss") {
     // Equal-height bars above/below a mid-line; magnitude discarded on purpose.
     const mid = round2((y0 + y1) / 2);
-    const h = round2((y1 - y0) / 2 - 0.5);
+    // Under ~4 units tall the half-band goes to zero or negative, and the wins
+    // and losses rendered as `height="-0.5"` — dropped by the renderer, so the
+    // streak vanished while the summary still read it out. Floor at the same
+    // 0.5 minimum mark bar mode uses; the band stays inside the frame because
+    // it is measured from the mid-line either way.
+    const h = Math.max(0.5, round2((y1 - y0) / 2 - 0.5));
     const bars: Bar[] = [];
     for (let i = 0; i < n; i++) {
       const v = data[i];
@@ -125,18 +175,25 @@ export function sparkBarGeometry(
     return { bars, baselineY: mid, domain: [-1, 1], slot, x0, y0, y1 };
   }
 
-  const domain = opts.domain ?? niceDomain(data, true);
+  const domain = resolveDomain(opts.domain, data);
   const yScale = scaleLinear(domain, [y1, y0]);
+  // The zero anchor is clamped INTO the domain first, so the baseline is always
+  // already inside the plot box whichever way the domain runs.
   const baselineY = round2(yScale(Math.min(Math.max(0, domain[0]), domain[1])));
 
   const bars: Bar[] = [];
   for (let i = 0; i < n; i++) {
     const v = data[i];
     if (!isFiniteValue(v)) continue;
-    const top = yScale(v);
+    // Clamp the ENDS, then derive the height. Clamping only `y` afterwards left
+    // the full height intact, so a value outside an explicit domain — a row of
+    // sparkbars pinned to one scale, one series overshooting — painted a
+    // `height="38"` bar in a 20-unit frame, straight across the text around it.
+    // Truncating at the frame reads as "off the top"; overflow reads as a bug.
+    const top = clamp(yScale(v), y0, y1);
     const h = Math.max(0.5, Math.abs(top - baselineY));
-    // Clamp into the plot: a ~zero bar sitting on a floor baseline would push
-    // its min-height below y1, so nudge it back inside rather than overflow.
+    // A ~zero bar sitting on a floor baseline still pushes its min-height below
+    // y1, so nudge it back inside rather than overflow.
     let y = Math.min(top, baselineY);
     if (y + h > y1) y = y1 - h;
     if (y < y0) y = y0;

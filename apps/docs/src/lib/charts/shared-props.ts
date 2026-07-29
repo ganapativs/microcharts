@@ -5,7 +5,7 @@
  */
 import type { ChartProp } from "./types";
 
-export const GRAMMAR_PROPS: ChartProp[] = [
+const GRAMMAR_PROPS: ChartProp[] = [
   {
     name: "data",
     type: "(number | null)[] | per-chart shape",
@@ -68,7 +68,7 @@ export const GRAMMAR_PROPS: ChartProp[] = [
   },
 ];
 
-export const LAYOUT_PROPS: ChartProp[] = [
+const LAYOUT_PROPS: ChartProp[] = [
   {
     name: "width",
     type: "number | string",
@@ -102,7 +102,7 @@ export const LAYOUT_PROPS: ChartProp[] = [
   },
 ];
 
-export const I18N_PROPS: ChartProp[] = [
+const I18N_PROPS: ChartProp[] = [
   {
     name: "locale",
     type: "string | string[]",

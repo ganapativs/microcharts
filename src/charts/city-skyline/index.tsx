@@ -117,16 +117,16 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
   const fmt = makeFormatter(format, locale);
 
   // annotations host: Marker x = building index (bar center),
-  // Threshold/TargetZone y = data values on the shared zero-anchored scale
-  // (mirror of the geometry: y(v) = groundY − (v / maxV) · maxH).
-  const skylineValues = data.map((d) => (Number.isFinite(d.value) && d.value > 0 ? d.value : 0));
-  const maxV = domain ? domain[1] : Math.max(1, ...skylineValues);
+  // Threshold/TargetZone y = data values on the shared zero-anchored scale.
+  // The domain comes back OUT of the geometry rather than being re-derived
+  // here — a second copy of the fallback drew thresholds on a scale the
+  // buildings weren't standing on.
   const ann = resolveAnnotations(children, {
     x: (i) => {
       const b = geo.buildings[Math.round(i)];
       return b ? b.x + b.w / 2 : NaN;
     },
-    y: scaleLinear([0, maxV], [groundY, groundY - maxH]),
+    y: scaleLinear(geo.domain, [groundY, groundY - maxH]),
     width: geo.width,
     height,
     fontSize: annotationFontSize(height),
@@ -154,6 +154,11 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
           x2={geo.ground.x2}
           y2={geo.ground.y}
           data-mc-ink="muted"
+          // Without a width role the ground fell back to the SVG default of 1
+          // and stayed there: `--mc-density` thinned every other mark in the
+          // chart while the floor the buildings stand on did not move.
+          // `support` resolves to 1 at the default stroke width.
+          data-mc-w="support"
           strokeOpacity={0.6}
         />
       ) : null}

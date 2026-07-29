@@ -53,7 +53,7 @@ export const DEFAULT_FIXTURE = "typical";
 export function applyFixture(key: string, data: number[]): (number | null)[] {
   return (FIXTURES.find((f) => f.key === key) ?? FIXTURES[0]!).apply(data);
 }
-export const seriesLiteral = (series: readonly (number | null)[]): string =>
+const seriesLiteral = (series: readonly (number | null)[]): string =>
   `[${series.map((v) => (v === null ? "null" : String(v))).join(", ")}]`;
 
 /**

@@ -1,7 +1,7 @@
 // Signed segment lengths from a center line via core/stack.divergingStack.
 // Graded opacity encodes ordinal distance from neutral, never magnitude. 2-dp.
 import { divergingStack, type DivergingStack } from "../../core/stack.js";
-import { labelFont, textGutter } from "../../core/labels.js";
+import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
 import { round2, type Value } from "../../core/types.js";
 import { maxOf, minOf } from "../../core/scale.js";
 
@@ -22,15 +22,34 @@ export interface LikertGeometry {
   shares: { negative: number; positive: number; neutral: number };
 }
 
+/**
+ * The box `<Chart>` will actually paint: it clamps a non-finite or non-positive
+ * viewBox side to 1. Everything downstream has to resolve `width`/`height` the
+ * same way or it lays the strip out against a box nobody drew — `width={NaN}`
+ * (a size read off an unmounted element) put `x1="NaN"` on the center line and
+ * `x="NaN"` on an end label under a clean viewBox and a correct summary.
+ */
+export function likertBox(width: number, height: number): readonly [number, number] {
+  return [
+    Number.isFinite(width) && width > 0 ? width : 1,
+    Number.isFinite(height) && height > 0 ? height : 1,
+  ];
+}
+
 /** Label font size (viewBox units) — `labelFont` floor 7, scaled to strip height. */
 export function likertFont(height: number): number {
   return labelFont(height, 0.5);
 }
 
+/** Bar thickness: the strip inset a unit top and bottom, never thinner than 3. */
+export function likertBarHeight(height: number): number {
+  return Math.max(3, height - 4);
+}
+
 /**
- * End-label gutter reserved on BOTH sides before geometry runs. Shared so the
- * static frame and the interactive overlay/hit-test always resolve against the
- * same plot box.
+ * End-label gutter reserved on BOTH sides before geometry runs. What the labels
+ * COST; `likertLabels` decides whether they can afford it, and is what both
+ * entries call so the frame and the hit test resolve the same plot box.
  *
  * `widest` is the longest string the chart's own percent formatter can produce,
  * so the caller passes what it will actually PAINT. It used to be a hardcoded 4
@@ -41,6 +60,38 @@ export function likertFont(height: number): number {
  */
 export function likertGutter(labelled: boolean, fontSize: number, widest = 4): number {
   return labelled ? textGutter(Math.max(4, widest), fontSize, 4) : 0;
+}
+
+/**
+ * Whether the end labels are drawn, and the gutter both entries must reserve for
+ * them — 0 when they are not, so a dropped label never leaves dead space behind.
+ *
+ * The vertical test is the usual one. The horizontal test is the one this chart
+ * was missing: two reserves can be wider than the box, and nothing stopped them.
+ * At 40×14 the gutters claimed 44 of 40 units, so every segment came out with a
+ * negative width and vanished — a strip with no bar at all, and the two percents
+ * painted on top of each other in the middle of it. A caller `format` that
+ * returns prose ("24.000 percent") does the same at any width, and there the
+ * text ran past the viewBox edge as well.
+ *
+ * The labels lose once the plot they leave is narrower than the bar is thick: a
+ * diverging bar shorter than its own thickness has stopped being a bar, and the
+ * mark outranks its annotation.
+ */
+export function likertLabels(opts: {
+  labelled: boolean;
+  width: number;
+  height: number;
+  fontSize: number;
+  /** Longest string the caller's own formatter can produce (see `likertGutter`). */
+  widest?: number | undefined;
+}): { show: boolean; gutter: number } {
+  const reserve = likertGutter(true, opts.fontSize, opts.widest);
+  const show =
+    opts.labelled &&
+    labelFitsY(opts.height / 2, opts.fontSize, opts.height) &&
+    opts.width - 2 * reserve >= likertBarHeight(opts.height);
+  return { show, gutter: show ? reserve : 0 };
 }
 
 export function likertStripGeometry(opts: {

@@ -30,7 +30,12 @@ export const STATUS_STATES: Record<string, StatusState> = {
 /** Resolve a status key against built-ins + overrides; unknown → `off` + warn. */
 export function resolveStatus(status: string, states?: Record<string, StatusState>): StatusState {
   const map = states ? { ...STATUS_STATES, ...states } : STATUS_STATES;
-  const state = map[status];
+  // Own keys only. `status` is DATA — any string is in contract, and the plain
+  // lookup resolved "constructor" / "toString" / "__proto__" through
+  // Object.prototype to a truthy function whose `.glyph` is undefined. Geometry
+  // then fell off its switch and the render threw on `mark.kind`, taking the
+  // whole tree down instead of falling back to "off".
+  const state = Object.hasOwn(map, status) ? map[status] : undefined;
   if (state) return state;
   devWarn(`<StatusDot> unknown status "${status}" — rendering the "off" glyph.`);
   return STATUS_STATES.off!;
@@ -102,13 +107,26 @@ export function StatusDot(props: StatusDotProps): ReactNode {
       className={className ? `mc-status ${className}` : "mc-status"}
       style={style}
     >
+      {/* Paint rides presentation attributes, never inline `style`. The fill is
+          dynamic, so it has to come from the component — but an inline
+          declaration outranks every author rule, and `.mc-root` sets
+          `forced-color-adjust: none`, so the forced-colors mapping styles.css
+          writes for `[data-mc-status]` never applied: High Contrast Mode painted
+          #0E7A5F / #8a8986 against the user's own background. An attribute sits
+          below the stylesheet, so the mapping wins there and `color` everywhere
+          else — and a hollow mark's literal `fill="none"` is what the blanket
+          hollow-mark rule reads. */}
       {pulse ? (
+        // The halo carries the same dynamic ink, so it needs the same mapping.
+        // "halo" stays outside the glyph vocabulary: it is not a silhouette, and
+        // the value-scoped ring/half rules must not claim it.
         <circle
           className="mc-status-halo"
           cx={SIZE / 2}
           cy={SIZE / 2}
           r={3}
-          style={{ fill }}
+          data-mc-status="halo"
+          fill={fill}
           aria-hidden="true"
         />
       ) : null}
@@ -119,10 +137,11 @@ export function StatusDot(props: StatusDotProps): ReactNode {
           r={mark.r}
           data-mc-status={state.glyph}
           data-mc-w={mark.hollow ? "support" : undefined}
-          style={mark.hollow ? { fill: "none", stroke: fill } : { fill, stroke: "none" }}
+          fill={mark.hollow ? "none" : fill}
+          stroke={mark.hollow ? fill : "none"}
         />
       ) : mark.kind === "path" ? (
-        <path d={mark.d} data-mc-status={state.glyph} style={{ fill, stroke: "none" }} />
+        <path d={mark.d} data-mc-status={state.glyph} fill={fill} stroke="none" />
       ) : (
         <>
           <circle
@@ -131,9 +150,13 @@ export function StatusDot(props: StatusDotProps): ReactNode {
             r={mark.r}
             data-mc-status="half"
             data-mc-w="support"
-            style={{ fill: "none", stroke: fill }}
+            fill="none"
+            stroke={fill}
           />
-          <path d={mark.d} style={{ fill, stroke: "none" }} />
+          {/* The half-disc is half the busy silhouette and was the one mark
+              with no `data-mc-status` at all — unmapped even once the paint
+              moved off `style`. */}
+          <path d={mark.d} data-mc-status="half" fill={fill} stroke="none" />
         </>
       )}
       {children}

@@ -27,7 +27,7 @@ function formatStars(n: number): string {
   return `${k >= 10 ? Math.round(k) : Math.round(k * 10) / 10}k`;
 }
 
-export function useGithubStars(repo: string): number | null {
+function useGithubStars(repo: string): number | null {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {

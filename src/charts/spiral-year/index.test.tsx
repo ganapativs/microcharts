@@ -50,6 +50,24 @@ describe("<SpiralYear>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
   });
 
+  // The announced scale and the painted scale have to be the same scale: a bad
+  // `size` used to leave a confident summary over a chart that painted nothing.
+  it("a non-finite size keeps the frame, the seat, and the marks finite", () => {
+    const { container } = draw(<SpiralYear data={YEAR} size={NaN} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 24 24");
+    expect(svg.getAttribute("style")).not.toMatch(/NaN|Infinity/);
+    expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+    expect(svg.getAttribute("aria-label")).toBe("52 weeks; peak 480 in week 30, low in week 6.");
+  });
+
+  it("steps outside the documented 3 | 5 still paints the ramp", () => {
+    const { container } = draw(<SpiralYear data={YEAR} steps={Infinity as unknown as 5} />);
+    const marks = container.querySelectorAll('path[data-mc-ink="bar"]');
+    expect(marks.length).toBeGreaterThan(0);
+    for (const p of marks) expect(p.getAttribute("d")).not.toBe("");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<SpiralYear data={YEAR} title="Seasonality" />);
     await expectNoA11yViolations(container);

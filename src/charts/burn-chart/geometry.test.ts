@@ -65,6 +65,28 @@ describe("burnGeometry", () => {
     expect(burnGeometry({ ...base, plan: [], actual: [] })).toBeNull();
   });
 
+  it("elapsed/total count the PLOTTED values, not the raw arrays", () => {
+    // Non-finite entries are filtered before scaling, so the line stops at
+    // day 2 here. Counting the props instead said "4 of 12 days in".
+    const geo = burnGeometry({
+      ...base,
+      plan: [40, NaN, 32, Infinity, 0],
+      actual: [40, NaN, 36, 34],
+    })!;
+    expect(geo.elapsed).toBe(3);
+    expect(geo.total).toBe(3);
+    expect(geo.nowActual).toBe(34);
+  });
+
+  it("a series past the spread limit scales instead of throwing", () => {
+    // `Math.max(1, ...yValues)` threw RangeError here — both arrays are
+    // caller-sized, so neither may be spread into a call.
+    const actual = Array.from({ length: 200_000 }, (_, i) => 200_000 - i);
+    const geo = burnGeometry({ ...base, plan: [], actual })!;
+    expect(geo.domain[1]).toBe(200_000);
+    expect(geo.elapsed).toBe(200_000);
+  });
+
   test.prop([
     fc.array(fc.double({ noNaN: true, min: 0, max: 100 }), { minLength: 2, maxLength: 30 }),
     fc.array(fc.double({ noNaN: true, min: 0, max: 100 }), { minLength: 1, maxLength: 20 }),

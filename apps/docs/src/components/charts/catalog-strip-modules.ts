@@ -14,9 +14,9 @@ import stationGlyph from "@/lib/charts/station-glyph";
 
 /** Narrow per-chart module map for the `<CatalogStrip />` index-page teaser —
  *  exactly the deterministic `sample(12)` slugs (core → frontier), imported one
- *  by one like `home/hero-modules.ts`. Sourcing the teaser's `Mark` glyphs here
- *  instead of `lib/charts/registry.getModule()` keeps the whole 106-chart
- *  interactive graph out of the guide route that renders `/docs`.
+ *  by one. Sourcing the teaser's `Mark` glyphs here instead of
+ *  `lib/charts/registry.getModule()` keeps the whole 106-chart interactive graph
+ *  out of the guide route that renders `/docs`.
  *
  *  Keep in sync with `sample(count)` in `catalog-strip.tsx` for the default
  *  count of 12. Slugs not in this map render nothing (matches the old

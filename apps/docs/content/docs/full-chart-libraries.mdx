@@ -1,42 +1,13 @@
 ---
 title: Full chart libraries
 description:
-  How microcharts relates to Recharts and Chart.js — different jobs, not replacements. Word-sized marks inside UI vs
-  full chart surfaces. Measured size pins for orientation; see Performance for our CI receipts.
+  How microcharts and full chart libraries like Recharts and Chart.js do different jobs, with pinned size numbers for
+  orientation.
 ---
 
 [Recharts](https://recharts.org) and [Chart.js](https://www.chartjs.org) are full chart libraries. They draw surfaces
 that are mostly chart: scales, legends, tooltips, plugins, dashboard layouts. microcharts draws a word-sized mark
-_inside_ a surface you already have — a sentence, a table cell, a KPI, a streamed reply — where a full chart library
-would be too heavy and too loud.
-
-We are not a substitute for either. Read [When to use microcharts](/docs/when-to-use) for the product decision; this
-page pins the size numbers so they stay honest.
-
-## Side by side
-
-|                      | Full library (Recharts, Chart.js, …) | microcharts                                     |
-| -------------------- | ------------------------------------ | ----------------------------------------------- |
-| Surface              | The chart _is_ the panel             | The chart sits in prose / cell / KPI            |
-| Chrome               | Axes, legends, tooltips, brush       | None by design                                  |
-| Typical budget       | Tens to hundreds of kB               | <SizeMarketing />                               |
-| Runtime dependencies | Real dependency trees                | Zero (`dependencies: {}`; React is a peer)      |
-| Server Components    | Usually a client chart runtime       | Default export is hook-free SVG, zero client JS |
-| Accessible name      | You wire it (plugins, tables, aria)  | `role="img"` + summary from the data by default |
-
-A product can use both when it needs both jobs.
-
-## Recharts
-
-Recharts is a strong default for React dashboards: composable `<LineChart>`, axes, tooltip, responsive container.
-
-Orientation numbers (not “smaller wins for every app”):
-
-<VsRechartsTable />
-
-**Reach for Recharts** when the page is mostly chart — ticks, legends, brush, or a familiar Recharts tree.
-
-**Reach for microcharts** when the mark must live in a sentence, a cell, or an RSC with nothing to hydrate.
+_inside_ a surface you already have — a sentence, a table cell, a KPI, a streamed reply. Here is each job in code:
 
 ```tsx
 // Recharts — full surface
@@ -57,10 +28,37 @@ import { Sparkline } from "@microcharts/react/sparkline";
 </span>;
 ```
 
+Neither replaces the other. Read [When to use microcharts](/docs/when-to-use) for the product decision; this page pins
+the size numbers so they stay accurate.
+
+## Side by side
+
+|                      | Full library (Recharts, Chart.js, …) | microcharts                                     |
+| -------------------- | ------------------------------------ | ----------------------------------------------- |
+| Surface              | The chart _is_ the panel             | The chart sits in prose / cell / KPI            |
+| Chrome               | Axes, legends, tooltips, brush       | None by design                                  |
+| Typical budget       | Tens to hundreds of kB               | <SizeMarketing />                               |
+| Runtime dependencies | Real dependency trees                | Zero (`dependencies: {}`; React is a peer)      |
+| Server Components    | Usually a client chart runtime       | Default export is hook-free SVG, zero client JS |
+| Accessible name      | You wire it (plugins, tables, aria)  | `role="img"` + summary from the data by default |
+
+## Recharts
+
+Recharts is a strong default for React dashboards: composable `<LineChart>`, axes, tooltip, responsive container.
+
+The gzip figures below are orientation, not a scoreboard — a smaller number doesn't win an app that needs ticks and a
+brush:
+
+<VsRechartsTable />
+
+**Reach for Recharts** when the page is mostly chart — ticks, legends, brush, or a familiar Recharts tree.
+
+**Reach for microcharts** when the mark must live in a sentence, a cell, or an RSC with nothing to hydrate.
+
 ## Chart.js
 
 Chart.js is Canvas-first, with a large plugin and config ecosystem. In React it is usually wrapped by `react-chartjs-2`.
-That stack is for dashboard and report canvases — not for a mark in a table cell.
+That stack draws dashboard and report canvases, at a size that doesn't fit a table cell.
 
 <VsChartJsTable />
 
@@ -68,17 +66,16 @@ That stack is for dashboard and report canvases — not for a mark in a table ce
 
 **Reach for microcharts** when you need inline SVG, accessible-by-default summaries, or static RSC output.
 
-Canvas charts need an explicit accessibility path (hidden table, aria, plugins). microcharts makes the accessible name
-the default — see [Accessibility](/docs/accessibility). That is not a claim that Chart.js cannot be made accessible.
+Canvas charts need an explicit accessibility path: a hidden table, aria wiring, or a plugin. microcharts makes the
+accessible name the default instead — see [Accessibility](/docs/accessibility). Chart.js can be made accessible; it just
+isn't accessible until you do that work.
 
-## What this page is not saying
+## Picking one
 
-- Not “faster than Recharts for dashboards”
-- Not “Chart.js, but lighter, for the same job”
-- Gzip figures here are orientation, not a scoreboard
-
-If the job is a full chart, pick a full library. If the job is a word-sized mark, pick microcharts — or add it alongside
-the library you already trust.
+If the job is a full chart, pick a full library. If the job is a word-sized mark, pick microcharts, or add it alongside
+the library you already run. Nothing on this page claims microcharts is faster than Recharts for a dashboard, or that
+it's a lighter Chart.js for the same job. Those are different jobs, and comparing across them wouldn't tell you
+anything.
 
 ## Next
 

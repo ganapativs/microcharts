@@ -97,14 +97,14 @@ export function Preview() {
 }
 export const playground: PlaygroundSpec = {
   knobs: [
-    { kind: "toggle", key: "benchmark", label: "benchmark", init: true },
+    { kind: "toggle", key: "compare", label: "compare", init: true },
     { kind: "toggle", key: "plateau", label: "plateau", init: true },
     { kind: "segmented", key: "curve", label: "curve", options: ["step", "smooth"], init: "step" },
   ],
   render: (s) => (
     <RetentionCurve
       data={DEMO}
-      benchmark={s.benchmark ? BENCH : undefined}
+      compare={s.compare ? BENCH : undefined}
       plateau={s.plateau as boolean}
       curve={s.curve as "step" | "smooth"}
       unit="week"
@@ -117,7 +117,7 @@ export const playground: PlaygroundSpec = {
     [
       "<RetentionCurve",
       "  data={cohort}",
-      s.benchmark && "  benchmark={industry}",
+      s.compare && "  compare={industry}",
       s.plateau === false && "  plateau={false}",
       s.curve !== "step" && `  curve="${s.curve}"`,
       "/>",
@@ -130,8 +130,8 @@ export const playground: PlaygroundSpec = {
 export const recipes: Recipe[] = [
   {
     label: "vs industry benchmark",
-    code: `<RetentionCurve data={cohort} benchmark={industry} />`,
-    node: <RetentionCurve data={DEMO} benchmark={BENCH} summary={false} width={170} height={26} />,
+    code: `<RetentionCurve data={cohort} compare={industry} />`,
+    node: <RetentionCurve data={DEMO} compare={BENCH} summary={false} width={170} height={26} />,
   },
   {
     label: "smooth (editorial)",
@@ -152,7 +152,7 @@ export const contexts: ChartContexts = {
       <p className="text-[0.95rem] leading-relaxed text-fd-foreground">
         W12 cohort retention{" "}
         <span className="mc-inline">
-          <RetentionCurve data={DEMO} benchmark={BENCH} unit="week" height={16} summary={false} />
+          <RetentionCurve data={DEMO} compare={BENCH} unit="week" height={16} summary={false} />
         </span>{" "}
         — 38% at week 12, above benchmark.
       </p>
@@ -169,7 +169,7 @@ export const contexts: ChartContexts = {
               <td className="py-1.5">
                 <RetentionCurve
                   data={row.data}
-                  benchmark={BENCH}
+                  compare={BENCH}
                   unit="week"
                   height={18}
                   summary={false}
@@ -195,7 +195,7 @@ export const contexts: ChartContexts = {
         </div>
         <RetentionCurve
           data={CTX_ROWS[0]!.data}
-          benchmark={BENCH}
+          compare={BENCH}
           unit="week"
           height={36}
           summary={false}
@@ -215,7 +215,7 @@ export const contexts: ChartContexts = {
             {row.name}
             <RetentionCurve
               data={row.data}
-              benchmark={BENCH}
+              compare={BENCH}
               unit="week"
               height={14}
               summary={false}

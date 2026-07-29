@@ -1,13 +1,12 @@
 ---
 title: DataDiff
-description: >-
-  React data diff chart — before/after series divergence for a release or experiment. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: DataDiff draws the added and removed counts per key as diverging bars on one shared symmetric scale.
 ---
 
-DataDiff answers "what changed between these two versions?". Each key gets a diverging bar: **removed leftward, added
-rightward, both always drawn** on one symmetric shared scale. Net is a mark you can turn on, never a replacement for the
-two bars — a +500/−480 churn and a +20/−0 trickle must never look alike.
+DataDiff compares two versions of a dataset and gives each key a diverging bar: **removed leftward, added rightward,
+both always drawn** on one symmetric shared scale. Net is a mark you can turn on, never a replacement for the two bars.
+A table that added 500 rows and dropped 480 nets to +20, the same as one that added 20 and dropped nothing, and those
+are not the same event.
 
 <LiveDemo label="DataDiff" sizeOf="data-diff">
   <DataDiff
@@ -36,15 +35,18 @@ two bars — a +500/−480 churn and a +20/−0 trickle must never look alike.
 
 ## When to use it
 
-- **Good for** — a table cell per dataset version, a KPI card for a sync or import job, any per-key added/removed audit
-  where churn matters.
-- **Avoid for** — a plain ranking (MiniBar) or parts of a single whole (SegmentedBar).
+Use it for a table cell per dataset version, a KPI card for a sync or import job, or any per-key added/removed audit
+where churn matters. For a plain ranking reach for MiniBar; for parts of a single whole, SegmentedBar.
 
 ## Sizing
 
 <Sizing chart="data-diff" />
 
 ## Variants
+
+`labels` prints in-chart key tags, `net` adds a per-row tick at added − removed, and `label="totals"` prints a
+`+added / −removed` footer. One symmetric scale spans every row, so a big change never shrinks to fit a small one; to
+compare across charts, pass them a shared `domain`.
 
 <LiveDemo
   label="key tags + net + totals"
@@ -113,23 +115,16 @@ two bars — a +500/−480 churn and a +20/−0 trickle must never look alike.
 </LiveDemo>
 
 An empty `data` array renders an empty chart and reports **"No data."** A non-empty diff where every key is 0/0 still
-draws its hairline placeholder ticks and reports **"No changes across 2 keys."** — the keys are named even when nothing
-about them changed.
+draws a hairline placeholder tick per row and reports **"No changes across 2 keys."** A key with no change keeps its
+row, so the absence of a change never reads as the absence of the key.
 
 ## Four homes
 
 <FourContexts slug="data-diff" />
 
-## Why this default
-
-Both directions are always drawn, because net-only diffs hide churn: a table that added 500 rows and dropped 480 is not
-the same event as one that added 20 and dropped nothing, even though both net to roughly the same number. One symmetric
-scale spans every row so a big change never shrinks to fit a small one, and a key with no change still gets a hairline
-tick — the absence of a change is not the absence of the key. Cross-chart comparison goes through a shared `domain`.
-
 ## Accessibility
 
-The accessible name states the totals, the key count, and the single largest change — **"+468 added, −170 removed across
+The accessible name states the totals, the key count, and the single largest change: **"+468 added, −170 removed across
 3 keys; largest change: users (+220)."** The interactive entry steps the rows and announces each key's added, removed,
 and net change.
 

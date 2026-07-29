@@ -74,6 +74,51 @@ describe("<SparkBar> static structure", () => {
   });
 });
 
+describe("<SparkBar> hostile config never paints outside the frame", () => {
+  const rects = (c: HTMLElement) =>
+    [...c.querySelectorAll("rect")].map((r) => ({
+      x: Number(r.getAttribute("x")),
+      y: Number(r.getAttribute("y")),
+      w: Number(r.getAttribute("width")),
+      h: Number(r.getAttribute("height")),
+    }));
+
+  it("gap={NaN} renders the default spacing, not NaN coordinates", () => {
+    const { container } = draw(<SparkBar data={D} gap={NaN} />);
+    for (const r of rects(container)) {
+      expect(Number.isFinite(r.x + r.y + r.w + r.h)).toBe(true);
+    }
+  });
+
+  it("a value above an explicit domain truncates at the frame", () => {
+    // 20 in a [0, 10] domain used to emit height="38" in a 20-unit viewBox —
+    // `.mc-root` is overflow: visible, so it painted across the text around it.
+    const { container } = draw(<SparkBar data={[2, 20]} domain={[0, 10]} height={20} />);
+    for (const r of rects(container)) expect(r.y + r.h).toBeLessThanOrEqual(20);
+  });
+
+  it("a NaN domain bound keeps the scale the summary describes", () => {
+    // The flattened midline it produced contradicted the announced range.
+    const { container } = draw(<SparkBar data={D} domain={[NaN, NaN]} />);
+    expect(rects(container)).toEqual(rects(draw(<SparkBar data={D} />).container));
+  });
+
+  it("height={NaN} resolves the same box the frame does", () => {
+    const { container } = draw(<SparkBar data={D} height={NaN} label="last" />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 80 20");
+    expect(svg.getAttribute("style")).not.toMatch(/NaN/);
+  });
+
+  it("win-loss stays visible on a frame too short to halve", () => {
+    const { container } = draw(<SparkBar data={[1, -1, 0]} mode="winloss" height={3} />);
+    for (const r of rects(container)) {
+      expect(r.h).toBeGreaterThan(0);
+      expect(r.y + r.h).toBeLessThanOrEqual(3);
+    }
+  });
+});
+
 describe("<SparkBar> a11y (axe, )", () => {
   it("informative chart is axe-clean", async () => {
     const { container } = draw(<SparkBar data={D} title="Weekly" />);

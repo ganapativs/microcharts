@@ -51,6 +51,37 @@ describe("<PictogramRow>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
   });
 
+  it("fractional total floors to whole units — 'No data.', not '0.25 of 0.'", () => {
+    const { container } = draw(<PictogramRow value={0.25} total={0.5} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+    expect(container.querySelectorAll("circle")).toHaveLength(0);
+  });
+
+  it("a non-finite box falls back to the documented 60×12 — no NaN in the markup", () => {
+    const { container } = draw(<PictogramRow value={3} total={5} width={NaN} height={Infinity} />);
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 60 12");
+    expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+  });
+
+  it("a dense row still paints — a negative radius is an SVG error, not a small dot", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = draw(<PictogramRow value={10} total={60} />);
+    const rs = [...container.querySelectorAll("circle")].map((c) => Number(c.getAttribute("r")));
+    expect(rs).toHaveLength(60);
+    expect(rs.every((r) => r >= 0)).toBe(true);
+    expect(rs.filter((r) => r > 0).length).toBeGreaterThan(0);
+    expect(warn).toHaveBeenCalled();
+  });
+
+  it("square coords stay 2-dp — deriving them from cx/r reintroduced float noise", () => {
+    const { container } = draw(<PictogramRow value={2} total={5} shape="square" />);
+    for (const rect of container.querySelectorAll("rect")) {
+      for (const attr of ["x", "y", "width", "height"]) {
+        expect(rect.getAttribute(attr)!).toMatch(/^-?\d+(\.\d{1,2})?$/);
+      }
+    }
+  });
+
   it("negative value → all empty, true summary", () => {
     const { container } = draw(<PictogramRow value={-2} total={4} />);
     expect(

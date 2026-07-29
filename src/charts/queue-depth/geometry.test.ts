@@ -51,6 +51,51 @@ describe("queueDepthGeometry", () => {
     expect(queueDepthGeometry({ ...base, data: [80, 80, 80, 80] })!.trend).toBe("flat");
   });
 
+  it("a queue pinned exactly AT capacity is not a breach", () => {
+    // `>=` re-stroked the whole edge in the negative ink here while `breached`
+    // (and the summary) said "within capacity" — the alarm painted for a queue
+    // in its most common steady state.
+    const geo = queueDepthGeometry({ ...base, data: [100, 100, 100, 100], capacity: CAP })!;
+    expect(geo.breach).toBe("");
+    expect(geo.breached).toBe(false);
+    expect(geo.points.every((p) => !p.above)).toBe(true);
+  });
+
+  it("touching the hairline emits no zero-length span", () => {
+    const geo = queueDepthGeometry({ ...base, data: [80, 100, 80], capacity: CAP })!;
+    expect(geo.breach).toBe("");
+  });
+
+  it("a breach that starts at capacity still opens on the hairline", () => {
+    const geo = queueDepthGeometry({ ...base, data: [100, 120, 100], capacity: CAP })!;
+    // opens and closes at y = Y(capacity), the same y the hairline sits on
+    expect(geo.breach).toBe(`M2 ${geo.capacityY} L40 2 L78 ${geo.capacityY}`);
+  });
+
+  it("capacity ≤ 0 reads as no capacity — nothing to breach, nothing to announce", () => {
+    for (const capacity of [0, -5]) {
+      const geo = queueDepthGeometry({ ...base, data: DATA, capacity })!;
+      expect(geo.capacityY).toBeNull();
+      expect(geo.breach).toBe("");
+      expect(geo.breached).toBe(false);
+      expect(geo.ratio).toBeNull();
+    }
+  });
+
+  it("a domain that is not a finite ascending pair falls back to the auto domain", () => {
+    const auto = queueDepthGeometry({ ...base, data: DATA, capacity: CAP });
+    for (const domain of [
+      [0, NaN],
+      [NaN, 100],
+      [0, Infinity],
+      [-Infinity, Infinity],
+      [50, 50],
+      [300, 0], // inverted: would paint a growing backlog downward
+    ] as ReadonlyArray<readonly [number, number]>) {
+      expect(queueDepthGeometry({ ...base, data: DATA, capacity: CAP, domain })).toEqual(auto);
+    }
+  });
+
   it("zero-everywhere → flat, within capacity, no leak", () => {
     const geo = queueDepthGeometry({ ...base, data: [0, 0, 0], capacity: 100 })!;
     expect(geo.now).toBe(0);

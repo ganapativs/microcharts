@@ -51,7 +51,7 @@ function CompareTable({
 }) {
   return (
     <>
-      <div className="prose-no-margin relative my-6 overflow-auto">
+      <div tabIndex={0} className="prose-no-margin relative my-6 overflow-auto">
         <table className="tabular-nums">
           <thead>
             <tr>

@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
-import { eventTimelineGeometry } from "./geometry.js";
+import { eventTimelineGeometry, timelineBox } from "./geometry.js";
 import {
   EventTimeline as StaticEventTimeline,
   eventTimelineSummary,
@@ -45,8 +45,8 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
     domain,
     now,
     label = "none",
-    width = 80,
-    height = 12,
+    width: widthProp = 80,
+    height: heightProp = 12,
     format,
     locale,
     strings = EN_TIMELINE,
@@ -72,6 +72,10 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
 
   const items = useMemo(() => normalizeItems(data), [data]);
   const win = useMemo(() => timelineDomain(items, domain), [items, domain]);
+  // Same resolved box the static entry uses — the hit box, the readout anchor
+  // and the focus outline are all in viewBox units, so a box that disagrees with
+  // the painted one puts the outline somewhere the marks are not.
+  const [width, height] = timelineBox(widthProp, heightProp);
   const fontSize = labelFont(height, 0.45);
   const geo = useMemo(
     () =>

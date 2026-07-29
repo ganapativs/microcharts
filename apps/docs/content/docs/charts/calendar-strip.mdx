@@ -1,12 +1,11 @@
 ---
 title: CalendarStrip
-description: >-
-  React calendar strip chart — recent weeks day-by-day with real calendar position. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  "Recent weeks day by day, week-aligned to the real calendar, with empty days drawn differently from zero days."
 ---
 
-CalendarStrip answers "what did the last few weeks actually look like, day by day?" — week-aligned recent activity where
-real calendar position matters. Weekday rhythm is the read; for longer ordinal histories, use ActivityGrid.
+Each cell is one dated day, sitting in its real week column: four weeks by default, starting Monday, so one glance
+covers a month of weekday rhythm without scrolling history. Weekday rhythm is the read.
 
 <LiveDemo label="CalendarStrip" sizeOf="calendar-strip">
   <CalendarStrip
@@ -30,8 +29,8 @@ real calendar position matters. Weekday rhythm is the read; for longer ordinal h
 
 ## When to use it
 
-- **Good for** — habit/deploy cadence in KPI cards, week-aligned recent activity.
-- **Avoid for** — long ordinal histories (ActivityGrid), exact per-day values (MiniBar).
+Use it for habit or deploy cadence in KPI cards and week-aligned recent activity. For long ordinal histories use
+ActivityGrid; for exact per-day values use MiniBar.
 
 ## Sizing
 
@@ -64,6 +63,9 @@ real calendar position matters. Weekday rhythm is the read; for longer ordinal h
     style={{ width: 150, height: 84 }}
   />
 </LiveDemo>
+
+All date math is UTC, so the same input renders identically in any host timezone and SSR output never depends on where
+the server runs. `end` defaults to today; pin it wherever determinism matters.
 
 `cell`/`gap` bump the edge length and spacing directly — grid-sibling parity with ActivityGrid and GardenGrid.
 
@@ -103,18 +105,12 @@ real calendar position matters. Weekday rhythm is the read; for longer ordinal h
   />
 </LiveDemo>
 
+Empty is not zero here. A day with no record renders as a faint outline; a day with value 0 renders as a filled track
+cell, so a gap in the feed never reads as a quiet day. Future days are blank, never extrapolated.
+
 ## Four homes
 
 <FourContexts slug="calendar-strip" />
-
-## Why this default
-
-Monday start + 4 weeks: one glance covers a month of weekday rhythm without scrolling history. All date math is UTC —
-the same input renders identically in any host timezone, so SSR output never depends on where the server runs. `end`
-defaults to today but should be pinned wherever determinism matters.
-
-Empty ≠ zero: a day with no record renders as a faint outline, a day with value 0 as a filled track cell — a feed gap
-never masquerades as a quiet day. Future days are blank, never extrapolated.
 
 ## Accessibility
 

@@ -4,9 +4,6 @@
  * Descriptions mirror quickstart#the-shared-grammar — keep in sync.
  */
 import type { ChartProp } from "./types";
-export declare const GRAMMAR_PROPS: ChartProp[];
-export declare const LAYOUT_PROPS: ChartProp[];
-export declare const I18N_PROPS: ChartProp[];
 /** Interactive-only shared props — see `types.ts` (`picker` / `animates` flags). */
 export declare const SHARED_INTERACTIVE_PROPS: ChartProp[];
 export declare const SHARED_PROPS: ChartProp[];

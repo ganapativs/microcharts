@@ -1,13 +1,12 @@
 ---
 title: HeatCell
-description: >-
-  React heat cell chart — one intensity cell for a table cell or matrix slot. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: HeatCell renders one value as a quantized intensity cell for grids you lay out yourself.
 ---
 
-HeatCell answers "how intense is this one value against a known scale?". It is the single-cell building block for grids
-you lay out yourself — a matrix of tenants × hours, a custom calendar, a density chip in a sentence. Color is quantized
-into discrete steps: continuous opacity would fake precision a 12-px cell can't deliver.
+You lay out the grid — a matrix of tenants × hours, a custom calendar, a density chip in a sentence — and HeatCell is
+the single cell inside it, showing how intense one value is against a known scale. Color is quantized into five discrete
+steps, the most a reader reliably distinguishes at cell size and the same ramp ActivityGrid uses, so intensity means one
+thing across the library. Continuous opacity would fake precision a 12-px cell can't deliver.
 
 <LiveDemo label="HeatCell" sizeOf="heat-cell">
   <span className="inline-flex items-center gap-1.5">
@@ -27,8 +26,8 @@ into discrete steps: continuous opacity would fake precision a 12-px cell can't 
 
 ## When to use it
 
-- **Good for** — table-cell matrices, custom grids, intensity chips beside labels.
-- **Avoid for** — precise comparison (MiniBar, DotPlot) or time series (HeatStrip, ActivityGrid).
+Use it for table-cell matrices, custom grids, and intensity chips beside labels. For precise comparison use MiniBar or
+DotPlot; for a time series, HeatStrip or ActivityGrid.
 
 ## The shared-domain rule
 
@@ -82,21 +81,18 @@ rows.map((r) => r.hours.map((v) => <HeatCell value={v} domain={domain} />));
   </span>
 </LiveDemo>
 
+Values outside the `domain` clamp to the end steps and are never silently rescaled, so one out-of-range cell can't
+restretch a grid. A zero-width domain renders the single mid step and logs a dev warning.
+
 ## Four homes
 
 <FourContexts slug="heat-cell" />
 
-## Why this default
-
-Five steps is the most a reader reliably distinguishes at cell size — the same ramp ActivityGrid uses, so intensity
-means one thing across the library. Values outside the domain clamp to the end steps (documented, never silently
-rescaled), and a zero-width domain renders the single mid step with a dev warning.
-
 ## Accessibility
 
-The accessible name carries the value _and_ its calibration — the shape cells above read **"70 — level 4 of 5."** — so
-the color scale is never the only channel. Non-finite input renders a designed empty track and says **"No data."** The
-interactive entry reveals the same reading on hover/focus, with ActivityGrid announcement parity.
+The accessible name carries the value _and_ its calibration: the shape cells above read **"70 — level 4 of 5."** The
+color scale is never the only channel. Non-finite input renders a designed empty track and says **"No data."** The
+interactive entry reveals the same reading on hover and focus, with ActivityGrid announcement parity.
 
 <InteractionNote slug="heat-cell" />
 

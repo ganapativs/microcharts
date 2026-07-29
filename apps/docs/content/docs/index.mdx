@@ -1,18 +1,17 @@
 ---
 title: Introduction
 description:
-  Word-sized React charts for LLMs and humans — zero dependencies, sparklines & inline SVG microcharts, ~2–7 kB
-  interactive · ~1–4 kB static, accessible by default, RSC-safe. 106 chart types, one grammar.
+  Word-sized React charts — 106 types, one API, zero dependencies, ~2–7 kB interactive · ~1–4 kB static, accessible by
+  default, RSC-safe.
 ---
 
-microcharts is a set of tiny, handcrafted charts for React — **made for AI first, and for the people reading what it
-writes**. The grammar is small and predictable enough for a model to emit correctly mid-sentence, and every chart
-describes itself in words, so a chart an LLM streams into a chat reply, a document, or a generated slide is one a person
-can read and trust. They're built to sit _inside_ an interface — in a sentence, a table cell, a KPI card, a tab header,
-a streamed reply — where a full chart library would be too heavy and too loud. One quiet signal, read at a glance.
+microcharts renders charts small enough to sit inside a sentence: a trend in a table cell, a bullet in a KPI card, a
+sparkline in a streamed AI reply. The grammar is small and predictable enough for a model to emit correctly mid-stream,
+and every chart generates a plain-language description of its own data, so a chart an LLM writes into a chat reply, a
+document, or a slide is one a person can read and check.
 
-Prefer [Set up with AI](/docs/quickstart#set-up-with-an-ai-agent) — paste one prompt and an agent installs the package,
-imports the stylesheet, and verifies with a first chart. Or install manually (both steps are required):
+The fastest setup is [Set up with AI](/docs/quickstart#set-up-with-an-ai-agent): paste one prompt and an agent installs
+the package, imports the stylesheet, and verifies with a first chart. Or install manually (both steps are required):
 
 <PackageTabs />
 
@@ -20,8 +19,7 @@ The other half of manual setup is one stylesheet import at your app root — see
 [Quickstart](/docs/quickstart#set-up-manually).
 
 Every chart renders from `data` alone, ships as pure SVG with **zero runtime dependencies**, and carries an accessible
-description generated from the data itself — the same properties that make it safe for a model to write are the ones
-that make it pleasant for a human to use.
+description generated from the data itself.
 
 <LiveDemo
   label="Sparkline"
@@ -35,24 +33,23 @@ that make it pleasant for a human to use.
 
 ## Why microcharts
 
-- **AI-native, by design.** A chart is plain `data` plus generated words, so a model can emit one mid-sentence and read
-  one back — [chat streams, agents, and tool output](/docs/ai) are the primary homes, not an afterthought. One grammar
-  across 106 types means an LLM that has seen one chart can write them all, and an assistant that speaks
-  [MCP](/docs/mcp) can call them directly.
+- **AI-native.** A chart is plain `data` plus generated words, so a model can emit one mid-sentence and read one back.
+  [Chat streams, agents, and tool output](/docs/ai) are primary surfaces. One grammar across 106 types means an LLM that
+  has seen one chart can write them all, and an assistant that speaks [MCP](/docs/mcp) can call them directly.
 - **Zero dependencies.** No chart engine, no D3 — just SVG. CI-enforced, forever.
 - **Server-component safe.** Static charts are hook-free and listener-free; they render to HTML with zero client
-  JavaScript, and add interactivity only from a separate `/interactive` subpath — where one contract covers the catalog:
-  hover, roving arrow keys, touch scrub, and click-to-pin, read back through `onActive` / `onSelect`. Single-unit charts
-  have nothing to rove between and take `onSelect` alone.
-- **Accessible by default.** Each chart is an `img` with a natural-language summary built from your data — nothing to
-  remember, nothing to drift.
+  JavaScript. Interactivity comes from a separate `/interactive` subpath, where one contract covers the catalog: hover,
+  roving arrow keys, touch scrub, and click-to-pin, read back through `onActive` / `onSelect`. Single-unit charts have
+  nothing to rove between and take `onSelect` alone.
+- **Accessible by default.** Each chart is an `img` with a natural-language summary built from your data. The summary is
+  generated, so it updates when the numbers do.
 - **Tiny.** **~2–7 kB interactive · ~1–4 kB static** gzip each, imported from their own subpath and budget-gated in CI.
 
 ## One catalog, one grammar
 
 The library ships a full catalog of chart types, grouped by the question each one answers. `data` alone always renders
-something correct, and a prop name means the same thing on every chart — so you pick by the _decision_ you need read,
-not by fighting an options bag.
+something correct, and a prop name means the same thing on every chart, so picking a chart is picking the question you
+need answered.
 
 <CatalogFacts />
 
@@ -60,29 +57,26 @@ From sparklines to bump charts, funnels, honeycombs, and calendar strips — a s
 
 <CatalogStrip />
 
-Browse them all on the [All charts](/docs/charts) page, which files every type under the question it answers — start
-from what you need someone to see, and land on the chart.
+Browse them all on the [All charts](/docs/charts) page, which files every type under the question it answers.
 
 ## Where they live
 
-The point of a word-sized chart is that it belongs _in_ your interface, not in a dashboard off to the side. And because
-it's plain SVG that renders from `data` alone, "interface" isn't limited to a browser tab:
+A word-sized chart belongs inside the interface it describes. And because it's plain SVG rendered from `data` alone,
+"interface" reaches past the browser tab:
 
-- **In your product** — a trend in a table cell, a KPI card, a tab header, a dense dashboard, where a full chart engine
-  would be too heavy and too loud.
+- **In your product** — a trend in a table cell, a KPI card, a tab header, a dense dashboard.
 - **In a report or slide** — a figure in a rendered PDF or deck, the same markup that drops into a table cell, with
   nothing to export.
-- **In your docs** — inline in Markdown, next to the sentence that explains it. The charts on this very page are
-  rendered exactly that way — MDX in, live SVG out.
-- **In an AI reply** — streamed mid-sentence by a model, since every chart is plain data plus generated words.
-  [AI-native](/docs/ai) shows a live stream doing exactly that.
+- **In your docs** — inline in Markdown, next to the sentence that explains it. The charts on this page are rendered
+  that way: MDX in, live SVG out.
+- **In an AI reply** — streamed mid-sentence by a model. [AI-native](/docs/ai) shows a live stream doing it.
 
 Here's the same chart doing its job in four of those homes:
 
 <FourContexts slug="sparkline" />
 
-[Composition](/docs/composition) has the exact placement recipe for each surface — a table cell, a KPI card, a tab, or
-inline in a sentence. Unsure whether this library or a full chart library fits?
+[Composition](/docs/composition) has the placement recipe for each surface — a table cell, a KPI card, a tab, or inline
+in a sentence. Unsure whether you need this library or a full chart library?
 [When to use microcharts](/docs/when-to-use). Ready to render one? The [Quickstart](/docs/quickstart) gets you from
 install to a live chart in minutes.
 
@@ -92,7 +86,7 @@ install to a live chart in minutes.
 
 Micro charts — also called sparklines, tiny charts, or inline charts — are small, word-sized data visualizations: a
 trend line, bar, or dot that fits inside a sentence, table cell, or KPI card without axes or legends. They answer one
-question at a glance in the space of a word, where a full chart would be too heavy and too loud.
+question in the space of a word.
 
 ### What is microcharts?
 
@@ -102,13 +96,13 @@ and server-component safe.
 
 ### How is microcharts different from Recharts or Chart.js?
 
-Those are full chart libraries for surfaces that are mostly chart. microcharts is built to sit _inside_ an interface —
-word-sized SVG marks where a full chart library would be too heavy and too loud. One chart per subpath, typically **~2–7
-kB interactive · ~1–4 kB static** gzip, no axes or legends, static entries with **zero client JavaScript** from an RSC.
-We are not a replacement; see [When to use](/docs/when-to-use) and [Full chart libraries](/docs/full-chart-libraries),
-or the measured per-library pages: [vs Recharts](/docs/vs-recharts), [vs Chart.js](/docs/vs-chartjs),
-[vs react-sparklines](/docs/vs-react-sparklines), [vs MUI X Sparkline](/docs/vs-mui-x-sparkline), and
-[vs visx](/docs/vs-visx).
+Recharts and Chart.js are built for surfaces that are mostly chart; in a table cell, their smallest chart is larger than
+the cell. microcharts is built for the cell itself: word-sized SVG marks, one chart per subpath at **~2–7 kB interactive
+· ~1–4 kB static** gzip, no axes or legends, and static entries that render from an RSC with **zero client JavaScript**.
+The two solve different problems — see [When to use](/docs/when-to-use) and
+[Full chart libraries](/docs/full-chart-libraries), or the measured per-library pages: [vs Recharts](/docs/vs-recharts),
+[vs Chart.js](/docs/vs-chartjs), [vs react-sparklines](/docs/vs-react-sparklines),
+[vs MUI X Sparkline](/docs/vs-mui-x-sparkline), and [vs visx](/docs/vs-visx).
 
 ### Are microcharts accessible?
 
@@ -124,9 +118,9 @@ only when you need hover, keyboard, touch, or selection.
 ### Why is there no pie chart, gauge, or waffle?
 
 They fail at word size: pie angles are unreadable in a table cell, a needle gauge spends its pixels on chrome, a waffle
-doesn't fit in a word. Each refusal has an honest in-catalog replacement — [SegmentedBar](/docs/charts/segmented-bar)
-for pie, [Bullet](/docs/charts/bullet) for gauges, [IconArray](/docs/charts/icon-array) for waffle. The reasoning lives
-in [Design notes](/docs/design-notes) and [When to use](/docs/when-to-use).
+doesn't fit in a word. Each has an in-catalog replacement — [SegmentedBar](/docs/charts/segmented-bar) for pie,
+[Bullet](/docs/charts/bullet) for gauges, [IconArray](/docs/charts/icon-array) for waffle. The reasoning lives in
+[Design notes](/docs/design-notes) and [When to use](/docs/when-to-use).
 
 ### Why does my first chart render unstyled, or with serif labels?
 
@@ -137,21 +131,19 @@ back to a serif — set `--mc-font` or give the page a font. Both are covered in
 
 ### Can I match the charts to my brand color?
 
-Yes — pass one accent to `defineTheme` and it derives a color-blind-safe categorical palette plus hand-tuned-style dark
-twins, in OKLCH, with zero dependencies; or set the `--mc-*` tokens directly. The one thing a theme can never change is
-what the data means: positive and negative keep their hues on every accent and preset. See [Theming](/docs/theming).
+Yes. Pass one accent to `defineTheme` and it derives a color-blind-safe categorical palette plus matched dark twins, in
+OKLCH, with zero dependencies; or set the `--mc-*` tokens directly. A theme never changes what the data means: positive
+and negative keep their hues on every accent and preset. See [Theming](/docs/theming).
 
 ### How do I propose a new chart type?
 
 Open an issue first. A new type must clear the admission bar: a unique data story the catalog can't already answer, one
-honest encoding channel, and readable at ≤ 200×60 px without training. It's a high bar on purpose — every shipped chart
-clears it, and [CONTRIBUTING.md](https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md) walks through the
-rest.
+honest encoding channel, and readable at ≤ 200×60 px without training.
+[CONTRIBUTING.md](https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md) walks through the rest.
 
-<Callout type="info" title="Production-ready, still earning its scars">
-  microcharts is tested and ready to use in production — but it hasn't been battle-tested across every stack and edge
-  yet, so you may hit the occasional rough edge. When you do, tell us: bug reports and feature requests on
-  [GitHub](https://github.com/ganapativs/microcharts/issues) are how it keeps getting sharper.
+<Callout type="info" title="Production status">
+  Tested and in production use, but not across every stack and edge yet. If you hit something, open an issue on
+  [GitHub](https://github.com/ganapativs/microcharts/issues).
 </Callout>
 
 ## Made by
@@ -162,3 +154,6 @@ lives on [GitHub](https://github.com/ganapativs/microcharts), where issues, idea
 
 Want to contribute? [CONTRIBUTING.md](https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md) covers the
 dev setup, the non-negotiables, and what a PR needs to ship.
+
+The screenshot review that keeps all 106 charts looking right in light, dark, and every preset runs on
+[Argos](https://argos-ci.com?utm_source=ganapativs/microcharts&utm_campaign=oss), which is free for open source.

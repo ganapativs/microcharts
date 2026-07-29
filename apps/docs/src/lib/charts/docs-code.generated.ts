@@ -1342,11 +1342,11 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
   },
   "retention-curve": {
     playground:
-      'import { RetentionCurve } from "@microcharts/react/retention-curve/interactive";\n\n<RetentionCurve\n  data={cohort}\n  benchmark={industry}\n/>',
+      'import { RetentionCurve } from "@microcharts/react/retention-curve/interactive";\n\n<RetentionCurve\n  data={cohort}\n  compare={industry}\n/>',
     recipes: [
       {
         label: "vs industry benchmark",
-        code: "<RetentionCurve data={cohort} benchmark={industry} />",
+        code: "<RetentionCurve data={cohort} compare={industry} />",
       },
       {
         label: "smooth (editorial)",
@@ -2251,11 +2251,11 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
     contexts: [
       {
         label: "In a sentence",
-        code: '<p>\n  Seat occupancy{" "}\n  <span className="mc-inline">\n    <Honeycomb value={34} total={40} summary={false} />\n  </span>{" "}\n  — 34 of 40 taken, one row left.\n</p>',
+        code: '<p>\n  Seat occupancy{" "}\n  <span className="mc-inline">\n    <Honeycomb value={34} total={40} rows={2} summary={false} />\n  </span>{" "}\n  — 34 of 40 taken, one row left.\n</p>',
       },
       {
         label: "In a table cell",
-        code: "<td>\n  <Honeycomb value={34} total={40} />\n</td>",
+        code: "<td>\n  <Honeycomb value={34} total={40} rows={2} />\n</td>",
       },
       {
         label: "In a KPI card",
@@ -2263,7 +2263,7 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
       },
       {
         label: "In a tab header",
-        code: '<button className="tab">\n  Room A <Honeycomb value={34} total={40} />\n</button>',
+        code: '<button className="tab">\n  Room A <Honeycomb value={10} total={12} rows={2} />\n</button>',
       },
     ],
   },
@@ -3298,15 +3298,15 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
       },
       {
         label: "In a table cell",
-        code: '<td>\n  <WinProbWorm data={winProb} sides={["home", "away"]} />\n</td>',
+        code: '<td>\n  <WinProbWorm data={winProb} sides={["home", "away"]} label="none" />\n</td>',
       },
       {
         label: "In a KPI card",
-        code: '<div className="kpi">\n  <span className="figure">62%</span>\n  <span className="unit">win probability</span>\n  <WinProbWorm data={winProb} sides={["home", "away"]} />\n</div>',
+        code: '<div className="kpi">\n  <span className="figure">98%</span>\n  <span className="unit">win probability</span>\n  <WinProbWorm data={winProb} sides={["home", "away"]} />\n</div>',
       },
       {
         label: "In a tab header",
-        code: '<button className="tab">\n  Game 1 <WinProbWorm data={winProb} sides={["home", "away"]} />\n</button>',
+        code: '<button className="tab">\n  Finals G1 <WinProbWorm data={winProb} sides={["home", "away"]} label="none" />\n</button>',
       },
     ],
   },

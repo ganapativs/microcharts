@@ -6,13 +6,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import { rollup } from "../segmented-bar/geometry.js";
 import { sharesSummary, type SegmentedBarDatum } from "../segmented-bar/index.js";
-import { microDonutGeometry } from "./geometry.js";
+import { donutMaxWedges, donutSize, microDonutGeometry } from "./geometry.js";
 
 export type MicroDonutDatum = SegmentedBarDatum;
 
@@ -45,12 +45,10 @@ const CAT_N = 4; // --mc-cat-1 … --mc-cat-4 via data-mc-cat roles
 export function MicroDonut(props: MicroDonutProps): ReactNode {
   const {
     data,
-    maxWedges = 4,
     decorative = false,
-    weight = 5,
+    weight,
     label = "none",
     colors,
-    size = 24,
     format,
     locale,
     strings = EN_COMPOSITION,
@@ -66,6 +64,11 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     devWarn("<MicroDonut> negative values excluded — a composition cannot contain negative parts.");
   }
 
+  // Resolved once, here and in the interactive entry, from the one place that
+  // owns the defaults: the box the summary describes has to be the box we paint.
+  const size = donutSize(props.size);
+  const maxWedges = donutMaxWedges(props.maxWedges);
+
   const rolled = rollup(data, maxWedges, strings.otherLabel);
   const geo = microDonutGeometry({
     size,
@@ -77,8 +80,14 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
   const totalText =
     label === "total" && Number.isFinite(total) ? makeFormatter(format, locale)(total) : undefined;
   const showLabel = !decorative && totalText !== undefined && labelFitsY(size / 2, fontSize, size);
+  // Shares take `locale` but never the value `format` (which carries the
+  // units) — the same split SegmentedBar and PartitionStrip make. Without it a
+  // de-DE static donut announced an en-US "62%" while its own interactive entry
+  // announced "62 %".
   const accName =
-    decorative || summary === false ? false : (summary ?? sharesSummary(rolled, strings));
+    decorative || summary === false
+      ? false
+      : (summary ?? sharesSummary(rolled, strings, makePercentFormatter(locale)));
   const rootStyle = showLabel
     ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
     : style;

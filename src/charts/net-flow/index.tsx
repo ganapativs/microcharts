@@ -9,6 +9,7 @@ import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { resolveSummary } from "../../core/summary.js";
+import { chartSide } from "../../core/types.js";
 import {
   netFlowGeometry,
   type NetFlowGeometry,
@@ -20,6 +21,30 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 /** Signed value string — direction lives in the text, not the color. */
 export function signedNet(net: number, fmt: (n: number) => string): string {
   return withPlus(net, fmt);
+}
+
+/**
+ * The `label="last"` net readout, or `null` when the box cannot seat it.
+ *
+ * Exported because the interactive entry reserves the SAME right gutter in its
+ * own geometry pass. It used to decide that on `label` alone, so in a box too
+ * short to seat the text the static dropped the label (viewBox = `width`) while
+ * the client still reserved the gutter (`totalWidth = width + gutter`) — the
+ * pointer map ran over a wider box than the one on screen and the crosshair and
+ * readout chip drifted off the cursor.
+ */
+export function netFlowLabel(
+  geo: NetFlowGeometry,
+  height: number,
+  label: "last" | "none",
+  fmt: (n: number) => string,
+): { font: number; text: string } | null {
+  if (label !== "last" || geo.degenerate || geo.last === null) return null;
+  const font = labelFont(height);
+  // Degradation contract: a label the box can no longer seat is DROPPED, and
+  // its reserved gutter goes with it.
+  if (!labelFitsY(height / 2, font, height)) return null;
+  return { font, text: signedNet(geo.last.net, fmt) };
 }
 
 export function netFlowSummary(
@@ -63,7 +88,13 @@ export interface NetFlowProps {
   children?: ReactNode | undefined;
 }
 
+// Presentation ATTRIBUTES, not inline style: `styles.css` is written at
+// `:where()` zero specificity so a consumer rule can retune a chart, and an
+// inline style is the one thing that cannot be overridden.
 const AREA_OPACITY = 0.2;
+// Columns are narrow where an area is broad — they need the extra weight to
+// read as the same surface at the same value.
+const BAR_OPACITY = 0.45;
 
 export function NetFlow(props: NetFlowProps): ReactNode {
   const {
@@ -73,8 +104,6 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     positive = "up",
     label = "last",
     domain,
-    width = 80,
-    height = 20,
     format,
     locale,
     strings = EN_NET_FLOW,
@@ -85,6 +114,12 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `Chart` clamps the box it puts in the viewBox; the label gutter and the
+  // seat are measured against the same clamped box so a non-finite prop cannot
+  // put text or a baseline outside the frame (see `chartSide`).
+  const width = chartSide(props.width ?? 80);
+  const height = chartSide(props.height ?? 20);
 
   const cls = className ? `mc-net-flow ${className}` : "mc-net-flow";
   // Paths ignore the label gutter — one geometry pass, then widen the box.
@@ -108,20 +143,16 @@ export function NetFlow(props: NetFlowProps): ReactNode {
   }
 
   const fmt = makeFormatter(format, locale);
-  const FONT = label === "last" ? labelFont(height) : 0;
-  const showLabel =
-    FONT > 0 && !geo.degenerate && geo.last != null && labelFitsY(height / 2, FONT, height);
-  const labelText = showLabel ? signedNet(geo.last!.net, fmt) : "";
-  const totalWidth = showLabel ? width + Math.ceil(labelText.length * FONT * 0.72) + 4 : width;
-  const labelX = width + 3;
+  const lab = netFlowLabel(geo, height, label, fmt);
+  const totalWidth = lab ? width + Math.ceil(lab.text.length * lab.font * 0.72) + 4 : width;
 
   const accName = resolveSummary(summary, () => netFlowSummary(geo, fmt, strings));
   // color encodes valence (which direction is good), position encodes identity
   // (in always above, out always below) — the two channels are independent
   const inRole = positive === "down" ? "negative" : "positive";
   const outRole = positive === "down" ? "positive" : "negative";
-  const rootStyle = showLabel
-    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+  const rootStyle = lab
+    ? ({ ...style, "--mc-label-size": `${lab.font}px` } as CSSProperties)
     : style;
   const bars = geo.mode === "bars";
 
@@ -152,30 +183,33 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       {ann.under}
       {geo.degenerate ? null : bars ? (
         <>
-          {geo.inBars.map((b) =>
+          {/* Keyed by period index, not by x: in a box too narrow to separate
+              the slots every column lands on the SAME x, and a coordinate key
+              then collides — React drops the duplicates and columns vanish. */}
+          {geo.inBars.map((b, i) =>
             b.height > 0 ? (
               <rect
-                key={`i${b.x}`}
+                key={i}
                 x={b.x}
                 y={b.y}
                 width={b.width}
                 height={b.height}
                 data-mc-ink={inRole}
-                style={{ fillOpacity: AREA_OPACITY + 0.25 }}
+                fillOpacity={BAR_OPACITY}
                 shapeRendering="crispEdges"
               />
             ) : null,
           )}
-          {geo.outBars.map((b) =>
+          {geo.outBars.map((b, i) =>
             b.height > 0 ? (
               <rect
-                key={`o${b.x}`}
+                key={i}
                 x={b.x}
                 y={b.y}
                 width={b.width}
                 height={b.height}
                 data-mc-ink={outRole}
-                style={{ fillOpacity: AREA_OPACITY + 0.25 }}
+                fillOpacity={BAR_OPACITY}
                 shapeRendering="crispEdges"
               />
             ) : null,
@@ -183,8 +217,8 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         </>
       ) : (
         <>
-          <path d={geo.inArea.d} data-mc-ink={inRole} style={{ fillOpacity: AREA_OPACITY }} />
-          <path d={geo.outArea.d} data-mc-ink={outRole} style={{ fillOpacity: AREA_OPACITY }} />
+          <path d={geo.inArea.d} data-mc-ink={inRole} fillOpacity={AREA_OPACITY} />
+          <path d={geo.outArea.d} data-mc-ink={outRole} fillOpacity={AREA_OPACITY} />
         </>
       )}
       <line
@@ -204,17 +238,16 @@ export function NetFlow(props: NetFlowProps): ReactNode {
       {net && !geo.degenerate && geo.last ? (
         <circle cx={geo.last.x} cy={geo.last.y} r={1.8} data-mc-ink="point" />
       ) : null}
-      {showLabel ? (
+      {lab ? (
         <text
-          x={labelX}
+          x={geo.labelX}
           y={geo.labelY}
           textAnchor="start"
           dominantBaseline="central"
           data-mc-ink="label"
-          fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
+          fontSize={lab.font}
         >
-          {labelText}
+          {lab.text}
         </text>
       ) : null}
       {ann.over}

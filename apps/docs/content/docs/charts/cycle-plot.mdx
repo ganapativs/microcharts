@@ -1,14 +1,12 @@
 ---
 title: CyclePlot
-description: >-
-  React cycle plot chart — seasonal slots with within-slot drift on a shared spine. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: CyclePlot reshapes a series into seasonal slots, connecting the slot means and drawing each slot's drift.
 ---
 
-CyclePlot answers "what repeats beneath the trend — and is any slot itself drifting?". The series is reshaped into
-`period` slots (7 for weekdays, 12 for months); each slot shows its own raw values across cycles as a muted polyline in
-**time order**, plus a mean tick, and the accent spine connects the slot means. Seasonality (the spine) and drift (the
-within-slot lines) are different questions of the same data — so they never share a mark.
+Friday peaks at 61, Sunday dips to 38, and slot 2 has been climbing across three cycles. CyclePlot reshapes the series
+into `period` slots (7 for weekdays, 12 for months). Each slot shows its own raw values across cycles as a muted
+polyline in **time order**, plus a mean tick, and the accent spine connects the slot means. Seasonality is the spine and
+drift is the within-slot lines: two questions of the same data, on two marks.
 
 <LiveDemo
   label="CyclePlot"
@@ -47,16 +45,21 @@ within-slot lines) are different questions of the same data — so they never sh
 
 ## When to use it
 
-- **Good for** — a KPI card that says "the week has a shape", weekday traffic / hourly load / monthly sales seasonality,
-  or spotting one slot that is itself drifting.
-- **Avoid for** — a plain time series (Sparkline) or one composition (SegmentedBar). `period` outside 4–12 warns in
-  development: below that there is no cycle to see, above it the slots stop being separable.
+Use it for a KPI card that says "the week has a shape", for weekday traffic / hourly load / monthly sales seasonality,
+or for spotting one slot that is itself drifting. For a plain time series reach for Sparkline; for one composition,
+SegmentedBar. A `period` outside 4–12 warns in development: below that there is no cycle to see, above it the slots stop
+being separable.
 
 ## Sizing
 
 <Sizing chart="cycle-plot" />
 
 ## Variants
+
+`center` picks the slot statistic: mean by default, `"median"` when a slot's distribution is skewed. The interactive
+per-slot announcement names which one it used. `trend={false}` drops the spine and leaves the within-slot lines. Those
+lines are never smoothed and never joined across a slot boundary — each polyline begins and ends inside its own column,
+so a Monday trend cannot bleed into Tuesday.
 
 <LiveDemo
   label="median center + spine only"
@@ -136,26 +139,17 @@ within-slot lines) are different questions of the same data — so they never sh
   />
 </LiveDemo>
 
-A slot with no finite values in it draws no mean tick and no within-slot line; the spine connects the non-empty slots
-only, joining an empty slot's neighbours directly rather than dipping to a made-up center. A single cycle (one value per
-slot) draws the spine and dots as usual, but no within-slot polylines — a line needs at least two observations in a
-slot.
+A slot with no finite values draws no mean tick and no within-slot line. The spine connects the non-empty slots only,
+joining an empty slot's neighbours directly rather than dipping to a made-up center. A single cycle (one value per slot)
+draws the spine and dots as usual, but no within-slot polylines, since a line needs at least two observations in a slot.
 
 ## Four homes
 
 <FourContexts slug="cycle-plot" />
 
-## Why this default
-
-A mean spine plus raw slot lines, because seasonality and drift are different questions asked of the same data — and
-answering both on one mark would blur them. The within-slot lines are never smoothed and never joined across a slot
-boundary: each slot's polyline begins and ends inside its own column, so a Monday trend can never bleed into Tuesday.
-The `center` choice is explicit — mean by default, median when a slot's distribution is skewed — and the interactive
-per-slot announcement names which one it used.
-
 ## Accessibility
 
-The accessible name states the peak and dip slots and any leading drift — **"Peaks slot 6 (61), dips slot 1 (38); slot 2
+The accessible name states the peak and dip slots and any leading drift: **"Peaks slot 6 (61), dips slot 1 (38); slot 2
 rising across 3 cycles."** The interactive entry steps the slots (mean, cycle count, drift) with ←/→, and steps the
 individual observations within a slot with ↑/↓.
 

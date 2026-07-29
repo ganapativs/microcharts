@@ -45,6 +45,49 @@ export interface OhlcGeometry {
   y1: number;
 }
 
+/**
+ * A period is tradeable only when all four prices are finite and the body sits
+ * inside the range. Shared with the summary and the last-close label: a period
+ * the picture refuses must not be counted in the sentence or named in the
+ * gutter either.
+ */
+export function ohlcValid(p: OhlcInput): boolean {
+  return (
+    [p.open, p.high, p.low, p.close].every(Number.isFinite) &&
+    p.high >= p.low &&
+    p.open >= p.low &&
+    p.open <= p.high &&
+    p.close >= p.low &&
+    p.close <= p.high
+  );
+}
+
+/**
+ * The periods a render actually paints: the most recent `maxPeriods`, floor 1.
+ * Exported because three callers have to agree on it — the geometry, the
+ * summary, and the interactive entry's period lookup. The client used to
+ * re-derive the window from the raw prop, so `maxPeriods={0}` painted the last
+ * period and announced the FIRST one (`slice(-0)` is `slice(0)`: the whole
+ * array), and `maxPeriods={-3}` dropped periods off the front instead of the
+ * back.
+ */
+export function ohlcWindow(
+  periods: readonly OhlcInput[],
+  maxPeriods: number | undefined,
+): readonly OhlcInput[] {
+  const cap = Math.max(1, maxPeriods ?? 20);
+  return periods.length > cap ? periods.slice(-cap) : periods;
+}
+
+/** The close `label="last"` names — the most recent period that will paint. */
+export function ohlcLastClose(shown: readonly OhlcInput[]): number | undefined {
+  for (let i = shown.length - 1; i >= 0; i--) {
+    const p = shown[i]!;
+    if (ohlcValid(p)) return p.close;
+  }
+  return undefined;
+}
+
 export function ohlcGeometry(opts: {
   width: number;
   height: number;
@@ -58,9 +101,8 @@ export function ohlcGeometry(opts: {
   // half a unit of inset so a wick's cap is not shaved by the viewBox edge
   const y0 = 0.5;
   const y1 = round2(height - 0.5);
-  const maxPeriods = Math.max(1, opts.maxPeriods ?? 20);
-  const truncated = opts.periods.length > maxPeriods;
-  const periods = truncated ? opts.periods.slice(-maxPeriods) : [...opts.periods];
+  const periods = ohlcWindow(opts.periods, opts.maxPeriods);
+  const truncated = periods.length < opts.periods.length;
 
   const invalid: number[] = [];
   // Carry each surviving period's SOURCE index: dropping a corrupt period
@@ -68,14 +110,7 @@ export function ohlcGeometry(opts: {
   // read back against the caller's array off by the number of drops before it.
   const valid: { p: OhlcInput; src: number }[] = [];
   periods.forEach((p, i) => {
-    const ok =
-      [p.open, p.high, p.low, p.close].every(Number.isFinite) &&
-      p.high >= p.low &&
-      p.open >= p.low &&
-      p.open <= p.high &&
-      p.close >= p.low &&
-      p.close <= p.high;
-    if (ok) valid.push({ p, src: i });
+    if (ohlcValid(p)) valid.push({ p, src: i });
     else invalid.push(i);
   });
   const n = valid.length;

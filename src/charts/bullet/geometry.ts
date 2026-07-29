@@ -1,8 +1,11 @@
 // A measure bar against qualitative bands with a target tick. Horizontal scale
 // anchored at zero. Coords 2-dp via the kernel.
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
+
+/** Drawn-band ceiling — one band is one DOM node and `bands` is caller data. */
+const MAX_BANDS = 200;
 
 interface BulletRegion {
   x: number;
@@ -49,26 +52,43 @@ export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
   const value = hasValue ? opts.value : 0;
   const target = Number.isFinite(opts.target) ? opts.target : undefined;
   const bands = (opts.bands ?? []).filter((b) => Number.isFinite(b));
-  const domain =
-    opts.domain && Number.isFinite(opts.domain[0]) && Number.isFinite(opts.domain[1])
-      ? opts.domain
-      : undefined;
+  // A domain also has to ASCEND to be usable. The measure bar always grows
+  // rightward from x0, so an inverted `[100, 0]` leaves its length meaning
+  // "distance from the domain max" — a value under target then paints past the
+  // target tick while the summary says it is under. A flat `[50, 50]` is worse:
+  // the kernel maps every value to the range midpoint, so the bands collapse to
+  // zero width (no track at all) and the bar reads half-full whatever the data
+  // says. Both drop to auto-fit, the same rule a non-finite domain takes.
+  const d = opts.domain;
+  const domain = d && Number.isFinite(d[0]) && Number.isFinite(d[1]) && d[1] > d[0] ? d : undefined;
   const x0 = pad;
   const x1 = width - pad;
 
   const candidates = [value, target ?? 0, ...bands, domain?.[1] ?? 0].filter((n) =>
     Number.isFinite(n),
   );
-  const max = domain?.[1] ?? Math.max(1, ...candidates);
+  // `maxOf`, never `Math.max(...candidates)`: `bands` is caller-sized and the
+  // spread throws RangeError past ~125k arguments — a bands array that long
+  // crashed the render instead of drawing it.
+  const max = domain?.[1] ?? maxOf(candidates, 1);
   const min = domain?.[0] ?? 0;
   const x = scaleLinear([min, max], [x0, x1]);
 
   const trackY = pad;
-  const trackH = height - pad * 2;
+  // Below `2 * pad` of height this went negative: a negative `height` on a
+  // <rect> is an SVG error, and the measure bar centred inside it painted above
+  // y=0 — `.mc-root` is overflow: visible, so that spills into the page.
+  const trackH = Math.max(0, height - pad * 2);
   const track = { x: x0, width: round2(x1 - x0), y: round2(trackY), height: round2(trackH) };
 
   // Bands: [min..t1], [t1..t2], …, [tk..max]. Ascending, clamped, de-duped.
-  const thresholds = bands.filter((t) => t > min && t < max).sort((a, b) => a - b);
+  // One threshold is one <rect> and `bands` is unbounded caller data, so the
+  // lowest MAX_BANDS survive and the rest merge into the top region — which
+  // still runs to `max`, so the track stays covered end to end.
+  const thresholds = bands
+    .filter((t) => t > min && t < max)
+    .sort((a, b) => a - b)
+    .slice(0, MAX_BANDS);
   const edges = [min, ...thresholds, max];
   const regions: BulletRegion[] = [];
   for (let i = 0; i < edges.length - 1; i++) {
@@ -77,8 +97,10 @@ export function bulletGeometry(opts: BulletGeometryOptions): BulletGeometry {
     if (rw > 0) regions.push({ x: round2(rx), width: round2(rw), step: i });
   }
 
-  // Measure bar — centered, ~⅓ track height (Few's thin measure).
-  const measureH = Math.max(2, trackH * 0.34);
+  // Measure bar — centered, ~⅓ track height (Few's thin measure). The 2-unit
+  // floor keeps it visible on a short chart, but never past the track itself:
+  // on a track thinner than that the bar would hang outside the viewBox.
+  const measureH = Math.min(trackH, Math.max(2, trackH * 0.34));
   const measureY = trackY + (trackH - measureH) / 2;
   const vx = hasValue ? clamp(x(value), x0, x1) : x0;
   const measure = {

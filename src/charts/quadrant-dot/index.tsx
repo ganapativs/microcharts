@@ -8,7 +8,14 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
-import { quadrantDotGeometry, quadrantDotRadii, type QuadrantDotGeometry } from "./geometry.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  quadrantDotGeometry,
+  quadrantDotRadii,
+  type QuadrantDotGeometry,
+} from "./geometry.js";
+import { chartSide } from "../../core/types.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type QuadrantNames = readonly [string, string, string, string];
@@ -84,8 +91,8 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
     region = true,
     format,
     locale,
-    width = 24,
-    height = 24,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     strings = EN_QUADRANT,
     title,
@@ -98,6 +105,10 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-quadrant-dot ${className}` : "mc-quadrant-dot";
+  // `Chart` clamps the frame; the marks are laid out against the same resolved
+  // box, or a NaN width paints NaN coordinates inside a valid viewBox.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
   const geo = quadrantDotGeometry({ width, height, data, field, xDomain, domain, split });
 
   if (geo === null) {
@@ -124,7 +135,7 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
       ? false
       : (summary ?? quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
-  const { focal: focalR, ghost: ghostR } = quadrantDotRadii(width, height);
+  const { focal: focalR, ghost: ghostR, halo: haloR } = quadrantDotRadii(width, height);
 
   return (
     <Chart
@@ -174,24 +185,15 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {/* Peers at 0.42 — ghost role's 0.18 is for area fills, too faint on dots. */}
-      {geo.ghosts.map((g) => (
-        <circle
-          key={`${g.vx}:${g.vy}`}
-          cx={g.x}
-          cy={g.y}
-          r={ghostR}
-          data-mc-ink="ghost"
-          fillOpacity={0.42}
-        />
+      {/* Peers at 0.42 — ghost role's 0.18 is for area fills, too faint on dots.
+          Keyed by position in the nearest-first order, not by value: two peers
+          are routinely tied (same score, same coordinates), and a value key made
+          that a duplicate-key collision React resolves by dropping one dot. */}
+      {geo.ghosts.map((g, i) => (
+        <circle key={i} cx={g.x} cy={g.y} r={ghostR} data-mc-ink="ghost" fillOpacity={0.42} />
       ))}
       {/* Focal + filled halo (ring would let the cross cut through as a chord). */}
-      <circle
-        cx={geo.dot.x}
-        cy={geo.dot.y}
-        r={focalR + 1.4}
-        style={{ fill: accent, fillOpacity: 0.18 }}
-      />
+      <circle cx={geo.dot.x} cy={geo.dot.y} r={haloR} style={{ fill: accent, fillOpacity: 0.18 }} />
       <circle
         cx={geo.dot.x}
         cy={geo.dot.y}

@@ -6,7 +6,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
@@ -18,7 +18,7 @@ import {
   crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
-import { labelMetrics, sparkBarGeometry } from "./geometry.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
 // Bars carry valence tokens (bar/accent/positive/negative), not just "bar" —
@@ -46,8 +46,8 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const {
     data,
     domain,
-    width = 80,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     mode = "bar",
     gap = 0.25,
     label = "none",
@@ -68,6 +68,11 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The hit box and the readout are sized in viewBox units off this box, so it
+  // has to be the same resolved box the static renders — not the raw prop.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "rise", animate, { selector: BAR_SELECTOR, origin: "signed" });

@@ -8,7 +8,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { quantiles } from "../../core/quantile.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import type { Value } from "../../core/types.js";
+import { chartSide, type Value } from "../../core/types.js";
 import { rugGeometry, type RugTick } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -69,8 +69,12 @@ export function RugStrip(props: RugStripProps): ReactNode {
     style,
     children,
   } = props;
-  const width = props.width ?? (orientation === "horizontal" ? 60 : 10);
-  const height = props.height ?? (orientation === "horizontal" ? 10 : 60);
+  // The box drives the geometry AND the inline seat, neither of which `Chart`'s
+  // own clamp reaches (see `chartSide`). A NaN height shipped `V NaN` ticks and
+  // `--mc-seat: NaN` inside a perfectly valid viewBox; a 0 or negative one
+  // marched the ticks off the left edge — both under a correct-sounding name.
+  const width = chartSide(props.width ?? (orientation === "horizontal" ? 60 : 10));
+  const height = chartSide(props.height ?? (orientation === "horizontal" ? 10 : 60));
 
   if (data.length > 400) {
     devWarn(

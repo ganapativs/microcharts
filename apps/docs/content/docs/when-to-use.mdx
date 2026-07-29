@@ -1,20 +1,17 @@
 ---
 title: When to use microcharts
 description:
-  Word-sized React charts for sentences, table cells, KPI cards, and streamed replies — not a Recharts or Chart.js
-  replacement. When microcharts fits, when a full chart library fits, and how they can sit in the same app.
+  How to tell whether a job wants a word-sized chart or a full chart library like Recharts or Chart.js, and how to use
+  both in one product.
 ---
 
-microcharts is a set of tiny, handcrafted charts for React — built to sit _inside_ an interface, where a full chart
-library would be too heavy and too loud. A trend after a number, a bullet in a KPI, a strip in a table cell, a mark in a
-streamed reply. One quiet signal, read at a glance.
+microcharts draws tiny charts for React that sit _inside_ an interface: a trend after a number, a bullet in a KPI, a
+strip in a table cell, a mark in a streamed reply.
 
 It is not a substitute for [Recharts](https://recharts.org), [Chart.js](https://www.chartjs.org), Nivo, ECharts, or
-visx. Those libraries draw surfaces that are mostly chart: axes, legends, tooltips, brush, zoom. microcharts draws the
-opposite: mostly words and UI, with a word-sized mark.
-
-Use a full library when the page _is_ the chart. Use microcharts when the chart sits inside something you were already
-reading — or use both in the same product.
+visx. Those libraries draw surfaces that are mostly chart: axes, legends, tooltips, brush, zoom. microcharts draws
+mostly words and UI with a word-sized mark in them. Use a full library when the page _is_ the chart. Use microcharts
+when the chart sits inside something you were already reading.
 
 ## Fit
 
@@ -27,25 +24,10 @@ reading — or use both in the same product.
 | Dense Canvas series, Chart.js plugins, analyst dashboards                | **Chart.js** (or similar)                                        |
 | One library for every chart in the product                               | Usually a **full** library; add microcharts for the inline marks |
 
-## What this library refuses
-
-Pie, needle gauges, waffles, and similar shapes fail at word size — they are excluded on purpose. Each has a
-strictly-better in-catalog replacement (for example [SegmentedBar](/docs/charts/segmented-bar),
-[Bullet](/docs/charts/bullet), [IconArray](/docs/charts/icon-array)). See the [introduction](/docs).
-
-## Size
-
-Every chart is imported from its own subpath and budget-gated in CI: <SizeMarketing /> gzip, **zero runtime
-dependencies**, static SVG from an RSC with nothing to hydrate. Accessible by default — `role="img"` with a summary
-generated from the data.
-
-Pinned orientation numbers for Recharts and Chart.js (version, date, method):
-[Full chart libraries](/docs/full-chart-libraries). Our own receipts: [Performance](/docs/performance).
-
 ## Same app, two jobs
 
-A product can use Recharts on an analytics page and a Sparkline in the table that links to it. Different import,
-different budget.
+Most products need both rows of that table. Use Recharts on the analytics page and a Sparkline in the table that links
+to it — different import, different budget:
 
 ```tsx
 // dashboard panel — your full chart library
@@ -55,6 +37,21 @@ different budget.
 import { Sparkline } from "@microcharts/react/sparkline";
 <Sparkline data={row.series} width={72} height={16} dots="none" summary={false} />;
 ```
+
+## Size
+
+Every chart is imported from its own subpath and budget-gated in CI: <SizeMarketing /> gzip, **zero runtime
+dependencies**, static SVG from an RSC with nothing to hydrate. Each one is `role="img"` with a summary generated from
+the data.
+
+Pinned orientation numbers for Recharts and Chart.js (version, date, method):
+[Full chart libraries](/docs/full-chart-libraries). Our own receipts: [Performance](/docs/performance).
+
+## What the catalog leaves out
+
+Pie, needle gauges, waffles, and similar shapes fail at word size, so they're excluded on purpose. Each has an
+in-catalog replacement — for example [SegmentedBar](/docs/charts/segmented-bar), [Bullet](/docs/charts/bullet), and
+[IconArray](/docs/charts/icon-array). The reasoning is in [Design notes](/docs/design-notes#what-we-dont-ship).
 
 ## Go deeper
 

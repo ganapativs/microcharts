@@ -126,7 +126,7 @@ function Cell({ name, mark, children }: { name: string; mark: string; children: 
   );
 }
 
-export function AnnotationHostGallery() {
+function AnnotationHostGallery() {
   return (
     <div
       className="grid w-full gap-4"

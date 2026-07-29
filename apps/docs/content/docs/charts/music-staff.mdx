@@ -1,14 +1,14 @@
 ---
 title: MusicStaff
-description: >-
-  React music staff chart — ordered values as notes on a miniature staff. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description:
+  MusicStaff reads a short series as a melody, with each value's pitch on a five-line staff carrying the number.
 ---
 
-MusicStaff answers "what's the shape of this short series?" by reading it as a melody: each value is a note, its
-**pitch** (vertical position on a five-line staff) is the value, and left-to-right is time. Pitch is the only channel —
-there are no clefs, stems, beams, or bar lines, because every other notation convention would be decoration. The read is
-in steps (nine to thirteen positions), so exact values steer to `Sparkline` with a label.
+MusicStaff reads a short series as a melody, so its shape lands in one look: each value is a note on a five-line staff,
+**pitch** (vertical position) is the value, and left-to-right is time. Pitch is the only channel, so there are no clefs,
+stems, beams, or bar lines. The read is in steps (nine to thirteen positions), so exact values steer to `Sparkline` with
+a label. Two adjacent equal values are spaced along the time axis and never dodged vertically, because moving a note
+vertically would change its pitch.
 
 <LiveDemo
   label="MusicStaff"
@@ -30,10 +30,9 @@ in steps (nine to thirteen positions), so exact values steer to `Sparkline` with
 
 ## When to use it
 
-- **Good for** — a weekly-rhythm read in a sentence, the shape of a sprint or short series in a cell, or a per-channel
-  melody in a tab.
-- **Avoid for** — exact values (Sparkline with a label), long series (over sixteen points), or trends where the exact
-  slope matters.
+Use it for a weekly-rhythm read in a sentence, the shape of a sprint or short series in a cell, or a per-channel melody
+in a tab. For exact values use Sparkline with a label; skip it for long series (over sixteen points) and for trends
+where the exact slope matters.
 
 ## Sizing
 
@@ -51,6 +50,11 @@ in steps (nine to thirteen positions), so exact values steer to `Sparkline` with
     <MusicStaff data={[3, 5, null, 8, 6]} width={90} height={24} />
   </span>
 </LiveDemo>
+
+Ledger mode is the default: a note above or below the staff sits on a hairline ledger tick and keeps its true pitch,
+rather than being clipped. `mode="staff"` is for dense cells where ledger lines would collide with a neighbour; there,
+out-of-range pitches clamp to the nearest staff line or space, trading visual precision for a collision-free cell. The
+accessible summary is the same either way, since it describes the raw values, not the clamped pixel positions.
 
 ## Edge cases
 
@@ -77,27 +81,19 @@ in steps (nine to thirteen positions), so exact values steer to `Sparkline` with
   />
 </LiveDemo>
 
-A single value draws one note and no contour line — a melody needs at least two notes to have a shape. An all-`null`
-series draws the bare staff with no notes at all; the accessible name falls back to `describeSeries`'s own no-data
-phrasing. With a `locale`, the trailing `label="last"` value follows that locale's own grouping and decimal marks.
+A single value draws one note and no contour line, since a melody needs at least two notes to have a shape. An
+all-`null` series draws the bare staff with no notes at all, and the accessible name falls back to `describeSeries`'s
+own no-data phrasing. With a `locale`, the trailing `label="last"` value follows that locale's own grouping and decimal
+marks.
 
 ## Four homes
 
 <FourContexts slug="music-staff" />
 
-## Why this default
-
-The ledger mode is the default because clipping pitch silently is worse than two extra hairline ledger ticks — a note
-above or below the staff still reads truly. `mode="staff"` exists for dense cells where ledger lines would collide with
-a neighbour; there, out-of-range pitches clamp to the nearest staff line or space instead, trading visual precision for
-a collision-free cell — the accessible summary is unaffected either way, since it describes the raw values, not the
-clamped pixel positions. Two adjacent equal values are spaced by the time axis, never dodged vertically, because moving
-a note vertically would change its pitch — and pitch is the data.
-
 ## Accessibility
 
-MusicStaff reuses the same natural-language summary as `Sparkline`, verbatim — for `[3, 5, 4, 8, 6, 9]`, **"Trending up
-200%. Range 3 to 9. Last value 9."** The interactive entry steps the notes with ←/→, announcing each as **"Point 3 of 6:
+MusicStaff reuses `Sparkline`'s natural-language summary verbatim. For `[3, 5, 4, 8, 6, 9]` that is **"Trending up 200%.
+Range 3 to 9. Last value 9."** The interactive entry steps the notes with ←/→ and announces each as **"Point 3 of 6:
 4."**
 
 <InteractionNote slug="music-staff" />

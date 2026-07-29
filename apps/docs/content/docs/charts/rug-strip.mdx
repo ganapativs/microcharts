@@ -1,13 +1,15 @@
 ---
 title: RugStrip
-description: >-
-  React rug strip chart — 1-D density as a rug of marks on a shared line for raw samples. Tiny accessible SVG
-  microchart; RSC-safe static or /interactive.
+description: RugStrip marks every raw observation as a tick on one line, with stacked duplicates darkening into density.
 ---
 
-RugStrip answers "where do the raw observations actually sit?". Every tick is one real observation — no binning, no
-jitter, no thinning. Stacked duplicates darken (tiered opacity), and `markValue` tells the chart's strongest single
-story: one raw value against the field.
+RugStrip puts every value in a sample on one line as its own tick, so the full spread and the places the values crowd
+read straight off the marks. Every tick is one real observation: no binning, no jitter, no thinning. Coincident values
+darken through three opacity tiers (35%, 60%, 85%), so a lone tick stays visible while a stack reads as density; the
+tiers are bucketed because a browser paints one path's stroke as a single operation, so the overlap compositing you
+might expect never happens. `markValue` adds a full-height highlighted tick for one raw value against the field, which
+is the strongest single read the strip offers; the regular ticks are inset by one unit so that highlight reads taller
+without escaping the box.
 
 <LiveDemo
   label="RugStrip"
@@ -38,9 +40,9 @@ story: one raw value against the field.
 
 ## When to use it
 
-- **Good for** — "you are here" in a pay band, raw spread beside a stat, margin composition under a Sparkline.
-- **Avoid for** — more than ~400 observations (a rug promises raw marks and never downsamples; use HistogramStrip) or
-  trends over time (Sparkline).
+Use it for a "you are here" read in a pay band, raw spread beside a stat, or margin composition under a Sparkline. Past
+about 400 observations, reach for HistogramStrip: a rug promises raw marks and never downsamples. For trends over time
+use Sparkline.
 
 ## Sizing
 
@@ -75,8 +77,8 @@ story: one raw value against the field.
   <RugStrip data={[]} title="No observations" style={{ width: 140, height: 14 }} />
 </LiveDemo>
 
-Empty data draws a quiet centered axis line — not a blank hole — so the strip still reads as "a rug with nothing on it"
-rather than a layout gap.
+Empty data draws a centered axis line rather than a blank hole, so the strip still reads as a rug with nothing on it
+instead of a layout gap.
 
 <LiveDemo label="single observation" code={`<RugStrip data={[52]} title="One observation" />`}>
   <RugStrip data={[52]} title="One observation" style={{ width: 140, height: 14 }} />
@@ -89,24 +91,17 @@ dividing by zero.
   <RugStrip data={[42, 48, 55, 61, 71]} markValue={120} title="Above the field" style={{ width: 140, height: 14 }} />
 </LiveDemo>
 
-A `markValue` outside the observed domain clamps to the nearest edge — it never escapes the box or silently rescales the
-field around it.
+A `markValue` outside the observed domain clamps to the nearest edge. It never escapes the box, and it never rescales
+the field around itself.
 
 ## Four homes
 
 <FourContexts slug="rug-strip" />
 
-## Why this default
-
-Ticks sit at 35% opacity — singles stay visible while stacks read as density. Because a browser paints one path's stroke
-as a single operation, coincident ticks are bucketed into opacity tiers (35% / 60% / 85%) rather than relying on overlap
-compositing that never happens. Regular ticks are inset one unit so the full-height accent highlight reads "taller"
-without escaping the box.
-
 ## Accessibility
 
-The accessible name is the distribution — **"8 values from 42 to 75, median 59.5."** The interactive entry walks
-observations in sorted order and announces each with its rank: **"48 — 2nd of 17."**
+The accessible name is the distribution: **"8 values from 42 to 75, median 59.5."** The interactive entry walks the
+observations in sorted order and announces each one with its rank: **"48 — 2nd of 17."**
 
 <InteractionNote slug="rug-strip" />
 

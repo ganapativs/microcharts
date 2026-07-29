@@ -33,6 +33,16 @@ export interface ControlGeometry {
   domain: readonly [number, number];
 }
 
+/**
+ * Rounds a reported DATA value. `round2` is a coordinate rounder —
+ * `Math.round(v * 100)` overflows to Infinity past ~1.8e306 — and these are
+ * data, not viewBox units: `baseline={1e308}` is a legal prop, and it made the
+ * accessible name read "center ∞, limits ∞–∞" while the band painted at its
+ * real, finite place. Past 1e15 there is no fractional digit left to drop, so
+ * skipping the round there costs nothing.
+ */
+const stat = (v: number) => (Math.abs(v) < 1e15 ? round2(v) : v);
+
 export function controlGeometry(opts: {
   width: number;
   height: number;
@@ -51,10 +61,18 @@ export function controlGeometry(opts: {
   const pad = opts.pad ?? 2;
   const W = width - 2 * pad;
 
-  const center =
-    opts.baseline !== undefined && isFiniteValue(opts.baseline)
-      ? opts.baseline
-      : data.reduce((s, v) => s + v, 0) / n;
+  // `sum / n` is exact enough and cheap, but the running total overflows to
+  // ±Infinity past ~1.8e308 — a series of entirely finite readings then
+  // announced an infinite center. The streaming mean cannot overflow; it also
+  // rounds differently in the last bits, so it stays the fallback rather than
+  // the default and ordinary series keep the sum they always had.
+  let mean = data.reduce((s, v) => s + v, 0) / n;
+  if (!Number.isFinite(mean)) {
+    mean = 0;
+    for (let i = 0; i < n; i++) mean += (data[i]! - mean) / (i + 1);
+  }
+
+  const center = opts.baseline !== undefined && isFiniteValue(opts.baseline) ? opts.baseline : mean;
 
   // σ̂ from the mean moving range (Shewhart individuals): MR̄ / 1.128
   let mrSum = 0;
@@ -121,12 +139,12 @@ export function controlGeometry(opts: {
   }
 
   return {
-    center: { y: Y(center), value: round2(center) },
+    center: { y: Y(center), value: stat(center) },
     band: {
       y: bandTop,
       height: round2(bandBottom - bandTop),
-      lo: round2(lo),
-      hi: round2(hi),
+      lo: stat(lo),
+      hi: stat(hi),
     },
     line: { d: linePath(pts) },
     points,

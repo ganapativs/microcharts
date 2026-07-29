@@ -1,13 +1,13 @@
 ---
 title: FoldedDayBand
-description: >-
-  React folded day-band chart — intraday band folded so days stack for comparison. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description:
+  FoldedDayBand folds many periods onto one axis and draws the median with 25–75 and 5–95 percentile envelopes.
 ---
 
-FoldedDayBand answers "what does a typical period look like — and is the current one typical?". It folds many days (or
-weeks, or any cycle) onto a single period axis and shows the median with 25–75 and 5–95 percentile envelopes. Drop in a
-`today` overlay and the chart answers the second question: is right now inside the usual band, or an outlier?
+FoldedDayBand folds many days (or weeks, or any cycle) onto a single period axis and draws the median with 25–75 and
+5–95 percentile envelopes — the typical-period grammar clinical glucose profiles standardized on. The envelopes are
+per-bin quantiles, never smoothed across bins, and the outer boundary fades so 5–95 doesn't read as a hard limit. Pass a
+`today` overlay to see whether the current period sits inside the usual band.
 
 <LiveDemo
   label="FoldedDayBand"
@@ -39,8 +39,8 @@ const curve = (h) => 40 + 42 _ Math.max(0, 1 - Math.abs(h - 14) / 10); const obs
 
 ## When to use it
 
-- **Good for** — typical-day traffic or load profiles, on-call or energy capacity planning.
-- **Avoid for** — a raw time series (Sparkline) or a single period with nothing to fold.
+Use it for typical-day traffic or load profiles, and for on-call or energy capacity planning. For a raw time series use
+Sparkline; a single period has nothing to fold.
 
 ## Sizing
 
@@ -114,20 +114,13 @@ shape; only the announced numbers are localized.
 </LiveDemo>
 
 A single observation reports a real accessible name (median and peak both equal that one value) but has no width to fold
-across, so nothing visibly paints — the chart is accessible-first even when there's too little data to draw. Identical
-values across every bin still render as a flat line, distinct from an empty `data` array, which renders nothing and
-announces "No data."
+across, so nothing visibly paints. Identical values across every bin still render as a flat line, distinct from an empty
+`data` array, which renders nothing and announces "No data." When a bin holds too few observations the band collapses to
+the median there rather than inventing a width.
 
 ## Four homes
 
 <FourContexts slug="folded-day-band" />
-
-## Why this default
-
-Two envelopes plus a median is the typical-day grammar that clinical glucose profiles standardized on. The envelopes
-come from real per-bin quantiles — never smoothed across bins into a shape the data doesn't support — and the outer
-boundary fades so 5–95 doesn't read as a hard limit. When a bin has too few observations the band collapses to the
-median there rather than inventing a width.
 
 ## Accessibility
 

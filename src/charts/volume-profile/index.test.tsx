@@ -69,6 +69,44 @@ describe("<VolumeProfile>", () => {
   });
 });
 
+// Hostile CONFIG — the props a host computes rather than types by hand. Each
+// case rendered a chart that looked fine and announced something that was not
+// the scale it painted.
+describe("VolumeProfile hostile config", () => {
+  /** Every numeric attribute the chart emitted, so NaN can't hide in one. */
+  const attrs = (el: Element): string[] =>
+    [...el.querySelectorAll("*")].flatMap((n) => [...n.attributes].map((a) => a.value));
+
+  it("a non-fraction valueArea never reaches the accessible name", () => {
+    // `Number("")` → NaN walked no bins outward and still announced
+    // "NaN% within 142–142": the announced convention was not the shaded band.
+    for (const bad of [NaN, Infinity, -1, 95] as const) {
+      const { container } = draw(<VolumeProfile data={PROFILE} bins={5} valueArea={bad} />);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+        "Activity concentrates at 142 (POC); 70% within 140.4–143.6.",
+      );
+    }
+  });
+
+  it("an unbounded or non-finite bins renders a bounded chart", () => {
+    // bins={Infinity} threw `Invalid array length`; bins={NaN} announced
+    // "No data." over five real observations.
+    const huge = draw(<VolumeProfile data={PROFILE} bins={Infinity} />).container;
+    expect(huge.querySelector('path[data-mc-ink="bar"]')).not.toBeNull();
+    const nan = draw(<VolumeProfile data={PROFILE} bins={NaN} />).container;
+    expect(nan.querySelector("svg")!.getAttribute("aria-label")).not.toBe("No data.");
+  });
+
+  it("a non-finite width/height paints in the default box, never NaN coords", () => {
+    for (const box of [{ width: NaN }, { height: NaN }, { height: Infinity }] as const) {
+      const { container } = draw(<VolumeProfile data={PROFILE} bins={5} {...box} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 48 32");
+      expect(attrs(svg).filter((v) => /NaN|Infinity/.test(v))).toEqual([]);
+    }
+  });
+});
+
 seriesEdgeSuite("VolumeProfile", (data: readonly Value[]) => (
   <VolumeProfile data={data as readonly number[]} title="Edge" width={48} height={32} />
 ));

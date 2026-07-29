@@ -1,14 +1,12 @@
 ---
 title: Honeycomb
-description: >-
-  React honeycomb chart — capacity fill as a countable hex comb — occupancy of slots, not a magnitude bar. Tiny
-  accessible SVG microchart; RSC-safe static or /interactive.
+description: Honeycomb shows how many of a capacity's slots are taken, as filled cells in a hex comb you can count.
 ---
 
-Honeycomb answers "how many of the available slots are taken?" as filled cells in an area-filling hex grid. The unit is
-the cell, so the count is genuinely countable — this is occupancy of a capacity, not a magnitude. It fills row-major
-from the top-left, so occupancy reads as a sweep, and the whole grid is exactly two SVG paths (filled and empty) no
-matter how large the total.
+34 of 40 seats are taken: Honeycomb fills 34 cells of an area-filling hex grid. The unit is the cell, so the count is
+countable, and this stays occupancy of a capacity rather than a magnitude. Cell size never changes with value, only the
+count does. It fills row-major from the top left, so occupancy reads as a sweep, and the whole grid is exactly two SVG
+paths (filled and empty) no matter how large the total.
 
 <LiveDemo label="Honeycomb" sizeOf="honeycomb">
   <Honeycomb value={34} total={40} unit="seats" title="Occupancy" cell={6} />
@@ -24,9 +22,9 @@ matter how large the total.
 
 ## When to use it
 
-- **Good for** — seats or licenses taken of a capacity, an occupancy read in a KPI card, or a countable of-total in a
-  cell.
-- **Avoid for** — a capacity over about sixty (that's `Progress`), a magnitude with no total (MiniBar), or trends.
+Use it for seats or licenses taken of a capacity, an occupancy read in a KPI card, or a countable of-total in a cell.
+For a capacity over about sixty use `Progress`, and for a magnitude with no total, MiniBar. It isn't a trend chart, and
+`PictogramRow` is the one that counts unlike things.
 
 ## Sizing
 
@@ -45,6 +43,10 @@ matter how large the total.
   </span>
 </LiveDemo>
 
+Empty cells are outlined by default, so takenness survives grayscale: a filled cell against an outlined one reads
+without color. `empty="blank"` drops the empty cells entirely instead of dimming them, for surfaces where the outline
+reads as noise. Packing is automatic, because a near-square comb is the recognizable form; `rows` overrides it.
+
 ## Edge cases
 
 <LiveDemo label="value = 0" code={`<Honeycomb value={0} total={12} unit="seats" />`}>
@@ -62,24 +64,17 @@ matter how large the total.
   <Honeycomb value={0} total={0} title="No capacity" cell={6} />
 </LiveDemo>
 
+A value past the total fills every cell while the accessible name keeps the true number, so occupancy is never silently
+clipped. Above sixty cells the counting stops working, so the chart emits a dev warning; reach for `Progress` there.
+
 ## Four homes
 
 <FourContexts slug="honeycomb" />
 
-## Why this default
-
-Outline empties are the default because takenness must survive grayscale — a filled cell versus an outlined cell reads
-without color. `empty="blank"` drops the empty cells entirely instead of dimming them, for surfaces where the outline
-reads as noise. Auto packing is the default because a near-square honeycomb is the recognizable form. The unit is the
-cell, and its size never changes with value — the count varies, the geometry doesn't — which is what keeps this honest
-area-filling _occupancy_, distinct from a `PictogramRow` counting unlike things. Above sixty cells, unit counting stops
-being countable, so the chart emits a dev warning and the docs steer to `Progress`. A value past the total fills every
-cell, but the accessible name still states the true number — occupancy is never silently clipped.
-
 ## Accessibility
 
 The accessible name is the exact occupancy — **"45 of 40 seats filled."** — always the true value, even when it exceeds
-the total. The interactive entry announces the count on change through a polite live region and reveals the value /
+the total. The interactive entry announces the count on change through a polite live region and reveals the value and
 total on hover. Focus it and the arrow keys rove cell by cell (←/→ within a row, ↑/↓ holding the column), each cell
 announced as **"Cell 7 of 40 — filled."**
 

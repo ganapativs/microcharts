@@ -1,13 +1,12 @@
 ---
 title: TrendArrow
-description: >-
-  React trend arrow chart — direction and magnitude of change as a compact arrow. Tiny accessible SVG microchart;
-  RSC-safe static or /interactive.
+description: TrendArrow shows the direction of a change as a glyph, with a declared flat band for noise.
 ---
 
-TrendArrow answers "which way is this moving?" at glyph size. The shape _is_ the direction — up, down, or a flat bar —
-and color only reinforces it, so the read survives grayscale, print, and forced-colors. When the magnitude matters,
-reach for [Delta](/docs/charts/delta) instead.
+A latency number moved 8% and the table cell has room for one glyph. TrendArrow encodes the direction in the shape: up,
+down, or a flat bar. Color reinforces the shape, so the read survives grayscale, print, and forced-colors. The glyph
+never scales with magnitude: an arrow twice as long would claim precision this size can't carry. When the magnitude
+matters, reach for [Delta](/docs/charts/delta) instead.
 
 <LiveDemo
   label="TrendArrow"
@@ -44,8 +43,8 @@ reach for [Delta](/docs/charts/delta) instead.
 
 ## When to use it
 
-- **Good for** — table direction columns, dense dashboards, inline movement cues.
-- **Avoid for** — exact magnitudes (Delta) or series shape (Sparkline).
+Use it for table direction columns, dense dashboards, and inline movement cues. For exact magnitudes use Delta; for the
+shape of a series use Sparkline.
 
 ## Sizing
 
@@ -56,7 +55,8 @@ reserve a gutter for the number, so text never paints outside the chart.
 
 ## Variants
 
-Three glyph weights for three densities, an honest noise floor, and the number when the glyph alone is too terse.
+Three glyph weights for three densities, a declared noise floor, and the number itself when the glyph alone is too
+terse. The default arrow keeps its shaft and head legible at 8 px and in forced-colors, where lighter marks blur.
 
 <LiveDemo
   label="glyphs"
@@ -80,6 +80,8 @@ Three glyph weights for three densities, an honest noise floor, and the number w
     <TrendArrow value={0.01} flatBand={0.02} title="Within noise" style={{ width: 20, height: 20 }} />
   </span>
 </LiveDemo>
+
+`flatBand` is where you declare your noise floor, so a ±0.1% wiggle reads as no change instead of a trend.
 
 <LiveDemo
   label="with the value"
@@ -132,17 +134,11 @@ in German grouping.
 
 <FourContexts slug="trend-arrow" />
 
-## Why this default
-
-The arrow (shaft + head) stays legible at 8 px and in forced-colors where lighter marks blur; the glyph never scales
-with magnitude — an arrow twice as long would be a lie at this precision. `flatBand` exists so tiny wiggles don't read
-as movement: declare your noise floor instead of letting every ±0.1% look like a trend.
-
 ## Accessibility
 
-The default accessible name is the factual direction — **"Up 12%."**, **"No change."** within the flat band, **"No
-data."** for non-finite input. `positive="down"` flips only the color, never the glyph or the words. The interactive
-entry announces direction changes through a polite live region and pulses the glyph (gated on reduced motion).
+The default accessible name is the direction: **"Up 12%."**, **"No change."** within the flat band, **"No data."** for
+non-finite input. `positive="down"` flips only the color, never the glyph or the words. The interactive entry announces
+direction changes through a polite live region and pulses the glyph, gated on reduced motion.
 
 <InteractionNote slug="trend-arrow" />
 

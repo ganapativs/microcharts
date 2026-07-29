@@ -8,7 +8,10 @@
 // their own path so they can carry the alert token. Coords 2-dp.
 import { maxPerBucket } from "../../core/downsample.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
+
+export const DEFAULT_WIDTH = 60;
+export const DEFAULT_HEIGHT = 16;
 
 interface SeismoTick {
   x: number;
@@ -49,7 +52,14 @@ export function seismogramGeometry(opts: {
   /** Magnitude threshold; |v| ≥ anomaly flags the tick. */
   anomaly?: number | undefined;
 }): SeismogramGeometry {
-  const { width, height, mode } = opts;
+  const { mode } = opts;
+  // The box is a caller prop, and a bad one is destructive in a way a bad value
+  // is not: `Chart` clamps what it puts in the viewBox, so a NaN width shipped
+  // `M NaN` ticks and `--mc-seat: NaN` inside a perfectly valid frame, and a
+  // negative one put the collapsed tick at x = −30 — ink outside the box, which
+  // `.mc-root`'s `overflow: visible` spills rather than clips (see `chartSide`).
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const pad = 0.5;
   const anomaly =
     opts.anomaly !== undefined && Number.isFinite(opts.anomaly)
@@ -78,18 +88,37 @@ export function seismogramGeometry(opts: {
   }
 
   const signed = values.some((v) => isFiniteValue(v) && v < 0);
-  const domain =
+  const fit: readonly [number, number] = extent(values) ?? [0, 1];
+  // A host computes `domain`, so it arrives however its min/max came out. A
+  // reversed pair is a WINDOW, not a mirrored axis — RugStrip settled that —
+  // and is read low→high either way.
+  const given =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))
-      ? opts.domain
-      : (extent(values) ?? [0, 1]);
+      ? opts.domain[0] <= opts.domain[1]
+        ? opts.domain
+        : ([opts.domain[1], opts.domain[0]] as const)
+      : fit;
+
+  // Zero-anchored either way: signed keeps 0 inside the domain so the baseline
+  // IS the zero line; unsigned measures magnitude up from 0.
+  const anchor = (d: readonly [number, number]): readonly [number, number] => [
+    signed ? Math.min(0, d[0]) : 0,
+    Math.max(0, d[1]),
+  ];
+  let [lo, hi] = anchor(given);
+  // A window with nothing left to scale against (`[0, 0]`, or one entirely
+  // below zero for unsigned magnitudes) sent every tick to the scale midpoint:
+  // signed data collapsed to zero-length ticks — a strip that paints as empty
+  // while its name announces a peak — and unsigned data to one uniform
+  // half-length, which reads as barcode mode. Fall back to the extent a
+  // `domain`-less caller already gets, so the painted scale stays the announced
+  // one.
+  if (lo === hi) [lo, hi] = anchor(fit);
 
   // Signed → zero baseline, tick direction encodes sign (up = +, down = −).
-  // Unsigned → centered baseline, tick mirrors both ways (seismograph trace).
-  const lo = Math.min(0, domain[0]);
-  const hi = Math.max(0, domain[1]);
-  const scale = signed
-    ? scaleLinear([lo, hi], [height - pad, pad])
-    : scaleLinear([0, hi], [center, pad]); // magnitude → half-length (up from center)
+  // Unsigned → centered baseline, tick mirrors both ways (seismograph trace):
+  // magnitude → half-length up from center.
+  const scale = scaleLinear([lo, hi], [signed ? height - pad : center, pad]);
   const baselineY = signed ? round2(clamp(scale(0), pad, height - pad)) : center;
   const maxHalf = center - pad;
 

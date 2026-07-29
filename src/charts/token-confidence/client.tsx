@@ -9,7 +9,7 @@ import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } fro
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { DEFAULT_TIERS, tokenTiers, type Tier } from "./geometry.js";
+import { DEFAULT_TIERS, splitToken, tokenTiers, type Tier } from "./geometry.js";
 import { tokenConfidenceSummary, type TokenConfidenceProps } from "./index.js";
 
 const CLASS: Record<Tier, string | undefined> = {
@@ -64,6 +64,11 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
     return m;
   }, [flagged]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // A non-finite confidence already reads as `guessing` — the READING has to
+  // agree. `fmt(NaN)` announced "52: guessing, NaN." and painted "guessing NaN"
+  // in the chip while the underline was correct. Em-dash rather than a strings
+  // token for the same reason Delta uses one: it is typography, not language.
+  const conf = useCallback((c: number): string => (Number.isFinite(c) ? fmt(c) : "—"), [fmt]);
   const hostRef = useRef<HTMLSpanElement>(null);
   // Tokens are addressed through one data attribute, not an array of ref
   // callbacks: an inline `ref={(el) => …}` has a fresh identity every render, so
@@ -105,11 +110,11 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
         strings.tokenAt(
           t.token.trim() || t.token,
           strings.tokenTierNames[TIER_INDEX[t.tier]],
-          fmt(t.confidence),
+          conf(t.confidence),
         ),
       );
     },
-    [tokens, strings, fmt],
+    [tokens, strings, conf],
   );
 
   const showChip = useCallback(
@@ -121,12 +126,12 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       const h = host.getBoundingClientRect();
       const r = el.getBoundingClientRect();
       setChip({
-        text: strings.tokenChip(strings.tokenTierNames[TIER_INDEX[t.tier]]!, fmt(t.confidence)),
+        text: strings.tokenChip(strings.tokenTierNames[TIER_INDEX[t.tier]]!, conf(t.confidence)),
         left: r.left - h.left + r.width / 2,
         top: r.top - h.top,
       });
     },
-    [readout, tokens, strings, fmt, tokenEl],
+    [readout, tokens, strings, conf, tokenEl],
   );
 
   const focusFlagged = useCallback(
@@ -214,40 +219,41 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       }
       onBlur={() => setChip(null)}
     >
-      {tokens.map((t, i) => {
-        const flaggedPos = flaggedPosOf.get(i) ?? -1;
-        const isFlagged = flaggedPos >= 0;
+      {/* One span per MARKED token, and none at all for the rest — the same
+          hot-path shape the static entry ships. A confident token used to get an
+          outer wrapper span carrying nothing, and a flagged one got an
+          outer+inner pair; a 500-token streamed reply paid ~500 dead nodes.
+          Merging the pair also puts the tab stop on the underlined word itself,
+          which is what styles.css targets — `.mc-tc-live .mc-tc-*:focus-visible`
+          never matched the old outer span, so the accent focus ring never
+          appeared — and it centers the chip on the word rather than on the word
+          plus its trailing space. */}
+      {tokens.flatMap((t, i) => {
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
-        // underline the WORD only — whitespace stays outside the marked span
-        const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(t.token);
-        const lead = m?.[1] ?? "";
-        const core = m?.[2] ?? t.token;
-        const trail = m?.[3] ?? "";
-        return (
+        if (!cls) return [t.token];
+        const flaggedPos = flaggedPosOf.get(i);
+        const focusable = flaggedPos !== undefined && !decorative;
+        const [lead, core, trail] = splitToken(t.token);
+        return [
+          lead,
           <span
             // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key
             key={i}
-            data-mc-token={isFlagged ? i : undefined}
-            id={isFlagged && !decorative ? `${baseId}-${i}` : undefined}
+            className={cls}
+            data-mc-token={flaggedPos === undefined ? undefined : i}
+            id={focusable ? `${baseId}-${i}` : undefined}
             tabIndex={
-              isFlagged && !decorative
+              focusable
                 ? active === flaggedPos || (active === null && flaggedPos === 0)
                   ? 0
                   : -1
                 : undefined
             }
           >
-            {cls ? (
-              <>
-                {lead}
-                <span className={cls}>{core}</span>
-                {trail}
-              </>
-            ) : (
-              t.token
-            )}
-          </span>
-        );
+            {core}
+          </span>,
+          trail,
+        ];
       })}
       {legend ? (
         // Tier names from the strings bundle, same as the static entry — see the

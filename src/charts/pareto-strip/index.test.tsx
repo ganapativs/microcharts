@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ParetoStrip } from "./index.js";
@@ -88,9 +88,102 @@ describe("<ParetoStrip>", () => {
     expect(vbWidth(de)).toBeGreaterThan(vbWidth(en));
   });
 
+  it("duplicate category labels still draw one bar each", () => {
+    // Labels are caller data: two categories can share a name, and a caller
+    // category named "Other" sits beside the rolled-up one. Keying bars by
+    // label made React drop or duplicate a bar on re-render.
+    const errors: unknown[] = [];
+    const spy = vi.spyOn(console, "error").mockImplementation((...a) => errors.push(a[0]));
+    const dupes = draw(
+      <ParetoStrip
+        data={[
+          { label: "Timeouts", value: 38 },
+          { label: "Timeouts", value: 24 },
+          { label: "OOM", value: 15 },
+        ]}
+        width={160}
+      />,
+    ).container;
+    const collides = draw(
+      <ParetoStrip
+        data={[
+          { label: "Other", value: 38 },
+          { label: "A", value: 24 },
+          { label: "B", value: 15 },
+          { label: "C", value: 9 },
+        ]}
+        maxItems={2}
+        width={160}
+      />,
+    ).container;
+    spy.mockRestore();
+    expect(dupes.querySelectorAll("rect").length).toBe(3);
+    expect(collides.querySelectorAll("rect").length).toBe(3); // 2 head + Other
+    expect(errors.filter((e) => String(e).includes("same key"))).toEqual([]);
+  });
+
+  it("color tints the vital few only; the muted rest keeps its ink role", () => {
+    // An inline fill survives `forced-color-adjust: none` verbatim, so the
+    // muted bars must reach High Contrast through the role, not a pinned var.
+    const { container } = draw(<ParetoStrip data={CAUSES} color="#c0392b" width={200} />);
+    const bars = [...container.querySelectorAll("rect")];
+    const vital = bars.filter((b) => b.getAttribute("data-mc-ink") === "bar");
+    const muted = bars.filter((b) => b.getAttribute("data-mc-ink") === "neutral");
+    expect(vital.length).toBeGreaterThan(0);
+    expect(muted.length).toBeGreaterThan(0);
+    expect(vital.length + muted.length).toBe(bars.length);
+    for (const b of vital) expect(b.style.fill).not.toBe("");
+    for (const b of muted) expect(b.getAttribute("style")).toBeNull();
+    // the crossing dot keeps the accent role under a custom color too
+    expect(container.querySelector("circle")!.getAttribute("data-mc-ink")).toBe("accent");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<ParetoStrip data={CAUSES} title="Incident causes" />);
     await expectNoA11yViolations(container);
+  });
+});
+
+// Hosts compute these props, so a bad one is ordinary. Each used to paint while
+// the accessible name read normally: `threshold={NaN}` emitted `<line y1="NaN">`
+// under a summary that had silently dropped the threshold, and `threshold={150}`
+// put the hairline 6 units above a 20-unit box — `.mc-root` is
+// `overflow: visible`, so that lands on the page rather than clipping.
+describe("ParetoStrip hostile config", () => {
+  it("a non-finite scalar paints no NaN and announces the scale it drew", () => {
+    const bad = [
+      () => <ParetoStrip data={CAUSES} threshold={NaN} />,
+      () => <ParetoStrip data={CAUSES} threshold={Infinity} />,
+      () => <ParetoStrip data={CAUSES} maxItems={NaN} />,
+      () => <ParetoStrip data={CAUSES} width={NaN} />,
+      () => <ParetoStrip data={CAUSES} height={NaN} />,
+    ];
+    for (const ui of bad) {
+      const { container } = draw(ui());
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+      // every one of these resolves to a documented default, so all five
+      // announce the same chart the default props draw
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+        "Top 4 of 9 causes account for 82% of the total.",
+      );
+    }
+  });
+
+  it("an out-of-range threshold clamps to the box edge", () => {
+    for (const [threshold, y1] of [
+      [150, 2],
+      [-50, 18],
+    ] as const) {
+      const { container } = draw(<ParetoStrip data={CAUSES} threshold={threshold} height={20} />);
+      expect(Number(container.querySelector("line")!.getAttribute("y1"))).toBe(y1);
+      const dot = container.querySelector("circle");
+      if (dot) {
+        const cy = Number(dot.getAttribute("cy"));
+        const r = Number(dot.getAttribute("r"));
+        expect(cy - r).toBeGreaterThanOrEqual(0);
+        expect(cy + r).toBeLessThanOrEqual(20);
+      }
+    }
   });
 });
 

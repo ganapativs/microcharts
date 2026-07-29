@@ -1,15 +1,14 @@
 ---
 title: TapeGauge
-description: >-
-  React tape gauge chart — a linear tape reading — not a circular speedometer. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: TapeGauge reads a live value against zones on a scrolling tape, with chevrons for the rate of change.
 ---
 
-TapeGauge answers "what is it now, is that OK, and where is it heading?" for a single live reading — airspeed,
-throughput, temperature, queue depth. The scale scrolls past a fixed center pointer, so the value stays parked where
-your eye already is; semantic zones mark the safe, caution, and danger bands; and a stack of chevrons encodes the rate
-of change as a channel entirely separate from the level. It is the aviation primary-flight-display tape, shrunk to a
-word.
+Airspeed is 142 and climbing, and the reading you need is the current one. TapeGauge parks the value at a fixed center
+pointer and scrolls the scale past it, so the current reading is always in the same place. It is the aviation
+primary-flight-display tape at word size, and it suits any single live reading: airspeed, throughput, temperature, queue
+depth. Semantic zones mark the safe, caution, and danger bands. A stack of chevrons encodes the rate of change on a
+channel separate from the level, so a fast climb and a high value never read as the same thing. The visible span stays
+fixed while the value updates, so a jump renders as motion of the scale rather than a silent rescale.
 
 <LiveDemo label="TapeGauge" sizeOf="tape-gauge">
   <TapeGauge
@@ -37,8 +36,8 @@ word.
 
 ## When to use it
 
-- **Good for** — a live changing reading with a safe/caution band; value plus trend at a glance.
-- **Avoid for** — a history you want to scan (Sparkline) or a single static number (Delta).
+Use it for a live changing reading with a safe/caution band, where you need the value and its trend together. A history
+you want to scan belongs in Sparkline, and a single static number in Delta.
 
 ## Sizing
 
@@ -103,7 +102,7 @@ word.
   />
 </LiveDemo>
 
-`format` also takes `Intl.NumberFormatOptions` — with a `locale`, both the in-gauge readout and the accessible summary
+`format` also takes `Intl.NumberFormatOptions`. With a `locale`, both the in-gauge readout and the accessible summary
 follow that locale's own grouping ("14.200" in German, not "14,200").
 
 ## Edge cases
@@ -124,21 +123,16 @@ follow that locale's own grouping ("14.200" in German, not "14,200").
   <TapeGauge value={142} rate={1} span={40} title="Airspeed, unzoned" width={46} height={68} />
 </LiveDemo>
 
+A non-finite `value` renders an empty gauge: no pointer, no readout. `zones` are optional, and without them the gauge
+still tracks level and rate.
+
 ## Four homes
 
 <FourContexts slug="tape-gauge" />
 
-## Why this default
-
-The value is pinned at the pointer and the scale moves instead, because on a live instrument the one thing you never
-want to hunt for is the current reading. Rate lives on its own channel — chevrons, not position — so a fast climb and a
-high value are never confused for one another, the failure mode that sinks a naïve gauge. The visible span is fixed
-while the value updates, so a jump reads as motion of the scale rather than a silent rescale that hides how far it
-moved.
-
 ## Accessibility
 
-The accessible name states the level, the trend word, and the containing zone — **"Now 142, rising; in the 130–150
+The accessible name states the level, the trend word, and the containing zone: **"Now 142, rising; in the 130–150
 zone."** The interactive entry re-announces the reading through a polite live region, throttled so a rapidly changing
 value never floods a screen reader, and focus reads the full summary on demand.
 

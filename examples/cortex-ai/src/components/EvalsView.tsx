@@ -17,7 +17,7 @@ const mixColors = [
   "var(--mc-positive, #0e7a5f)",
   "var(--mc-negative, #bd4b2d)",
   "var(--mc-cat-1, #d2982f)",
-  "var(--mc-cat-6, #a85c8c)",
+  "var(--mc-cat-6, #a55a89)",
   "var(--mc-neutral, #8a8986)",
 ];
 

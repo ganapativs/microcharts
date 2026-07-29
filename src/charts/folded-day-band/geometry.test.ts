@@ -58,6 +58,77 @@ describe("foldedBandGeometry", () => {
     expect(peakStat.q3).toBeGreaterThanOrEqual(peakStat.q1);
   });
 
+  // Hostile CONFIG: `period` is a number a host computes (`Number("")` on an
+  // empty field), and `t % 0` / `t % Infinity` are both NaN — every reading
+  // piled into bin 0 while the chart still looked plotted.
+  it.each([NaN, Infinity, -Infinity, 0, -5])("period=%p folds on the default period", (period) => {
+    const geo = foldedBandGeometry({
+      data: DATA,
+      today: null,
+      period,
+      bins: 24,
+      percentiles: BANDS,
+      width: 120,
+      height: 32,
+    });
+    const ok = foldedBandGeometry({
+      data: DATA,
+      today: null,
+      period: 24,
+      bins: 24,
+      percentiles: BANDS,
+      width: 120,
+      height: 32,
+    });
+    expect(geo.peak).toEqual(ok.peak);
+    expect(geo.medianPath).toBe(ok.medianPath);
+  });
+
+  // `quantiles` yields NaN for a non-finite probability by design. That NaN
+  // reached the band's `d` (dropped whole by the browser) and binStats.q1/q3,
+  // which the interactive readout painted as "middle half NaN–NaN".
+  it("drops an envelope whose percentile is not finite", () => {
+    const geo = foldedBandGeometry({
+      data: DATA,
+      today: null,
+      period: 24,
+      bins: 24,
+      percentiles: [
+        [NaN, 75],
+        [5, 95],
+      ],
+      width: 120,
+      height: 32,
+    });
+    expect(geo.bandPaths.length).toBe(1);
+    expect(geo.bandPaths.join("")).not.toMatch(/NaN|Infinity/);
+    for (const s of geo.binStats) {
+      expect(Number.isFinite(s.q1)).toBe(true);
+      expect(Number.isFinite(s.q3)).toBe(true);
+    }
+  });
+
+  // `Chart` clamps a non-finite viewBox to 1; geometry scaling by the raw prop
+  // instead emitted NaN coords (and a NaN `--mc-seat`) under a confident name.
+  it.each([
+    ["width", NaN],
+    ["width", 0],
+    ["height", NaN],
+    ["height", -10],
+  ])("a non-finite %s still yields finite coords", (which, bad) => {
+    const geo = foldedBandGeometry({
+      data: DATA,
+      today: null,
+      period: 24,
+      bins: 24,
+      percentiles: BANDS,
+      width: which === "width" ? (bad as number) : 120,
+      height: which === "height" ? (bad as number) : 32,
+    });
+    expect(`${geo.medianPath}${geo.bandPaths.join("")}`).not.toMatch(/NaN|Infinity/);
+    expect(Number.isFinite(geo.y1)).toBe(true);
+  });
+
   test.prop([
     fc.array(
       fc.record({

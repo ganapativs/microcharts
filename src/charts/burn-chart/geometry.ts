@@ -4,7 +4,7 @@
 // smoothed or optimistic curve). History is precise; the projection is dotted
 // and provisional by construction. Y zero-anchored. Coords 2-dp.
 import { linePath } from "../../core/path.js";
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
 export type BurnMode = "down" | "up";
@@ -31,6 +31,12 @@ export interface BurnGeometry {
   /** For the summary — the latest actual + the plan at that period. */
   nowActual: number;
   nowPlan: number | null;
+  /** Counts of the values that are actually PLOTTED (non-finite entries are
+   *  filtered out before scaling). A summary counted from the raw prop arrays
+   *  announced days the mark never drew: `actual: [40, NaN, 36, 34]` said
+   *  "4 days in" over a line that stops at day 2. */
+  elapsed: number;
+  total: number;
   /** Whether the projection reaches the target at all (false = flatlined). */
   finishes: boolean;
   /** Per-period positions — overlays + nearest-x (history + projection). */
@@ -107,8 +113,9 @@ export function burnGeometry(opts: {
     today,
     finishes ? Math.min(finishPeriod, deadline * 2 + 2) : deadline,
   );
-  const yValues = [...plan, ...actual, target];
-  const yMax = opts.domain?.[1] ?? Math.max(1, ...yValues);
+  // maxOf, not `Math.max(...)`: the spread pushes one argument per element and
+  // throws past ~125k, and both arrays are caller-sized.
+  const yMax = opts.domain?.[1] ?? maxOf([...plan, ...actual, target], 1);
   const yMin = opts.domain?.[0] ?? 0; // zero-anchored
   const xScale = scaleLinear([0, Math.max(1, spanEnd)], [pad, width - pad]);
   const yScale = scaleLinear([yMin, yMax], [height - pad, pad]);
@@ -161,6 +168,8 @@ export function burnGeometry(opts: {
     landing,
     nowActual: round2(nowActual),
     nowPlan: plan.length > today ? round2(plan[today]!) : null,
+    elapsed: actual.length,
+    total: plan.length,
     finishes,
     points,
     labelX: round2(width + 3),

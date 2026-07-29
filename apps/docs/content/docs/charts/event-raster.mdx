@@ -1,13 +1,12 @@
 ---
 title: EventRaster
-description: >-
-  React event raster chart — multi-lane event ticks for sync at a glance. Tiny accessible SVG microchart; RSC-safe
-  static or /interactive.
+description: EventRaster stacks per-source event ticks in lanes on one shared time domain.
 ---
 
-EventRaster answers "when did each source fire — and do sources fire together, in sequence, or not at all?". Vertical
-bands reveal synchronization, diagonals reveal propagation, and sparse rows reveal silence. One tick is always one event
-— the only exception is the disclosed `overflow="bin"` mode for aliasing lanes.
+EventRaster draws one tick per event and one lane per source, all on a shared time domain. A vertical band means those
+sources fired together, a diagonal means one triggered the next, and a sparse row means silence. Lanes stay aligned to
+that shared domain because the banding is the phenomenon the chart exists to show. One tick is always one event; the
+single exception is `overflow="bin"`, and the summary discloses it.
 
 <LiveDemo label="EventRaster" sizeOf="event-raster">
   <EventRaster
@@ -33,8 +32,8 @@ bands reveal synchronization, diagonals reveal propagation, and sparse rows reve
 
 ## When to use it
 
-- **Good for** — service events across sources, agent steps, cron / sensor triggers.
-- **Avoid for** — a single lane (RugStrip) or continuous rates (Sparkline).
+Use it for service events across sources, agent steps, and cron or sensor triggers. For a single lane use RugStrip; for
+continuous rates use Sparkline.
 
 ## Sizing
 
@@ -93,21 +92,18 @@ bands reveal synchronization, diagonals reveal propagation, and sparse rows reve
   <EventRaster data={[{ label: "boot", events: [0] }]} title="Single event" width={160} height={16} />
 </LiveDemo>
 
+An empty lane keeps its row, because a source that stopped firing is part of the reading. When a lane is dense enough
+that its ticks would alias into a solid smear, `overflow="bin"` (the default) switches that lane to per-bucket counts
+drawn as opacity, and the summary names the lanes that were binned. `overflow="clip"` opts out and keeps one tick per
+event at any density.
+
 ## Four homes
 
 <FourContexts slug="event-raster" />
 
-## Why this default
-
-Lanes stay aligned to a shared time domain because vertical banding — several sources firing at the same instant — is
-the phenomenon the chart exists to reveal. An empty lane is kept, not dropped: silence is signal. When a lane is so
-dense that ticks would alias into a solid smear, it switches to per-bucket counts shown as opacity, and the summary says
-which lanes were binned — the encoding change never hides. That is `overflow="bin"`, the default; `overflow="clip"` opts
-out and keeps one tick per event whatever the density.
-
 ## Accessibility
 
-The accessible name summarises the field — **"3 lanes, 22 events; busiest api (11)."** The interactive entry roves lanes
+The accessible name summarizes the field: **"3 lanes, 22 events; busiest api (11)."** The interactive entry roves lanes
 with ↑/↓ and events with ←/→, announcing each event's lane, time, and position within the lane.
 
 <InteractionNote slug="event-raster" />

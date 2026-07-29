@@ -1,13 +1,12 @@
 import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
-import { Reveal } from "@/components/ui/reveal";
-import { markInner, SectionMark } from "@/components/brand/shared";
+import { markInner } from "@/components/brand/shared";
 
 const MISUSE = [
   {
     label: "Recolor the cells",
     svg: (
       <>
-        <path d={SQUIRCLE_PATH} fill="var(--accent)" />
+        <path d={SQUIRCLE_PATH} fill="var(--mc-accent)" />
         {CELLS.map((c) => (
           <rect
             key={c.x}
@@ -29,11 +28,11 @@ const MISUSE = [
   },
   {
     label: "Rotate",
-    svg: <g transform="rotate(18 16 16)">{markInner("var(--accent)")}</g>,
+    svg: <g transform="rotate(18 16 16)">{markInner("var(--mc-accent)")}</g>,
   },
   {
     label: "Stretch",
-    svg: <g transform="translate(0 5) scale(1 0.68)">{markInner("var(--accent)")}</g>,
+    svg: <g transform="translate(0 5) scale(1 0.68)">{markInner("var(--mc-accent)")}</g>,
   },
   {
     label: "Add effects",
@@ -44,7 +43,7 @@ const MISUSE = [
             <feDropShadow dx="0" dy="1.6" stdDeviation="1.4" floodOpacity="0.5" />
           </filter>
         </defs>
-        <g filter="url(#dropbad)">{markInner("var(--accent)")}</g>
+        <g filter="url(#dropbad)">{markInner("var(--mc-accent)")}</g>
       </>
     ),
   },
@@ -52,7 +51,7 @@ const MISUSE = [
     label: "Reflow the grid",
     svg: (
       <>
-        <path d={SQUIRCLE_PATH} fill="var(--accent)" />
+        <path d={SQUIRCLE_PATH} fill="var(--mc-accent)" />
         {[
           { x: 8, y: 8, o: 0.4 },
           { x: 20, y: 12, o: 0.7 },
@@ -76,31 +75,30 @@ const MISUSE = [
 
 export function BrandMisuse() {
   return (
-    <section className="mx-auto max-w-shell px-4 py-14 sm:px-6">
-      <SectionMark>Don’t</SectionMark>
-      <Reveal className="mb-8 max-w-2xl">
-        <h2 className="display text-[length:var(--text-fluid-h2)]">What not to do with it</h2>
-        <p className="mt-4 max-w-xl text-fd-muted-foreground">
-          Recolor cells, invert fills, rotate, stretch, add effects, or reflow the grid. Each one
-          breaks the encoding the mark shares with the charts.
+    <section className="act">
+      <div className="shell">
+        <h2 className="display-2" style={{ maxWidth: "var(--m-head)" }}>
+          What not to do with it
+        </h2>
+        <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
+          The grade across the three cells is an encoding, the same kind the charts use. Every one
+          of these breaks it.
         </p>
-      </Reveal>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {MISUSE.map((d, i) => (
-          <Reveal key={d.label} delay={i * 35} className="panel-soft flex flex-col overflow-hidden">
-            <div className="bk-stage relative min-h-[6.5rem]" data-tile="light">
-              <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden>
-                {d.svg}
-              </svg>
-              <span aria-hidden className="bk-badge absolute right-2 top-2">
-                ×
-              </span>
+        <div className="u-block grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {MISUSE.map((d) => (
+            <div key={d.label} className="plate flex flex-col overflow-hidden">
+              <div className="bk-stage relative min-h-[6.5rem]" data-tile="light">
+                <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden>
+                  {d.svg}
+                </svg>
+                <span aria-hidden className="bk-badge absolute right-2 top-2">
+                  ×
+                </span>
+              </div>
+              <p className="kicker px-3 pb-3 pt-3 text-center">{d.label}</p>
             </div>
-            <div className="border-t border-hairline px-3 py-2.5 text-center">
-              <span className="text-xs text-fd-muted-foreground">{d.label}</span>
-            </div>
-          </Reveal>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

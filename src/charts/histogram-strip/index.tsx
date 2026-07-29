@@ -83,8 +83,16 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
       className={className ? `mc-histogram ${className}` : "mc-histogram"}
       style={style}
     >
-      {geo.bars.map((b) =>
-        b.h > 0 ? (
+      {geo.bars.map((b) => {
+        if (b.h <= 0) return null;
+        // The marked bin takes the `accent` ink ROLE, not an inline
+        // `fill: var(--mc-accent)`. `.mc-root` sets `forced-color-adjust: none`,
+        // so an inline fill survives verbatim into High Contrast Mode — the one
+        // emphasized bin kept the theme's accent hex while every other bar
+        // became CanvasText, out of reach of the forced-colors mapping. The role
+        // paints identically in the normal layer and maps to Highlight there.
+        const marked = hasMark && b.index === geo.markBin;
+        return (
           <rect
             key={b.index}
             x={b.x}
@@ -92,19 +100,19 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
             width={b.w}
             height={b.h}
             shapeRendering="crispEdges"
-            data-mc-ink="bar"
+            data-mc-ink={marked ? "accent" : "bar"}
             style={
-              hasMark
-                ? b.index === geo.markBin
-                  ? { fill: "var(--mc-accent)" }
-                  : { fillOpacity: 0.55, ...(color ? { fill: color } : null) }
-                : color
-                  ? { fill: color }
-                  : undefined
+              marked
+                ? undefined
+                : hasMark
+                  ? { fillOpacity: 0.55, ...(color ? { fill: color } : null) }
+                  : color
+                    ? { fill: color }
+                    : undefined
             }
           />
-        ) : null,
-      )}
+        );
+      })}
       {children}
     </Chart>
   );

@@ -42,6 +42,11 @@ describe("<CitySkyline>", () => {
     expect(container.querySelectorAll('path[data-mc-ink="accent"]').length).toBe(0);
   });
 
+  it("the ground carries a width role, so --mc-density reaches it", () => {
+    const { container } = draw(<CitySkyline data={TEAMS} />);
+    expect(container.querySelector("line")!.getAttribute("data-mc-w")).toBe("support");
+  });
+
   it("ground={false} drops the baseline", () => {
     const { container } = draw(<CitySkyline data={TEAMS} ground={false} />);
     expect(container.querySelector("line")).toBeNull();
@@ -108,6 +113,25 @@ describe("<CitySkyline>", () => {
         />,
       );
       expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual(["40"]);
+    });
+
+    it("a non-finite domain still paints the skyline the summary announces", () => {
+      const { container } = draw(
+        <CitySkyline data={TEAMS} domain={[0, Number.NaN]} label="value" />,
+      );
+      const attrs = [...container.querySelectorAll("rect, text, line, path")].flatMap((el) =>
+        [...el.attributes].map((a) => a.value),
+      );
+      expect(attrs.filter((v) => /NaN|Infinity/.test(v))).toEqual([]);
+      // the announced tallest is the painted tallest: 46 fills the plot
+      expect(container.querySelector('rect[data-mc-ink="bar"]')!.getAttribute("height")).toBe("13");
+    });
+
+    it("an unbounded height renders instead of hanging", () => {
+      // `height` reaches the window-row loop through maxH; Infinity used to grow
+      // the path string until the process died.
+      const { container } = draw(<CitySkyline data={TEAMS} height={Number.POSITIVE_INFINITY} />);
+      expect(container.querySelectorAll('path[data-mc-ink="accent"]').length).toBe(5);
     });
 
     it("all-unmeasured still draws the ground line — empty is visible", () => {

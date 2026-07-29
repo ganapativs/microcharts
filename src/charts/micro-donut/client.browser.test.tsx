@@ -55,6 +55,22 @@ describe("interactive <MicroDonut>", () => {
       .not.toBeNull();
   });
 
+  it("format/locale reach the composed static entry's centre total", async () => {
+    // They are destructured here for the readout, so they stopped riding
+    // `...rest` into the static — the centre figure silently lost its format.
+    const screen = await render(
+      <MicroDonut
+        data={MIX}
+        size={48}
+        label="total"
+        locale="de-DE"
+        format={{ maximumFractionDigits: 0 }}
+      />,
+    );
+    const text = screen.container.querySelector("text[data-mc-ink='label']");
+    expect(text?.textContent).toBe("1.000");
+  });
+
   it("controlled selectedIndex pins the wedge without focus", async () => {
     const screen = await render(<MicroDonut data={MIX} selectedIndex={1} />);
     expect(screen.container.querySelector('path[data-mc-w="tick"]')).not.toBeNull();

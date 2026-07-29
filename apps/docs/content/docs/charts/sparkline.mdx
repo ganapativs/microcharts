@@ -1,12 +1,11 @@
 ---
 title: Sparkline
-description: >-
-  React sparkline chart — tiny accessible SVG trend line. RSC-safe static entry, or /interactive with hover and
-  keyboard. Zero-dependency microchart from @microcharts/react.
+description: Sparkline draws a trend line over ordered values, with optional dots, a fill, and a normal-range band.
 ---
 
-Sparkline draws a compact trend over ordered values. Reach for it when direction and shape matter more than exact points
-— inline in a sentence, inside a table cell, or as the quiet backbone of a KPI card.
+A quarter of revenue is six numbers in a row, and what you want from them is the shape. Sparkline draws those ordered
+values as one line, sized for a sentence, a table cell, or a KPI card. The default is the line plus an accent dot on the
+last point, which marks where "now" is; fill, a normal-range band, and min/max dots are props you turn on.
 
 <LiveDemo label="Sparkline" sizeOf="sparkline">
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} title="Weekly revenue" />
@@ -22,9 +21,9 @@ Sparkline draws a compact trend over ordered values. Reach for it when direction
 
 ## When to use it
 
-- **Good for** — an inline trend, a table-cell trend, a KPI sparkline, dense dashboards.
-- **Avoid for** — part-to-whole comparisons or reading exact category values. Use [SparkBar](/docs/charts/sparkbar) for
-  discrete magnitudes, or [Bullet](/docs/charts/bullet) for a value against a target.
+Use it for an inline trend, a table-cell trend, a KPI sparkline, and dense dashboards. It won't answer part-to-whole
+comparisons or exact category values: use [SparkBar](/docs/charts/sparkbar) for discrete magnitudes, or
+[Bullet](/docs/charts/bullet) for a value against a target.
 
 ## Sizing
 
@@ -35,11 +34,15 @@ a chart that fills its container — the viewBox keeps the aspect ratio.
 
 ## Variants
 
-Shape, fill, a normal-range band, and dots are all props — same data, different read. Flip any of them to the Code tab.
+Shape, fill, a normal-range band, and dots are props on the same data. Each is off by default: at word size an extra
+fill or band takes pixels away from the line itself. Open the Code tab on any demo to see the call.
 
 <LiveDemo label="curve" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} curve="smooth" />`}>
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} curve="smooth" title="Smooth curve" />
 </LiveDemo>
+
+`curve="smooth"` interpolates with monotone cubic tangents, so the curve stays inside the range its own points span. A
+spike back down to zero cannot bow below zero on the way, and a filled area cannot cross its baseline.
 
 <LiveDemo label="fill" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} fill />`}>
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} fill title="Filled area" />
@@ -86,14 +89,15 @@ Shape, fill, a normal-range band, and dots are all props — same data, differen
   <Sparkline data={[5, 5, 5, 5, 5, 5]} width={130} height={32} title="Flat series" />
 </LiveDemo>
 
-A `null` means "no measurement here" — the line breaks at the gap and never interpolates across it, so an outage can't
-masquerade as a smooth trend. A single point has no line to draw; it sits centered in the plot, visible as the default
-endpoint dot. An all-equal series renders on the vertical mid-line — a zero-span domain maps to the middle of the range,
-so flat data reads as level, not as bottomed-out.
+A `null` means "no measurement here": the line breaks at the gap and never interpolates across it, so an outage doesn't
+render as a smooth trend. A single point has no line to draw; it sits centered in the plot, visible as the default
+endpoint dot. An all-equal series renders on the vertical mid-line, because a zero-span domain maps to the middle of the
+range, so flat data reads as level rather than bottomed-out.
 
 Past `maxPoints` (default 200) the drawn line decimates to a min/max-preserving envelope: every spike keeps its true
-position and height, gaps stay gaps, and the summary, dots, and hover values still come from the raw data — only the
-path gets lighter. Pass `maxPoints={Infinity}` to opt out.
+position and height, gaps stay gaps, and the summary, dots, and hover values still come from the raw data. Only the path
+gets lighter. An envelope is used instead of a stride sample so that a single spike at point 1,500 of 2,000 still
+renders. Pass `maxPoints={Infinity}` to opt out.
 
 <LiveDemo
   label="2,000 points"
@@ -119,25 +123,15 @@ wrappers. Sentence placements use `mc-inline`; see [Composition](/docs/compositi
 
 <FourContexts slug="sparkline" />
 
-## Why this default
-
-A bare line plus one accent dot on the last point — no fill, no band, no min/max dots. The shape of the series is the
-whole story until you ask for more, and the endpoint dot marks where "now" is. Min/max dots, fill, and the band are
-opt-in because at word size they compete with the line for the same few pixels; adding them by default would make every
-sparkline noisier for the common case that only needs direction and range. Long series decimate to a min/max-preserving
-envelope rather than a naive stride sample, so a single spike at point 1,500 of 2,000 still shows up — silently dropping
-it would be the more common bug in a naive implementation, and a chart that hides its own spikes is dishonest by
-construction.
-
 ## Accessibility
 
 By default the chart is an `img` whose accessible name is generated from the data. The example above is announced as:
 
 > Weekly revenue. Trending up 200%. Range 3 to 9. Last value 9.
 
-Pass a `title` to name it, or `summary={false}` — with no `title` — to make it decorative when the surrounding text
-already says what it shows. The interactive entry adds a polite live region that reads each focused point as you arrow
-through it.
+Pass a `title` to name it, or `summary={false}` with no `title` to make it decorative when the surrounding text already
+says what it shows. The interactive entry adds a polite live region that reads each focused point as you arrow through
+it.
 
 <InteractionNote slug="sparkline" />
 

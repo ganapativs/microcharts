@@ -36,9 +36,54 @@ describe("<EventRaster>", () => {
     expect(texts).toEqual(["api", "db", "cache"]);
   });
 
-  it("emphasis accents one lane", () => {
+  it("emphasis accents one lane and MUTES the rest (never fill-only ink)", () => {
     const { container } = draw(<EventRaster data={RASTER} emphasis="db" width={160} height={24} />);
     expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    // `neutral` is the FILL family: on these zero-area tick verticals it set
+    // `stroke: none` and filled nothing, so every muted lane disappeared.
+    expect(container.querySelectorAll('path[data-mc-ink="neutral"]').length).toBe(0);
+    expect(container.querySelectorAll('path[data-mc-ink="muted"]').length).toBe(2);
+    // one weight for every lane, from the token — not a literal the density and
+    // contrast levers cannot reach, and forced-colors cannot remap
+    for (const p of container.querySelectorAll("path")) {
+      expect(p.getAttribute("stroke")).toBeNull();
+      expect(p.getAttribute("stroke-width")).toBeNull();
+      expect(p.getAttribute("data-mc-w")).toBe("full");
+      expect(p.getAttribute("fill")).toBe("none");
+    }
+  });
+
+  it("lane ticks take the stroked data ink by default", () => {
+    const { container } = draw(<EventRaster data={RASTER} width={160} height={24} />);
+    expect(container.querySelectorAll('path[data-mc-ink="data"]').length).toBe(3);
+  });
+
+  it("an explicit window drops the events outside it — from the picture AND the name", () => {
+    const { container } = draw(
+      <EventRaster data={RASTER} domain={[10, 20]} width={160} height={24} />,
+    );
+    // announced total = painted total; a name quoting 19 over a 5-tick picture
+    // is a count the reader cannot check
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "3 lanes, 5 events; busiest api (2).",
+    );
+    const xs = [...container.querySelectorAll("path")].flatMap((p) =>
+      [...p.getAttribute("d")!.matchAll(/M([\d.-]+)/g)].map((m) => Number(m[1])),
+    );
+    expect(xs.length).toBe(5);
+    for (const x of xs) expect(x).toBeGreaterThanOrEqual(0);
+    for (const x of xs) expect(x).toBeLessThanOrEqual(160);
+  });
+
+  it("a hostile domain renders the default window, never NaN coordinates", () => {
+    for (const domain of [
+      [NaN, NaN],
+      [0, NaN],
+      [-Infinity, Infinity],
+    ] as const) {
+      const { container } = draw(<EventRaster data={RASTER} domain={domain} width={160} />);
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+    }
   });
 
   it("is axe-clean", async () => {
