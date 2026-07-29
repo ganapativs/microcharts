@@ -31,9 +31,21 @@
       "dependencyDashboardApproval": true
     },
     {
-      "description": "engines + peerDependencies are the PUBLISHED contract, not the dev toolchain. `rangeStrategy: bump` would narrow them to whatever this repo happens to develop against — engines.node >=20 to >=24.18.0, or a peer range to the newest patch — locking consumers out for no gain. They move by hand, with intent. `.node-version` is unaffected, so the toolchain still tracks Node.",
+      "description": "engines + peerDependencies are the PUBLISHED contract, not the dev toolchain. `rangeStrategy: bump` would narrow them to whatever this repo happens to develop against — engines.node >=20 to >=24.18.0, or a peer range to the newest patch — locking consumers out for no gain. They move by hand, with intent.",
       "matchManagers": ["npm"],
       "matchDepTypes": ["engines", "peerDependencies"],
+      "enabled": false
+    },
+    {
+      "description": "Playwright and the CI container image are ONE version. `test-browser` and `visual` run inside `mcr.microsoft.com/playwright:vX-noble`, which ships the browsers preinstalled; if the npm package outruns the tag, every leg dies with \"Executable doesn't exist at /ms-playwright/…\". npm publishes a release before MCR builds the image, so this can never be safe to automate. Approve from the dependency dashboard only once the tag exists at https://mcr.microsoft.com/v2/playwright/tags/list, and move ci.yml + visual.yml in the same PR.",
+      "matchPackageNames": ["playwright", "playwright-core", "@playwright/test"],
+      "groupName": "playwright + CI image",
+      "dependencyDashboardApproval": true,
+      "automerge": false
+    },
+    {
+      "description": "`.node-version` is deliberately the floating major `24`, so every local toolchain (fnm/nvm/nodenv) picks up each Node patch — including security patches — with no PR at all. Renovate's nodenv manager would rewrite it to one exact patch, which narrows local installs, disagrees with the exact `node-version:` each CI job pins for itself, and files a PR per Node release. CI's pins are the ones that move by hand.",
+      "matchManagers": ["nodenv"],
       "enabled": false
     }
   ]
