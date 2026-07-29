@@ -90,6 +90,10 @@ export function Delta({
     <span
       ref={hostRef}
       className="mc-delta-live"
+      // The tab stop below is this span, and the library's focus ring keys off
+      // `data-mc-host` (styles.css) — without it a focusable Delta fell back to
+      // the UA outline while every other interactive chart drew the accent ring.
+      data-mc-host=""
       data-pulse={pulse ? "1" : undefined}
       data-enter={enter ? "1" : undefined}
       tabIndex={pick || report ? 0 : undefined}

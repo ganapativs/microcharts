@@ -287,14 +287,11 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       <path
         d={g.d}
         fill="none"
+        stroke="var(--mc-accent)"
         strokeLinejoin="round"
         strokeLinecap="round"
-        data-mc-w={pinned ? "tick" : undefined}
+        data-mc-w={pinned ? "tick" : "full"}
         vectorEffect="non-scaling-stroke"
-        style={{
-          stroke: "var(--mc-accent)",
-          strokeWidth: pinned ? undefined : "var(--mc-sw)",
-        }}
       />
     );
   };

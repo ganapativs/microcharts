@@ -33,6 +33,55 @@ describe("citySkylineGeometry — height + lit windows", () => {
     expect(under.buildings[0]!.litCount).toBe(0);
   });
 
+  it("a non-finite domain bound falls back to the data max", () => {
+    // A NaN bound used to carry NaN into every y/height: the skyline went blank
+    // while the summary still announced the real tallest.
+    const bad = citySkylineGeometry({
+      data: [{ value: 46 }, { value: 23 }],
+      bw: 9,
+      height: 24,
+      groundY: 22,
+      maxH: 20,
+      gap: 3,
+      pad: 2,
+      domain: [0, Number.NaN],
+    });
+    expect(bad.domain).toEqual([0, 46]);
+    const good = g([{ value: 46 }, { value: 23 }]);
+    expect(bad.buildings.map((b) => b.h)).toEqual(good.buildings.map((b) => b.h));
+  });
+
+  it("a finite domain sets the frame the annotation host draws on", () => {
+    const geo = citySkylineGeometry({
+      data: [{ value: 46 }],
+      bw: 9,
+      height: 24,
+      groundY: 22,
+      maxH: 20,
+      gap: 3,
+      pad: 2,
+      domain: [0, 92],
+    });
+    expect(geo.domain).toEqual([0, 92]);
+    expect(geo.buildings[0]!.h).toBeCloseTo(10, 1); // half the frame
+  });
+
+  it("an unbounded plot height caps the window rows instead of hanging", () => {
+    // maxH comes from the caller's `height`; an infinite one made `rows`
+    // infinite and the fill loop grew a path string until the tab died.
+    const geo = citySkylineGeometry({
+      data: [{ value: 46, lit: 1 }],
+      bw: 9,
+      height: Number.POSITIVE_INFINITY,
+      groundY: 1000,
+      maxH: Number.POSITIVE_INFINITY,
+      gap: 3,
+      pad: 2,
+    });
+    expect(geo.buildings[0]!.windowCount).toBe(400); // 200 rows × 2 columns
+    expect(geo.buildings[0]!.litCount).toBe(400);
+  });
+
   it("buildings march left to right by band", () => {
     const geo = g([{ value: 10 }, { value: 20 }, { value: 30 }]);
     expect(geo.buildings[0]!.x).toBeLessThan(geo.buildings[1]!.x);

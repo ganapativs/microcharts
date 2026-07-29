@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import {
   SearchDialog,
   SearchDialogClose,
@@ -14,6 +15,7 @@ import { useDocsSearch } from "fumadocs-core/search/client";
 import { oramaStaticClient } from "fumadocs-core/search/client/orama-static";
 import { create } from "@orama/orama";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
+import { track } from "@/lib/analytics";
 
 function initOrama() {
   return create({
@@ -27,6 +29,11 @@ export default function DefaultSearchDialog(props: SharedProps) {
   const { search, setSearch, query } = useDocsSearch({
     client: oramaStaticClient({ initOrama, locale }),
   });
+
+  // Dialog is lazy-mounted only when opened — one open event per open.
+  useEffect(() => {
+    track({ name: "search", action: "open" });
+  }, []);
 
   return (
     <SearchDialog search={search} onSearchChange={setSearch} isLoading={query.isLoading} {...props}>

@@ -13,7 +13,7 @@ import { GiveUpTable } from "@/components/home/give-up-table";
 import { Degradation } from "@/components/home/degradation";
 import { AppPlates } from "@/components/home/app-plates";
 import { PresetScopeStyle } from "@/components/home/preset-scope-style";
-import { DefineThemeLine } from "@/components/home/define-theme-line";
+import { ThemeBench } from "@/components/home/theme-bench";
 import { ClosingActions } from "@/components/home/actions";
 
 /**
@@ -117,14 +117,19 @@ export default function HomePage() {
       </section>
 
       {/* ─────────── ACT IV · wear it ───────────
-          Two sections, not one: a heading has to open the landmark it names, and
-          the theming beat sits above this act's heading. */}
-      <section aria-label="Theming" className="act">
+          Two sections, not one: a heading has to open the landmark it names. The
+          theming beat opens the act and carries the act's controls, so it takes
+          an `h3` rather than a display heading of its own — it is the instrument,
+          and the wall of apps below is what the instrument produces. */}
+      <section aria-labelledby="theming" className="act">
         <div className="shell">
+          <h3 id="theming" className="h3" style={{ maxWidth: "var(--m-head)" }}>
+            A theme starts with one color.
+          </h3>
           {/* Text after a JSX expression must be a template literal when it spans
               a newline and carries a typographic apostrophe — SWC glues the words
               together in SSR otherwise (swc-ssr-spaces.test.ts). */}
-          <p className="lead" style={{ maxWidth: "var(--m-lead)" }}>
+          <p className="lead u-lede" style={{ maxWidth: "var(--m-lead)" }}>
             Give{" "}
             <Link
               prefetch={false}
@@ -133,9 +138,9 @@ export default function HomePage() {
             >
               <code className="font-mono text-[0.78em]">defineTheme</code>
             </Link>
-            {` one color. It works out the rest: a color-blind-safe scale, and a dark version tuned by hand. Green stays positive and vermillion stays negative whatever color you pass. The palette control at the top of the page runs it. Change the accent and the line below changes too.`}
+            {` an accent and it works out the rest: a color-blind-safe scale, and a dark version tuned by hand. Green stays positive and vermillion stays negative whatever you pass. Pick one below and watch the page take it.`}
           </p>
-          <DefineThemeLine />
+          <ThemeBench />
         </div>
       </section>
 

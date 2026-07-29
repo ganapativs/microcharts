@@ -214,7 +214,7 @@
 
 /* ── type ramp ─────────────────────────────────────────────────────────────
    The display face is 40px and up ONLY, and never carries a numeral — every
-   figure on the surface is JetBrains Mono. display-1 is spent on the opening
+   figure on the surface is Iosevka. display-1 is spent on the opening
    claim and the closing aphorism of the landing page, and nowhere else. */
 .surface .display-1 {
   font: 700 clamp(44px, 2.2rem + 5.6vw, 108px) / 0.9 var(--fd);

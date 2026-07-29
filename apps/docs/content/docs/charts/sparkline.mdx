@@ -41,6 +41,9 @@ fill or band takes pixels away from the line itself. Open the Code tab on any de
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} curve="smooth" title="Smooth curve" />
 </LiveDemo>
 
+`curve="smooth"` interpolates with monotone cubic tangents, so the curve stays inside the range its own points span. A
+spike back down to zero cannot bow below zero on the way, and a filled area cannot cross its baseline.
+
 <LiveDemo label="fill" code={`<Sparkline data={[3, 5, 4, 8, 6, 9]} fill />`}>
   <Sparkline data={[3, 5, 4, 8, 6, 9]} width={120} height={32} fill title="Filled area" />
 </LiveDemo>

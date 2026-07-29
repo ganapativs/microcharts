@@ -195,7 +195,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       {geo.points.map((p, i) =>
         flagIdx.has(i) ? (
           <circle
-            key={`f${p.x}`}
+            key={`f${i}`}
             cx={p.x}
             cy={p.y}
             r={rFlag}
@@ -206,7 +206,10 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         ) : null,
       )}
       {/* OOC: negative ring stroke (role fills; no ink role for hollow ring). */}
-      {geo.points.flatMap((p) =>
+      {/* Keyed by INDEX, never by x: coords are 2-dp rounded, so a long series
+          on a short strip puts several points on the same x and React saw
+          duplicate keys (marks silently dropped or doubled). */}
+      {geo.points.flatMap((p, i) =>
         dots === "none"
           ? []
           : p.out
@@ -214,7 +217,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
                 ...(ringClears(p.y)
                   ? [
                       <circle
-                        key={`o${p.x}`}
+                        key={`o${i}`}
                         cx={p.x}
                         cy={p.y}
                         r={rRing}
@@ -226,14 +229,14 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
                       />,
                     ]
                   : []),
-                <circle key={`d${p.x}`} cx={p.x} cy={p.y} r={rOut} data-mc-ink="negative" />,
+                <circle key={`d${i}`} cx={p.x} cy={p.y} r={rOut} data-mc-ink="negative" />,
               ]
             : dots === "all"
               ? [
                   // custom `color` can't come from the static "point" role rule,
                   // so it falls back to a plain fill attribute (no role → no CSS)
                   <circle
-                    key={`a${p.x}`}
+                    key={`a${i}`}
                     cx={p.x}
                     cy={p.y}
                     r={rDot}

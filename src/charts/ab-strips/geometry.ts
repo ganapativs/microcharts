@@ -5,7 +5,20 @@
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
-import { labelFitsBand, textGutter } from "../../core/labels.js";
+import { labelFitsBand, textGutterProse } from "../../core/labels.js";
+
+/**
+ * `round2` for the ANNOUNCED numbers (medians, delta, quantile edges). It
+ * multiplies by 100 before rounding, so a finite value past ~1.8e306 comes back
+ * ±Infinity — a sample of 1e307s announced "median ∞" over a normally painted
+ * strip, and the delta gutter printed a literal "NaN%" (∞ ÷ ∞). Two decimals
+ * carry no information at that magnitude, so the value passes through instead.
+ * Coordinates never need this: they are clamped into the viewBox first.
+ */
+function roundValue(n: number): number {
+  const r = round2(n);
+  return Number.isFinite(r) ? r : n;
+}
 
 interface StripRow {
   y: number;
@@ -59,17 +72,49 @@ function rowStats(sample: readonly number[]): RowStats | null {
   return { p5: small ? e[0] : p5, p25, p50, p75, p95: small ? e[1] : p95, small };
 }
 
+/** Largest share of the box the row tags' lead gutter may claim. */
+const MAX_LEAD_SHARE = 0.45;
+
+/** Lead gutter (viewBox units) for `chars` of row tag at `fontSize`. */
+function tagLead(chars: number, fontSize: number): number {
+  // Row tags are CALLER text ("Control cohort"), not figures this library
+  // formatted, so they take the prose estimate — `textGutter`'s digit-calibrated
+  // 0.62 left an all-caps arm name painting over its own strip.
+  return textGutterProse(chars, fontSize, 3);
+}
+
 /**
- * Do the A/B row tags fit? The two arms split the padded box into two rows and
- * each tag is centred on its row, so once the row pitch is under one em the tags
- * stack on each other ("A" on "B", "Ctrl" on "Test") and the outer two push
- * their em-boxes past the viewBox edge. There is no smaller type to retreat to,
- * so below the pitch the tags drop — pass `labelChars: 0` and the lead gutter
- * drops with them. The arms are still distinguishable without the tags: row A is
- * neutral ink and row B is accent, top-to-bottom in the summary's order.
+ * Characters of row tag to reserve a lead gutter for — 0 when the tags must
+ * drop, which also drops their gutter so the strips reclaim the full width.
+ *
+ * Two ways they stop fitting, and the answer to both is to drop them. The arms
+ * stay distinguishable without tags: row A is neutral ink and row B is accent,
+ * top-to-bottom in the summary's order.
+ *
+ * **Vertically** — the two arms split the padded box into two rows and each tag
+ * is centred on its row, so once the row pitch is under one em the tags stack on
+ * each other ("A" on "B", "Ctrl" on "Test") and the outer two push their
+ * em-boxes past the viewBox edge. There is no smaller type to retreat to.
+ *
+ * **Horizontally** — this gate was missing, and the lead gutter is unbounded in
+ * the tag's length. `seriesLabels={["Control group", "Treatment"]}` squeezed an
+ * 80-wide plot down to 16 units; one size up the reserved lead crossed
+ * `width - pad` outright, which inverts `scaleLinear`'s range and makes `clamp`
+ * pin every x at the lead — every mark landed at x=135 in a 108-wide viewBox,
+ * outside a root that is `overflow: visible`.
  */
-export function abTagsFit(height: number, fontSize: number, pad = 2): boolean {
-  return labelFitsBand((height - pad * 2) / 2, fontSize);
+export function abTagChars(opts: {
+  width: number;
+  height: number;
+  fontSize: number;
+  labels: readonly [string, string];
+  pad?: number | undefined;
+}): number {
+  const pad = opts.pad ?? 2;
+  if (!labelFitsBand((opts.height - pad * 2) / 2, opts.fontSize)) return 0;
+  const chars = Math.max(opts.labels[0].length, opts.labels[1].length);
+  const fits = tagLead(chars, opts.fontSize) + pad * 2 <= opts.width * MAX_LEAD_SHARE;
+  return fits ? chars : 0;
 }
 
 export function abStripsGeometry(opts: {
@@ -93,10 +138,16 @@ export function abStripsGeometry(opts: {
   const gutterCh = opts.gutterCh ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
   // left gutter for the A/B row tags (≈ 2 ch). `labelChars: 0` means the caller
-  // dropped the tags (see `abTagsFit`) — the gutter goes with them, so the two
-  // strips reclaim the full width rather than sitting against dead space.
+  // dropped the tags (see `abTagChars`) — the gutter goes with them, so the two
+  // strips reclaim the full width rather than sitting against dead space. The
+  // cap is the containment backstop for a direct caller that skipped the gate: a
+  // lead past `width - pad` inverts the scale's range and clamps every mark to a
+  // coordinate outside the viewBox.
   const labelChars = opts.labelChars ?? 2;
-  const lead = labelChars > 0 ? textGutter(labelChars, fontSize, 3) : 0;
+  const lead =
+    labelChars > 0
+      ? Math.min(tagLead(labelChars, fontSize), Math.max(0, width * MAX_LEAD_SHARE - pad * 2))
+      : 0;
 
   const domain: readonly [number, number] =
     opts.domain && opts.domain.every((d) => Number.isFinite(d))
@@ -115,13 +166,13 @@ export function abStripsGeometry(opts: {
     y: rowY(i),
     outer: { x: x(s.p5), width: round2(x(s.p95) - x(s.p5)) },
     inner: { x: x(s.p25), width: round2(x(s.p75) - x(s.p25)) },
-    median: { x: x(s.p50), value: round2(s.p50) },
+    median: { x: x(s.p50), value: roundValue(s.p50) },
     edges: [
-      { p: 5, x: x(s.p5), value: round2(s.p5) },
-      { p: 25, x: x(s.p25), value: round2(s.p25) },
-      { p: 50, x: x(s.p50), value: round2(s.p50) },
-      { p: 75, x: x(s.p75), value: round2(s.p75) },
-      { p: 95, x: x(s.p95), value: round2(s.p95) },
+      { p: 5, x: x(s.p5), value: roundValue(s.p5) },
+      { p: 25, x: x(s.p25), value: roundValue(s.p25) },
+      { p: 50, x: x(s.p50), value: roundValue(s.p50) },
+      { p: 75, x: x(s.p75), value: roundValue(s.p75) },
+      { p: 95, x: x(s.p95), value: roundValue(s.p95) },
     ],
     small: s.small,
   });
@@ -134,9 +185,9 @@ export function abStripsGeometry(opts: {
 
   return {
     rows: [mkRow(sa, 0), mkRow(sb, 1)],
-    aMedian: round2(sa.p50),
-    bMedian: round2(sb.p50),
-    deltaMedian: round2(sb.p50 - sa.p50),
+    aMedian: roundValue(sa.p50),
+    bMedian: roundValue(sb.p50),
+    deltaMedian: roundValue(sb.p50 - sa.p50),
     overlap,
     na: opts.a.filter(isFiniteValue).length,
     nb: opts.b.filter(isFiniteValue).length,

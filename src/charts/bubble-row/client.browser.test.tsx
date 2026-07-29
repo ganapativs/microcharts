@@ -41,6 +41,28 @@ describe("interactive <BubbleRow>", () => {
     expect(live.textContent).toBe("LATAM: no data.");
   });
 
+  it("a negative announces no data too, and reports no encoded value", async () => {
+    // The area channel can't say "minus", so the bubble is a presence ring —
+    // announcing "-5" would describe a mark that isn't there.
+    const seen: unknown[] = [];
+    const screen = await render(
+      <BubbleRow
+        data={[
+          { label: "DEBT", value: -5 },
+          { label: "AMER", value: 890 },
+        ]}
+        title="Markets"
+        onActive={(d) => seen.push(d)}
+      />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(live.textContent).toBe("DEBT: no data.");
+    expect(seen.at(-1)).toMatchObject({ index: 0, value: null, label: "DEBT" });
+  });
+
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<BubbleRow data={REGIONS} title="Markets" />);
     const wrap = screen.container.querySelector(".mc-bubble-live")!;

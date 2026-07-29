@@ -5,7 +5,15 @@ import { CHARTS } from "@/lib/charts/registry";
 import { SHOWCASE } from "@/lib/showcase";
 import { PRESETS } from "@/lib/mc-tokens";
 import { CHART_GZIP } from "@/lib/stats";
-import { SHARES, CHECKOUT_P95, DEGRADE, FENCE_SERIES } from "./home-data";
+import { BENCH } from "@/lib/docs-facts";
+import {
+  SHARES,
+  CHECKOUT_P95,
+  DEGRADE,
+  FENCE_SERIES,
+  HERO_SIZES,
+  HERO_SVG_BYTES,
+} from "./home-data";
 
 /**
  * The home page's load-bearing claims, held by source rather than by review.
@@ -304,13 +312,47 @@ describe("the hero claim rotates without moving anything", () => {
   });
 
   it("quotes each type's own measured weight in the callout", () => {
-    // Four types spanning 4.77–6.75 kB demonstrate the range the first sentence
+    // Four types spanning 4.77–6.86 kB demonstrate the range the first sentence
     // claims. A hard-coded kB beside a mark that becomes three other charts is
     // the exact drift this file exists to catch.
     const quoted = [...frames().matchAll(/kb: ([\d.]+),/g)].map((m) => Number(m[1]));
     expect(quoted).toHaveLength(4);
     const real = new Set(Object.values(CHART_GZIP).map((g) => g.interactive));
     for (const kb of quoted) expect(real, String(kb)).toContain(kb);
+  });
+
+  // The two hero series are literals: `hero-frames.tsx` is a client component,
+  // and deriving them there would pull `entries.generated.json` (~1 MB) into the
+  // bundle. The comment on each says it comes from `chart-sizes.json` /
+  // `bench-summary.json` — these two tests are what make that true.
+  const stable = () => CHARTS.filter((c) => c.status === "stable");
+  const median = (xs: readonly number[]) => xs[Math.floor(xs.length / 2)]!;
+
+  it("plots every measured interactive size, in order", () => {
+    const measured = stable()
+      .map((c) => CHART_GZIP[c.slug]?.interactive)
+      .filter((n): n is number => typeof n === "number")
+      .sort((a, b) => a - b);
+    // 105 of 106 — `wind-barb` ships static only.
+    expect([...HERO_SIZES]).toEqual(measured);
+  });
+
+  it("plots every measured SVG payload, in order", () => {
+    const measured = stable()
+      .map((c) => BENCH.chart(c.slug)?.avgBytes)
+      .filter((n): n is number => typeof n === "number")
+      .sort((a, b) => a - b);
+    expect([...HERO_SVG_BYTES]).toEqual(measured);
+  });
+
+  it("quotes the median of each series it draws", () => {
+    // A sentence quoting a median beside a mark of the same numbers is the pair
+    // most likely to drift: the array gets regenerated and the prose doesn't.
+    const src = stripComments(frames());
+    expect(src).toContain(`<Fig>${median(HERO_SIZES)} kB</Fig>`);
+    expect(src).toContain(`<Fig>${median(HERO_SVG_BYTES).toLocaleString("en-US")}</Fig> bytes`);
+    // "and the biggest is < 7 kB", one line below the rug.
+    expect(Math.max(...HERO_SIZES)).toBeLessThan(7);
   });
 
   it("gives the rail one dot per claim, and every dot a name", () => {
@@ -651,11 +693,18 @@ describe("rules stay quiet and controls stay still", () => {
 
 describe("code is highlighted by one shared lexer", () => {
   it("has no second copy of the tokenizer anywhere in the app", () => {
+    // Two lexers, one palette: `jsx-lex` reads the JSX snippets, `config-lex`
+    // reads the JSON/TOML/YAML/shell blocks on /docs/mcp. They cover disjoint
+    // languages and share the `tok-*` classes; a THIRD file emitting those
+    // classes is the duplicate this guards against.
     const libDir = resolve(process.cwd(), "src");
     const owners = walk(libDir)
       .filter((f) => !f.endsWith(".test.ts") && !f.endsWith(".test.tsx"))
       .filter((f) => /tok-tag/.test(readFileSync(f, "utf8")));
-    expect(owners.map((f) => f.replace(`${libDir}/`, ""))).toEqual(["lib/jsx-lex.ts"]);
+    expect(owners.map((f) => f.replace(`${libDir}/`, "")).sort()).toEqual([
+      "lib/config-lex.ts",
+      "lib/jsx-lex.ts",
+    ]);
   });
 
   it("puts the home code surfaces on that lexer and on one code style", () => {

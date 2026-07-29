@@ -26,19 +26,54 @@ describe("<Slope>", () => {
     );
   });
 
+  // Ink ROLES, not `stroke=` attributes: styles.css paints the roles, and a
+  // stylesheet rule outranks an SVG presentation attribute. The attribute
+  // spelling these assertions used to read passed while the browser painted
+  // every line in `--mc-stroke` — valence, highlight and `color` all silently
+  // lost on the connector while the dots obeyed them (see client.browser.test).
   it("neutral ink by default; positive engages direction tokens", () => {
     const plain = draw(<Slope data={DATA.slice(0, 2)} />).container;
-    expect(plain.querySelector("line")!.getAttribute("stroke")).toBe("var(--mc-neutral)");
+    expect(plain.querySelector("line")!.getAttribute("data-mc-ink")).toBe("muted");
+    expect(plain.querySelector("circle")!.getAttribute("data-mc-ink")).toBe("neutral");
+    expect(plain.querySelector("line")!.getAttribute("stroke")).toBeNull();
     const valenced = draw(<Slope data={DATA.slice(0, 2)} positive="up" />).container;
-    const strokes = [...valenced.querySelectorAll("line")].map((l) => l.getAttribute("stroke"));
-    expect(strokes).toContain("var(--mc-positive)");
-    expect(strokes).toContain("var(--mc-negative)");
+    const inks = [...valenced.querySelectorAll("line")].map((l) => l.getAttribute("data-mc-ink"));
+    expect(inks).toContain("positive");
+    expect(inks).toContain("negative");
+    // the dot at each end takes the row's role too, so line and endpoint agree
+    expect(
+      [...valenced.querySelectorAll("circle")].map((c) => c.getAttribute("data-mc-ink")),
+    ).toEqual(["positive", "positive", "negative", "negative"]);
   });
 
   it("highlight → accent + heavier stroke", () => {
     const { container } = draw(<Slope data={DATA} highlight="West" />);
     const lines = [...container.querySelectorAll("line")];
-    expect(lines[1]!.getAttribute("stroke")).toBe("var(--mc-accent)");
+    expect(lines[1]!.getAttribute("data-mc-ink")).toBe("accent");
+    expect(lines[1]!.style.strokeWidth).toBe("calc(var(--mc-sw) * 1.5)");
+  });
+
+  it("color paints inline (the one declaration that must beat the role's rule)", () => {
+    const { container } = draw(<Slope data={DATA.slice(0, 2)} color="#c0ffee" positive="up" />);
+    const line = container.querySelector("line")!;
+    expect(line.style.stroke).toBe("rgb(192, 255, 238)");
+    expect(container.querySelector("circle")!.style.fill).toBe("rgb(192, 255, 238)");
+    // …and highlight still outranks it
+    const hl = draw(
+      <Slope data={DATA.slice(0, 2)} color="#c0ffee" highlight={0} />,
+    ).container.querySelector("line")!;
+    expect(hl.getAttribute("data-mc-ink")).toBe("accent");
+    expect(hl.style.stroke).toBe("");
+  });
+
+  it("every rendered label carries the label ink role", () => {
+    // A right-column <text> holding a VALUE carried no role, so it painted the
+    // `.mc-root text` default (`--mc-stroke`) opposite a left column in
+    // `--mc-neutral`, and forced colors had nothing to map.
+    const { container } = draw(<Slope data={DATA.slice(0, 2)} label="both" width={140} />);
+    const texts = [...container.querySelectorAll("text")];
+    expect(texts.length).toBeGreaterThan(0);
+    expect(texts.every((t) => t.getAttribute("data-mc-ink") === "label")).toBe(true);
   });
 
   it("missing end → dashed stub (incomplete)", () => {
@@ -53,6 +88,33 @@ describe("<Slope>", () => {
     expect(spacious.querySelectorAll("text").length).toBeGreaterThan(0);
     const cramped = draw(<Slope data={DATA} label="value" height={24} />).container;
     expect(cramped.querySelectorAll("text").length).toBe(0);
+  });
+
+  it("the summary formats its numbers with `format`/`locale`", () => {
+    const name = (ui: React.ReactNode) =>
+      draw(ui).container.querySelector("svg")!.getAttribute("aria-label");
+    // flat pair: the value went out as String(n), so a chart labelled "12.3K"
+    // announced "12345.6".
+    expect(
+      name(
+        <Slope
+          data={[{ label: "a", from: 12345.6, to: 12345.6 }]}
+          format={{ notation: "compact" }}
+        />,
+      ),
+    ).toBe("No change at 12K.");
+    // the ratio is a percent, and a percent is locale-shaped (de-DE: NBSP + %)
+    expect(
+      name(<Slope data={[...DATA, { label: "Far", from: 10, to: 40 }]} locale="de-DE" />),
+    ).toBe("6 categories: 4 up, 2 down. Largest change Far, up 300 %.");
+  });
+
+  it("a single row is announced as a slope, not as a field of one", () => {
+    const { container } = draw(<Slope data={[{ label: "East", from: 40, to: 47 }]} />);
+    // was "1 categories: 1 up, 0 down. Largest change East, up 18%."
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "East: 40 to 47, up 18%.",
+    );
   });
 
   it("is axe-clean", async () => {

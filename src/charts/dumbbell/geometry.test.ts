@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { dumbbellGeometry } from "./geometry.js";
+import { dumbbellGeometry, dumbbellLabelChars } from "./geometry.js";
 
 const base = { width: 60, height: 12, gutterCh: 0, fontSize: 6 };
 
@@ -26,6 +26,55 @@ describe("dumbbellGeometry", () => {
     expect(geo.rows[0]!.x0).toBeNull();
     expect(geo.rows[0]!.x1).not.toBeNull();
     expect(geo.rows[0]!.dir).toBe(0);
+  });
+
+  it("a gutter that leaves no plot is refused, not clamped", () => {
+    // 4 chars at fontSize 7 reserve a 37-unit gutter. In a 20-unit box that put
+    // plotX0 (39) past plotX1 (18) and painted the pair outside the viewBox.
+    expect(dumbbellLabelChars({ width: 20, height: 12, rows: 1, fontSize: 7, longest: 400 })).toBe(
+      0,
+    );
+    const geo = dumbbellGeometry({
+      width: 20,
+      height: 12,
+      pairs: [{ from: 1, to: 2 }],
+      gutterCh: 0,
+      fontSize: 7,
+    });
+    expect(geo.plotX0).toBeLessThan(geo.plotX1);
+  });
+
+  test.prop([
+    fc.integer({ min: 6, max: 400 }),
+    fc.integer({ min: 4, max: 200 }),
+    fc.integer({ min: 1, max: 5 }),
+    fc.integer({ min: 7, max: 11 }),
+    fc.integer({ min: 1, max: 40 }),
+  ])(
+    "the reserved gutter always leaves a plot inside the box",
+    (width, height, rows, fontSize, longest) => {
+      const chars = dumbbellLabelChars({ width, height, rows, fontSize, longest });
+      const geo = dumbbellGeometry({
+        width,
+        height,
+        pairs: Array.from({ length: rows }, () => ({ from: 0, to: 1 })),
+        gutterCh: chars > 0 ? chars + 1 : 0,
+        fontSize,
+      });
+      expect(geo.plotX0).toBeLessThanOrEqual(geo.plotX1);
+      expect(geo.plotX1).toBeLessThanOrEqual(width);
+    },
+  );
+
+  it("row names drop under a pitch shorter than one line of text", () => {
+    // The static entry gated on this; the interactive one did not, so the client
+    // reserved a gutter the painted chart never had (rings a gutter off the dots).
+    expect(dumbbellLabelChars({ width: 77, height: 28, rows: 5, fontSize: 11, longest: 5 })).toBe(
+      0,
+    );
+    expect(dumbbellLabelChars({ width: 220, height: 80, rows: 5, fontSize: 11, longest: 5 })).toBe(
+      5,
+    );
   });
 
   test.prop([

@@ -41,7 +41,7 @@ const TYPE_FACES: {
   {
     cls: "font-mono text-[44px] leading-none tracking-tight",
     specimen: "Ag",
-    name: "JetBrains Mono",
+    name: "Iosevka",
     role: "Metadata · Code",
     use: "Labels, sizes, coordinates, snippets.",
   },

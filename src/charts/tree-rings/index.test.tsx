@@ -33,9 +33,36 @@ describe("<TreeRings>", () => {
     expect(accent).toBeTruthy();
   });
 
-  it("rings='fill' draws annulus paths", () => {
+  it("rings='fill' merges each opacity parity into one evenodd path", () => {
     const { container } = draw(<TreeRings data={YEARS} rings="fill" />);
-    expect(container.querySelectorAll("path").length).toBeGreaterThan(0);
+    const paths = [...container.querySelectorAll("path")];
+    // two muted parities + the highlighted ring — not one node per period
+    expect(paths.length).toBe(3);
+    // 4 even rings + 3 odd (the 8th is the highlight), 2 circles per annulus
+    expect((paths[0]!.getAttribute("d")!.match(/M/g) ?? []).length).toBe(8);
+    expect((paths[1]!.getAttribute("d")!.match(/M/g) ?? []).length).toBe(6);
+    for (const p of paths) expect(p.getAttribute("fill-rule")).toBe("evenodd");
+  });
+
+  it("rings='fill' takes its neutral from the ink role, not an inline hex", () => {
+    // `.mc-root` sets forced-color-adjust: none, so an inline fill survives
+    // verbatim into High Contrast Mode; the alternating opacity stays inline
+    // because it is what separates neighbouring rings.
+    const { container } = draw(<TreeRings data={YEARS} rings="fill" />);
+    const muted = [...container.querySelectorAll('path[data-mc-ink="fill"]')];
+    expect(muted.length).toBe(2);
+    for (const p of muted) expect(p.getAttribute("style")).not.toMatch(/fill:/);
+    expect(muted.map((p) => p.getAttribute("style"))).toEqual([
+      "fill-opacity: 0.22;",
+      "fill-opacity: 0.4;",
+    ]);
+  });
+
+  it("the boundary rings carry a width role, so --mc-density reaches them", () => {
+    const { container } = draw(<TreeRings data={YEARS} />);
+    expect(container.querySelector('path[data-mc-ink="muted"]')!.getAttribute("data-mc-w")).toBe(
+      "support",
+    );
   });
 
   it("label='last' prints the latest value", () => {
@@ -68,6 +95,50 @@ describe("<TreeRings>", () => {
     it("all-null still draws the centre dot — empty is visible, not blank", () => {
       const { container } = draw(<TreeRings data={[null, null] as unknown as number[]} />);
       expect(container.querySelectorAll("circle").length).toBeGreaterThan(0);
+    });
+  });
+
+  // A host computes these; `Number("")` is NaN and a lifetime total can arrive
+  // as Infinity. Each one used to render a normal-looking chart whose painted
+  // scale disagreed with the scale its accessible name announced.
+  describe("hostile config props", () => {
+    const attrs = (container: HTMLElement) =>
+      [...container.querySelectorAll("*")].flatMap((el) => [...el.attributes].map((a) => a.value));
+
+    it("a non-finite size keeps the disc on the default 24-unit box", () => {
+      for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 0, -20]) {
+        const { container } = draw(<TreeRings data={YEARS} size={bad} />);
+        const svg = container.querySelector("svg")!;
+        expect(svg.getAttribute("viewBox")).toBe("0 0 24 24");
+        expect(attrs(container).filter((v) => /NaN|Infinity/.test(v))).toEqual([]);
+      }
+    });
+
+    it("a non-finite fontSize keeps the label gutter inside the viewBox", () => {
+      // NaN reached the gutter arithmetic, so Chart clamped the viewBox to one
+      // unit wide while the disc still painted out to `size`.
+      const { container } = draw(<TreeRings data={YEARS} label="last" fontSize={Number.NaN} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 43 24");
+      expect(svg.getAttribute("style")).toContain("--mc-label-size: 11px");
+      expect(container.querySelector("text")!.getAttribute("font-size")).toBe("11");
+    });
+
+    it("an infinite total paints the same disc as no total at all", () => {
+      const inf = draw(<TreeRings data={YEARS} total={Number.POSITIVE_INFINITY} />);
+      const none = draw(<TreeRings data={YEARS} />);
+      const d = (c: HTMLElement) => c.querySelector('path[data-mc-ink="muted"]')?.getAttribute("d");
+      expect(d(inf.container)).toBe(d(none.container));
+      expect(d(inf.container)).toBeTruthy();
+    });
+
+    it("a size too small for rings still paints the centre dot inside the box", () => {
+      const { container } = draw(<TreeRings data={YEARS} size={3} />);
+      const dot = container.querySelector('circle[data-mc-ink="point"]')!;
+      const [cx, r] = [+dot.getAttribute("cx")!, +dot.getAttribute("r")!];
+      expect(r).toBeGreaterThan(0);
+      expect(cx - r).toBeGreaterThanOrEqual(0);
+      expect(cx + r).toBeLessThanOrEqual(3);
     });
   });
 });

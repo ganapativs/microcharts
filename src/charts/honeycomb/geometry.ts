@@ -16,9 +16,44 @@ export interface HoneycombGeometry {
    *  padded/ceiled viewBox. */
   y0: number;
   y1: number;
+  /** The circumradius the comb was actually laid out on. Callers must draw
+   *  overlays (the pick ring) and hit-test from THIS, never the raw `cell` prop
+   *  — see `resolveCell` for what a raw one can be. */
+  cell: number;
 }
 
 const SQRT3 = Math.sqrt(3);
+
+/** Component defaults, shared with `index.tsx` so a repaired prop repairs the
+ *  painted comb and the announced count to the same number. */
+export const HONEYCOMB_TOTAL = 10;
+const HONEYCOMB_CELL = 4;
+
+/* A config number the host computes rather than types: `total={Number(field.value)}`
+   on an empty field is `NaN`, and `total={seats / perFloor}` with `perFloor`
+   momentarily 0 is `Infinity`. Both flowed into the accessible name, so a comb of
+   seven ordinary hexes announced "5 of NaN filled."; a non-finite `rows` or `cell`
+   additionally emitted `d="MNaN NaN…"` under a `viewBox="0 0 1 1"`, and a negative
+   `cell` put hexes at negative coords — outside the viewBox `.mc-root` does not
+   clip. Repaired here, once, so geometry and summary read the same numbers. */
+
+/** Capacity the comb is laid out and ANNOUNCED against: whole cells, ≥ 0. A
+ *  negative capacity clamps to none (`total={0}`'s "No data."); a non-finite one
+ *  is not a capacity at all, so it falls back to the documented default. */
+export function resolveTotal(raw: number | undefined): number {
+  return raw !== undefined && Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : HONEYCOMB_TOTAL;
+}
+
+/** Filled count the comb paints and ANNOUNCES: whole cells, ≥ 0. Non-finite is
+ *  not a count — it reads as none, the repair `resolveK` makes in IconArray. */
+export function resolveValue(raw: number): number {
+  return Number.isFinite(raw) ? Math.max(0, Math.round(raw)) : 0;
+}
+
+/** Hex circumradius: finite and non-negative, else the documented default. */
+export function resolveCell(raw: number | undefined): number {
+  return raw !== undefined && Number.isFinite(raw) && raw >= 0 ? raw : HONEYCOMB_CELL;
+}
 
 // Saturate drawn cells at a legible-comb bound. `total` is a caller prop; a
 // non-physical value (e.g. 1e15) would otherwise loop unbounded, allocating
@@ -48,16 +83,22 @@ export function honeycombGeometry(opts: {
   cellR: number;
   pad: number;
 }): HoneycombGeometry {
-  const { cellR: r, pad } = opts;
-  const total = Math.min(Math.max(0, Math.floor(opts.total)), HONEYCOMB_MAX_CELLS);
-  const value = Math.max(0, Math.round(opts.value));
-  const filledCount = Math.min(value, total);
+  const { pad } = opts;
+  const r = resolveCell(opts.cellR);
+  const total = Math.min(resolveTotal(opts.total), HONEYCOMB_MAX_CELLS);
+  const filledCount = Math.min(resolveValue(opts.value), total);
 
-  const rows =
-    opts.rows === "auto"
+  // A non-finite `rows` is not a row count; fall back to `auto` (the default).
+  const asked =
+    opts.rows === "auto" || !Number.isFinite(opts.rows)
       ? Math.max(1, Math.round(Math.sqrt(total)))
       : Math.max(1, Math.floor(opts.rows));
-  const cols = total === 0 ? 0 : Math.ceil(total / rows);
+  const cols = total === 0 ? 0 : Math.ceil(total / asked);
+  // Size from the rows the comb OCCUPIES, not the rows asked for: `rows={5}` on
+  // 12 cells lays out 3 columns, which is 4 rows — reserving the fifth left a
+  // dead band under the comb and pulled the inline seat (y1) off its middle.
+  // `rows={100}` reserved 88 of them.
+  const rows = cols === 0 ? 1 : Math.ceil(total / cols);
 
   const colSpace = SQRT3 * r; // horizontal spacing (pointy-top)
   const rowSpace = 1.5 * r; // vertical spacing
@@ -97,5 +138,6 @@ export function honeycombGeometry(opts: {
     height,
     y0: round2(pad),
     y1: round2(pad + 2 * r + (rows - 1) * rowSpace),
+    cell: r,
   };
 }

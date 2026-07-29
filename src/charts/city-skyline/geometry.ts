@@ -3,6 +3,7 @@
 // secondary, low-precision "mostly lit / half lit / dark"). Windows: fixed 2
 // columns, filled bottom-up, quantized to the window count. No roofline/antenna/
 // width variation ever — earn every mark. All coords 2-dp.
+import { maxOf } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 
 interface SkylineBuilding {
@@ -21,11 +22,20 @@ interface SkylineBuilding {
 export interface CitySkylineGeometry {
   buildings: SkylineBuilding[];
   ground: { x1: number; x2: number; y: number };
+  /** The resolved zero-anchored height domain `[0, max]` — the frame the
+   * annotation host draws on, so it can never diverge from the buildings. */
+  domain: readonly [number, number];
   width: number;
   height: number;
 }
 
 const WIN_COLS = 2;
+/** Windows are a low-precision channel — a building legible at word size holds
+ * about five rows. The cap exists because `maxH` comes from the caller's
+ * `height`: an infinite one made `rows` infinite and the fill loop below grew a
+ * path string until the tab died, and a merely huge one emitted thousands of
+ * window rects nobody can see. */
+const MAX_WIN_ROWS = 200;
 
 export function citySkylineGeometry(opts: {
   data: readonly { value: number; lit?: number | undefined }[];
@@ -42,7 +52,11 @@ export function citySkylineGeometry(opts: {
 }): CitySkylineGeometry {
   const { data, bw, height, gap, pad, groundY, maxH } = opts;
   const values = data.map((d) => (Number.isFinite(d.value) && d.value > 0 ? d.value : 0));
-  const max = opts.domain ? opts.domain[1] : Math.max(1, ...values);
+  // A domain with a non-finite bound is not a scale: `value / NaN` carried NaN
+  // into every y and height while the summary still announced the real tallest,
+  // so the chart went blank and read as populated. Fall back to the data max.
+  const max =
+    opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain[1] : maxOf(values, 1);
 
   const winUnit = Math.max(2, round2(bw * 0.42)); // window + gutter cell size
   const winGut = winUnit * 0.28;
@@ -53,7 +67,7 @@ export function citySkylineGeometry(opts: {
     const x = round2(pad + i * (bw + gap));
     const h = round2(max <= 0 ? 0 : Math.min(1, value / max) * maxH);
     const y = round2(groundY - h);
-    const rows = Math.max(0, Math.floor(h / winUnit));
+    const rows = h > 0 && winUnit > 0 ? Math.min(MAX_WIN_ROWS, Math.floor(h / winUnit)) : 0;
     const windowCount = rows * WIN_COLS;
     // A non-finite lit fraction is "unknown", not "dark": clamping NaN would
     // carry NaN into litCount and out to the interactive readout's lit percent.
@@ -78,5 +92,11 @@ export function citySkylineGeometry(opts: {
   });
 
   const width = Math.max(1, Math.ceil(data.length * (bw + gap) - gap + 2 * pad));
-  return { buildings, ground: { x1: pad, x2: round2(width - pad), y: groundY }, width, height };
+  return {
+    buildings,
+    ground: { x1: pad, x2: round2(width - pad), y: groundY },
+    domain: [0, max],
+    width,
+    height,
+  };
 }

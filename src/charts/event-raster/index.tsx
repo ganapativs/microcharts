@@ -11,10 +11,13 @@ import {
   LANE_CAP,
   rasterDomain,
   rasterLabels,
+  rasterWindow,
+  resolveRasterDomain,
   type RasterLaneInput,
 } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 import { maxOf } from "../../core/scale.js";
+import { round2 } from "../../core/types.js";
 
 export type EventRasterDatum = RasterLaneInput;
 
@@ -40,11 +43,20 @@ export interface EventRasterProps {
 
 const LANE_UNIT = 14;
 
-/** Shared summary — lane/event totals, the busiest lane, binned disclosure. */
+/**
+ * Shared summary — lane/event totals, the busiest lane, binned disclosure.
+ *
+ * `domain` is the window the chart drew, and the counts are taken over it: an
+ * explicit domain narrower than the data hides those events from the picture,
+ * and a name announcing a total the reader cannot count is the one thing a
+ * summary must never do. Omitted, it fits the data — every finite event, which
+ * is what the default render shows.
+ */
 export function eventRasterSummary(
   data: readonly EventRasterDatum[],
   binnedLabels: readonly string[],
   strings: EventRasterStrings,
+  domain: readonly [number, number] = rasterDomain(data),
 ): string {
   const lanes = data.slice(0, LANE_CAP);
   if (lanes.length === 0) return strings.noData;
@@ -52,7 +64,7 @@ export function eventRasterSummary(
   let busy = lanes[0]!.label;
   let busyCount = -1;
   for (const lane of lanes) {
-    const c = lane.events.filter((e) => Number.isFinite(e)).length;
+    const c = rasterWindow(lane.events, domain).length;
     total += c;
     if (c > busyCount) {
       busyCount = c;
@@ -104,10 +116,12 @@ export function EventRaster(props: EventRasterProps): ReactNode {
     ),
   });
 
-  const domain = domainProp ?? rasterDomain(data);
+  const domain = resolveRasterDomain(domainProp, data);
   const geo = eventRasterGeometry({ data, domain, width, height, gutter, overflow });
   const binnedLabels = geo.lanes.filter((l) => l.binned).map((l) => l.label);
-  const accName = resolveSummary(summary, () => eventRasterSummary(data, binnedLabels, strings));
+  const accName = resolveSummary(summary, () =>
+    eventRasterSummary(data, binnedLabels, strings, domain),
+  );
 
   return (
     <Chart
@@ -126,7 +140,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       {geo.lanes.map((lane, i) =>
         i % 2 === 1 ? (
           <rect
-            key={`band-${lane.label}`}
+            key={i}
             x={round2(gutter)}
             y={lane.y}
             width={round2(width - gutter)}
@@ -139,38 +153,45 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       {/* flat siblings, no per-lane <g> — up to LANE_CAP lanes puts this well
           past the >10-element SSR hot-path line; the dim multiplier is repeated
           as a plain `opacity` on each lane's own marks instead of one group */}
-      {geo.lanes.flatMap((lane) => {
+      {geo.lanes.flatMap((lane, i) => {
         const active = emphasis ? lane.label === emphasis : true;
         const dim = emphasis && !active ? 0.7 : 1;
-        const ink = emphasis ? (active ? "accent" : "neutral") : undefined;
+        // Ink roles are element-split in styles.css: a bucket is a filled rect
+        // and takes the fill family, a tick path is an open stroke and takes the
+        // stroked one. A muted lane used to take `neutral` for both — it is
+        // fill-only, so on the tick path it set `stroke: none` and filled zero-
+        // area verticals with nothing: every muted lane VANISHED under `emphasis`.
+        const fillInk = emphasis ? (active ? "accent" : "neutral") : "bar";
+        // One weight for every lane, whatever its emphasis state, and it comes
+        // from `--mc-sw` so density and prefers-contrast retune the ticks. The
+        // literal stroke this replaced was deaf to both, and it survived
+        // forced-colors verbatim: the theme ink against the user's own
+        // background is not a visible tick in High Contrast Mode.
+        const strokeInk = emphasis ? (active ? "accent" : "muted") : "data";
         const cy = round2(lane.y + lane.laneH / 2);
         const nodes: ReactNode[] = lane.binned
           ? lane.bins.map((b) => (
               <rect
-                key={`b-${lane.label}-${b.x}`}
+                key={`b-${i}-${b.x}`}
                 x={b.x}
                 y={round2(lane.y + lane.laneH * 0.16)}
                 width={b.width}
                 height={round2(lane.laneH * 0.68)}
                 shapeRendering="crispEdges"
-                data-mc-ink={ink ?? "bar"}
+                data-mc-ink={fillInk}
                 opacity={dim}
                 fillOpacity={b.opacity}
               />
             ))
           : [
               <path
-                key={`p-${lane.label}`}
+                key={`p-${i}`}
                 d={lane.path}
+                // literal, and load-bearing: it is the only signal the accent
+                // and forced-colors rules read to keep an open mark hollow
                 fill="none"
-                // no-emphasis default stays a literal stroke (not the "data" ink
-                // role): that role also sets stroke-width via CSS, which would
-                // beat the literal strokeWidth below for THIS state only and
-                // leave emphasized/muted lanes 0.1 thinner — every lane must
-                // stay the same tick weight regardless of emphasis state
-                data-mc-ink={ink}
-                stroke={ink ? undefined : "var(--mc-stroke)"}
-                strokeWidth={1.4}
+                data-mc-ink={strokeInk}
+                data-mc-w="full"
                 strokeLinecap="round"
                 opacity={dim}
                 vectorEffect="non-scaling-stroke"
@@ -179,7 +200,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
         if (labels)
           nodes.push(
             <text
-              key={`t-${lane.label}`}
+              key={`t-${i}`}
               x={round2(gutter - 3)}
               y={cy}
               dominantBaseline="central"
@@ -196,10 +217,6 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }
 
 export { rasterDomain };

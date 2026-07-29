@@ -2,12 +2,16 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { SproutRow } from "./client.js";
+import { SproutRow as StaticSproutRow } from "./index.js";
 
 const ACCT = [
   { label: "Acme", value: 3 },
   { label: "Beta", value: 1 },
   { label: "Gamma", value: null },
 ] as const;
+
+const viewBox = (root: { container: HTMLElement }): string | null =>
+  root.container.querySelector("svg")!.getAttribute("viewBox");
 
 const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
@@ -64,6 +68,15 @@ describe("interactive <SproutRow>", () => {
   it("controlled selectedIndex pins the ring without focus", async () => {
     const screen = await render(<SproutRow data={ACCT} selectedIndex={1} />);
     expect(screen.container.querySelectorAll('ellipse[data-mc-w="tick"]')).toHaveLength(1);
+  });
+
+  it("a hostile height resolves to the same box the static picks", async () => {
+    // Both entries have to agree about the frame, or the hit box and the focus
+    // ring are sized against a box the glyphs were never drawn in.
+    const live = await render(<SproutRow data={ACCT} height={NaN} />);
+    const still = await render(<StaticSproutRow data={ACCT} height={NaN} />);
+    expect(viewBox(live)).toBe(viewBox(still));
+    expect(viewBox(live)).not.toMatch(/NaN/);
   });
 
   it("consumer children reach the composed static chart", async () => {

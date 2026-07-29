@@ -9,7 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
-import { round2, type Value } from "../../core/types.js";
+import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import { dualWindowGeometry, rollingMean } from "./geometry.js";
 
 export interface DualWindowMeterProps {
@@ -36,6 +36,17 @@ export interface DualWindowMeterProps {
   children?: ReactNode | undefined;
 }
 
+/**
+ * The compliance target as text. `target` is typed `number`, but a host that
+ * derives it — an empty input field, a config that hasn't loaded — hands over
+ * NaN or `undefined` at runtime, and `fmt` then throws or announces a literal
+ * "NaN"/"∞" over a normally painted chart. It reads as the same "—" the missing
+ * readings use, and the geometry drops the target line for the same input.
+ */
+function targetText(target: number, fmt: (n: number) => string): string {
+  return isFiniteValue(target) ? fmt(target) : "—";
+}
+
 /** Shared summary — the sustained (slow) read vs target, then the fast read. */
 export function dualWindowSummary(
   fastLast: number | null,
@@ -47,7 +58,7 @@ export function dualWindowSummary(
   if (slowLast == null && fastLast == null) return strings.noData;
   return strings.dualWindow(
     slowLast == null ? "—" : fmt(slowLast),
-    fmt(target),
+    targetText(target, fmt),
     fastLast == null ? "—" : fmt(fastLast),
   );
 }
@@ -183,19 +194,24 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           style={{ fill: "var(--mc-neutral)", fillOpacity: 0.12 }}
         />
       ) : null}
-      <line
-        x1={1}
-        x2={width - gutter - 1}
-        y1={geo.targetY}
-        y2={geo.targetY}
-        data-mc-ink="muted"
-        data-mc-w="tick"
-        strokeDasharray="2 1.5"
-        vectorEffect="non-scaling-stroke"
-      />
+      {geo.targetY == null ? null : (
+        <line
+          x1={1}
+          x2={width - gutter - 1}
+          y1={geo.targetY}
+          y2={geo.targetY}
+          data-mc-ink="muted"
+          data-mc-w="tick"
+          strokeDasharray="2 1.5"
+          vectorEffect="non-scaling-stroke"
+        />
+      )}
       {/* the ×1.3 / ×0.7 width pair IS the encoding (slow sustained = thick,
           fast reactive = thin) — justified literal multipliers on the primary
-          token, not width roles (those are for secondary strokes) */}
+          token, not width roles (those are for secondary strokes). BOTH traces
+          need `non-scaling-stroke` or the ratio only holds at 1:1: the fast
+          trace alone scaled with the box, so past ~1.9× it painted THICKER than
+          the slow one and the encoding read backwards. */}
       <path
         d={geo.slowPath}
         data-mc-ink="data"
@@ -209,11 +225,14 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.fastPath}
         data-mc-ink="accent"
         fill="none"
+        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-sw) * 0.7)" }}
       />
-      {showLabels && geo.slowLast != null ? (
+      {/* a reading with no representable y has nowhere to sit: the fallback
+          below would park it at y=0, half a glyph outside the box */}
+      {showLabels && geo.slowLast != null && geo.slowLastY != null ? (
         <text
           x={width}
           y={slowY}
@@ -225,7 +244,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           {fmt(geo.slowLast)}
         </text>
       ) : null}
-      {showFast && geo.fastLast != null ? (
+      {showFast && geo.fastLast != null && geo.fastLastY != null ? (
         <text
           x={width}
           y={fastY}

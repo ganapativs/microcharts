@@ -865,6 +865,166 @@
   height: auto;
 }
 
+/* ── the theming bench ───────────────────────────────────────────────────────
+   Two control rows, the call they are making, and one specimen per token family.
+
+   It is a FIELD, not a plate: Act IV's wall two screens down is made of plates,
+   and a bordered box here would read as the first card of that wall rather than
+   as an instrument the reader can touch. One rule opens it and one closes it, the
+   same pair `.u-ruled` draws everywhere else on the surface.
+
+   Nothing in this block has an entrance. Every state is a `[data-state]` on a
+   real `<button>`, and the transitions are hover and press feedback at the
+   surface's own 0.18s. */
+.home .bench {
+  border-top: 1px solid var(--rule);
+  padding-top: var(--sp-lede);
+}
+.home .bench-controls {
+  display: grid;
+  gap: clamp(14px, 1.8vw, 22px);
+}
+/* Side by side once both rows fit without either wrapping mid-set. Below that
+   they stack, because a two-column grid at 700px broke "chart style" into
+   three lines and the two groups stopped reading as a pair of switches. */
+@media (min-width: 880px) {
+  .home .bench-controls {
+    grid-template-columns: max-content max-content;
+    column-gap: clamp(28px, 4vw, 64px);
+  }
+}
+.home .bench-group {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.home .bench-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* One control language for both rows: same height, same radius, same rest edge.
+   The swatch carries a colour dot and the style chip does not, which is the only
+   difference a reader should be able to name. */
+.home .bench-sw,
+.home .bench-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding-inline: 10px;
+  border-radius: 8px;
+  background: var(--field-1);
+  box-shadow: inset 0 0 0 1px var(--rule);
+  font: 400 0.72rem/1 var(--fm);
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    box-shadow 0.18s var(--e),
+    color 0.18s var(--e);
+}
+.home .bench-sw:hover,
+.home .bench-chip:hover {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--edge-accent);
+}
+/* SELECTED is never colour alone, the same rule the charts follow: the ring
+   doubles in weight and the label steps to full ink, so the choice survives
+   greyscale, forced colours and the mono preset (where the accent IS the ink). */
+.home .bench-sw[data-state="on"],
+.home .bench-chip[data-state="on"] {
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--mc-accent);
+}
+.home .bench-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  /* The literal seed in light, its hand-tuned twin in dark. A single hex would
+     be the wrong swatch in one of the two modes, which is the exact thing the
+     paragraph beside it says the library does not do. */
+  background: var(--sw-l);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--paper-ink, #000) 18%, transparent);
+}
+.dark .home .bench-dot {
+  background: var(--sw-d);
+}
+
+/* Two lines reserved. The preset notes run one line or two at this measure, and
+   a caption that sizes itself moves the code block and all four specimens under
+   it every time the reader crosses the row. */
+.home .bench-note {
+  margin-top: 14px;
+  min-height: 2.2em;
+  max-width: var(--m-prose);
+  color: var(--ink-3);
+}
+
+/* The specimens. A fixed mark box and a fixed caption slot, so four types with
+   four natural aspects land on ONE midline and ONE caption baseline: the beat is
+   "the theme changed", and a row that reflows on every click argues the
+   opposite. */
+.home .bench-specs {
+  /* `--sp-block`, not `--sp-sub`: the controls, the call and the specimens are
+     ONE object. At the block gap the row reads as the output of the switch above
+     it; at the sub gap it read as a second, unrelated beat. */
+  margin-top: var(--sp-block);
+  display: grid;
+  /* 150px, not 184: at the wider track a 390px phone dropped to ONE column and
+     the four specimens ran 800px tall, which turns a row you compare across into
+     a list you scroll. Two columns hold at 358px and the marks are 108px wide. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: clamp(16px, 2.2vw, 30px);
+  max-width: 62rem;
+}
+.home .bench-spec {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.home .bench-mark {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  /* Left, not centred: every caption under it starts at the same x, and a
+     centred mark over a left-set caption reads as two unrelated objects. */
+  justify-content: flex-start;
+}
+.home .bench-mark svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.home .bench-spec figcaption {
+  display: grid;
+  gap: 5px;
+}
+.home .bench-token {
+  font: 500 0.6875rem/1.45 var(--fm);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  /* Two token names wrap rather than run off a 184px column. */
+  overflow-wrap: anywhere;
+}
+.home .bench-what {
+  font: 400 0.8125rem/1.45 var(--fs);
+  color: var(--ink-3);
+}
+
+.home .bench-foot {
+  margin-top: var(--sp-block);
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+  color: var(--ink-3);
+}
+.home .bench-foot code {
+  font-family: var(--fm);
+  color: var(--ink-2);
+}
+
 /* ── Act IV plates: their own offset lattice with corner overlaps ── */
 @media (min-width: 1081px) {
   .home .plates {

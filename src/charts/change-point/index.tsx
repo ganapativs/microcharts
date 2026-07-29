@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear, extent } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { round2, isFiniteValue } from "../../core/types.js";
 import { makeFormatter, makePercentFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_CHANGE_POINT, type ChangePointStrings } from "../../core/strings-change-point.js";
@@ -33,13 +33,17 @@ export function changePointSummary(
   let lead = geo.breaks[0]!;
   for (const b of geo.breaks) if (Math.abs(b.delta) > Math.abs(lead.delta)) lead = b;
   const isLast = lead.index === geo.breaks[geo.breaks.length - 1]!.index;
+  // A regime mean is NaN when every point in it is a gap (reachable with
+  // explicit `breaks`), and `fmt(NaN)` announces the literal string "NaN" —
+  // the catalog's placeholder for an unmeasurable slot is an em dash.
+  const num = (v: number): string => (isFiniteValue(v) ? fmt(v) : "—");
   return strings.changePoint(
     lead.delta >= 0 ? "up" : "down",
     // unsigned — the direction word already carries the sign
     pct(Math.abs(lead.delta)),
     lead.index,
-    fmt(lead.before),
-    fmt(lead.after),
+    num(lead.before),
+    num(lead.after),
     isLast ? "stable" : "again",
   );
 }
@@ -205,7 +209,10 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           d={geo.line.d}
           data-mc-ink="data"
           fill="none"
-          style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
+          // stroke only: `data-mc-ink="data"` already sets the same
+          // `var(--mc-sw)`, and repeating it inline put the width out of reach of
+          // a consumer override (the ink rules are deliberately `:where()`).
+          style={{ stroke: accent }}
           strokeLinejoin="round"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
@@ -238,7 +245,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

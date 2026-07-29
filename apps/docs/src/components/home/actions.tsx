@@ -13,15 +13,22 @@ import { CopyLine } from "./copy-line";
 function Door({
   href,
   primary,
+  analytics,
   children,
 }: {
   href: string;
   primary?: boolean;
+  analytics: string;
   children: React.ReactNode;
 }) {
   // Default prefetch: these are the home page's primary exits (few links).
   return (
-    <Link href={href} className="door group" data-primary={primary || undefined}>
+    <Link
+      href={href}
+      className="door group"
+      data-primary={primary || undefined}
+      data-analytics={`cta:${analytics}`}
+    >
       <span className="door-label">{children}</span>
       <ArrowRight
         aria-hidden
@@ -38,6 +45,7 @@ function SetupLink() {
       href={SETUP_HREF}
       className="ulink group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.08em]"
       style={{ color: "var(--ink-2)" }}
+      data-analytics="cta:setup-ai"
     >
       <Sparkles aria-hidden className="size-3.5 shrink-0" />
       Set up with AI
@@ -51,10 +59,12 @@ export function HeroActions() {
   return (
     <div className="mt-9 grid justify-items-start gap-6 sm:mt-10">
       <div className="flex flex-wrap items-baseline gap-x-9 gap-y-4">
-        <Door href="/docs/quickstart" primary>
+        <Door href="/docs/quickstart" primary analytics="get-started">
           Get started
         </Door>
-        <Door href="/charts">Browse the catalog</Door>
+        <Door href="/charts" analytics="browse-catalog">
+          Browse the catalog
+        </Door>
       </div>
       <div className="grid justify-items-start gap-y-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3.5">
         <CopyLine text={`pnpm add ${SITE.pkg}`} />
@@ -76,10 +86,12 @@ export function ClosingActions() {
   return (
     <div className="mt-9 grid justify-items-start gap-6 sm:mt-12">
       <div className="flex flex-wrap items-baseline gap-x-9 gap-y-4">
-        <Door href={SETUP_HREF} primary>
+        <Door href={SETUP_HREF} primary analytics="setup-ai">
           Set up with AI
         </Door>
-        <Door href="/docs">Read the docs</Door>
+        <Door href="/docs" analytics="read-docs">
+          Read the docs
+        </Door>
       </div>
       <CopyLine text={`pnpm add ${SITE.pkg}`} />
     </div>

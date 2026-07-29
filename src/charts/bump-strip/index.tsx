@@ -9,9 +9,9 @@ import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
-import { bumpGeometry } from "./geometry.js";
+import { bumpGeometry, usableMaxRank } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
-import { minOf } from "../../core/scale.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 export function bumpSummary(ranks: readonly Value[], strings: FlowStrings): string {
   const clean = ranks.filter((r): r is number => isFiniteValue(r) && r >= 1).map(Math.round);
@@ -61,20 +61,24 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
   if (data.some((r) => isFiniteValue(r) && (r < 1 || !Number.isInteger(r)))) {
     devWarn("<BumpStrip> ranks are 1-based ordinals — non-integers rounded, < 1 dropped.");
   }
-  if (maxRank !== undefined && data.some((r) => isFiniteValue(r) && r > maxRank)) {
-    devWarn(`<BumpStrip> rank beyond maxRank=${maxRank} clamped to the bottom band.`);
+  // Warn against the maxRank the geometry actually used, never the raw prop — an
+  // unusable one is ignored, so "clamped to the bottom band" would be a lie.
+  const fixedMax = usableMaxRank(maxRank);
+  if (maxRank !== undefined && fixedMax === undefined) {
+    devWarn("<BumpStrip> maxRank must be a finite rank ≥ 1 — ignored; scaling to the data.");
+  }
+  if (fixedMax !== undefined && data.some((r) => isFiniteValue(r) && r > fixedMax)) {
+    devWarn(`<BumpStrip> rank beyond maxRank=${fixedMax} clamped to the bottom band.`);
   }
 
   const fontSize = labelFont(height, 0.4);
   // clamped label center — the glyph box (central baseline) never leaves the frame
   const labelY = (y: number): number =>
     Math.min(Math.max(y, fontSize * 0.5), height - fontSize * 0.5);
+  // maxOf, not `Math.max(...arr)`: a spread over a caller's series throws past
+  // ~125k arguments. (The interactive entry already loops for the same reason.)
   const maxLabelChars =
-    label === "none"
-      ? 0
-      : 1 +
-        String(Math.max(1, ...data.filter((r): r is number => isFiniteValue(r)).map(Math.round)))
-          .length;
+    label === "none" ? 0 : 1 + String(maxOf(data.filter(isFiniteValue).map(Math.round), 1)).length;
   const geo = bumpGeometry({
     width,
     height,
@@ -115,8 +119,13 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
+      {/* Rank-change moments, plus the periods the line cannot reach: a period
+          with gaps on both sides is a bare `M` in the step path, and SVG never
+          strokes a lone moveto — `[3, null, 2]` painted an empty plot while the
+          name announced both ranks. Same dot either way; the reading is there,
+          the line simply has nothing to connect it to. */}
       {dots === "changes"
-        ? geo.changes.map((c, i) => (
+        ? [...geo.changes, ...geo.isolated].map((c, i) => (
             <circle key={i} cx={c.x} cy={c.y} r={1.5} data-mc-ink="accent" />
           ))
         : null}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { binMass, profileLayout, volumeProfileGeometry } from "./geometry.js";
+import { binMass, profileLayout, resolveValueArea, volumeProfileGeometry } from "./geometry.js";
 
 const PROFILE = [
   { level: 138, weight: 8 },
@@ -67,6 +67,53 @@ describe("volumeProfileGeometry", () => {
     const right = profileLayout({ ...args, align: "right", label: "poc" });
     const rightBare = profileLayout({ ...args, align: "right", label: "none" });
     expect(right.bars[0]!.x).toBeGreaterThan(rightBare.bars[0]!.x);
+  });
+
+  // Hostile CONFIG: `bins`, `valueArea`, `width` and `height` are props a host
+  // computes (a slider, an empty input field → `Number("")` → NaN), and each of
+  // these rendered a normal-looking chart while lying somewhere.
+  describe("a config value a host can compute never breaks the layout", () => {
+    it("a non-fraction valueArea falls back to the stated 70%", () => {
+      expect(resolveValueArea(0.5)).toBe(0.5);
+      expect(resolveValueArea(1)).toBe(1);
+      for (const bad of [NaN, Infinity, -1, 0, 12, undefined]) {
+        expect(resolveValueArea(bad), `${bad} is not a fraction`).toBe(0.7);
+      }
+    });
+
+    it("bins={NaN} bins the data instead of reporting no data", () => {
+      // NaN collapsed the bin array to empty, and the name read "No data."
+      // over five real observations.
+      const rows = binMass(PROFILE, NaN);
+      expect(rows.length).toBe(12);
+      expect(rows.reduce((s, r) => s + r.mass, 0)).toBe(67);
+    });
+
+    it("an unbounded bins saturates instead of throwing or exhausting memory", () => {
+      // `Infinity` threw `Invalid array length` out of `Array.from` and took the
+      // whole tree down; `1e6` built a million rows.
+      expect(binMass(PROFILE, Infinity).length).toBe(12);
+      expect(binMass(PROFILE, 1_000_000).length).toBe(512);
+    });
+
+    it("a non-finite width/height lays out in the default box, not NaN", () => {
+      const geo = profileLayout({
+        data: PROFILE,
+        bins: 5,
+        valueArea: 0.7,
+        align: "right",
+        width: NaN,
+        height: Infinity,
+        label: "poc",
+        fontSize: 7,
+        fmt: (n) => `${n}`,
+      });
+      for (const b of geo.bars) {
+        for (const v of [b.x, b.y, b.width, b.height]) expect(Number.isFinite(v)).toBe(true);
+        expect(b.x + b.width).toBeLessThanOrEqual(48.01);
+        expect(b.y + b.height).toBeLessThanOrEqual(32.01);
+      }
+    });
   });
 
   test.prop([

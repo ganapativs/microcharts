@@ -87,10 +87,14 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
   // and the readout hangs out of the bottom. It DROPS instead — the two wedges
   // and the mid hairline still read the balance, which is the primary encoding.
   const spreadY = fontSize * 0.7;
+  // Gate on the wedges that actually rendered, not on the raw row counts: a book
+  // whose bids were all dropped (zero amounts, or outside the `levels` window)
+  // has no touch to measure, and the raw-count gate still printed "0" over the
+  // gap as if the two sides met there.
   const showSpread =
     label === "spread" &&
-    data.demand.length > 0 &&
-    data.supply.length > 0 &&
+    geo.demandPath !== "" &&
+    geo.supplyPath !== "" &&
     labelFitsY(spreadY, fontSize, height);
 
   return (

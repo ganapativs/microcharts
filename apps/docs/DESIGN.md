@@ -43,8 +43,8 @@ express: `.u-sub`, `.u-block`, `.u-lede`, and `.u-ruled` for a block that draws 
 
 `.display-1` · `.display-2` · `.h3` · `.lead` · `.prose` · `.sentence` · `.mono` · `.mono-s` · `.kicker` · `.num` ·
 `.figure`. Two rules hold across all of it: **the display face is 40px and up only**, and **it never carries a numeral**
-— every figure on the surface is JetBrains Mono, `.num` inline and `.figure` when the number is the statement. Reading
-sizes are rem; drawing sizes (labels inside a diagram) stay px, split by job, not by size.
+— every figure on the surface is Iosevka, `.num` inline and `.figure` when the number is the statement. Reading sizes
+are rem; drawing sizes (labels inside a diagram) stay px, split by job, not by size.
 
 ### Actions
 
@@ -113,7 +113,7 @@ a claim about behavior quotes what the build measured or what a test asserts (`d
 | Display       | **Open Runde** (statics, self-hosted)        | A rounded cut of Inter (SIL OFL) — warmer than the industrial grotesques earlier rounds settled on, and it holds authority at 3rem / 500 without extra weight. Statics, not a variable font, so only the three weights the site sets ship: 500 for docs titles, 600 for section heads and the footer wordmark, 700 for the landing page's two bookend lines. |
 | UI / body     | **Hanken Grotesk**                           | Compact humanist. Everything read at length, on both surfaces.                                                                                                                                                                                                                                                                                               |
 | Reading serif | **Source Serif 4** (italic + regular, latin) | One job: prose depicted AS prose — the landing page's living sentence and its paper inversion. Loaded by the landing route and by the brand page's type specimen, nowhere else.                                                                                                                                                                              |
-| Mono          | **JetBrains Mono**                           | Grammar, kickers, every figure, machine surfaces.                                                                                                                                                                                                                                                                                                            |
+| Mono          | **Iosevka** (Extended cut)                   | Grammar, kickers, every figure, machine surfaces.                                                                                                                                                                                                                                                                                                            |
 
 ### The docs ramp (as built today)
 

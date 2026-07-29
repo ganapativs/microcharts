@@ -108,7 +108,9 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
     [dateFormat, locale],
   );
 
-  const pitch = cell + gap;
+  // pitch from the RESOLVED cell/gap, not the props: a non-finite one falls back
+  // to the default in geometry, and a NaN pitch makes every locate() miss.
+  const pitch = (geo?.cell ?? CALENDAR_CELL) + (geo?.gap ?? CALENDAR_GAP);
   // past-or-present cells only (future is blank — not focusable)
   const count = geo ? geo.totalDays : 0;
   const cells = geo?.cells;
@@ -194,10 +196,12 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
       ? undefined
       : typeof summary === "string"
         ? summary
-        : calendarStripSummary(geo.activeDays, geo.totalDays, weeks, strings);
+        : // geo.rows, never the raw `weeks` — the static entry names the painted
+          // window and the wrapper has to name the same one.
+          calendarStripSummary(geo.activeDays, geo.totalDays, geo.rows, strings);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
-  const m = cellMetrics(cell, shape);
+  const m = cellMetrics(geo.cell, shape);
   const ring = (i: number, pinned: boolean) => {
     const c = geo.cells[i];
     if (!c) return null;

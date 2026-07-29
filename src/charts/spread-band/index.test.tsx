@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { SpreadBand } from "./index.js";
@@ -24,6 +24,19 @@ describe("<SpreadBand>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "Organic leads Paid by 8; last crossed at point 5.",
     );
+  });
+
+  // `muted` is fill:none/stroke, so this dot needed an inline fill to show at
+  // all — and an inline paint outranks the forced-colors mapping, so it kept a
+  // warm gray in High Contrast Mode. `muted`'s stray stroke also grew it to the
+  // accent dot's radius.
+  it("the reference endpoint dot is a filled neutral role, never an inline paint", () => {
+    const { container } = draw(<SpreadBand data={PAIRS} seriesLabels={["Organic", "Paid"]} />);
+    const dot = container.querySelector('circle[data-mc-ink="neutral"]')!;
+    expect(dot).not.toBeNull();
+    expect(dot.getAttribute("r")).toBe("1.5");
+    expect(dot.getAttribute("style")).toBeNull();
+    expect(container.querySelector('circle[data-mc-ink="muted"]')).toBeNull();
   });
 
   it("identical series → level, one line only", () => {
@@ -78,6 +91,18 @@ describe("<SpreadBand>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "Organic leads B by 6; never crossed.",
     );
+  });
+
+  // The crossing dots were keyed by their rounded coordinates. Past ~7.6k points
+  // the x step drops below the 2-dp grid, adjacent crossings round to the same
+  // pair, and React reconciled them as one element.
+  it("crossings keep unique keys when the x step falls under the rounding grid", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const dense = Array.from({ length: 8000 }, (_, i) => ({ a: i % 2 ? 1 : -1, b: 0 }));
+    const { container } = draw(<SpreadBand data={dense} summary={false} />);
+    expect(spy.mock.calls.map(String).join(" ")).not.toMatch(/same key/);
+    expect(container.querySelectorAll('circle[data-mc-ink="point"]').length).toBe(7999);
+    spy.mockRestore();
   });
 
   it("is axe-clean", async () => {

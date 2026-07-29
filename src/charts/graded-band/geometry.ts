@@ -36,6 +36,7 @@ export interface GradedBandGeometry {
 }
 
 const GRADED_MAX_LEVELS = 3;
+const DEFAULT_LEVELS: readonly number[] = [50, 80, 95];
 
 export function gradedBandGeometry(opts: {
   width: number;
@@ -57,10 +58,15 @@ export function gradedBandGeometry(opts: {
   if (finite.length === 0) return null;
 
   // levels: sorted ASCENDING, deduped, 1..3 (ES2022 — spread + sort)
-  const levels = [...new Set((opts.levels ?? [50, 80, 95]).filter((l) => l > 0 && l < 100))]
+  const asked = [...new Set((opts.levels ?? DEFAULT_LEVELS).filter((l) => l > 0 && l < 100))]
     .sort((a, b) => a - b)
     .slice(0, GRADED_MAX_LEVELS);
-  if (levels.length === 0) return null;
+  // A `levels` array that filters down to nothing is a config mistake, not an
+  // absent sample: returning null here made the chart announce "No data." over
+  // a perfectly good series — `levels={[]}`, `levels={[0, 100]}`, or a NaN out
+  // of an empty number input. Fall back to the documented default so the
+  // announcement keeps describing the data that was actually passed.
+  const levels = asked.length > 0 ? asked : DEFAULT_LEVELS;
 
   const median = quantiles(finite, [0.5])![0]!;
 
@@ -94,14 +100,23 @@ export function gradedBandGeometry(opts: {
   const bandH = round2(Math.max(3, height * 0.5));
   const bandY = round2((height - bandH) / 2);
 
-  const bands: GradedBandLevel[] = bounds.map((b, i) => ({
-    p: b.p,
-    x: x(b.lo),
-    width: round2(x(b.hi) - x(b.lo)),
-    lo: round2(b.lo),
-    hi: round2(b.hi),
-    step: i, // widest (i=0) → step 0 (faintest); narrowest → step k-1 (strongest)
-  }));
+  const bands: GradedBandLevel[] = bounds.map((b, i) => {
+    // Left edge + span, not `lo` + `hi - lo`: a descending `domain` (a caller
+    // writing `[max, min]`) maps the high bound to the LEFT and emitted a
+    // negative `width`, which SVG treats as an error — every band vanished
+    // while the summary still announced all three intervals. An ascending
+    // domain is unaffected: `lo` is already the left edge there.
+    const xLo = x(b.lo);
+    const xHi = x(b.hi);
+    return {
+      p: b.p,
+      x: Math.min(xLo, xHi),
+      width: round2(Math.abs(xHi - xLo)),
+      lo: round2(b.lo),
+      hi: round2(b.hi),
+      step: i, // widest (i=0) → step 0 (faintest); narrowest → step k-1 (strongest)
+    };
+  });
 
   return {
     bands,

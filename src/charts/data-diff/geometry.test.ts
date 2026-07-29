@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { dataDiffGeometry } from "./geometry.js";
+import { dataDiffCap, dataDiffGeometry, dataDiffTagFont } from "./geometry.js";
 
 const base = { width: 80, height: 20 };
 const DIFF = [
@@ -124,6 +124,53 @@ describe("dataDiffGeometry", () => {
     // 10 of a 100-domain half-width, not full
     const half = small.centerX - 2;
     expect(small.rows[0]!.added.width).toBeCloseTo(half * 0.1, 1);
+  });
+
+  // A host computes `domain` — `Math.max(...)` over a series with a hole is NaN —
+  // and it is the scale's divisor: an unusable one used to zero every bar width
+  // while the summary still announced the totals.
+  it.each([
+    ["NaN", NaN],
+    ["Infinity", Infinity],
+    ["-Infinity", -Infinity],
+    ["negative", -100],
+    ["zero", 0],
+  ])("an unusable domain max (%s) falls back to the data's own max", (_label, max) => {
+    const geo = dataDiffGeometry({ ...base, data: DIFF, domain: [0, max] })!;
+    expect(geo.degenerate).toBe(false);
+    for (const r of geo.rows) {
+      expect(r.added.width).toBeGreaterThan(0);
+      expect(Number.isFinite(r.added.width)).toBe(true);
+      expect(Number.isFinite(r.removed.width)).toBe(true);
+    }
+    // identical to the unset domain — the fallback IS the default scale
+    expect(geo.rows).toEqual(dataDiffGeometry({ ...base, data: DIFF })!.rows);
+  });
+
+  it("a non-finite maxItems falls back to the 12-row cap, never an empty plot", () => {
+    expect(dataDiffCap(NaN)).toBe(12);
+    expect(dataDiffCap(Infinity)).toBe(12);
+    expect(dataDiffCap(undefined)).toBe(12);
+    expect(dataDiffCap(0)).toBe(1);
+    expect(dataDiffCap(3)).toBe(3);
+    const geo = dataDiffGeometry({ ...base, data: DIFF, maxItems: NaN })!;
+    expect(geo.rows.length).toBe(6);
+  });
+
+  describe("dataDiffTagFont", () => {
+    it("steps down to fit the gutter budget instead of dropping the tags", () => {
+      // 6 chars at font 10 reserves 61 units — past 45% of an 80-wide box — but
+      // the same key fits at 5, so a roomy row must not lose its tag.
+      expect(dataDiffTagFont(10, 6, 80)).toBe(5);
+      // wide enough for the pitch font: no step-down
+      expect(dataDiffTagFont(10, 6, 160)).toBe(10);
+    });
+
+    it("returns 0 when even the smallest tag blows the budget", () => {
+      expect(dataDiffTagFont(10, 40, 80)).toBe(0);
+      expect(dataDiffTagFont(4, 6, 160)).toBe(0); // pitch below the floor
+      expect(dataDiffTagFont(NaN, 6, 160)).toBe(0);
+    });
   });
 
   test.prop([

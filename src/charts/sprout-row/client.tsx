@@ -4,7 +4,6 @@
 // selects (onSelect). Announces each item's stage; a focus ring lifts the active
 // glyph.
 import { useCallback, useMemo, useRef } from "react";
-import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import {
   named,
@@ -19,6 +18,7 @@ import { sproutRowGeometry, stageGlyphBox } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import {
   SproutRow as StaticSproutRow,
+  sproutBox,
   sproutLabelsFit,
   sproutLayout,
   sproutRowSummary,
@@ -48,9 +48,6 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     summary,
     data,
     labels = false,
-    // Labels stagger onto two tiers below the soil, so the default row is taller
-    // when names are shown — mirror the static default exactly.
-    height = labels ? 40 : 20,
     animate = false,
     readout = true,
     className,
@@ -61,7 +58,9 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  // The static's own resolution, not a second copy of it: the hit box, the ring
+  // and the painted glyphs all have to be sized against one box.
+  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize);
   const hostRef = useRef<HTMLSpanElement>(null);
   // "rise" from the soil: each stage glyph (data-mc-ink="point") grows upward
   // from its baseline, left→right — the row literally sprouts. "trail" scaled

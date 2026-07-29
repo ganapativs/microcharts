@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { percentileLadderGeometry } from "./geometry.js";
 import {
   PercentileLadder as StaticPercentileLadder,
@@ -71,12 +71,26 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     order: "index",
   });
 
+  // Same box sanitation as the static entry, for the same reason: the picker
+  // maps pointer x through `width`, so a non-finite prop made every hit test
+  // NaN under a frame `Chart` had already clamped.
+  const w = chartSide(width);
+  const h = chartSide(height);
   // must match the static geometry (label font sizes the log-tag gutter) —
   // import the CHART's font, not `core/labels`' same-named helper
-  const font = ladderFont(height);
+  const font = ladderFont(h);
   const geo = useMemo(
-    () => percentileLadderGeometry({ width, height, data, ps, scale, domain: props.domain, font }),
-    [width, height, data, ps, scale, props.domain, font],
+    () =>
+      percentileLadderGeometry({
+        width: w,
+        height: h,
+        data,
+        ps,
+        scale,
+        domain: props.domain,
+        font,
+      }),
+    [w, h, data, ps, scale, props.domain, font],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const ratioFmt = useMemo(() => makeFormatter({ maximumFractionDigits: 1 }, locale), [locale]);
@@ -108,13 +122,10 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
     },
     [geo],
   );
-  // median reference = the p50 tick if present, else the lowest percentile.
-  // Declared above `datum` so the chip-mirroring `formatted` (below) can read it.
-  const medianValue = useMemo(() => {
-    if (!geo) return 0;
-    const mid = geo.ticks.find((t) => t.p === 50) ?? geo.ticks[0]!;
-    return mid.value;
-  }, [geo]);
+  // The reference is the sample's median, straight from geometry — deriving it
+  // here (nearest tick to p50) made the chip and the static summary quote two
+  // different multiples of "the median" for the same ladder.
+  const medianValue = geo?.median ?? 0;
 
   const datum = useCallback(
     (i: number) => {
@@ -133,8 +144,8 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
 
   const { active, selected, bind } = useActivePicker({
     count,
-    width,
-    height,
+    width: w,
+    height: h,
     locate,
     datum,
     onActive,
@@ -161,7 +172,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         x1={t.x}
         y1={0.5}
         x2={t.x}
-        y2={height - 0.5}
+        y2={h - 0.5}
         data-mc-ink="accent"
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
@@ -193,8 +204,8 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         ps={ps}
         scale={scale}
         label={label}
-        width={width}
-        height={height}
+        width={w}
+        height={h}
         format={format}
         locale={locale}
         strings={strings}
@@ -207,7 +218,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
       {readout && tick ? (
         <span
           className="mc-ladder-readout mc-spark-readout"
-          style={crosshairReadoutStyle(tick.x, width)}
+          style={crosshairReadoutStyle(tick.x, w)}
         >
           {`p${tick.p} ${fmt(tick.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×)`}
         </span>

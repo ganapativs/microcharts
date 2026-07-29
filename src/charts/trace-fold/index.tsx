@@ -6,8 +6,9 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TRACE_FOLD, type TraceFoldStrings } from "../../core/strings-trace-fold.js";
-import { traceFoldGeometry, traceFoldHeight, type Span } from "./geometry.js";
+import { DEFAULT_WIDTH, traceFoldGeometry, traceFoldHeight, type Span } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { chartSide, round2 } from "../../core/types.js";
 
 export type TraceFoldDatum = Span;
 
@@ -51,7 +52,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
     data,
     emphasis = "critical",
     labels = true,
-    width = 120,
+    width: widthProp = DEFAULT_WIDTH,
     height: heightProp,
     format,
     locale,
@@ -65,7 +66,15 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   } = props;
 
   const depthCount = Math.max(1, new Set(data.slice(0, 40).map((s) => s.depth)).size);
-  const height = heightProp ?? traceFoldHeight(depthCount);
+  // Everything below reads the RESOLVED box, never the prop. A host that sizes a
+  // trace off an element it has not measured yet passes `width={NaN}`: `Chart`
+  // clamped the frame, so the viewBox and the accessible name both stayed
+  // correct while every span rect carried x="NaN" and the root carried
+  // `--mc-seat: NaN`. A negative box was worse — the rows drew at negative
+  // coordinates, outside a frame that does not clip.
+  const fallbackH = traceFoldHeight(depthCount);
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp ?? fallbackH, fallbackH);
   const rowGap = 1.2;
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(height / depthCount, 0.6);
@@ -135,8 +144,4 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

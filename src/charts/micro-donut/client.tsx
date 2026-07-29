@@ -17,7 +17,7 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { largestRemainderPercents, rollup } from "../segmented-bar/geometry.js";
 import { sharesSummary } from "../segmented-bar/index.js";
-import { microDonutGeometry } from "./geometry.js";
+import { donutMaxWedges, donutSize, microDonutGeometry } from "./geometry.js";
 import { MicroDonut as StaticMicroDonut, type MicroDonutProps } from "./index.js";
 
 const TAU = Math.PI * 2;
@@ -41,10 +41,8 @@ export interface InteractiveMicroDonutProps extends MicroDonutProps, PickerProps
 export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   const {
     data,
-    maxWedges = 4,
     decorative = false,
-    weight = 5,
-    size = 24,
+    weight,
     format,
     locale,
     strings = EN_COMPOSITION,
@@ -60,6 +58,12 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Resolved through the geometry's own resolvers, exactly as the static entry
+  // does: the pointer math, the picker box and the painted ring all have to be
+  // on one scale, and a hostile `size` must not survive into `--mc-seat`.
+  const size = donutSize(props.size);
+  const maxWedges = donutMaxWedges(props.maxWedges);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Wedges are stroked centerlines (see geometry), so the entrance DRAWS the
@@ -144,6 +148,8 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         decorative
         weight={weight}
         size={size}
+        format={format}
+        locale={locale}
         strings={strings}
       />
     );
@@ -195,6 +201,11 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
         maxWedges={maxWedges}
         weight={weight}
         size={size}
+        // `format`/`locale` are destructured for the readout, so they were no
+        // longer in `...rest` — the static's `label="total"` centre figure fell
+        // back to the default formatter the moment a chart went interactive.
+        format={format}
+        locale={locale}
         strings={strings}
         summary={false}
       >

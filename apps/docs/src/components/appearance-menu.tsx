@@ -94,6 +94,11 @@ export function AppearanceMenu() {
   // <body> with fixed coords, anchored toward whichever side has room.
   function toggle() {
     if (!open && ref.current) {
+      // Re-read on OPEN, not only on mount. The home page's theming bench sets
+      // the same two attributes, so a reader who picks an accent there and then
+      // opens this menu would otherwise find the mount-time choice still ticked.
+      setAccentState(document.documentElement.dataset.accent ?? "cobalt");
+      setPresetState(document.documentElement.dataset.mcPreset ?? "modern");
       const r = ref.current.getBoundingClientRect();
       // approximate popover height (preview + theme + accent + chart-style rows
       // + the preset note line) so the up/down flip keeps it on-screen; err tall

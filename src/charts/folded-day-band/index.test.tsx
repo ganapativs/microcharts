@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { FoldedDayBand, foldedBandSummary } from "./index.js";
+import { FoldedDayBand, binPosition, foldedBandSummary } from "./index.js";
 import { foldedBandGeometry } from "./geometry.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
 import { makeFormatter } from "../../core/format.js";
@@ -58,6 +58,49 @@ describe("<FoldedDayBand>", () => {
       height: 32,
     });
     expect(foldedBandSummary(geo, 24, EN_FOLDED_BAND, fmt)).toBe("Median peaks at 14 (82).");
+  });
+
+  // The envelopes are the primary encoding. Inline `fill` survived verbatim
+  // into High Contrast Mode (`.mc-root` sets `forced-color-adjust: none`), so a
+  // 12%-opacity ink was no envelope at all; the paint moved to the shared
+  // `[data-mc-cone]` rule, which has a forced-colors mapping.
+  it("envelopes paint through a themable rule, never an inline fill", () => {
+    const { container } = draw(<FoldedDayBand data={DATA} />);
+    const bands = [...container.querySelectorAll("path[data-mc-cone]")];
+    expect(bands.length).toBe(2);
+    for (const b of bands) {
+      const inline = b.getAttribute("style") ?? "";
+      expect(inline).not.toMatch(/(^|;)\s*fill\s*:/);
+      expect(inline).toContain("--mc-cone-color");
+      expect(inline).toContain("--mc-cone-opacity");
+    }
+  });
+
+  // Both traces sit in the same plot box; one scaling its stroke with the box
+  // and the other not let the support-weight overlay outweigh the median.
+  it("both traces hold their stroke weight when the box scales", () => {
+    const { container } = draw(<FoldedDayBand data={DATA} today={TODAY} />);
+    for (const sel of ['path[data-mc-ink="data"]', 'path[data-mc-ink="accent"]']) {
+      expect(container.querySelector(sel)!.getAttribute("vector-effect")).toBe(
+        "non-scaling-stroke",
+      );
+    }
+  });
+
+  // Announced axis == drawn axis. `period` reaches this component from a host
+  // computation, and the summary read it raw.
+  it.each([NaN, Infinity, 0, -5])("period=%p never leaks into the name", (period) => {
+    const { container } = draw(<FoldedDayBand data={DATA} period={period} />);
+    const name = container.querySelector("svg")!.getAttribute("aria-label")!;
+    expect(name).not.toMatch(/NaN|Infinity/);
+    expect(name).toBe("Median peaks at 14 (82).");
+  });
+
+  // Saturated in geometry (512 bins), so the label has to saturate with it —
+  // dividing by the raw prop put every bin at position 0.
+  it("a huge `bins` labels the axis it actually drew", () => {
+    expect(binPosition(256, 1_000_000, 24)).toBe(binPosition(256, 512, 24));
+    expect(binPosition(0, NaN, NaN)).toBe(0);
   });
 
   it("is axe-clean", async () => {

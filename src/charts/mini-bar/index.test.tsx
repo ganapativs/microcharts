@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { MiniBar, type MiniBarDatum } from "./index.js";
+import { textGutter } from "../../core/labels.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 import { expectHostsAnnotations } from "../../test/annotation-host.js";
@@ -99,6 +100,79 @@ describe("<MiniBar>", () => {
     const { container } = draw(<MiniBar data={[{ label: "Only", value: 4 }]} />);
     expect(container.querySelectorAll("rect").length).toBe(1);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("1 category");
+  });
+
+  // The max readout is the only text this chart paints, and `.mc-root` is
+  // `overflow: visible` — a label pushed past an edge lands in the page. Before
+  // the reserved band it did exactly that: anchored on the max bar with no
+  // horizontal gutter and floored at 0.55 × fontSize instead of the ascent.
+  const maxLabel = (c: HTMLElement) => c.querySelector("text");
+  const extents = (t: SVGTextElement) => {
+    const fs = Number(t.getAttribute("font-size"));
+    const x = Number(t.getAttribute("x"));
+    const y = Number(t.getAttribute("y"));
+    const w = textGutter(t.textContent!.length, fs, 2);
+    return { left: x - w / 2, right: x + w / 2, top: y - fs * 0.78, bottom: y + fs * 0.22 };
+  };
+
+  const CONTAINMENT: [string, MiniBarDatum[], number, number][] = [
+    ["max first, narrow box", DATA, 50, 16],
+    ["max last", [...DATA].reverse(), 50, 16],
+    ["grouped digits", DATA.map((d) => ({ ...d, value: d.value! * 1000 })), 90, 16],
+    ["tall box", DATA, 80, 40],
+    ["all negative", DATA.map((d) => ({ ...d, value: -d.value! })), 50, 16],
+    ["all zero", DATA.map((d) => ({ ...d, value: 0 })), 50, 16],
+  ];
+
+  it.each(CONTAINMENT)("label='max' stays inside the viewBox: %s", (_name, data, width, height) => {
+    const { container } = draw(<MiniBar data={data} label="max" width={width} height={height} />);
+    const t = maxLabel(container);
+    if (!t) return; // dropped out — the other containment answer
+    const e = extents(t);
+    expect(e.left).toBeGreaterThanOrEqual(-0.01);
+    expect(e.right).toBeLessThanOrEqual(width + 0.01);
+    expect(e.top).toBeGreaterThanOrEqual(-0.01);
+    expect(e.bottom).toBeLessThanOrEqual(height + 0.01);
+  });
+
+  const topBarY = (c: HTMLElement) =>
+    [...c.querySelectorAll("rect")].reduce(
+      (m, r) => Math.min(m, Number(r.getAttribute("y"))),
+      Infinity,
+    );
+
+  it("label='max' reserves its band before geometry (no bar under the text)", () => {
+    const { container } = draw(<MiniBar data={DATA} label="max" />);
+    expect(topBarY(container)).toBeGreaterThan(Number(maxLabel(container)!.getAttribute("y")));
+    // and the band is given back when the label goes
+    expect(topBarY(draw(<MiniBar data={DATA} />).container)).toBeLessThan(topBarY(container));
+  });
+
+  it("label='max' drops out when the box can't seat it", () => {
+    // too narrow for the digits at this size…
+    expect(
+      maxLabel(
+        draw(<MiniBar data={[{ label: "a", value: 94000000 }]} label="max" width={24} />).container,
+      ),
+    ).toBeNull();
+    // …and too short to give the band up
+    expect(maxLabel(draw(<MiniBar data={DATA} label="max" height={10} />).container)).toBeNull();
+    // no finite value to report
+    expect(
+      maxLabel(draw(<MiniBar data={[{ label: "a", value: null }]} label="max" />).container),
+    ).toBeNull();
+    // horizontal runs value along x — documented as vertical-only
+    expect(
+      maxLabel(draw(<MiniBar data={DATA} label="max" orientation="horizontal" />).container),
+    ).toBeNull();
+  });
+
+  it("label='max' paints after every bar (a wide label used to be overdrawn)", () => {
+    const { container } = draw(<MiniBar data={DATA} label="max" />);
+    const marks = [...container.querySelector("svg")!.children].filter(
+      (el) => el.tagName === "rect" || el.tagName === "text",
+    );
+    expect(marks.at(-1)!.tagName).toBe("text");
   });
 
   it("is axe-clean", async () => {

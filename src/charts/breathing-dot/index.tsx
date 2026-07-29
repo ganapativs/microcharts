@@ -9,8 +9,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont, textGutter } from "../../core/labels.js";
-import { breathingDotGeometry } from "./geometry.js";
+import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
+import { breathingDotGeometry, loadBand, resolveThresholds } from "./geometry.js";
 
 const BAND_INK = ["positive", "neutral", "negative"] as const;
 
@@ -51,10 +52,12 @@ export function breathingDotSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { thresholds = [0.5, 0.8], strings = EN_BREATHING_DOT, format, locale } = opts;
-  if (!(typeof value === "number" && Number.isFinite(value))) return strings.breathingDotUnknown;
+  const { strings = EN_BREATHING_DOT, format, locale } = opts;
+  if (!isFiniteValue(value)) return strings.breathingDotUnknown;
   const v = Math.min(1, Math.max(0, value));
-  const band = v < thresholds[0] ? 0 : v < thresholds[1] ? 1 : 2;
+  // Same resolver + same band function the geometry uses, so the word spoken
+  // and the color painted can never come off different edges.
+  const band = loadBand(v, resolveThresholds(opts.thresholds));
   return strings.breathingDot(makeFormatter(format, locale, PCT)(v), strings.loadBands[band]);
 }
 
@@ -74,24 +77,36 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(size);
-
   const geo = breathingDotGeometry({ value, size, thresholds, pad: PAD });
+  // `fontSize` is host-computed like `size`, and a non-finite or non-positive
+  // one reached the DOM verbatim: `font-size="NaN"`, plus a NaN viewBox width
+  // through the gutter it sizes. Fall back to the `size`-derived default.
+  const fontSize =
+    isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : labelFont(geo.size);
+
   const accName =
     summary === false
       ? false
       : (summary ?? breathingDotSummary(value, { thresholds, strings, format, locale }));
   const pctText =
     label === "value" && !geo.unknown ? makeFormatter(format, locale, PCT)(geo.level) : null;
+  const labelY = geo.size / 2 + fontSize * 0.34;
+  // `labelFont` floors at 7, so under a box of ~8 units the numeral's em-box no
+  // longer fits the glyph box vertically — and `.mc-root` is `overflow: visible`,
+  // so it paints on the page instead of clipping. Drop it (labels.ts degradation
+  // rule); the summary still states the percent.
+  const labelFits = label === "value" && labelFitsY(labelY, fontSize, geo.size, false);
   // Reserve from the ACTUAL numeral, not a fixed digit count: a locale that puts
   // a NBSP before the sign ("100 %") is one character wider than the "100%" the
   // 2.6 em band was cut for, and `.mc-root` is `overflow: visible` — the numeral
-  // would spill into the page rather than clip. The band stays the floor so
-  // en-US output is byte-identical.
-  const labelBand =
-    label === "value"
-      ? Math.max(fontSize * 2.6, pctText ? textGutter(pctText.length, fontSize, 1) : 0)
-      : 0;
+  // would spill into the page rather than clip. The band stays the floor. It is
+  // reserved even while the value is unknown, so a feed that drops out does not
+  // resize the line it sits on. `Math.ceil` because that floor is fractional: at
+  // the default size it put `width="39.400000000000006"` on the root, against
+  // the integer-viewBox rule (`textGutter` already snaps to integers).
+  const labelBand = labelFits
+    ? Math.ceil(Math.max(fontSize * 2.6, pctText ? textGutter(pctText.length, fontSize, 1) : 0))
+    : 0;
 
   return (
     <Chart
@@ -126,10 +141,10 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
         data-mc-ink={geo.unknown ? "neutral" : BAND_INK[geo.band]}
         style={geo.unknown ? { fillOpacity: 0.5 } : undefined}
       />
-      {pctText !== null ? (
+      {pctText !== null && labelFits ? (
         <text
           x={geo.size + 1}
-          y={geo.size / 2 + fontSize * 0.34}
+          y={labelY}
           fontSize={fontSize}
           textAnchor="start"
           data-mc-ink="label"

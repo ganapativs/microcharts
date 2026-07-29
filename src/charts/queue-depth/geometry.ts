@@ -82,9 +82,28 @@ export function queueDepthGeometry(opts: {
   const finite = opts.data.filter(isFiniteValue);
   if (finite.length === 0) return null;
 
-  const capacity = isFiniteValue(opts.capacity) ? opts.capacity : null;
-  const yMax = opts.domain?.[1] ?? Math.max(1, maxOf(finite), capacity ?? 0);
-  const yMin = opts.domain?.[0] ?? 0; // zero-anchored (stock)
+  // Capacity resolved ONCE, positive-finite: hairline, breach spans, `above`,
+  // `breached` and `ratio` all read this, so the announced ceiling is the
+  // painted one. Non-finite was already dropped; 0 and negatives were not, and
+  // they put every sample "above capacity" — the whole edge re-stroked in the
+  // negative ink — while `ratio` (guarded against ÷0) stayed null, so the
+  // summary mentioned no capacity at all.
+  const capacity = isFiniteValue(opts.capacity) && opts.capacity > 0 ? opts.capacity : null;
+  // A fixed domain is honored only as a finite ASCENDING pair. `scaleLinear`
+  // maps a non-finite span to its range midpoint, so `[0, NaN]` painted every
+  // sample as one flat line at mid-height while the summary went on announcing
+  // the real trend off the raw values — announced scale ≠ painted scale. An
+  // inverted `[max, min]` flips the encoding instead: a growing backlog paints
+  // downward under a ▴ glyph. Both fall back to the documented auto domain.
+  const fixed =
+    opts.domain &&
+    Number.isFinite(opts.domain[0]) &&
+    Number.isFinite(opts.domain[1]) &&
+    opts.domain[1] > opts.domain[0]
+      ? opts.domain
+      : null;
+  const yMax = fixed ? fixed[1] : Math.max(1, maxOf(finite), capacity ?? 0);
+  const yMin = fixed ? fixed[0] : 0; // zero-anchored (stock)
 
   const xScale = scaleLinear([0, Math.max(1, n - 1)], [pad, width - pad]);
   const yScale = scaleLinear([yMin, yMax], [height - pad, pad]);
@@ -130,11 +149,17 @@ export function queueDepthGeometry(opts: {
     if (run.length === 0) x0 = x;
     xN = x;
     run.push(`${x} ${y}`);
-    points.push({ index: i, x, y, value: round2(v), above: capacity !== null && v > capacity });
+    // Strictly ABOVE — one flag drives both the point and its breach span, so
+    // the re-stroke can no longer disagree with what the summary announces.
+    // `>=` here painted a queue sitting exactly AT capacity (its most common
+    // steady state) in full negative ink under a "within capacity" summary, and
+    // turned a line that merely touched the hairline into a zero-length span.
+    const above = capacity !== null && v > capacity;
+    points.push({ index: i, x, y, value: round2(v), above });
     if (capacity !== null) {
       if (prev) {
-        const pa = prev.v >= capacity;
-        if (pa !== v >= capacity && v !== prev.v) {
+        const pa = prev.v > capacity;
+        if (pa !== above && v !== prev.v) {
           const cx = round2(prev.x + ((capacity - prev.v) / (v - prev.v)) * (x - prev.x));
           const cy = Y(capacity);
           if (pa) {
@@ -146,7 +171,7 @@ export function queueDepthGeometry(opts: {
           }
         }
       }
-      if (v >= capacity) brk.push(`${x} ${y}`);
+      if (above) brk.push(`${x} ${y}`);
       prev = { x, v };
     }
   });
@@ -174,7 +199,7 @@ export function queueDepthGeometry(opts: {
     capacityY,
     trend,
     now: end.value,
-    ratio: capacity !== null && capacity > 0 ? round2(now / capacity) : null,
+    ratio: capacity !== null ? round2(now / capacity) : null,
     breached: capacity !== null && now > capacity,
     points,
     labelX: round2(width + 3),

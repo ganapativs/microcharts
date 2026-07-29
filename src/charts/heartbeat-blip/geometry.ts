@@ -26,6 +26,31 @@ export interface HeartbeatGeometry {
   y1: number;
 }
 
+// The window is a DIVISOR for every spike's x, so a zero / non-finite one emits
+// `x="NaN"` and the spikes vanish silently. Fall back to the documented default
+// rather than drawing nothing. `heartbeatSummary` applies the same rule, so the
+// window a reader hears can never disagree with the one the trace is drawn on.
+const resolveWindow = (w: number): number => (Number.isFinite(w) && w > 0 ? w : DEFAULT_WINDOW);
+
+/** In-window, finite events; events after `now` clamped to now (clock skew). */
+function inWindowEvents(events: readonly number[], win: number, now: number): number[] {
+  const start = now - win;
+  const out: number[] = [];
+  for (const t of events)
+    if (Number.isFinite(t) && t >= start && t <= now + win) out.push(Math.min(t, now));
+  return out;
+}
+
+/**
+ * In-window tally, without the path build. `label="count"` has to know the
+ * numeral before it can reserve the gutter that numeral needs, and the
+ * interactive entry recomputes the tally four times a second as the clock
+ * advances — neither wants a throwaway spike path each time.
+ */
+export function heartbeatCount(events: readonly number[], window: number, now: number): number {
+  return inWindowEvents(events, resolveWindow(window), now).length;
+}
+
 export function heartbeatGeometry(opts: {
   events: readonly number[];
   window: number;
@@ -35,26 +60,33 @@ export function heartbeatGeometry(opts: {
   pad: number;
 }): HeartbeatGeometry {
   const { events, now, width, height, pad } = opts;
-  // The window is a DIVISOR for every spike's x, so a zero / non-finite one
-  // emits `x="NaN"` and the spikes vanish silently. Fall back to the documented
-  // default rather than drawing nothing.
-  const win = Number.isFinite(opts.window) && opts.window > 0 ? opts.window : DEFAULT_WINDOW;
-  const innerW = width - pad * 2;
+  const win = resolveWindow(opts.window);
+  // A reserved label gutter wider than the box used to make this negative, which
+  // mirrored every spike out of the viewBox instead of collapsing the plot.
+  const innerW = Math.max(0, width - pad * 2);
   const baseY = round2(height * 0.62);
   const peakY = round2(pad + 1); // top of the spike
   const dipY = round2(Math.min(height - pad, baseY + height * 0.14));
 
   const start = now - win;
-  // In-window, finite events; events after `now` clamped to now (clock skew).
-  const inWindow = events
-    .filter((t) => Number.isFinite(t) && t >= start && t <= now + win)
-    .map((t) => Math.min(t, now));
+  const inWindow = inWindowEvents(events, win, now);
 
-  const xOf = (t: number): number => round2(pad + ((t - start) / win) * innerW);
+  // The fraction is [0, 1] by construction — except that `t - start` overflows to
+  // Infinity once `start` underflows (a window near 1e308 makes it -Infinity),
+  // and that used to reach the emitted path as `x="Infinity"`.
+  const xOf = (t: number): number =>
+    round2(pad + Math.min(1, Math.max(0, (t - start) / win)) * innerW);
 
   let spikesPath = "";
+  // Two events that round to the same x emit the same glyph over itself: same
+  // pixels, more bytes. A busy minute (tens of thousands of timestamps on a
+  // 60-unit strip) used to build a multi-megabyte `d`; `count` is taken from the
+  // unfiltered set below, so the reading is untouched.
+  const drawn = new Set<number>();
   for (const t of inWindow) {
     const x = xOf(t);
+    if (drawn.has(x)) continue;
+    drawn.add(x);
     // QRS-ish glyph ~3 units wide: baseline → up to peak → small dip → baseline.
     const xl = round2(Math.max(pad, x - 1.2));
     const xr = round2(Math.min(width - pad, x + 1.2));

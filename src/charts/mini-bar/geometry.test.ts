@@ -41,17 +41,38 @@ describe("miniBarGeometry", () => {
     expect(geo.bars[0]!.w).toBeCloseTo(geo.bars[1]!.w / 2, 1);
   });
 
+  it("topPad reserves a band above the plot; bars still stand on the box bottom", () => {
+    const plain = miniBarGeometry({ ...base, values: [10, 5] });
+    const padded = miniBarGeometry({ ...base, values: [10, 5], topPad: 8 });
+    expect(plain.y0).toBe(0);
+    expect(padded.y0).toBe(8);
+    expect(padded.y1).toBe(16); // the floor seat is unmoved
+    expect(padded.bars[0]!.y).toBeGreaterThanOrEqual(8);
+    expect(padded.bars[0]!.y + padded.bars[0]!.h).toBeCloseTo(padded.baseline, 1);
+    expect(padded.bars[0]!.h).toBeCloseTo(plain.bars[0]!.h / 2, 1);
+  });
+
+  it("topPad is vertical-only: horizontal runs value along x, so it ignores the band", () => {
+    const geo = miniBarGeometry({ ...base, orientation: "horizontal", values: [5, 10], topPad: 8 });
+    expect(geo.y0).toBe(0);
+    expect(geo.bars[0]!.x).toBe(0);
+    expect(geo.bars[1]!.w).toBeCloseTo(50, 0);
+  });
+
   test.prop([
     fc.array(fc.option(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { nil: null }), {
       minLength: 1,
       maxLength: 8,
     }),
     fc.constantFrom<"horizontal" | "vertical">("horizontal", "vertical"),
-  ])("containment: every bar inside the box, 2-dp", (values, orientation) => {
-    const geo = miniBarGeometry({ width: 50, height: 16, values, orientation });
+    // the label band the component can actually reserve: it always leaves the
+    // plot at least a line of its own
+    fc.double({ noNaN: true, min: 0, max: 12 }),
+  ])("containment: every bar inside the box, 2-dp", (values, orientation, topPad) => {
+    const geo = miniBarGeometry({ width: 50, height: 16, values, orientation, topPad });
     for (const b of geo.bars) {
       expect(b.x).toBeGreaterThanOrEqual(-0.01);
-      expect(b.y).toBeGreaterThanOrEqual(-0.01);
+      expect(b.y).toBeGreaterThanOrEqual(geo.y0 - 0.01);
       expect(b.x + b.w).toBeLessThanOrEqual(50.01);
       expect(b.y + b.h).toBeLessThanOrEqual(16.01);
     }

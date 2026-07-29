@@ -38,6 +38,16 @@ describe("dotPlotGeometry", () => {
     expect(truncateLabel("Amsterdam")).toBe("Amster…");
   });
 
+  it("truncateLabel never cuts a surrogate pair in half", () => {
+    const party = "\u{1F389}";
+    // odd offset: a 6-unit cut lands mid-pair. It used to ship a lone surrogate,
+    // which renders as U+FFFD — back off a unit instead.
+    expect(truncateLabel(`a${party.repeat(4)}`, 6)).toBe(`a${party.repeat(2)}…`);
+    expect([...truncateLabel(`a${party.repeat(4)}`, 6)]).not.toContain("�");
+    // even offset: the cut is already clean, so the full budget is kept
+    expect(truncateLabel(party.repeat(4), 6)).toBe(`${party.repeat(3)}…`);
+  });
+
   test.prop([
     fc.array(fc.option(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { nil: null }), {
       minLength: 1,

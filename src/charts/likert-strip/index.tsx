@@ -8,8 +8,13 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
-import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
-import { labelFitsY } from "../../core/labels.js";
+import {
+  likertBarHeight,
+  likertBox,
+  likertFont,
+  likertLabels,
+  likertStripGeometry,
+} from "./geometry.js";
 import type { MiniBarDatum } from "../mini-bar/index.js";
 import { maxOf, minOf } from "../../core/scale.js";
 
@@ -78,18 +83,24 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     devWarn("<LikertStrip> negative counts treated as 0.");
   }
 
-  const fontSize = likertFont(height);
-  const wantLabels = label !== "none" && labelFitsY(height / 2, fontSize, height);
+  const [w, h] = likertBox(width, height);
+  const fontSize = likertFont(h);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
   // End labels reserve deterministic gutters, measured off the widest string this
   // chart's OWN formatter can produce — `pctFmt(1)` is the 100% case, and it is
   // one character longer than "100%" in every locale that spaces the sign.
-  const gutter = likertGutter(wantLabels, fontSize, pctFmt(1).length);
+  const { show: wantLabels, gutter } = likertLabels({
+    labelled: label !== "none",
+    width: w,
+    height: h,
+    fontSize,
+    widest: pctFmt(1).length,
+  });
   const geo = likertStripGeometry({
-    width,
-    height,
+    width: w,
+    height: h,
     values: data.map((d) => d.value),
     neutral,
     gutterL: gutter,
@@ -104,24 +115,38 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
           ? strings.noResponses
           : likertSummary(geo.shares, hasNeutralLevel, pctFmt, strings)));
 
-  const midY = height / 2;
-  // direct labels hug the BAR ends, not the frame — a small negative pole
-  // must not leave its label floating at the far edge
+  const midY = h / 2;
+  // direct labels hug the BAR ends, not the frame — with `neutral="omit"` on a
+  // lone neutral level there is no bar at all, and its labels must still land
+  // inside the box rather than 4 units outside it
   const barX0 = geo?.segments.length ? minOf(geo.segments.map((g) => g.x)) : 0;
-  const barX1 = geo?.segments.length ? maxOf(geo.segments.map((g) => g.x + g.width)) : width;
-  // the SAME reserve `likertGutter` opened, from the one shared estimator — the
-  // end labels are percentages this chart formatted, so the digits rate holds
-  const est = likertGutter(true, fontSize);
+  const barX1 = geo?.segments.length ? maxOf(geo.segments.map((g) => g.x + g.width)) : w;
+  // The reserve the geometry ACTUALLY opened. This used to re-estimate at the
+  // 4-char default, so a wider one — `fr-FR`'s "100 %", any caller `format` —
+  // passed a fit test sized for a label the chart was not painting, and the text
+  // ran off the viewBox. 0.01 is the geometry's own rounding: two 2-dp coords
+  // sum a hundredth past the plot edge, which must not bounce a label off the
+  // bar end and onto the frame.
   const leftLabel =
-    barX0 - est >= 0
+    barX0 - gutter >= -0.01
       ? { x: barX0 - 4, anchor: "end" as const }
       : { x: 1, anchor: "start" as const };
   const rightLabel =
-    barX1 + est <= width
+    barX1 + gutter <= w + 0.01
       ? { x: barX1 + 4, anchor: "start" as const }
-      : { x: width - 1, anchor: "end" as const };
-  const barH = Math.max(3, height - 4);
+      : { x: w - 1, anchor: "end" as const };
+  const barH = likertBarHeight(h);
   const net = geo ? (geo.shares.positive - geo.shares.negative) * 100 : 0;
+  // The strip localises every percent it paints and every percent it announces;
+  // the net score was ASCII digits, so an `ar-EG` chart read "٦٢٪ … +38". Sign
+  // stays typographic (the catalog's `−`), magnitude goes through the formatter.
+  // Built behind the guard: `makeFormatter` keys its cache with `JSON.stringify`,
+  // and the other two label modes never spend a net score.
+  const netFmt =
+    wantLabels && label === "net"
+      ? makeFormatter(undefined, locale, { maximumFractionDigits: 0 })
+      : null;
+  const netText = netFmt ? `${net >= 0 ? "+" : "−"}${netFmt(Math.abs(net))}` : null;
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
@@ -131,8 +156,8 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
 
   return (
     <Chart
-      width={width}
-      height={height}
+      width={w}
+      height={h}
       title={title}
       summary={accName}
       id={id}
@@ -150,7 +175,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
             x1={geo.centerX}
             y1={0.5}
             x2={geo.centerX}
-            y2={height - 0.5}
+            y2={h - 0.5}
             data-mc-ink="muted"
             data-mc-w="support"
             strokeOpacity={0.6}
@@ -193,7 +218,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
                 {pctFmt(geo.shares.positive)}
               </text>
             </>
-          ) : wantLabels && label === "net" ? (
+          ) : netText !== null ? (
             <text
               x={rightLabel.x}
               y={midY}
@@ -202,7 +227,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
               textAnchor={rightLabel.anchor}
               data-mc-ink="label"
             >
-              {`${net >= 0 ? "+" : "−"}${Math.round(Math.abs(net))}`}
+              {netText}
             </text>
           ) : null}
         </>

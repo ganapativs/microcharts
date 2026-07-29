@@ -130,9 +130,12 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
           key={i}
           x={c.x}
           y={c.y}
-          width={cell}
-          height={cell}
+          // the RESOLVED cell edge, never the raw prop: a `cell` the geometry
+          // repaired but the mark did not painted rects the grid never spaced.
+          width={geo.cell}
+          height={geo.cell}
           rx={1}
+          shapeRendering="crispEdges"
           data-mc-ink={c.gap ? "gap" : "cell"}
           fillOpacity={c.gap ? undefined : levelOpacity(c.level)}
           style={!c.gap ? cellFill : undefined}

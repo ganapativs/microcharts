@@ -69,6 +69,44 @@ describe("spreadBandGeometry", () => {
     expect(geo.bLeadBand).toBe("");
   });
 
+  // A gap, or a gap between two gaps, can overflow to ±Infinity long before the
+  // values themselves do. `Infinity / (Infinity + Infinity)` is NaN, NaN sails
+  // through `clamp`, and the crossing dot plus its two split band subpaths
+  // reached the DOM as `MNaN NaN`.
+  it.each([
+    ["both gaps overflow", 1e308, -1e308, -1e308, 1e308],
+    ["the gap-of-gaps overflows", 1e308, 0, -1e308, 0],
+    ["neither overflows alone", 5e307, -5e307, -5e307, 5e307],
+  ])("crossing stays finite when %s", (_why, a0, b0, a1, b1) => {
+    const geo = spreadBandGeometry({
+      ...base,
+      data: [
+        { a: a0, b: b0 },
+        { a: a1, b: b1 },
+      ],
+    });
+    expect(geo.crossings.length).toBe(1);
+    for (const v of geo.crossings[0]!) expect(Number.isFinite(v)).toBe(true);
+    for (const d of [geo.aLeadBand, geo.bLeadBand, geo.subjectD, geo.referenceD]) {
+      expect(d).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
+  it("the crossing dot sits on the drawn subject segment", () => {
+    const geo = spreadBandGeometry({
+      ...base,
+      data: [
+        { a: 0, b: 10 },
+        { a: 10, b: 0 },
+      ],
+    });
+    const [x, y] = geo.crossings[0]!;
+    const [x0, y0] = geo.subjectPoints[0]!;
+    const [x1, y1] = geo.subjectPoints[1]!;
+    const t = (x - x0) / (x1 - x0);
+    expect(y).toBeCloseTo(y0 + t * (y1 - y0), 1);
+  });
+
   test.prop([
     fc.array(
       fc.record({

@@ -4,8 +4,11 @@
 // but never hidden). and tiny muted ghost dots for the peer field. The read is
 // quadrant MEMBERSHIP first; exact position second. Boundary rule: ≥ split ⇒
 // right/top (deterministic). Glyph scale (24×24). Coords 2-dp.
-import { scaleLinear, extent } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { clamp, scaleLinear, extent } from "../../core/scale.js";
+import { chartSide, round2 } from "../../core/types.js";
+
+export const DEFAULT_WIDTH = 24;
+export const DEFAULT_HEIGHT = 24;
 
 interface Pt {
   x: number;
@@ -39,10 +42,47 @@ const finite = (p: Pt): boolean => Number.isFinite(p.x) && Number.isFinite(p.y);
  * Mark radii — proportional to the box, so they must not be re-derived by the
  * interactive entry: its hit radius is sized from the PAINTED ghost, and a
  * fixed one leaves the outer ring of a large dot dead to the pointer.
+ *
+ * `halo` is the outermost mark (the focal's soft disc, and the focus/selection
+ * ring drawn on top of it), so it is what the plot has to be inset by.
  */
-export function quadrantDotRadii(width: number, height: number): { focal: number; ghost: number } {
-  const focal = Math.max(1.6, Math.min(width, height) * 0.1);
-  return { focal, ghost: Math.max(1, focal * 0.52) };
+export function quadrantDotRadii(
+  width: number,
+  height: number,
+): { focal: number; ghost: number; halo: number } {
+  const w = chartSide(width, DEFAULT_WIDTH);
+  const h = chartSide(height, DEFAULT_HEIGHT);
+  // 2-dp like every other emitted coordinate: unrounded these reached the `r`
+  // attribute as `2.4000000000000004`, and the plot inset derived from `halo`
+  // then missed the frame by a float's width.
+  const focal = round2(Math.max(1.6, Math.min(w, h) * 0.1));
+  return { focal, ghost: round2(Math.max(1, focal * 0.52)), halo: round2(focal + 1.4) };
+}
+
+/**
+ * Domain from a caller prop, or the data extent. A single NaN/±Infinity in the
+ * tuple (`Math.min(...)` over a series holding a null, a domain read from an
+ * empty input) used to reach `scaleLinear`, which degenerates to the range
+ * midpoint — every dot stacked on the split line — while the accessible name
+ * went on naming a quadrant and a peer count from the raw values. Announced
+ * scale and painted scale have to be the same scale.
+ */
+function resolveDomain(
+  prop: readonly [number, number] | undefined,
+  values: readonly number[],
+  fallback: number,
+): readonly [number, number] {
+  if (prop && prop.every((d) => Number.isFinite(d))) return prop;
+  return extent(values) ?? [fallback, fallback];
+}
+
+/** Split from a caller prop, or the domain midpoint — the documented default. */
+function resolveSplit(prop: number | undefined, d: readonly [number, number]): number {
+  if (Number.isFinite(prop)) return prop as number;
+  const mid = (d[0] + d[1]) / 2;
+  // A domain wide enough to overflow (±1e308) makes its own midpoint infinite,
+  // which paints the cross at `Infinity` inside a valid viewBox.
+  return Number.isFinite(mid) ? mid : d[0];
 }
 
 export function quadrantDotGeometry(opts: {
@@ -55,24 +95,40 @@ export function quadrantDotGeometry(opts: {
   split?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): QuadrantDotGeometry | null {
-  const { width, height, data } = opts;
+  const { data } = opts;
   if (!finite(data)) return null;
 
-  const pad = opts.pad ?? 3;
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const field = (opts.field ?? []).filter(finite);
+
+  // The plot is inset by the widest mark, not by a flat 3: the focal's halo
+  // scales with the box, so at 120 px a focal on the domain edge painted ~10
+  // units of accent OUTSIDE the viewBox — `.mc-root` is `overflow: visible`, so
+  // that is a spill over neighbouring text, not a clip. Capped at half the box
+  // so a mark wider than its own frame collapses to the centre instead of
+  // inverting the range.
+  const { halo } = quadrantDotRadii(width, height);
+  const pad = Math.max(opts.pad ?? 3, halo);
+  const padX = Math.min(pad, width / 2);
+  const padY = Math.min(pad, height / 2);
 
   const xs = [data.x, ...field.map((p) => p.x)];
   const ys = [data.y, ...field.map((p) => p.y)];
-  const xd = opts.xDomain ?? extent(xs) ?? [data.x, data.x];
-  const yd = opts.domain ?? extent(ys) ?? [data.y, data.y];
+  const xd = resolveDomain(opts.xDomain, xs, data.x);
+  const yd = resolveDomain(opts.domain, ys, data.y);
   const xDegenerate = xd[0] === xd[1];
   const yDegenerate = yd[0] === yd[1];
 
-  const sx = scaleLinear(xd, [pad, width - pad]);
-  const sy = scaleLinear(yd, [height - pad, pad]); // y up
+  const sx = scaleLinear(xd, [padX, width - padX]);
+  const sy = scaleLinear(yd, [height - padY, padY]); // y up
+  // Out-of-domain points (a caller's fixed domain, a peer past it) project
+  // outside the box; the mark belongs on the edge it ran off, never past it.
+  const projX = (v: number): number => round2(clamp(sx(v), padX, width - padX));
+  const projY = (v: number): number => round2(clamp(sy(v), padY, height - padY));
 
-  const splitX = opts.split?.[0] ?? (xd[0] + xd[1]) / 2;
-  const splitY = opts.split?.[1] ?? (yd[0] + yd[1]) / 2;
+  const splitX = resolveSplit(opts.split?.[0], xd);
+  const splitY = resolveSplit(opts.split?.[1], yd);
 
   // boundary rule: ≥ split ⇒ right (x) / top (y)
   const xHigh = data.x >= splitX;
@@ -80,8 +136,11 @@ export function quadrantDotGeometry(opts: {
   // TL=0, TR=1, BL=2, BR=3
   const quadrant: 0 | 1 | 2 | 3 = yHigh ? (xHigh ? 1 : 0) : xHigh ? 3 : 2;
 
-  const crossX = xDegenerate ? null : round2(sx(splitX));
-  const crossY = yDegenerate ? null : round2(sy(splitY));
+  // Clamped to the box, not the plot inset: a split outside the domain means
+  // the whole field sits on one side, and the cross says so by sitting on the
+  // frame. Unclamped it drew a hairline (and a tint rect) metres wide.
+  const crossX = xDegenerate ? null : round2(clamp(sx(splitX), 0, width));
+  const crossY = yDegenerate ? null : round2(clamp(sy(splitY), 0, height));
 
   // tint rect = the focal's quadrant, split by the cross (whole axis if degenerate)
   const cx = crossX ?? width / 2;
@@ -103,8 +162,8 @@ export function quadrantDotGeometry(opts: {
   // ghosts sorted nearest-first from the focal (the interactive cycles in this order)
   const ghosts = field
     .map((p) => ({
-      x: round2(sx(p.x)),
-      y: round2(sy(p.y)),
+      x: projX(p.x),
+      y: projY(p.y),
       vx: p.x,
       vy: p.y,
       quadrant: quadOf(p),
@@ -116,7 +175,7 @@ export function quadrantDotGeometry(opts: {
 
   return {
     cross: { x: crossX, y: crossY },
-    dot: { x: round2(sx(data.x)), y: round2(sy(data.y)), vx: data.x, vy: data.y },
+    dot: { x: projX(data.x), y: projY(data.y), vx: data.x, vy: data.y },
     ghosts,
     quadrant,
     xHigh,

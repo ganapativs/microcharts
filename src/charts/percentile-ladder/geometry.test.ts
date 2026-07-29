@@ -26,6 +26,34 @@ describe("percentileLadderGeometry", () => {
     expect(geo.ticks.map((t) => t.p)).toEqual([25, 50, 90, 99]);
   });
 
+  it("percentiles outside (0, 100) drop — announced scale is the painted one", () => {
+    // `quantiles` clamps p into the sample, so a p200 tick painted the maximum
+    // while the summary announced "p200 … the slowest -100%".
+    const geo = percentileLadderGeometry({ ...base, data: SAMPLE, ps: [-10, 50, 200] })!;
+    expect(geo.ticks.map((t) => t.p)).toEqual([50]);
+  });
+
+  it("a ps that filters down to nothing falls back to the default, not to no-data", () => {
+    for (const ps of [[], [0, 100], [NaN]]) {
+      const geo = percentileLadderGeometry({ ...base, data: SAMPLE, ps })!;
+      expect(geo.ticks.map((t) => t.p)).toEqual([50, 90, 99]);
+    }
+  });
+
+  it("ratio is the tail over the sample MEDIAN, whatever the lowest tick is", () => {
+    // "× the median" in the summary means p50: the old last/first quotient
+    // announced p90/p25 under the median's name.
+    const geo = percentileLadderGeometry({ ...base, data: SAMPLE, ps: [25, 90] })!;
+    expect(geo.median).toBe(50);
+    expect(geo.ratio).toBe(1.8);
+  });
+
+  it("one requested percentile is not 'all percentiles equal'", () => {
+    const geo = percentileLadderGeometry({ ...base, data: SAMPLE, ps: [90] })!;
+    expect(geo.collapsed).toBe(false);
+    expect(geo.ticks.map((t) => t.p)).toEqual([90]);
+  });
+
   it("log applies only when every value > 0; else falls back", () => {
     const applied = percentileLadderGeometry({ ...base, data: [1, 10, 100, 1000], scale: "log" })!;
     expect(applied.log).toBe(true);

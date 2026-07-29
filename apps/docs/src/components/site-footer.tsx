@@ -123,15 +123,14 @@ export function SiteFooter() {
               </a>
             </div>
             <p className="mt-2 max-w-52 text-sm text-fd-muted-foreground">{SITE.tagline}</p>
-            {/* Brand sits on the LICENCE line, not in the Docs column, and that is
-                the whole argument for where it went when it came out of the
-                masthead. The three columns beside this one are sorted by kind —
-                things to read, charts to browse, surfaces for machines — and a
-                brand page is none of them. What it actually is, is the other half
-                of this line: `MIT` is permission to use the code, and /brand is
-                permission to use the name and the mark (its longest section is
-                exactly that). Same category, same line, in the one column whose
-                whole subject is the identity it documents. */}
+            {/* Brand is also in the masthead; here it sits on the LICENCE line,
+                not in the Docs column. The three columns beside this one are
+                sorted by kind — things to read, charts to browse, surfaces for
+                machines — and a brand page is none of them. What it is here: the
+                other half of this line. `MIT` is permission to use the code, and
+                /brand is permission to use the name and the mark. Same category,
+                same line, in the column whose subject is the identity it
+                documents. */}
             <div className="mono-label mt-4 flex items-center gap-1.5">
               <span>Zero deps · MIT ·</span>
               <Link

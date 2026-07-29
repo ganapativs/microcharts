@@ -22,8 +22,8 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { quantileDotplot } from "../../core/quantile.js";
-import { round2 } from "../../core/types.js";
-import { oddsGutter, quantileDotsGeometry } from "./geometry.js";
+import { chartSide, round2 } from "../../core/types.js";
+import { oddsGutter, quantileDotsGeometry, resolveCount } from "./geometry.js";
 import {
   QuantileDots as StaticQuantileDots,
   quantileDotsSummary,
@@ -46,8 +46,8 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     count,
     threshold,
     side = "above",
-    width = 80,
-    height = 20,
+    width: widthProp = 80,
+    height: heightProp = 20,
     format,
     locale,
     strings = EN_QUANTILE_DOTS,
@@ -72,8 +72,12 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pad = 2;
+  // Same clamp the static applies, or the pointer map and the reserved gutter
+  // would be sized against a box the static never paints (see `chartSide`).
+  const width = chartSide(widthProp);
+  const height = chartSide(heightProp);
 
-  const dotCount = Math.max(1, Math.min(25, Math.round(count ?? 20)));
+  const dotCount = resolveCount(count);
   const plot = useMemo(() => quantileDotplot(data, dotCount), [data, dotCount]);
   const columns = plot?.columns ?? 0;
   const colCounts = useMemo(() => {
@@ -103,14 +107,27 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   /** Root viewBox width — the plot plus that reserved gutter. */
   const boxW = width + oddsGutter(gutterCh, font);
 
-  // Pointer x maps across the painted SVG — plot coords, gutter included.
+  // The chart at rest: the accessible name, and the value→x frame the pointer
+  // has to invert. Built from props alone, so it does not move under the cursor.
+  const staticGeo = useMemo(
+    () =>
+      quantileDotsGeometry({ width, height, data, count, threshold, side, domain: props.domain }),
+    [width, height, data, count, threshold, side, props.domain],
+  );
+
+  // Pointer x maps across the painted SVG — plot coords, gutter included. It
+  // inverts the frame the STATIC paints rather than splitting the plot into
+  // `columns` equal shares: under a fixed `domain` the columns cover only part
+  // of the plot, and an even split would land on the wrong bin.
   const locate = useCallback(
     (x: number) => {
-      if (columns === 0) return null;
-      const t = ((x - pad) / (width - 2 * pad)) * columns;
-      return Math.max(0, Math.min(columns - 1, Math.floor(t)));
+      if (plot === null || staticGeo === null || columns === 0) return null;
+      if (plot.binWidth === 0) return 0;
+      const v = staticGeo.x0 + ((x - pad) / (width - 2 * pad)) * staticGeo.range;
+      const c = Math.floor((v - plot.x0) / plot.binWidth);
+      return Math.max(0, Math.min(columns - 1, c));
     },
-    [columns, width],
+    [plot, staticGeo, columns, width],
   );
 
   const datum = useCallback(
@@ -172,11 +189,6 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
     [width, height, data, count, activeThreshold, side, props.domain, gutterCh, font],
   );
 
-  const staticGeo = useMemo(
-    () =>
-      quantileDotsGeometry({ width, height, data, count, threshold, side, domain: props.domain }),
-    [width, height, data, count, threshold, side, props.domain],
-  );
   const accName =
     summary === false
       ? undefined

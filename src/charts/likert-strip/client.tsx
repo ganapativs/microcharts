@@ -15,8 +15,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
-import { likertFont, likertGutter, likertStripGeometry } from "./geometry.js";
-import { labelFitsY } from "../../core/labels.js";
+import { likertBox, likertFont, likertLabels, likertStripGeometry } from "./geometry.js";
 import { isFiniteValue } from "../../core/types.js";
 import { LikertStrip as StaticLikertStrip, likertSummary, type LikertStripProps } from "./index.js";
 
@@ -67,29 +66,34 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
       'rect[data-mc-ink="negative"], rect[data-mc-ink="positive"], rect[data-mc-ink="neutral"]',
   });
 
-  const fontSize = likertFont(height);
+  // The box `<Chart>` will paint, resolved before anything measures against it —
+  // the hit test and the overlay have to agree with the static entry's clamp.
+  const [w, h] = likertBox(width, height);
+  const fontSize = likertFont(h);
   const pctFmt = useMemo(
     () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
-  // Same reservation as the static entry, measured off the same widest string —
-  // a gutter that disagreed between the two would walk the hit box off the bars.
-  const gutter = likertGutter(
-    label !== "none" && labelFitsY(height / 2, fontSize, height),
+  // Same reservation as the static entry, from the same resolver — a gutter that
+  // disagreed between the two would walk the hit box off the bars.
+  const { gutter } = likertLabels({
+    labelled: label !== "none",
+    width: w,
+    height: h,
     fontSize,
-    pctFmt(1).length,
-  );
+    widest: pctFmt(1).length,
+  });
   const geo = useMemo(
     () =>
       likertStripGeometry({
-        width,
-        height,
+        width: w,
+        height: h,
         values: data.map((d) => d.value),
         neutral,
         gutterL: gutter,
         gutterR: gutter,
       }),
-    [width, height, data, neutral, gutter],
+    [w, h, data, neutral, gutter],
   );
   // Response counts are cardinal, not shares — grouped by the locale, never run
   // through the percent `format` the shares use.
@@ -125,8 +129,8 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
 
   const { active, selected, bind } = useActivePicker({
     count: geo?.segments.length ?? 0,
-    width,
-    height,
+    width: w,
+    height: h,
     locate,
     datum,
     onActive,
@@ -153,7 +157,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         x={s.x - 0.5}
         y={1}
         width={s.width + 1}
-        height={height - 2}
+        height={h - 2}
         fill="none"
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}
@@ -211,10 +215,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         {announced}
       </span>
       {readout && seg && segDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(seg.x + seg.width / 2, width)}
-        >
+        <span className="mc-spark-readout" style={crosshairReadoutStyle(seg.x + seg.width / 2, w)}>
           {`${segDatum.label} ${pctFmt(seg.share)} (${segCount})`}
         </span>
       ) : null}

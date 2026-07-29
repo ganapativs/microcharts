@@ -44,6 +44,53 @@ describe("<MinimapStrip>", () => {
     expect(container.querySelector('path[data-mc-ink="bar"]')).toBeNull();
   });
 
+  it("a non-finite box resolves to the documented one, marks and frame together", () => {
+    // `Chart` clamps the FRAME only, so a host handing down a collapsed flex
+    // measurement got a valid viewBox around `x="NaN"` marks and `--mc-seat: NaN`.
+    const { container } = draw(
+      <MinimapStrip data={DATA} width={Number.NaN} height={Number.POSITIVE_INFINITY} />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 120 16");
+    expect(svg.getAttribute("style") ?? "").not.toMatch(/NaN|Infinity/);
+    for (const el of container.querySelectorAll("*")) {
+      for (const attr of ["d", "x", "y", "width", "height"]) {
+        expect(el.getAttribute(attr) ?? "", `<${el.tagName} ${attr}>`).not.toMatch(/NaN|Infinity/);
+      }
+    }
+  });
+
+  it("a hairline strip emits no negative extents, in either mode", () => {
+    // The lane's 2u floor used to cost more than a thin box had: bars grew
+    // upward out of the band and the heat cells took `height="-1"`, which is an
+    // SVG error — the whole content band stopped rendering.
+    for (const mode of ["bars", "heat"] as const) {
+      for (const height of [1, 2, 3, 4]) {
+        const { container } = draw(<MinimapStrip data={DATA} mode={mode} height={height} />);
+        for (const el of container.querySelectorAll("*")) {
+          for (const attr of ["width", "height"]) {
+            const v = el.getAttribute(attr);
+            if (v !== null)
+              expect(Number(v), `${mode} ${height} ${attr}`).toBeGreaterThanOrEqual(0);
+          }
+          expect(el.getAttribute("d") ?? "", `${mode} ${height}`).not.toMatch(/v-/);
+        }
+      }
+    }
+  });
+
+  it("fog is two nodes however many gaps it covers", () => {
+    const known = Array.from({ length: 12 }, (_, i) => [i * 100, i * 100 + 40] as [number, number]);
+    const { container } = draw(
+      <MinimapStrip data={{ content: CONTENT, window: [0, 100], known }} domain={[0, 1200]} />,
+    );
+    expect(container.querySelectorAll('[data-mc-ink="neutral"]').length).toBe(1);
+    expect(container.querySelectorAll('[data-mc-ink="muted"]').length).toBe(1);
+    // …and every gap is still covered: one closed subpath each.
+    const fog = container.querySelector('path[data-mc-ink="neutral"]')!;
+    expect(fog.getAttribute("d")!.split("z").length - 1).toBe(12);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<MinimapStrip data={DATA} title="Document position" />);
     await expectNoA11yViolations(container);

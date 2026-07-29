@@ -6,10 +6,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { round2 } from "../../core/types.js";
 import { EN_CALIBRATION, type CalibrationStrings } from "../../core/strings-calibration.js";
 import {
   calibrationGeometry,
-  isBinned,
+  resolveMinSupport,
+  supportPath,
+  DOT_R,
   PAD,
   type BinnedRow,
   type CalibrationPoint,
@@ -55,13 +58,6 @@ export function calibrationSummary(
   return strings.calibration(points.length, fmt(maxGap.predicted), fmt(maxGap.observed), low);
 }
 
-function defaultMinSupport(data: readonly CalibrationStripDatum[]): number {
-  const total = isBinned(data)
-    ? data.reduce((s, r) => s + (Number.isFinite(r.count) ? r.count : 0), 0)
-    : data.length;
-  return Math.max(10, Math.round(total * 0.02));
-}
-
 export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
   const {
     data,
@@ -83,7 +79,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const ms = minSupport ?? defaultMinSupport(data);
+  const ms = resolveMinSupport(data, minSupport);
   const supportHeight = Math.max(4, Math.round(height * 0.18));
   const geo = calibrationGeometry({ data, bins, minSupport: ms, width, height, supportHeight });
   const accName =
@@ -107,20 +103,15 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
       className={className ? `mc-calib ${className}` : "mc-calib"}
       style={style}
     >
-      {/* support lane — flat siblings, plain attributes (up to `bins` bars +
-          `bins` points can clear the 10-element SSR hot-path threshold) */}
-      {geo.supportBars.map((b, i) => (
-        <rect
-          key={i}
-          x={b.x}
-          y={b.y}
-          width={b.width}
-          height={b.height}
+      {/* support lane — one path, one node, whatever `bins` is (see supportPath) */}
+      {geo.supportBars.length > 0 ? (
+        <path
+          d={supportPath(geo.supportBars)}
           shapeRendering="crispEdges"
           data-mc-ink="neutral"
           fillOpacity={0.35}
         />
-      ))}
+      ) : null}
 
       <path
         d={`M${geo.diagonal.x1} ${geo.diagonal.y1}L${geo.diagonal.x2} ${geo.diagonal.y2}`}
@@ -159,7 +150,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 key={i}
                 cx={p.x}
                 cy={p.y}
-                r={1.6}
+                r={DOT_R}
                 fill="none"
                 stroke={color ?? "var(--mc-accent)"}
                 strokeOpacity={0.5}
@@ -171,7 +162,7 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 key={i}
                 cx={p.x}
                 cy={p.y}
-                r={1.6}
+                r={DOT_R}
                 data-mc-ink="accent"
                 style={color ? { fill: color } : undefined}
               />
@@ -180,8 +171,4 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

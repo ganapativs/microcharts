@@ -214,7 +214,6 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

@@ -10,7 +10,13 @@ import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
-import { ringAnnulus, ringOutline, treeRingsGeometry } from "./geometry.js";
+import {
+  ringAnnulus,
+  ringOutline,
+  treeRingsGeometry,
+  treeRingsSize,
+  TREE_PAD,
+} from "./geometry.js";
 
 export interface TreeRingsProps {
   data: readonly number[];
@@ -40,7 +46,15 @@ export interface TreeRingsProps {
   children?: ReactNode | undefined;
 }
 
-const PAD = 1;
+/**
+ * Label size, resolved once. A non-finite `fontSize` reached the gutter
+ * arithmetic as NaN, so `Chart` clamped the viewBox to 1 unit wide while the
+ * disc still painted out to `size` — the entire chart outside its own box —
+ * and shipped `--mc-label-size: NaNpx` with it.
+ */
+function treeRingsFont(box: number, fontSize: number | undefined): number {
+  return isFiniteValue(fontSize) && fontSize > 0 ? fontSize : labelFont(box);
+}
 
 /**
  * The static's viewBox width: the disc plus the right gutter the `label="last"`
@@ -55,10 +69,11 @@ export function treeRingsWidth(opts: {
   fontSize?: number | undefined;
   fmt: (n: number) => string;
 }): number {
+  const box = treeRingsSize(opts.size);
   const last = opts.data[opts.data.length - 1];
-  if (opts.label !== "last" || !isFiniteValue(last)) return opts.size;
-  const font = opts.fontSize ?? labelFont(opts.size);
-  return opts.size + Math.ceil(`${opts.fmt(last)}`.length * 0.62 * font + 5);
+  if (opts.label !== "last" || !isFiniteValue(last)) return box;
+  const font = treeRingsFont(box, opts.fontSize);
+  return box + Math.ceil(`${opts.fmt(last)}`.length * 0.62 * font + 5);
 }
 
 export function treeRingsSummary(
@@ -90,7 +105,8 @@ export function treeRingsSummary(
     unit,
     fmt(data[lastI]!),
     fmt(data[maxI]!),
-    `${periodWord} ${maxI + 1}`,
+    // trimmed so `periodWord=""` reads "biggest 22 in 5", not "in  5"
+    `${periodWord} ${maxI + 1}`.trim(),
   );
 }
 
@@ -104,7 +120,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     periodWord = "period",
     unit = "periods",
     color,
-    size = 24,
+    size,
     format,
     locale,
     strings = EN_TREE,
@@ -115,9 +131,10 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(size);
+  const box = treeRingsSize(size);
+  const fontSize = treeRingsFont(box, props.fontSize);
 
-  const geo = treeRingsGeometry({ values: data, size, pad: PAD, total });
+  const geo = treeRingsGeometry({ values: data, size: box, pad: TREE_PAD, total });
   const accIdx = highlight === "last" ? data.length - 1 : highlight === "none" ? -1 : highlight;
   const accName =
     summary === false
@@ -129,21 +146,30 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   // the last-value label sits in a gutter to the RIGHT of the disc (over the
   // concentric rings it would collide), so it needs a wider viewBox
   const showLabel = label === "last" && isFiniteValue(last);
-  const gutter = treeRingsWidth({ data, size, label, fontSize, fmt }) - size;
+  const gutter = treeRingsWidth({ data, size: box, label, fontSize, fmt }) - box;
 
-  // SSR hot path (rings="stroke", the default): up to 24 boundary circles all
-  // share the same muted style, so they merge into one path — one node instead
-  // of N. The highlighted ring alone keeps its own element (distinct color/weight).
+  // SSR hot path, one pass for both variants: the muted rings all share their
+  // paint, so they merge into O(1) nodes instead of N. `stroke` (the default)
+  // merges every boundary into one outline path. `fill` merges each opacity
+  // parity into one evenodd path — the rings are disjoint and concentric, so a
+  // group listed as nested circles alternates filled/hollow exactly as the
+  // separate annuli did. The highlighted ring alone keeps its own element
+  // (distinct color and weight).
   const accentRing = geo.rings.find((r) => r.index === accIdx && r.rOuter > r.rInner);
-  const mutedRingsPath = geo.rings
-    .filter((r) => r.rOuter > r.rInner && r.index !== accIdx)
-    .map((r) => ringOutline(geo.center.cx, geo.center.cy, r.rOuter))
-    .join("");
+  const filled = rings === "fill";
+  let mutedOutline = "";
+  const mutedFill = ["", ""];
+  for (const r of geo.rings) {
+    if (r.rOuter <= r.rInner || r.index === accIdx) continue;
+    if (filled)
+      mutedFill[r.index % 2] += ringAnnulus(geo.center.cx, geo.center.cy, r.rOuter, r.rInner);
+    else mutedOutline += ringOutline(geo.center.cx, geo.center.cy, r.rOuter);
+  }
 
   return (
     <Chart
-      width={size + gutter}
-      height={size}
+      width={box + gutter}
+      height={box}
       title={title}
       summary={accName}
       id={id}
@@ -158,27 +184,51 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
       className={className ? `mc-tree ${className}` : "mc-tree"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {rings === "fill"
-        ? geo.rings.map((r) =>
-            r.rOuter <= r.rInner ? null : (
+      {filled
+        ? [
+            // The neutral fill lives in the `fill` ink role, not inline:
+            // `.mc-root` sets `forced-color-adjust: none`, so an inline
+            // `var(--mc-stroke)` at 22% survived verbatim into High Contrast
+            // Mode and vanished against the user's chosen background. The
+            // alternating opacity stays inline — it is what keeps neighbouring
+            // rings apart, and it overrides the role's flat one in both modes.
+            mutedFill[0] ? (
               <path
-                key={`f${r.index}`}
-                d={ringAnnulus(geo.center.cx, geo.center.cy, r.rOuter, r.rInner)}
+                key="f0"
+                d={mutedFill[0]}
                 fillRule="evenodd"
-                style={{
-                  fill: r.index === accIdx ? paint : "var(--mc-stroke)",
-                  fillOpacity: r.index === accIdx ? 0.9 : r.index % 2 === 0 ? 0.22 : 0.4,
-                }}
+                data-mc-ink="fill"
+                style={{ fillOpacity: 0.22 }}
               />
-            ),
-          )
+            ) : null,
+            mutedFill[1] ? (
+              <path
+                key="f1"
+                d={mutedFill[1]}
+                fillRule="evenodd"
+                data-mc-ink="fill"
+                style={{ fillOpacity: 0.4 }}
+              />
+            ) : null,
+            accentRing ? (
+              <path
+                key="fa"
+                d={ringAnnulus(geo.center.cx, geo.center.cy, accentRing.rOuter, accentRing.rInner)}
+                fillRule="evenodd"
+                style={{ fill: paint, fillOpacity: 0.9 }}
+              />
+            ) : null,
+          ]
         : [
-            mutedRingsPath ? (
+            mutedOutline ? (
               <path
                 key="rings"
-                d={mutedRingsPath}
+                d={mutedOutline}
                 fill="none"
                 data-mc-ink="muted"
+                // the boundaries ARE the primary mark; a width role keeps them
+                // on --mc-density instead of the UA's fixed 1
+                data-mc-w="support"
                 style={{ strokeOpacity: 0.55 }}
               />
             ) : null,
@@ -196,8 +246,8 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
       <circle cx={geo.center.cx} cy={geo.center.cy} r={geo.r0 * 0.5} data-mc-ink="point" />
       {showLabel ? (
         <text
-          x={size + 4}
-          y={size / 2}
+          x={box + 4}
+          y={box / 2}
           fontSize={fontSize}
           dominantBaseline="central"
           textAnchor="start"

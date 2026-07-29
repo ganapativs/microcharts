@@ -17,7 +17,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { balanceBeamGeometry } from "./geometry.js";
+import { balanceBeamGeometry, DEFAULT_MAX_TILT } from "./geometry.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } from "./index.js";
 
@@ -45,7 +45,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     mode = "ratio",
     shape = "square",
     domain,
-    maxTilt = 12,
+    maxTilt = DEFAULT_MAX_TILT,
     width = 48,
     height = 20,
     format,

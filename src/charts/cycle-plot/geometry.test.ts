@@ -79,6 +79,28 @@ describe("cycleGeometry", () => {
     expect(cycleGeometry({ ...base, data: [], period: 4 })).toBeNull();
   });
 
+  it("a non-finite caller domain falls back to the data extent", () => {
+    // `[NaN, NaN]` / `[0, Infinity]` are not scales: scaleLinear maps every
+    // value to the range midpoint, so the chart painted one flat rule while the
+    // summary (which reads raw centers) still announced the real peak and dip.
+    const fit = cycleGeometry({ ...base, data: WEEKS, period: 7 })!;
+    for (const bad of [
+      [NaN, NaN],
+      [0, NaN],
+      [-Infinity, Infinity],
+      [0, Infinity],
+    ] as const) {
+      const geo = cycleGeometry({ ...base, data: WEEKS, period: 7, domain: bad })!;
+      expect(geo.domain).toEqual(fit.domain);
+      expect(geo.slots.map((s) => s.center.y)).toEqual(fit.slots.map((s) => s.center.y));
+    }
+  });
+
+  it("a finite caller domain is still honoured exactly", () => {
+    const geo = cycleGeometry({ ...base, data: WEEKS, period: 7, domain: [0, 100] })!;
+    expect(geo.domain).toEqual([0, 100]);
+  });
+
   it("degenerate domain (all equal) flagged", () => {
     const geo = cycleGeometry({ ...base, data: [5, 5, 5, 5, 5, 5], period: 3 })!;
     expect(geo.degenerate).toBe(true);

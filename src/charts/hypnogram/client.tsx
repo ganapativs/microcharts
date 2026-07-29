@@ -69,7 +69,9 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     const extra = appearance.filter((s) => !statesProp.includes(s));
     return [...statesProp, ...extra];
   }, [statesProp, appearance]);
-  const domain = useMemo(() => domainProp ?? resolveDomain(data), [domainProp, data]);
+  // resolveDomain vets the prop too — a NaN/reversed/degenerate window would
+  // otherwise put the hit-test on a different scale from the painted runs
+  const domain = useMemo(() => resolveDomain(data, domainProp), [domainProp, data]);
   // Mirror the static's layout EXACTLY (row-count-driven height + the row-label
   // gutter it reserves). Deriving either independently shifts every run's x by
   // the gutter, so the hit-test and the outlines drift off the rendered marks.

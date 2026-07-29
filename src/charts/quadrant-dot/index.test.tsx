@@ -81,6 +81,59 @@ describe("<QuadrantDot>", () => {
     expect(container.querySelector("text")).toBeNull();
   });
 
+  // Hostile CONFIG, at the markup boundary: a NaN reaching an attribute makes
+  // the browser drop it, so the chart renders at the wrong scale (or not at
+  // all) behind an accessible name that still sounds right.
+  it("never emits a non-finite coordinate for a hostile domain, split, or box", () => {
+    const hostile = [
+      <QuadrantDot key="xd" data={{ x: 3, y: 9 }} field={FIELD} xDomain={[NaN, 10]} />,
+      <QuadrantDot key="yd" data={{ x: 3, y: 9 }} field={FIELD} domain={[0, NaN]} />,
+      <QuadrantDot key="xi" data={{ x: 3, y: 9 }} field={FIELD} xDomain={[-Infinity, 10]} />,
+      <QuadrantDot key="sn" data={{ x: 3, y: 9 }} field={FIELD} split={[NaN, 5]} />,
+      <QuadrantDot key="si" data={{ x: 3, y: 9 }} field={FIELD} split={[Infinity, 5]} />,
+      <QuadrantDot key="w" data={{ x: 3, y: 9 }} field={FIELD} width={NaN} />,
+      <QuadrantDot key="h" data={{ x: 3, y: 9 }} field={FIELD} height={NaN} />,
+    ];
+    for (const ui of hostile) {
+      const { container } = draw(ui);
+      for (const el of container.querySelectorAll("svg *")) {
+        for (const attr of el.attributes) {
+          expect(attr.value, `${el.tagName}.${attr.name}`).not.toMatch(/NaN|Infinity/);
+        }
+      }
+      expect(container.querySelector("svg")!.getAttribute("viewBox")).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
+  it("a split outside the domain keeps the tint inside the viewBox", () => {
+    const { container } = draw(
+      <QuadrantDot
+        data={{ x: 3, y: 9 }}
+        field={FIELD}
+        xDomain={[0, 10]}
+        domain={[0, 10]}
+        split={[20, 5]}
+      />,
+    );
+    const rect = container.querySelector('rect[data-mc-ink="region"]')!;
+    const x = Number(rect.getAttribute("x"));
+    const w = Number(rect.getAttribute("width"));
+    expect(x).toBeGreaterThanOrEqual(0);
+    expect(x + w).toBeLessThanOrEqual(24);
+  });
+
+  // Two items with the same score is the ordinary case, not the hostile one:
+  // a value-derived key collided and React dropped one of the tied dots.
+  it("paints one ghost per peer even when peers are tied", () => {
+    const tied = [
+      { x: 2, y: 8 },
+      { x: 2, y: 8 },
+      { x: 5, y: 5 },
+    ];
+    const { container } = draw(<QuadrantDot data={{ x: 3, y: 9 }} field={tied} />);
+    expect(container.querySelectorAll('circle[data-mc-ink="ghost"]').length).toBe(3);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <QuadrantDot data={{ x: 3, y: 9 }} field={FIELD} title="Effort vs impact" />,

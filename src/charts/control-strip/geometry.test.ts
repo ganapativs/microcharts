@@ -67,6 +67,22 @@ describe("controlGeometry", () => {
     expect(controlGeometry({ ...base, data: [] })).toBeNull();
   });
 
+  // The reported center/limits are DATA, not coordinates: rounding them with the
+  // 2-dp coordinate rounder overflowed past ~1.8e306, so a finite `baseline`
+  // announced "center ∞, limits ∞–∞" over a band drawn at its real place.
+  it("a finite baseline past the 2-dp rounder's range still reports finite stats", () => {
+    const geo = controlGeometry({ ...base, data: SAMPLE, baseline: 1e308 })!;
+    expect(geo.center.value).toBe(1e308);
+    expect(Number.isFinite(geo.band.lo)).toBe(true);
+    expect(Number.isFinite(geo.band.hi)).toBe(true);
+  });
+
+  it("center survives a sum that overflows to Infinity", () => {
+    const geo = controlGeometry({ ...base, data: [1e308, 1.1e308, 1e308, 1.2e308] })!;
+    expect(Number.isFinite(geo.center.value)).toBe(true);
+    expect(geo.center.value).toBeCloseTo(1.075e308, -300);
+  });
+
   test.prop([
     fc.array(fc.double({ noNaN: true, min: -1e3, max: 1e3 }), { minLength: 1, maxLength: 60 }),
   ])("containment: points inside the plot; band within it", (data) => {

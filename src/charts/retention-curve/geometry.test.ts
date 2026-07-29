@@ -22,6 +22,16 @@ describe("retentionGeometry", () => {
     expect(geo.plateau!.value).toBeCloseTo(0.342, 2);
   });
 
+  it("plateau `from` is a PERIOD, not a position in the finite values", () => {
+    // Two missing readings up front: the flat tail is periods 5–7, so a `from`
+    // counted over the compacted array (3) would announce "from period 3" and
+    // draw the marker across the steep drop.
+    const gappy = [1, Number.NaN, Number.NaN, 0.5, 0.34, 0.341, 0.34, 0.339];
+    const geo = retentionGeometry({ ...base, data: gappy })!;
+    expect(geo.plateau!.from).toBe(5);
+    expect(geo.plateau!.fromX).toBe(geo.points.find((p) => p.period === 5)!.x);
+  });
+
   it("no plateau when the tail is still moving", () => {
     const geo = retentionGeometry({ ...base, data: [1, 0.8, 0.6, 0.45, 0.32, 0.22] })!;
     expect(geo.plateau).toBeNull();

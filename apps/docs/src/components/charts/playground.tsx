@@ -178,26 +178,16 @@ function ReadoutTile({
     k === "window" ? "win" : k === "select" ? "sel" : "act";
 
   return (
-    <div
-      className={cn(
-        "pointer-events-none absolute right-2.5 top-2.5 z-10 flex flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md transition-[width,max-width] duration-200 ease-out",
-        open ? "w-[11.5rem] sm:w-[13rem]" : "w-auto max-w-[11.5rem]",
-      )}
-    >
-      <div
-        className={cn(
-          "flex items-center gap-1.5 pl-2.5 pr-1.5",
-          open ? "justify-between pb-0 pt-2" : "h-7",
-        )}
-      >
+    <div className="pointer-events-none absolute right-2.5 top-2.5 z-10 flex w-[11.5rem] flex-col overflow-hidden rounded-lg border border-hairline bg-fd-card/85 text-left shadow-lg backdrop-blur-md sm:w-[13rem]">
+      <div className="flex h-7 shrink-0 items-center justify-between gap-1.5 pl-2.5 pr-1.5">
         <span className="mono-label min-w-0 flex-1 truncate leading-none text-[0.5rem]">
           {label}
         </span>
         <div className="flex h-5 shrink-0 items-center gap-1">
-          {(open || state !== "empty") && (
+          {(open || state === "live" || (state !== "empty" && !open)) && (
             <span
               className={cn(
-                "flex h-5 items-center gap-1 leading-none text-[0.55rem] font-medium",
+                "flex h-5 items-center gap-1 leading-none text-[0.55rem] font-medium transition-opacity duration-200 ease-out",
                 state === "live"
                   ? "text-fd-primary"
                   : state === "pinned"
@@ -206,7 +196,7 @@ function ReadoutTile({
               )}
             >
               {state === "live" && (
-                <span className="size-1 animate-pulse rounded-full bg-fd-primary" />
+                <span className="size-1 shrink-0 animate-pulse rounded-full bg-fd-primary" />
               )}
               {open
                 ? state === "empty"
@@ -228,7 +218,7 @@ function ReadoutTile({
             <ChevronDown
               aria-hidden
               className={cn(
-                "size-3.5 shrink-0 transition-transform duration-200 ease-out",
+                "size-3.5 shrink-0 transition-transform duration-300 ease-out-quint",
                 open && "rotate-180",
               )}
             />
@@ -238,60 +228,69 @@ function ReadoutTile({
 
       <div
         className={cn(
-          "grid transition-[grid-template-rows] duration-200 ease-out",
+          "grid transition-[grid-template-rows] duration-300 ease-out-quint",
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
       >
         <div className="pointer-events-none min-h-0 overflow-hidden">
-          <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-0.5">
-            <span
-              className={cn(
-                "font-display font-medium leading-tight tracking-tight tabular-nums break-all",
-                value && value.length > 12 ? "text-[0.85rem]" : "text-lg leading-none",
-                value === null
-                  ? "text-fd-muted-foreground/40"
-                  : state === "idle"
-                    ? "text-fd-foreground/70"
-                    : "text-fd-foreground",
-              )}
-            >
-              {value ?? "—"}
-            </span>
-          </div>
-
-          <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
-            {events.length === 0 ? (
-              <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
-                {emptyHint}
-              </li>
-            ) : (
-              events.slice(0, 6).map((e, i) => (
-                <li
-                  key={e.id}
-                  className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
-                  style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
-                >
-                  <span
-                    className={cn(
-                      "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
-                      e.kind === "active" ? "text-fd-muted-foreground/70" : "text-fd-primary",
-                    )}
-                  >
-                    {kindTag(e.kind)}
-                  </span>
-                  {e.d ? (
-                    <span className="min-w-0 flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
-                      {e.kind === "window" ? showDatum(e.d) : `#${e.d.index + 1} ${showDatum(e.d)}`}
-                    </span>
-                  ) : (
-                    <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
-                      cleared
-                    </span>
-                  )}
-                </li>
-              ))
+          <div
+            className={cn(
+              "flex flex-col transition-opacity duration-200 ease-out",
+              open ? "opacity-100 delay-75" : "opacity-0 duration-150",
             )}
-          </ol>
+          >
+            <div className="flex flex-col gap-0.5 px-2.5 pb-1.5 pt-0.5">
+              <span
+                className={cn(
+                  "font-display font-medium leading-tight tracking-tight tabular-nums break-all",
+                  value && value.length > 12 ? "text-[0.85rem]" : "text-lg leading-none",
+                  value === null
+                    ? "text-fd-muted-foreground/40"
+                    : state === "idle"
+                      ? "text-fd-foreground/70"
+                      : "text-fd-foreground",
+                )}
+              >
+                {value ?? "—"}
+              </span>
+            </div>
+
+            <ol className="flex flex-col gap-px border-t border-hairline bg-fd-muted/25 px-1.5 py-1">
+              {events.length === 0 ? (
+                <li className="px-1 py-0.5 text-[0.55rem] italic text-fd-muted-foreground/50">
+                  {emptyHint}
+                </li>
+              ) : (
+                events.slice(0, 6).map((e, i) => (
+                  <li
+                    key={e.id}
+                    className="flex items-center gap-1.5 px-1 text-[0.55rem] leading-snug"
+                    style={{ opacity: Math.max(0.4, 1 - i * 0.13) }}
+                  >
+                    <span
+                      className={cn(
+                        "w-6 shrink-0 font-mono text-[0.5rem] uppercase tracking-wide",
+                        e.kind === "active" ? "text-fd-muted-foreground/70" : "text-fd-primary",
+                      )}
+                    >
+                      {kindTag(e.kind)}
+                    </span>
+                    {e.d ? (
+                      <span className="min-w-0 flex-1 truncate font-mono tabular-nums text-fd-foreground/75">
+                        {e.kind === "window"
+                          ? showDatum(e.d)
+                          : `#${e.d.index + 1} ${showDatum(e.d)}`}
+                      </span>
+                    ) : (
+                      <span className="flex-1 truncate font-mono italic text-fd-muted-foreground/50">
+                        cleared
+                      </span>
+                    )}
+                  </li>
+                ))
+              )}
+            </ol>
+          </div>
         </div>
       </div>
     </div>

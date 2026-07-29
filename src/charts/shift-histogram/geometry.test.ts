@@ -56,6 +56,46 @@ describe("shiftHistogramGeometry", () => {
     expect(shiftHistogramGeometry({ ...base, before: [], after: [] })).toBeNull();
   });
 
+  it("a non-finite `bins` falls back to auto; a huge one is capped at n", () => {
+    // NaN collapsed the bin array to empty (blank plot, summary still reading
+    // the shift) and Infinity threw RangeError out of Array.from.
+    const auto = shiftHistogramGeometry({ ...base, before: BEFORE, after: AFTER })!;
+    for (const bins of [NaN, Infinity, -Infinity]) {
+      const geo = shiftHistogramGeometry({ ...base, before: BEFORE, after: AFTER, bins })!;
+      expect(geo.bins).toHaveLength(auto.bins.length);
+    }
+    // more bins than observations is only slivers
+    const capped = shiftHistogramGeometry({ ...base, before: [1, 2], after: [3], bins: 5000 })!;
+    expect(capped.bins.length).toBeLessThanOrEqual(3);
+  });
+
+  it("a reversed `domain` is normalized, so bars and median rules agree", () => {
+    const both = { ...base, before: BEFORE, after: AFTER };
+    const asc = shiftHistogramGeometry({ ...both, domain: [0, 200] })!;
+    const desc = shiftHistogramGeometry({ ...both, domain: [200, 0] })!;
+    // the fall has to read the same way on both marks: after median LEFT of before
+    expect(desc.medians.after!.x).toBeLessThan(desc.medians.before!.x);
+    expect(desc.medians.after!.x).toBe(asc.medians.after!.x);
+    expect(desc.bins.map((b) => b.up)).toEqual(asc.bins.map((b) => b.up));
+  });
+
+  it("medians describe the values the bins actually count", () => {
+    // A window past the data painted nothing, yet still announced a median for
+    // each side with both rules clamped onto the left edge.
+    expect(
+      shiftHistogramGeometry({ ...base, before: BEFORE, after: AFTER, domain: [900, 1000] }),
+    ).toBeNull();
+    // a window over part of the data reports that part's n, not the raw sample's
+    const geo = shiftHistogramGeometry({
+      ...base,
+      before: [1, 2, 3, 400],
+      after: [1, 2, 500],
+      domain: [0, 10],
+    })!;
+    expect([geo.nBefore, geo.nAfter]).toEqual([3, 2]);
+    expect(geo.medians.before!.value).toBe(2);
+  });
+
   test.prop([
     fc.array(fc.double({ noNaN: true, min: 0, max: 200 }), { minLength: 1, maxLength: 80 }),
     fc.array(fc.double({ noNaN: true, min: 0, max: 200 }), { minLength: 1, maxLength: 80 }),
@@ -69,6 +109,9 @@ describe("shiftHistogramGeometry", () => {
       expect(b.up).toBeLessThanOrEqual(half + 0.02);
       expect(b.down).toBeLessThanOrEqual(half + 0.02);
     }
+    // the gutter label starts at labelX and runs 4 chars at the digits-only
+    // 0.62 over-estimate — it has to end inside totalWidth, not past the box
+    expect(geo.labelX + 4 * 8 * 0.62).toBeLessThanOrEqual(geo.totalWidth);
   });
 });
 

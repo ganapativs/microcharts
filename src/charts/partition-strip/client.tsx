@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PARTITION } from "../../core/strings-partition.js";
-import { partitionStripGeometry } from "./geometry.js";
+import { partitionBox, partitionStripGeometry } from "./geometry.js";
 import {
   PartitionStrip as StaticPartitionStrip,
   partitionStripSummary,
@@ -41,8 +41,8 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
   const {
     data,
     labels = true,
-    width = 120,
-    height = 24,
+    width: widthProp = 120,
+    height: heightProp = 24,
     format,
     locale,
     strings = EN_PARTITION,
@@ -58,6 +58,10 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same clamp the static entry and <Chart> apply, or the pointer math and the
+  // readout anchor would address a box nobody painted.
+  const [width, height] = partitionBox(widthProp, heightProp);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // reveal by x (`order:"x"`) — DOM order interleaves the two rows, so a plain

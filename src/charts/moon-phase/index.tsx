@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makePercentFormatter } from "../../core/format.js";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
-import { moonGeometry, type MoonMode } from "./geometry.js";
+import { DEFAULT_SIZE, moonGeometry, type MoonMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface MoonPhaseProps {
@@ -58,7 +58,7 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
     value,
     mode = "progress",
     color,
-    size = 16,
+    size = DEFAULT_SIZE,
     locale,
     strings = EN_MOON,
     title,
@@ -74,8 +74,9 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
 
   return (
     <Chart
-      width={size}
-      height={size}
+      // The RESOLVED box, never the prop — the disc is drawn in it (see resolveSize).
+      width={geo.size}
+      height={geo.size}
       title={title}
       summary={accName}
       id={id}
@@ -87,8 +88,13 @@ export function MoonPhase(props: MoonPhaseProps): ReactNode {
       style={style}
     >
       <circle cx={geo.disc.cx} cy={geo.disc.cy} r={geo.disc.r} data-mc-ink="band" />
-      {/* Lit area = datum; fill is thematic. */}
-      {geo.litPath ? <path d={geo.litPath} style={{ fill: color ?? "var(--mc-moon)" }} /> : null}
+      {/* Lit area = datum; fill is thematic. `data-mc-moon` marks WHICH path is
+          the datum: `children` land in this same <svg>, so the interactive
+          entry's per-change bloom used to grab whatever path came first and, at
+          new moon (no lit path at all), animated an annotation instead. */}
+      {geo.litPath ? (
+        <path d={geo.litPath} data-mc-moon="" style={{ fill: color ?? "var(--mc-moon)" }} />
+      ) : null}
       <circle
         cx={geo.disc.cx}
         cy={geo.disc.cy}

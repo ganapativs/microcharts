@@ -199,8 +199,8 @@ export const contexts: ChartContexts = {
             zones={ZONES}
             span={60}
             orientation="horizontal"
-            width={88}
-            height={14}
+            width={110}
+            height={22}
             summary={false}
           />
         </span>{" "}
@@ -223,8 +223,8 @@ export const contexts: ChartContexts = {
                   zones={ZONES}
                   span={60}
                   orientation="horizontal"
-                  width={100}
-                  height={16}
+                  width={120}
+                  height={22}
                   summary={false}
                 />
               </td>
@@ -253,7 +253,7 @@ export const contexts: ChartContexts = {
           span={60}
           orientation="horizontal"
           width={180}
-          height={22}
+          height={24}
           summary={false}
         />
       </>
@@ -275,8 +275,8 @@ export const contexts: ChartContexts = {
               zones={ZONES}
               span={60}
               orientation="horizontal"
-              width={48}
-              height={12}
+              width={72}
+              height={22}
               summary={false}
             />
           </span>

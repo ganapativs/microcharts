@@ -26,7 +26,12 @@ export interface CoverageStripGeometry {
   /** measured / expected, 0–1, 2-dp. */
   coverage: number;
   measured: number;
+  /** Whole slot count the cells were laid out and the summary counted against.
+   *  Callers must read THIS, never the raw `expected` opt — see `resolveCount`. */
   expected: number;
+  /** Whole step count the cells were binned against — paint the ramp from this,
+   *  never from the raw `steps` opt (same reason as `expected`). */
+  steps: number;
   /** Longest run of missing slots, including any trailing shortfall vs expected. */
   longestGap: number;
   crisp: boolean;
@@ -38,6 +43,18 @@ export interface CoverageStripGeometry {
 }
 
 export const COVERAGE_MAX_SLOTS = 120;
+
+/** `expected` and `steps` are counts a host computes rather than types:
+ *  `expected={hours / bucket}` with `bucket` momentarily 0 is `Infinity`, and
+ *  `Number(field.value)` on a cleared input is `NaN`. Both used to flow through
+ *  raw: `expected={NaN}` ran the slot loop zero times, so a strip holding six
+ *  real readings drew nothing and announced "No data."; `expected={7.5}` drew 8
+ *  cells and announced "4 of 7.5 slots"; a non-finite `steps` binned every
+ *  intensity cell to `fill-opacity="NaN"`. Repair once, here, so the summary
+ *  counts the slots that were actually drawn. */
+function resolveCount(raw: number | undefined, fallback: number, min: number): number {
+  return raw !== undefined && Number.isFinite(raw) ? Math.max(min, Math.round(raw)) : fallback;
+}
 
 export function coverageGeometry(opts: {
   width: number;
@@ -51,7 +68,8 @@ export function coverageGeometry(opts: {
   gutterCh?: number;
   fontSize?: number;
 }): CoverageStripGeometry {
-  const { width, height, data, mode = "binary", steps = 5, shape } = opts;
+  const { width, height, data, mode = "binary", shape } = opts;
+  const steps = resolveCount(opts.steps, 5, 1);
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
@@ -61,7 +79,7 @@ export function coverageGeometry(opts: {
     present: v !== null && v !== undefined,
     value: isFiniteValue(v) ? v : null,
   }));
-  const rawExpected = Math.max(opts.expected ?? slots.length, slots.length);
+  const rawExpected = Math.max(resolveCount(opts.expected, slots.length, 0), slots.length);
   const expected = Math.min(rawExpected, COVERAGE_MAX_SLOTS);
   // trailing shortfall renders as gaps
   const cellsIn: { present: boolean; value: number | null }[] = [];
@@ -74,6 +92,7 @@ export function coverageGeometry(opts: {
       coverage: 0,
       measured: 0,
       expected: 0,
+      steps,
       longestGap: 0,
       crisp: shape === "square",
       pitch: 0,
@@ -130,6 +149,7 @@ export function coverageGeometry(opts: {
     coverage: round2(measured / expected),
     measured,
     expected,
+    steps,
     longestGap,
     crisp: m.crisp,
     pitch,

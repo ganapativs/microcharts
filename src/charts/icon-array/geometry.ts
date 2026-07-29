@@ -6,16 +6,28 @@
 // counting chart). Coords 2-dp.
 import { round2 } from "../../core/types.js";
 import { cellMetrics, type CellShape } from "../../shared/cell.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
 
 export type IconArrayN = 10 | 20 | 100;
 
 /** cols × rows per denominator — legibility is designed, not arbitrary. */
-export const GRID_DIMS: Record<IconArrayN, [number, number]> = {
+const GRID_DIMS: Record<IconArrayN, [number, number]> = {
   10: [5, 2],
   20: [10, 2],
   100: [10, 10],
 };
+
+/**
+ * Snap `total` to a designed denominator, defaulting to 20. `GRID_DIMS` has no
+ * entry for anything else, and the lookup was destructured unguarded — a
+ * `total` of 25, 0 or NaN (a JS caller, an untyped CMS field, a model emitting
+ * the prop) threw "undefined is not iterable" and took the render down with it.
+ * Resolve once so the painted denominator and the announced one are the same
+ * number.
+ */
+export function resolveTotal(total: number | undefined): IconArrayN {
+  return total === 10 || total === 100 ? total : 20;
+}
 
 export interface IconArrayGeometry {
   units: { x: number; y: number; filled: boolean; index: number }[];
@@ -46,6 +58,52 @@ export function resolveK(value: number, n: number): number {
   return Math.min(n, Math.max(0, Math.round(v * n)));
 }
 
+export interface IconArrayLabelPlan {
+  /** Label size in viewBox units. */
+  font: number;
+  /** Characters of gutter to carve out of the width (0 when the label drops). */
+  gutterCh: number;
+  show: boolean;
+}
+
+/**
+ * Whether the side label is affordable, and what it costs. Lives here so the
+ * static and interactive entries cannot compute different gutters and paint
+ * different grids.
+ *
+ * The ratio reserve is derived from the denominator, not fixed: `"100 in 100"`
+ * is ten characters where `"3 in 20"` is seven, and reserving a flat nine
+ * pushed the full 100-unit label up to 6.7 units past the right edge of the
+ * viewBox (`.mc-root` is `overflow: visible`, so it spilled into the page).
+ * `2 × digits + 5` is both sides of the ratio, the four characters of `" in "`,
+ * and one character of slack — which reproduces the calibrated 9 for the 10-
+ * and 20-unit grids exactly, so only the case that overflowed moves.
+ */
+export function iconArrayLabelPlan(opts: {
+  label: "ratio" | "percent" | "none";
+  total: IconArrayN;
+  width: number;
+  height: number;
+}): IconArrayLabelPlan {
+  const { label, total, width, height } = opts;
+  // label a touch smaller than the strips so the countable grid stays the hero
+  // (~0.5·height, clamped 7–10) — see coverage-strip
+  const font = labelFont(height, 0.5);
+  const wantCh = label === "ratio" ? 2 * `${total}`.length + 5 : label === "percent" ? 5 : 0;
+  if (wantCh === 0) return { font, gutterCh: 0, show: false };
+  // The label lives in a gutter carved OUT of the width. On a narrow box that
+  // gutter can swallow the grid whole — the units collapse to nothing and the
+  // text runs off the right edge. So the label is gated on the grid keeping a
+  // countable cell (≥ 1.5 units per column, gaps included) after the gutter,
+  // and on the text fitting the box vertically. When it drops, the gutter drops
+  // with it and the grid gets the full width — the countable grid is the chart.
+  const [cols] = GRID_DIMS[total];
+  const show =
+    labelFitsY(height / 2, font, height) &&
+    width - textGutter(wantCh, font, 4) >= cols * 1.5 * 1.25;
+  return { font, gutterCh: show ? wantCh : 0, show };
+}
+
 export function iconArrayGeometry(opts: {
   width: number;
   height: number;
@@ -55,7 +113,8 @@ export function iconArrayGeometry(opts: {
   gutterCh?: number;
   fontSize?: number;
 }): IconArrayGeometry {
-  const { width, height, value, total: n, shape } = opts;
+  const { width, height, value, shape } = opts;
+  const n = resolveTotal(opts.total);
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;

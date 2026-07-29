@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import {
   named,
   fillFor,
@@ -73,6 +74,9 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   // "+50 %" or the pointer map runs short of the rendered viewBox.
   const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const pct = useCallback((frac: number) => changePointDelta(frac, pctFmt), [pctFmt]);
+  // A focused point can be a gap, and a regime mean is NaN when every point in
+  // it is one. `fmt(NaN)` paints and announces the literal string "NaN".
+  const num = useCallback((v: number | undefined) => (isFiniteValue(v) ? fmt(v) : "—"), [fmt]);
 
   // Mirror the static's delta gutter: geometry is laid out in `width`, but the
   // rendered viewBox is `width + gutter`. Mapping the pointer over `width`
@@ -119,6 +123,13 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     },
     [geo, data.length, width],
   );
+  // The chip's break text, in one place: `datum.formatted` is documented as the
+  // chip's own string, and two copies of it had already drifted apart.
+  const breakText = useCallback(
+    (b: { before: number; after: number; delta: number }) =>
+      `${num(b.before)}→${num(b.after)} (${pct(b.delta)})`,
+    [num, pct],
+  );
   // index = the DATA index (points are 1:1 with `data`); value = the series
   // value there (`null` at a gap).
   const datum = useCallback(
@@ -130,16 +141,16 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
       if (geo) {
         const brk = geo.breaks.find((b) => b.index === i);
         formatted = brk
-          ? `${fmt(brk.before)}→${fmt(brk.after)} (${pct(brk.delta)})`
+          ? breakText(brk)
           : strings.changePointRegime(regimeOf(i).regime, geo.segments.length);
       }
       return {
         index: i,
-        value: Number.isFinite(data[i]) ? (data[i] as number) : null,
+        value: isFiniteValue(data[i]) ? data[i]! : null,
         formatted,
       };
     },
-    [data, geo, fmt, pct, regimeOf, strings],
+    [data, geo, breakText, regimeOf, strings],
   );
 
   // The kernel's `step` sees only (current, key), but Shift+Tab must cycle the
@@ -204,31 +215,34 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     if (atBreak) {
       announced = strings.changePointBreak(
         atBreak.index,
-        fmt(atBreak.before),
-        fmt(atBreak.after),
+        num(atBreak.before),
+        num(atBreak.after),
         pct(atBreak.delta),
       );
     } else {
       const { regime, mean } = regimeOf(shown);
       announced = strings.changePointAt(
         shown,
-        fmt(data[shown] as number),
+        num(data[shown]),
         regime,
         geo.segments.length,
-        fmt(mean),
+        num(mean),
       );
     }
   }
 
   const px = shown !== null && geo ? xOf(shown) : 0;
+  // The chip is a VISIBLE surface, so its regime badge goes through the same
+  // `SummaryStrings` token the announcement uses — it was hardcoded English,
+  // which a `strings` override could not reach.
   const readoutText =
     shown === null
       ? ""
       : atBreak
-        ? `${fmt(atBreak.before)}→${fmt(atBreak.after)} (${pct(atBreak.delta)})`
+        ? breakText(atBreak)
         : geo
-          ? `regime ${regimeOf(shown).regime}/${geo.segments.length}`
-          : fmt(data[shown] as number);
+          ? strings.changePointRegime(regimeOf(shown).regime, geo.segments.length)
+          : num(data[shown]);
 
   return (
     <span

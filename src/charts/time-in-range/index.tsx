@@ -5,13 +5,14 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { makePercentFormatter } from "../../core/format.js";
+import { chartSide, round2 } from "../../core/types.js";
 
 import { EN_TIME_IN_RANGE, type TimeInRangeStrings } from "../../core/strings-time-in-range.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
+  presentZones,
   timeInRangeGeometry,
   zonePercents,
-  ZONE_ORDER,
   type Orientation,
   type TimeInRangeDatum,
   type ZoneKey,
@@ -47,13 +48,12 @@ export interface TimeInRangeProps {
   children?: ReactNode | undefined;
 }
 
-/** Present-zone integer percents keyed by zone — label + summary read the same. */
+/** Present-zone integer percents keyed by zone — label + summary read the same.
+ *  Zones come from `presentZones`, the one place the "which zones are present"
+ *  rule lives, so the announced list can never differ from the painted strip. */
 export function zonePercentMap(data: TimeInRangeDatum): Partial<Record<ZoneKey, number>> {
-  const keys = ZONE_ORDER.filter((k) => {
-    const v = data[k];
-    return typeof v === "number" && Number.isFinite(v) && v > 0;
-  });
-  const pcts = zonePercents(keys.map((k) => data[k] as number));
+  const { keys, values } = presentZones(data);
+  const pcts = zonePercents(values);
   const out: Partial<Record<ZoneKey, number>> = {};
   keys.forEach((k, i) => (out[k] = pcts[i]!));
   return out;
@@ -95,13 +95,16 @@ export function timeInRangeSummary(
   return strings.timeInRange(clauses.join(", "));
 }
 
+const DEFAULT_WIDTH = 80;
+const DEFAULT_HEIGHT = 12;
+
 export function TimeInRange(props: TimeInRangeProps): ReactNode {
   const {
     data,
     orientation = "horizontal",
     label = "in",
-    width = 80,
-    height = 12,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     locale,
     strings = EN_TIME_IN_RANGE,
     title,
@@ -111,6 +114,14 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `Chart` clamps the frame, but the zones were laid out against the RAW prop:
+  // a host-computed side (`Number("")` → NaN, a collapsed flex box → 0) emitted
+  // `width="NaN"` rects inside a valid viewBox, `Infinity` ones outside it, and
+  // a NaN height went on to poison `--mc-label-size` and `--mc-seat` — dragging
+  // the inline baseline with it.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const geo = timeInRangeGeometry({ data, width, height, orientation });
   const pct = zonePercentMap(data);
@@ -188,8 +199,4 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

@@ -48,8 +48,56 @@ describe("<ShiftHistogram>", () => {
       <ShiftHistogram data={{ before: BEFORE, after: AFTER }} width={160} />,
     );
     expect(container.querySelectorAll('rect[data-mc-ink="neutral"]').length).toBeGreaterThan(2); // before
-    expect(container.querySelectorAll('rect[data-mc-ink="bar"]').length).toBeGreaterThan(2); // after
+    expect(container.querySelectorAll('rect[data-mc-ink="accent"]').length).toBeGreaterThan(2); // after
     expect(container.querySelector("line")).not.toBeNull(); // center + medians
+  });
+
+  it("every mark paints through an ink role, so forced-colors can remap it", () => {
+    const { container } = draw(
+      <ShiftHistogram data={{ before: BEFORE, after: AFTER }} width={160} />,
+    );
+    // An inline fill/stroke or a literal token survives `forced-color-adjust:
+    // none` verbatim in High Contrast Mode. Every mark here is role-painted.
+    for (const el of container.querySelectorAll("rect, line")) {
+      expect(el.getAttribute("data-mc-ink")).not.toBeNull();
+      expect(el.getAttribute("stroke")).toBeNull();
+      expect(el.getAttribute("style") ?? "").not.toContain("fill:");
+    }
+    expect(container.querySelector('line[data-mc-ink="muted"]')).not.toBeNull(); // mirror axis
+    expect(container.querySelector('line[data-mc-ink="data"]')).not.toBeNull(); // before median
+    expect(container.querySelector('line[data-mc-ink="accent"]')).not.toBeNull(); // after median
+  });
+
+  it("a caller `color` still owns the after side inline", () => {
+    const { container } = draw(
+      <ShiftHistogram data={{ before: BEFORE, after: AFTER }} width={160} color="tomato" />,
+    );
+    expect(container.querySelector('rect[data-mc-ink="accent"]')!.getAttribute("style")).toContain(
+      "tomato",
+    );
+    expect(container.querySelector('line[data-mc-ink="accent"]')!.getAttribute("style")).toContain(
+      "tomato",
+    );
+  });
+
+  it("a non-finite `bins` falls back to auto instead of blanking the plot", () => {
+    // Hosts compute this off an empty field (`Number("")` → NaN) or a ratio
+    // (→ Infinity). NaN emptied the bin array under a summary that still read
+    // the shift; Infinity threw RangeError out of Array.from mid-render.
+    for (const bins of [NaN, Infinity, -Infinity]) {
+      const { container } = draw(
+        <ShiftHistogram data={{ before: BEFORE, after: AFTER }} bins={bins} />,
+      );
+      expect(container.querySelectorAll("rect").length).toBeGreaterThan(2);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("Median fell");
+    }
+  });
+
+  it("the label carries no inline font-variant (styles.css owns tabular-nums)", () => {
+    const { container } = draw(
+      <ShiftHistogram data={{ before: BEFORE, after: AFTER }} format={MS} width={160} />,
+    );
+    expect(container.querySelector("text")!.getAttribute("style")).toBeNull();
   });
 
   it("overlay mode draws the after side as an outline (no down fill)", () => {

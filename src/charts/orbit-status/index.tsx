@@ -9,8 +9,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { orbitStatusGeometry } from "./geometry.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
+import { orbitLabelBand, orbitStatusGeometry } from "./geometry.js";
 
 export interface OrbitStatusProps {
   latency: number;
@@ -50,10 +51,9 @@ export function orbitStatusSummary(
   } = {},
 ): string {
   const { threshold, strings = EN_ORBIT_STATUS, format, locale } = opts;
-  if (!(Number.isFinite(latency) && Number.isFinite(rate))) return strings.orbitUnknown;
+  if (!isFiniteValue(latency) || !isFiniteValue(rate)) return strings.orbitUnknown;
   const fmt = makeFormatter(format, locale);
-  const alerted =
-    typeof threshold === "number" && Number.isFinite(threshold) && latency >= threshold;
+  const alerted = isFiniteValue(threshold) && latency >= threshold;
   return strings.orbitStatus(fmt(Math.max(0, latency)), fmt(Math.max(0, rate)), alerted);
 }
 
@@ -77,7 +77,6 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(size);
 
   const geo = orbitStatusGeometry({
     latency,
@@ -88,20 +87,33 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     threshold,
     pad: PAD,
   });
+  // `fontSize` is host-computed like `size`, and a non-finite or non-positive
+  // one reached the DOM verbatim: `font-size="NaN"`, `y="NaN"`, and a NaN
+  // viewBox width through the gutter it sizes. Fall back to the size-derived
+  // default.
+  const fontSize =
+    isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : labelFont(geo.size);
+
   const accName =
     summary === false
       ? false
       : (summary ?? orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
   const fmt = makeFormatter(format, locale);
+  const labelY = geo.size / 2 + fontSize * 0.34;
+  // `labelFont` floors at 7, so under a box of ~8 units the numeral's em-box no
+  // longer fits the glyph box vertically — and `.mc-root` is `overflow: visible`,
+  // so it paints on the page instead of clipping. Drop it (labels.ts degradation
+  // rule), gutter and all; the summary still states the ms.
   const labelText =
-    label === "latency" && !geo.unknown ? strings.orbitLatency(fmt(Math.max(0, latency))) : null;
-  // Reserve the gutter from the real text extent so the ms numeral never spills
-  // (0.7·em/char over-estimate — the "ms" glyphs run wider than digits).
-  const labelBand = labelText ? Math.ceil(labelText.length * 0.7 * fontSize + 2) : 0;
+    label === "latency" && !geo.unknown && labelFitsY(labelY, fontSize, geo.size, false)
+      ? strings.orbitLatency(fmt(Math.max(0, latency)))
+      : null;
+  // Reserve the gutter from the real text extent so the ms numeral never spills.
+  const labelBand = labelText ? orbitLabelBand(labelText.length, fontSize) : 0;
 
   return (
     <Chart
-      width={size + labelBand}
+      width={geo.size + labelBand}
       height={geo.size}
       title={title}
       summary={accName}
@@ -142,13 +154,16 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
           cy={geo.satellite.cy}
           r={geo.satellite.r}
           data-mc-ink={geo.satellite.alerted ? "negative" : "accent"}
-          style={color ? { fill: color } : undefined}
+          // `color` re-paints the accent satellite only. An alerted one carries
+          // valence, and a brand hue over it announces "above threshold" in the
+          // caller's calm blue (BiasStrip/Constellation guard theirs the same way).
+          style={color && !geo.satellite.alerted ? { fill: color } : undefined}
         />
       ) : null}
       {labelText !== null ? (
         <text
-          x={size + 1}
-          y={geo.size / 2 + fontSize * 0.34}
+          x={geo.size + 1}
+          y={labelY}
           fontSize={fontSize}
           textAnchor="start"
           data-mc-ink="label"

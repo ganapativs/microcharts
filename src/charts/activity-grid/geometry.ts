@@ -24,6 +24,12 @@ export interface ActivityGridGeometry {
   rows: number;
   width: number;
   height: number;
+  /** The resolved `cell` / `gap` / `levels` the cells were actually laid out and
+   *  bucketed against. Callers must paint from THESE, never from the raw opts —
+   *  see `resolve` below for what a raw value can be. */
+  cell: number;
+  gap: number;
+  levels: number;
 }
 
 export interface ActivityGridGeometryOptions {
@@ -42,6 +48,16 @@ export interface ActivityGridGeometryOptions {
   offset?: number | undefined;
 }
 
+/** A config number the host computes rather than types: `cell={boxPx / weeks}`
+ *  with `weeks` momentarily 0 is `Infinity`, and `Number(input.value)` on an
+ *  empty field is `NaN`. Both used to flow straight through into `width`, so
+ *  the chart emitted `viewBox="0 0 NaN NaN"` and vanished; a negative `gap` put
+ *  cells at negative x, outside the viewBox that `.mc-root` does not clip.
+ *  Repair once, here, so every caller reads the numbers the cells were built on. */
+function resolve(raw: number | undefined, fallback: number, min: number): number {
+  return raw !== undefined && Number.isFinite(raw) && raw >= min ? raw : fallback;
+}
+
 /** Buckets a value into 0..(levels-1). 0 for ≤0 / empty; positives fill 1..max. */
 function levelOf(value: number, min: number, max: number, levels: number): number {
   if (value <= 0) return 0;
@@ -54,11 +70,14 @@ export function activityGridGeometry(
   data: readonly Value[],
   opts: ActivityGridGeometryOptions = {},
 ): ActivityGridGeometry {
-  const rows = Math.max(1, opts.rows ?? 7);
-  const cell = opts.cell ?? 10;
-  const gap = opts.gap ?? 2;
-  const levels = Math.max(2, opts.levels ?? 5);
-  const offset = Math.max(0, Math.floor(opts.offset ?? 0)) % rows;
+  const rows = Math.floor(resolve(opts.rows, 7, 1));
+  const cell = resolve(opts.cell, 10, 0);
+  const gap = resolve(opts.gap, 2, 0);
+  // `levels` is a count of discrete bins, so it rounds to a whole number before
+  // it is clamped — a fractional one made `levelOf` return fractional levels
+  // that no opacity step in the ramp corresponds to.
+  const levels = Math.max(2, Math.round(resolve(opts.levels, 5, 1)));
+  const offset = Math.floor(resolve(opts.offset, 0, 0)) % rows;
   const step = cell + gap;
 
   const n = data.length;
@@ -90,5 +109,5 @@ export function activityGridGeometry(
     };
   });
 
-  return { cells, cols, rows, width, height };
+  return { cells, cols, rows, width, height, cell, gap, levels };
 }

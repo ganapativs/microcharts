@@ -60,4 +60,41 @@ describe("interactive <PercentileTrace>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  // The chip is rendered text, so it is a localizable surface. It used to be an
+  // inline `${unit} ${index}: ${value}` template — a `strings` bundle
+  // translated what a screen reader heard and not what a sighted reader saw.
+  it("a localized bundle reaches the visible chip, not just the announcement", async () => {
+    const strings = {
+      noData: "Keine Daten.",
+      percentileValue: (n: string) => `P${n}`,
+      percentileTrace: (c: string, d: string, b: string) => `${c}, ${d}; ${b}.`,
+      percentileDelta: (dir: "up" | "down", a: string) => `${dir} ${a}`,
+      percentileFlat: "unverändert",
+      percentileBand: () => "mittleres Halb",
+      percentileTraceAt: (unit: string, i: number, v: string) => `${v} in ${unit} ${i}`,
+    };
+    const screen = await render(
+      <PercentileTrace data={SAMPLE} unit="Woche" strings={strings} title="Kohorte" />,
+    );
+    const wrap = screen.container.querySelector(".mc-percentile-trace-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("P81 in Woche 7");
+    expect(document.querySelector('[aria-live="polite"]')!.textContent).toBe("P81 in Woche 7");
+  });
+
+  // The box is a host input: a non-finite one used to reach the hit-test math,
+  // so the crosshair landed on a plot the static never drew.
+  it("a non-finite width still hit-tests against the box the static drew", async () => {
+    const screen = await render(<PercentileTrace data={SAMPLE} width={Number.NaN} />);
+    const wrap = screen.container.querySelector(".mc-percentile-trace-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect.poll(() => wrap.querySelector("svg line")).not.toBeNull();
+    const x = wrap.querySelector("svg line")!.getAttribute("x1")!;
+    expect(Number.isFinite(Number(x))).toBe(true);
+  });
 });

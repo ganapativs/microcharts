@@ -59,6 +59,53 @@ describe("<QueueDepth>", () => {
     expect(container.querySelector("text")).toBeNull();
   });
 
+  it("what is painted is what is announced: at capacity, no alarm ink", () => {
+    const { container } = draw(<QueueDepth data={[100, 100, 100, 100]} capacity={CAP} />);
+    expect(container.querySelector('path[data-mc-ink="negative"]')).toBeNull();
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "100 queued, within capacity, holding steady over the last quarter.",
+    );
+  });
+
+  it("capacity ≤ 0 renders exactly like no capacity", () => {
+    // It used to paint a full-width breach + a negative endpoint the summary
+    // never mentioned (the ÷0 guard left `ratio` null, so the clause vanished).
+    const none = draw(<QueueDepth data={DATA} />).container.innerHTML;
+    for (const capacity of [0, -5]) {
+      expect(draw(<QueueDepth data={DATA} capacity={capacity} />).container.innerHTML).toBe(none);
+    }
+  });
+
+  it("a poisoned domain cannot flatten the mark under a 'growing' summary", () => {
+    const auto = draw(<QueueDepth data={DATA} capacity={CAP} />).container;
+    const poisoned = draw(<QueueDepth data={DATA} capacity={CAP} domain={[0, NaN]} />).container;
+    const ys = (c: Element): string[] => {
+      const d = c.querySelector('path[data-mc-ink="accent"]')!.getAttribute("d")!;
+      return [...new Set([...d.matchAll(/[\d.-]+ ([\d.-]+)/g)].map((m) => m[1]!))];
+    };
+    expect(ys(poisoned).length).toBeGreaterThan(1); // was one flat line at mid-height
+    expect(ys(poisoned)).toEqual(ys(auto));
+    expect(poisoned.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      auto.querySelector("svg")!.getAttribute("aria-label"),
+    );
+  });
+
+  it("the endpoint label takes an ink role, never an inline fill", () => {
+    // `.mc-root` sets forced-color-adjust: none, so an inline var(--mc-negative)
+    // survived verbatim into High Contrast Mode and skipped the role mapping.
+    const breached = draw(<QueueDepth data={DATA} capacity={CAP} />).container;
+    const end = [...breached.querySelectorAll("text")].at(-1)!;
+    expect(end.getAttribute("data-mc-ink")).toBe("negative");
+    expect(end.getAttribute("style")).toBeNull();
+
+    const ok = draw(<QueueDepth data={[90, 70, 50, 30]} capacity={CAP} />).container;
+    expect([...ok.querySelectorAll("text")].at(-1)!.getAttribute("data-mc-ink")).toBe("accent");
+    // the `color` prop still wins over the role, as it does on the endpoint dot
+    const tinted = draw(<QueueDepth data={[90, 70, 50, 30]} capacity={CAP} color="#123456" />);
+    const tintedEnd = [...tinted.container.querySelectorAll("text")].at(-1)!;
+    expect(tintedEnd.getAttribute("style")).toContain("rgb(18, 52, 86)");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<QueueDepth data={DATA} capacity={CAP} title="Support queue" />);
     await expectNoA11yViolations(container);

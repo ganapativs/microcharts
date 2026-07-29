@@ -30,6 +30,16 @@ describe("sproutRowGeometry — ordinal growth", () => {
     expect(geo.soil.x1).toBeLessThan(geo.soil.x2);
   });
 
+  it("a box too short for the pad keeps the soil on the frame", () => {
+    // `height - pad - 1` went negative under ~3 units, so the soil — and every
+    // glyph standing on it — painted above the top edge of a valid viewBox.
+    for (const height of [1, 2, 3, 4]) {
+      const geo = sproutRowGeometry({ stages: [3], height, step: 16, pad: 2 });
+      expect(geo.soil.y1).toBeGreaterThanOrEqual(0);
+      expect(geo.soil.y1).toBeLessThanOrEqual(height);
+    }
+  });
+
   it("labels reserve a bottom band (soil rises)", () => {
     const plain = sproutRowGeometry({ stages: [1, 2], height: 20, step: 16, pad: 2 });
     const labelled = sproutRowGeometry({
@@ -80,7 +90,10 @@ const glyphPoints = (d: string): [number, number][] => {
 };
 
 describe("stageGlyphBox — the ring's box is the glyph's box", () => {
-  test.prop([fc.integer({ min: 0, max: 3 }), fc.double({ min: 4, max: 60, noNaN: true })])(
+  // `gh` runs below zero because callers derive it as `baselineY - pad`, and a
+  // collapsed box makes that negative: the glyph used to flip and emit a
+  // NEGATIVE arc radius. Floored at 0 it simply has no room to grow.
+  test.prop([fc.integer({ min: 0, max: 3 }), fc.double({ min: -6, max: 60, noNaN: true })])(
     "contains every painted point, and touches it on all four sides",
     (stage, gh) => {
       const by = gh + 2;
@@ -99,6 +112,23 @@ describe("stageGlyphBox — the ring's box is the glyph's box", () => {
       expect(box.x1 - Math.max(...xs)).toBeLessThan(0.1);
       expect(Math.min(...ys) - box.y0).toBeLessThan(0.1);
       expect(box.y1 - Math.max(...ys)).toBeLessThan(0.1);
+    },
+  );
+
+  // Containment is a hard rule, and the leaf's 1.4-unit floor was the one part
+  // of the glyph that ignored the room it had: at height 4 it painted 2.3 units
+  // above the frame. Heights below ~6 shed the plant instead of spilling.
+  test.prop([fc.integer({ min: 0, max: 3 }), fc.integer({ min: 1, max: 64 })])(
+    "the glyph stays inside a row of any height",
+    (stage, height) => {
+      const pad = 2; // mirrors <SproutRow>'s PAD
+      const geo = sproutRowGeometry({ stages: [stage], height, step: 16, pad });
+      const slot = geo.slots[0]!;
+      const box = stageGlyphBox(slot.stage!, slot.x, slot.baselineY, slot.baselineY - pad);
+      expect(box.x0).toBeGreaterThanOrEqual(0);
+      expect(box.y0).toBeGreaterThanOrEqual(0);
+      expect(box.x1).toBeLessThanOrEqual(geo.width);
+      expect(box.y1).toBeLessThanOrEqual(height);
     },
   );
 });

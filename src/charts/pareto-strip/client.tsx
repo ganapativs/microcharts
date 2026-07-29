@@ -17,7 +17,14 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { paretoGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import {
+  paretoGeometry,
+  DEFAULT_HEIGHT,
+  DEFAULT_MAX_ITEMS,
+  DEFAULT_THRESHOLD,
+  DEFAULT_WIDTH,
+} from "./geometry.js";
 import {
   ParetoStrip as StaticParetoStrip,
   paretoPercent,
@@ -39,12 +46,12 @@ export interface InteractiveParetoStripProps extends ParetoStripProps, PickerPro
 export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode {
   const {
     data,
-    threshold = 80,
-    maxItems = 8,
+    threshold = DEFAULT_THRESHOLD,
+    maxItems = DEFAULT_MAX_ITEMS,
     unit = "causes",
     metric = "the total",
-    width = 80,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     locale,
     strings = EN_PARETO,
     title,
@@ -59,6 +66,12 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The same resolved box the static lays out in — the pointer map is scaled by
+  // it, so a raw `height={NaN}` would size the hit box against a frame `Chart`
+  // had already clamped.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   // The same percent formatter the static renders with — the label gutter is
   // measured off its output, so the two entries must widen identically.

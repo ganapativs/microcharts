@@ -57,6 +57,10 @@ describe("the MCP page matches the server it documents", () => {
     expect(Object.keys(pkg.bin)).toHaveLength(1);
   });
 
+  it("the setup section is the generated client list, not hand-typed blocks", () => {
+    expect(docs.mcp).toContain("<McpClients />");
+  });
+
   it("the stated Node floor matches the package's engines field", () => {
     const floor = /(\d+)/.exec(pkg.engines.node)?.[1];
     expect(floor, "packages/mcp engines.node has no numeric floor").toBeTruthy();

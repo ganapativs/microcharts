@@ -56,6 +56,65 @@ describe("<PartitionStrip>", () => {
     expect(container.querySelector('rect[data-mc-ink="accent"]')).not.toBeNull();
   });
 
+  // A size read off an unmounted element arrives as NaN. <Chart> clamps the
+  // viewBox, so the box stayed clean and the accessible name stayed correct
+  // while every mark carried `width="NaN"` and the root carried `--mc-seat: NaN`.
+  it.each([
+    ["width", { width: NaN }],
+    ["width ∞", { width: Infinity }],
+    ["width 0", { width: 0 }],
+    ["height", { height: NaN }],
+    ["height ∞", { height: Infinity }],
+    ["height -3", { height: -3 }],
+  ])("non-finite %s never reaches an attribute", (_name, size) => {
+    const { container } = draw(<PartitionStrip data={TREE} labels title="Hostile" {...size} />);
+    const svg = container.querySelector("svg")!;
+    for (const el of [svg, ...svg.querySelectorAll("*")]) {
+      for (const a of Array.from(el.attributes)) {
+        expect(a.value, `${el.tagName}[${a.name}]`).not.toMatch(/NaN|Infinity/);
+      }
+    }
+    expect(svg.getAttribute("style") ?? "").not.toMatch(/NaN|Infinity/);
+  });
+
+  // Group names are caller prose, not figures this library formatted: uppercase
+  // and wide glyphs paint at up to 0.95 units/char, and a label seated at the
+  // digits rate ran 5.3 units past the viewBox in a real browser.
+  it("drops a label the segment cannot seat at the prose rate", () => {
+    const { container } = draw(
+      <PartitionStrip
+        data={[
+          { label: "WWWW", value: 24 },
+          { label: "x", value: 76 },
+        ]}
+        width={120}
+        height={24}
+      />,
+    );
+    const painted = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(painted).not.toContain("WWWW");
+  });
+
+  it("keeps a label the segment can seat", () => {
+    const { container } = draw(<PartitionStrip data={TREE} width={200} height={24} />);
+    const painted = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(painted).toContain("JS");
+  });
+
+  // The knockout label ink is sized for a saturated category fill; on the muted
+  // neutral it reads 2.9:1 in dark mode. `data-mc-dim` is the hook that steps it
+  // back to ordinary label ink (same attribute TraceFold uses).
+  it("marks a muted label dim, and leaves the lineage's labels alone", () => {
+    const { container } = draw(
+      <PartitionStrip data={TREE} emphasis="JS" width={260} height={24} />,
+    );
+    const byLabel = new Map(
+      [...container.querySelectorAll("text")].map((t) => [t.textContent, t] as const),
+    );
+    expect(byLabel.get("JS")!.hasAttribute("data-mc-dim")).toBe(false);
+    expect(byLabel.get("HTML")!.hasAttribute("data-mc-dim")).toBe(true);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <PartitionStrip data={TREE} title="Bundle composition" width={200} height={24} />,

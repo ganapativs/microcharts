@@ -58,6 +58,22 @@ describe("interactive <Bullet>", () => {
     await expect.poll(() => live.textContent).toBe("");
   });
 
+  // `Intl` formats NaN as "NaN" and Infinity as "∞", and both reached the chip
+  // and the live region verbatim while the name beside them said "No data.".
+  it("a non-finite value reads as an em-dash, never as NaN", async () => {
+    const fig = await mount(<Bullet value={Number.NaN} target={80} />);
+    fig.focus();
+    await expect.poll(() => fig.querySelector(".mc-spark-readout")?.textContent).toBe("— / 80");
+    expect(fig.querySelector('[aria-live="polite"]')!.textContent).toBe("— / 80");
+    expect(fig.getAttribute("aria-label")).toBe("No data.");
+  });
+
+  it("a non-finite value with no target reads as an em-dash", async () => {
+    const fig = await mount(<Bullet value={Number.POSITIVE_INFINITY} />);
+    fig.focus();
+    await expect.poll(() => fig.querySelector(".mc-spark-readout")?.textContent).toBe("—");
+  });
+
   // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
   it("onActive reports the measure once, then null when the active state clears", async () => {
     const seen: unknown[] = [];

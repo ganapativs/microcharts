@@ -13,6 +13,7 @@ import { AI_SNIPPETS } from "./ai-snippets.ts";
 import { GRAMMAR } from "./ai-grammar.ts";
 import { PROVIDER_GROUPS, MACHINE_SURFACES, AGENT_RULES } from "./ai-providers.ts";
 import { AI_LOGOS } from "./ai-logos.ts";
+import { MCP_CLIENT_GROUPS } from "./mcp-clients.ts";
 import { interactionNote } from "./charts/interaction-note.ts";
 import { DOCS_CODE } from "./charts/docs-code.generated.ts";
 
@@ -125,6 +126,30 @@ function cheatSheetText(): string {
   return `**Agent cheat sheet.** Grammar:\n\n${grammar}\n\nRules:\n\n${rules}\n\nSurfaces: ${surfaces}`;
 }
 
+/**
+ * `<McpClients />` → every client's setup as headed sections. The list is the
+ * page's main content, so a mirror that dropped it would send an agent to a
+ * page about connecting a server with no way to connect it.
+ */
+function mcpClientsText(): string {
+  return MCP_CLIENT_GROUPS.map((g) => {
+    const clients = g.clients
+      .map((c) => {
+        const setups = c.setups
+          .map(
+            (s) =>
+              `**${s.label}**${s.file ? ` — \`${s.file}\`` : ""}\n\n${fence(s.lang, s.code)}${
+                s.note ? `\n\n${s.note}` : ""
+              }`,
+          )
+          .join("\n\n");
+        return `#### ${c.name}\n\n${setups}${c.note ? `\n\n${c.note}` : ""}\n\nDocs: ${c.docs}`;
+      })
+      .join("\n\n");
+    return `### ${g.title}\n\n${clients}`;
+  }).join("\n\n");
+}
+
 /** Purely-visual components with no textual content worth keeping — removed. */
 const VISUAL_ONLY = [
   "StreamDemo",
@@ -206,6 +231,7 @@ export function expandComponents(md: string, resolveChart?: ResolveChart): strin
   // <GrammarExplorer /> / <ProviderWall /> / <SurfaceCards /> → text equivalents
   out = out.replace(/<GrammarExplorer\s*\/>/g, grammarText());
   out = out.replace(/<ProviderWall\s*\/>/g, providerText());
+  out = out.replace(/<McpClients\s*\/>/g, () => mcpClientsText());
   out = out.replace(/<SurfaceCards\s*\/>/g, surfaceText());
   out = out.replace(/<AgentCheatSheet\s*\/>/g, cheatSheetText());
   out = out.replace(

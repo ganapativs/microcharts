@@ -50,6 +50,38 @@ describe("<ChangePoint>", () => {
     expect(container.querySelector("text")!.textContent).toBe("+50%");
   });
 
+  it("a regime with no finite points reads '—', never the string 'NaN'", () => {
+    const { container } = draw(
+      <ChangePoint data={[...Array(10).fill(NaN), ...Array(10).fill(5)]} breaks={[10]} />,
+    );
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "Level shifted up 0% around point 10 (mean — → 5); stable since.",
+    );
+  });
+
+  it("a hostile domain never reaches the markup as NaN", () => {
+    for (const domain of [
+      [NaN, NaN],
+      [-Infinity, Infinity],
+    ] as [number, number][]) {
+      const { container } = draw(<ChangePoint data={STEP} domain={domain} label="delta" />);
+      expect(container.innerHTML).not.toContain("NaN");
+    }
+  });
+
+  it("maxItems={NaN} still detects (the documented default of 2)", () => {
+    const { container } = draw(<ChangePoint data={STEP} maxItems={NaN} />);
+    expect(container.querySelectorAll('rect[data-mc-ink="region"]').length).toBe(1);
+  });
+
+  it("leaves stroke-width and tabular-nums to the stylesheet", () => {
+    const { container } = draw(<ChangePoint data={STEP} label="delta" />);
+    expect(container.querySelector('path[data-mc-ink="data"]')!.getAttribute("style")).toBe(
+      "stroke: var(--mc-accent);",
+    );
+    expect(container.querySelector("text")!.getAttribute("style")).toBeNull();
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<ChangePoint data={STEP} title="Error rate" />);
     await expectNoA11yViolations(container);

@@ -20,9 +20,11 @@ describe("interactive <ChangePoint>", () => {
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
     const live = document.querySelector('[aria-live="polite"]')!;
     await expect.poll(() => live.textContent).toMatch(/^Point 0: 32 — regime 1 of 2, mean 32\.$/);
+    // the chip goes through `strings.changePointRegime` — it was hardcoded
+    // English, which no `strings` override could reach
     await expect
       .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
-      .toBe("regime 1/2");
+      .toBe("regime 1 of 2");
     wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
     await expect.poll(() => live.textContent).toMatch(/regime 2 of 2, mean 48\.$/);
   });
@@ -76,6 +78,22 @@ describe("interactive <ChangePoint>", () => {
     fig.blur();
     await expect.poll(() => fig.querySelector(PIN)).not.toBeNull();
     await expect.poll(() => fig.querySelector(FOCUS)).toBeNull();
+  });
+
+  it("a gap announces '—' and the chip mirrors `datum.formatted`", async () => {
+    const seen: { formatted?: string | undefined }[] = [];
+    const gappy = [...Array(10).fill(32), NaN, ...Array(10).fill(32), ...Array(20).fill(48)];
+    const screen = await render(
+      <ChangePoint data={gappy} width={200} height={32} onActive={(d) => d && seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-change-point-live") as HTMLElement;
+    wrap.focus();
+    await userEvent.keyboard(`{Home}${"{ArrowRight}".repeat(10)}`);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("Point 10: — — regime 1 of 2, mean 32.");
+    await expect
+      .poll(() => wrap.querySelector(".mc-spark-readout")?.textContent)
+      .toBe(seen.at(-1)!.formatted);
   });
 
   it("controlled selectedIndex pins the crosshair with no interaction", async () => {

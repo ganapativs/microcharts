@@ -13,6 +13,14 @@ describe("statusDotGeometry", () => {
     expect(new Set(keys).size).toBe(GLYPHS.length);
   });
 
+  it("a glyph outside the vocabulary degrades to the ring, never undefined", () => {
+    // `states` is a public extension point, so a glyph can arrive from JSON that
+    // TypeScript never checked. Falling off the switch returned undefined and
+    // the render threw on `mark.kind`.
+    const m = statusDotGeometry({ width: 8, height: 8, glyph: "square" as StatusGlyph });
+    expect(m).toEqual(statusDotGeometry({ width: 8, height: 8, glyph: "ring" }));
+  });
+
   test.prop([fc.integer({ min: 6, max: 48 }), fc.constantFrom(...GLYPHS)])(
     "marks stay inside the box, 2-dp (containment)",
     (size, glyph) => {

@@ -46,10 +46,17 @@ export function rugGeometry(opts: {
 }): RugGeometry {
   const { length, thickness, values, markValue, orientation } = opts;
   const finite = values.filter(isFiniteValue).sort((a, b) => a - b);
-  const domain =
+  const given =
     opts.domain && Number.isFinite(opts.domain[0]) && Number.isFinite(opts.domain[1])
       ? opts.domain
       : (extent(finite) ?? [0, 1]);
+  // A caller-supplied domain may arrive high→low. It is a WINDOW, not a
+  // mirrored axis — `uniformBins` and EventRaster already order theirs — and
+  // honoring the reversal broke both things `domain` exists for: the rug ran
+  // right→left beside a HistogramStrip fixed to the same domain, and the
+  // interactive picker's binary search (which assumes position ascends with
+  // value) announced a tick nowhere near the cursor.
+  const domain: readonly [number, number] = given[0] <= given[1] ? given : [given[1], given[0]];
   const pad = 0.5;
   const scale = scaleLinear(domain, [pad, length - pad]);
 
@@ -61,14 +68,17 @@ export function rugGeometry(opts: {
   // group coincident positions (2-dp keys), bucket multiplicity into tiers
   const counts = new Map<number, number>();
   for (const t of ticks) counts.set(t.pos, (counts.get(t.pos) ?? 0) + 1);
+  // Regular ticks are inset 1 unit each end, so the full-extent highlight reads
+  // "taller". The inset is a QUARTER of a thin strip rather than a flat 1: at
+  // `thickness` 2 the flat inset put both ends on the same coordinate, and
+  // below 1 it ran the segment from y=1 to a negative y — ink outside the
+  // viewBox, which `.mc-root`'s `overflow: visible` spills rather than clips.
+  const inset = thickness < 4 ? round2(thickness / 4) : 1;
+  const far = round2(thickness - inset);
   const byTier: string[][] = [[], [], []];
   for (const [pos, count] of counts) {
-    // regular ticks are inset 1 unit each end, so the full-extent highlight
-    // reads "taller" while everything stays inside the viewBox (containment)
     const seg =
-      orientation === "horizontal"
-        ? `M${pos} 1V${round2(thickness - 1)}`
-        : `M1 ${pos}H${round2(thickness - 1)}`;
+      orientation === "horizontal" ? `M${pos} ${inset}V${far}` : `M${inset} ${pos}H${far}`;
     byTier[tierOf(count)]!.push(seg);
   }
   const tiers: RugTier[] = byTier

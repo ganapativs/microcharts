@@ -134,6 +134,20 @@
   --mc-cat-4: #876701;
   --mc-cat-5: #5a9b62;
   --mc-cat-6: #007a86;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #6b87cb 5.49:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #8c548c 5.29:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #c26e65 5.29:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #876701 5.02:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #5a9b62 5.79:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #007a86 4.82:1 */
+  /* Knockout ink for labels sitting ON one of those fills. Same reason as the
+     cats above — the site forces theme by class, so the library's
+     prefers-color-scheme branch is deaf to it — but this one was missed, and it
+     is the token that fails LOUDLY: on a dark-OS machine viewing the site in
+     light mode, every fill resolved light while the ink stayed on the dark
+     branch. TraceFold's span labels measured 3.28:1, TimeInRange 3.59:1,
+     PartitionStrip 3.76:1, all under the 4.5:1 text floor. */
+  --mc-on-fill: rgba(255, 255, 255, 0.96);
   /* interactive readout chip → site popover surface so it matches the theme */
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
@@ -217,6 +231,15 @@
   --mc-cat-4: #b2903e;
   --mc-cat-5: #85c78c;
   --mc-cat-6: #23a8b7;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #95b2fa 8.96:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #b87db8 6.11:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #f1998f 8.69:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #b2903e 6.36:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #85c78c 9.39:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #23a8b7 6.73:1 */
+  /* The dark twin of the on-fill ink — restated here for the same class-not-media
+     reason, so a light-OS machine viewing the site in dark mode is covered too. */
+  --mc-on-fill: rgba(0, 0, 0, 0.9);
   --mc-surface: var(--color-fd-popover);
   --mc-surface-ink: var(--color-fd-popover-foreground);
   --mc-surface-edge: var(--color-fd-border);
@@ -321,6 +344,12 @@
   --mc-cat-4: #007891;
   --mc-cat-5: #7b82ca;
   --mc-cat-6: #935181;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #c07157 5.31:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #7c6c05 4.98:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #479d70 5.82:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #007891 4.86:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #7b82ca 5.43:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #935181 5.33:1 */
 }
 .dark[data-accent="ember"] {
   /* Warm lifted amber, matte, not neon. */
@@ -333,6 +362,12 @@
   --mc-cat-4: #30a5c2;
   --mc-cat-5: #a4adf8;
   --mc-cat-6: #c07aac;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #f09c81 8.76:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #a69640 6.45:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #74c99a 9.41:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #30a5c2 6.67:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #a4adf8 8.86:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #c07aac 6.07:1 */
 }
 
 :root[data-accent="moss"] {
@@ -345,6 +380,12 @@
   --mc-cat-4: #815898;
   --mc-cat-5: #c16c77;
   --mc-cat-6: #91600f;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #6f9750 5.72:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #007c7a 4.78:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #578cc9 5.53:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #815898 5.27:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #c16c77 5.26:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #91600f 5.13:1 */
 }
 .dark[data-accent="moss"] {
   --accent: #a3c46a;
@@ -356,6 +397,12 @@
   --mc-cat-4: #ac81c5;
   --mc-cat-5: #f097a1;
   --mc-cat-6: #be8a43;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #9ac37b 9.32:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #23aaa7 6.75:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #81b8f8 9.06:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #ac81c5 6.14:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #f097a1 8.65:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #be8a43 6.32:1 */
 }
 
 :root[data-accent="clay"] {
@@ -368,6 +415,12 @@
   --mc-cat-4: #00798e;
   --mc-cat-5: #7783ca;
   --mc-cat-6: #925284;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #c1705b 5.31:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #7f6a03 5.03:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #4c9c6c 5.78:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #00798e 4.82:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #7783ca 5.43:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #925284 5.29:1 */
 }
 .dark[data-accent="clay"] {
   --accent: #e08e73;
@@ -379,6 +432,12 @@
   --mc-cat-4: #2ca6bf;
   --mc-cat-5: #a0aff9;
   --mc-cat-6: #be7baf;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #f09b85 8.72:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #aa943f 6.42:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #78c996 9.43:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #2ca6bf 6.69:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #a0aff9 8.93:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #be7baf 6.09:1 */
 }
 
 :root[data-accent="rose"] {
@@ -391,6 +450,12 @@
   --mc-cat-4: #007b7e;
   --mc-cat-5: #5d8bca;
   --mc-cat-6: #855795;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #c26d72 5.3:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #8e6209 5.11:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #699855 5.73:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #007b7e 4.81:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #5d8bca 5.54:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #855795 5.25:1 */
 }
 .dark[data-accent="rose"] {
   --accent: #fb6f89;
@@ -402,6 +467,12 @@
   --mc-cat-4: #21a9ac;
   --mc-cat-5: #87b6f9;
   --mc-cat-6: #b080c1;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #f1979c 8.65:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #ba8c41 6.33:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #93c47f 9.3:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #21a9ac 6.72:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #87b6f9 9.01:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #b080c1 6.14:1 */
 }
 
 :root[data-accent="teal"] {
@@ -414,6 +485,12 @@
   --mc-cat-4: #9f4f62;
   --mc-cat-5: #b57b3b;
   --mc-cat-6: #5c772a;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #0f9e93 5.85:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #2e70a6 5:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #9a77bd 5.31:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #9f4f62 5.28:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #b57b3b 5.41:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #5c772a 4.84:1 */
 }
 .dark[data-accent="teal"] {
   --accent: #55c2b3;
@@ -425,6 +502,12 @@
   --mc-cat-4: #cd788a;
   --mc-cat-5: #e3a666;
   --mc-cat-6: #84a155;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #53cabf 9.42:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #5a9bd4 6.47:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #c6a2eb 8.74:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #cd788a 6.1:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #e3a666 8.87:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #84a155 6.58:1 */
 }
 
 /* ---- Ink-preset categorical ramps — mono/print/eink own their whole ink set,
@@ -441,6 +524,12 @@
   --mc-cat-4: #bfbfbf;
   --mc-cat-5: #dedede;
   --mc-cat-6: #737373;
+  --mc-on-cat-1: rgba(255, 255, 255, 0.96); /* #111111 17.39:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #555555 7.03:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #8c8c8c 5.74:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #bfbfbf 10.1:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #dedede 13.43:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #737373 4.52:1 */
 }
 .dark[data-mc-preset="mono"][data-mc-preset="mono"] {
   --mc-cat-1: #e4e4e4;
@@ -449,6 +538,12 @@
   --mc-cat-4: #c4c4c4;
   --mc-cat-5: #c4c4c4;
   --mc-cat-6: #a9a9a9;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #e4e4e4 14.13:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #898989 5.53:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #a9a9a9 8.04:1 */
 }
 :root[data-mc-preset="eink"][data-mc-preset="eink"] {
   --mc-cat-1: #000000;
@@ -457,6 +552,12 @@
   --mc-cat-4: #c4c4c4;
   --mc-cat-5: #e0e0e0;
   --mc-cat-6: #666666;
+  --mc-on-cat-1: rgba(255, 255, 255, 0.96); /* #000000 19.23:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #4d4d4d 7.95:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #8c8c8c 5.74:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #e0e0e0 13.66:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #666666 5.45:1 */
 }
 .dark[data-mc-preset="eink"][data-mc-preset="eink"] {
   --mc-cat-1: #ebebeb;
@@ -465,6 +566,12 @@
   --mc-cat-4: #c4c4c4;
   --mc-cat-5: #c4c4c4;
   --mc-cat-6: #9b9b9b;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #ebebeb 14.97:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #808080 4.93:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #c4c4c4 10.6:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #9b9b9b 6.87:1 */
 }
 :root[data-mc-preset="print"][data-mc-preset="print"] {
   --mc-cat-1: #14507a;
@@ -473,6 +580,12 @@
   --mc-cat-4: #7a5a12;
   --mc-cat-5: #666666;
   --mc-cat-6: #1a1a1a;
+  --mc-on-cat-1: rgba(255, 255, 255, 0.96); /* #14507a 8.02:1 */
+  --mc-on-cat-2: rgba(255, 255, 255, 0.96); /* #0c6249 6.91:1 */
+  --mc-on-cat-3: rgba(255, 255, 255, 0.96); /* #a33f22 6.01:1 */
+  --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #7a5a12 6.02:1 */
+  --mc-on-cat-5: rgba(255, 255, 255, 0.96); /* #666666 5.45:1 */
+  --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #1a1a1a 16.08:1 */
 }
 .dark[data-mc-preset="print"][data-mc-preset="print"] {
   --mc-cat-1: #5084af;
@@ -481,6 +594,12 @@
   --mc-cat-4: #b09053;
   --mc-cat-5: #9b9b9b;
   --mc-cat-6: #e2e2e2;
+  --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #5084af 4.88:1 */
+  --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #52977d 5.6:1 */
+  --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #dc795d 6.36:1 */
+  --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #b09053 6.36:1 */
+  --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #9b9b9b 6.87:1 */
+  --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #e2e2e2 13.89:1 */
 }
 
 /* ---- Base ---------------------------------------------------------------- */
@@ -1245,6 +1364,148 @@ figure:has(> pre) .shiki,
   pointer-events: none;
   z-index: 1;
 }
+/* ── MCP client list (/docs/mcp) ───────────────────────────────────────────
+   One `<details>` per client inside a shared panel. Closed, a row is a name, a
+   mark, and where its config lives — so the list scans as a directory. Open, it
+   is the same code surface as everywhere else on the site (.code-inset band,
+   shared token colours). No JS: the disclosure is the element's own, and rows in
+   one group share a `name`, so opening one closes its neighbour. */
+.mcp-client + .mcp-client {
+  border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+}
+.mcp-client-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.85rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background-color 0.18s var(--ease-out-quint);
+}
+.mcp-client-summary::-webkit-details-marker {
+  display: none;
+}
+.mcp-client-summary:hover {
+  background-color: color-mix(in oklab, var(--glass-surface-strong) 55%, transparent);
+}
+.mcp-client[open] .mcp-client-summary {
+  border-bottom: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+}
+.mcp-mark {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  color: var(--color-fd-muted-foreground);
+}
+.mcp-monogram {
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 5px;
+  border: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  line-height: 1;
+  color: var(--color-fd-muted-foreground);
+}
+.mcp-client-name {
+  font-size: 0.87rem;
+  color: var(--color-fd-foreground);
+}
+.mcp-where {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--faint);
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Narrow: the path would ellipsize to nothing useful, and it is the first thing
+   the open row says anyway. Name and chevron carry the row instead. */
+@media (width < 40rem) {
+  .mcp-where {
+    display: none;
+  }
+}
+.mcp-chevron {
+  flex: none;
+  color: var(--faint);
+  transition: transform 0.2s var(--ease-out-quint);
+}
+.mcp-client[open] .mcp-chevron {
+  transform: rotate(180deg);
+}
+.mcp-client-body {
+  padding: 0.35rem 0 0.75rem;
+}
+.mcp-setup {
+  padding: 0.5rem 0.85rem 0;
+}
+.mcp-setup-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 1.9rem;
+}
+.mcp-file {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-fd-muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mcp-code {
+  margin: 0.15rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.65;
+  tab-size: 2;
+}
+.mcp-note {
+  margin: 0.5rem 0.85rem 0;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--color-fd-muted-foreground);
+}
+.mcp-note code {
+  font-family: var(--font-mono);
+  font-size: 0.94em;
+  color: var(--color-fd-foreground);
+}
+.mcp-client-body > .mcp-note {
+  margin-top: 0.75rem;
+}
+.mcp-client-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  padding: 0.85rem 0.85rem 0;
+}
+.mcp-client-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--color-fd-muted-foreground);
+  text-decoration: none;
+  transition: color 0.18s var(--ease-out-quint);
+}
+.mcp-client-foot a:hover {
+  color: var(--color-fd-foreground);
+}
+.mcp-client-foot .mcp-install {
+  color: var(--accent);
+}
+
 /* Examples detail — framed theme-aware hero screenshot + live chart-mark tiles
    ("the catalog, put to work" made literal: every mark an app uses, linked to
    its doc page). */

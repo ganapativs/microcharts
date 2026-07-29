@@ -50,6 +50,46 @@ describe("<BurnChart>", () => {
     expect(none.querySelector("text")).toBeNull();
   });
 
+  it("counts the plotted days, not the raw arrays", () => {
+    // actual [40, NaN, 36, 34] draws three points; the summary used to open
+    // "4 of 11 days in" over a line that stops at day 2.
+    const { container } = draw(<BurnChart data={{ plan: PLAN, actual: [40, NaN, 36, 34] }} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain(
+      "3 of 11 days in: 34 points remain",
+    );
+  });
+
+  it("nothing plotted in `actual` → no measured remainder is claimed, no today dot", () => {
+    // A plan with no recorded burn used to announce "0 points remain" and paint
+    // an accent dot on the zero floor — "finished" — for work never recorded.
+    for (const actual of [[], [NaN, NaN]]) {
+      const { container } = draw(<BurnChart data={{ plan: PLAN, actual }} />);
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+      expect(container.querySelector("circle")).toBeNull();
+      expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull(); // plan still draws
+    }
+  });
+
+  it("the gap numeral carries a valence ink ROLE, never an inline fill", () => {
+    // `.mc-root` sets forced-color-adjust: none, so an inline var(--mc-negative)
+    // survived verbatim into High Contrast Mode and no consumer rule could
+    // reach it. The role paints the same token and earns the mapping.
+    const late = draw(<BurnChart data={{ plan: PLAN, actual: ACTUAL }} />).container;
+    const early = draw(
+      <BurnChart data={{ plan: PLAN, actual: [40, 34, 28, 22, 16, 10] }} />,
+    ).container;
+    expect(late.querySelector("text")!.getAttribute("data-mc-ink")).toBe("negative");
+    expect(early.querySelector("text")!.getAttribute("data-mc-ink")).toBe("positive");
+    for (const c of [late, early])
+      expect(c.querySelector("text")!.getAttribute("style")).toBeNull();
+  });
+
+  it("an astral unit noun keeps a whole code point in the gap label", () => {
+    // charAt(0) emitted a lone surrogate — half a character in the gutter.
+    const { container } = draw(<BurnChart data={{ plan: PLAN, actual: ACTUAL }} unit="🗓day" />);
+    expect(container.querySelector("text")!.textContent).toBe("+10 🗓");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <BurnChart data={{ plan: PLAN, actual: ACTUAL }} title="Sprint 12" />,

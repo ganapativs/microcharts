@@ -42,6 +42,35 @@ describe("<GardenGrid>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
   });
 
+  it("a hostile config prop never reaches the DOM", () => {
+    // Host-computed knobs (`Number(field.value)`, `boxPx / weeks`) used to paint
+    // cx/cy/r="NaN" inside viewBox="0 0 1 1" — or, for a NaN `domain`, a grid of
+    // r="0" dots under a summary still announcing the peak.
+    for (const p of [
+      { rows: NaN },
+      { rows: -3 },
+      { cell: Infinity },
+      { cell: -5 },
+      { gap: NaN },
+      { steps: NaN as unknown as 5 },
+      { domain: [NaN, NaN] as const },
+    ]) {
+      const { container } = draw(<GardenGrid data={WEEKS} {...p} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 24 84");
+      const rs = [...container.querySelectorAll('circle[data-mc-ink="point"]')].map((c) =>
+        Number(c.getAttribute("r")),
+      );
+      expect(rs.length).toBe(9);
+      expect(rs.every((r) => Number.isFinite(r) && r > 0)).toBe(true);
+    }
+  });
+
+  it("the zero ring keeps 2-dp coords at any cell size", () => {
+    const { container } = draw(<GardenGrid data={[0]} cell={9} />);
+    expect(container.querySelector('circle[data-mc-ink="muted"]')!.getAttribute("r")).toBe("2.7");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<GardenGrid data={WEEKS} title="Activity" />);
     await expectNoA11yViolations(container);

@@ -57,4 +57,31 @@ describe("interactive <TreeRings>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("the halo's stroke is viewBox geometry, so it scales with the disc", async () => {
+    // Its width IS the ring's own thickness; `non-scaling-stroke` pinned that to
+    // screen pixels, so the halo stopped covering its ring at any zoom but 1:1.
+    const screen = await render(<TreeRings data={YEARS} selectedIndex={3} />);
+    const halo = screen.container.querySelector('circle[data-mc-w="tick"]')!;
+    expect(halo.getAttribute("vector-effect")).toBeNull();
+  });
+
+  // `periodWord[0]` is a UTF-16 code unit, not a character: "" threw
+  // `undefined.toUpperCase()` on mount, and an astral noun was capitalised to
+  // half a surrogate pair.
+  it("an empty periodWord labels the ring by number instead of throwing", async () => {
+    const screen = await render(<TreeRings data={YEARS} periodWord="" title="Age" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(fig.querySelector('[aria-live="polite"]')!.textContent).toBe("1: 8.");
+  });
+
+  it("an astral periodWord survives capitalisation intact", async () => {
+    const screen = await render(<TreeRings data={YEARS} periodWord="🌲ring" title="Age" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(fig.querySelector('[aria-live="polite"]')!.textContent).toBe("🌲ring 1: 8.");
+  });
 });

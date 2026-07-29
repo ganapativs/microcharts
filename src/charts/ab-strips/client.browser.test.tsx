@@ -58,6 +58,33 @@ describe("interactive <ABStrips>", () => {
       .not.toBeNull();
   });
 
+  it("mirrors the static's tag drop, so the focus ring lands on the band", async () => {
+    // Both entries gate the row tags through `abTagChars`. When a long identity
+    // drops them, a client copy that kept reserving the lead would compute a
+    // wider box than the composed static and slide every overlay off the marks.
+    const screen = await render(
+      <ABStrips
+        data={{ a: A, b: B }}
+        width={80}
+        height={40}
+        seriesLabels={["Control cohort 2024", "Treatment cohort"]}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-ab-strips-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowDown");
+    key(wrap, "Home"); // row B, p5 — the left edge of B's outer band
+    await expect
+      .poll(() => screen.container.querySelector('circle[data-mc-w="support"]'))
+      .not.toBeNull();
+    const bOuter = [...screen.container.querySelectorAll("rect")].find(
+      (r) => r.getAttribute("fill") === "var(--mc-accent)",
+    )!;
+    const ring = screen.container.querySelector('circle[data-mc-w="support"]')!;
+    expect(screen.container.querySelectorAll("text").length).toBe(1); // delta only
+    expect(Number(ring.getAttribute("cx"))).toBeCloseTo(Number(bOuter.getAttribute("x")), 2);
+  });
+
   it("controlled selectedIndex pins the dot without focus", async () => {
     const screen = await render(<ABStrips data={{ a: A, b: B }} selectedIndex={2} />);
     expect(screen.container.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();

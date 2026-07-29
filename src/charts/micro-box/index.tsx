@@ -163,15 +163,14 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         data-mc-w="support"
         vectorEffect="non-scaling-stroke"
       />
-      <rect
-        x={geo.box.x}
-        y={geo.box.y}
-        width={geo.box.w}
-        height={geo.box.h}
-        data-mc-ink="band"
-        stroke="var(--mc-neutral)"
-        data-mc-w="hair"
-      />
+      {/* `band` is a fill-only role — styles.css declares `stroke: none` on it,
+          and a CSS declaration outranks a presentation attribute, so the
+          `stroke="var(--mc-neutral)"` + `data-mc-w="hair"` this rect used to
+          carry never painted a single pixel (verified against the real
+          stylesheet). Dropped rather than forced inline: an inline stroke would
+          survive `forced-color-adjust: none` as a fixed gray in High Contrast
+          Mode. Giving the IQR box a real outline needs a stroked ink role. */}
+      <rect x={geo.box.x} y={geo.box.y} width={geo.box.w} height={geo.box.h} data-mc-ink="band" />
       <line
         x1={geo.medianX}
         y1={geo.box.y}

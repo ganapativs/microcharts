@@ -22,7 +22,8 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PICTOGRAM, type PictogramStrings } from "../../core/strings-pictogram.js";
-import { pictogramGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, pictogramGeometry } from "./geometry.js";
 import {
   PictogramRow as StaticPictogramRow,
   pictogramSummary,
@@ -61,8 +62,8 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     // own size or viewBox, or the overlay rings drift off the units.
     shape = "dot",
     fractional = "clip",
-    width = 60,
-    height = 12,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     readout = true,
     onActive,
     onSelect,
@@ -70,6 +71,11 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     defaultSelectedIndex,
     ...rest
   } = props;
+  // Resolved before anything reads it: the picker's hit box and the readout
+  // chip's offset are both in box units, and a non-finite one puts the pointer
+  // mapping and the chip somewhere the units are not.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
     () => makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale),

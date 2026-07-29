@@ -12,7 +12,7 @@ import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.j
 import { valueStepOpacity, type CellShape } from "../../shared/cell.js";
 import type { Value } from "../../core/types.js";
 import { labelFitsBand, labelFont } from "../../core/labels.js";
-import { coverageGeometry, type CoverageStripGeometry } from "./geometry.js";
+import { COVERAGE_MAX_SLOTS, coverageGeometry, type CoverageStripGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function coverageSummary(
@@ -79,6 +79,14 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   if (expected !== undefined && data.length > expected) {
     devWarn("<CoverageStrip> data longer than `expected` — expected clamped up to data length.");
   }
+  if (expected !== undefined && !Number.isFinite(expected)) {
+    devWarn("<CoverageStrip> `expected` must be a finite slot count — ignored; counting the data.");
+  }
+  if (data.length > COVERAGE_MAX_SLOTS) {
+    // silence here would be a lie by omission: the summary states a slot count,
+    // and past the cap that count is the drawn window, not the series.
+    devWarn(`<CoverageStrip> ${data.length} slots — capped at ${COVERAGE_MAX_SLOTS}.`);
+  }
 
   // label size in viewBox units — ~0.62·height, clamped 7–11 to match the rest
   // of the catalog at any chart size
@@ -137,8 +145,11 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
             rx={c.rx}
             shapeRendering={geo.crisp ? "crispEdges" : undefined}
             data-mc-ink="cell"
+            // geo.steps, never the raw prop: a non-finite `steps` binned every
+            // cell to fill-opacity="NaN" while the geometry had already fallen
+            // back to 5. Announced ramp and painted ramp are one ramp.
             fillOpacity={
-              mode === "intensity" && c.step !== null ? valueStepOpacity(c.step, steps) : 1
+              mode === "intensity" && c.step !== null ? valueStepOpacity(c.step, geo.steps) : 1
             }
             style={customFill}
           />

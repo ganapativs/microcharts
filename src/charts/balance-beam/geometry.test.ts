@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { balanceBeamGeometry } from "./geometry.js";
+import { balanceBeamGeometry, DEFAULT_MAX_TILT } from "./geometry.js";
 
 const g = (a: number, b: number, extra: Partial<Parameters<typeof balanceBeamGeometry>[0]> = {}) =>
   balanceBeamGeometry({
@@ -8,7 +8,7 @@ const g = (a: number, b: number, extra: Partial<Parameters<typeof balanceBeamGeo
     b,
     width: 48,
     height: 20,
-    maxTilt: 12,
+    maxTilt: DEFAULT_MAX_TILT,
     mode: "ratio",
     pad: 2,
     ...extra,
@@ -63,4 +63,78 @@ describe("balanceBeamGeometry — tilt + area-true weights", () => {
       }
     },
   );
+
+  // A weight sits ABOVE its beam end, so the vertical bound is the one a tilt
+  // can break — `difference` mode with a small domain saturates the tilt while
+  // both pans stay nearly equal, which used to lift a full-size square off the
+  // top edge (`y="-3.18"` at the default 48×20).
+  test.prop([
+    fc.integer({ min: 0, max: 1000 }),
+    fc.integer({ min: 0, max: 1000 }),
+    fc.integer({ min: 32, max: 240 }),
+    fc.integer({ min: 12, max: 80 }),
+    fc.integer({ min: 0, max: 40 }),
+    fc.option(fc.tuple(fc.integer({ min: -50, max: 50 }), fc.integer({ min: -50, max: 50 })), {
+      nil: undefined,
+    }),
+  ])("nothing paints outside the viewBox, any mode/box/tilt", (a, b, width, height, tilt, dom) => {
+    const r = balanceBeamGeometry({
+      a,
+      b,
+      width,
+      height,
+      maxTilt: tilt,
+      mode: dom ? "difference" : "ratio",
+      domain: dom ? ([dom[0], dom[1]] as const) : undefined,
+      pad: 2,
+    });
+    for (const y of [r.beam.y1, r.beam.y2]) {
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(height);
+    }
+    for (const w of r.weights) {
+      expect(w.cy - w.half).toBeGreaterThanOrEqual(-0.02);
+      expect(w.cy + w.half).toBeLessThanOrEqual(height);
+      expect(w.cx - w.half).toBeGreaterThanOrEqual(-0.05);
+      expect(w.cx + w.half).toBeLessThanOrEqual(width + 0.05);
+    }
+  });
+});
+
+// Hostile CONFIG, not hostile data: `maxTilt` is the one scalar a host computes
+// (a slider, `Number(input.value)`), and every value below reached a painted
+// coordinate before these guards — as NaN, or as a tilt pointing at the LIGHTER
+// pan while the summary named the heavier one.
+describe("balanceBeamGeometry — hostile maxTilt", () => {
+  const DEFAULTED = g(620, 480).tiltDeg;
+
+  it("a non-finite maxTilt falls back to the default, never NaN", () => {
+    for (const bad of [Number.NaN, Infinity, -Infinity])
+      expect(g(620, 480, { maxTilt: bad }).tiltDeg).toBe(DEFAULTED);
+  });
+
+  it("never tilts against the side the summary calls heavier", () => {
+    // negative → no tilt at all; huge → capped, not wrapped past 90° (which
+    // flipped the sign of sin and pointed the beam the wrong way).
+    for (const tilt of [-12, -1e6, 1e6, 4000]) {
+      const r = g(620, 480, { maxTilt: tilt });
+      expect(r.heavier).toBe(-1);
+      expect(r.tiltDeg).toBeGreaterThanOrEqual(0); // left end down, or level
+      expect(r.beam.y1).toBeGreaterThanOrEqual(r.beam.y2);
+    }
+  });
+
+  it("an end never swings past the fulcrum's stance on a wide, short beam", () => {
+    const r = balanceBeamGeometry({
+      a: 1000,
+      b: 1,
+      width: 200,
+      height: 20,
+      maxTilt: 12,
+      mode: "ratio",
+      pad: 2,
+    });
+    expect(r.beam.y1).toBeLessThanOrEqual(20);
+    expect(r.beam.y2).toBeGreaterThanOrEqual(0);
+  });
 });

@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { spreadLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
@@ -18,17 +18,42 @@ import { resolveSummary } from "../../core/summary.js";
 
 export type SlopeDatum = DumbbellDatum & { label: string };
 
-export function slopeSummary(data: readonly SlopeDatum[], strings: PairedStrings): string {
+/**
+ * Direction counts, led by the biggest mover.
+ *
+ * `fmt`/`pctFmt` are optional so the exported signature stays compatible, but
+ * both entries pass them: without `fmt` the announced value was `String(n)`,
+ * so a chart formatting "12.3K" on screen announced "12345.6"; without
+ * `pctFmt` the ratio was an en-US percent, and `locale` reached every other
+ * number on the chart but not that one (the fix Dumbbell already carries).
+ */
+export function slopeSummary(
+  data: readonly SlopeDatum[],
+  strings: PairedStrings,
+  fmt: (n: number) => string = String,
+  pctFmt: (fraction: number) => string = makePercentFormatter(undefined),
+): string {
   const finite = data.filter((d) => Number.isFinite(d.from) && Number.isFinite(d.to));
   if (finite.length === 0) return strings.noData;
+  // One row has no field to stand out from, and the counting sentence read
+  // "1 categories: 1 up, 0 down. Largest change East, up 18%." — ungrammatical
+  // and three clauses to say one thing. Same sentence the interactive entry
+  // announces for that row, so both readings of a one-row slope agree.
+  if (finite.length === 1) {
+    const d = finite[0]!;
+    const one = pairChange(d.from, d.to, pctFmt);
+    return one
+      ? strings.slopeAt(d.label, fmt(d.from), fmt(d.to), one.dir, one.pct)
+      : strings.flatPair(fmt(d.from));
+  }
   const up = finite.filter((d) => d.to > d.from).length;
   const down = finite.filter((d) => d.to < d.from).length;
   let top = finite[0]!;
   for (const d of finite) {
     if (Math.abs(d.to - d.from) > Math.abs(top.to - top.from)) top = d;
   }
-  const c = pairChange(top.from, top.to);
-  if (!c) return strings.flatPair(String(top.from));
+  const c = pairChange(top.from, top.to, pctFmt);
+  if (!c) return strings.flatPair(fmt(top.from));
   return strings.slopes(finite.length, up, down, top.label, c.dir, c.pct);
 }
 
@@ -93,7 +118,9 @@ export function Slope(props: SlopeProps): ReactNode {
     label,
     fmt,
   });
-  const accName = resolveSummary(summary, () => slopeSummary(data, strings));
+  // Relative change — takes `locale`, never the value `format` (its units).
+  const pctFmt = makePercentFormatter(locale);
+  const accName = resolveSummary(summary, () => slopeSummary(data, strings, fmt, pctFmt));
 
   const goodDir = positive === "down" ? -1 : 1;
   const showLabels = label !== "none" && !labelsDropped;
@@ -145,15 +172,26 @@ export function Slope(props: SlopeProps): ReactNode {
       {geo.lines.map((line) => {
         const d = data[line.index]!;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === line.index);
-        const stroke = isHl
-          ? "var(--mc-accent)"
-          : color
-            ? color
-            : positive !== undefined && line.dir !== 0
-              ? line.dir === goodDir
-                ? "var(--mc-positive)"
-                : "var(--mc-negative)"
-              : "var(--mc-neutral)";
+        // One ink ROLE per row, read by the connector and by its endpoint dots.
+        // A `stroke=` attribute cannot carry this: styles.css paints every role
+        // from a stylesheet rule, and a CSS declaration outranks an SVG
+        // presentation attribute — so `stroke="var(--mc-positive)"` under
+        // `data-mc-ink="data"` painted `--mc-stroke` regardless, and `positive`,
+        // `highlight` and `color` all died on the line while the dots (inline
+        // `style`) obeyed them. Roles also earn the forced-colors mapping.
+        // Element-split: a line strokes its valence, a circle fills it, and the
+        // no-valence case has two names (muted strokes, neutral fills).
+        const ink = isHl
+          ? "accent"
+          : positive !== undefined && line.dir !== 0
+            ? line.dir === goodDir
+              ? "positive"
+              : "negative"
+            : null;
+        // `color` is the caller's literal and outranks valence, as before. It
+        // has to be inline to beat the role's own rule — the same escape hatch
+        // Dumbbell's dot uses, and the same forced-colors trade.
+        const paint = !isHl && color !== undefined;
         const incomplete = line.y0 === null || line.y1 === null;
         return (
           <g key={line.index}>
@@ -163,10 +201,10 @@ export function Slope(props: SlopeProps): ReactNode {
                 y1={line.y0}
                 x2={line.x1}
                 y2={line.y1}
-                stroke={stroke}
-                data-mc-ink="data"
+                data-mc-ink={ink ?? "muted"}
                 style={{
                   strokeWidth: isHl ? "calc(var(--mc-sw) * 1.5)" : "var(--mc-sw)",
+                  ...(paint ? { stroke: color } : null),
                 }}
                 vectorEffect="non-scaling-stroke"
               />
@@ -177,9 +215,8 @@ export function Slope(props: SlopeProps): ReactNode {
                 y1={(line.y0 ?? line.y1)!}
                 x2={line.y0 !== null ? line.x0 + 6 : line.x1}
                 y2={(line.y0 ?? line.y1)!}
-                stroke={stroke}
-                data-mc-ink="data"
-                style={{ strokeWidth: "var(--mc-sw)" }}
+                data-mc-ink={ink ?? "muted"}
+                style={{ strokeWidth: "var(--mc-sw)", ...(paint ? { stroke: color } : null) }}
                 strokeDasharray="1.5 1.5"
                 vectorEffect="non-scaling-stroke"
               />
@@ -189,8 +226,8 @@ export function Slope(props: SlopeProps): ReactNode {
                 cx={line.x0}
                 cy={line.y0}
                 r={1.5}
-                data-mc-ink="point"
-                style={{ fill: stroke }}
+                data-mc-ink={ink ?? "neutral"}
+                style={paint ? { fill: color } : undefined}
               />
             ) : null}
             {line.y1 !== null ? (
@@ -198,8 +235,8 @@ export function Slope(props: SlopeProps): ReactNode {
                 cx={line.x1}
                 cy={line.y1}
                 r={1.5}
-                data-mc-ink="point"
-                style={{ fill: stroke }}
+                data-mc-ink={ink ?? "neutral"}
+                style={paint ? { fill: color } : undefined}
               />
             ) : null}
             {showLabels && wantLeft && leftYs[line.index] !== null ? (
@@ -221,7 +258,11 @@ export function Slope(props: SlopeProps): ReactNode {
                 fontSize={fontSize}
                 dominantBaseline="central"
                 textAnchor="start"
-                data-mc-ink={wantLabel && !wantLeft ? "label" : undefined}
+                /* Always the label role — the right column carried none as soon
+                   as it held a VALUE, which left it painting `--mc-stroke` (the
+                   `.mc-root text` default) beside a left column in `--mc-neutral`,
+                   and only a marked label maps to CanvasText in forced colors. */
+                data-mc-ink="label"
               >
                 {wantLeft ? fmt(d.to) : ""}
                 {wantLeft && wantLabel ? " " : ""}

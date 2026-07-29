@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
-import { heartbeatGeometry } from "./geometry.js";
+import { heartbeatCount } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -123,15 +123,10 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   }, [events, win, now, strings, reduced, inView, wrapRef]);
 
   // The count in the window at the frame currently on screen — the number the
-  // spike density only implies, and the number `label="count"` would print.
-  const count = heartbeatGeometry({
-    events,
-    window: win,
-    now: liveNow,
-    width: 60,
-    height: 16,
-    pad: 1,
-  }).count;
+  // spike density only implies, and the number `label="count"` would print. The
+  // tally alone: this reruns on every 250 ms tick, and it used to build (and
+  // throw away) a full spike path each time.
+  const count = heartbeatCount(events, win, liveNow);
   // Bare `3` is ambiguous at a glance; the chip names the unit. The permanent
   // `label="count"` stays the tight numeral (space beside the glyph).
   const readoutText = strings.heartbeatChip(count);

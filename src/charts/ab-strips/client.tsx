@@ -18,7 +18,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
-import { abStripsGeometry, abTagsFit } from "./geometry.js";
+import { abStripsGeometry, abTagChars } from "./geometry.js";
 import { ABStrips as StaticABStrips, abSummary, abDelta, type ABStripsProps } from "./index.js";
 
 export interface InteractiveABStripsProps extends ABStripsProps, PickerProps {
@@ -64,9 +64,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   // stretch `totalWidth` past the composed static's viewBox and slide the
   // pointer map off the marks.
   const FONT = labelFont(height, 0.3);
-  const labelChars = abTagsFit(height, FONT)
-    ? Math.max(seriesLabels[0].length, seriesLabels[1].length)
-    : 0;
+  const labelChars = abTagChars({ width, height, fontSize: FONT, labels: seriesLabels });
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // Same percent formatter the static builds — the gutter is measured off its
   // output, so a locale that widens it (fr-FR "+15 %") must widen it identically
@@ -83,6 +81,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
       b: data.b,
       labelChars,
       domain: props.domain,
+      fontSize: FONT,
     });
     const showLabel =
       (props.label ?? "delta") === "delta" && base != null && labelFitsBand(height, FONT);

@@ -64,6 +64,26 @@ describe("interactive <NetFlow>", () => {
     expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);
   });
 
+  // …and the same has to hold when the box is too short to SEAT that label.
+  // The client used to reserve the gutter on `label` alone, so in a 6-unit box
+  // the static dropped the label (viewBox 48) while the client mapped pointer x
+  // over 48 + gutter — every reading landed one period early.
+  it("drops the gutter with the label in a box too short to seat it", async () => {
+    const screen = await render(<NetFlow data={SAMPLE} width={48} height={6} />);
+    const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    const svg = wrap.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 48 6");
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    const line = [...svg.querySelectorAll("line")].find(
+      (l) => l.getAttribute("x1") === l.getAttribute("x2"),
+    )!;
+    const lineFrac = Number(line.getAttribute("x1")) / 48;
+    const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
+    expect(Math.abs(lineFrac - parseFloat(chip.style.left) / 100)).toBeLessThan(0.01);
+  });
+
   it("onActive reports the focused datum (period index + signed net); null on clear", async () => {
     const seen: unknown[] = [];
     const screen = await render(<NetFlow data={SAMPLE} onActive={(d) => seen.push(d)} />);

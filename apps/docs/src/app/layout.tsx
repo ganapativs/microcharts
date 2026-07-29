@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Hanken_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@/components/analytics";
 import { LabelCodeRegions } from "@/components/label-code-regions";
@@ -47,10 +47,28 @@ const display = localFont({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
+// Iosevka (SIL OFL — licence beside the files) is the site's mono: metadata
+// labels, figures, code. Self-hosted because it isn't on Google Fonts. The cut
+// is Iosevka EXTENDED, whose 600/1000 advance matches the mono the site was
+// typeset against, so every hardcoded mono size and tracking value still holds;
+// the default 500/1000 cut would run 17% narrow. Three statics — 400 for code
+// and figures, 500 for the uppercase labels and table heads, 700 because Shiki
+// emits `font-weight: bold` for keywords and a missing weight would synthesize.
+// ~20 kB each. Regenerate from the official Iosevka release TTFs:
+//   python3 -m fontTools.subset Iosevka-Extended.ttf \
+//     --unicodes=<google latin range + arrows, box + block drawing> \
+//     --layout-features=kern,liga,calt,ccmp,locl,mark,mkmk \
+//     --flavor=woff2 --no-hinting
+const mono = localFont({
+  src: [
+    { path: "../fonts/Iosevka-400-latin.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/Iosevka-500-latin.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/Iosevka-700-latin.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-mono-src",
   display: "swap",
+  adjustFontFallback: false,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
 // Apply saved accent + chart preset before first paint.

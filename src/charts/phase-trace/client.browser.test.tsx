@@ -61,6 +61,21 @@ describe("interactive <PhaseTrace>", () => {
     await expect.poll(() => fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  it("the draw entrance targets the trajectory, never the quadrant grid", async () => {
+    // Mirrors the `useEntrance` selector in client.tsx. The grid shares the
+    // muted ink role (it needs the forced-colors mapping) and is told apart by
+    // its width role, so dropping either attribute would silently restaff the
+    // entrance — with chrome drawing on and the trail no longer animating.
+    const SELECTOR =
+      'path[data-mc-ink="muted"]:not([data-mc-w="hair"]), path[data-mc-ink="accent"]';
+    const screen = await render(<PhaseTrace data={TRAJ} grid width={120} height={100} />);
+    const svg = screen.container.querySelector("svg")!;
+    expect(svg.querySelector('path[data-mc-w="hair"]')).not.toBeNull();
+    const drawn = [...svg.querySelectorAll(SELECTOR)];
+    expect(drawn.length).toBe(2); // trail + tail
+    expect(drawn.some((el) => el.getAttribute("data-mc-w") === "hair")).toBe(false);
+  });
+
   it("controlled selectedIndex pins the ring with no interaction", async () => {
     const screen = await render(
       <PhaseTrace data={TRAJ} width={120} height={100} selectedIndex={2} />,

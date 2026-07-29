@@ -68,6 +68,80 @@ describe("quantileDotsGeometry", () => {
     expect(quantileDotsGeometry({ ...base, data: [] })).toBeNull();
   });
 
+  // Hostile CONFIG, not hostile data: a host binds `count` to a number field
+  // (`Number("")` → NaN) or a config lookup. Passed through, NaN survived both
+  // clamps, `quantileDotplot` laid out ZERO dots, and the chart still announced
+  // "0 in NaN chances above 15" over what looked like a normal plot.
+  it("non-finite count falls back to the documented default (20)", () => {
+    for (const count of [NaN, Infinity, -Infinity]) {
+      const geo = quantileDotsGeometry({ ...base, data: WAITS, count, threshold: 15 })!;
+      expect(geo.count).toBe(20);
+      expect(geo.dots).toHaveLength(20);
+      expect(Number.isFinite(geo.threshold!.x)).toBe(true);
+    }
+  });
+
+  it("a non-finite width/height still lays out a drawable box", () => {
+    for (const box of [
+      { width: NaN, height: 20 },
+      { width: 80, height: NaN },
+      { width: 0, height: -5 },
+    ]) {
+      const geo = quantileDotsGeometry({ ...box, data: WAITS, threshold: 15 })!;
+      for (const d of geo.dots) {
+        expect(Number.isFinite(d.x) && Number.isFinite(d.y) && Number.isFinite(d.r)).toBe(true);
+      }
+      expect(Number.isFinite(geo.threshold!.x)).toBe(true);
+      expect(Number.isFinite(geo.totalWidth)).toBe(true);
+    }
+  });
+
+  it("a finite domain fixes the value→x map (rows compare on one scale)", () => {
+    const auto = quantileDotsGeometry({ ...base, data: WAITS, threshold: 15 })!;
+    const fixed = quantileDotsGeometry({ ...base, data: WAITS, threshold: 15, domain: [0, 60] })!;
+    expect(fixed.x0).toBe(0);
+    expect(fixed.range).toBe(60);
+    // the threshold sits where the domain says, not where the sample's span does
+    expect(fixed.threshold!.x).toBeCloseTo(2 + (15 / 60) * 76, 1);
+    expect(fixed.threshold!.x).not.toBeCloseTo(auto.threshold!.x, 1);
+    // and a second, narrower sample maps the SAME value to the SAME x
+    const other = quantileDotsGeometry({
+      ...base,
+      data: WAITS.map((v) => v / 2),
+      threshold: 15,
+      domain: [0, 60],
+    })!;
+    expect(other.threshold!.x).toBeCloseTo(fixed.threshold!.x, 2);
+  });
+
+  it("a non-finite or inverted domain falls back to the data span", () => {
+    const auto = quantileDotsGeometry({ ...base, data: WAITS, threshold: 15 });
+    for (const domain of [
+      [NaN, NaN],
+      [0, NaN],
+      [-Infinity, Infinity],
+      [60, 0],
+      [10, 10],
+    ] as const) {
+      expect(quantileDotsGeometry({ ...base, data: WAITS, threshold: 15, domain })).toEqual(auto);
+    }
+  });
+
+  test.prop([
+    fc.array(fc.double({ noNaN: true, min: -1e3, max: 1e3 }), { minLength: 1, maxLength: 80 }),
+    fc.double({ noNaN: true, min: -1e3, max: 1e3 }),
+    fc.double({ noNaN: true, min: 0.01, max: 2e3 }),
+  ])("containment: a fixed domain never pushes a dot out of the box", (data, lo, width) => {
+    const geo = quantileDotsGeometry({ ...base, data, domain: [lo, lo + width] });
+    if (!geo) return;
+    for (const d of geo.dots) {
+      expect(d.x - d.r).toBeGreaterThanOrEqual(-0.02);
+      expect(d.x + d.r).toBeLessThanOrEqual(80.02);
+      expect(d.y - d.r).toBeGreaterThanOrEqual(-0.02);
+      expect(d.y + d.r).toBeLessThanOrEqual(20.02);
+    }
+  });
+
   test.prop([
     fc.array(fc.double({ noNaN: true, min: -1e3, max: 1e3 }), { minLength: 1, maxLength: 80 }),
   ])("containment: dots inside the plot", (data) => {

@@ -140,6 +140,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const accName = resolveSummary(summary, () => gradedBandSummary(geo, fmt, strings, levelFmt));
   const k = geo.bands.length;
   const outer = geo.bands[0];
+  const bandColor = color ?? "var(--mc-accent)";
   // pin the label size to viewBox units (see coverage-strip)
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
@@ -165,11 +166,24 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           width={round2(outer.width + 4)}
           height={geo.bandH}
           rx={geo.bandH / 2}
-          data-mc-ink="band"
-          style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(0, k) * 0.5 }}
+          data-mc-cone="edge"
+          style={
+            {
+              "--mc-cone-color": bandColor,
+              "--mc-cone-opacity": OPACITY(0, k) * 0.5,
+            } as CSSProperties
+          }
         />
       ) : null}
-      {/* Inline fill — band ink-role would force --mc-band. */}
+      {/* The nested intervals are the whole read, and their paint is dynamic
+          (accent, or the `color` prop, at a per-level opacity), so the chart
+          sets the shared `--mc-cone-*` vars and styles.css owns the `fill` —
+          the same move ForecastCone and FoldedDayBand make. Inline `fill` is
+          what this used to do, and `.mc-root` sets `forced-color-adjust: none`:
+          a 14%-opacity accent survives verbatim into High Contrast Mode, where
+          it is not a visible interval. The shared rule maps all three to system
+          ink and keeps their ordering. `ink="band"` is the wrong token here —
+          it is a muted background, not accent data ink. */}
       {geo.bands.map((b) => (
         <rect
           key={b.p}
@@ -178,8 +192,13 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           width={b.width}
           height={geo.bandH}
           rx={softEdge ? geo.bandH / 2 : 1}
-          data-mc-ink="band"
-          style={{ fill: color ?? "var(--mc-accent)", fillOpacity: OPACITY(b.step, k) }}
+          data-mc-cone={b.p}
+          style={
+            {
+              "--mc-cone-color": bandColor,
+              "--mc-cone-opacity": OPACITY(b.step, k),
+            } as CSSProperties
+          }
         />
       ))}
 
@@ -211,8 +230,17 @@ export function GradedBand(props: GradedBandProps): ReactNode {
           y={geo.labelY}
           textAnchor="end"
           dominantBaseline="central"
+          // The gutter readout is a direct value label like every other
+          // chart's. Without the role it fell through to `.mc-root text`'s
+          // `--mc-stroke`, a fixed dark hex that `forced-color-adjust: none`
+          // preserves into High Contrast Mode — the median went invisible on a
+          // dark system background. `label` is the role that carries the
+          // CanvasText mapping. (`tabular-nums` came off with it: styles.css
+          // already sets it on `.mc-root text`, and inline put it out of a
+          // consumer's reach.)
+          data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontWeight: 600, fontVariantNumeric: "tabular-nums" }}
+          style={{ fontWeight: 600 }}
         >
           {medText}
         </text>

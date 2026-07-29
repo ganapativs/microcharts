@@ -121,6 +121,13 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
       style={rootStyle}
     >
       <path d={geo.d} data-mc-ink={ink} />
+      {/* `data-mc-ink="label"` is the ink ROLE, not just a color: bare
+          `.mc-root text` falls back to `--mc-stroke` (a literal #1a1917) and
+          `.mc-root` sets `forced-color-adjust: none`, so High Contrast Mode
+          painted that near-black against whatever background the user chose.
+          The role picks up the `fill: CanvasText` mapping — and elsewhere quiets
+          the number to `--mc-neutral`, which is what a direct value label is
+          across the catalog. */}
       {showValue ? (
         <text
           x={geo.labelX}
@@ -128,6 +135,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
           fontSize={geo.fontSize}
           dominantBaseline="central"
           textAnchor="start"
+          data-mc-ink="label"
         >
           {model.display}
         </text>

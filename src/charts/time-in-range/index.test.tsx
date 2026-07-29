@@ -68,6 +68,41 @@ describe("<TimeInRange>", () => {
     expect(de.querySelectorAll("rect").length).toBe(3);
   });
 
+  it("a hostile width/height falls back to the default frame instead of painting NaN", () => {
+    // A host-computed side (`Number("")`, a collapsed flex box, a division by a
+    // zero container) laid the zones out against the raw prop: `width="NaN"`
+    // rects inside a valid viewBox, `Infinity` ones outside it, and a NaN
+    // `--mc-seat` dragging the inline baseline with it.
+    for (const side of [NaN, Infinity, -Infinity, 0, -40]) {
+      for (const props of [{ width: side }, { height: side }]) {
+        const { container } = draw(
+          <TimeInRange data={{ below: 9, in: 72, above: 19 }} {...props} />,
+        );
+        const svg = container.querySelector("svg")!;
+        expect(svg.getAttribute("viewBox")).toBe("0 0 80 12");
+        for (const el of container.querySelectorAll("*")) {
+          for (const attr of el.attributes) {
+            expect(attr.value).not.toMatch(/NaN|Infinity/);
+          }
+        }
+      }
+    }
+  });
+
+  it("a total past the double range paints the zones it announces", () => {
+    // Was: shares all collapsed to 0 (the sum overflowed), so the strip came out
+    // blank while the accessible name read "1% in range, 1% below, 1% above".
+    const { container } = draw(<TimeInRange data={{ below: 1e308, in: 1e308, above: 1e308 }} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "33% in range, 34% below, 33% above.",
+    );
+    const widths = [...container.querySelectorAll("rect")].map((r) =>
+      Number(r.getAttribute("width")),
+    );
+    expect(widths.length).toBe(3);
+    expect(widths.every((w) => w > 20)).toBe(true);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <TimeInRange data={{ below: 9, in: 72, above: 19 }} title="Glucose in range" />,

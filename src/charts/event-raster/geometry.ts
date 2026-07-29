@@ -4,6 +4,7 @@
 // exception is the honest `overflow="bin"` mode, which switches an aliasing lane
 // to per-bucket counts (opacity) and SAYS SO in the summary. 2-dp.
 import { uniformBins } from "../../core/bin.js";
+import { scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { labelFitsBand, labelFont, textGutterProse } from "../../core/labels.js";
 
@@ -74,11 +75,62 @@ export interface RasterLane {
   path: string;
   /** Per-bucket opacity rects — non-empty only when this lane is binned. */
   bins: RasterBin[];
+  /** Events inside the window — what this lane paints, not what it was handed. */
   count: number;
   binned: boolean;
 }
 
 export const LANE_CAP = 12;
+
+/**
+ * Resolve the caller `domain` — the second thing both entries must agree on,
+ * for the same reason as the gutter above: two windows put the ticks and the
+ * hover overlay on different axes.
+ *
+ * A `domain` is computed by the host, not typed by hand, so it arrives hostile.
+ * `[NaN, NaN]` — a window derived from an empty fetch — put `MNaN` in every
+ * lane path, so nothing painted while the accessible name still announced every
+ * event. `[0, NaN]` was worse: the span fell back to 1 and the ticks marched
+ * hundreds of units past the viewBox. Falling back to the data extent is the
+ * guard the other domain-taking charts already apply.
+ *
+ * A reversed pair is a window with its ends swapped, not a mirrored time axis:
+ * `uniformBins` normalizes it, so honoring the reversal made a binned lane run
+ * left→right while its tick neighbours ran right→left in the same chart.
+ */
+export function resolveRasterDomain(
+  domain: readonly [number, number] | undefined,
+  data: readonly RasterLaneInput[],
+): readonly [number, number] {
+  if (!domain || !Number.isFinite(domain[0]) || !Number.isFinite(domain[1]))
+    return rasterDomain(data);
+  return domain[0] <= domain[1] ? domain : [domain[1], domain[0]];
+}
+
+/**
+ * The events a window actually holds, in input order.
+ *
+ * An explicit `domain` is a window — a caller overfetching around it is normal
+ * — and an event outside it used to be scaled anyway, landing hundreds of units
+ * past the viewBox (`.mc-root` is `overflow: visible`: it spills, it never
+ * clips). Clamping to the edge was the alternative and it lies, piling ticks
+ * into the vertical band this chart exists to report. The binned branch already
+ * dropped those events (`uniformBins` counts nothing outside its domain), so
+ * one chart was reading two windows depending on lane density.
+ */
+export function rasterWindow(
+  events: readonly number[],
+  domain: readonly [number, number],
+): number[] {
+  // isFiniteValue first: `null >= 0` is true (it coerces), so the comparisons
+  // alone would admit a null event and place it at the window's low edge.
+  return events.filter((e) => isFiniteValue(e) && e >= domain[0] && e <= domain[1]);
+}
+
+/** A lane aliases once its events outnumber the pixels available to draw them. */
+export function rasterAliases(events: number, plotW: number): boolean {
+  return events > plotW * 0.9;
+}
 
 /** Default domain: min/max over every event across all lanes. */
 export function rasterDomain(data: readonly RasterLaneInput[]): readonly [number, number] {
@@ -106,20 +158,22 @@ export function eventRasterGeometry(opts: {
   const lanes = data.slice(0, LANE_CAP);
   const n = Math.max(1, lanes.length);
   const laneH = height / n;
-  const [d0, d1] = domain;
-  const span = d1 - d0 || 1;
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);
-  const xOf = (t: number): number => round2(plotX0 + ((t - d0) / span) * plotW);
+  // scaleLinear, not `(t - d0) / span`: it maps a degenerate window to the plot
+  // midpoint and survives a span that overflows to Infinity (`1e308 - -1e308`),
+  // which the hand-rolled form turned into NaN coordinates.
+  const x = scaleLinear(domain, [plotX0, plotX0 + plotW]);
+  const xOf = (t: number): number => round2(x(t));
   const pad = Math.min(1, laneH * 0.18);
 
   const out: RasterLane[] = lanes.map((lane, i) => {
     const y = round2(i * laneH);
-    const events = lane.events.filter(isFiniteValue);
+    const events = rasterWindow(lane.events, domain);
     const y0 = round2(y + pad);
     const y1 = round2(y + laneH - pad);
     // aliasing → each event would collide with its neighbour; bin honestly
-    const aliasing = overflow === "bin" && events.length > plotW * 0.9;
+    const aliasing = overflow === "bin" && rasterAliases(events.length, plotW);
     if (aliasing) {
       const nb = Math.max(2, Math.floor(plotW / 2));
       const binned = uniformBins(events, { domain, bins: nb });

@@ -16,7 +16,13 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
-import { largestRemainderPercents, rollup, segmentedBarGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import {
+  largestRemainderPercents,
+  MAX_SEGMENTS,
+  rollup,
+  segmentedBarGeometry,
+} from "./geometry.js";
 import {
   SegmentedBar as StaticSegmentedBar,
   sharesSummary,
@@ -36,10 +42,10 @@ export interface InteractiveSegmentedBarProps extends SegmentedBarProps, PickerP
 export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNode {
   const {
     data,
-    maxSegments = 5,
+    maxSegments = MAX_SEGMENTS,
     order = "data",
-    width = 60,
-    height = 10,
+    width: widthProp = 60,
+    height: heightProp = 10,
     format,
     locale,
     strings = EN_COMPOSITION,
@@ -55,6 +61,12 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same clamp the static entry applies, for the same reason: the hit box, the
+  // focus outline and the readout anchor are all measured in these units, so a
+  // NaN width would put the picker on a scale the frame never had.
+  const width = chartSide(widthProp, 60);
+  const height = chartSide(heightProp, 10);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // "sweep" from the left — a part-to-whole bar reads best assembling left→right
@@ -83,12 +95,19 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     [width, height, rolled, fontSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const pcts = useMemo(() => largestRemainderPercents(geo.segments.map((s) => s.share)), [geo]);
+  // Percents off the rolled VALUES, matching the painted labels and the summary
+  // to the point. Indexed by rolled position too: a share can underflow to zero
+  // and drop its segment, and a positional lookup would then read the next
+  // category's share into this one's readout.
+  const pcts = useMemo(() => largestRemainderPercents(rolled.map((d) => d.value)), [rolled]);
   // Largest-remainder integers (they must still sum to 100) rendered through a
   // real percent formatter — `${n}%` hardcoded the sign and its spacing, which
   // fr-FR writes as "12 %".
   const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
-  const pctAt = useCallback((i: number) => pctFmt((pcts[i] ?? 0) / 100), [pctFmt, pcts]);
+  const pctAt = useCallback(
+    (i: number) => pctFmt((pcts[geo.segments[i]?.index ?? -1] ?? 0) / 100),
+    [pctFmt, pcts, geo],
+  );
 
   const locate = useCallback(
     (x: number) => {

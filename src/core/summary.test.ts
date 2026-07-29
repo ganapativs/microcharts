@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import { describeSeries } from "./summary.js";
+import { EN } from "./strings.js";
 import type { Value } from "./types.js";
 
 describe("describeSeries (edge matrix)", () => {
@@ -45,5 +46,34 @@ describe("describeSeries (invariants)", () => {
     const out = describeSeries(xs);
     expect(out.length).toBeGreaterThan(0);
     expect(out.endsWith(".")).toBe(true);
+  });
+});
+
+describe("paired templates tolerate an undefined ratio", () => {
+  // `pairChange` cannot compute a percent from a zero baseline and returns "".
+  // Every paired template concatenated it unguarded, so a Dumbbell of
+  // { from: 0, to: 5 } announced "From 0 to 5, up ." — a trailing gap where the
+  // number should be, in the accessible name.
+  it("fromTo drops the empty ratio, keeps the direction", () => {
+    expect(EN.fromTo("0", "5", "up", "")).toBe("From 0 to 5, up.");
+    expect(EN.fromTo("0", "5", "up", "40%")).toBe("From 0 to 5, up 40%.");
+  });
+
+  it("rows / slopeAt / slopes do the same", () => {
+    expect(EN.rows(2, "Berlin", "up", "")).toBe("2 rows. Largest change Berlin, up.");
+    expect(EN.slopeAt("A", "0", "5", "up", "")).toBe("A: 0 to 5, up.");
+    expect(EN.slopes(3, 2, 1, "A", "up", "")).toBe(
+      "3 categories: 2 up, 1 down. Largest change A, up.",
+    );
+  });
+
+  it("no template leaves a space before its full stop", () => {
+    for (const s of [
+      EN.fromTo("0", "5", "up", ""),
+      EN.rows(2, "B", "down", ""),
+      EN.slopeAt("A", "0", "5", "up", ""),
+      EN.slopes(3, 2, 1, "A", "up", ""),
+    ])
+      expect(s).not.toMatch(/\s\.|\s{2}/);
   });
 });

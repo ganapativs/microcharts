@@ -108,7 +108,7 @@ export function GardenGrid(props: GardenGridProps): ReactNode {
               key={c.index}
               cx={c.cx}
               cy={c.cy}
-              r={geo.rMax * 0.6}
+              r={geo.rEmpty}
               data-mc-ink="muted"
               strokeOpacity={0.55}
             />

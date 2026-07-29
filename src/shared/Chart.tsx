@@ -4,6 +4,7 @@
 // when an explicit stable `id` is supplied — see shared/a11y.ts).
 import type { CSSProperties, ReactNode } from "react";
 import { accessibleNaming } from "./a11y.js";
+import { chartSide } from "../core/types.js";
 
 /** Inline (`.mc-inline`) baseline seat — viewBox coords from the top; plot box only, never data bbox (values would bob). */
 interface Seat {
@@ -54,7 +55,14 @@ export interface ChartProps {
 }
 
 export function Chart(props: ChartProps): ReactNode {
-  const { width, height, title, summary, id, seat, className, style, children } = props;
+  const { title, summary, id, seat, className, style, children } = props;
+  // The box is the ONE thing every chart hands this wrapper, and a non-finite
+  // one is fatal in a way a bad mark is not (see `chartSide`). Clamping it here
+  // fixes the FRAME only — a chart whose geometry read the raw prop still emits
+  // NaN coordinates inside a valid viewBox, so charts call `chartSide` too and
+  // the two stay in step because it is one function, not two copies.
+  const width = chartSide(props.width);
+  const height = chartSide(props.height);
   const naming = accessibleNaming(title, summary, id);
   const seated = seatVars(seat, height);
   const rootStyle = seated ? (style ? { ...style, ...seated } : seated) : style;

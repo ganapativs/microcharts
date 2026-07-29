@@ -7,12 +7,12 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
 import {
-  GRID_DIMS,
   iconArrayGeometry,
+  iconArrayLabelPlan,
+  resolveTotal,
   type IconArrayGeometry,
   type IconArrayN,
 } from "./geometry.js";
@@ -62,7 +62,7 @@ export interface IconArrayProps {
 export function IconArray(props: IconArrayProps): ReactNode {
   const {
     value,
-    total = 20,
+    total: rawTotal,
     label = "ratio",
     shape = "square",
     positive,
@@ -80,23 +80,16 @@ export function IconArray(props: IconArrayProps): ReactNode {
     children,
   } = props;
 
-  // label a touch smaller than the strips so the countable grid stays the hero
-  // (~0.5·height, clamped 7–10) — see coverage-strip
-  const FONT = labelFont(height, 0.5);
-  const wantCh = label === "ratio" ? 9 : label === "percent" ? 5 : 0;
-  // The ratio label lives in a gutter carved OUT of the width. On a narrow box
-  // that gutter can swallow the grid whole — the units collapse to nothing and
-  // the text runs off the right edge. So the label is gated on the grid keeping
-  // a countable cell (≥ 1.5 units per column, gaps included) after the gutter,
-  // and on the text fitting the box vertically. When it drops, the gutter drops
-  // with it and the grid gets the full width — the countable grid is the chart.
-  const [cols] = GRID_DIMS[total];
-  const wantGutter = wantCh > 0 ? textGutter(wantCh, FONT, 4) : 0;
-  const showLabel =
-    wantCh > 0 && labelFitsY(height / 2, FONT, height) && width - wantGutter >= cols * 1.5 * 1.25;
-  const gutterCh = showLabel ? wantCh : 0;
+  const total = resolveTotal(rawTotal);
+  const plan = iconArrayLabelPlan({ label, total, width, height });
+  const { font: FONT, gutterCh, show: showLabel } = plan;
   const geo = iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT });
 
+  if (rawTotal !== undefined && rawTotal !== total) {
+    devWarn(
+      `<IconArray> total=${rawTotal} has no designed grid — using ${total}. Pick 10, 20 or 100.`,
+    );
+  }
   if (total === 100 && (width < 40 || height < 40)) {
     devWarn("<IconArray> total=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
   }
@@ -174,7 +167,6 @@ export function IconArray(props: IconArrayProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

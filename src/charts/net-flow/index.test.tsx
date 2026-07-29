@@ -75,6 +75,47 @@ describe("<NetFlow>", () => {
     expect(container.querySelectorAll("path").length).toBe(0);
   });
 
+  // The columns used to be keyed by their x. In a box too narrow to separate
+  // the slots every column lands on the SAME x, the keys collide, and React
+  // drops the duplicates — nine of ten bars silently vanished.
+  it("keeps every column in a box too narrow to separate the slots", () => {
+    const { container } = draw(<NetFlow data={SAMPLE} mode="bars" width={2} />);
+    expect(container.querySelectorAll("rect").length).toBe(10);
+  });
+
+  // Area weight is a presentation ATTRIBUTE, not inline style: styles.css is
+  // written at :where() zero specificity so a consumer rule can retune a chart,
+  // and inline style is the one declaration that cannot be overridden.
+  it("paints area weight as an overridable attribute", () => {
+    const { container } = draw(<NetFlow data={SAMPLE} />);
+    const area = container.querySelector('path[data-mc-ink="positive"]') as SVGElement;
+    expect(area.getAttribute("fill-opacity")).toBe("0.2");
+    expect(area.style.fillOpacity).toBe("");
+    const text = draw(<NetFlow data={SAMPLE} />).container.querySelector("text") as SVGElement;
+    expect(text.style.fontVariantNumeric).toBe(""); // styles.css owns tabular-nums
+  });
+
+  // A non-finite box prop is uniquely destructive: `Chart` clamps the viewBox,
+  // so a chart that laid out against the raw prop emitted NaN coordinates —
+  // or negative ones — inside a perfectly valid frame.
+  it.each([
+    ["width", { width: Number.NaN }],
+    ["height", { height: Number.NaN }],
+    ["negative width", { width: -40 }],
+    ["zero height", { height: 0 }],
+  ])("a hostile %s prop never reaches an attribute", (_name, box) => {
+    const { container } = draw(<NetFlow data={SAMPLE} {...box} />);
+    const svg = container.querySelector("svg")!;
+    const bad = [...svg.outerHTML.matchAll(/="([^"]*)"/g)]
+      .map((m) => m[1]!)
+      .filter((v) => /NaN|Infinity/.test(v));
+    expect(bad).toEqual([]);
+    // …and the accessible name still states the real numbers
+    expect(svg.getAttribute("aria-label")).toBe(
+      "Net +2 last period; in 7 vs out 5; net positive 4 of 5 periods.",
+    );
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<NetFlow data={SAMPLE} title="Cash flow" />);
     await expectNoA11yViolations(container);
@@ -96,5 +137,15 @@ describe("NetFlow degradation", () => {
     const small = draw(<NetFlow data={SAMPLE} width={48} height={6} />).container;
     expect(small.querySelector("text")).toBeNull();
     expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
+  });
+
+  // The gutter goes with the label. It is reserved in the viewBox width, so a
+  // gutter that outlives its label widens the box the interactive entry maps
+  // pointer x over and the crosshair drifts off the cursor.
+  it("drops the reserved gutter with the label", () => {
+    const small = draw(<NetFlow data={SAMPLE} width={48} height={6} />).container;
+    expect(small.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 48 6");
+    const big = draw(<NetFlow data={SAMPLE} width={48} height={32} />).container;
+    expect(big.querySelector("svg")!.getAttribute("viewBox")).not.toBe("0 0 48 32");
   });
 });

@@ -52,6 +52,27 @@ describe("<MicroScatter>", () => {
     expect(warn).toHaveBeenCalledOnce();
   });
 
+  it("a non-finite r prop paints nothing NaN (announced scale = painted scale)", () => {
+    const { container } = draw(<MicroScatter data={CLOUD} trend r={Number.NaN} />);
+    // The accessible name never saw `r` at all, so the chart used to announce a
+    // correct count and correlation over a cloud of cx/cy="NaN" — invisible.
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toMatch(/^24 points\./);
+    for (const el of container.querySelectorAll("circle, line, svg")) {
+      for (const attr of el.attributes) {
+        expect(attr.value).not.toMatch(/NaN|Infinity/);
+      }
+    }
+    // …and it falls back to the documented default radius.
+    expect(container.querySelector("circle")!.getAttribute("r")).toBe("1.5");
+  });
+
+  it("r is clamped to [1, 3]", () => {
+    const tiny = draw(<MicroScatter data={CLOUD} r={0} />);
+    expect(tiny.container.querySelector("circle")!.getAttribute("r")).toBe("1");
+    const huge = draw(<MicroScatter data={CLOUD} r={9} />);
+    expect(huge.container.querySelector("circle")!.getAttribute("r")).toBe("3");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<MicroScatter data={CLOUD} title="Latency vs error rate" />);
     await expectNoA11yViolations(container);

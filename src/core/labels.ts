@@ -17,6 +17,72 @@ export function labelFont(height: number, factor = 0.55): number {
 }
 
 /**
+ * Type size for a ROW label — a category name beside its own row, in a chart
+ * that stacks several (DotPlot, Dumbbell, ABStrips, SproutRow, RubricStrip,
+ * TraceFold, EventTimeline …).
+ *
+ * The input is the row PITCH, not the chart height, and that distinction is the
+ * whole reason this exists. `labelFont(height, …)` reads the box, which is right
+ * for a chart with one label in it and backwards for a stack: adding rows grows
+ * the height, so the type grew while the room per row shrank. Measured before
+ * this landed, at an identical 12-unit pitch and 160-unit width, Dumbbell
+ * (`labelFont(height, 0.42)`) pinned at the 11-unit ceiling from three rows on
+ * while DotPlot (pitch-based) sat at 7 — a 57% difference between two charts
+ * doing the same job, side by side in the catalog.
+ *
+ * Floor and ceiling are `labelFont`'s, so a row label never reads smaller or
+ * larger than the rest of the library.
+ */
+export function rowLabelFont(pitch: number, factor = ROW_LABEL_FACTOR): number {
+  return labelFont(pitch, factor);
+}
+
+/** @knipignore — published row-label vocabulary; adopted by the charts in a
+ *  follow-up pass, so nothing imports it yet.
+ *  DEFAULT share of the chart's width a row-label gutter may claim, for charts
+ *  whose row is mostly plot. Charts pass their own where the row is
+ *  label-forward — a DotPlot row is a name and one dot, so it earns more of the
+ *  width than a Dumbbell row, which has to fit two dots and a connector. What is
+ *  shared is the SIZING and the drop rule, not this number; forcing one share on
+ *  both dropped every DotPlot label at its 60-unit default. */
+export const ROW_LABEL_WIDTH_SHARE = 0.38;
+/** DotPlot-class rows: the name is half the mark. */
+export const ROW_LABEL_WIDTH_SHARE_WIDE = 0.5;
+/** @knipignore — see ROW_LABEL_WIDTH_SHARE.
+ *  Row labels are label-forward by definition — you cannot read the row
+ *  without its name — so they take the ~0.62 factor `labelFont` documents for
+ *  that case, applied to the PITCH instead of the box. */
+export const ROW_LABEL_FACTOR = 0.62;
+/** A row label past this stops being a label and starts being a column. */
+export const ROW_LABEL_MAX_CHARS = 14;
+/**
+ * Below this many visible characters a truncation identifies nothing at all —
+ * "Am…" is not a row name — so the label DROPS and hands its gutter back to the
+ * plot, which is the same degradation rule `labelFitsY` / `labelFitsBand` apply
+ * vertically; it had simply never been applied to horizontal truncation.
+ *
+ * Deliberately LOW. A first pass set this at 7, reasoning that "San F…" and
+ * "San J…" are the same label — true, but dropping the name entirely is worse
+ * than a weak one, and at DotPlot's default width a 7-char floor removed every
+ * category name. What actually protects the plot from a greedy gutter is
+ * `ROW_LABEL_WIDTH_SHARE`, not this; this only rules out stubs.
+ */
+export const ROW_LABEL_MIN_CHARS = 4;
+
+/**
+ * How many characters of a row label to paint, or **0 meaning drop it**.
+ *
+ * `room` is the width the gutter may occupy (normally
+ * `width * ROW_LABEL_WIDTH_SHARE`). The budget uses the prose per-char estimate,
+ * because row names are author text, not figures the library formatted.
+ */
+export function rowLabelChars(room: number, fontSize: number, longest: number, pad = 3): number {
+  const budget = proseCharsThatFit(room, fontSize, pad);
+  if (budget < Math.min(ROW_LABEL_MIN_CHARS, longest)) return 0;
+  return Math.min(ROW_LABEL_MAX_CHARS, budget, Math.max(1, longest));
+}
+
+/**
  * Reserved gutter width (viewBox units) for a `chars`-long label at `fontSize`,
  * plus a fixed `pad` of breathing room. The `0.62 × fontSize` per-character
  * estimate is a deliberate slight over-estimate for the tabular-nums figures the

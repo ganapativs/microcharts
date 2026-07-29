@@ -53,6 +53,67 @@ describe("<PhaseTrace>", () => {
     expect(container.querySelectorAll("circle").length).toBeGreaterThanOrEqual(2); // start + end
   });
 
+  it("paints through ink roles, so forced colors can remap every mark", () => {
+    const { container } = draw(
+      <PhaseTrace data={TRAJ} grid startDot xLabel="CPU" yLabel="Latency" />,
+    );
+    // The quadrant cross and the "now" dot used to carry --mc-* paint with no
+    // role at all, and the start dot overrode its role with an inline fill —
+    // all three survive verbatim under `forced-color-adjust: none`.
+    const gridLine = container.querySelector('path[data-mc-w="hair"]');
+    expect(gridLine?.getAttribute("data-mc-ink")).toBe("muted");
+    expect(gridLine?.getAttribute("stroke")).toBeNull();
+    const start = container.querySelector('circle[data-mc-ink="neutral"]');
+    expect(start?.getAttribute("style")).toBeNull();
+    expect(container.querySelector('circle[data-mc-ink="flag"]')).not.toBeNull();
+    // The trail's width is the "full" role, not an inline stroke-width a
+    // consumer stylesheet could never override.
+    const trail = container.querySelector('path[data-mc-ink="muted"][data-mc-w="full"]');
+    expect(trail?.getAttribute("style")).toBeNull();
+  });
+
+  // Hostile CONFIG props: the announced scale and the painted scale have to be
+  // the same scale. Each of these once rendered a normal-sounding aria-label
+  // over NaN coordinates (or, for tail, a rising trace announced as "steady").
+  describe("hostile config props", () => {
+    const HOSTILE = [
+      ["xDomain NaN", { xDomain: [NaN, NaN] }],
+      ["xDomain half-NaN", { xDomain: [0, NaN] }],
+      ["domain infinite", { domain: [-Infinity, Infinity] }],
+      ["domain zero-span", { domain: [5, 5] }],
+      ["tail NaN", { tail: NaN }],
+      ["width NaN", { width: NaN }],
+      ["height 0", { height: 0 }],
+      ["width negative", { width: -10 }],
+    ] as const;
+
+    for (const [label, props] of HOSTILE) {
+      it(`${label} → no non-finite reaches markup`, () => {
+        const { container } = draw(
+          <PhaseTrace data={TRAJ} grid startDot xLabel="CPU" yLabel="Latency" {...props} />,
+        );
+        for (const el of container.querySelectorAll("*"))
+          for (const attr of el.attributes)
+            expect(attr.value, `<${el.tagName} ${attr.name}>`).not.toMatch(/NaN|Infinity/);
+      });
+    }
+
+    it("a rejected tail still splits the trail from the accent tail it announces", () => {
+      const { container } = draw(
+        <PhaseTrace data={TRAJ} tail={NaN} xLabel="CPU" yLabel="Latency" />,
+      );
+      expect(container.querySelector('path[data-mc-ink="muted"]')).not.toBeNull();
+      expect(container.querySelector('[role="img"]')?.getAttribute("aria-label")).toBe(
+        "Latency vs CPU: now 62, 130; heading up-right.",
+      );
+    });
+
+    it("a rejected box keeps the viewBox and the marks on one scale", () => {
+      const { container } = draw(<PhaseTrace data={TRAJ} width={NaN} xLabel="x" yLabel="y" />);
+      expect(container.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 40 32");
+    });
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(
       <PhaseTrace data={TRAJ} xLabel="CPU" yLabel="Latency" title="Phase portrait" />,

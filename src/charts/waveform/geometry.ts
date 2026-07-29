@@ -4,7 +4,7 @@
 // domain is symmetric ±max|data| so shape reads honestly; the peak is disclosed
 // in the summary. Absolute comparisons require an explicit shared domain. 2-dp.
 import { maxPerBucket, envelope } from "../../core/downsample.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 
 export interface WaveBar {
   x: number;
@@ -16,9 +16,12 @@ export interface WaveBar {
 
 const PAD = 1;
 
+export const DEFAULT_WIDTH = 120;
+export const DEFAULT_HEIGHT = 24;
+
 /** buckets = min(⌊width/2⌋, samples), documented cap 64. */
 export function bucketCount(width: number, samples: number): number {
-  return Math.max(1, Math.min(Math.floor(width / 2), samples, 64));
+  return Math.max(1, Math.min(Math.floor(chartSide(width, DEFAULT_WIDTH) / 2), samples, 64));
 }
 
 /** Bars TILE the inner width: k slots of `bucketW`, each inset by half a gap. */
@@ -42,9 +45,10 @@ export function bucketX(
   i: number,
   opts: { width: number; buckets: number; mode: "bars" | "envelope" },
 ): number {
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
   const k = Math.max(1, Math.floor(opts.buckets));
-  if (opts.mode === "envelope") return round2(PAD + i * envelopeStep(opts.width, k));
-  const { bucketW, gap } = barPitch(opts.width, k);
+  if (opts.mode === "envelope") return round2(PAD + i * envelopeStep(width, k));
+  const { bucketW, gap } = barPitch(width, k);
   return round2(PAD + i * bucketW + gap / 2 + Math.max(0.4, bucketW - gap) / 2);
 }
 
@@ -52,6 +56,22 @@ function maxAbs(values: readonly Value[]): number {
   let m = 0;
   for (const v of values) if (isFiniteValue(v) && Math.abs(v) > m) m = Math.abs(v);
   return m;
+}
+
+/**
+ * The amplitude a full-height bar stands for: the explicit domain's peak, or
+ * the series' own. A host computes `domain` (often a min/max over a series that
+ * hides a NaN), and a non-finite one made `frac` NaN → every bar collapsed to
+ * the 0.4 silence tick while the summary still announced the real peak. Painted
+ * scale and announced scale have to be the same scale, so an unusable domain
+ * falls back to the auto one instead of flattening the signal.
+ */
+function peakScale(domain: readonly [number, number] | null, data: readonly Value[]): number {
+  if (domain) {
+    const d = Math.max(Math.abs(domain[0]), Math.abs(domain[1]));
+    if (Number.isFinite(d)) return d;
+  }
+  return maxAbs(data);
 }
 
 export interface WaveformGeometry {
@@ -73,9 +93,13 @@ export function waveformGeometry(opts: {
   domain: readonly [number, number] | null;
   mirror: boolean;
 }): WaveformGeometry {
-  const { data, width, height, buckets, domain, mirror } = opts;
+  const { data, buckets, domain, mirror } = opts;
+  // A NaN box is uniquely destructive: `Chart` clamps what it puts in the
+  // viewBox, so the frame looked right while every bar carried `V NaN`.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const k = Math.max(1, Math.floor(buckets));
-  const dmax = domain ? Math.max(Math.abs(domain[0]), Math.abs(domain[1])) : maxAbs(data);
+  const dmax = peakScale(domain, data);
 
   const innerH = height - PAD * 2;
   const cy = round2(height / 2);
@@ -128,9 +152,11 @@ export function envelopePath(opts: {
   domain: readonly [number, number] | null;
   mirror: boolean;
 }): string {
-  const { data, width, height, buckets, domain, mirror } = opts;
+  const { data, buckets, domain, mirror } = opts;
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const k = Math.max(1, Math.floor(buckets));
-  const dmax = domain ? Math.max(Math.abs(domain[0]), Math.abs(domain[1])) : maxAbs(data);
+  const dmax = peakScale(domain, data);
   const innerH = height - PAD * 2;
   const cy = height / 2;
   const halfH = innerH / 2;

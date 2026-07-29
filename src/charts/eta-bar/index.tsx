@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
+import { round2 } from "../../core/types.js";
 import { etaBarGeometry, hatchPath } from "./geometry.js";
 
 export interface EtaBarProps {
@@ -118,13 +119,19 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       className={className ? `mc-eta ${className}` : "mc-eta"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
+      {/* The unrun track is the same mark <Progress> draws, so it carries the
+          same role. It used to paint `--mc-neutral` at 0.14 inline, which put
+          it outside the theming contract (a consumer could not restyle it) and
+          outside the forced-colors mapping — `.mc-root` sets
+          forced-color-adjust: none, so a 14%-opacity gray track survived into
+          High Contrast Mode as very nearly nothing. */}
       <rect
         x={geo.done.x}
         y={geo.done.y}
         width={Math.max(0, barWidth - 2)}
         height={geo.done.height}
         rx={geo.done.height / 2}
-        style={{ fill: "var(--mc-neutral)", fillOpacity: 0.14 }}
+        data-mc-ink="band"
       />
       <rect
         x={geo.done.x}
@@ -178,8 +185,4 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

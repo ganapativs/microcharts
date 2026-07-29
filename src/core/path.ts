@@ -50,24 +50,73 @@ export function stepPath(points: ReadonlyArray<XY | null>): string {
     .join(" ");
 }
 
-/** Catmull-Rom → cubic Bézier (uniform, tension 1/6). Runs of < 3 fall back to
- *  a straight segment. Deterministic, closed-form, no measurement. */
+/**
+ * Monotone cubic (Fritsch–Carlson) → cubic Bézier. Runs of < 3 fall back to a
+ * straight segment. Deterministic, closed-form, no measurement.
+ *
+ * The tangents are clamped so the curve never leaves the interval its two
+ * endpoints span: a smoothed series cannot dip below its own minimum or rise
+ * above its own maximum. That is an honest-encoding requirement, not a taste
+ * call — uniform Catmull-Rom (what this was) overshot `[0, 10, 0, 0]` by 1.33
+ * viewBox units on a 20-unit-tall spark, i.e. it painted 6.7% of the plot at
+ * values the data never contained, and with `fill` it painted them below the
+ * zero baseline the area is anchored to.
+ *
+ * x is assumed non-decreasing (every caller places points on an index axis).
+ * A zero-width step has no defined secant, so its tangents flatten to 0, which
+ * is also what the monotonicity filter would do to a repeated value.
+ */
 export function smoothPath(points: ReadonlyArray<XY | null>): string {
   return runs(points)
     .map((run) => {
       const n = run.length;
       if (n < 3) return "M" + run.map(pt).join(" L");
+
+      // Secant slopes, then one-sided tangents at the ends and averaged
+      // tangents inside — zeroed at every local extremum so the curve turns
+      // flat there instead of swinging past the point.
+      const delta: number[] = [];
+      for (let i = 0; i < n - 1; i++) {
+        const h = run[i + 1]![0] - run[i]![0];
+        // A secant needs a forward step to be defined. Repeated or decreasing x
+        // never reaches here from a chart (every caller places points on an
+        // index axis), but the builders' documented guarantee is that no input
+        // produces NaN/Infinity — so a degenerate step is simply flat.
+        const s = h > 0 ? (run[i + 1]![1] - run[i]![1]) / h : 0;
+        delta.push(Number.isFinite(s) ? s : 0);
+      }
+      const m: number[] = [delta[0]!];
+      for (let i = 1; i < n - 1; i++) {
+        m.push(delta[i - 1]! * delta[i]! <= 0 ? 0 : (delta[i - 1]! + delta[i]!) / 2);
+      }
+      m.push(delta[n - 2]!);
+      // Fritsch–Carlson: pull any tangent pair back inside the circle of
+      // radius 3 around its secant, which is the exact monotonicity bound.
+      for (let i = 0; i < n - 1; i++) {
+        if (delta[i] === 0) {
+          m[i] = 0;
+          m[i + 1] = 0;
+          continue;
+        }
+        const a = m[i]! / delta[i]!;
+        const b = m[i + 1]! / delta[i]!;
+        const s = a * a + b * b;
+        if (s > 9) {
+          // Scale the tangents themselves — `t * a * delta` is the same number
+          // algebraically but multiplies an overflowed ratio back by its
+          // divisor, which is Infinity × 0 (NaN) for a near-zero secant.
+          const t = 3 / Math.sqrt(s);
+          m[i] = t * m[i]!;
+          m[i + 1] = t * m[i + 1]!;
+        }
+      }
+
       let d = `M${pt(run[0]!)}`;
       for (let i = 0; i < n - 1; i++) {
-        const p0 = run[i === 0 ? 0 : i - 1]!;
         const p1 = run[i]!;
         const p2 = run[i + 1]!;
-        const p3 = run[i + 2 < n ? i + 2 : n - 1]!;
-        const c1x = p1[0] + (p2[0] - p0[0]) / 6;
-        const c1y = p1[1] + (p2[1] - p0[1]) / 6;
-        const c2x = p2[0] - (p3[0] - p1[0]) / 6;
-        const c2y = p2[1] - (p3[1] - p1[1]) / 6;
-        d += ` C${r(c1x)} ${r(c1y)} ${r(c2x)} ${r(c2y)} ${r(p2[0])} ${r(p2[1])}`;
+        const t = (p2[0] - p1[0]) / 3;
+        d += ` C${r(p1[0] + t)} ${r(p1[1] + m[i]! * t)} ${r(p2[0] - t)} ${r(p2[1] - m[i + 1]! * t)} ${r(p2[0])} ${r(p2[1])}`;
       }
       return d;
     })

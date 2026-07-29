@@ -1,704 +1,704 @@
 {
-  "at": "2026-07-22T17:26:32.164Z",
+  "at": "2026-07-29T04:07:12.060Z",
   "node": "v24.18.0",
   "core": [
     {
       "label": "describeSeries (24 pts)",
-      "opsPerSec": 892393
+      "opsPerSec": 839748
     }
   ],
   "scenarios": [
     {
       "count": 100,
-      "ms": 1.2,
-      "msPer": 0.012,
-      "rowsPerMs": 83.1,
+      "ms": 4.1,
+      "msPer": 0.041,
+      "rowsPerMs": 24.4,
       "avgBytes": 572
     },
     {
       "count": 500,
       "ms": 5.5,
       "msPer": 0.011,
-      "rowsPerMs": 90.6,
+      "rowsPerMs": 90.8,
       "avgBytes": 572
     },
     {
       "count": 1000,
-      "ms": 10.8,
+      "ms": 10.7,
       "msPer": 0.011,
-      "rowsPerMs": 92.2,
+      "rowsPerMs": 93.7,
       "avgBytes": 572
     }
   ],
   "charts": {
     "sparkline": {
-      "rowsPerMs": 76.6,
-      "msPer": 0.013,
+      "rowsPerMs": 83.9,
+      "msPer": 0.012,
       "avgBytes": 572,
       "floor": 50,
       "pass": true
     },
     "sparkbar": {
-      "rowsPerMs": 14.5,
-      "msPer": 0.069,
+      "rowsPerMs": 12.7,
+      "msPer": 0.079,
       "avgBytes": 2722,
       "floor": 7,
       "pass": true
     },
     "delta": {
-      "rowsPerMs": 139.6,
-      "msPer": 0.007,
+      "rowsPerMs": 126.5,
+      "msPer": 0.008,
       "avgBytes": 238,
       "floor": 50,
       "pass": true
     },
     "bullet": {
-      "rowsPerMs": 64.5,
-      "msPer": 0.016,
-      "avgBytes": 708,
+      "rowsPerMs": 56.9,
+      "msPer": 0.018,
+      "avgBytes": 698,
       "floor": 20,
       "pass": true
     },
     "activity-grid": {
-      "rowsPerMs": 9.3,
-      "msPer": 0.107,
+      "rowsPerMs": 8.2,
+      "msPer": 0.122,
       "avgBytes": 4552,
       "floor": 5,
       "pass": true
     },
     "trend-arrow": {
-      "rowsPerMs": 112.9,
-      "msPer": 0.009,
-      "avgBytes": 377,
+      "rowsPerMs": 104.9,
+      "msPer": 0.01,
+      "avgBytes": 397,
       "floor": 50,
       "pass": true
     },
     "status-dot": {
-      "rowsPerMs": 144.8,
+      "rowsPerMs": 146.2,
       "msPer": 0.007,
-      "avgBytes": 302,
+      "avgBytes": 301,
       "floor": 50,
       "pass": true
     },
     "heat-cell": {
-      "rowsPerMs": 136.2,
+      "rowsPerMs": 135.2,
       "msPer": 0.007,
       "avgBytes": 344,
       "floor": 50,
       "pass": true
     },
     "progress": {
-      "rowsPerMs": 81.6,
-      "msPer": 0.012,
+      "rowsPerMs": 80,
+      "msPer": 0.013,
       "avgBytes": 500,
       "floor": 40,
       "pass": true
     },
     "rug-strip": {
-      "rowsPerMs": 65.2,
-      "msPer": 0.015,
+      "rowsPerMs": 62.6,
+      "msPer": 0.016,
       "avgBytes": 637,
       "floor": 15,
       "pass": true
     },
     "mini-bar": {
-      "rowsPerMs": 38.7,
-      "msPer": 0.026,
-      "avgBytes": 941,
+      "rowsPerMs": 43,
+      "msPer": 0.023,
+      "avgBytes": 899,
       "floor": 25,
       "pass": true
     },
     "pictogram-row": {
-      "rowsPerMs": 33.6,
-      "msPer": 0.03,
-      "avgBytes": 914,
+      "rowsPerMs": 36.7,
+      "msPer": 0.027,
+      "avgBytes": 854,
       "floor": 30,
       "pass": true
     },
     "seismogram": {
-      "rowsPerMs": 125.6,
+      "rowsPerMs": 122.2,
       "msPer": 0.008,
       "avgBytes": 312,
       "floor": 25,
       "pass": true
     },
     "heat-strip": {
-      "rowsPerMs": 10.4,
-      "msPer": 0.097,
-      "avgBytes": 4938,
+      "rowsPerMs": 9.8,
+      "msPer": 0.102,
+      "avgBytes": 5028,
       "floor": 8,
       "pass": true
     },
     "dot-plot": {
-      "rowsPerMs": 33.2,
+      "rowsPerMs": 33,
       "msPer": 0.03,
       "avgBytes": 1106,
       "floor": 20,
       "pass": true
     },
     "dumbbell": {
-      "rowsPerMs": 39.9,
-      "msPer": 0.025,
-      "avgBytes": 908,
+      "rowsPerMs": 25.7,
+      "msPer": 0.039,
+      "avgBytes": 1635,
       "floor": 20,
       "pass": true
     },
     "paired-bars": {
-      "rowsPerMs": 36.8,
-      "msPer": 0.027,
-      "avgBytes": 1114,
+      "rowsPerMs": 35.3,
+      "msPer": 0.028,
+      "avgBytes": 1210,
       "floor": 25,
       "pass": true
     },
     "slope": {
-      "rowsPerMs": 24.9,
+      "rowsPerMs": 25.1,
       "msPer": 0.04,
-      "avgBytes": 2076,
+      "avgBytes": 1606,
       "floor": 20,
       "pass": true
     },
     "segmented-bar": {
-      "rowsPerMs": 38.2,
-      "msPer": 0.026,
-      "avgBytes": 892,
+      "rowsPerMs": 33.4,
+      "msPer": 0.03,
+      "avgBytes": 842,
       "floor": 25,
       "pass": true
     },
     "histogram-strip": {
-      "rowsPerMs": 39.8,
-      "msPer": 0.025,
+      "rowsPerMs": 38.2,
+      "msPer": 0.026,
       "avgBytes": 897,
       "floor": 15,
       "pass": true
     },
     "micro-box": {
-      "rowsPerMs": 71.6,
+      "rowsPerMs": 73.3,
       "msPer": 0.014,
-      "avgBytes": 571,
+      "avgBytes": 517,
       "floor": 20,
       "pass": true
     },
     "progress-ring": {
-      "rowsPerMs": 92.2,
+      "rowsPerMs": 90.7,
       "msPer": 0.011,
       "avgBytes": 465,
       "floor": 40,
       "pass": true
     },
     "micro-donut": {
-      "rowsPerMs": 60.3,
-      "msPer": 0.017,
+      "rowsPerMs": 56.8,
+      "msPer": 0.018,
       "avgBytes": 783,
       "floor": 30,
       "pass": true
     },
     "funnel": {
-      "rowsPerMs": 30.4,
-      "msPer": 0.033,
-      "avgBytes": 1137,
+      "rowsPerMs": 34.3,
+      "msPer": 0.029,
+      "avgBytes": 1050,
       "floor": 25,
       "pass": true
     },
     "likert-strip": {
-      "rowsPerMs": 34.5,
-      "msPer": 0.029,
+      "rowsPerMs": 33.2,
+      "msPer": 0.03,
       "avgBytes": 1188,
       "floor": 25,
       "pass": true
     },
     "micro-scatter": {
-      "rowsPerMs": 9.9,
-      "msPer": 0.101,
+      "rowsPerMs": 9,
+      "msPer": 0.111,
       "avgBytes": 3557,
       "floor": 5,
       "pass": true
     },
     "waterfall": {
-      "rowsPerMs": 19.9,
-      "msPer": 0.05,
-      "avgBytes": 2107,
+      "rowsPerMs": 27.5,
+      "msPer": 0.036,
+      "avgBytes": 1376,
       "floor": 10,
       "pass": true
     },
     "bump-strip": {
-      "rowsPerMs": 18.5,
-      "msPer": 0.054,
+      "rowsPerMs": 17.8,
+      "msPer": 0.056,
       "avgBytes": 2032,
       "floor": 9,
       "pass": true
     },
     "dual-sparkline": {
-      "rowsPerMs": 56.6,
-      "msPer": 0.018,
-      "avgBytes": 1001,
+      "rowsPerMs": 53.6,
+      "msPer": 0.019,
+      "avgBytes": 997,
       "floor": 30,
       "pass": true
     },
     "stacked-area": {
-      "rowsPerMs": 19.8,
-      "msPer": 0.051,
-      "avgBytes": 3248,
+      "rowsPerMs": 19,
+      "msPer": 0.053,
+      "avgBytes": 3230,
       "floor": 15,
       "pass": true
     },
     "ohlc": {
-      "rowsPerMs": 7.6,
-      "msPer": 0.132,
-      "avgBytes": 6636,
+      "rowsPerMs": 7,
+      "msPer": 0.143,
+      "avgBytes": 6986,
       "floor": 6,
       "pass": true
     },
     "horizon": {
-      "rowsPerMs": 63.6,
-      "msPer": 0.016,
+      "rowsPerMs": 60.4,
+      "msPer": 0.017,
       "avgBytes": 746,
       "floor": 20,
       "pass": true
     },
     "calendar-strip": {
-      "rowsPerMs": 10.2,
-      "msPer": 0.098,
-      "avgBytes": 3745,
+      "rowsPerMs": 9.2,
+      "msPer": 0.109,
+      "avgBytes": 3841,
       "floor": 5,
       "pass": true
     },
     "event-timeline": {
-      "rowsPerMs": 35.2,
-      "msPer": 0.028,
+      "rowsPerMs": 33.2,
+      "msPer": 0.03,
       "avgBytes": 1180,
       "floor": 15,
       "pass": true
     },
     "coverage-strip": {
-      "rowsPerMs": 8.6,
-      "msPer": 0.116,
+      "rowsPerMs": 7.8,
+      "msPer": 0.127,
       "avgBytes": 4957,
       "floor": 6,
       "pass": true
     },
     "benchmark-strip": {
-      "rowsPerMs": 55.8,
-      "msPer": 0.018,
+      "rowsPerMs": 53.2,
+      "msPer": 0.019,
       "avgBytes": 762,
       "floor": 30,
       "pass": true
     },
     "percentile-ladder": {
-      "rowsPerMs": 41.1,
-      "msPer": 0.024,
+      "rowsPerMs": 38.8,
+      "msPer": 0.026,
       "avgBytes": 928,
       "floor": 25,
       "pass": true
     },
     "graded-band": {
-      "rowsPerMs": 44.5,
-      "msPer": 0.022,
-      "avgBytes": 683,
+      "rowsPerMs": 40.9,
+      "msPer": 0.024,
+      "avgBytes": 728,
       "floor": 25,
       "pass": true
     },
     "icon-array": {
-      "rowsPerMs": 17,
-      "msPer": 0.059,
-      "avgBytes": 2391,
+      "rowsPerMs": 16.2,
+      "msPer": 0.062,
+      "avgBytes": 2349,
       "floor": 7,
       "pass": true
     },
     "rate-volume": {
-      "rowsPerMs": 7.5,
-      "msPer": 0.133,
-      "avgBytes": 5579,
+      "rowsPerMs": 7.2,
+      "msPer": 0.14,
+      "avgBytes": 5537,
       "floor": 3,
       "pass": true
     },
     "net-flow": {
-      "rowsPerMs": 29.5,
-      "msPer": 0.034,
-      "avgBytes": 2169,
+      "rowsPerMs": 27.5,
+      "msPer": 0.036,
+      "avgBytes": 2115,
       "floor": 8,
       "pass": true
     },
     "retention-curve": {
-      "rowsPerMs": 39.4,
-      "msPer": 0.025,
-      "avgBytes": 1027,
+      "rowsPerMs": 38.1,
+      "msPer": 0.026,
+      "avgBytes": 976,
       "floor": 12,
       "pass": true
     },
     "burn-chart": {
-      "rowsPerMs": 26.9,
-      "msPer": 0.037,
-      "avgBytes": 1653,
+      "rowsPerMs": 26.2,
+      "msPer": 0.038,
+      "avgBytes": 1600,
       "floor": 10,
       "pass": true
     },
     "error-budget": {
-      "rowsPerMs": 33,
-      "msPer": 0.03,
-      "avgBytes": 1478,
+      "rowsPerMs": 31.5,
+      "msPer": 0.032,
+      "avgBytes": 1433,
       "floor": 12,
       "pass": true
     },
     "control-strip": {
-      "rowsPerMs": 52.1,
-      "msPer": 0.019,
+      "rowsPerMs": 51.2,
+      "msPer": 0.02,
       "avgBytes": 921,
       "floor": 12,
       "pass": true
     },
     "pareto-strip": {
-      "rowsPerMs": 31.9,
-      "msPer": 0.031,
+      "rowsPerMs": 29.4,
+      "msPer": 0.034,
       "avgBytes": 1456,
       "floor": 20,
       "pass": true
     },
     "data-diff": {
-      "rowsPerMs": 27.9,
-      "msPer": 0.036,
+      "rowsPerMs": 26.6,
+      "msPer": 0.038,
       "avgBytes": 1654,
       "floor": 20,
       "pass": true
     },
     "ensemble-ghosts": {
-      "rowsPerMs": 15.8,
-      "msPer": 0.063,
-      "avgBytes": 3190,
+      "rowsPerMs": 15.3,
+      "msPer": 0.065,
+      "avgBytes": 2746,
       "floor": 12,
       "pass": true
     },
     "change-point": {
-      "rowsPerMs": 27.9,
+      "rowsPerMs": 27.4,
       "msPer": 0.036,
-      "avgBytes": 1877,
+      "avgBytes": 1841,
       "floor": 12,
       "pass": true
     },
     "cycle-plot": {
-      "rowsPerMs": 21.5,
-      "msPer": 0.047,
-      "avgBytes": 2285,
+      "rowsPerMs": 31.5,
+      "msPer": 0.032,
+      "avgBytes": 1375,
       "floor": 17,
       "pass": true
     },
     "quadrant-dot": {
-      "rowsPerMs": 21.1,
-      "msPer": 0.047,
-      "avgBytes": 2116,
+      "rowsPerMs": 19.8,
+      "msPer": 0.051,
+      "avgBytes": 1922,
       "floor": 15,
       "pass": true
     },
     "shift-histogram": {
-      "rowsPerMs": 12.8,
-      "msPer": 0.078,
-      "avgBytes": 3453,
+      "rowsPerMs": 12.2,
+      "msPer": 0.082,
+      "avgBytes": 3153,
       "floor": 6,
       "pass": true
     },
     "ab-strips": {
-      "rowsPerMs": 21.9,
-      "msPer": 0.046,
-      "avgBytes": 1394,
+      "rowsPerMs": 20.6,
+      "msPer": 0.049,
+      "avgBytes": 1396,
       "floor": 15,
       "pass": true
     },
     "quantile-dots": {
-      "rowsPerMs": 14.9,
-      "msPer": 0.067,
-      "avgBytes": 2549,
+      "rowsPerMs": 14.3,
+      "msPer": 0.07,
+      "avgBytes": 2507,
       "floor": 6,
       "pass": true
     },
     "forecast-cone": {
-      "rowsPerMs": 32.3,
-      "msPer": 0.031,
-      "avgBytes": 1809,
+      "rowsPerMs": 31.5,
+      "msPer": 0.032,
+      "avgBytes": 1770,
       "floor": 10,
       "pass": true
     },
     "tally-marks": {
-      "rowsPerMs": 146.3,
+      "rowsPerMs": 133.7,
       "msPer": 0.007,
-      "avgBytes": 403,
+      "avgBytes": 438,
       "floor": 40,
       "pass": true
     },
     "dice-pips": {
-      "rowsPerMs": 77.5,
+      "rowsPerMs": 74.1,
       "msPer": 0.013,
-      "avgBytes": 511,
+      "avgBytes": 501,
       "floor": 40,
       "pass": true
     },
     "fill-word": {
-      "rowsPerMs": 103.7,
-      "msPer": 0.01,
-      "avgBytes": 497,
+      "rowsPerMs": 90.7,
+      "msPer": 0.011,
+      "avgBytes": 506,
       "floor": 40,
       "pass": true
     },
     "fat-digits": {
-      "rowsPerMs": 124.4,
+      "rowsPerMs": 123.2,
       "msPer": 0.008,
       "avgBytes": 323,
       "floor": 40,
       "pass": true
     },
     "thermometer": {
-      "rowsPerMs": 62.9,
+      "rowsPerMs": 61.9,
       "msPer": 0.016,
       "avgBytes": 879,
       "floor": 30,
       "pass": true
     },
     "moon-phase": {
-      "rowsPerMs": 110,
+      "rowsPerMs": 105.9,
       "msPer": 0.009,
-      "avgBytes": 409,
+      "avgBytes": 425,
       "floor": 40,
       "pass": true
     },
     "hourglass": {
-      "rowsPerMs": 56.5,
-      "msPer": 0.018,
+      "rowsPerMs": 50.8,
+      "msPer": 0.02,
       "avgBytes": 982,
       "floor": 40,
       "pass": true
     },
     "balance-beam": {
-      "rowsPerMs": 74.1,
-      "msPer": 0.013,
-      "avgBytes": 493,
+      "rowsPerMs": 68.5,
+      "msPer": 0.015,
+      "avgBytes": 528,
       "floor": 40,
       "pass": true
     },
     "sprout-row": {
-      "rowsPerMs": 35.9,
-      "msPer": 0.028,
+      "rowsPerMs": 34.4,
+      "msPer": 0.029,
       "avgBytes": 1391,
       "floor": 20,
       "pass": true
     },
     "garden-grid": {
-      "rowsPerMs": 11.9,
-      "msPer": 0.084,
+      "rowsPerMs": 11.3,
+      "msPer": 0.089,
       "avgBytes": 2496,
       "floor": 6,
       "pass": true
     },
     "bubble-row": {
-      "rowsPerMs": 24.8,
-      "msPer": 0.04,
+      "rowsPerMs": 23.2,
+      "msPer": 0.043,
       "avgBytes": 1510,
       "floor": 15,
       "pass": true
     },
     "music-staff": {
-      "rowsPerMs": 24.4,
-      "msPer": 0.041,
-      "avgBytes": 1727,
+      "rowsPerMs": 23.5,
+      "msPer": 0.042,
+      "avgBytes": 1662,
       "floor": 15,
       "pass": true
     },
     "tree-rings": {
-      "rowsPerMs": 44.8,
+      "rowsPerMs": 44.5,
       "msPer": 0.022,
-      "avgBytes": 2606,
+      "avgBytes": 2616,
       "floor": 10,
       "pass": true
     },
     "city-skyline": {
-      "rowsPerMs": 33.1,
-      "msPer": 0.03,
-      "avgBytes": 1350,
+      "rowsPerMs": 31.7,
+      "msPer": 0.032,
+      "avgBytes": 1370,
       "floor": 10,
       "pass": true
     },
     "honeycomb": {
-      "rowsPerMs": 48.4,
-      "msPer": 0.021,
+      "rowsPerMs": 44.8,
+      "msPer": 0.022,
       "avgBytes": 2842,
       "floor": 40,
       "pass": true
     },
     "constellation": {
-      "rowsPerMs": 29,
+      "rowsPerMs": 28.4,
       "msPer": 0.035,
       "avgBytes": 1154,
       "floor": 20,
       "pass": true
     },
     "polar-clock": {
-      "rowsPerMs": 28.5,
-      "msPer": 0.035,
-      "avgBytes": 2580,
+      "rowsPerMs": 26.4,
+      "msPer": 0.038,
+      "avgBytes": 2574,
       "floor": 8,
       "pass": true
     },
     "spiral-year": {
-      "rowsPerMs": 26.3,
-      "msPer": 0.038,
-      "avgBytes": 3824,
+      "rowsPerMs": 24.3,
+      "msPer": 0.041,
+      "avgBytes": 3847,
       "floor": 6,
       "pass": true
     },
     "breathing-dot": {
-      "rowsPerMs": 117.6,
-      "msPer": 0.009,
+      "rowsPerMs": 117.7,
+      "msPer": 0.008,
       "avgBytes": 399,
       "floor": 95,
       "pass": true
     },
     "heartbeat-blip": {
-      "rowsPerMs": 65.7,
-      "msPer": 0.015,
-      "avgBytes": 1196,
+      "rowsPerMs": 62.4,
+      "msPer": 0.016,
+      "avgBytes": 1166,
       "floor": 40,
       "pass": true
     },
     "comet-trail": {
-      "rowsPerMs": 25.9,
-      "msPer": 0.039,
-      "avgBytes": 1433,
+      "rowsPerMs": 24.5,
+      "msPer": 0.041,
+      "avgBytes": 1434,
       "floor": 12,
       "pass": true
     },
     "orbit-status": {
-      "rowsPerMs": 97.6,
+      "rowsPerMs": 95.4,
       "msPer": 0.01,
       "avgBytes": 484,
       "floor": 80,
       "pass": true
     },
     "time-in-range": {
-      "rowsPerMs": 41.6,
-      "msPer": 0.024,
+      "rowsPerMs": 36.2,
+      "msPer": 0.028,
       "avgBytes": 972,
       "floor": 30,
       "pass": true
     },
     "hypnogram": {
-      "rowsPerMs": 26.9,
-      "msPer": 0.037,
-      "avgBytes": 1981,
+      "rowsPerMs": 33.2,
+      "msPer": 0.03,
+      "avgBytes": 1419,
       "floor": 20,
       "pass": true
     },
     "eta-bar": {
-      "rowsPerMs": 95.3,
+      "rowsPerMs": 96,
       "msPer": 0.01,
-      "avgBytes": 504,
+      "avgBytes": 474,
       "floor": 60,
       "pass": true
     },
     "waveform": {
-      "rowsPerMs": 9.1,
-      "msPer": 0.11,
-      "avgBytes": 2160,
+      "rowsPerMs": 8.9,
+      "msPer": 0.112,
+      "avgBytes": 2153,
       "floor": 6,
       "pass": true
     },
     "event-raster": {
-      "rowsPerMs": 16.3,
-      "msPer": 0.061,
-      "avgBytes": 3427,
+      "rowsPerMs": 15,
+      "msPer": 0.067,
+      "avgBytes": 3485,
       "floor": 12,
       "pass": true
     },
     "rubric-strip": {
-      "rowsPerMs": 21.2,
-      "msPer": 0.047,
-      "avgBytes": 1753,
+      "rowsPerMs": 20.1,
+      "msPer": 0.05,
+      "avgBytes": 1712,
       "floor": 15,
       "pass": true
     },
     "token-confidence": {
-      "rowsPerMs": 11.3,
-      "msPer": 0.088,
+      "rowsPerMs": 11.2,
+      "msPer": 0.09,
       "avgBytes": 1982,
       "floor": 8,
       "pass": true
     },
     "wind-barb": {
-      "rowsPerMs": 82.6,
+      "rowsPerMs": 81,
       "msPer": 0.012,
-      "avgBytes": 548,
+      "avgBytes": 595,
       "floor": 65,
       "pass": true
     },
     "star-spoke": {
-      "rowsPerMs": 36.6,
-      "msPer": 0.027,
-      "avgBytes": 1312,
+      "rowsPerMs": 34.7,
+      "msPer": 0.029,
+      "avgBytes": 1337,
       "floor": 26,
       "pass": true
     },
     "minimap-strip": {
-      "rowsPerMs": 12.9,
-      "msPer": 0.078,
-      "avgBytes": 2230,
+      "rowsPerMs": 12.5,
+      "msPer": 0.08,
+      "avgBytes": 2217,
       "floor": 8,
       "pass": true
     },
     "dual-window-meter": {
-      "rowsPerMs": 22.6,
-      "msPer": 0.044,
-      "avgBytes": 1876,
+      "rowsPerMs": 21.3,
+      "msPer": 0.047,
+      "avgBytes": 1926,
       "floor": 17,
       "pass": true
     },
     "depth-wedge": {
-      "rowsPerMs": 60.4,
-      "msPer": 0.017,
+      "rowsPerMs": 55.8,
+      "msPer": 0.018,
       "avgBytes": 1038,
       "floor": 40,
       "pass": true
     },
     "partition-strip": {
-      "rowsPerMs": 16.4,
-      "msPer": 0.061,
-      "avgBytes": 2051,
+      "rowsPerMs": 15.7,
+      "msPer": 0.064,
+      "avgBytes": 1991,
       "floor": 13,
       "pass": true
     },
     "calibration-strip": {
-      "rowsPerMs": 10.9,
-      "msPer": 0.092,
-      "avgBytes": 2252,
+      "rowsPerMs": 14.2,
+      "msPer": 0.07,
+      "avgBytes": 1335,
       "floor": 8,
       "pass": true
     },
     "confusion-grid": {
-      "rowsPerMs": 17.6,
-      "msPer": 0.057,
+      "rowsPerMs": 16.9,
+      "msPer": 0.059,
       "avgBytes": 2740,
       "floor": 13,
       "pass": true
     },
     "folded-day-band": {
-      "rowsPerMs": 19.4,
-      "msPer": 0.051,
-      "avgBytes": 1798,
+      "rowsPerMs": 19.2,
+      "msPer": 0.052,
+      "avgBytes": 1889,
       "floor": 6,
       "pass": true
     },
     "volume-profile": {
-      "rowsPerMs": 33.8,
+      "rowsPerMs": 33,
       "msPer": 0.03,
       "avgBytes": 731,
       "floor": 20,
       "pass": true
     },
     "phase-trace": {
-      "rowsPerMs": 38.6,
-      "msPer": 0.026,
-      "avgBytes": 1397,
+      "rowsPerMs": 40,
+      "msPer": 0.025,
+      "avgBytes": 1345,
       "floor": 28,
       "pass": true
     },
     "trace-fold": {
-      "rowsPerMs": 8.9,
-      "msPer": 0.112,
+      "rowsPerMs": 8.8,
+      "msPer": 0.114,
       "avgBytes": 3708,
       "floor": 7,
       "pass": true
@@ -706,86 +706,86 @@
     "tape-gauge": {
       "rowsPerMs": 39,
       "msPer": 0.026,
-      "avgBytes": 1169,
+      "avgBytes": 1200,
       "floor": 20,
       "pass": true
     },
     "station-glyph": {
-      "rowsPerMs": 48.7,
+      "rowsPerMs": 46.7,
       "msPer": 0.021,
-      "avgBytes": 1068,
+      "avgBytes": 1124,
       "floor": 20,
       "pass": true
     },
     "cohort-triangle": {
-      "rowsPerMs": 4.8,
-      "msPer": 0.208,
-      "avgBytes": 7505,
+      "rowsPerMs": 4.2,
+      "msPer": 0.237,
+      "avgBytes": 9767,
       "floor": 3,
       "pass": true
     },
     "streak-spark": {
-      "rowsPerMs": 20.1,
-      "msPer": 0.05,
+      "rowsPerMs": 19.3,
+      "msPer": 0.052,
       "avgBytes": 2127,
       "floor": 15,
       "pass": true
     },
     "grade-profile": {
-      "rowsPerMs": 16.5,
-      "msPer": 0.061,
-      "avgBytes": 2592,
+      "rowsPerMs": 15.8,
+      "msPer": 0.063,
+      "avgBytes": 2591,
       "floor": 11,
       "pass": true
     },
     "win-prob-worm": {
-      "rowsPerMs": 33.9,
+      "rowsPerMs": 33.7,
       "msPer": 0.03,
       "avgBytes": 1294,
       "floor": 25,
       "pass": true
     },
     "queue-depth": {
-      "rowsPerMs": 40.9,
+      "rowsPerMs": 41.2,
       "msPer": 0.024,
-      "avgBytes": 2022,
+      "avgBytes": 1979,
       "floor": 30,
       "pass": true
     },
     "spread-band": {
-      "rowsPerMs": 25.4,
-      "msPer": 0.039,
-      "avgBytes": 2719,
+      "rowsPerMs": 24.9,
+      "msPer": 0.04,
+      "avgBytes": 2690,
       "floor": 18,
       "pass": true
     },
     "bias-strip": {
-      "rowsPerMs": 8.9,
-      "msPer": 0.113,
+      "rowsPerMs": 8.7,
+      "msPer": 0.116,
       "avgBytes": 3937,
       "floor": 6,
       "pass": true
     },
     "percentile-trace": {
-      "rowsPerMs": 46.6,
-      "msPer": 0.021,
-      "avgBytes": 1075,
+      "rowsPerMs": 44.7,
+      "msPer": 0.022,
+      "avgBytes": 1066,
       "floor": 33,
       "pass": true
     }
   },
   "agg": {
     "count": 106,
-    "medianRowsPerMs": 33.6,
+    "medianRowsPerMs": 33.2,
     "medianMsPer": 0.03,
-    "medianBytes": 1394,
+    "medianBytes": 1375,
     "fastest": {
-      "slug": "tally-marks",
-      "rowsPerMs": 146.3
+      "slug": "status-dot",
+      "rowsPerMs": 146.2
     },
     "slowest": {
       "slug": "cohort-triangle",
-      "rowsPerMs": 4.8
+      "rowsPerMs": 4.2
     },
     "belowFloor": []
   }

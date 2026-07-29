@@ -55,6 +55,35 @@ export interface GradeProfileGeometry {
   n: number;
 }
 
+/** Documented default grade-% thresholds (ascending) for the four bins. */
+export const DEFAULT_BINS = [3, 6, 10] as const;
+
+/**
+ * Hosts compute thresholds more often than they type them — a slider, a
+ * `Number("")` off an empty field, a sort that ran descending. Left alone,
+ * `grade < NaN` is false at every step, so `binOf` fell through to the top bin
+ * and the whole route painted in the brutal-climb ink while the summary still
+ * reported an ordinary 16% max. Thresholds that cannot bucket anything fall
+ * back to the documented defaults rather than repaint the terrain as a wall.
+ */
+function resolveBins(bins: readonly [number, number, number]): readonly [number, number, number] {
+  const [a, b, c] = bins;
+  const usable = Number.isFinite(a) && Number.isFinite(b) && Number.isFinite(c) && a <= b && b <= c;
+  return usable ? bins : DEFAULT_BINS;
+}
+
+/**
+ * A coordinate, or the plot edge when it is unrepresentable. Both spans
+ * overflow from perfectly finite endpoints more than 1.8e308 apart, and then
+ * `(v - min) / span` is `Infinity / Infinity` → NaN. SVG drops a `d` holding
+ * NaN wholesale, so the mark vanished while the accessible name still
+ * described it; degrading to the edge renders the same flat strip a zero span
+ * already does.
+ */
+function at(v: number, edge: number): number {
+  return Number.isFinite(v) ? round2(v) : edge;
+}
+
 export function gradeProfileGeometry(opts: {
   data: readonly GradePoint[];
   width: number;
@@ -62,7 +91,8 @@ export function gradeProfileGeometry(opts: {
   bins: readonly [number, number, number];
   topPad: number;
 }): GradeProfileGeometry {
-  const { data, width, height, bins, topPad } = opts;
+  const { data, width, height, topPad } = opts;
+  const bins = resolveBins(opts.bins);
   const pad = 1;
   const collapsed = width < 72;
   // Baseline seats flush with the box bottom so the profile aligns on the text
@@ -108,13 +138,18 @@ export function gradeProfileGeometry(opts: {
   const plotH = Math.max(1, yBase - plotTop);
   const plotW = width - pad * 2;
 
-  const xOf = (d: number): number => round2(pad + ((d - dMin) / dSpan) * plotW);
-  const yOf = (e: number): number => round2(yBase - ((e - eMin) / eSpan) * plotH);
+  const xOf = (d: number): number => at(pad + ((d - dMin) / dSpan) * plotW, pad);
+  const yOf = (e: number): number => at(yBase - ((e - eMin) / eSpan) * plotH, yBase);
 
   const binOf = (grade: number): 0 | 1 | 2 | 3 => {
-    // quantized — a discrete difficulty bucket, never a continuous ramp
+    // quantized — a discrete difficulty bucket, never a continuous ramp.
+    // Flats and every descent are bin 0 by definition — the bin encodes CLIMB
+    // difficulty, and a downhill has none. Gating on zero here rather than on
+    // `bins[0]` keeps that true for a caller whose first threshold sits at or
+    // below zero, which otherwise painted descents in a climb colour.
+    if (grade <= 0) return 0;
     if (collapsed) return grade >= bins[0] ? 2 : 0;
-    if (grade < bins[0]) return 0; // flats and every descent live here
+    if (grade < bins[0]) return 0; // gentle climbs live here too
     if (grade < bins[1]) return 1;
     if (grade < bins[2]) return 2;
     return 3;
@@ -138,7 +173,12 @@ export function gradeProfileGeometry(opts: {
     if (!(run > 0)) continue; // non-monotone / zero run → gap
     const rise = b.elev - a.elev;
     const grade = round2((rise / run) * 100);
-    if (rise > 0) {
+    // Two finite elevations still produce an unrepresentable climb: the
+    // difference overflows past 1.8e308, or `rise / run` does on a sub-normal
+    // run. `Intl` renders that "∞", so the chart announced "∞ gain; steepest
+    // ∞%" over an ordinary-looking profile. The quad still paints — the
+    // terrain is real — but a number nobody can read is not a measurement.
+    if (rise > 0 && Number.isFinite(totalGain + rise)) {
       cumGain += rise;
       totalGain += rise;
     }
@@ -157,7 +197,7 @@ export function gradeProfileGeometry(opts: {
       dEnd: round2(b.d),
       cumGain: round2(cumGain),
     });
-    if (grade > maxGrade) {
+    if (grade > maxGrade && Number.isFinite(grade)) {
       maxGrade = grade;
       maxGradeAt = round2((a.d + b.d) / 2);
       summitX = round2((x0 + x1) / 2);

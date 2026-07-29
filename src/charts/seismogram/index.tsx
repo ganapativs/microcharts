@@ -6,8 +6,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { isFiniteValue, type Value } from "../../core/types.js";
-import { seismogramGeometry } from "./geometry.js";
+import { chartSide, isFiniteValue, type Value } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, seismogramGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** From raw values (pre-downsample). Count = non-zero finite slots; peak = |max|. */
@@ -59,8 +59,8 @@ export function Seismogram(props: SeismogramProps): ReactNode {
     positive,
     anomaly,
     domain,
-    width = 60,
-    height = 16,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     format,
     locale,
@@ -73,17 +73,30 @@ export function Seismogram(props: SeismogramProps): ReactNode {
     children,
   } = props;
 
+  // The box drives the geometry AND the inline seat, neither of which `Chart`'s
+  // own clamp reaches: a NaN height shipped `V NaN` ticks and `--mc-seat: NaN`
+  // inside a valid viewBox (see `chartSide`).
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
+
   const geo = seismogramGeometry({ width, height, values: data, domain, mode, anomaly });
   const fmt = makeFormatter(format, locale);
   const accName = resolveSummary(summary, () => seismogramSummary(data, fmt, strings));
 
   const goodDown = positive === "down";
   const baseStroke = color ? { stroke: color } : null;
-  // signed polarity coloring only engages when the author declares which way is good
+  // Signed polarity coloring only engages when the author declares which way is
+  // good. An ink ROLE, not an inline stroke: `.mc-root` sets
+  // forced-color-adjust: none, so an inline `var(--mc-negative)` survived
+  // verbatim into High Contrast Mode — the theme hue against the user's own
+  // background — and a consumer could not restyle it either, since `:where()`
+  // gives the stylesheet zero specificity and inline paint beats all of it.
+  // Only the caller's own `color` stays inline.
   const polarity = (neg: boolean) =>
-    positive !== undefined
-      ? { stroke: neg === goodDown ? "var(--mc-positive)" : "var(--mc-negative)" }
-      : baseStroke;
+    positive === undefined ? "data" : neg === goodDown ? "positive" : "negative";
+  // …and where valence is not painting, the polarity paths are plain data ink,
+  // so the caller's `color` still reaches them.
+  const polarityStroke = positive === undefined ? (baseStroke ?? undefined) : undefined;
 
   return (
     <Chart
@@ -128,26 +141,37 @@ export function Seismogram(props: SeismogramProps): ReactNode {
       {geo.dPos !== "" ? (
         <path
           d={geo.dPos}
-          data-mc-ink="data"
+          // literal, and load-bearing: it is the only signal the valence rules
+          // read to keep an open mark hollow — without it the tick path takes
+          // `stroke: none` from the fill family and vanishes
+          fill="none"
+          data-mc-ink={polarity(false)}
+          data-mc-w="full"
+          strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
-          style={polarity(false) ?? undefined}
+          style={polarityStroke}
         />
       ) : null}
       {geo.dNeg !== "" ? (
         <path
           d={geo.dNeg}
-          data-mc-ink="data"
+          fill="none"
+          data-mc-ink={polarity(true)}
+          data-mc-w="full"
+          strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
-          style={polarity(true) ?? undefined}
+          style={polarityStroke}
         />
       ) : null}
       {geo.dFlag !== "" ? (
         /* anomaly spikes — alert token; redundant with height, never color-alone */
         <path
           d={geo.dFlag}
-          data-mc-ink="data"
+          fill="none"
+          data-mc-ink="negative"
+          data-mc-w="full"
+          strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
-          style={{ stroke: "var(--mc-negative)" }}
         />
       ) : null}
       {children}

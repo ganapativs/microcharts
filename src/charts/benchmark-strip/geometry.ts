@@ -90,6 +90,15 @@ export function benchmarkStripGeometry(opts: {
 
   const scale = scaleLinear(domain, [pad, width - pad]);
   const x = (v: number) => round2(clamp(scale(v), pad, width - pad));
+  // A band is the span between two data values, and a caller-supplied `domain`
+  // may run high→low. Order the ends: SVG treats a negative rect width as an
+  // ERROR and skips the element, so a reversed domain silently erased BOTH peer
+  // bands — the whole reference frame — while the summary still described them.
+  const span = (lo: number, hi: number) => {
+    const a = x(lo);
+    const b = x(hi);
+    return a <= b ? { x: a, width: round2(b - a) } : { x: b, width: round2(a - b) };
+  };
 
   const bandH = round2(Math.max(3, height * 0.5));
   const bandY = round2((height - bandH) / 2);
@@ -98,8 +107,8 @@ export function benchmarkStripGeometry(opts: {
   const clamped: -1 | 0 | 1 = rawDotX < pad ? -1 : rawDotX > width - pad ? 1 : 0;
 
   return {
-    outer: { x: x(outerLo), width: round2(x(outerHi) - x(outerLo)) },
-    inner: { x: x(p25), width: round2(x(p75) - x(p25)) },
+    outer: span(outerLo, outerHi),
+    inner: span(p25, p75),
     median: { x: x(p50), value: round2(p50) },
     dot: { x: x(value), value: round2(value), clamped },
     percentile: empiricalPercentile(sorted, value),

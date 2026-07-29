@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { partitionStripGeometry, parentValue } from "./geometry.js";
+import { partitionBox, partitionStripGeometry, parentValue } from "./geometry.js";
 
 const TREE = [
   {
@@ -42,6 +42,40 @@ describe("partitionStripGeometry", () => {
     expect(geo.groups).toBe(3);
     expect(geo.segments.filter((s) => s.row === 0).length).toBe(3);
     expect(geo.segments.filter((s) => s.row === 1).length).toBe(5);
+  });
+
+  it("resolves the box the way <Chart> does", () => {
+    expect(partitionBox(120, 24)).toEqual([120, 24]);
+    expect(partitionBox(NaN, 24)).toEqual([1, 24]);
+    expect(partitionBox(Infinity, -3)).toEqual([1, 1]);
+    expect(partitionBox(0, 24)).toEqual([1, 24]);
+  });
+
+  it("lays out against the painted box, never the raw prop", () => {
+    const geo = partitionStripGeometry({ data: TREE, width: NaN, height: 24, gap: 1 });
+    for (const s of geo.segments) {
+      expect(Number.isFinite(s.x)).toBe(true);
+      expect(Number.isFinite(s.width)).toBe(true);
+    }
+  });
+
+  // Fixed per-pair gaps outrun the frame once the group count passes it, which
+  // used to hand every segment a NEGATIVE width — an SVG error, so browsers drop
+  // the rect and the strip paints nothing. The gap thins instead.
+  it("thins the gap rather than inverting segments on a crowded strip", () => {
+    for (const n of [121, 150, 400]) {
+      const geo = partitionStripGeometry({
+        data: Array.from({ length: n }, (_, i) => ({ label: `g${i}`, value: 1 })),
+        width: 120,
+        height: 24,
+        gap: 1,
+      });
+      expect(geo.segments.length).toBeGreaterThan(0);
+      for (const s of geo.segments) {
+        expect(s.width).toBeGreaterThan(0);
+        expect(s.x + s.width).toBeLessThanOrEqual(120.01);
+      }
+    }
   });
 
   test.prop([

@@ -73,6 +73,31 @@ describe("interactive <PolarClock>", () => {
     await expect.poll(() => live.textContent).toBe("Monday: 200.");
   });
 
+  // The static drops a `label="max"` numeral it cannot fit and drops the band
+  // with it. The client maps the pointer over that same box, so it has to ask
+  // the static rather than re-derive `fontSize * 1.35`: a phantom 15-unit gutter
+  // stretches every pointer y and the dial answers with the wrong segment.
+  it("shares the label band with the static, including when the numeral is dropped", async () => {
+    const WIDE = [10, 20, 30, 40, 50, 60, 70, 1234567]; // 9 digits: no room at size 24
+    const seen: unknown[] = [];
+    const screen = await render(
+      <PolarClock data={WIDE} size={24} label="max" onActive={(d) => seen.push(d)} />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 24 24");
+    const r = fig.getBoundingClientRect();
+    // Just right of the hub on the horizontal centreline — 3 o'clock. A phantom
+    // gutter pushes this point's y below the hub and swings it to 5 o'clock.
+    fig.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width * 0.6,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    expect(seen.at(-1)).toMatchObject({ index: 2, value: 30 });
+  });
+
   it("controlled selectedIndex pins the sector without focus", async () => {
     const screen = await render(<PolarClock data={WEEK} selectedIndex={3} />);
     const fig = screen.getByRole("img").element() as HTMLElement;

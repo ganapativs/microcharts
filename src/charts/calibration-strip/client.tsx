@@ -18,19 +18,12 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_CALIBRATION } from "../../core/strings-calibration.js";
-import { calibrationGeometry, isBinned } from "./geometry.js";
+import { calibrationGeometry, resolveMinSupport } from "./geometry.js";
 import {
   CalibrationStrip as StaticCalibrationStrip,
   calibrationSummary,
   type CalibrationStripProps,
 } from "./index.js";
-
-function defaultMinSupport(data: CalibrationStripProps["data"]): number {
-  const total = isBinned(data)
-    ? data.reduce((s, r) => s + (Number.isFinite(r.count) ? r.count : 0), 0)
-    : data.length;
-  return Math.max(10, Math.round(total * 0.02));
-}
 
 export interface InteractiveCalibrationStripProps extends CalibrationStripProps, PickerProps {
   /**
@@ -74,9 +67,9 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         : 'circle[data-mc-ink="accent"], circle[data-mc-w="support"]',
   });
 
-  // `defaultMinSupport` sums the whole series, so it is memoised: the
-  // interactive entry re-renders on every unit crossed during a scrub.
-  const ms = useMemo(() => minSupport ?? defaultMinSupport(data), [minSupport, data]);
+  // The default sums the whole series, so it is memoised: the interactive entry
+  // re-renders on every unit crossed during a scrub.
+  const ms = useMemo(() => resolveMinSupport(data, minSupport), [minSupport, data]);
   const supportHeight = Math.max(4, Math.round(height * 0.18));
   const geo = useMemo(
     () => calibrationGeometry({ data, bins, minSupport: ms, width, height, supportHeight }),

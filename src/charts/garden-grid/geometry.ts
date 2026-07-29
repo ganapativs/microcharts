@@ -26,6 +26,26 @@ export interface GardenGridGeometry {
   width: number;
   height: number;
   rMax: number;
+  /** Radius of the zero ring — `rMax * 0.6`, rounded here so a `cell` like 9
+   *  does not emit `r="2.6999999999999997"`. */
+  rEmpty: number;
+  /** The resolved `cell` / `gap` / `steps` the grid was actually laid out and
+   *  bucketed against. Callers must paint and ANNOUNCE from THESE, never from
+   *  the raw opts — see `resolve` below for what a raw value can be. */
+  cell: number;
+  gap: number;
+  steps: number;
+}
+
+/** A config number the host computes rather than types: `cell={boxPx / weeks}`
+ *  with `weeks` momentarily 0 is `Infinity`, and `Number(input.value)` on an
+ *  empty field is `NaN`. Both flowed straight into `width`, so the grid emitted
+ *  `viewBox="0 0 1 1"` with every dot at `cx="NaN"`; a negative `cell` put dots
+ *  at negative coords with a negative `r`, outside the viewBox `.mc-root` does
+ *  not clip. Repair once, here, so every caller reads the numbers the cells
+ *  were built on. Same guard ActivityGrid applies. */
+function resolve(raw: number | undefined, fallback: number, min: number): number {
+  return raw !== undefined && Number.isFinite(raw) && raw >= min ? raw : fallback;
 }
 
 /** Buckets a value into 0..S. 0 for ≤0; positives fill 1..S. */
@@ -46,9 +66,16 @@ export function gardenGridGeometry(opts: {
   domain?: readonly [number, number] | undefined;
   pad: number;
 }): GardenGridGeometry {
-  const rows = Math.max(1, opts.rows);
-  const { cell, gap, pad } = opts;
-  const steps = Math.max(2, opts.steps);
+  // Rows are whole grid tracks: a fractional `rows` made `i % rows` fractional,
+  // so cells landed off the row pitch they were sized for.
+  const rows = Math.floor(resolve(opts.rows, 7, 1));
+  const cell = resolve(opts.cell, 10, 0);
+  const gap = resolve(opts.gap, 2, 0);
+  const pad = resolve(opts.pad, 1, 0);
+  // `steps` is a count of discrete bins, so it rounds to a whole number before
+  // it is clamped — a fractional one bucketed dots into radii no step of the
+  // √-quantized area ramp corresponds to.
+  const steps = Math.max(2, Math.round(resolve(opts.steps, 5, 1)));
   const stepPx = cell + gap;
   const rMax = round2(cell / 2);
 
@@ -58,7 +85,11 @@ export function gardenGridGeometry(opts: {
   const width = Math.max(1, cols > 0 ? cols * stepPx - gap + 2 * pad : 1);
   const height = Math.max(1, rows > 0 ? rows * stepPx - gap + 2 * pad : 1);
 
-  const e = opts.domain ?? extent(data);
+  // A caller `domain` has to be validated, not trusted: `[NaN, NaN]` (what
+  // `[Math.min(...vals), Math.max(...vals)]` yields when `vals` holds one NaN)
+  // made `stepOf` return NaN, so every dot painted `r="0"` — an empty-looking
+  // plot under an aria-label still announcing the peak and the active count.
+  const e = opts.domain?.every((d) => Number.isFinite(d)) ? opts.domain : extent(data);
   const [min, max] = e ?? [0, 0];
 
   const cells: GardenCell[] = data.map((v, i) => {
@@ -78,5 +109,5 @@ export function gardenGridGeometry(opts: {
     };
   });
 
-  return { cells, cols, rows, width, height, rMax };
+  return { cells, cols, rows, width, height, rMax, rEmpty: round2(rMax * 0.6), cell, gap, steps };
 }

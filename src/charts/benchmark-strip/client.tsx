@@ -20,6 +20,7 @@ import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.j
 import { benchmarkStripGeometry } from "./geometry.js";
 import {
   BenchmarkStrip as StaticBenchmarkStrip,
+  benchmarkGutterCh,
   benchmarkSummary,
   type BenchmarkStripProps,
 } from "./index.js";
@@ -65,6 +66,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
 
   // must match the static's viewBox (the label gutter widens totalWidth)
   const font = labelFont(height, 0.62);
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = useMemo(
     () =>
       benchmarkStripGeometry({
@@ -74,12 +76,14 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         value,
         range,
         domain: props.domain,
-        gutterCh: label !== "none" && labelFitsY(height / 2, font, height) ? 4 : 0,
+        gutterCh:
+          label !== "none" && labelFitsY(height / 2, font, height)
+            ? benchmarkGutterCh(label, value, fmt)
+            : 0,
         fontSize: font,
       }),
-    [width, height, data, value, range, props.domain, label, font],
+    [width, height, data, value, range, props.domain, label, font, fmt],
   );
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const accName =
     summary === false

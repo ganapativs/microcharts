@@ -3,14 +3,24 @@
 // is NO total bar and none may be added — that is the whole point.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
 import { EN_RUBRIC, type RubricStrings } from "../../core/strings-rubric.js";
-import { UNIT_DOMAIN, rubricStripGeometry, type RubricInput } from "./geometry.js";
+import {
+  DEFAULT_WIDTH,
+  ROW_GAP,
+  UNIT_DOMAIN,
+  defaultHeight,
+  labelAnchorX,
+  resolveDomain,
+  rubricLabels,
+  rubricRowBands,
+  rubricStripGeometry,
+  type RubricInput,
+} from "./geometry.js";
+import { truncateLabel } from "../dot-plot/geometry.js";
 import { resolveSummary } from "../../core/summary.js";
-import { maxOf } from "../../core/scale.js";
 
 export interface RubricStripDatum {
   label: string;
@@ -68,7 +78,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     target,
     labels = true,
     domain = UNIT_DOMAIN,
-    width = 80,
+    width: widthProp = DEFAULT_WIDTH,
     height: heightProp,
     format,
     locale,
@@ -81,37 +91,45 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     children,
   } = props;
 
-  const n = Math.max(1, data.length);
-  // one legible row per criterion — floor-7 labels need ~13 units of row height
-  const height = heightProp ?? Math.max(14, n * 13);
+  const auto = defaultHeight(data.length);
+  // The box drives the type size, the gutter, the seat and every mark, none of
+  // which `Chart`'s own clamp reaches: a NaN `width` emitted NaN bar widths, and
+  // a negative one put every row left of a perfectly valid viewBox (see
+  // `chartSide`).
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp ?? auto, auto);
   const fmt = makeFormatter(format, locale);
-  const fontSize = labelFont(height / n, 0.6);
-  // drop row labels when the rows are shorter than the font (they'd collide)
-  const labelsFit = height / n >= fontSize * 1.15;
+  // A `target` from an empty input (`Number("")` → NaN) compared false against
+  // every score, so a chart with no usable target painted every criterion as a
+  // MISS and parked the tick on the domain floor. No number, no target.
+  const targetV = isFiniteValue(target) ? target : undefined;
+  const dom = resolveDomain(domain);
 
   if (data.some((d) => d.weight != null && d.weight <= 0))
     devWarn("<RubricStrip> non-positive weight — treated as equal split.");
-  if (data.some((d) => d.score < domain[0] || d.score > domain[1]))
+  if (data.some((d) => d.score < dom[0] || d.score > dom[1]))
     devWarn("<RubricStrip> score outside domain — clamped.");
 
-  // Reserve label ink + a clear gap before the track (was +4 / x=gutter-2 →
-  // criterion names kissed the bars).
-  const labelGap = 8;
-  const gutter =
-    labels && labelsFit
-      ? Math.min(
-          width * 0.62,
-          maxOf(
-            data.map((d) => d.label.length),
-            1,
-          ) *
-            fontSize *
-            0.64 +
-            labelGap,
-        )
-      : 0;
-
-  const geo = rubricStripGeometry({ data: toInputs(data), domain, width, height, gutter, gap: 1 });
+  const bands = rubricRowBands({
+    weights: data.map((d) => d.weight ?? 1),
+    height,
+    gap: ROW_GAP,
+  });
+  const lab = rubricLabels({
+    names: data.map((d) => d.label),
+    bands,
+    width,
+    height,
+    show: labels,
+  });
+  const geo = rubricStripGeometry({
+    data: toInputs(data),
+    domain: dom,
+    width,
+    height,
+    gutter: lab.gutter,
+    gap: ROW_GAP,
+  });
   const accName = resolveSummary(summary, () => rubricStripSummary(data, strings, fmt));
 
   return (
@@ -126,20 +144,19 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       // bottom edge, so the block centres on the cap band.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-rubric ${className}` : "mc-rubric"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-size": `${lab.fontSize}px` } as CSSProperties}
     >
       {/* flat siblings, ink roles: rows × (track + bar [+ label]) is this
-          chart's SSR hot path (bench floor 25 charts/ms) — no per-row <g> */}
+          chart's SSR hot path (bench floor 25 charts/ms) — no per-row <g>.
+          Keys are the row INDEX: two criteria may share a name, and a duplicate
+          key reconciles the second row onto the first. */}
       {geo.rows.flatMap((row) => {
-        const cy = round2(row.y + row.height / 2);
-        // keep the row label inside the viewBox even when rows are shorter than the font
-        const ty = round2(Math.max(fontSize * 0.5, Math.min(height - fontSize * 0.5, cy)));
-        const pass = target != null ? row.score >= target : null;
+        const pass = targetV != null ? row.score >= targetV : null;
         const ink = pass == null ? "accent" : pass ? "positive" : "negative";
         const nodes = [
           <rect
-            key={`track-${row.label}`}
-            x={gutter}
+            key={`track-${row.index}`}
+            x={lab.gutter}
             y={row.y}
             width={row.trackWidth}
             height={row.height}
@@ -148,8 +165,8 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
             data-mc-ink="neutral"
           />,
           <rect
-            key={`bar-${row.label}`}
-            x={gutter}
+            key={`bar-${row.index}`}
+            x={lab.gutter}
             y={row.y}
             width={row.barWidth}
             height={row.height}
@@ -157,26 +174,26 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
             data-mc-ink={ink}
           />,
         ];
-        if (labels && labelsFit)
+        if (lab.chars > 0)
           nodes.push(
             <text
-              key={`label-${row.label}`}
-              x={round2(gutter - labelGap)}
-              y={ty}
+              key={`label-${row.index}`}
+              x={labelAnchorX(lab.gutter)}
+              y={lab.y[row.index]!}
               dominantBaseline="central"
               textAnchor="end"
-              fontSize={fontSize}
+              fontSize={lab.fontSize}
               data-mc-ink="label"
             >
-              {row.label}
+              {truncateLabel(row.label, lab.chars)}
             </text>,
           );
         return nodes;
       })}
-      {target != null ? (
+      {targetV != null ? (
         <line
-          x1={geo.targetX(target)}
-          x2={geo.targetX(target)}
+          x1={geo.targetX(targetV)}
+          x2={geo.targetX(targetV)}
           y1={0.5}
           y2={height - 0.5}
           data-mc-ink="data"
@@ -188,8 +205,4 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

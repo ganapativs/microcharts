@@ -141,22 +141,27 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
           d={g.d}
           data-mc-ink="ghost"
           fill="none"
-          stroke="var(--mc-neutral)"
-          strokeOpacity={0.34}
           data-mc-w="hair"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
         />
       ))}
       {endpoints
-        ? geo.ghostEnds.map((e) => (
+        ? // Keyed by draw order, not by coordinate: two members that end at the
+          // same value land on the same pixel and collided on a shared key.
+          // Only the OPACITY is inline — `fill` lives on the ghost ink role in
+          // styles.css so High Contrast Mode can map it to GrayText. (Inline,
+          // not an attribute: the role's own `fill-opacity: 0.18` would win
+          // over a presentation attribute and sink the dots below the hairlines
+          // they terminate.)
+          geo.ghostEnds.map((e, i) => (
             <circle
-              key={`${e.x},${e.y}`}
+              key={i}
               cx={e.x}
               cy={e.y}
               r={0.9}
               data-mc-ink="ghost"
-              style={{ fill: "var(--mc-neutral)", fillOpacity: 0.5 }}
+              style={{ fillOpacity: 0.5 }}
             />
           ))
         : null}
@@ -177,7 +182,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

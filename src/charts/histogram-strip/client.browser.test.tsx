@@ -61,6 +61,20 @@ describe("interactive <HistogramStrip>", () => {
       .not.toBeNull();
   });
 
+  // Mirrors BAR_SELECTOR in client.tsx. The marked bin carries `accent`, so the
+  // default `rise` selector ("bar" only) would leave exactly one bin standing
+  // still while the rest rose.
+  it("the entrance selector covers every painted bin, marked one included", async () => {
+    const screen = await render(<HistogramStrip data={VALUES} bins={3} markValue={5} />);
+    const svg = screen.container.querySelector("svg")!;
+    const painted = svg.querySelectorAll("rect[data-mc-ink]");
+    const covered = svg.querySelectorAll(
+      'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"]',
+    ).length;
+    expect(svg.querySelectorAll('rect[data-mc-ink="accent"]').length).toBe(1);
+    expect(covered).toBe(painted.length);
+  });
+
   it("controlled selectedIndex pins the outline without focus", async () => {
     const screen = await render(<HistogramStrip data={VALUES} bins={3} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

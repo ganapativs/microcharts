@@ -9,7 +9,7 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import type { EmptyCellStyle } from "../../core/types.js";
-import { honeycombGeometry } from "./geometry.js";
+import { honeycombGeometry, resolveTotal, resolveValue } from "./geometry.js";
 
 export interface HoneycombProps {
   /** Filled count (fractional rounds; the summary keeps the true value). */
@@ -51,10 +51,13 @@ export function honeycombSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { total = 10, unit = "", strings = EN_HONEYCOMB, format, locale } = opts;
+  const { unit = "", strings = EN_HONEYCOMB, format, locale } = opts;
+  // Same resolvers the comb is laid out on — the announced capacity and the
+  // painted one are the same number, whatever the host passed.
+  const total = resolveTotal(opts.total);
   if (total <= 0) return strings.noData;
   const fmt = makeFormatter(format, locale);
-  return strings.honeycomb(fmt(Math.max(0, Math.round(value))), fmt(Math.floor(total)), unit);
+  return strings.honeycomb(fmt(resolveValue(value)), fmt(total), unit);
 }
 
 export function Honeycomb(props: HoneycombProps): ReactNode {
@@ -78,15 +81,18 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
     children,
   } = props;
 
-  if (total > 60) devWarn("<Honeycomb> over 60 cells stops being countable — use Progress.");
+  // Resolve once, up front: the comb, the centred label, and the accessible name
+  // all have to read the same capacity and count.
+  const cap = resolveTotal(total);
+  const filled = resolveValue(value);
 
-  const geo = honeycombGeometry({ total, value, rows, cellR: cell, pad: PAD });
+  if (cap > 60) devWarn("<Honeycomb> over 60 cells stops being countable — use Progress.");
+
+  const geo = honeycombGeometry({ total: cap, value: filled, rows, cellR: cell, pad: PAD });
   let labelText: string | undefined;
   let fontSize = 0;
   if (label !== "none") {
     fontSize = labelFont(Math.min(geo.width, geo.height), 0.28);
-    const filled = Math.max(0, Math.round(value));
-    const cap = Math.floor(total);
     const fmt = makeFormatter(format, locale);
     labelText =
       label === "count"
@@ -101,7 +107,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
   const accName =
     summary === false
       ? false
-      : (summary ?? honeycombSummary(value, { total, unit, strings, format, locale }));
+      : (summary ?? honeycombSummary(filled, { total: cap, unit, strings, format, locale }));
   const fill = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
     ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)

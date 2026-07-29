@@ -37,8 +37,18 @@ describe("<DotPlot>", () => {
       />,
     );
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
-    expect(texts).toContain("Amster…");
+    // Truncated to what the gutter can actually PAY for at the 60-unit default,
+    // not to a fixed count. This used to force 6 characters whether they fit or
+    // not, which is the same containment hazard the shared row-label budget
+    // exists to prevent — `.mc-root` is overflow: visible, so an over-long name
+    // paints into the page rather than clipping.
+    expect(texts).toContain("Amst…");
     expect(texts).toContain("Oslo");
+    // Wider box, more of the name — the budget tracks the room.
+    const wide = draw(<DotPlot data={[{ label: "Amsterdam", value: 5 }]} width={200} />);
+    expect([...wide.container.querySelectorAll("text")].map((t) => t.textContent)).toContain(
+      "Amsterdam",
+    );
   });
 
   it("stem renders hairlines from zero", () => {
@@ -57,6 +67,57 @@ describe("<DotPlot>", () => {
     expect(tall.querySelectorAll("text").length).toBe(6); // categories + values
     const short = draw(<DotPlot data={DATA} label="value" height={18} />).container;
     expect(short.querySelectorAll("text").length).toBe(0); // too dense for any text
+  });
+
+  it("a null row keeps its category name (the dot is what's missing)", () => {
+    const { container } = draw(
+      <DotPlot
+        data={[
+          { label: "Ada", value: 96 },
+          { label: "Kim", value: null },
+          { label: "Sam", value: 88 },
+        ]}
+        height={40}
+      />,
+    );
+    expect(container.querySelectorAll("circle").length).toBe(2);
+    expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual([
+      "Ada",
+      "Kim",
+      "Sam",
+    ]);
+  });
+
+  it("a value that fits neither side of its dot drops rather than spilling", () => {
+    const { container } = draw(
+      <DotPlot
+        data={[
+          { label: "a", value: -999999999 },
+          { label: "b", value: 1 },
+        ]}
+        label="value"
+        height={40}
+      />,
+    );
+    const texts = [...container.querySelectorAll("text")];
+    // "-999,999,999" is wider than the whole plot: start-anchored it runs past
+    // the viewBox, end-anchored it runs past x=0. It drops; "1" still renders.
+    expect(texts.map((t) => t.textContent)).toEqual(["a", "b", "1"]);
+    // and every text that DID render stays inside the 60-unit viewBox
+    for (const t of texts) {
+      const x = Number(t.getAttribute("x"));
+      const est = t.textContent!.length * 10 * 0.62;
+      const left = t.getAttribute("text-anchor") === "end" ? x - est : x;
+      expect(left).toBeGreaterThanOrEqual(0);
+      expect(left + est).toBeLessThanOrEqual(60);
+    }
+  });
+
+  it("value labels take the label ink role (quiet, and mapped in forced-colors)", () => {
+    const { container } = draw(<DotPlot data={DATA} label="value" height={40} />);
+    const inks = [...container.querySelectorAll("text")].map((t) => t.getAttribute("data-mc-ink"));
+    expect(inks.length).toBe(6);
+    expect(inks.every((i) => i === "label")).toBe(true);
   });
 
   it("> 7 rows → dev warning", () => {

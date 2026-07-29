@@ -23,6 +23,34 @@ describe("dualSparklineGeometry", () => {
     expect(geo.coincident).toBe(true);
   });
 
+  it("an affordable endpoint label keeps its gutter", () => {
+    const geo = dualSparklineGeometry({ ...base, primary: [1, 2], compare: [1, 2], gutterCh: 2 });
+    expect(geo.labelled).toBe(true);
+    expect(geo.plot.x1).toBe(60 - 2 - 12); // textGutter(2, 6, 4)
+  });
+
+  it("a label wider than the box drops it — the plot never inverts", () => {
+    // "1,234,567,890,123" asked for a 78-unit gutter on a 60-unit box and drew
+    // both lines right-to-left out to x = -72, outside the viewBox.
+    const geo = dualSparklineGeometry({ ...base, primary: [1, 2], compare: [1, 2], gutterCh: 17 });
+    expect(geo.labelled).toBe(false);
+    expect(geo.plot.x1).toBeGreaterThan(geo.plot.x0);
+    expect(geo.lastPrimary!.x).toBeLessThanOrEqual(60);
+    expect(geo.lastPrimary!.x).toBeGreaterThanOrEqual(0);
+  });
+
+  it("a box too short to seat the figure drops the label", () => {
+    const geo = dualSparklineGeometry({
+      ...base,
+      height: 5,
+      fontSize: 7,
+      primary: [1, 2],
+      compare: [1, 2],
+      gutterCh: 2,
+    });
+    expect(geo.labelled).toBe(false);
+  });
+
   test.prop([
     fc.array(fc.option(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { nil: null }), {
       maxLength: 40,

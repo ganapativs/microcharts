@@ -105,6 +105,70 @@ describe("cohortTriangleGeometry", () => {
     expect(cohortTriangleGeometry(COHORTS, { labels: false, cell: 9 }).labels).toEqual([]);
   });
 
+  // `cell={boxPx / ages}` with `ages` momentarily 0 is Infinity, and
+  // `Number(field.value)` on an empty input is NaN. Both used to reach `step`,
+  // so every coord went NaN and the box became `viewBox="0 0 NaN NaN"` while
+  // the accessible name still read the retention correctly.
+  it.each([
+    ["NaN", Number.NaN],
+    ["Infinity", Number.POSITIVE_INFINITY],
+    ["negative", -5],
+  ])("hostile cell=%s falls back to the documented default", (_name, bad) => {
+    const g = cohortTriangleGeometry(COHORTS, { cell: bad, labels: false });
+    expect(g.cell).toBe(9);
+    expect(g.step).toBe(11);
+    expect(Number.isFinite(g.width)).toBe(true);
+    expect(Number.isFinite(g.height)).toBe(true);
+    for (const c of g.cells) {
+      expect(Number.isFinite(c.x)).toBe(true);
+      expect(Number.isFinite(c.y)).toBe(true);
+    }
+  });
+
+  // A negative gap marched the rows up and left, out of a viewBox `.mc-root`
+  // does not clip (cells landed at x=-27, y=-33 inside a 1×1 box).
+  it.each([
+    ["NaN", Number.NaN],
+    ["Infinity", Number.POSITIVE_INFINITY],
+    ["negative", -20],
+  ])("hostile gap=%s falls back to the documented default", (_name, bad) => {
+    const g = cohortTriangleGeometry(COHORTS, { gap: bad, labels: false });
+    expect(g.gap).toBe(2);
+    for (const c of g.cells) {
+      expect(c.x).toBeGreaterThanOrEqual(0);
+      expect(c.y).toBeGreaterThanOrEqual(0);
+      expect(c.x + g.cell).toBeLessThanOrEqual(g.width);
+      expect(c.y + g.cell).toBeLessThanOrEqual(g.height);
+    }
+  });
+
+  // Cohort names are caller prose, not figures this library formatted, so the
+  // gutter takes the 0.95/char estimate — 0.62 left an all-caps vintage
+  // painting ~27 units past the left edge.
+  it("reserves a PROSE gutter — an all-caps cohort name stays inside the box", () => {
+    const g = cohortTriangleGeometry([{ label: "WWWWWWWWWWWW", values: [1, 0.5] }], {
+      labels: true,
+    });
+    expect(g.showLabels).toBe(true);
+    // anchor is text-anchor="end", so the run extends LEFT from labels[0].x
+    const left = g.labels[0]!.x - "WWWWWWWWWWWW".length * g.fontSize * 0.95;
+    expect(left).toBeGreaterThanOrEqual(0);
+  });
+
+  // Every cohort present, none with a reading yet: `cols * step - gap` went
+  // negative and made the box narrower than the label gutter it still paints.
+  it("cohorts with no readings yet → box at least as wide as the label gutter", () => {
+    const g = cohortTriangleGeometry(
+      [
+        { label: "a", values: [] },
+        { label: "b", values: [] },
+      ],
+      { labels: true },
+    );
+    expect(g.cols).toBe(0);
+    expect(g.width).toBeGreaterThanOrEqual(g.gutter);
+  });
+
   it("caps at 12 cohorts × 12 ages", () => {
     const many = Array.from({ length: 20 }, (_, i) => ({
       label: `c${i}`,

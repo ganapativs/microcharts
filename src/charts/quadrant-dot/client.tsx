@@ -16,7 +16,13 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_QUADRANT, type QuadrantStrings } from "../../core/strings-quadrant.js";
-import { quadrantDotGeometry, quadrantDotRadii } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  quadrantDotGeometry,
+  quadrantDotRadii,
+} from "./geometry.js";
 import {
   QuadrantDot as StaticQuadrantDot,
   quadrantSummary,
@@ -59,8 +65,8 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     yLabel = "y",
     format,
     locale,
-    width = 24,
-    height = 24,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     strings = EN_QUADRANT,
     title,
     summary,
@@ -74,6 +80,11 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same resolved box the static entry lays out against, so the hit math and
+  // the painted marks cannot disagree about where a dot is.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "settle", animate, {
@@ -103,7 +114,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
 
   const count = targets.length;
   const peerCount = Math.max(0, count - 1);
-  const { focal: focalR } = quadrantDotRadii(width, height);
+  const { halo: haloR } = quadrantDotRadii(width, height);
 
   const locate = useCallback(
     (x: number, y: number) => {
@@ -164,7 +175,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
       <circle
         cx={t.x}
         cy={t.y}
-        r={focalR + 1.4}
+        r={haloR}
         fill="none"
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}

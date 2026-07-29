@@ -6,12 +6,18 @@
 // Coords 2-dp, integer viewBox.
 import { round2 } from "../../core/types.js";
 import { maxOf } from "../../core/scale.js";
-import { textGutterProse } from "../../core/labels.js";
+import { labelFont, textGutterProse } from "../../core/labels.js";
+
+/** Frame padding — the one copy, shared by the geometry and the chrome layout. */
+const PAD = 2;
+/** Smallest key tag this chart will draw before it drops the tags instead. */
+const TAG_FONT_MIN = 5;
 
 /**
- * Left gutter for the key tags — the ONE place geometry and both entries agree on
- * it, because it is the plot's x origin and a second-guessed copy walks every bar
- * (and the interactive focus ring) sideways by its width.
+ * Left gutter for the key tags — the ONE place it is computed, because it is the
+ * plot's x origin and a second-guessed copy walks every bar (and the interactive
+ * focus ring) sideways by its width. Both entries reach it through
+ * `dataDiffLayout`, never on their own.
  *
  * A key is caller text — a column name, a schema field, often upper-case — never
  * a figure this chart formatted, so it reserves at the PROSE per-char rate
@@ -23,10 +29,71 @@ import { textGutterProse } from "../../core/labels.js";
  * the sake of a scaffold. Returns 0 in that case, so the caller drops the tags
  * and the gutter in the same branch.
  */
-export function dataDiffGutter(chars: number, fontSize: number, width: number): number {
+function dataDiffGutter(chars: number, fontSize: number, width: number): number {
   if (chars <= 0) return 0;
   const gutter = textGutterProse(chars, fontSize, 4);
   return gutter <= width * 0.45 ? gutter : 0;
+}
+
+/**
+ * Displayed-row cap. `maxItems` is a host-computed prop — `Number(field.value)`
+ * on an empty input is NaN — and NaN slipped through `Math.round`/`Math.min`
+ * into `slice(0, NaN)`, which emptied the plot while the accessible name still
+ * announced every key. Non-finite falls back to the documented 12.
+ */
+export function dataDiffCap(maxItems: number | undefined): number {
+  const n = Math.round(maxItems ?? 12);
+  return Number.isFinite(n) ? Math.max(1, Math.min(12, n)) : 12;
+}
+
+/**
+ * Largest key-tag font that fits BOTH the row pitch and the gutter budget, or 0
+ * when none does (the caller drops the tags and their gutter together).
+ *
+ * Sizing on the pitch alone inverted the degradation: three rows in a 64-unit
+ * box got a 10-unit pitch font whose gutter blew the 45% budget, so the tags
+ * dropped — while the SAME box holding six rows kept them, because the tighter
+ * pitch happened to pick a font narrow enough to fit. Vertical room should not
+ * cost a label, so step down to the floor before giving up. Bounded by
+ * `labelFont`'s cap of 11, so the loop runs at most seven times.
+ */
+export function dataDiffTagFont(pitchFont: number, chars: number, width: number): number {
+  for (let f = Math.floor(pitchFont); f >= TAG_FONT_MIN; f--)
+    if (dataDiffGutter(chars, f, width) > 0) return f;
+  return 0;
+}
+
+/**
+ * Chrome layout — label font, totals-footer band, and the key-tag font — resolved
+ * ONCE for both entries. The interactive entry used to recompute all three from
+ * its own copy of the constants; they move the row band and `centerX`, so any
+ * drift slides the focus ring off the rows it frames.
+ */
+export function dataDiffLayout(opts: {
+  data: readonly { key: string }[];
+  labels?: boolean | undefined;
+  label?: "totals" | "none" | undefined;
+  maxItems?: number | undefined;
+  width: number;
+  height: number;
+}): { font: number; footer: number; tagFont: number; keyChars: number } {
+  const { width, height } = opts;
+  const font = labelFont(height, 0.4);
+  // rows split the plot height — the totals band only earns its own band when
+  // there is vertical room to spend on it.
+  const footer = opts.label === "totals" && height >= 34 ? font + 3 : 0;
+  const n = Math.min(opts.data.length, dataDiffCap(opts.maxItems));
+  const rowH = n > 0 ? (height - 2 * PAD - footer) / n : 0;
+  // a text glyph box measures ~1.6× its fontSize tall, so a tag must be ≤ half
+  // the row pitch to never touch its neighbour
+  const keyChars = maxOf(
+    opts.data.map((d) => d.key.length),
+    0,
+  );
+  const tagFont = opts.labels
+    ? dataDiffTagFont(Math.min(font, Math.floor(rowH * 0.5)), keyChars, width)
+    : 0;
+  return { font, footer, tagFont, keyChars };
 }
 
 interface DataDiffRow {
@@ -79,11 +146,11 @@ export function dataDiffGeometry(opts: {
   if (rowsIn.length === 0) return null;
 
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? PAD;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = dataDiffGutter(gutterCh, fontSize, width);
-  const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 12)));
+  const cap = dataDiffCap(opts.maxItems);
 
   // order is a VIEW concern — never mutate the caller's order semantics silently;
   // "data" preserves input (schema/alphabetical order is often meaningful)
@@ -102,13 +169,20 @@ export function dataDiffGeometry(opts: {
     { added: 0, removed: 0 },
   );
 
-  // one symmetric scale across ALL rows (churn must not shrink to fit)
+  // one symmetric scale across ALL rows (churn must not shrink to fit).
+  // `domain` is host-computed — `Math.max(...)` over a series with a hole is
+  // NaN, a ratio over an empty window is Infinity — and this max is the scale's
+  // DIVISOR: a non-finite or non-positive one made every bar width NaN, failed
+  // every `width > 0` test, and left a bare axis under an accessible name that
+  // still announced the totals. Fall back to the data's own max.
+  const domainMax = opts.domain?.[1];
   const scaleMax =
-    opts.domain?.[1] ??
-    maxOf(
-      rowsIn.map((r) => Math.max(r.added, r.removed)),
-      0,
-    );
+    domainMax !== undefined && Number.isFinite(domainMax) && domainMax > 0
+      ? domainMax
+      : maxOf(
+          rowsIn.map((r) => Math.max(r.added, r.removed)),
+          0,
+        );
   const degenerate = scaleMax === 0;
 
   // label gutter sits on the LEFT (keys read before the diverging bars)

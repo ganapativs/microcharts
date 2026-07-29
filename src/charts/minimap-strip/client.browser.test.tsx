@@ -23,6 +23,21 @@ describe("interactive <MinimapStrip>", () => {
     await expect.poll(() => live.textContent).toBe("Viewing 450 to 550 of 1,000.");
   });
 
+  it("announces the unknown share it paints", async () => {
+    // The fog comes from the composed static; the name here passed a flat 0, so
+    // the interactive strip hatched half of itself and said nothing about it.
+    const screen = await render(
+      <MinimapStrip
+        data={{ content: CONTENT, window: [0, 100], known: [[0, 500]] }}
+        domain={[0, 1000]}
+        width={160}
+        height={16}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-minimap-live") as HTMLElement;
+    expect(wrap.getAttribute("aria-label")).toContain("50% unknown");
+  });
+
   it("shows the window range while dragging — not only to a screen reader", async () => {
     const screen = await render(
       <MinimapStrip

@@ -108,6 +108,29 @@ describe("interactive <QuantileDots>", () => {
     expect(vbWidth).toBeGreaterThan(120); // the chip is anchored in the FULL box
   });
 
+  // The pointer inverts the frame the static PAINTS. Under a fixed domain the
+  // columns cover only part of the plot, so splitting the plot into `columns`
+  // equal shares put the crosshair on a different bin than the cursor.
+  it("under a fixed domain the pointer lands on the bin it points at", async () => {
+    const screen = await render(
+      <QuantileDots data={UNIFORM} threshold={15} domain={[0, 100]} width={200} title="Wait" />,
+    );
+    const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;
+    const svg = wrap.querySelector("svg")!;
+    const r = svg.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width * 0.1,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    const line = wrap.querySelector('line[data-mc-ink="muted"]') as SVGLineElement;
+    const lineAt = line.getBoundingClientRect().left;
+    expect(Math.abs(lineAt - (r.left + r.width * 0.1))).toBeLessThan(r.width * 0.06);
+  });
+
   it("Escape returns the probe to the prop threshold", async () => {
     const screen = await render(<QuantileDots data={UNIFORM} threshold={15} title="Wait" />);
     const wrap = screen.container.querySelector(".mc-quantile-dots-live") as HTMLElement;

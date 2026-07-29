@@ -55,6 +55,58 @@ describe("<CalibrationStrip>", () => {
     expect(container.querySelectorAll("circle").length).toBe(0);
   });
 
+  it("renders the support lane as a single node", () => {
+    const { container } = draw(<CalibrationStrip data={BINS} />);
+    expect(container.querySelectorAll("rect").length).toBe(0);
+    const lane = container.querySelector('path[data-mc-ink="neutral"]')!;
+    expect(lane.getAttribute("d")!.match(/M/g)!.length).toBe(10);
+    expect(container.querySelectorAll("svg > *").length).toBe(12); // lane + diagonal + 10 dots
+  });
+
+  // A non-finite `bins` used to size the support columns via
+  // `plotW / Math.max(1, NaN)`: the lane rendered `x="NaN" width="NaN"` while
+  // the dots and the announced summary looked perfectly normal.
+  it("hostile config never reaches an attribute or the accessible name", () => {
+    for (const props of [
+      { bins: NaN },
+      { bins: Infinity },
+      { bins: 0 },
+      { bins: 1e8 },
+      { minSupport: NaN },
+      { minSupport: Infinity },
+    ]) {
+      for (const mode of ["dots", "bars"] as const) {
+        const { container } = draw(<CalibrationStrip data={BINS} mode={mode} {...props} />);
+        expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+      }
+    }
+  });
+
+  it("marks stay inside the viewBox at the diagonal's corners (containment)", () => {
+    const edge = [
+      { predicted: 0, observed: 0, count: 500 },
+      { predicted: 1, observed: 1, count: 500 },
+    ];
+    const { container } = draw(<CalibrationStrip data={edge} width={100} height={32} />);
+    for (const c of container.querySelectorAll("circle")) {
+      const cx = Number(c.getAttribute("cx"));
+      const cy = Number(c.getAttribute("cy"));
+      const r = Number(c.getAttribute("r"));
+      expect(cx - r).toBeGreaterThanOrEqual(0);
+      expect(cx + r).toBeLessThanOrEqual(100);
+      expect(cy - r).toBeGreaterThanOrEqual(0);
+      expect(cy + r).toBeLessThanOrEqual(32);
+    }
+    // the lane is one path: walk its `M x y` origins and `h`/`v` extents
+    const d = container.querySelector('path[data-mc-ink="neutral"]')!.getAttribute("d")!;
+    for (const m of d.matchAll(/M([\d.-]+) ([\d.-]+)h([\d.-]+)v([\d.-]+)/g)) {
+      const [x, y, w, h] = m.slice(1).map(Number) as [number, number, number, number];
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x + w).toBeLessThanOrEqual(100);
+      expect(y + h).toBeLessThanOrEqual(32);
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<CalibrationStrip data={BINS} title="Model calibration" />);
     await expectNoA11yViolations(container);

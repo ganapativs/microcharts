@@ -3,6 +3,14 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
+
+function fetchPrompt() {
+  return fetch("/agent-setup.md").then((r) => {
+    if (!r.ok) throw new Error(String(r.status));
+    return r.text();
+  });
+}
 
 /**
  * One-click "copy the agent prompt" — fetches the canonical `/agent-setup.md`
@@ -20,18 +28,14 @@ export function CopyAgentSetup({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
-    const text = () =>
-      fetch("/agent-setup.md").then((r) => {
-        if (!r.ok) throw new Error(String(r.status));
-        return r.text();
-      });
     try {
       if (typeof ClipboardItem !== "undefined" && navigator.clipboard.write) {
-        const blob = text().then((t) => new Blob([t], { type: "text/plain" }));
+        const blob = fetchPrompt().then((t) => new Blob([t], { type: "text/plain" }));
         await navigator.clipboard.write([new ClipboardItem({ "text/plain": blob })]);
       } else {
-        await navigator.clipboard.writeText(await text());
+        await navigator.clipboard.writeText(await fetchPrompt());
       }
+      track({ name: "copy", kind: "agent_setup" });
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {

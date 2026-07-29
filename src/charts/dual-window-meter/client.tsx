@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { lastFinite } from "../../core/stats.js";
 import { labelFont } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
 import {
   named,
   fillFor,
@@ -143,9 +144,16 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
   const shown = active ?? selected;
   const f = shown != null ? fast[shown] : null;
   const s = shown != null ? slow[shown] : null;
+  // `fmt(target)` is guarded the same way the static summary guards it
+  // (`targetText` in ./index): a host-derived target arrives NaN or undefined,
+  // and formatting it bare either throws or announces "NaN" on every rove.
   const announced =
     shown != null
-      ? strings.dualWindowAt(f == null ? "—" : fmt(f), s == null ? "—" : fmt(s), fmt(target))
+      ? strings.dualWindowAt(
+          f == null ? "—" : fmt(f),
+          s == null ? "—" : fmt(s),
+          isFiniteValue(target) ? fmt(target) : "—",
+        )
       : "";
   const shownX = shown != null ? xOf(shown) : 0;
   const selX = selected != null ? xOf(selected) : 0;

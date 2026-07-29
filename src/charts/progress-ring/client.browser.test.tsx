@@ -69,6 +69,19 @@ describe("interactive <ProgressRing>", () => {
     expect(screen.container.querySelector(".mc-spark-readout")).toBeNull();
   });
 
+  it('label="percent" the ring is too small to print falls back to the chip', async () => {
+    // Asking for the label is not the same as getting it: a 16px hole drops the
+    // figure, and gating the chip on the REQUEST left "62% complete." announced
+    // and painted nowhere.
+    const screen = await render(<ProgressRing value={0.62} label="percent" size={16} />);
+    expect(screen.container.querySelector("text")).toBeNull();
+    const wrap = screen.container.querySelector(".mc-ring-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("62%");
+  });
+
   // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
   it("onActive reports the arc once, then null when the active state clears", async () => {
     const seen: unknown[] = [];

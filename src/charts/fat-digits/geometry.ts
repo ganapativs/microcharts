@@ -17,6 +17,18 @@ const WEIGHTS: Record<FatTiers, readonly number[]> = {
 };
 
 /**
+ * `tiers` → a table that exists. `WEIGHTS` is indexed by the prop, so a JS
+ * caller's `tiers={4}` (or a config-driven `null`/`NaN`) read `undefined[idx]`
+ * and threw a TypeError — the whole render, not just the mark. Anything off the
+ * table falls back to the documented default of 5. The summary resolves through
+ * here too, so the announced "of N" can never name a table the weights did not
+ * come from.
+ */
+export function resolveTiers(tiers: FatTiers | undefined): FatTiers {
+  return tiers === 3 ? 3 : 5;
+}
+
+/**
  * value → { weight, tier } (1-based tier). No USABLE domain → the middle tier.
  * "Usable" means a finite, non-degenerate pair: a short array (`domain[1]`
  * undefined) or a non-finite bound would make the ratio NaN, and a NaN index
@@ -28,7 +40,10 @@ export function fatTier(
   domain: readonly [number, number] | undefined,
   tiers: FatTiers,
 ): { weight: number; tier: number } {
-  const steps = WEIGHTS[tiers];
+  const steps = WEIGHTS[resolveTiers(tiers)];
+  // Step arithmetic runs off the table's own length, never the raw prop — a
+  // non-numeric `tiers` would otherwise still produce a NaN index here.
+  const n = steps.length;
   const usable =
     domain !== undefined &&
     isFiniteValue(domain[0]) &&
@@ -36,18 +51,20 @@ export function fatTier(
     domain[0] !== domain[1];
   let idx: number;
   if (!usable || !isFiniteValue(value)) {
-    idx = Math.floor((tiers - 1) / 2); // middle tier
+    idx = Math.floor((n - 1) / 2); // middle tier
   } else {
     const t = clamp((value - domain[0]!) / (domain[1]! - domain[0]!), 0, 1);
-    idx = Math.round(t * (tiers - 1));
+    idx = Math.round(t * (n - 1));
   }
   return { weight: steps[idx]!, tier: idx + 1 };
 }
 
 /** digit 0–9 → weight via ⌈(d+1)/(10/tiers)⌉ (documented). */
 function digitWeight(d: number, tiers: FatTiers): number {
-  const idx = Math.max(1, Math.ceil((d + 1) / (10 / tiers))) - 1;
-  return WEIGHTS[tiers][Math.min(idx, tiers - 1)]!;
+  const steps = WEIGHTS[resolveTiers(tiers)];
+  const n = steps.length;
+  const idx = Math.max(1, Math.ceil((d + 1) / (10 / n))) - 1;
+  return steps[Math.min(idx, n - 1)]!;
 }
 
 export interface FatDigitsGeometry {
@@ -80,9 +97,10 @@ export function fatDigitsGeometry(opts: {
   const { tier } = fatTier(value, domain, tiers);
 
   if (encode === "digit") {
+    const lightest = WEIGHTS[resolveTiers(tiers)][0]!;
     const glyphs = [...formatted].map((char) => ({
       char,
-      weight: /[0-9]/.test(char) ? digitWeight(Number(char), tiers) : WEIGHTS[tiers][0]!,
+      weight: /[0-9]/.test(char) ? digitWeight(Number(char), tiers) : lightest,
     }));
     return { x, y, width, height, glyphs, tier };
   }

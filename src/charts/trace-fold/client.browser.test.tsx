@@ -63,6 +63,13 @@ describe("interactive <TraceFold>", () => {
     expect(screen.container.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 200 32");
   });
 
+  it("an unusable width falls back to the same default box the static entry uses", async () => {
+    // Both entries clamp, or the picker's hit boxes are measured against a box
+    // nobody drew.
+    const screen = await render(<TraceFold data={TRACE} format={ms} width={Number.NaN} />);
+    expect(screen.container.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 120 32");
+  });
+
   it("controlled selectedIndex pins the outline with no interaction", async () => {
     const screen = await render(
       <TraceFold data={TRACE} format={ms} width={200} height={30} selectedIndex={2} />,

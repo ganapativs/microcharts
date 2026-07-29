@@ -103,14 +103,14 @@ export const CATEGORICAL_TOKENS: ColorToken[] = [
     cssVar: "--mc-cat-5",
     role: "",
     tone: "Terracotta",
-    light: "#c2543a",
+    light: "#bc5138",
     dark: "#e07e5e",
   },
   {
     cssVar: "--mc-cat-6",
     role: "",
     tone: "Mauve",
-    light: "#a85c8c",
+    light: "#a55a89",
     dark: "#c486b0",
   },
 ];

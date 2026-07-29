@@ -11,6 +11,7 @@ import {
 } from "../../core/strings-token-confidence.js";
 import {
   DEFAULT_TIERS,
+  splitToken,
   tokenTierCounts,
   tokenTiers,
   type TieredToken,
@@ -68,6 +69,8 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
 
   if (data.some((d) => !Number.isFinite(d.confidence)))
     devWarn("<TokenConfidence> non-finite confidence — treated as guessing.");
+  if (!Number.isFinite(tiers[0]) || !Number.isFinite(tiers[1]))
+    devWarn("<TokenConfidence> non-finite tiers cutoff — falling back to the default.");
 
   const tokens = tokenTiers({ data, tiers });
   const accName =
@@ -91,12 +94,7 @@ export function TokenConfidence(props: TokenConfidenceProps): ReactNode {
       {tokens.flatMap((t, i) => {
         const cls = CLASS[t.tier] ?? (show === "all" ? "mc-tc-seen" : undefined);
         if (!cls) return [t.token];
-        // underline the WORD only — keep leading/trailing whitespace outside the
-        // marked span so the mark never bleeds under the space between tokens.
-        const trimmed = t.token.trimStart();
-        const lead = t.token.slice(0, t.token.length - trimmed.length);
-        const core = trimmed.trimEnd();
-        const trail = trimmed.slice(core.length);
+        const [lead, core, trail] = splitToken(t.token);
         return [
           lead,
           // eslint-disable-next-line react/no-array-index-key -- tokens repeat; index is the only stable key

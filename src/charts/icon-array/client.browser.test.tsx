@@ -99,6 +99,20 @@ describe("interactive <IconArray>", () => {
     expect(screen.container.querySelector(".mc-spark-readout")).toBeNull();
   });
 
+  // Regression: an unguarded GRID_DIMS lookup threw here too, so a bad `total`
+  // killed the wrapper before the picker existed. The picker must rove the same
+  // 20 units the static entry paints.
+  it("a denominator with no designed grid roves the fallback 20-unit grid", async () => {
+    const screen = await render(<IconArray value={0.15} total={7 as never} />);
+    const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
+    expect(wrap.querySelectorAll("svg rect").length).toBe(20);
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("20 of 20 — empty");
+  });
+
   it("a custom `strings` owns the chip text (no hardcoded English)", async () => {
     const screen = await render(
       <IconArray

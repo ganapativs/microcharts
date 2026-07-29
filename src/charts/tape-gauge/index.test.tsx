@@ -84,6 +84,36 @@ valueEdgeSuite("TapeGauge", (value: number) => (
 const z = (from: unknown, to: unknown, tone: "pos" | "neg" | "warn" | "neutral" = "warn") =>
   ({ from, to, tone }) as unknown as { from: number; to: number; tone: "warn" };
 
+/** No non-finite number may reach a coordinate, a size, or the spoken name. */
+const expectNoNonFinite = (container: HTMLElement) => {
+  for (const el of container.querySelectorAll("*"))
+    for (const attr of [
+      "d",
+      "x",
+      "y",
+      "x1",
+      "x2",
+      "y1",
+      "y2",
+      "cx",
+      "cy",
+      "r",
+      "width",
+      "height",
+      "viewBox",
+      "style",
+      "aria-label",
+    ])
+      expect(el.getAttribute(attr) ?? "", `<${el.tagName} ${attr}>`).not.toMatch(/NaN|Infinity/);
+  expect(container.textContent).not.toMatch(/NaN|Infinity|undefined/);
+};
+
+/** Chevron count: the accent path that does NOT close (`z` ends the pointer). */
+const chevrons = (c: HTMLElement) =>
+  [...c.querySelectorAll<SVGPathElement>('path[data-mc-ink="accent"]')].filter(
+    (p) => !(p.getAttribute("d") ?? "").trim().endsWith("z"),
+  ).length;
+
 describe("<TapeGauge> degenerate zones (tests/craft/robust.mjs)", () => {
   const CASES: Record<string, readonly ReturnType<typeof z>[]> = {
     empty: [],
@@ -107,27 +137,7 @@ describe("<TapeGauge> degenerate zones (tests/craft/robust.mjs)", () => {
       const { container } = draw(
         <TapeGauge value={142} rate={1} zones={zones} span={60} height={64} title="Edge" />,
       );
-      for (const el of container.querySelectorAll("*"))
-        for (const attr of [
-          "d",
-          "x",
-          "y",
-          "x1",
-          "x2",
-          "y1",
-          "y2",
-          "cx",
-          "cy",
-          "r",
-          "width",
-          "height",
-          "viewBox",
-          "aria-label",
-        ])
-          expect(el.getAttribute(attr) ?? "", `<${el.tagName} ${attr}>`).not.toMatch(
-            /NaN|Infinity/,
-          );
-      expect(container.textContent).not.toMatch(/NaN|Infinity|undefined/);
+      expectNoNonFinite(container);
       expect(container.querySelector('[role="img"][aria-label]')).not.toBeNull();
     });
   }
@@ -147,6 +157,56 @@ describe("<TapeGauge> degenerate zones (tests/craft/robust.mjs)", () => {
     expect(chrome.getAttribute("d")).toMatch(/^M[\d.]+ 1V[\d.]+M/);
     expect(container.querySelectorAll("rect").length).toBe(0); // no zone read as level
     expect([...container.querySelectorAll("text")].length).toBe(0); // no readout
+  });
+});
+
+// `span`, `rateTiers`, `width` and `height` are CONFIG props — a NaN from an
+// empty input or an Infinity from a division renders a perfectly ordinary gauge
+// while the scale under it is not a scale. Announced and painted have to agree.
+describe("<TapeGauge> hostile scale props", () => {
+  it("an infinite span falls back to the auto window instead of dividing by it", () => {
+    const { container } = draw(
+      <TapeGauge value={142} rate={1} zones={ZONES} span={Infinity} title="Edge" />,
+    );
+    expectNoNonFinite(container); // was y="NaN" height="NaN" on every zone rect
+    // auto span = the 100–200 zone extent × 1.25, so tiers are [2.08, 8.33] and
+    // a rate of 1 is steady — the word and the (absent) chevron agree
+    expect(container.querySelector("[aria-label]")!.getAttribute("aria-label")).toContain("steady");
+    expect(chevrons(container)).toBe(0);
+    expect(container.querySelectorAll("rect").length).toBe(3);
+  });
+
+  it("a zero or negative span draws the auto window, not an empty tape", () => {
+    for (const span of [0, -5]) {
+      const { container } = draw(<TapeGauge value={142} zones={ZONES} span={span} title="Edge" />);
+      expectNoNonFinite(container);
+      expect(container.querySelectorAll("rect").length).toBe(3);
+    }
+  });
+
+  it("non-finite rate tiers fall back to the span-derived pair", () => {
+    const { container } = draw(
+      <TapeGauge value={142} rate={1} zones={ZONES} span={25} rateTiers={[NaN, NaN]} />,
+    );
+    // NaN compares false both ways, so both thresholds were "cleared" and a
+    // rate of 1 announced the top tier over a 25-unit window
+    expect(container.querySelector("[aria-label]")!.getAttribute("aria-label")).toContain("rising");
+    expect(container.querySelector("[aria-label]")!.getAttribute("aria-label")).not.toContain(
+      "fast",
+    );
+    expect(chevrons(container)).toBe(1);
+  });
+
+  it("a non-finite box clamps to the default, frame and marks together", () => {
+    for (const box of [{ width: NaN }, { height: NaN }, { width: 0 }, { height: Infinity }]) {
+      const { container } = draw(
+        <TapeGauge value={142} rate={1} zones={ZONES} span={25} title="Edge" {...box} />,
+      );
+      // `Chart` clamped the viewBox already; the marks were still laid out
+      // against the raw prop and painted NaN coords inside a valid frame
+      expectNoNonFinite(container);
+      expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 46 60");
+    }
   });
 });
 

@@ -89,7 +89,10 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     () => activityGridGeometry(data, { rows, cell, gap, levels: steps, domain, offset }),
     [data, rows, cell, gap, steps, domain, offset],
   );
-  const stepPx = cell + gap;
+  // Pitch and mark size come off the geometry, not the raw props — the pointer
+  // map has to be built on the same numbers the static entry painted, or a
+  // repaired `cell`/`gap` moves the cells and leaves hit-testing behind.
+  const stepPx = geo.cell + geo.gap;
   const w = Math.max(geo.width, 1);
   const h = Math.max(geo.height, 1);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -198,7 +201,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
     const c = geo.cells[i];
     if (!c) return null;
     // ring hugs the drawn mark, not the slot — shapes stay aligned
-    const m = cellMetrics(cell, shape);
+    const m = cellMetrics(geo.cell, shape);
     return (
       <rect
         x={c.x + m.inset - 0.5}

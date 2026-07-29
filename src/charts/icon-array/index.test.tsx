@@ -50,6 +50,44 @@ describe("<IconArray>", () => {
     await expectNoA11yViolations(container);
   });
 
+  // Regression: `total` is typed, but a JS caller / an untyped field / a model
+  // emitting the prop reached an unguarded GRID_DIMS lookup and threw
+  // "undefined is not iterable". The grid falls back to 20 and says so.
+  it("a denominator with no designed grid falls back to 20 instead of throwing", () => {
+    const { container } = draw(<IconArray value={0.15} total={7 as never} />);
+    expect(container.querySelectorAll("rect").length).toBe(20);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("3 in 20. About 15%.");
+    expect(container.querySelector("text")!.textContent).toBe("3 in 20");
+  });
+
+  // Regression: the ratio gutter reserved a flat 9 characters, so "100 in 100"
+  // (ten) painted up to 6.7 units past the right edge — and `.mc-root` is
+  // overflow: visible, so that lands in the page, not on the cutting-room floor.
+  it("the widest ratio label stays inside the viewBox at every denominator", () => {
+    for (const [w, h] of [
+      [140, 28],
+      [120, 60],
+      [100, 60],
+      [200, 60],
+    ] as const) {
+      const { container } = draw(<IconArray value={1} total={100} width={w} height={h} />);
+      const text = container.querySelector("text");
+      if (!text) continue; // the label is allowed to drop; it is not allowed to spill
+      expect(text.textContent).toBe("100 in 100");
+      const fs = Number(text.getAttribute("font-size"));
+      // same per-char over-estimate the reserved gutter is built from
+      const end = Number(text.getAttribute("x")) + text.textContent!.length * 0.62 * fs;
+      expect(end).toBeLessThanOrEqual(w);
+    }
+  });
+
+  // tabular-nums is set on `.mc-root text` in styles.css at :where() specificity
+  // so a consumer can override it. An inline copy here would win over both.
+  it("the label carries no inline paint", () => {
+    const { container } = draw(<IconArray value={0.15} total={20} />);
+    expect(container.querySelector("text")!.getAttribute("style")).toBeNull();
+  });
+
   // Degradation contract: see tests/craft/floor.mjs.
   it("narrow box: the ratio label drops and the grid reclaims the gutter", () => {
     const big = draw(<IconArray value={0.15} total={20} width={120} height={40} />).container;

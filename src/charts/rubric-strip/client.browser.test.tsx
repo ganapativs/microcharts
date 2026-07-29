@@ -77,4 +77,24 @@ describe("interactive <RubricStrip>", () => {
     );
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("the focus box frames the row it names — both entries share one gutter", async () => {
+    // The gutter used to be spelled out again here; a criterion name long
+    // enough to change it left the box hanging off the track it frames.
+    const named = [
+      { label: "Correctness of the answer", score: 0.92, weight: 3 },
+      { label: "Coverage", score: 0.78, weight: 2 },
+      { label: "Style", score: 0.41, weight: 1 },
+    ];
+    const screen = await render(
+      <RubricStrip data={named} width={220} height={40} selectedIndex={1} />,
+    );
+    const box = screen.container.querySelector('rect[data-mc-w="tick"]')!;
+    const track = [...screen.container.querySelectorAll('rect[data-mc-ink="neutral"]')][1]!;
+    expect(Number(box.getAttribute("x"))).toBeCloseTo(Number(track.getAttribute("x")) - 0.5, 2);
+    expect(Number(box.getAttribute("width"))).toBeCloseTo(
+      Number(track.getAttribute("width")) + 1,
+      2,
+    );
+  });
 });

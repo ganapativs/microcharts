@@ -1,9 +1,8 @@
 "use client";
 // Interactive <Waveform>. useActivePicker owns interaction: ONE pointer listener
 // + nearest-bucket-by-x, ←/→ rove buckets, click / Enter / Space selects
-// (onSelect).the merged bar path is
-// ; the client only overlays a transient crosshair, a
-// persistent pin and a readout.
+// (onSelect). The bars stay the static entry's merged path; the client only
+// overlays a transient crosshair, a persistent pin and a readout.
 import { useCallback, useMemo, useRef } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
@@ -18,7 +17,14 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WAVEFORM } from "../../core/strings-waveform.js";
-import { bucketCount, bucketX, waveformGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import {
+  bucketCount,
+  bucketX,
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  waveformGeometry,
+} from "./geometry.js";
 import { Waveform as StaticWaveform, waveformSummary, type WaveformProps } from "./index.js";
 
 export interface InteractiveWaveformProps extends WaveformProps, PickerProps {
@@ -39,8 +45,8 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     mode = "bars",
     mirror = true,
     domain,
-    width = 120,
-    height = 24,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_WAVEFORM,
@@ -56,6 +62,13 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same clamp the static entry applies, for the same reason and so the two
+  // agree: this entry computes its OWN buckets and geometry for the pointer map,
+  // and a non-finite box would put the overlay somewhere the composed static
+  // never drew.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The bars are ONE merged path (node budget), so they can't scale per-bar.

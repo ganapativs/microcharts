@@ -6,12 +6,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
-import { scaleLinear } from "../../core/scale.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont, labelFitsY } from "../../core/labels.js";
+import { labelFont, labelFitsBand, textGutter } from "../../core/labels.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
-import { isFiniteValue } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 import { miniBarGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -60,7 +60,7 @@ export interface MiniBarProps {
   orientation?: "horizontal" | "vertical" | undefined;
   /** Which sign is good — engages pos/neg tokens on signed data. */
   positive?: "up" | "down" | undefined;
-  /** Direct max-value readout (vertical only; drops when the box is too short). */
+  /** Direct max-value readout (vertical only; drops when the box is too small for it). */
   label?: "none" | "max" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
@@ -107,21 +107,22 @@ export function MiniBar(props: MiniBarProps): ReactNode {
   }
 
   const sorted = sortData(data, order);
-  const geo = miniBarGeometry({
-    width,
-    height,
-    values: sorted.map((d) => d.value),
-    domain,
-    orientation,
-  });
   const fmt = makeFormatter(format, locale);
   const accName = resolveSummary(summary, () => miniBarSummary(data, fmt, strings));
 
   const hasNegative = sorted.some((d) => isFiniteValue(d.value) && d.value < 0);
   const goodSign = positive === "down" ? -1 : 1;
+
+  // The max readout gets a band of its own above the plot, reserved BEFORE
+  // geometry. Nudging it up over a full-height bar spilled it past the viewBox
+  // top (`.mc-root` never clips, so that lands in the page) and painted label
+  // ink on bar ink. The whole readout — band included — drops out when the box
+  // is too short to give the band up or too narrow to hold the digits.
   let maxText: string | undefined;
   let maxIdx = -1;
   let fontSize = 0;
+  let topPad = 0;
+  let labelW = 0;
   if (label === "max" && orientation === "vertical") {
     fontSize = labelFont(height, 0.45);
     let maxVal = -Infinity;
@@ -132,8 +133,35 @@ export function MiniBar(props: MiniBarProps): ReactNode {
         maxIdx = i;
       }
     }
-    if (maxIdx >= 0 && labelFitsY(height / 2, fontSize, height)) maxText = fmt(maxVal);
+    const labelBand = fontSize + 1; // ascent + descent + a unit of clearance
+    const text = maxIdx >= 0 ? fmt(maxVal) : "";
+    labelW = textGutter(text.length, fontSize, 2);
+    // the band never wins the box: the plot keeps at least a line of its own
+    if (maxIdx >= 0 && labelFitsBand(height - labelBand, fontSize) && labelW <= width) {
+      maxText = text;
+      topPad = labelBand;
+    }
   }
+
+  const geo = miniBarGeometry({
+    width,
+    height,
+    values: sorted.map((d) => d.value),
+    domain,
+    orientation,
+    topPad,
+  });
+
+  // Label anchored over the max bar, then clamped by its own reserved gutter and
+  // by the font's ascent/descent — the containment rule every direct label here
+  // follows, since the static path may never measure text.
+  const maxBar = maxText !== undefined ? geo.bars[maxIdx] : undefined;
+  const labelX = maxBar
+    ? round2(clamp(maxBar.x + maxBar.w / 2, labelW / 2, width - labelW / 2))
+    : 0;
+  const labelY = maxBar
+    ? round2(clamp(maxBar.y - 1, fontSize * 0.78, height - fontSize * 0.22))
+    : 0;
 
   // annotations host contract: Marker x = category slot (bar center), Threshold/
   // TargetZone y = data values. Only VERTICAL bars carry value on the y-axis;
@@ -146,7 +174,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
             const b = geo.bars[Math.round(i)];
             return b ? b.x + b.w / 2 : NaN;
           },
-          y: scaleLinear(geo.domain, [height, 0]),
+          y: scaleLinear(geo.domain, [geo.y1, geo.y0]),
           width,
           height,
           fontSize: annotationFontSize(height),
@@ -204,32 +232,33 @@ export function MiniBar(props: MiniBarProps): ReactNode {
               ? "right"
               : "left";
         return (
-          <g key={b.index}>
-            <rect
-              x={b.x}
-              y={b.y}
-              width={b.w}
-              height={b.h}
-              shapeRendering="crispEdges"
-              data-mc-ink={ink}
-              data-mc-origin={origin}
-              style={!isHl && color ? { fill: color } : undefined}
-            />
-            {maxText !== undefined && i === maxIdx ? (
-              <text
-                x={b.x + b.w / 2}
-                y={Math.max(fontSize * 0.55, b.y - 1)}
-                fontSize={fontSize}
-                dominantBaseline="auto"
-                textAnchor="middle"
-                data-mc-ink="label"
-              >
-                {maxText}
-              </text>
-            ) : null}
-          </g>
+          <rect
+            key={b.index}
+            x={b.x}
+            y={b.y}
+            width={b.w}
+            height={b.h}
+            shapeRendering="crispEdges"
+            data-mc-ink={ink}
+            data-mc-origin={origin}
+            style={!isHl && color ? { fill: color } : undefined}
+          />
         );
       })}
+      {/* after every bar: a wide label used to be painted over by the bars that
+          followed it in the map */}
+      {maxText !== undefined ? (
+        <text
+          x={labelX}
+          y={labelY}
+          fontSize={fontSize}
+          dominantBaseline="auto"
+          textAnchor="middle"
+          data-mc-ink="label"
+        >
+          {maxText}
+        </text>
+      ) : null}
       {ann.over}
       {ann.rest}
     </Chart>

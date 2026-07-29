@@ -16,8 +16,8 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
-import { labelFont, proseCharsThatFit } from "../../core/labels.js";
-import { dumbbellGeometry } from "./geometry.js";
+import { rowLabelFont } from "../../core/labels.js";
+import { dumbbellGeometry, dumbbellLabelChars } from "./geometry.js";
 import {
   Dumbbell as StaticDumbbell,
   dumbbellSummary,
@@ -37,13 +37,18 @@ export interface InteractiveDumbbellProps extends DumbbellProps, PickerProps {
   animate?: boolean;
 }
 
-// The chip and `datum.formatted` show the direction on its OWN, with no sentence
+// The chip and `datum.formatted` show the change on its OWN, with no sentence
 // around it, so neither can use the `fromTo`/`rows` templates (those take the
 // direction as an enum and word it themselves). Both were rendering the raw
 // `"up"`/`"down"` token — English no bundle could reach. Module scope, so it adds
 // no identity to any hook's dependency list.
-function dirWord(strings: PairedStrings, dir: "up" | "down"): string {
-  return strings.dirNames[dir === "up" ? 0 : 1];
+//
+// `pairChange` reports no percent when `from` is 0 (a change against a zero base
+// has none), and with no sentence to absorb the gap the chip printed the empty
+// slot verbatim: "0 → 5 (up )". Direction alone when there is no figure.
+function changeWords(strings: PairedStrings, c: { dir: "up" | "down"; pct: string }): string {
+  const dir = strings.dirNames[c.dir === "up" ? 0 : 1]!;
+  return c.pct ? `${dir} ${c.pct}` : dir;
 }
 
 export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
@@ -81,14 +86,26 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     link: "line[data-mc-ink]",
   });
 
-  const fontSize = labelFont(height, 0.42);
+  // Must be the SAME number the composed static computes, or the overlay rings
+  // land off the labels — pitch-based, exactly as index.tsx does it.
+  const fontSize = rowLabelFont(data.length > 0 ? height / data.length : height);
   // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
-  // the interactive entry re-renders on every unit crossed during a scrub.
-  const maxLabelChars = useMemo(() => {
-    if (!data.some((d) => d.label)) return 0;
-    const longest = data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0);
-    return Math.min(longest, Math.max(4, proseCharsThatFit(width * 0.42, fontSize, 4)));
-  }, [data, width, fontSize]);
+  // the interactive entry re-renders on every unit crossed during a scrub. It has
+  // to be the SAME budget the static entry reserves (dumbbellLabelChars owns it):
+  // the rings and readout below are placed from this geometry, the dots from the
+  // composed static one, and a second spelling of the drop rule put them a whole
+  // gutter apart on a short box.
+  const maxLabelChars = useMemo(
+    () =>
+      dumbbellLabelChars({
+        width,
+        height,
+        rows: data.length,
+        fontSize,
+        longest: data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
+      }),
+    [data, width, height, fontSize],
+  );
   const geo = useMemo(
     () =>
       dumbbellGeometry({
@@ -149,7 +166,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
         value: d && Number.isFinite(d.to) ? d.to : null,
         label: d?.label,
         formatted: d
-          ? `${Number.isFinite(d.from) ? fmt(d.from) : "—"} → ${Number.isFinite(d.to) ? fmt(d.to) : "—"}${c ? ` (${dirWord(strings, c.dir)} ${c.pct})` : ""}`
+          ? `${Number.isFinite(d.from) ? fmt(d.from) : "—"} → ${Number.isFinite(d.to) ? fmt(d.to) : "—"}${c ? ` (${changeWords(strings, c)})` : ""}`
           : undefined,
       };
     },
@@ -261,7 +278,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             height,
           )}
         >
-          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${dirWord(strings, shownChange.dir)} ${shownChange.pct})` : ""}`}
+          {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${changeWords(strings, shownChange)})` : ""}`}
         </span>
       ) : null}
     </span>

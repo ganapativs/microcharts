@@ -75,7 +75,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       // The terminator can't morph (no d: interpolation on Safari), but a bare
       // fade reads flat — pair it with a subtle bloom so the light visibly
       // changes rather than dissolving.
-      const lit = wrap.current?.querySelector<SVGPathElement>("path");
+      const lit = wrap.current?.querySelector<SVGPathElement>("[data-mc-moon]");
       if (lit) {
         lit.style.transformBox = "fill-box";
         lit.style.transformOrigin = "center";

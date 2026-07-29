@@ -32,6 +32,7 @@ export function SetupWithAi({
         className={cn("g2-setup-chip", className)}
         title={LABEL}
         aria-label={LABEL}
+        data-analytics="cta:setup-ai"
       >
         <Sparkles className="size-3.5 shrink-0" aria-hidden />
         <span className="g2-setup-chip-label">{LABEL}</span>
@@ -49,6 +50,7 @@ export function SetupWithAi({
           tone === "muted" ? "text-fd-muted-foreground" : "text-fd-primary",
           className,
         )}
+        data-analytics="cta:setup-ai"
       >
         <Sparkles className="size-3.5 shrink-0" aria-hidden />
         {LABEL}
@@ -68,6 +70,7 @@ export function SetupWithAi({
         "cta-accent group inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-transform hover:-translate-y-0.5",
         className,
       )}
+      data-analytics="cta:setup-ai"
     >
       <Sparkles className="size-4" aria-hidden />
       {LABEL}

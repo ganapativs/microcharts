@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { EnsembleGhosts } from "./index.js";
@@ -40,6 +40,48 @@ describe("<EnsembleGhosts>", () => {
     const on = draw(<EnsembleGhosts data={ENS} endpoints />).container;
     expect(off.querySelector("circle")).toBeNull();
     expect(on.querySelectorAll("circle").length).toBeGreaterThan(0);
+  });
+
+  it("tied endpoints get one dot each, on distinct keys", () => {
+    // Three identical members land the same (x,y), which collided on the old
+    // coordinate-derived React key.
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    const tied = [
+      [1, 2, 3],
+      [1, 2, 3],
+      [1, 2, 3],
+    ];
+    const { container } = draw(<EnsembleGhosts data={tied} endpoints />);
+    expect(container.querySelectorAll("circle").length).toBe(3);
+    expect(err.mock.calls.map(String).join(" ")).not.toMatch(/same key/i);
+    err.mockRestore();
+  });
+
+  it("a host-computed non-finite domain never reaches a coordinate", () => {
+    for (const domain of [
+      [Number.NaN, 60],
+      [0, Number.NaN],
+      [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY],
+    ] as const) {
+      const { container } = draw(<EnsembleGhosts data={ENS} domain={domain} endpoints />);
+      const svg = container.querySelector("svg")!;
+      const coords = [...svg.querySelectorAll("path, circle, text")].flatMap((el) =>
+        ["d", "cx", "cy", "x", "y"].map((a) => el.getAttribute(a) ?? ""),
+      );
+      expect(coords.filter((v) => /NaN|Infinity/.test(v))).toEqual([]);
+    }
+  });
+
+  it("ghost marks carry no literal colour — the ink role owns it (forced-colors)", () => {
+    // `.mc-root` sets `forced-color-adjust: none`, so an inline/attribute
+    // `fill: var(--mc-neutral)` survives verbatim into High Contrast Mode and
+    // the styles.css `ghost → GrayText` mapping never lands.
+    const { container } = draw(<EnsembleGhosts data={ENS} endpoints />);
+    for (const el of container.querySelectorAll('[data-mc-ink="ghost"]')) {
+      expect(el.getAttribute("stroke")).toBeNull();
+      expect(el.getAttribute("style") ?? "").not.toMatch(/(^|[^-])fill\s*:/);
+      expect(el.getAttribute("style") ?? "").not.toMatch(/(^|[^-])stroke\s*:/);
+    }
   });
 
   it("is axe-clean", async () => {

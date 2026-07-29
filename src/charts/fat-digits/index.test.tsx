@@ -94,3 +94,51 @@ describe("<FatDigits> degenerate domains (tests/craft/robust.mjs)", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("1,204 — tier 3 of 5.");
   });
 });
+
+describe("<FatDigits> hostile config props (tests/craft/robust.mjs)", () => {
+  // A non-finite/non-positive fontSize used to reach the box as NaN: `Chart`
+  // clamped the viewBox to 1×1 (nothing visible) while the accessible name still
+  // read the value, and `NaNpx` landed in --mc-label-size and --mc-seat.
+  const SIZES: Record<string, unknown> = {
+    NaN: Number.NaN,
+    Infinity: Number.POSITIVE_INFINITY,
+    "-Infinity": Number.NEGATIVE_INFINITY,
+    zero: 0,
+    negative: -20,
+    null: null,
+  };
+
+  for (const [label, fontSize] of Object.entries(SIZES)) {
+    it(`fontSize ${label} → the 14-unit default, box intact`, () => {
+      const { container } = draw(
+        <FatDigits value={1204} domain={[0, 1500]} fontSize={fontSize as number} />,
+      );
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 48 20");
+      expect(svg.getAttribute("style")).toContain("--mc-label-size: 14px");
+      expect(svg.getAttribute("style")).not.toMatch(/NaN|Infinity|null/);
+      expect(container.querySelector("text")!.getAttribute("font-size")).toBe("14");
+      expect(container.querySelector("text")!.getAttribute("y")).toBe("10");
+    });
+  }
+
+  // The weight table is keyed by `tiers`, so an off-table count read
+  // `undefined[idx]` and threw a TypeError out of the whole render.
+  for (const tiers of [4, 0, Number.NaN, null]) {
+    it(`tiers ${String(tiers)} → the default 5-step scale, announced as 5`, () => {
+      const { container } = draw(
+        <FatDigits value={1204} domain={[0, 1500]} tiers={tiers as 5} title="Edge" />,
+      );
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+        "Edge. 1,204 — tier 4 of 5.",
+      );
+      // announced scale = painted scale: tier 4 of the 5-step table is 750
+      expect(container.querySelector("tspan")!.getAttribute("style")).toContain("font-weight: 750");
+    });
+  }
+
+  it("tiers=3 still selects the 3-step table", () => {
+    const { container } = draw(<FatDigits value={1204} domain={[0, 1500]} tiers={3} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("1,204 — tier 3 of 3.");
+  });
+});

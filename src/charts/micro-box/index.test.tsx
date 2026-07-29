@@ -25,6 +25,19 @@ describe("<MicroBox>", () => {
     );
   });
 
+  it("the IQR box carries no paint the stylesheet overrides", () => {
+    // Regression: the box rect shipped stroke="var(--mc-neutral)" + a hair
+    // stroke-width, but `[data-mc-ink="band"]` declares `stroke: none` and CSS
+    // outranks a presentation attribute — the outline never painted. Dead paint
+    // on a mark reads as intent to anyone changing this file.
+    const { container } = draw(
+      <MicroBox stats={{ min: 12, q1: 35, median: 42, q3: 51, max: 96 }} />,
+    );
+    const box = container.querySelector('rect[data-mc-ink="band"]')!;
+    expect(box.getAttribute("stroke")).toBeNull();
+    expect(box.getAttribute("data-mc-w")).toBeNull();
+  });
+
   it("raw data path computes the five numbers", () => {
     const { container } = draw(<MicroBox data={RAW} />);
     expect(container.querySelector("rect")).not.toBeNull();

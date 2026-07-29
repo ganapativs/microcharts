@@ -12,9 +12,10 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TAPE_GAUGE } from "../../core/strings-tape-gauge.js";
-import { autoSpan, tapeGaugeReadoutFont } from "./index.js";
+import { resolveTapeScale, tapeGaugeReadoutFont } from "./index.js";
 import { TapeGauge as StaticTapeGauge, tapeGaugeSummary, type TapeGaugeProps } from "./index.js";
-import { NO_ZONES, tapeGaugeGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, NO_ZONES, tapeGaugeGeometry } from "./geometry.js";
 
 export interface InteractiveTapeGaugeProps extends TapeGaugeProps {
   /** Minimum ms between live-region announcements (documented throttle). */
@@ -53,8 +54,8 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     span: spanProp,
     rateTiers: tiersProp,
     orientation = "vertical",
-    width = 46,
-    height = 60,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -74,8 +75,18 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
-  const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
-  const tiers = tiersProp ?? [span / 60, span / 15];
+  // Same resolved scale and same resolved box as the static entry — both go
+  // through one function so the hover chip's reveal threshold, the geometry
+  // this entry memoises and the SVG the static paints cannot drift apart.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
+  const { span, tiers } = resolveTapeScale({
+    value,
+    span: spanProp,
+    zones,
+    rate,
+    rateTiers: tiersProp,
+  });
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // The tape walks ticks and zones; in `live` use this component re-renders on
   // every reading, so keep it off the render path when only the throttled

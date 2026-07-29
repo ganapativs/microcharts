@@ -16,7 +16,14 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_EVENT_RASTER } from "../../core/strings-event-raster.js";
-import { LANE_CAP, rasterDomain, rasterLabels } from "./geometry.js";
+import {
+  LANE_CAP,
+  rasterAliases,
+  rasterLabels,
+  rasterWindow,
+  resolveRasterDomain,
+} from "./geometry.js";
+import { scaleLinear } from "../../core/scale.js";
 import {
   EventRaster as StaticEventRaster,
   eventRasterSummary,
@@ -47,6 +54,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const {
     data,
     labels: labelsProp,
+    overflow = "bin",
     domain: domainProp,
     width = 120,
     height: heightProp,
@@ -79,11 +87,13 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   const height = heightProp ?? n * LANE_UNIT;
   const laneH = height / n;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const domain = useMemo(() => domainProp ?? rasterDomain(data), [domainProp, data]);
+  const domain = useMemo(() => resolveRasterDomain(domainProp, data), [domainProp, data]);
 
+  // Windowed exactly as the static entry paints: an event the picture drops is
+  // not a unit the keyboard can rove to, and not a time the readout may quote.
   const sorted = useMemo(
-    () => lanes.map((l) => [...l.events].filter((e) => Number.isFinite(e)).sort((a, b) => a - b)),
-    [lanes],
+    () => lanes.map((l) => rasterWindow(l.events, domain).sort((a, b) => a - b)),
+    [lanes, domain],
   );
   // Widest lane label, in chars. Memoised away from the render path (a scrub
   // re-renders per unit crossed); the gutter itself is cheap arithmetic on top.
@@ -102,11 +112,9 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
   });
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);
-  const span = domain[1] - domain[0] || 1;
-  const xOf = useCallback(
-    (t: number) => plotX0 + ((t - domain[0]) / span) * plotW,
-    [plotX0, plotW, span, domain],
-  );
+  // Same scale the geometry builds, from the same resolved domain — the
+  // crosshair has to land on the tick it is naming.
+  const xOf = useMemo(() => scaleLinear(domain, [plotX0, plotX0 + plotW]), [domain, plotX0, plotW]);
 
   // Unit = one EVENT, flattened lane-major across lanes (lane 0's events first,
   // then lane 1's…): the raster is 2-D (lane × time) but the contract's index is
@@ -209,12 +217,22 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     defaultSelectedIndex,
   });
 
+  // The static entry bins an aliasing lane and says so; the wrapper owns the
+  // accessible name here, so it has to carry the same disclosure or the chart
+  // paints per-bucket counts and announces nothing about them.
+  const binnedLabels = useMemo(
+    () =>
+      overflow === "bin"
+        ? lanes.filter((_, i) => rasterAliases(sorted[i]!.length, plotW)).map((l) => l.label)
+        : [],
+    [overflow, lanes, sorted, plotW],
+  );
   const accName =
     summary === false
       ? undefined
       : typeof summary === "string"
         ? summary
-        : eventRasterSummary(data, [], strings);
+        : eventRasterSummary(data, binnedLabels, strings, domain);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // unit index → its lane + event time (undefined when out of range)
@@ -246,6 +264,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         {...rest}
         data={data}
         labels={labelsProp}
+        overflow={overflow}
         domain={domain}
         width={width}
         height={height}

@@ -141,8 +141,12 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     defaultSelectedIndex,
   });
 
+  // `strings` reaches the announcements but was missing HERE, so a host that
+  // localized the readout still got an English accessible name on the wrapper —
+  // while the static entry it composes localized the same name correctly.
+  // sparkbar's client entry already passes it; this was the divergence.
   const accName =
-    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale }));
+    summary === false ? undefined : (summary ?? describeSeries(data, { format, locale, strings }));
   // The unit shown by the crosshair + readout: the live hover/keyboard focus,
   // falling back to a pinned selection when the pointer has left.
   const shown = active ?? selected;

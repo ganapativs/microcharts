@@ -115,6 +115,74 @@ for (const c of CASES) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Hostile CONFIG.
+//
+// Everything above mutates DATA, because `mutate` only rewrites arrays. A bare
+// numeric prop \u2014 `width`, `height`, `target`, `total`, `window`, `open` \u2014 is
+// never touched by it, and that is the hole the catalog audit kept falling into
+// one chart at a time: thirteen separate charts independently reported the same
+// shape of bug, where a non-finite scalar produced NaN coordinates (or an
+// invalid `viewBox`, which the browser DROPS) under a perfectly correct-sounding
+// accessible name. A per-chart guard cannot make that a catalog invariant; this
+// can.
+//
+// The floor is the same one the data pass asserts, plus the accessible name:
+// a chart handed a nonsense scalar degrades to its documented default and says
+// so, rather than announcing a value it never drew.
+const HOSTILE = [
+  ["NaN", Number.NaN],
+  ["+Infinity", Number.POSITIVE_INFINITY],
+  ["-Infinity", Number.NEGATIVE_INFINITY],
+  ["zero", 0],
+  ["negative", -7],
+];
+
+for (const c of CASES) {
+  let M;
+  try {
+    M = await D(c.slug);
+  } catch {
+    continue; // already reported by the data pass
+  }
+  const Comp = M[c.comp];
+  if (!Comp) continue;
+  const base = c.variants[0];
+  const scalars = Object.keys(base).filter((k) => typeof base[k] === "number");
+  for (const key of scalars) {
+    for (const [label, value] of HOSTILE) {
+      total++;
+      const props = { ...base, [key]: value };
+      let html;
+      try {
+        html = renderToStaticMarkup(createElement(Comp, props));
+      } catch (e) {
+        problems.push(`${c.slug} [config ${key}=${label}]: THREW ${e.message}`);
+        continue;
+      }
+      if (!html) {
+        problems.push(`${c.slug} [config ${key}=${label}]: rendered NOTHING`);
+        continue;
+      }
+      const m = html.match(BAD);
+      if (m) {
+        const at = html.indexOf(m[0]);
+        problems.push(
+          `${c.slug} [config ${key}=${label}]: leaked ${m[1]} \u2014 \u2026${html.slice(Math.max(0, at - 60), at + 40).replace(/\s+/g, " ")}\u2026`,
+        );
+        continue;
+      }
+      // An invalid viewBox is dropped by the browser, so the chart renders at
+      // the wrong scale with its name still attached \u2014 silent, and worse than
+      // a visible NaN.
+      const vb = /viewBox="([^"]*)"/.exec(html);
+      if (vb && !/^0 0 \d+(\.\d+)? \d+(\.\d+)?$/.test(vb[1])) {
+        problems.push(`${c.slug} [config ${key}=${label}]: invalid viewBox "${vb[1]}"`);
+      }
+    }
+  }
+}
+
 console.log(`${total} chart\u00d7scenario renders, ${problems.length} problems`);
 for (const p of problems) console.log("  " + p);
 if (problems.length) process.exit(1);

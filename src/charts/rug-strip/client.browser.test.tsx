@@ -34,6 +34,23 @@ describe("interactive <RugStrip>", () => {
     await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("9.7");
   });
 
+  it("a reversed domain still picks the tick under the cursor", async () => {
+    // The picker binary-searches positions, so a mirrored axis announced a
+    // value that was painted nowhere near the pointer (here: 5.2, at the end
+    // where 9.7 is drawn). Geometry orders the domain, so the two agree again.
+    const screen = await render(<RugStrip data={DATA} domain={[10, 0]} />);
+    const wrap = screen.container.querySelector(".mc-rug-live") as HTMLElement;
+    const r = wrap.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width - 1,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    await expect.poll(() => document.querySelector(".mc-spark-readout")?.textContent).toBe("9.7");
+  });
+
   it("onActive reports the focused observation; null once cleared", async () => {
     const seen: unknown[] = [];
     const screen = await render(<RugStrip data={DATA} onActive={(d) => seen.push(d)} />);

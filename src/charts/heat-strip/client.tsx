@@ -102,8 +102,10 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
 
   const { active, selected, bind } = useActivePicker({
     count: geo.cells.length,
-    width,
-    height,
+    // the resolved box the cells were laid out in — pointer coords are scaled
+    // into the painted viewBox, which is geo's, not the raw prop's
+    width: geo.width,
+    height: geo.height,
     locate,
     datum,
     onActive,
@@ -176,7 +178,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
       {readout && shownCell ? (
         <span
           className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownCell.x + shownCell.w / 2, width)}
+          style={crosshairReadoutStyle(shownCell.x + shownCell.w / 2, geo.width)}
         >
           {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>

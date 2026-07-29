@@ -8,7 +8,10 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FOLDED_BAND, type FoldedBandStrings } from "../../core/strings-folded-band.js";
 import {
   DEFAULT_PERCENTILES,
+  DEFAULT_PERIOD,
   foldedBandGeometry,
+  resolveBins,
+  resolvePeriod,
   type FoldedBandResult,
   type TP,
 } from "./geometry.js";
@@ -37,9 +40,15 @@ export interface FoldedDayBandProps {
   children?: ReactNode | undefined;
 }
 
-/** Position label for a fold bin (in period units). */
+/**
+ * Position label for a fold bin, in period units. Resolves `bins` and `period`
+ * itself so a label can never describe an axis the geometry did not draw: the
+ * interactive entry calls this with the RAW props, so `bins={1e9}` (saturated
+ * to 512 in geometry) announced position 0 for every bin, and a `period` of
+ * NaN/0/±Infinity announced "NaN".
+ */
 export function binPosition(bin: number, bins: number, period: number): number {
-  return Math.round((bin / Math.max(1, bins)) * period);
+  return Math.round((bin / resolveBins(bins)) * resolvePeriod(period));
 }
 
 /** Shared summary — where the median peaks, plus a today-vs-typical clause. */
@@ -65,7 +74,7 @@ export function foldedBandSummary(
 export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
   const {
     data,
-    period = 24,
+    period = DEFAULT_PERIOD,
     today,
     percentiles = DEFAULT_PERCENTILES,
     bins = 24,
@@ -111,12 +120,25 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
       className={className ? `mc-folded ${className}` : "mc-folded"}
       style={style}
     >
+      {/* Quantile envelopes. The paint is dynamic (two nested intervals that
+          must stay ORDERED — the inner one denser), so the chart sets the two
+          `--mc-cone-*` vars and `styles.css` owns the `fill`. Inline fill is
+          what this used to do, and `.mc-root` sets `forced-color-adjust: none`
+          — a 12%-opacity ink survives verbatim into High Contrast Mode, where
+          it is not a visible envelope. The shared rule maps both bands to
+          system ink and keeps their ordering. */}
       {order.map((bi) =>
         geo.bandPaths[bi] ? (
           <path
             key={bi}
             d={geo.bandPaths[bi]}
-            style={{ fill: "var(--mc-stroke)", fillOpacity: bi === 0 ? 0.22 : 0.12 }}
+            data-mc-cone={bi}
+            style={
+              {
+                "--mc-cone-color": "var(--mc-stroke)",
+                "--mc-cone-opacity": bi === 0 ? 0.22 : 0.12,
+              } as CSSProperties
+            }
           />
         ) : null,
       )}
@@ -135,6 +157,9 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
         />
       ) : null}
       {geo.todayPath ? (
+        // Scale-invariant like the median above it. Without the vector-effect
+        // this support-weight overlay thickened with the box and overtook the
+        // headline median wherever the chart renders above ~1.5×.
         <path
           d={geo.todayPath}
           data-mc-ink="accent"
@@ -142,6 +167,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

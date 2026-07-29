@@ -70,6 +70,56 @@ describe("<Dumbbell>", () => {
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(texts).toContain("40");
     expect(texts).toContain("60");
+    // Every rendered figure takes the label ink role. A bare <text> keeps
+    // `--mc-stroke` verbatim under `forced-color-adjust: none`, so in High
+    // Contrast Mode it painted a fixed theme ink on the user's own background.
+    for (const t of container.querySelectorAll("text")) {
+      expect(t.getAttribute("data-mc-ink")).toBe("label");
+    }
+  });
+
+  it("an unnamed leading row is described by its move, never by an empty name", () => {
+    const { container } = draw(
+      <Dumbbell
+        data={[
+          { from: 1, to: 2 },
+          { from: 3, to: 9 },
+        ]}
+      />,
+    );
+    // `rows` has a slot for the name; "Largest change , up 200%." shipped the hole.
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "From 3 to 9, up 200%.",
+    );
+  });
+
+  it("a box too narrow for the label gutter drops the names, not the containment", () => {
+    const { container } = draw(
+      <Dumbbell data={[{ label: "Minas Gerais", from: 1, to: 2 }]} width={20} height={12} />,
+    );
+    expect(container.querySelectorAll("text").length).toBe(0);
+    // The 4-char floor once reserved a 37-unit gutter inside a 20-unit box and
+    // pushed both dots past the right edge (`.mc-root` is overflow: visible).
+    for (const c of container.querySelectorAll("circle")) {
+      const cx = Number(c.getAttribute("cx"));
+      const r = Number(c.getAttribute("r"));
+      expect(cx - r).toBeGreaterThanOrEqual(0);
+      expect(cx + r).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it('a row named "0" keeps its name (length, not truthiness)', () => {
+    const { container } = draw(
+      <Dumbbell
+        data={[
+          { label: "0", from: 50, to: 55 },
+          { label: "1", from: 48, to: 68 },
+        ]}
+        width={220}
+        height={40}
+      />,
+    );
+    expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual(["0", "1"]);
   });
 
   it("is axe-clean", async () => {

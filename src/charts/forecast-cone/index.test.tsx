@@ -53,7 +53,7 @@ describe("<ForecastCone>", () => {
 
   it("2 bands + solid history + dashed median", () => {
     const { container } = draw(<ForecastCone data={HIST} forecast={FC} />);
-    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(2);
+    expect(container.querySelectorAll("path[data-mc-cone]").length).toBe(2);
     const mid = [...container.querySelectorAll("path")].find(
       (p) => p.getAttribute("stroke-dasharray") === "2.5 2.5",
     );
@@ -64,7 +64,7 @@ describe("<ForecastCone>", () => {
     const { container } = draw(
       <ForecastCone data={HIST} forecast={{ mid: FC.mid, p80: FC.p80 }} />,
     );
-    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(1);
+    expect(container.querySelectorAll("path[data-mc-cone]").length).toBe(1);
   });
 
   it("a non-widening cone dev-warns and renders as given (never auto-inflated)", () => {
@@ -83,7 +83,7 @@ describe("<ForecastCone>", () => {
       />,
     );
     expect(warn).toHaveBeenCalled();
-    expect(container.querySelectorAll("path.mc-cone-band").length).toBe(1);
+    expect(container.querySelectorAll("path[data-mc-cone]").length).toBe(1);
   });
 
   it("label='landing' states the median endpoint; 'none' shows no text", () => {

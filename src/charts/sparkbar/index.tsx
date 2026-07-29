@@ -12,8 +12,15 @@ import {
   type SeriesStrings,
   resolveSummary,
 } from "../../core/summary.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { labelMetrics, sparkBarGeometry, type Bar, type SparkBarMode } from "./geometry.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  labelMetrics,
+  sparkBarGeometry,
+  type Bar,
+  type SparkBarMode,
+} from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 
@@ -62,8 +69,8 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   const {
     data,
     domain,
-    width = 80,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     mode = "bar",
     gap = 0.25,
     label = "none",
@@ -79,6 +86,11 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Everything below reads the RESOLVED box, never the prop: `height={NaN}` set
+  // `--mc-label-size: NaNpx` and a NaN seat on a frame `Chart` had clamped to 1.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const accName = resolveSummary(summary, () => describeSeries(data, { format, locale, strings }));
   const fmt = makeFormatter(format, locale);

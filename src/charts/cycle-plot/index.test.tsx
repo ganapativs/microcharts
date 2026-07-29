@@ -33,7 +33,26 @@ describe("<CyclePlot>", () => {
     const { container } = draw(<CyclePlot data={WEEKS} period={7} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull(); // spine
     expect(container.querySelectorAll("circle").length).toBe(7); // one tick per slot
-    expect(container.querySelectorAll('path[data-mc-ink="ghost"]').length).toBe(7); // slot lines
+    // The slot lines are one node carrying seven subpaths — identical paint, so
+    // seven <path> siblings were seven nodes saying the same thing.
+    const ghosts = container.querySelectorAll('path[data-mc-ink="ghost"]');
+    expect(ghosts.length).toBe(1);
+    expect(ghosts[0]!.getAttribute("d")!.match(/M/g)!.length).toBe(7);
+  });
+
+  it("keeps each slot's subpath inside its own column after the merge", () => {
+    const { container } = draw(<CyclePlot data={WEEKS} period={7} width={84} height={20} />);
+    const d = container.querySelector('path[data-mc-ink="ghost"]')!.getAttribute("d")!;
+    // Subpaths must stay in slot order and never span a boundary: every x in
+    // subpath i sits left of every x in subpath i+1.
+    const runs = d
+      .split("M")
+      .filter(Boolean)
+      .map((run) => [...run.matchAll(/(\d+\.?\d*) \d+\.?\d*/g)].map((m) => Number(m[1])));
+    expect(runs.length).toBe(7);
+    for (let i = 1; i < runs.length; i++) {
+      expect(Math.min(...runs[i]!)).toBeGreaterThan(Math.max(...runs[i - 1]!));
+    }
   });
 
   it("trend={false} → spine only, no slot lines", () => {
@@ -45,7 +64,23 @@ describe("<CyclePlot>", () => {
   it("spine={false} → no spine, slot lines remain", () => {
     const { container } = draw(<CyclePlot data={WEEKS} period={7} spine={false} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).toBeNull();
-    expect(container.querySelectorAll('path[data-mc-ink="ghost"]').length).toBe(7);
+    expect(container.querySelector('path[data-mc-ink="ghost"]')).not.toBeNull();
+  });
+
+  it("a domain that is not a scale still paints the shape it announces", () => {
+    // `[NaN, NaN]` is what a host gets from Math.min/max over a series holding a
+    // null. It used to flatten every mark onto the midline while the summary
+    // kept announcing the real peak and dip.
+    const { container } = draw(
+      <CyclePlot data={WEEKS} period={7} slots={DAYS} domain={[NaN, 5]} />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe(
+      "Peaks Fri (61), dips Sun (38); Mon rising across 6 cycles.",
+    );
+    const ys = [...container.querySelectorAll("circle")].map((c) => Number(c.getAttribute("cy")));
+    expect(new Set(ys).size).toBeGreaterThan(1); // not one flat rule
+    expect(ys.every((y) => Number.isFinite(y))).toBe(true);
   });
 
   it("no in-chart text by default (labels feed summaries)", () => {

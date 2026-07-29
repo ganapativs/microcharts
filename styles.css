@@ -52,8 +52,20 @@
     --mc-cat-2: #5b9fd4; /* azure */
     --mc-cat-3: #2e8c66; /* emerald */
     --mc-cat-4: #285788; /* sapphire */
-    --mc-cat-5: #c2543a; /* terracotta */
-    --mc-cat-6: #a85c8c; /* mauve */
+    /* Terracotta and mauve sat at L* 49.6 / 49.3 — dead mid-lightness, which is
+       the one place NEITHER knockout ink clears 4.5:1 (they topped out at 4.33
+       and 4.37). Darkened by ΔE 2.0 and 1.1 — at or under the just-noticeable
+       threshold — which puts both on the light ink at 4.54/4.52, raises their
+       contrast on a white page, and moves them further from cat-3's L* 52.2, so
+       the lightness ordering separates better rather than worse. */
+    --mc-cat-5: #bc5138; /* terracotta */
+    --mc-cat-6: #a55a89; /* mauve */
+    --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #d2982f 7.5:1 */
+    --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #5b9fd4 6.71:1 */
+    --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #2e8c66 4.71:1 */
+    --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #285788 7.04:1 */
+    --mc-on-cat-5: rgba(255, 255, 255, 0.96); /* #bc5138 4.56:1 */
+    --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #a55a89 4.52:1 */
 
     /* geometry + type */
     --mc-stroke-width: 1.5;
@@ -133,10 +145,48 @@
       --mc-cat-4: #6e9bd1;
       --mc-cat-5: #e07e5e;
       --mc-cat-6: #c486b0;
+      --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #e2b45c 9.69:1 */
+      --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #6fb0e0 8.07:1 */
+      --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #4fb08d 7.2:1 */
+      --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #6e9bd1 6.63:1 */
+      --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #e07e5e 6.68:1 */
+      --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #c486b0 6.73:1 */
       /* Lifted fills flip the on-fill ink: white-on-accent falls to 2.7:1 here
          (2.96:1 on positive), while this dark ink reads 6.8:1 / 6.3:1. */
       --mc-on-fill: rgba(0, 0, 0, 0.9);
     }
+  }
+  /* Explicit LIGHT — the missing half of the contract. `[data-mc-theme="dark"]`
+     below has always let a host force dark; there was no way to force light, so
+     on a dark-OS machine the media query above won no matter what the host said.
+     That is not a cosmetic mismatch: a host that pins light usually overrides
+     the palette tokens too, and `--mc-on-fill` is the one nobody thinks to
+     restate — so the FILLS came out light while their knockout ink stayed on the
+     dark branch. Measured on the docs site in exactly that state: TraceFold's
+     span labels 3.28:1, TimeInRange 3.59:1, PartitionStrip 3.76:1, all under the
+     4.5:1 text floor, on a page whose every other token was correctly light.
+     Placed after the media query, at the same zero specificity, so it simply
+     wins on cascade order — the same shape as the dark block below. */
+  :where([data-mc-theme="light"]) {
+    --mc-stroke: #1a1917;
+    --mc-positive: #0e7a5f;
+    --mc-negative: #bd4b2d;
+    --mc-accent: #1f6091;
+    --mc-neutral: #8a8986;
+    --mc-moon: #c1922f;
+    --mc-cat-1: #d2982f;
+    --mc-cat-2: #5b9fd4;
+    --mc-cat-3: #2e8c66;
+    --mc-cat-4: #285788;
+    --mc-cat-5: #bc5138;
+    --mc-cat-6: #a55a89;
+    --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #d2982f 7.5:1 */
+    --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #5b9fd4 6.71:1 */
+    --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #2e8c66 4.71:1 */
+    --mc-on-cat-4: rgba(255, 255, 255, 0.96); /* #285788 7.04:1 */
+    --mc-on-cat-5: rgba(255, 255, 255, 0.96); /* #bc5138 4.56:1 */
+    --mc-on-cat-6: rgba(255, 255, 255, 0.96); /* #a55a89 4.52:1 */
+    --mc-on-fill: rgba(255, 255, 255, 0.96);
   }
   :where([data-mc-theme="dark"]) {
     --mc-stroke: #eae9e6;
@@ -151,6 +201,12 @@
     --mc-cat-4: #6e9bd1;
     --mc-cat-5: #e07e5e;
     --mc-cat-6: #c486b0;
+    --mc-on-cat-1: rgba(0, 0, 0, 0.9); /* #e2b45c 9.69:1 */
+    --mc-on-cat-2: rgba(0, 0, 0, 0.9); /* #6fb0e0 8.07:1 */
+    --mc-on-cat-3: rgba(0, 0, 0, 0.9); /* #4fb08d 7.2:1 */
+    --mc-on-cat-4: rgba(0, 0, 0, 0.9); /* #6e9bd1 6.63:1 */
+    --mc-on-cat-5: rgba(0, 0, 0, 0.9); /* #e07e5e 6.68:1 */
+    --mc-on-cat-6: rgba(0, 0, 0, 0.9); /* #c486b0 6.73:1 */
     --mc-on-fill: rgba(0, 0, 0, 0.9);
   }
   /* Presets = token bundles. Visual only. */
@@ -675,6 +731,19 @@
       var(--mc-band)
     );
   }
+  /* ForecastCone uncertainty bands. Same move as the cell ramp above, for the
+     same reason: the paint is dynamic (series accent, or the `color` prop), so
+     the CHART sets a variable and the fill lives here. It used to set `fill`
+     and `fill-opacity` inline under a `mc-cone-band` class that no rule ever
+     matched, which put the chart's primary encoding out of reach of both the
+     theming contract and the forced-colors mapping below — a 13%-opacity brand
+     accent, preserved verbatim by `forced-color-adjust: none`, is not a visible
+     cone in High Contrast Mode. */
+  :where(.mc-root [data-mc-cone]) {
+    fill: var(--mc-cone-color, var(--mc-accent));
+    fill-opacity: var(--mc-cone-opacity, 0.13);
+    stroke: none;
+  }
   /* IconArray empty unit + CoverageStrip gap — a "measured nothing here" slot,
      never a void: faint band fill + hairline neutral outline. Static, so the
      color lives here (was inline) to earn a forced-colors mapping below. The
@@ -769,29 +838,52 @@
     font-weight: 600;
     fill: var(--mc-on-fill);
   }
-  /* PartitionStrip labels sit on a CATEGORICAL fill, not a deep semantic one, so
-     they take the categorical ink: the light ink reads 2.1–3.7:1 on the mid-tone
-     cats in either theme. A label lands on a rect and is its next sibling (the
-     chart emits `[rect, text]` per segment), so the fill it sits on is exactly
-     what the selector can name.
+  /* A label on a CATEGORICAL fill takes that fill's OWN ink.
+     `--mc-on-cat-N` is generated per palette by scripts/gen-on-cat-ink.mjs,
+     which picks whichever of the two inks has more contrast on that exact hex
+     and fails the build if neither clears 4.5:1.
 
-     Two steps are deep enough to keep the light ink: an `emphasis` segment, which
-     paints `--mc-accent` (6.3:1 light / 6.8:1 dark on the light ink), and
-     light-mode sapphire `--mc-cat-4` — the one deep cat, where the dark ink is
-     3.0:1 and the light ink 5.5:1. Dark-mode cat-4 is the lifted twin (5.7:1 on
-     the dark ink), so that half of the exception is scoped to light. */
-  :where(.mc-partition) :where(text) {
+     This replaces a single `--mc-on-cat` plus a hand-written cat-4 exception and
+     two dark-mode undo rules. That model could not be made correct: measured
+     across the six accent palettes and three achromatic presets, 30 of 108
+     categorical fills need the LIGHT ink, and they sit in the same scope as cats
+     that need the DARK one — `print`'s cat-1 (#14507a) wants light at 8.0:1
+     while the default cat-1 (#d2982f) wants dark. One token per palette cannot
+     satisfy both, which is why these labels measured 3.76:1 on the live site.
+
+     A label lands on a rect and is its next sibling (both charts emit
+     `[rect, text]` per segment), so the fill it sits on is exactly what the
+     selector can name. The `--mc-on-cat` fallback keeps the achromatic presets
+     working: they derive their cats with `color-mix`, so there is no hex for the
+     generator to measure and they keep the single token. */
+  :where(.mc-partition, .mc-segbar) :where(text) {
     fill: var(--mc-on-cat);
   }
-  :where(.mc-partition) :where(rect[data-mc-ink="accent"] + text, rect[data-mc-cat="4"] + text) {
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="1"] + text) {
+    fill: var(--mc-on-cat-1, var(--mc-on-cat));
+  }
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="2"] + text) {
+    fill: var(--mc-on-cat-2, var(--mc-on-cat));
+  }
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="3"] + text) {
+    fill: var(--mc-on-cat-3, var(--mc-on-cat));
+  }
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="4"] + text) {
+    fill: var(--mc-on-cat-4, var(--mc-on-cat));
+  }
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="5"] + text) {
+    fill: var(--mc-on-cat-5, var(--mc-on-cat));
+  }
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-cat="6"] + text) {
+    fill: var(--mc-on-cat-6, var(--mc-on-cat));
+  }
+  /* An emphasis segment paints `--mc-accent`, a deep semantic fill, so it keeps
+     the semantic on-fill ink rather than a categorical one. */
+  :where(.mc-partition, .mc-segbar) :where(rect[data-mc-ink="accent"] + text) {
     fill: var(--mc-on-fill);
   }
-  @media (prefers-color-scheme: dark) {
-    :where(.mc-partition) :where(rect[data-mc-cat="4"] + text) {
-      fill: var(--mc-on-cat);
-    }
-  }
-  :where([data-mc-theme="dark"]) :where(.mc-partition) :where(rect[data-mc-cat="4"] + text) {
+  /* SegmentedBar's rollup sits on the neutral fill, not a cat. */
+  :where(.mc-segbar) :where(rect[data-mc-ink="neutral"] + text) {
     fill: var(--mc-on-cat);
   }
   /* A label on a non-critical TraceFold span steps back to the ORDINARY label
@@ -1117,6 +1209,19 @@
     :where(.mc-root) {
       forced-color-adjust: none;
     }
+    /* The accent TOKEN, not just the accent role. Roughly a hundred interactive
+       entries draw their focus/selection ring as a literal
+       `stroke="var(--mc-accent)"` with no `data-mc-ink` — that is the house
+       pattern, not a mistake in one chart — so the role mapping below never
+       reached them and every focus ring kept the brand hex against the user's
+       chosen Canvas (cobalt on black is about 2.5:1). Remapping the variable
+       fixes all of them at once instead of editing a hundred client entries.
+       Safe against `color-mix`: the one rule that mixes this token
+       (`[data-mc-cell-mix]`) is itself overridden further down this block, and
+       `--mc-surface-edge` already mixes `CanvasText` in the tokens layer. */
+    :where(.mc-root) {
+      --mc-accent: Highlight;
+    }
     /* data ink → CanvasText, accent → Highlight, muted → GrayText */
     :where(.mc-root [data-mc-ink="data"]) {
       stroke: CanvasText;
@@ -1124,6 +1229,19 @@
     :where(.mc-root [data-mc-ink="accent"]) {
       stroke: Highlight;
       fill: Highlight;
+    }
+    /* …and the element split, repeated. This block sits in
+       `@layer microcharts.motion`, which outranks `microcharts.charts`, so the
+       charts-layer split that keeps an accent LINE hollow is overridden in
+       here — an open polyline gets `fill: Highlight` and paints as a solid
+       wedge. The `[data-mc-ink="ghost"]` split is already repeated below for
+       exactly this reason; accent was the one that was missed. The literal
+       `fill="none"` safety net at the end of the block still covers marks that
+       declare themselves hollow; this covers the role on its own, so a chart
+       does not have to remember both. */
+    :where(.mc-root :is(path, line, polyline)[data-mc-ink="accent"]) {
+      fill: none;
+      stroke: Highlight;
     }
     :where(.mc-root [data-mc-ink="muted"]) {
       stroke: GrayText;
@@ -1156,6 +1274,14 @@
     :where(.mc-root [data-mc-ink="cell"]) {
       forced-color-adjust: none;
       fill: Highlight;
+    }
+    /* Uncertainty bands: system accent, and the two intervals stay ORDERED —
+       the inner band has to keep reading as the denser one, or the cone stops
+       saying which outcomes are likelier. The chart's own opacity var carries
+       that ordering, so it is deliberately not flattened here. */
+    :where(.mc-root [data-mc-cone]) {
+      fill: Highlight;
+      fill-opacity: calc(var(--mc-cone-opacity, 0.13) * 2.5);
     }
     /* mix-ramp cells (HeatCell/HeatStrip): same system accent; the discrete
        level survives as fill-opacity, driven by the same unitless mix var. */
@@ -1224,7 +1350,19 @@
     :where(.mc-root [data-mc-cat="6"]) {
       fill-opacity: 0.62;
     }
-    :where(.mc-trace, .mc-partition) :where(text) {
+    /* Knockout labels, generalised. The two rules below already did this by
+       class name; the ROLE needs it too. `text[data-mc-on-fill]` resolves to a
+       literal rgba white/black, and `.mc-root` sets `forced-color-adjust: none`,
+       so that literal survived verbatim — painted over marks this same block has
+       just remapped to CanvasText / GrayText / Highlight, which is exactly the
+       pairing the theming contract was verifying and no longer holds. A label
+       sitting ON a mark takes the background colour, because every mark around
+       it is now a foreground one. Covers EventTimeline spans, TimeInRange zone
+       percents and HeatCell values. */
+    :where(.mc-root text[data-mc-on-fill]) {
+      fill: Canvas;
+    }
+    :where(.mc-trace, .mc-partition, .mc-segbar) :where(text) {
       fill: Canvas;
     }
     :where(.mc-trace) :where(text[data-mc-dim]) {
@@ -1233,6 +1371,16 @@
     /* quadrant tint is purely decorative → drop it entirely in high contrast */
     :where(.mc-root [data-mc-ink="region"]) {
       fill: transparent;
+    }
+    /* Direct value labels. This mapping was missing, and unlike a mark that
+       merely loses its hue, a label that loses contrast loses its content:
+       `--mc-neutral` (#8a8986) is a fixed warm gray, and `.mc-root` sets
+       forced-color-adjust: none, so it PAINTED THAT GRAY against whatever
+       background the user chose — 3.5:1 on a Canvas of white, under the 4.5:1
+       text floor. Text takes the system foreground; the numeral is the whole
+       point of the gutter it was given. */
+    :where(.mc-root text[data-mc-ink="label"]) {
+      fill: CanvasText;
     }
     /* tail flag keeps its emphasis, mapped to the system accent */
     :where(.mc-root line[data-mc-ink="flag"]) {

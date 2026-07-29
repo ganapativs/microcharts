@@ -39,6 +39,22 @@ describe("<Bullet>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("72% of 80% target.");
   });
 
+  it("a bands array past the spread limit renders instead of throwing", () => {
+    const bands = Array.from({ length: 200_000 }, (_, i) => i / 2000);
+    const { container } = draw(<Bullet value={50} target={80} bands={bands} />);
+    // bounded band rects + the measure; the render used to die with RangeError
+    expect(container.querySelectorAll("rect").length).toBeLessThanOrEqual(202);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("50 of 80 target.");
+  });
+
+  it("a sub-pad height emits no negative rect dimension", () => {
+    const { container } = draw(<Bullet value={72} target={80} height={1} />);
+    for (const r of container.querySelectorAll("rect")) {
+      expect(Number(r.getAttribute("height"))).toBeGreaterThanOrEqual(0);
+      expect(Number(r.getAttribute("width"))).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<Bullet value={72} target={80} bands={[50, 80]} title="Sales" />);
     await expectNoA11yViolations(container);

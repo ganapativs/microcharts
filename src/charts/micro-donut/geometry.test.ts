@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { microDonutGeometry } from "./geometry.js";
+import {
+  DONUT_MAX_WEDGES,
+  DONUT_SIZE,
+  donutMaxWedges,
+  donutSize,
+  microDonutGeometry,
+} from "./geometry.js";
 
 describe("microDonutGeometry", () => {
   it("wedges start at 12 o'clock, sweep clockwise, separated by gaps", () => {
@@ -31,6 +37,39 @@ describe("microDonutGeometry", () => {
   it("zero/negative shares are excluded", () => {
     const geo = microDonutGeometry({ size: 24, shares: [2, 0, -1, 3], weight: 5 });
     expect(geo.wedges.length).toBe(2);
+  });
+
+  it("a hostile size/weight falls back to the documented default, not to NaN", () => {
+    const ref = microDonutGeometry({ size: DONUT_SIZE, shares: [0.6, 0.4], weight: 5 });
+    for (const size of [Number.NaN, Infinity, -Infinity, 0, -10, undefined]) {
+      const geo = microDonutGeometry({ size: size as number, shares: [0.6, 0.4], weight: 5 });
+      expect(geo.wedges.map((w) => w.d)).toEqual(ref.wedges.map((w) => w.d));
+      expect(geo.y0).toBe(ref.y0);
+      expect(geo.y1).toBe(ref.y1);
+    }
+    for (const weight of [Number.NaN, undefined]) {
+      expect(microDonutGeometry({ size: 24, shares: [1], weight }).weight).toBe(ref.weight);
+    }
+  });
+
+  it("weight is never negative — a negative stroke-width drops the element", () => {
+    // Sizes below ~3 leave no room for a band: 0 draws nothing, which is the
+    // honest read; -0.5 would make the browser discard the wedge entirely.
+    for (const size of [1, 2, 3, 4, 24, 48]) {
+      const geo = microDonutGeometry({ size, shares: [0.5, 0.5], weight: 5 });
+      expect(geo.weight).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("donutMaxWedges keeps the cap a ceiling", () => {
+    expect(donutMaxWedges(2)).toBe(2);
+    expect(donutMaxWedges(2.5)).toBe(2);
+    expect(donutMaxWedges(1)).toBe(1);
+    for (const n of [Number.NaN, Infinity, 0, -3, undefined]) {
+      expect(donutMaxWedges(n as number)).toBe(DONUT_MAX_WEDGES);
+    }
+    expect(donutSize(48)).toBe(48);
+    expect(donutSize(Number.NaN)).toBe(DONUT_SIZE);
   });
 
   test.prop([
