@@ -31,11 +31,15 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
 2. **Budgets are CI gates:** ≤ 3 kB gzip per static subpath (≤ 2 kB target, simple "Delta-class" charts ≤ 1.5 kB),
    interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
    JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
-   `scripts/size-budgets.json`), never hand-edited. **Two of these ceilings no longer describe the shipped budgets and
-   need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB, none by more
-   than 1.25 kB; and `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries are above that
-   delta (median ~2.4 kB), because size-limit measures each subpath standalone and so charges every one of them the full
-   shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
+   `scripts/size-budgets.json`), never hand-edited. Separately from the budgets, every PR is **diffed against its base
+   branch**: `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI re-measures it against
+   a fresh build (`size-snapshot.mjs --check`), and the `size-diff` job replies on the PR with a per-subpath table.
+   Growth over **1% on any subpath fails** — regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
+   `size-increase-approved` when an increase is deliberate. **Two of these ceilings no longer describe the shipped
+   budgets and need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB,
+   none by more than 1.25 kB; and `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries
+   are above that delta (median ~2.4 kB), because size-limit measures each subpath standalone and so charges every one
+   of them the full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.
@@ -191,6 +195,15 @@ The 2026-07 voice pass set the register for the whole repo. Exemplars: `apps/doc
 
 ## Working rules
 
+- **Generated artifacts are never hand-edited and never stale.** `pnpm gen:all` regenerates every committed generated
+  file in dependency order — `.size-limit.json`, `scripts/size-snapshot.json`, the docs `chart-sizes.json` /
+  `bench-summary.json`, the five docs registry snapshots (`*.generated.{ts,json}`), `packages/mcp/server.json`, and the
+  MCP embedded catalog + assets. `pnpm gen:check` runs the same generators and fails if any owned path moved; it is a
+  pre-push hook and the `quality` CI step, so nothing generated can reach main by hand or out of date. Adding a
+  generator means adding it to `STEPS` in `scripts/gen-all.mjs`. Asset generators (brand kit, wordmark, promo, favicon,
+  figma) are deliberately outside that set — run them by hand when the brand moves. Writing a `*.generated.*` file with
+  oxfmt means formatting over `--stdin-filepath`: `.oxfmtrc.json` ignores those globs, so passing the written path gives
+  oxfmt zero targets and it exits 2, which crashes the generator.
 - Commit style: conventional commits, subject ≤ 50 chars, body only when the "why" isn't obvious.
 - Never add a dependency (even a dev one) without checking that it's actively maintained.
 - Every doc example must be a compiled fixture — never write snippets that don't build.

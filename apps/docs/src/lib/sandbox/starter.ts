@@ -236,7 +236,7 @@ const PACKAGE_JSON = `{
     "preview": "vite preview"
   },
   "dependencies": {
-    "@microcharts/react": "^0.8.0",
+    "@microcharts/react": "^0.11.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

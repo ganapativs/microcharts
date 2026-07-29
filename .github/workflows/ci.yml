@@ -37,12 +37,17 @@ jobs:
       - run: pnpm robust
       - run: pnpm floor
       - run: pnpm knip
+      # EVERY committed generated artifact — size limits, the size-diff baseline,
+      # the docs size/bench numbers, the docs registry snapshots, the MCP catalog
+      # — is regenerated here and diffed. One step, so a new generator can only be
+      # added by adding it to STEPS in gen-all.mjs, and nothing generated can
+      # reach main hand-edited or stale. `--skip-build` reuses the dist/ built
+      # above.
+      #
+      # Ahead of `pnpm size` on purpose: it owns `.size-limit.json`, so the
+      # budget gate below runs against a regenerated gate file, not a stale one.
+      - run: node scripts/gen-all.mjs --check --skip-build
       - run: pnpm size
-      # generated files must match their sources — never hand-edited
-      - run: node scripts/gen-size-limits.mjs --check
-      - run: node scripts/sync-sizes.mjs --check
-      - run: node scripts/sync-bench.mjs --check
-      - run: node scripts/sync-server-json.mjs --check
       - run: pnpm exec publint
       - run: pnpm exec attw --pack .
       # @microcharts/mcp — the sibling MCP server. Runs after the library build
@@ -74,6 +79,67 @@ jobs:
         with:
           node-version: 24.18.0
       - run: node scripts/check-mcp-changeset.mjs "origin/${{ github.base_ref }}"
+
+  # Per-subpath gzip diff against the base branch, replied as one sticky PR
+  # comment. It reads two committed `scripts/size-snapshot.json` files — the
+  # `quality` job re-measures the head one against a fresh build, so neither
+  # side can be understated and this job needs no build at all.
+  #
+  # Fails when any subpath grows more than 1%. To land a deliberate increase,
+  # label the PR `size-increase-approved` (the report is still posted) and
+  # re-baseline the budgets in the same PR.
+  size-diff:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      # setup-node activates the repo's `packageManager` via corepack, so pnpm
+      # has to exist even though this job only runs a builtins-only node script.
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.18.0
+      - name: Diff sizes against ${{ github.base_ref }}
+        id: diff
+        # The report has to reach the PR even when the gate fails, so the
+        # failure is re-raised in the last step instead of here.
+        continue-on-error: true
+        env:
+          SIZE_DIFF_ALLOW:
+            ${{ contains(github.event.pull_request.labels.*.name, 'size-increase-approved') && '1' ||
+            '0' }}
+        run: node scripts/size-diff.mjs "origin/${{ github.base_ref }}" --out size-report.md
+      - name: Job summary
+        if: always()
+        run: cat size-report.md >> "$GITHUB_STEP_SUMMARY"
+      # Forked PRs get a read-only token, so the comment API would 403. The job
+      # summary above carries the same report for those.
+      - name: Reply on the PR
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          marker='<!-- microcharts-size-report -->'
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+                 --jq "map(select(.body | startswith(\"$marker\"))) | .[0].id // empty")
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" -F body=@size-report.md >/dev/null
+            echo "updated comment $id"
+          else
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -F body=@size-report.md >/dev/null
+            echo "posted a new comment"
+          fi
+      - name: Enforce the size gate
+        if: steps.diff.outcome == 'failure'
+        run: |
+          echo "::error::A subpath grew by more than 1% — see the size report comment on this PR."
+          exit 1
 
   # Static + core-math suite (jsdom). Its output is pure `renderToStaticMarkup`
   # of deterministic geometry — identical on React 18 and 19 — so it runs ONCE,
@@ -143,6 +209,24 @@ jobs:
       - run: pnpm build # dist/ that the fixture imports
       - run: pnpm --filter @microcharts/fixture-next build
       - run: pnpm --filter @microcharts/fixture-next verify
+
+  # The docs workspace was never on CI, so every guard it owns — the registry
+  # snapshots, /catalog.json, /llms.txt, the hero specimen literals, the prose
+  # claim checks — could drift on main unnoticed. It is 2.5 k assertions in ~3 s.
+  # It consumes the built dist/, so the library build comes first.
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @microcharts/docs typecheck
+      - run: pnpm --filter @microcharts/docs test
 
   # Block PRs that introduce dependencies with known vulnerabilities. Only the
   # diff is scanned, so it needs the PR event's base/head — hence the guard.

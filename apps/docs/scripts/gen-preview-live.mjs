@@ -61,10 +61,17 @@ ${lines}
 `;
 
   const out = join(docsDir, "src", "lib", "charts", "preview-live.generated.ts");
-  writeFileSync(out, body);
   // Normalize to oxfmt (unquoted keys, line wrapping) so the committed snapshot
   // stays clean under `format:check` no matter how this template is spaced.
+  // Over STDIN, not the written path: `.oxfmtrc.json` ignores `**/*.generated.ts`,
+  // so pointing oxfmt at the output leaves it with zero targets and it exits 2 —
+  // which crashed this generator outright. Same workaround as `gen-entries.mjs`.
   // Via `pnpm exec` — bare `oxfmt` is not on PATH.
-  execFileSync("pnpm", ["exec", "oxfmt", out], { cwd: docsDir, stdio: "ignore" });
+  const formatted = execFileSync("pnpm", ["exec", "oxfmt", "--stdin-filepath=preview-live.ts"], {
+    cwd: docsDir,
+    input: body,
+    encoding: "utf8",
+  });
+  writeFileSync(out, formatted);
   console.log(`gen-preview-live: wrote ${slugs.length} lazy preview loaders to ${out}`);
 }
