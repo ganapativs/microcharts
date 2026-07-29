@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { CommandLine } from "@/components/ui/command-line";
+import { track } from "@/lib/analytics";
 
 /**
  * A one-line copyable command, tokenised by the site's shared `<CommandLine>`:
@@ -33,6 +34,7 @@ export function CopyLine({
       // Clipboard denied (insecure context, permission): the command is on
       // screen and selectable, so there is nothing to recover.
     }
+    track({ name: "copy", kind: "install" });
     setCopied(true);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setCopied(false), 1500);

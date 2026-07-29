@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 
 /**
  * A copyable colour chip for the brand page. The whole tile is the button —
@@ -25,6 +26,7 @@ export function ColorSwatch({
       type="button"
       onClick={() => {
         void navigator.clipboard.writeText(hex).then(() => {
+          track({ name: "copy", kind: "brand" });
           setCopied(true);
           setTimeout(() => setCopied(false), 1200);
         });

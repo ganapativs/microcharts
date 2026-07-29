@@ -7,6 +7,7 @@ import {
   STARTER_OPEN_FILE,
   STARTER_TITLE,
 } from "@/lib/sandbox/starter";
+import { track } from "@/lib/analytics";
 
 /**
  * "Try it live" launcher. Repo-controlled starter files (lib/sandbox/starter.ts)
@@ -33,6 +34,7 @@ function project() {
 }
 
 function openFull() {
+  track({ name: "sandbox", source: "stackblitz-starter" });
   void import("@stackblitz/sdk")
     .then((m) => m.default.openProject(project(), { openFile: STARTER_OPEN_FILE, newWindow: true }))
     .catch(() => {

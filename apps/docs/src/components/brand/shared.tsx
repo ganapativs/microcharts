@@ -180,7 +180,7 @@ export function AssetTile({
           <div className="kicker mt-1.5 truncate">{asset.note}</div>
         </div>
         <div className="flex shrink-0 items-center gap-0.5">
-          <CopyButton text={src} size={8} />
+          <CopyButton text={src} size={8} analyticsKind="brand" />
           <a
             href={`/brand/${asset.file}`}
             download

@@ -37,7 +37,7 @@ export function PackageTabs({ pkg = "@microcharts/react" }: { pkg?: string }) {
       </div>
       <div className="flex items-center gap-2.5 pb-2.5 pl-4 pr-2 pt-1">
         <CommandLine command={command} className="min-w-0 flex-1 truncate text-sm" />
-        <CopyButton text={command} size={7} className="shrink-0" />
+        <CopyButton text={command} size={7} className="shrink-0" analyticsKind="install" />
       </div>
     </div>
   );

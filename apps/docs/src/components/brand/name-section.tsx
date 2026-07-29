@@ -61,7 +61,7 @@ export function BrandNameSection() {
                       </code>
                     )}
                   </dd>
-                  <CopyButton text={row.v} size={7} className="shrink-0" />
+                  <CopyButton text={row.v} size={7} className="shrink-0" analyticsKind="brand" />
                 </div>
               ))}
             </dl>

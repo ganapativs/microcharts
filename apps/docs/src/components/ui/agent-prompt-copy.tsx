@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Check, Copy, Link2 } from "lucide-react";
 import { SITE } from "@/lib/site";
+import { track } from "@/lib/analytics";
 
 const SHORT_PROMPT = `Set up ${SITE.pkg} in this repo — follow ${SITE.url}/agent-setup.md and complete every step in order.`;
 
@@ -16,6 +17,7 @@ export function AgentPromptCopy() {
   const copy = (text: string, which: Exclude<Copied, null>) => {
     if (!text) return;
     void navigator.clipboard.writeText(text).then(() => {
+      track({ name: "copy", kind: "agent_setup" });
       setCopied(which);
       setTimeout(() => setCopied((c) => (c === which ? null : c)), 1600);
     });

@@ -74,6 +74,7 @@ export function ExampleView({ app }: { app: ShowcaseApp }) {
                   rel="noreferrer noopener"
                   className="door group"
                   data-primary
+                  data-analytics="cta:example-live"
                 >
                   <span className="door-label">Open the live app</span>
                   <ArrowUpRight
@@ -103,6 +104,7 @@ export function ExampleView({ app }: { app: ShowcaseApp }) {
               rel="noreferrer noopener"
               className="shot-frame"
               aria-label={`Open the live ${app.name} app`}
+              data-analytics="cta:example-live"
             >
               <span
                 className="shot"
