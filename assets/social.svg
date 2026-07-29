@@ -1,7 +1,7 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Open Runde', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif">
   <!-- Design language: the microcharts.dev marketing surface — flat #0a0b0f field,
        one 152° accent wash + film grain ground, Open Runde display, Hanken body,
-       JetBrains mono metadata. Every chart is the REAL shipped component:
+       Iosevka mono metadata. Every chart is the REAL shipped component:
        `@chart` slots are filled by scripts/gen-promo.mjs (react-dom/server over
        dist/, rasterized in Chromium so @font-face + styles.css apply).
        Layout: two flex-like rows, ten unique chart types, card widths sized to
@@ -44,28 +44,28 @@
     <g transform="translate(72,196)">
       <rect x="0.5" y="0.5" width="299" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart sparkline x=24 y=22 w=252 h=70-->
-      <text x="150" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
+      <text x="150" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
     </g>
     <g transform="translate(388,196)">
       <rect x="0.5" y="0.5" width="249" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart waveform x=24 y=28 w=202 h=58-->
-      <text x="125" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">WAVEFORM</text>
+      <text x="125" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">WAVEFORM</text>
     </g>
     <g transform="translate(654,196)">
       <rect x="0.5" y="0.5" width="209" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart sparkbar x=24 y=22 w=162 h=70-->
-      <text x="105" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
+      <text x="105" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
     </g>
     <g transform="translate(880,196)">
       <rect x="0.5" y="0.5" width="179" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart delta x=20 y=26 w=140 h=40 fs=26-->
       <text x="90" y="98" text-anchor="middle" font-size="12.5" fill="#e9e8e3" opacity="0.45">1,240 → 1,394</text>
-      <text x="90" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
+      <text x="90" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
     </g>
     <g transform="translate(1076,196)">
       <rect x="0.5" y="0.5" width="131" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart ring x=28 y=14 w=76 h=76-->
-      <text x="66" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">PROGRESS</text>
+      <text x="66" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">PROGRESS</text>
     </g>
   </g>
 
@@ -74,31 +74,31 @@
     <g transform="translate(72,354)">
       <rect x="0.5" y="0.5" width="319" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart activity24 x=24 y=18 w=272 h=80-->
-      <text x="160" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
+      <text x="160" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
     </g>
     <g transform="translate(408,354)">
       <rect x="0.5" y="0.5" width="219" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart ohlc x=20 y=16 w=180 h=78-->
-      <text x="110" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">OHLC</text>
+      <text x="110" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">OHLC</text>
     </g>
     <g transform="translate(644,354)">
       <rect x="0.5" y="0.5" width="139" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart donut x=36 y=16 w=68 h=68-->
-      <text x="70" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">DONUT</text>
+      <text x="70" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">DONUT</text>
     </g>
     <g transform="translate(800,354)">
       <rect x="0.5" y="0.5" width="199" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart segmented x=22 y=50 w=156 h=18-->
-      <text x="100" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">SEGMENTED</text>
+      <text x="100" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SEGMENTED</text>
     </g>
     <g transform="translate(1016,354)">
       <rect x="0.5" y="0.5" width="191" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
       <!--@chart heatstrip x=20 y=50 w=152 h=20-->
-      <text x="96" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">HEAT STRIP</text>
+      <text x="96" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">HEAT STRIP</text>
     </g>
   </g>
 
   <!-- footer: stat line + url, centered + stacked -->
-  <text x="640" y="556" text-anchor="middle" xml:space="preserve" font-size="14" fill="#e9e8e3" opacity="0.5" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan opacity="0.55">   ·   </tspan>0 dependencies<tspan opacity="0.55">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan opacity="0.55">   ·   </tspan>RSC-safe<tspan opacity="0.55">   ·   </tspan>accessible by default</text>
+  <text x="640" y="556" text-anchor="middle" xml:space="preserve" font-size="14" fill="#e9e8e3" opacity="0.5" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan opacity="0.55">   ·   </tspan>0 dependencies<tspan opacity="0.55">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan opacity="0.55">   ·   </tspan>RSC-safe<tspan opacity="0.55">   ·   </tspan>accessible by default</text>
   <text x="640" y="598" text-anchor="middle" font-size="17" fill="#528dff" font-family="\'Open Runde\', ui-sans-serif, system-ui, sans-serif" font-weight="500">microcharts.dev</text>
 </svg>

@@ -9,7 +9,28 @@
 // read fails. 2-dp.
 import { arcPath, TAU } from "../../core/arc.js";
 import { normalizeShares } from "../../core/stack.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
+
+/** Documented prop defaults. They live here, not in the two entries, because
+ *  the static entry, the interactive entry and this geometry all resolve the
+ *  same three scalars and must land on the same number — a NaN `size` painted
+ *  nothing (arcPath rejects a non-finite radius) under a full accessible name. */
+export const DONUT_SIZE = 24;
+const DONUT_WEIGHT = 5;
+export const DONUT_MAX_WEDGES = 4;
+
+/** Box side: positive-finite, else the default. Also fixes the seat — a
+ *  non-finite `size` reached `<Chart seat>` as `--mc-seat: NaN`. */
+export function donutSize(size: number | undefined): number {
+  return isFiniteValue(size) && size > 0 ? size : DONUT_SIZE;
+}
+
+/** Wedge cap: at least one whole wedge. The cap is a legibility CEILING, and a
+ *  hostile value used to breach it — `0` reaches `slice(0, -1)`, which keeps
+ *  every category but the last, so `maxWedges={0}` rendered five wedges. */
+export function donutMaxWedges(n: number | undefined): number {
+  return isFiniteValue(n) && n >= 1 ? Math.floor(n) : DONUT_MAX_WEDGES;
+}
 
 export interface Wedge {
   /** Value arc — a stroked open centerline at mid-radius. */
@@ -24,7 +45,7 @@ export interface Wedge {
 export function microDonutGeometry(opts: {
   size: number;
   shares: readonly number[];
-  weight: number;
+  weight?: number | undefined;
   gapDeg?: number | undefined;
 }): {
   wedges: Wedge[];
@@ -35,12 +56,17 @@ export function microDonutGeometry(opts: {
   /** Bottom edge of the ring's plot box. */
   y1: number;
 } {
-  const { size, shares, gapDeg = 2 } = opts;
+  const { shares, gapDeg = 2 } = opts;
+  const size = donutSize(opts.size);
   const c = size / 2;
   const rOuter = c - 0.5;
   const y0 = round2(c - rOuter);
   const y1 = round2(c + rOuter);
-  const weight = round2(Math.min(Math.max(opts.weight, 1), rOuter - 0.5));
+  const asked = isFiniteValue(opts.weight) ? opts.weight : DONUT_WEIGHT;
+  // Upper bound floored at 0: a `size` of 1 or 2 leaves no room for a band, and
+  // a NEGATIVE stroke-width is an SVG error — the browser drops the whole
+  // element rather than drawing a thin ring. 0 draws nothing, honestly.
+  const weight = round2(Math.min(Math.max(asked, 1), Math.max(rOuter - 0.5, 0)));
   const norm = normalizeShares(shares);
   if (!norm) return { wedges: [], weight, y0, y1 };
 

@@ -71,6 +71,9 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
   });
 
   const sorted = useMemo(() => sortData(data, order), [data, order]);
+  // No `topPad` here on purpose: the label band only shifts the VALUE axis, and
+  // interaction reads the category axis only (band lookup, ring x/width, readout
+  // anchor). The static entry stays the single owner of the label's box.
   const geo = useMemo(
     () =>
       miniBarGeometry({

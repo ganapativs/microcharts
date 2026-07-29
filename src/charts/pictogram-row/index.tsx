@@ -7,7 +7,13 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { pictogramGeometry, type PictogramUnit } from "./geometry.js";
+import { chartSide, round2 } from "../../core/types.js";
+import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  pictogramGeometry,
+  type PictogramUnit,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** True numbers even on overflow ("9 of 8."). */
@@ -17,8 +23,12 @@ export function pictogramSummary(
   fmt: (n: number) => string,
   strings: ScalarStrings,
 ): string {
-  if (!Number.isFinite(value) || !Number.isFinite(total) || total <= 0) return strings.noData;
-  return strings.countOf(fmt(value), Math.floor(total));
+  // Whole units are what the row draws, so they are what it announces. Reading
+  // `total > 0` instead let a fractional denominator through: `total={0.5}`
+  // floors to no units at all, yet the name read "0.25 of 0." over an empty box.
+  const units = Math.floor(total);
+  if (!Number.isFinite(value) || !Number.isFinite(total) || units < 1) return strings.noData;
+  return strings.countOf(fmt(value), units);
 }
 
 export interface PictogramRowProps {
@@ -53,8 +63,8 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
     shape = "dot",
     fractional = "clip",
     renderPoint,
-    width = 60,
-    height = 12,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     format,
     locale,
@@ -66,6 +76,10 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Same resolution the geometry runs, so the frame and the units share a box.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   if (Number.isFinite(total) && total > 20) {
     devWarn(`<PictogramRow> total=${total} — past 20 units, counting fails; use Progress.`);
@@ -101,31 +115,6 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
     >
       {geo.units.map((u) => {
         if (renderPoint) return renderPoint(u);
-        const ring =
-          shape === "dot" ? (
-            <circle
-              key={`r${u.index}`}
-              cx={u.cx}
-              cy={u.cy}
-              r={u.r - 0.3}
-              fill="none"
-              data-mc-ink={u.fill >= 1 ? undefined : "muted"}
-              data-mc-w={u.fill >= 1 ? undefined : "hair"}
-              stroke={u.fill >= 1 ? "none" : undefined}
-            />
-          ) : (
-            <rect
-              key={`r${u.index}`}
-              x={u.cx - u.r + 0.3}
-              y={u.cy - u.r + 0.3}
-              width={(u.r - 0.3) * 2}
-              height={(u.r - 0.3) * 2}
-              fill="none"
-              data-mc-ink={u.fill >= 1 ? undefined : "muted"}
-              data-mc-w={u.fill >= 1 ? undefined : "hair"}
-              stroke={u.fill >= 1 ? "none" : undefined}
-            />
-          );
         if (u.fill >= 1) {
           return shape === "dot" ? (
             <circle
@@ -139,16 +128,45 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
           ) : (
             <rect
               key={u.index}
-              x={u.cx - u.r}
-              y={u.cy - u.r}
-              width={u.r * 2}
-              height={u.r * 2}
+              // rounded on derivation: subtracting two 2-dp numbers reintroduces
+              // binary noise (`1.1399999999999997`) straight into the markup
+              x={round2(u.cx - u.r)}
+              y={round2(u.cy - u.r)}
+              width={round2(u.r * 2)}
+              height={round2(u.r * 2)}
               shapeRendering="crispEdges"
               data-mc-ink={fillRole}
               style={fillStyle}
             />
           );
         }
+        // Below here the unit is empty or partial, so the ring always shows —
+        // it used to be built for filled units too, with every attribute behind
+        // a `u.fill >= 1` ternary that the early return above had already ruled
+        // out. One throwaway element per filled unit, and three dead branches.
+        const ring =
+          shape === "dot" ? (
+            <circle
+              key={`r${u.index}`}
+              cx={u.cx}
+              cy={u.cy}
+              r={u.ringR}
+              fill="none"
+              data-mc-ink="muted"
+              data-mc-w="hair"
+            />
+          ) : (
+            <rect
+              key={`r${u.index}`}
+              x={round2(u.cx - u.ringR)}
+              y={round2(u.cy - u.ringR)}
+              width={round2(u.ringR * 2)}
+              height={round2(u.ringR * 2)}
+              fill="none"
+              data-mc-ink="muted"
+              data-mc-w="hair"
+            />
+          );
         if (u.partial) {
           return (
             <g key={u.index}>

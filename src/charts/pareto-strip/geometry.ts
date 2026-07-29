@@ -4,8 +4,42 @@
 // the threshold crossing are "vital" (accent); the rest are muted — the chart's
 // one job is to say where to stop reading. `Other` never participates in
 // ranking. Coords 2-dp, integer viewBox.
-import { round2 } from "../../core/types.js";
-import { maxOf } from "../../core/scale.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
+import { clamp, maxOf } from "../../core/scale.js";
+
+/** Documented defaults, shared by the geometry, the caption and the summary. */
+export const DEFAULT_THRESHOLD = 80;
+export const DEFAULT_MAX_ITEMS = 8;
+export const DEFAULT_WIDTH = 80;
+export const DEFAULT_HEIGHT = 20;
+
+/**
+ * The reference line, resolved once. A host computes this — a settings field, a
+ * config fetch, `Number(input.value)` on a cleared input — so a non-finite or
+ * out-of-range percent is ordinary, and every one of them used to paint:
+ * `threshold={NaN}` emitted `<line y1="NaN">` while the accessible name quietly
+ * dropped to the no-threshold "X leads at 36%", so the announced scale and the
+ * painted scale disagreed; `threshold={Infinity}` emitted `y1="-Infinity"`; and
+ * `threshold={150}` / `{-50}` put a hairline 6 units outside a 20-unit box,
+ * which `.mc-root`'s `overflow: visible` paints onto the page rather than
+ * clipping. A cumulative share lives in [0, 100], so anything outside it is
+ * clamped to the edge rather than honoured off-box. `false` still means off.
+ */
+export function resolveThreshold(t?: number | false | undefined): number | null {
+  if (t === false) return null;
+  if (t === undefined) return DEFAULT_THRESHOLD;
+  return isFiniteValue(t) ? clamp(t, 0, 100) : DEFAULT_THRESHOLD;
+}
+
+/**
+ * Roll-up cap, resolved once. `Math.round(NaN)` is NaN and NaN survives both
+ * `Math.min` and `Math.max`, so `maxItems={NaN}` sliced zero head rows and
+ * rolled the whole dataset into a single "Other" bar announced as
+ * "Other leads at 100%" — the ranking, which is the entire chart, gone.
+ */
+export function resolveMaxItems(n?: number | undefined): number {
+  return isFiniteValue(n) ? clamp(Math.round(n), 1, 12) : DEFAULT_MAX_ITEMS;
+}
 
 interface ParetoBar {
   x: number;
@@ -59,13 +93,17 @@ export function paretoGeometry(opts: {
   const valid = opts.data.filter((d) => Number.isFinite(d.value) && d.value >= 0);
   if (valid.length === 0) return null;
 
-  const { width, height } = opts;
+  // The box is a host input too (a CSS var read back, a collapsed flex
+  // measurement): `Chart` clamps the FRAME, so a raw non-finite side left NaN
+  // bar coords inside a valid viewBox. Resolve to the documented box instead.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const pad = opts.pad ?? 2;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
-  const cap = Math.max(1, Math.min(12, Math.round(opts.maxItems ?? 8)));
-  const threshold = opts.threshold === false ? null : (opts.threshold ?? 80);
+  const cap = resolveMaxItems(opts.maxItems);
+  const threshold = resolveThreshold(opts.threshold);
 
   // stable descending sort (input order breaks ties)
   const sorted = valid.map((d, i) => ({ ...d, i })).sort((a, b) => b.value - a.value || a.i - b.i);

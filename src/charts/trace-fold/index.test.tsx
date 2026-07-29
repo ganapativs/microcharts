@@ -85,6 +85,36 @@ describe("<TraceFold>", () => {
       expect(container.querySelectorAll("rect").length).toBe(1);
     });
 
+    // A host sizing a trace off an element it has not measured yet passes
+    // `width={NaN}`. `Chart` clamped the frame, so the viewBox and the
+    // accessible name read correct while every rect carried x="NaN"; a negative
+    // box drew the rows outside a frame that does not clip.
+    it.each([
+      ["NaN", Number.NaN],
+      ["Infinity", Number.POSITIVE_INFINITY],
+      ["zero", 0],
+      ["negative", -50],
+    ])("an unusable %s box falls back to the default, not NaN coords", (_name, bad) => {
+      const boxes = [{ width: bad, height: 40 }, { width: 200, height: bad }, { width: bad }];
+      for (const box of boxes) {
+        const { container } = draw(<TraceFold data={TRACE} {...box} />);
+        const svg = container.querySelector("svg")!;
+        expect(svg.getAttribute("viewBox")).not.toMatch(/NaN|Infinity|-/);
+        // the seat and the label size are derived from the box too
+        expect(svg.getAttribute("style")).not.toMatch(/NaN|Infinity/);
+        const [, , vw, vh] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+        for (const r of container.querySelectorAll("rect")) {
+          const [x, y, w, h] = ["x", "y", "width", "height"].map((a) => Number(r.getAttribute(a)));
+          expect([x, y, w, h].every((n) => Number.isFinite(n))).toBe(true);
+          // the fallback box is the one the marks are laid out against
+          expect(x!).toBeGreaterThanOrEqual(0);
+          expect(y!).toBeGreaterThanOrEqual(0);
+          expect(x! + w!).toBeLessThanOrEqual(vw! + 0.01);
+          expect(y! + h!).toBeLessThanOrEqual(vh! + 0.01);
+        }
+      }
+    });
+
     it("an unplaceable span is never named the longest", () => {
       const geo = traceFoldGeometry({
         data: [

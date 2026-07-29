@@ -175,8 +175,13 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         <path
           key={b.p}
           d={b.d}
-          className="mc-cone-band"
-          style={{ fill: accent, fillOpacity: BAND_OPACITY[b.p] }}
+          data-mc-cone={b.p}
+          style={
+            {
+              "--mc-cone-color": accent,
+              "--mc-cone-opacity": BAND_OPACITY[b.p],
+            } as CSSProperties
+          }
         />
       ))}
       {geo.history.d ? (
@@ -230,7 +235,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

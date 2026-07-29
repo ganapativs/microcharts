@@ -201,6 +201,10 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
       {labels.slice(0, kk).flatMap((lab, i) => {
         const cellW = (size - rightGutter - gutterCh - 1) / kk;
         const c = round2(gutterCh + cellW * (i + 0.5));
+        // Code POINT, not code unit: `labels` is caller data, and charAt(0) on
+        // an astral first character ("🐱 cat", "𝐀 class") emits a lone
+        // surrogate, which paints as the replacement glyph on both axes.
+        const initial = [...lab][0] ?? "";
         return [
           <text
             key={`col-${i}`}
@@ -211,7 +215,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
             fontSize={fontSize}
             data-mc-ink="label"
           >
-            {lab.charAt(0)}
+            {initial}
           </text>,
           <text
             key={`row-${i}`}
@@ -222,7 +226,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
             fontSize={fontSize}
             data-mc-ink="label"
           >
-            {lab.charAt(0)}
+            {initial}
           </text>,
         ];
       })}

@@ -61,8 +61,21 @@ export function tallyGeometry(opts: {
 }): TallyGeometry {
   const { value, total, height, pad, pen, overflow, fontSize } = opts;
   // count is floored + never negative; the summary always carries the truth.
-  const count = Math.max(0, Math.floor(isFinite(value) ? value : 0));
-  const cap = Math.min(Math.max(0, Math.floor(total)), TALLY_MAX_MARKS);
+  // `Number.isFinite`, not the global — the loose one coerces, and this is the
+  // only place in the library that reached for it.
+  const count = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
+  // `total` is a caller prop and non-physical values have to degrade, not
+  // erase: ±Infinity already saturated at the mark cap, but NaN propagated all
+  // the way to `remaining`, so `while (NaN > 0)` never ran and `overflowCount`
+  // came out NaN — a chart that drew NOTHING and printed no `+N` while its
+  // accessible name still read the true count. A stated denominator that isn't
+  // a number is no denominator: fall back to the cap and let the overflow
+  // numeral carry whatever is past it.
+  const stated = Math.floor(total);
+  const cap = Math.min(
+    Number.isFinite(stated) ? Math.max(0, stated) : TALLY_MAX_MARKS,
+    TALLY_MAX_MARKS,
+  );
   const drawn = Math.min(count, cap);
   const overflowCount = count - drawn;
 

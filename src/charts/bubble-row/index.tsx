@@ -6,9 +6,13 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { isFiniteValue } from "../../core/types.js";
-import { bubbleRowGeometry, type BubbleAlign } from "./geometry.js";
+import {
+  PAD,
+  bubbleLayout,
+  bubbleRowGeometry,
+  isBubbleValue,
+  type BubbleAlign,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface BubbleDatum {
@@ -37,8 +41,6 @@ export interface BubbleRowProps {
   children?: ReactNode | undefined;
 }
 
-const PAD = 1;
-
 export function bubbleRowSummary(
   data: readonly BubbleDatum[],
   opts: {
@@ -49,10 +51,7 @@ export function bubbleRowSummary(
 ): string {
   const { strings = EN_BUBBLE, format, locale } = opts;
   const fmt = makeFormatter(format, locale);
-  const finite = data.filter(
-    (d): d is { label: string; value: number } =>
-      typeof d.value === "number" && Number.isFinite(d.value) && d.value >= 0,
-  );
+  const finite = data.filter((d): d is { label: string; value: number } => isBubbleValue(d.value));
   if (finite.length === 0) return strings.noData;
   let hi = finite[0]!;
   let lo = finite[0]!;
@@ -69,8 +68,6 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     align = "center",
     label = "value",
     color,
-    height = 30,
-    gap = 2,
     format,
     locale,
     strings = EN_BUBBLE,
@@ -81,33 +78,40 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     style,
     children,
   } = props;
-  // Numerals scale with height (floor 7) so they read at the library norm — a
-  // fixed size looked ~40 % smaller than every other chart's labels.
-  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  // Every caller-supplied scalar is resolved here, once, and the same resolver
+  // runs in the interactive entry — a raw `height`/`gap`/`fontSize` used to
+  // carry NaN straight into the viewBox.
+  const {
+    height,
+    gap,
+    fontSize,
+    band: labelBand,
+    labelY,
+    charW,
+  } = bubbleLayout({ height: props.height, gap: props.gap, fontSize: props.fontSize, label });
   const fmt = makeFormatter(format, locale);
   const fill = color ?? "var(--mc-accent)";
 
   const text = (i: number): string | null => {
     const d = data[i]!;
-    // The geometry already treats any non-finite value as "no bubble" (it draws
-    // the minR presence ring). The numeral has to agree: `=== null` alone let
-    // NaN/±Infinity through to `fmt` and painted a literal "NaN" label.
-    if (label === "none" || !isFiniteValue(d.value)) return null;
+    // The geometry already treats anything the area channel can't carry as "no
+    // bubble" (it draws the minR presence ring). The numeral has to agree, or a
+    // dot meaning "nothing measurable" gets labelled -5.
+    if (charW === 0 || !isBubbleValue(d.value)) return null;
     return label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
   };
   // Numeral widths feed the geometry so bubbles spread to fit every number — the
   // low-precision channel OWES the reader the value, so none is ever dropped.
   const labelWidths =
-    label === "none"
+    charW === 0
       ? undefined
       : data.map((_, i) => {
           const t = text(i);
-          // 0.72 em/char real extent + a full em of breathing room, so numbers
-          // under adjacent bubbles never crowd.
-          return t ? t.length * 0.72 * fontSize + fontSize : 0;
+          // per-char extent + a full em of breathing room, so numbers under
+          // adjacent bubbles never crowd.
+          return t ? t.length * charW * fontSize + fontSize : 0;
         });
 
-  const labelBand = label === "none" ? 0 : fontSize + 2;
   const geo = bubbleRowGeometry({
     values: data.map((d) => d.value),
     height,
@@ -120,8 +124,6 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
   const accName = resolveSummary(summary, () =>
     bubbleRowSummary(data, { strings, format, locale }),
   );
-  // The numerals' text baseline — also the inline seat's floor when they render.
-  const labelY = geo.height - PAD - fontSize * 0.32;
 
   const placed = geo.bubbles
     .map((b) => {

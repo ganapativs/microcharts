@@ -7,13 +7,15 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_MINIMAP, type MinimapStrings } from "../../core/strings-minimap.js";
 import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
   hatchPath,
   minimapDomain,
   minimapGeometry,
   minimapWindow,
   type MinimapInput,
 } from "./geometry.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 
 export type MinimapStripDatum = MinimapInput;
 
@@ -68,8 +70,8 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
     mode = "bars",
     markLane = true,
     domain: domainProp,
-    width = 120,
-    height = 16,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_MINIMAP,
@@ -80,6 +82,13 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
     style,
     children,
   } = props;
+
+  // The box is a host input too (a CSS var read back, a collapsed flex
+  // measurement): `Chart` clamps the FRAME, so a raw non-finite side left
+  // `x="NaN"`, `width="Infinity"` and `--mc-seat: NaN` inside a valid viewBox.
+  // Resolve to the documented box once, so the marks and the frame share a scale.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const fmt = makeFormatter(format, locale);
   // Position + fog shares — percents of their own, so `locale` but never `format`.
@@ -115,26 +124,27 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       className={className ? `mc-minimap ${className}` : "mc-minimap"}
       style={style}
     >
-      {/* Fog over unknown regions (flat siblings). */}
-      {geo.fogRects.flatMap((f, i) => [
-        <rect
-          key={`fog${i}`}
-          x={f.x}
-          y={f.y}
-          width={f.width}
-          height={f.height}
-          fillOpacity={0.1}
-          data-mc-ink="neutral"
-        />,
-        <path
-          key={`hatch${i}`}
-          d={hatchPath(f)}
-          strokeOpacity={0.4}
-          data-mc-ink="muted"
-          data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
-        />,
-      ])}
+      {/* Fog over unknown regions. Every gap carries identical paint, so the
+          whole fog is two paths however many `known` extents leave holes — a
+          20-segment `known` used to emit 42 nodes for one flat texture. */}
+      {geo.fogRects.length > 0 ? (
+        <>
+          <path
+            d={geo.fogRects
+              .map((f) => `M${f.x} ${f.y}h${f.width}v${f.height}h${-f.width}z`)
+              .join("")}
+            fillOpacity={0.1}
+            data-mc-ink="neutral"
+          />
+          <path
+            d={geo.fogRects.map((f) => hatchPath(f)).join("")}
+            strokeOpacity={0.4}
+            data-mc-ink="muted"
+            data-mc-w="hair"
+            vectorEffect="non-scaling-stroke"
+          />
+        </>
+      ) : null}
 
       {mode === "heat" ? (
         geo.buckets.map((b, i) => (
@@ -190,8 +200,4 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

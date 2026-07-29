@@ -70,6 +70,25 @@ describe("interactive <Delta>", () => {
     expect(seen.length).toBe(2);
   });
 
+  it("the focusable wrapper is a styling host, so it keeps the accent ring", async () => {
+    const screen = await render(<Delta value={0.12} onSelect={() => {}} />);
+    const wrap = screen.container.querySelector(".mc-delta-live") as HTMLElement;
+    // styles.css draws the ring on [data-mc-host]:focus-visible; without the
+    // attribute a focusable Delta fell back to the UA outline.
+    expect(wrap.getAttribute("data-mc-host")).toBe("");
+    expect(wrap.getAttribute("tabindex")).toBe("0");
+  });
+
+  it("an overflowing ratio reports no reading rather than ∞", async () => {
+    const picks: unknown[] = [];
+    const screen = await render(
+      <Delta value={1} from={Number.MIN_VALUE} onSelect={(d) => picks.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-delta-live") as HTMLElement;
+    wrap.click();
+    expect(picks).toMatchObject([{ index: 0, value: null, formatted: "—" }]);
+  });
+
   it("the decorative form reports nothing", async () => {
     const seen: unknown[] = [];
     const screen = await render(

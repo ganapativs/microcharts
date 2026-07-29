@@ -109,6 +109,21 @@ describe("interactive <ActivityGrid>", () => {
     expect(fig.style.getPropertyValue("--mc-seat")).not.toBe("");
   });
 
+  // Regression: the pointer map was built from the RAW `cell`/`gap`, so a
+  // config the geometry had to repair (`Number("")` → NaN, a negative gap) left
+  // hit-testing on numbers nothing was painted at — and the ring, which sized
+  // itself from the same raw `cell`, emitted NaN coordinates.
+  it("survives a hostile cell/gap/weekStart without emitting NaN", async () => {
+    for (const props of [{ cell: NaN }, { gap: NaN }, { gap: -20 }, { cell: 0, gap: 0 }]) {
+      const screen = await render(<ActivityGrid data={DATA} title="Commits" {...props} />);
+      const figs = screen.container.querySelectorAll<HTMLElement>('[role="img"]');
+      const fig = figs[figs.length - 1]!;
+      fig.focus();
+      await userEvent.keyboard("{Home}");
+      expect(/NaN|Infinity/.test(fig.outerHTML), JSON.stringify(props)).toBe(false);
+    }
+  });
+
   it("does not hoist a seat when the chart is not inline", async () => {
     const fig = await mount(<ActivityGrid data={DATA} />);
     await new Promise((r) => setTimeout(r, 20)); // let the effect run

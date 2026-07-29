@@ -6,7 +6,6 @@
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -18,9 +17,8 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
-import { dataDiffGeometry, dataDiffGutter } from "./geometry.js";
+import { dataDiffGeometry, dataDiffLayout } from "./geometry.js";
 import { DataDiff as StaticDataDiff, dataDiffSummary, type DataDiffProps } from "./index.js";
-import { maxOf } from "../../core/scale.js";
 
 export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
   strings?: DataDiffStrings;
@@ -80,16 +78,14 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   // Mirror the static's tag gutter + totals footer exactly — they move the row
   // band and centerX, so omitting them slides the focus ring off the rows.
   const geo = useMemo(() => {
-    const font = labelFont(height, 0.4);
-    const nRows = Math.min(data.length, Math.max(1, Math.min(12, Math.round(maxItems))));
-    const footer = label === "totals" && height >= 34 ? font + 3 : 0;
-    const rowH = nRows > 0 ? (height - 4 - footer) / nRows : 0;
-    const keyChars = maxOf(
-      data.map((d) => d.key.length),
-      0,
-    );
-    const fitFont = Math.max(5, Math.min(font, Math.floor(rowH * 0.5)));
-    const tags = labels && rowH >= 10 && dataDiffGutter(keyChars, fitFont, width) > 0;
+    const { footer, tagFont, keyChars } = dataDiffLayout({
+      data,
+      labels,
+      label,
+      maxItems,
+      width,
+      height,
+    });
     return dataDiffGeometry({
       width,
       height,
@@ -97,8 +93,8 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       order,
       domain,
       maxItems,
-      gutterCh: tags ? keyChars : 0,
-      fontSize: tags ? fitFont : font,
+      gutterCh: tagFont > 0 ? keyChars : 0,
+      fontSize: tagFont,
       footer,
     });
   }, [width, height, data, order, domain, maxItems, labels, label]);

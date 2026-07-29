@@ -5,7 +5,7 @@
 // that lie — a rate nobody generated — is the one this type exists to prevent.
 // Coords 2-dp, integer viewBox.
 import { linePath, stepPath } from "../../core/path.js";
-import { clamp, extent, scaleLinear } from "../../core/scale.js";
+import { clamp, extent, maxOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
 export interface RateVolumePoint {
@@ -80,8 +80,23 @@ export function rateVolumeGeometry(opts: {
 
   // Volume: zero-anchored bars on their own scale (context, not a series).
   const volumes = data.map((d) => (isFiniteValue(d.volume) && d.volume > 0 ? d.volume : 0));
-  const volMax = opts.volumeDomain?.[1] ?? Math.max(0, ...volumes);
-  const volTop = opts.volumeDomain?.[0] ?? 0;
+  // `volumeDomain` gets the same finite guard the rate `domain` gets below. A
+  // host that computes it as `[0, Math.max(...volumes)]` over a series holding
+  // one hole hands us `[0, NaN]`, and `scaleLinear` degrades a non-finite span
+  // to its range midpoint — so every ghost bar came out the SAME half-height
+  // block, a denominator that encodes nothing painted as though it did. That is
+  // the fake-denominator lie this type exists to prevent. A non-increasing pair
+  // is the same failure spelled with finite numbers, so it falls back too.
+  const vDomain =
+    opts.volumeDomain &&
+    opts.volumeDomain.every((d) => Number.isFinite(d)) &&
+    opts.volumeDomain[1] > opts.volumeDomain[0]
+      ? opts.volumeDomain
+      : null;
+  // maxOf, not `Math.max(0, ...volumes)`: the spread pushes one argument per
+  // period, and a caller-sized series throws past ~125k.
+  const volMax = vDomain ? vDomain[1] : maxOf(volumes, 0);
+  const volTop = vDomain ? vDomain[0] : 0;
   const scaleV = scaleLinear([volTop, volMax], [plotB, plotT]);
   const barW = round2(Math.max(0.5, slotW * 0.68));
   const bars: VolumeBar[] = volumes.map((v, i) => {

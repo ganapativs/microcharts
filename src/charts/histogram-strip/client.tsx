@@ -22,6 +22,11 @@ import {
   type HistogramStripProps,
 } from "./index.js";
 
+// The marked bin carries `accent`, not `bar`, so the forced-colors mapping can
+// reach it — and the default `rise` selector only matches "bar", which left that
+// one bin sitting still while every other rose. (SparkBar precedent.)
+const BAR_SELECTOR = 'rect[data-mc-ink="bar"], rect[data-mc-ink="accent"]';
+
 export interface InteractiveHistogramStripProps extends HistogramStripProps, PickerProps {
   strings?: DistStrings;
   /**
@@ -57,7 +62,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "rise", animate);
+  useEntrance(hostRef, "rise", animate, { selector: BAR_SELECTOR });
 
   const geo = useMemo(
     () => histogramGeometry({ width, height, values: data, domain, bins, markValue }),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { iconArrayGeometry, resolveK } from "./geometry.js";
+import { iconArrayGeometry, iconArrayLabelPlan, resolveK, resolveTotal } from "./geometry.js";
 
 const base = { width: 60, height: 24, shape: "square" as const };
 
@@ -14,6 +14,56 @@ describe("resolveK (half-up, clamped)", () => {
     expect(resolveK(-0.2, 20)).toBe(0);
     expect(resolveK(2, 20)).toBe(20);
     expect(resolveK(Number.NaN, 20)).toBe(0);
+  });
+});
+
+describe("resolveTotal", () => {
+  it("keeps the designed denominators", () => {
+    expect(resolveTotal(10)).toBe(10);
+    expect(resolveTotal(20)).toBe(20);
+    expect(resolveTotal(100)).toBe(100);
+  });
+
+  // Regression: GRID_DIMS was destructured unguarded, so any other number threw
+  // "undefined is not iterable" and took the whole render down.
+  it("snaps anything else to 20 instead of throwing", () => {
+    for (const bad of [0, 7, 25, -5, 1e6, Number.NaN, Number.POSITIVE_INFINITY, undefined])
+      expect(resolveTotal(bad)).toBe(20);
+  });
+
+  it("geometry paints the resolved denominator, so the count matches the grid", () => {
+    const geo = iconArrayGeometry({ ...base, value: 0.15, total: 7 as never });
+    expect(geo.n).toBe(20);
+    expect(geo.units.length).toBe(20);
+    expect(geo.k).toBe(3);
+  });
+});
+
+describe("iconArrayLabelPlan", () => {
+  // Regression: a flat 9-char reserve fit "3 in 20" but not "100 in 100", which
+  // painted up to 6.7 units past the right edge of an overflow-visible root.
+  it("reserves for the widest ratio the denominator can produce", () => {
+    const box = { label: "ratio", width: 400, height: 40 } as const;
+    expect(iconArrayLabelPlan({ ...box, total: 10 }).gutterCh).toBe(9);
+    // unchanged: the calibrated reserve for "20 in 20"
+    expect(iconArrayLabelPlan({ ...box, total: 20 }).gutterCh).toBe(9);
+    // "100 in 100" is ten characters
+    expect(iconArrayLabelPlan({ ...box, total: 100 }).gutterCh).toBe(11);
+  });
+
+  it("percent keeps its own reserve; 'none' asks for no gutter", () => {
+    expect(
+      iconArrayLabelPlan({ label: "percent", total: 100, width: 400, height: 40 }).gutterCh,
+    ).toBe(5);
+    const off = iconArrayLabelPlan({ label: "none", total: 20, width: 400, height: 40 });
+    expect(off.show).toBe(false);
+    expect(off.gutterCh).toBe(0);
+  });
+
+  it("drops the label (and its gutter) when it would swallow the grid", () => {
+    const plan = iconArrayLabelPlan({ label: "ratio", total: 20, width: 36, height: 12 });
+    expect(plan.show).toBe(false);
+    expect(plan.gutterCh).toBe(0);
   });
 });
 

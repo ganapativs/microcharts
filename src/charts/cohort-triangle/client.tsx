@@ -180,8 +180,10 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
       <rect
         x={c.x - 0.5}
         y={c.y - 0.5}
-        width={cell + 1}
-        height={cell + 1}
+        // geo.cell, not the prop: the static entry paints the RESOLVED edge, so
+        // a repaired `cell` would otherwise ring a rect of a different size.
+        width={geo.cell + 1}
+        height={geo.cell + 1}
         rx={1.5}
         fill="none"
         stroke="var(--mc-accent)"
@@ -229,7 +231,10 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
       </StaticCohortTriangle>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownCell.x + cell / 2, w)}>
+        <span
+          className="mc-spark-readout"
+          style={crosshairReadoutStyle(shownCell.x + geo.cell / 2, w)}
+        >
           {/* The localized sentence minus its full stop — a bare number left the
               reader to work out WHICH cohort at WHICH age they were pointing at,
               while the live region beside it named both. Same text, same

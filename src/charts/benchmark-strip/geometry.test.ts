@@ -43,6 +43,15 @@ describe("benchmarkStripGeometry", () => {
     expect(geo.percentile).toBe(100);
   });
 
+  it("a high→low domain still paints both bands (negative rect width is an SVG error)", () => {
+    const geo = benchmarkStripGeometry({ ...base, data: PEERS, value: 20, domain: [40, 0] })!;
+    expect(geo.outer.width).toBeGreaterThan(0);
+    expect(geo.inner.width).toBeGreaterThan(0);
+    // still nested, just mirrored: the strip reads high→low
+    expect(geo.inner.x).toBeGreaterThanOrEqual(geo.outer.x - 0.01);
+    expect(geo.inner.x + geo.inner.width).toBeLessThanOrEqual(geo.outer.x + geo.outer.width + 0.01);
+  });
+
   it("empty / non-finite value → null (degenerate, caller renders no-data)", () => {
     expect(benchmarkStripGeometry({ ...base, data: [], value: 5 })).toBeNull();
     expect(benchmarkStripGeometry({ ...base, data: PEERS, value: Number.NaN })).toBeNull();
@@ -62,5 +71,7 @@ describe("benchmarkStripGeometry", () => {
     expect(geo.dot.x).toBeLessThanOrEqual(80.01);
     expect(geo.percentile).toBeGreaterThanOrEqual(0);
     expect(geo.percentile).toBeLessThanOrEqual(100);
+    expect(geo.outer.width).toBeGreaterThanOrEqual(0);
+    expect(geo.inner.width).toBeGreaterThanOrEqual(0);
   });
 });

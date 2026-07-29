@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { moonGeometry } from "./geometry.js";
+import { moonGeometry, resolveSize } from "./geometry.js";
 
 const g = (value: number, mode: "progress" | "cycle" = "progress") =>
   moonGeometry({ value, mode, size: 16, pad: 0.5 });
@@ -37,6 +37,34 @@ describe("moonGeometry — area-true illumination", () => {
     expect(d.cx).toBe(8);
     expect(d.cy).toBe(8);
     expect(d.r).toBe(7.5);
+  });
+
+  // `size` arrives from hosts, not just literals — see resolveSize's note.
+  it("size resolves to a drawable box", () => {
+    for (const bad of [NaN, Infinity, -Infinity]) expect(resolveSize(bad)).toBe(16);
+    expect(resolveSize(0)).toBe(1);
+    expect(resolveSize(-20)).toBe(1);
+    expect(resolveSize(0.4)).toBe(1);
+    expect(resolveSize(24.4)).toBe(24);
+  });
+
+  it("every coord derives from the resolved box, never the prop", () => {
+    const bad = moonGeometry({ value: 0.68, mode: "progress", size: NaN, pad: 0.5 });
+    expect(bad.size).toBe(16);
+    expect(bad.disc).toEqual({ cx: 8, cy: 8, r: 7.5 });
+    expect(bad.litPath).not.toMatch(/NaN|Infinity/);
+  });
+
+  // A negative `r` is an SVG error that drops the circle; the survivors then sat
+  // outside the box, which `.mc-root`'s `overflow: visible` paints on the page.
+  it("a sub-unit box gives a non-negative radius inside the viewBox", () => {
+    for (const size of [0, -20, 0.4, 1]) {
+      const geo = moonGeometry({ value: 0.68, mode: "progress", size, pad: 0.5 });
+      expect(geo.size).toBe(1);
+      expect(geo.disc.r).toBeGreaterThanOrEqual(0);
+      expect(geo.disc.cx - geo.disc.r).toBeGreaterThanOrEqual(0);
+      expect(geo.disc.cx + geo.disc.r).toBeLessThanOrEqual(geo.size);
+    }
   });
 
   test.prop([fc.double({ min: 0, max: 1, noNaN: true })])(

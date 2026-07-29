@@ -103,3 +103,23 @@ seriesEdgeSuite("ConfusionGrid", (data: readonly Value[]) => {
     />
   );
 });
+
+it("axis initials take a code POINT, never half a surrogate pair", () => {
+  const { container } = draw(
+    <ConfusionGrid
+      data={{
+        labels: ["🐱 cat", "🐶 dog"],
+        counts: [
+          [8, 2],
+          [1, 9],
+        ],
+      }}
+    />,
+  );
+  const initials = [...container.querySelectorAll('text[data-mc-ink="label"]')].map(
+    (t) => t.textContent ?? "",
+  );
+  expect(initials).toEqual(["🐱", "🐱", "🐶", "🐶"]);
+  // Whole pair (2 code units, 1 code point) — charAt(0) emitted just the lead.
+  for (const s of initials) expect([s.length, [...s].length]).toEqual([2, 1]);
+});

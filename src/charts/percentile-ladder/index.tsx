@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
-import { round2, type Value } from "../../core/types.js";
+import { chartSide, round2, type Value } from "../../core/types.js";
 import { labelFitsY } from "../../core/labels.js";
 import { percentileLadderGeometry, type PercentileLadderGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -32,7 +32,11 @@ export function ladderSummary(
 export interface PercentileLadderProps {
   /** Raw sample; the component derives the quantiles. */
   data: readonly Value[];
-  /** Percentiles to mark (default `[50, 90, 99]`, 2–4 entries). */
+  /**
+   * Percentiles to mark (default `[50, 90, 99]`, 2–4 entries). Each must sit
+   * strictly between 0 and 100; anything else drops, and a `ps` with nothing
+   * left falls back to the default rather than rendering an empty chart.
+   */
   ps?: readonly number[] | undefined;
   /** `"linear"` (default) | `"log"` for long tails (falls back on any value ≤ 0). */
   scale?: "linear" | "log" | undefined;
@@ -83,6 +87,11 @@ export function ladderLabelLayout(
   const boxes: { lo: number; hi: number }[] = [];
   const place = (i: number) => {
     const cx = clampX(i);
+    // A label wider than the box inverts clampX's range (its low bound passes
+    // its high one), and the winning bound put half the text in the margin —
+    // `.mc-root` is overflow: visible, so that is a spill onto the page, not a
+    // clip. Too wide to sit inside the frame is a drop, same as a collision.
+    if (cx - half[i]! < 0 || cx + half[i]! > width) return;
     const lo = cx - half[i]! - 1;
     const hi = cx + half[i]! + 1;
     if (boxes.some((b) => lo < b.hi && hi > b.lo)) return;
@@ -118,12 +127,17 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     children,
   } = props;
 
-  const FONT = ladderFont(height);
-  const labelY = round2(height - FONT * 0.22 - 0.2);
-  const showLabels =
-    label !== "none" && width >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, height, false);
-  const trackY = round2(height * 0.35);
-  const maxHalf = round2(Math.min(3, height * 0.28));
+  // `Chart` clamps the FRAME, so a non-finite `width`/`height` prop left the
+  // viewBox valid while every mark inside it went NaN — a chart that announces
+  // a full summary and paints nothing. Both sides call the one helper.
+  const w = chartSide(width);
+  const h = chartSide(height);
+
+  const FONT = ladderFont(h);
+  const labelY = round2(h - FONT * 0.22 - 0.2);
+  const showLabels = label !== "none" && w >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, h, false);
+  const trackY = round2(h * 0.35);
+  const maxHalf = round2(Math.min(3, h * 0.28));
   const bareSeat = {
     mode: "center" as const,
     top: round2(trackY - maxHalf),
@@ -131,7 +145,15 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   };
   // scale="log" silently falls back to linear on any value ≤ 0 (docs note it);
   // the in-chart `log` tag renders only when the transform IS applied
-  const geo = percentileLadderGeometry({ width, height, data, ps, scale, domain, font: FONT });
+  const geo = percentileLadderGeometry({
+    width: w,
+    height: h,
+    data,
+    ps,
+    scale,
+    domain,
+    font: FONT,
+  });
 
   const fmt = makeFormatter(format, locale);
   const ratioFmt = makeFormatter({ maximumFractionDigits: 1 }, locale);
@@ -142,8 +164,8 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   if (geo === null) {
     return (
       <Chart
-        width={width}
-        height={height}
+        width={w}
+        height={h}
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
@@ -172,14 +194,14 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   // (as it already does under LABEL_MIN_WIDTH) and the graduated ticks — the
   // primary encoding — carry the read on their own.
   const texts = rendered.map((t) => labelText(t.p, t.value));
-  const labelX = showLabels ? ladderLabelLayout(geo, texts, width, FONT) : null;
+  const labelX = showLabels ? ladderLabelLayout(geo, texts, w, FONT) : null;
   // pin the label size to viewBox units (see coverage-strip / )
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
-      width={width}
-      height={height}
+      width={w}
+      height={h}
       title={title}
       summary={accName}
       id={id}
@@ -257,6 +279,10 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
             ),
           )
         : null}
+      {/* Full label ink, no fill-opacity: the tag is what keeps the transform
+          from being silent, and muting `--mc-neutral` to 0.7 read ~2.4:1 on
+          white — under the text floor, and `.mc-root` sets
+          forced-color-adjust: none, so the fade survived High Contrast too. */}
       {geo.logTag ? (
         <text
           x={geo.logTag.x}
@@ -265,7 +291,6 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
           dominantBaseline="central"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fillOpacity: 0.7 }}
         >
           log
         </text>

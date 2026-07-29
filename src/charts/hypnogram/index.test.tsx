@@ -70,6 +70,72 @@ seriesEdgeSuite("Hypnogram", (data: readonly Value[]) => (
   />
 ));
 
+// The shared matrix hardens `data`; `domain` is the other caller-supplied
+// number, and it used to reach the scale unchecked — see `resolveDomain`.
+describe("<Hypnogram> hostile domain config", () => {
+  const HOSTILE: [string, [number, number]][] = [
+    ["NaN start", [NaN, 110]],
+    ["NaN end", [0, NaN]],
+    ["infinite end", [0, Infinity]],
+    ["overflowing span", [-1e308, 1e308]],
+    ["zero span", [5, 5]],
+    ["reversed", [110, 0]],
+  ];
+  const good = draw(<Hypnogram data={SLEEP} />).container.querySelector("svg")!.outerHTML;
+
+  for (const [label, domain] of HOSTILE) {
+    it(`${label} → falls back to the data window, byte-for-byte`, () => {
+      const { container } = draw(<Hypnogram data={SLEEP} domain={domain} />);
+      expect(container.querySelector("svg")!.outerHTML).toBe(good);
+    });
+  }
+
+  it("reversed is swapped, not mirrored — time never runs backwards", () => {
+    const fwd = draw(<Hypnogram data={SLEEP} domain={[0, 110]} />).container;
+    const rev = draw(<Hypnogram data={SLEEP} domain={[110, 0]} />).container;
+    const d = (c: HTMLElement) => c.querySelector('path[data-mc-ink="data"]')!.getAttribute("d");
+    expect(d(rev)).toBe(d(fwd));
+  });
+});
+
+describe("<Hypnogram> windows to `domain`", () => {
+  // `.mc-root` is overflow: visible, so an out-of-window run does not clip —
+  // domain={[20, 60]} used to paint x −5 → 211 in a 140-unit box while the
+  // name still read "6 transitions".
+  const inWindow = () => draw(<Hypnogram data={SLEEP} domain={[20, 60]} width={140} />).container;
+
+  it("nothing paints outside the viewBox", () => {
+    const c = inWindow();
+    const xs = [...c.querySelectorAll("path")].flatMap((p) =>
+      [...(p.getAttribute("d") ?? "").matchAll(/[MH](-?[\d.]+)/g)].map((m) => Number(m[1])),
+    );
+    expect(xs.length).toBeGreaterThan(0);
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(140);
+  });
+
+  it("announces the runs it paints, not the ones it dropped", () => {
+    expect(hypnogramSummary(SLEEP, ["Awake", "Light", "Deep", "REM"], [20, 60], EN_HYPNOGRAM)).toBe(
+      "2 transitions across 4 states; longest run Deep.",
+    );
+  });
+
+  it("a window that predates the data reads as no data", () => {
+    expect(hypnogramSummary(SLEEP, ["Awake"], [-200, -100], EN_HYPNOGRAM)).toBe("No data.");
+  });
+});
+
+describe("<Hypnogram> row scaffold", () => {
+  it("is one path — one rule segment per state row", () => {
+    const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} />);
+    const rules = container.querySelector('path[data-mc-w="hair"]')!;
+    // fill="none" is load-bearing: styles.css would otherwise fill the rules
+    expect(rules.getAttribute("fill")).toBe("none");
+    expect(rules.getAttribute("d")!.match(/M/g)).toHaveLength(4);
+    expect(container.querySelectorAll("line").length).toBe(0);
+  });
+});
+
 describe("<Hypnogram> colors", () => {
   it("colors[] overrides lane fills in the lanes mode", () => {
     const { container } = draw(
@@ -86,6 +152,22 @@ describe("<Hypnogram> colors", () => {
     expect(lanes.length).toBeGreaterThan(0);
     expect(lanes[0]!.style.fill).toBe("rgb(1, 2, 3)");
     expect(lanes[0]!.getAttribute("data-mc-cat")).toBe("1");
+  });
+
+  it("lane opacity is an attribute, so the forced-colors cat ramp can win", () => {
+    const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} mode="lanes" />);
+    const lane = container.querySelector("rect[data-mc-cat]")!;
+    expect(lane.getAttribute("fill-opacity")).toBe("0.9");
+    expect((lane as SVGElement).style.fillOpacity).toBe("");
+  });
+
+  it("lane boxes are 2-dp, not float noise", () => {
+    const { container } = draw(<Hypnogram data={SLEEP} domain={[0, 110]} mode="lanes" />);
+    for (const r of container.querySelectorAll("rect")) {
+      for (const a of ["x", "y", "width", "height"]) {
+        expect(r.getAttribute(a), `<rect ${a}>`).not.toMatch(/\.\d{3,}/);
+      }
+    }
   });
 });
 

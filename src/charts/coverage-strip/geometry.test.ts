@@ -51,6 +51,35 @@ describe("coverageGeometry", () => {
     expect(geo.longestGap).toBe(4);
   });
 
+  it("a non-finite `expected` is ignored — the window is the data", () => {
+    // `expected={hours / bucket}` with bucket 0, or Number("") from a cleared
+    // field: NaN used to run the slot loop zero times, so a strip holding real
+    // readings drew nothing and announced "No data."
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      const geo = coverageGeometry({ ...base, data: [1, null, 3], expected: bad });
+      expect(geo.expected).toBe(3);
+      expect(geo.cells.length).toBe(3);
+      expect(geo.measured).toBe(2);
+    }
+  });
+
+  it("a fractional `expected` rounds to the slots actually drawn", () => {
+    // announced scale = painted scale: 7.5 used to draw 8 cells and report
+    // "4 of 7.5 slots" at 4/7.5 coverage
+    const geo = coverageGeometry({ ...base, data: [1, null, 3, 4], expected: 7.5 });
+    expect(geo.expected).toBe(8);
+    expect(geo.cells.length).toBe(geo.expected);
+    expect(geo.coverage).toBe(0.38);
+  });
+
+  it("a non-finite or sub-1 `steps` falls back to the default ramp", () => {
+    for (const bad of [Number.NaN, Number.POSITIVE_INFINITY, 0, -3]) {
+      const geo = coverageGeometry({ ...base, data: [0, 50, 100], mode: "intensity", steps: bad });
+      expect(geo.steps).toBe(bad === 0 || bad === -3 ? 1 : 5);
+      expect(geo.cells.every((c) => c.step === null || Number.isInteger(c.step))).toBe(true);
+    }
+  });
+
   it("caps at COVERAGE_MAX_SLOTS", () => {
     const geo = coverageGeometry({ ...base, data: Array.from({ length: 500 }, () => 1) });
     expect(geo.cells.length).toBe(COVERAGE_MAX_SLOTS);

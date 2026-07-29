@@ -53,6 +53,25 @@ describe("<TokenConfidence>", () => {
     expect(host.getAttribute("aria-label")).toContain("10 tokens");
   });
 
+  // A cutoff arriving as null/NaN used to redefine the tiering silently: the
+  // painted marks and the accessible name agreed with each other and with
+  // nothing else — `[null, null]` flagged not one token.
+  it("a non-finite tiers cutoff falls back to the default, marks and name alike", () => {
+    const base = draw(<TokenConfidence data={SENT} />);
+    const expected = base.container
+      .querySelector(".mc-token-confidence")!
+      .getAttribute("aria-label");
+    for (const tiers of [[null, null], [Number.NaN, Number.NaN], []]) {
+      const { container } = draw(
+        <TokenConfidence data={SENT} tiers={tiers as unknown as readonly [number, number]} />,
+      );
+      const host = container.querySelector(".mc-token-confidence")!;
+      expect(host.getAttribute("aria-label")).toBe(expected);
+      expect(host.querySelectorAll(".mc-tc-unsure").length).toBe(2);
+      expect(host.querySelectorAll(".mc-tc-guessing").length).toBe(2);
+    }
+  });
+
   it("legend appends the inline key", () => {
     const { container } = draw(<TokenConfidence data={SENT} legend />);
     expect(container.querySelector(".mc-tc-legend")!.textContent).toContain("unsure");

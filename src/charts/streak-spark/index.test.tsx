@@ -120,6 +120,38 @@ describe("<StreakSpark> static structure", () => {
   });
 });
 
+// A host computes width/height/threshold — a cleared input, a 0-width container
+// on first paint, a config fetch — so a non-finite one is ordinary. `Chart`
+// clamps the frame it draws; before these, the geometry still read the raw prop.
+describe("<StreakSpark> hostile config", () => {
+  const html = (ui: React.ReactNode) => draw(ui).container.querySelector("svg")!.outerHTML;
+
+  it("a non-finite or non-positive box renders the default box, no NaN", () => {
+    const base = html(<StreakSpark data={D} title="T" />);
+    for (const box of [
+      { width: Number.NaN },
+      { height: Number.NaN },
+      { width: Number.POSITIVE_INFINITY },
+      { height: Number.POSITIVE_INFINITY },
+      { width: 0 },
+      { height: 0 },
+      { height: -20 },
+    ]) {
+      expect(html(<StreakSpark data={D} title="T" {...box} />)).toBe(base);
+    }
+  });
+
+  it("a non-finite threshold announces the default reading, not an all-fail one", () => {
+    const nums = [1, 1, 1, 0, 1, 1];
+    const name = (t?: number) =>
+      draw(<StreakSpark data={nums} threshold={t} title="T" />)
+        .container.querySelector("svg")!
+        .getAttribute("aria-label");
+    expect(name(Number.NaN)).toBe(name(undefined));
+    expect(name(Number.POSITIVE_INFINITY)).toBe(name(undefined));
+  });
+});
+
 describe("<StreakSpark> a11y (axe, )", () => {
   it("informative chart is axe-clean", async () => {
     const { container } = draw(<StreakSpark data={STREAK} title="Deploys" />);

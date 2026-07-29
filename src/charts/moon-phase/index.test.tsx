@@ -56,6 +56,41 @@ describe("<MoonPhase>", () => {
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
   });
 
+  // A hostile `size` used to render a NaN disc and a NaN `--mc-seat` under a
+  // perfectly normal accessible name (see resolveSize).
+  it("a non-finite size falls back to the default box, not NaN coords", () => {
+    const { container } = draw(<MoonPhase value={0.68} size={NaN} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 16 16");
+    expect(svg.outerHTML).not.toMatch(/NaN|Infinity/);
+  });
+
+  it("a sub-unit size keeps every mark inside the viewBox", () => {
+    const { container } = draw(<MoonPhase value={0.68} size={-20} />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 1 1");
+    for (const c of container.querySelectorAll("circle")) {
+      const [cx, r] = [Number(c.getAttribute("cx")), Number(c.getAttribute("r"))];
+      expect(r).toBeGreaterThanOrEqual(0);
+      expect(cx - r).toBeGreaterThanOrEqual(0);
+      expect(cx + r).toBeLessThanOrEqual(1);
+    }
+  });
+
+  // The interactive bloom targets this attribute, so it must mark the lit path
+  // and nothing a caller puts in `children`.
+  it("data-mc-moon marks the lit path only", () => {
+    const { container } = draw(
+      <MoonPhase value={0}>
+        <path d="M0 0L1 1" />
+      </MoonPhase>,
+    );
+    expect(container.querySelectorAll("[data-mc-moon]").length).toBe(0);
+    const lit = draw(<MoonPhase value={0.6} />).container.querySelectorAll("[data-mc-moon]");
+    expect(lit.length).toBe(1);
+    expect(lit[0]!.tagName.toLowerCase()).toBe("path");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<MoonPhase value={0.68} title="Sprint" />);
     await expectNoA11yViolations(container);

@@ -74,8 +74,8 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The spine (ink="data") is the primary draw. With `spine={false}` (the rare
-  // within-slot-drift-only mode) there's no data path, so draw the ghost
-  // within-slot polylines instead of falling through to a whole-svg wipe.
+  // within-slot-drift-only mode) there's no data path, so draw the merged ghost
+  // slot-line path instead of falling through to a whole-svg wipe.
   useEntrance(
     hostRef,
     "draw",

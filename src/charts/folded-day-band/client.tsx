@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FOLDED_BAND } from "../../core/strings-folded-band.js";
-import { DEFAULT_PERCENTILES, foldedBandGeometry } from "./geometry.js";
+import { DEFAULT_PERCENTILES, DEFAULT_PERIOD, foldedBandGeometry } from "./geometry.js";
 import {
   FoldedDayBand as StaticFoldedDayBand,
   binPosition,
@@ -36,7 +36,7 @@ export interface InteractiveFoldedDayBandProps extends FoldedDayBandProps, Picke
 export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.ReactNode {
   const {
     data,
-    period = 24,
+    period = DEFAULT_PERIOD,
     today,
     percentiles = DEFAULT_PERCENTILES,
     bins = 24,

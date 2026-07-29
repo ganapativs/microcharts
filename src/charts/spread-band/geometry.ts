@@ -124,9 +124,22 @@ export function spreadBandGeometry(opts: {
       const sign = di > 0 || dj > 0 ? 1 : -1;
       push(sign, `M${xi} ${yai} L${xj} ${yaj} L${xj} ${ybj} L${xi} ${ybi} Z`);
     } else {
-      const t = di / (di - dj); // fraction along the step to a=b
+      // Fraction along the step to a=b. Both gaps are caller data subtracted
+      // twice over, so either the gap or the gap-of-gaps can overflow to
+      // ±Infinity on a pair like 1e308 / −1e308: `Infinity / (Infinity +
+      // Infinity)` is NaN, and NaN sails through `clamp` (NaN < min and
+      // NaN > max are both false), so the crossing dot and the two split band
+      // subpaths hanging off it reached the DOM as `MNaN NaN`. The flip is real
+      // at that scale even when its sub-step position is unrecoverable — take
+      // the step midpoint, which is at most half a pixel out here.
+      const raw = di / (di - dj);
+      const t = Number.isFinite(raw) ? raw : 0.5;
       const xc = round2(xi + t * (xj - xi));
-      const yc = yFor(p.a + t * (q.a - p.a));
+      // Interpolate the already-scaled, already-clamped endpoints rather than
+      // the raw values: the scale is affine so the number is the same one, but
+      // it cannot re-overflow, and the dot stays ON the drawn subject line even
+      // where clamping has bent that line to the plot edge.
+      const yc = round2(yai + t * (yaj - yai));
       crossings.push([xc, yc] as const);
       lastFlip = i + 1;
       push(di > 0 ? 1 : -1, `M${xi} ${yai} L${xc} ${yc} L${xi} ${ybi} Z`);

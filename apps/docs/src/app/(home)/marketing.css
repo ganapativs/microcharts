@@ -844,6 +844,18 @@ html.dark .surface .shot {
   background-image: linear-gradient(135deg, #e9edf4 49.5%, #0a0b0f 50.5%);
   background-size: 100% 100%;
 }
+/* An adaptive file only ever draws ONE of its two forms, so on the split ground
+   half of it lands on the paper it wasn't drawn for — a dark-ink name vanishing
+   into the dark triangle. The tile stacks both static forms and masks the dark
+   one along the same 135° line the ground uses, so each half sits on its own
+   paper and the tile shows what the file actually does. */
+.surface .bk-stage[data-tile="auto"] .bk-split {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  mask-image: linear-gradient(135deg, transparent 49.5%, #000 50.5%);
+}
 .surface .bk-badge {
   display: grid;
   width: 1.25rem;

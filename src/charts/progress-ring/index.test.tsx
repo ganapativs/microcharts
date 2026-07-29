@@ -45,6 +45,20 @@ describe("<ProgressRing>", () => {
     expect(container.querySelectorAll("path").length).toBeGreaterThanOrEqual(1);
   });
 
+  it("sweep prints the REMAINING percent — one glyph, one number", () => {
+    // The arc paints 32% and the name says "32% remaining"; the centre figure
+    // used to print the 68% that was done.
+    const { container } = draw(<ProgressRing value={0.68} sweep label="percent" size={32} />);
+    expect(container.querySelector("text")!.textContent).toBe("32%");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("32% remaining.");
+  });
+
+  it("sweep overflow: nothing left to spend, so the figure reads 0%", () => {
+    const { container } = draw(<ProgressRing value={1.4} sweep label="percent" size={32} />);
+    expect(container.querySelector("text")!.textContent).toBe("0%");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("0% remaining.");
+  });
+
   it("max <= 0 → track only + 'No data.'", () => {
     const { container } = draw(<ProgressRing value={5} max={0} />);
     expect(container.querySelectorAll("path").length).toBe(1);
@@ -54,6 +68,49 @@ describe("<ProgressRing>", () => {
   it("node budget ≤ 3", () => {
     const { container } = draw(<ProgressRing value={0.4} label="percent" />);
     expect(container.querySelectorAll("svg *").length).toBeLessThanOrEqual(3);
+  });
+
+  // Hostile CONFIG props: `size` and `weight` are scalars a caller can compute,
+  // and a non-finite one used to paint a wrong mark (or none) under a perfectly
+  // normal accessible name. Announced scale = painted scale.
+  describe("hostile config", () => {
+    const HOSTILE = [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, 0, -5];
+
+    it.each(HOSTILE)("size=%p falls back to the documented 24-unit box", (size) => {
+      const { container } = draw(<ProgressRing value={0.5} size={size} label="percent" />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toBe("0 0 24 24");
+      // and it still PAINTS: a non-finite radius made every arc builder bail,
+      // leaving an empty track under "50% complete."
+      expect(container.querySelector('path[data-mc-ink="band"]')!.getAttribute("d")).not.toBe("");
+      expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    });
+
+    it.each(HOSTILE)("weight=%p keeps the ring hollow and the arc drawn", (weight) => {
+      const { container } = draw(<ProgressRing value={0.5} weight={weight} />);
+      // two subpaths = outer rim + punched hole; NaN collapsed this to a disc
+      const track = container.querySelector('path[data-mc-ink="band"]')!.getAttribute("d")!;
+      expect((track.match(/M/g) ?? []).length).toBe(2);
+      expect(container.querySelector('path[data-mc-ink="accent"]')).not.toBeNull();
+    });
+
+    it("never emits a non-finite attribute or custom property", () => {
+      for (const v of HOSTILE) {
+        for (const props of [{ size: v }, { weight: v }]) {
+          const { container } = draw(<ProgressRing value={0.5} label="percent" {...props} />);
+          expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+        }
+      }
+    });
+
+    it("a 1-unit box never asks for a negative stroke-width", () => {
+      // SVG treats a negative stroke-width as an error and drops the value arc.
+      const { container } = draw(<ProgressRing value={0.5} size={1} />);
+      for (const el of container.querySelectorAll<SVGElement>("[style]")) {
+        const w = el.style.strokeWidth;
+        if (w) expect(Number.parseFloat(w)).toBeGreaterThanOrEqual(0);
+      }
+    });
   });
 
   it("is axe-clean", async () => {

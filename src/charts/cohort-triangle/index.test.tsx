@@ -82,6 +82,33 @@ describe("<CohortTriangle>", () => {
     expect(opacities(pct)).toEqual(opacities(frac));
   });
 
+  // The announced scale and the painted scale must be the same scale: a hostile
+  // `cell`/`gap` used to leave the aria-label reading the retention correctly
+  // while the box was `viewBox="0 0 NaN NaN"` and the chart had vanished.
+  it.each([
+    ["cell", Number.NaN],
+    ["cell", Number.POSITIVE_INFINITY],
+    ["gap", Number.NaN],
+    ["gap", Number.POSITIVE_INFINITY],
+    ["gap", -20],
+  ])("hostile %s renders a finite box and finite marks", (prop, bad) => {
+    const { container } = draw(<CohortTriangle data={COHORTS} {...{ [prop]: bad }} title="t" />);
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toMatch(/^0 0 \d+(\.\d+)? \d+(\.\d+)?$/);
+    for (const r of container.querySelectorAll("rect"))
+      for (const a of ["x", "y", "width", "height"])
+        expect(Number.isFinite(Number(r.getAttribute(a)))).toBe(true);
+  });
+
+  it("cells paint the resolved cell edge, crisp", () => {
+    const { container } = draw(
+      <CohortTriangle data={COHORTS} cell={Number.NaN} labels={false} title="t" />,
+    );
+    const first = container.querySelector("rect")!;
+    expect(first.getAttribute("width")).toBe("9");
+    expect(first.getAttribute("shape-rendering")).toBe("crispEdges");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<CohortTriangle data={COHORTS} title="Cohorts" />);
     await expectNoA11yViolations(container);

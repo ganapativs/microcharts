@@ -9,7 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { valueStepMixPct, type CellShape } from "../../shared/cell.js";
-import { heatCellGeometry } from "./geometry.js";
+import { heatCellGeometry, HEAT_CELL_LABEL_SIZE } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function heatCellSummary(
@@ -73,11 +73,14 @@ export function HeatCell(props: HeatCellProps): ReactNode {
 
   const geo = heatCellGeometry({ width: SIZE, height: SIZE, value, domain, steps, shape });
   const fmt = makeFormatter(format, locale);
+  // Every reading of the scale — the name, the ramp, the on-fill threshold —
+  // comes off `geo.steps`, the count the value was actually binned against. The
+  // raw prop announced a scale nothing was painted from (see resolveSteps).
   const accName = resolveSummary(summary, () =>
-    heatCellSummary(value, geo.step, steps, fmt, strings),
+    heatCellSummary(value, geo.step, geo.steps, fmt, strings),
   );
 
-  const fontSize = 7;
+  const fontSize = HEAT_CELL_LABEL_SIZE;
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;
   const showLabel = text !== undefined && geo.labelFits(text.length, fontSize);
 
@@ -120,7 +123,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
           geo.step === null
             ? undefined
             : ({
-                "--mc-cell-mix": String(valueStepMixPct(geo.step, steps)),
+                "--mc-cell-mix": String(valueStepMixPct(geo.step, geo.steps)),
                 ...(color ? { "--mc-cell-color": color } : undefined),
               } as CSSProperties)
         }
@@ -135,7 +138,9 @@ export function HeatCell(props: HeatCellProps): ReactNode {
           textAnchor="middle"
           // Upper steps mix enough accent for on-fill ink (--mc-on-fill);
           // faint cells keep stroke ink so the number doesn't wash out.
-          {...(geo.step !== null && geo.step >= steps / 2 ? { "data-mc-on-fill": "" } : undefined)}
+          {...(geo.step !== null && geo.step >= geo.steps / 2
+            ? { "data-mc-on-fill": "" }
+            : undefined)}
         >
           {text}
         </text>

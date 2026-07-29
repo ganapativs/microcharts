@@ -14,8 +14,8 @@ export const PALETTE = {
   azure: "#5B9FD4",
   emerald: "#2E8C66",
   sapphire: "#285788",
-  terracotta: "#C2543A",
-  mauve: "#A85C8C",
+  terracotta: "#BC5138",
+  mauve: "#A55A89",
 } as const;
 
 /** Semantic defaults (light). Dark values are hand-tuned in styles.css. */

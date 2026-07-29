@@ -15,6 +15,10 @@ export const DEFAULT_PERCENTILES: readonly [number, number][] = [
   [5, 95],
 ];
 
+/** Default fold length, in `t` units — one day. Shared by both entries and by
+ *  `resolvePeriod`, so the fallback and the prop default cannot drift apart. */
+export const DEFAULT_PERIOD = 24;
+
 export interface TP {
   t: number;
   value: number;
@@ -48,16 +52,35 @@ export interface FoldedBandResult {
 const MAX_BINS = 512;
 
 /** The bin count actually used, resolved ONCE per geometry call. Every consumer
- *  — the buckets, the x scale, the reported `bins` — must share it: clamping
- *  inside the bucketing alone left the x scale dividing by the raw prop, which
- *  collapsed the whole plot into a sliver at the left edge (and reported a bin
- *  count that was never drawn). */
-function resolveBins(bins: number): number {
+ *  — the buckets, the x scale, the reported `bins`, the axis labels — must
+ *  share it: clamping inside the bucketing alone left the x scale dividing by
+ *  the raw prop, which collapsed the whole plot into a sliver at the left edge
+ *  (and reported a bin count that was never drawn). Exported so `binPosition`
+ *  labels the axis the geometry actually drew. */
+export function resolveBins(bins: number): number {
   return Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.floor(bins))) : 1;
 }
 
-function foldBins(data: readonly TP[], period: number, bins: number): number[][] {
-  const n = resolveBins(bins);
+/** The fold length actually used. `period` is caller config — an empty input
+ *  field gives `Number("") → NaN`, and 0 / ±Infinity make `t % period` NaN, so
+ *  every reading piled into bin 0 while the summary announced "Median peaks at
+ *  NaN". A fold length that is not a positive finite number cannot fold; fall
+ *  back to the documented default so the announced axis is the drawn axis. */
+export function resolvePeriod(period: number): number {
+  return Number.isFinite(period) && period > 0 ? period : DEFAULT_PERIOD;
+}
+
+/** viewBox extents, resolved the way `Chart` resolves them. `Chart` clamps a
+ *  non-finite box to 1 for the viewBox; geometry scaling by the raw prop
+ *  instead emitted NaN in every coord (and a NaN `--mc-seat`) under a
+ *  perfectly confident accessible name. Both sides read the same box. */
+function resolveExtent(n: number): number {
+  return Number.isFinite(n) && n > 0 ? n : 1;
+}
+
+/** `period` and `n` are already resolved by the caller — both fold passes (the
+ *  pooled history and the `today` overlay) must land on one identical grid. */
+function foldBins(data: readonly TP[], period: number, n: number): number[][] {
   const buckets: number[][] = Array.from({ length: n }, () => []);
   for (const d of data) {
     if (!isFiniteValue(d.value) || !Number.isFinite(d.t)) continue;
@@ -79,10 +102,21 @@ export function foldedBandGeometry(opts: {
   width: number;
   height: number;
 }): FoldedBandResult {
-  const { data, today, period, percentiles, width, height } = opts;
-  // Resolve the bin count once — the buckets, the x scale and the reported
-  // `bins` all have to agree (see `resolveBins`).
+  const { data, today } = opts;
+  // Resolve the config props once — the buckets, the x scale, the reported
+  // `bins` and the announced fold position all have to agree.
   const bins = resolveBins(opts.bins);
+  const period = resolvePeriod(opts.period);
+  const width = resolveExtent(opts.width);
+  const height = resolveExtent(opts.height);
+  // An envelope whose percentile is not a finite number cannot be computed:
+  // `quantiles` returns NaN for it by design, and that NaN reached both the
+  // band's path `d` (which the browser then drops whole) and `binStats.q1/q3`,
+  // which the interactive readout painted as "middle half NaN–NaN". Drop the
+  // pair rather than draw an envelope nobody can see.
+  const percentiles = opts.percentiles.filter(
+    ([lo, hi]) => Number.isFinite(lo) && Number.isFinite(hi),
+  );
   const pad = 1;
   const plotW = width - pad * 2;
   const plotH = height - pad * 2;

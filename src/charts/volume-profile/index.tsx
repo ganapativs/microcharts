@@ -6,7 +6,16 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
-import { profileLayout, volumeProfileGeometry, type LevelRow } from "./geometry.js";
+import { chartSide, round2 } from "../../core/types.js";
+import {
+  DEFAULT_BINS,
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  profileLayout,
+  resolveValueArea,
+  volumeProfileGeometry,
+  type LevelRow,
+} from "./geometry.js";
 
 export type VolumeProfileDatum = LevelRow | number;
 
@@ -50,12 +59,12 @@ export function volumeProfileSummary(
 export function VolumeProfile(props: VolumeProfileProps): ReactNode {
   const {
     data,
-    valueArea = 0.7,
+    valueArea: valueAreaProp,
     align = "left",
     label = "poc",
-    bins = 12,
-    width = 48,
-    height = 32,
+    bins = DEFAULT_BINS,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_VOLUME_PROFILE,
@@ -66,6 +75,13 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Resolved ONCE, before anything reads them: the summary states the value-area
+  // convention the band was walked with, and `labelFont` turns a NaN height into
+  // a NaN font size on text the box then cannot check.
+  const valueArea = resolveValueArea(valueAreaProp);
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const fmt = makeFormatter(format, locale);
   const pctFmt = makePercentFormatter(locale);
@@ -157,8 +173,4 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

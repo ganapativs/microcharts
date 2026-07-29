@@ -16,7 +16,8 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
-import { traceFoldGeometry, traceFoldHeight } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import { DEFAULT_WIDTH, traceFoldGeometry, traceFoldHeight } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
 
 export interface InteractiveTraceFoldProps extends TraceFoldProps, PickerProps {
@@ -32,7 +33,7 @@ export interface InteractiveTraceFoldProps extends TraceFoldProps, PickerProps {
 export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   const {
     data,
-    width = 120,
+    width: widthProp = DEFAULT_WIDTH,
     height: heightProp,
     format,
     locale,
@@ -67,7 +68,12 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
     for (let i = 0; i < Math.min(40, data.length); i++) seen.add(data[i]!.depth);
     return Math.max(1, seen.size);
   }, [data]);
-  const height = heightProp ?? traceFoldHeight(depthCount);
+  // Same clamp as the static entry, so the picker's hit boxes, the readout's
+  // x and the painted rects are all measured against the box `Chart` drew —
+  // an unusable prop falls back here rather than reaching the geometry.
+  const fallbackH = traceFoldHeight(depthCount);
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp ?? fallbackH, fallbackH);
   const geo = useMemo(
     () => traceFoldGeometry({ data, width, height, rowGap: 1.2 }),
     [data, width, height],

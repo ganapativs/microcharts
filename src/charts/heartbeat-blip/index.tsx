@@ -9,8 +9,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
-import { DEFAULT_WINDOW, heartbeatGeometry } from "./geometry.js";
+import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
+import { DEFAULT_WINDOW, heartbeatCount, heartbeatGeometry } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
   /** Event timestamps (ms). Not a value series. */
@@ -100,10 +100,35 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height);
+  // A host-computed size (`Number(field.value)` on an empty input → NaN) used to
+  // reach the reserved band, and from there every coordinate in the chart.
+  const fs = props.fontSize;
+  const fontSize = fs !== undefined && Number.isFinite(fs) && fs > 0 ? fs : labelFont(height);
 
   const resolvedNow = resolveNow(events, now);
-  const labelBand = label === "count" ? fontSize * 2 : 0;
+  // The tally is a pure time filter — width-independent — so the numeral is
+  // known before the gutter it needs is reserved, with no throwaway geometry.
+  const countText =
+    label === "count"
+      ? makeFormatter(format, locale)(heartbeatCount(events, win, resolvedNow))
+      : "";
+  // Text that no longer fits is dropped, never painted outside the box. The
+  // numeral is anchored at the right edge, so an over-long count runs off the
+  // LEFT of the viewBox — `width` is the budget, not the reserved band.
+  const showCount =
+    countText !== "" &&
+    labelFitsBand(height, fontSize) &&
+    textGutter(countText.length, fontSize, PAD) <= width;
+  // `fontSize * 2` was a two-digit guess held as the floor (it keeps the roomy
+  // gap between the now-dot and the numeral); a four-digit count asks for more.
+  // The 45% budget is the real fix: the old band could exceed `width` outright,
+  // which inverted the plot and painted every mark left of the viewBox.
+  const labelBand = showCount
+    ? Math.min(
+        Math.max(fontSize * 2, textGutter(countText.length, fontSize, 1)),
+        Math.max(0, Math.floor(width * 0.45)),
+      )
+    : 0;
   const geo = heartbeatGeometry({
     events,
     window: win,
@@ -116,8 +141,11 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     summary === false
       ? false
       : (summary ?? heartbeatSummary(events, { window: win, now, strings, format, locale }));
-  const spikeColor = color ?? "var(--mc-accent)";
-  const fmt = makeFormatter(format, locale);
+  // The empty-state word is translatable, so it can outgrow the plot it centres in.
+  const showEmpty =
+    geo.spikesPath === "" &&
+    labelFitsBand(height, fontSize) &&
+    textGutter(strings.heartbeatEmpty.length, fontSize, 0) <= geo.width;
 
   return (
     <Chart
@@ -141,22 +169,24 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
         y2={geo.baseline.y}
         data-mc-ink="muted"
         data-mc-w="hair"
-        style={{ strokeOpacity: 0.55 }}
+        strokeOpacity={0.55}
       />
-      {/* Spikes: inline stroke (color override); width from primary ink. */}
+      {/* The trace is the whole reading, so its paint comes from the accent ink
+          ROLE — an inline `stroke: var(--mc-accent)` is preserved verbatim by
+          `.mc-root { forced-color-adjust: none }`, i.e. a brand hex on the user's
+          own High Contrast background. `color` still overrides inline. */}
       {geo.spikesPath ? (
         <path
           className="mc-heartbeat-spikes"
           d={geo.spikesPath}
-          style={{
-            fill: "none",
-            stroke: spikeColor,
-            strokeWidth: "var(--mc-sw)",
-            strokeLinejoin: "round",
-            strokeLinecap: "round",
-          }}
+          data-mc-ink="accent"
+          data-mc-w="full"
+          fill="none"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          style={color ? { stroke: color } : undefined}
         />
-      ) : (
+      ) : showEmpty ? (
         <text
           x={geo.width / 2}
           y={height / 2}
@@ -164,11 +194,11 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
           textAnchor="middle"
           dominantBaseline="central"
           data-mc-ink="label"
-          style={{ fillOpacity: 0.7 }}
+          fillOpacity={0.7}
         >
           {strings.heartbeatEmpty}
         </text>
-      )}
+      ) : null}
       <circle
         className="mc-heartbeat-now"
         cx={geo.nowDot.cx}
@@ -176,15 +206,17 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
         r={geo.nowDot.r + 0.6}
         data-mc-ink="accent"
       />
-      {label === "count" ? (
+      {showCount ? (
         <text
           x={width - PAD}
-          y={geo.baseline.y + fontSize * 0.34}
+          // Clamped so the descender stays inside a short box — the label is
+          // seated, not dropped, for the sake of 0.1 units.
+          y={Math.min(geo.baseline.y + fontSize * 0.34, height - fontSize * 0.22)}
           fontSize={fontSize}
           textAnchor="end"
           data-mc-ink="label"
         >
-          {fmt(geo.count)}
+          {countText}
         </text>
       ) : null}
       {children}

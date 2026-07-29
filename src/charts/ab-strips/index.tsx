@@ -9,7 +9,7 @@ import { makeFormatter, makePercentFormatter, withPlus, type Format } from "../.
 import { round2 } from "../../core/types.js";
 import { EN_AB, type ABStrings } from "../../core/strings-ab.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
-import { abStripsGeometry, abTagsFit, type ABStripsGeometry } from "./geometry.js";
+import { abStripsGeometry, abTagChars, type ABStripsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Signed percent (or absolute when the base is 0) delta of B vs A.
@@ -22,8 +22,12 @@ export function abDelta(
   fmt: (n: number) => string,
   pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
-  if (geo.aMedian === 0) return withPlus(geo.deltaMedian, fmt);
-  return withPlus(geo.deltaMedian / Math.abs(geo.aMedian), pct);
+  const ratio = geo.deltaMedian / Math.abs(geo.aMedian);
+  // A base of 0 has no percentage, and neither does one small enough that the
+  // ratio overflows to ±Infinity (a 1e308 arm against a 0.01 one) — both state
+  // the delta in the metric's own units rather than print "∞%".
+  if (geo.aMedian === 0 || !Number.isFinite(ratio)) return withPlus(geo.deltaMedian, fmt);
+  return withPlus(ratio, pct);
 }
 
 export function abSummary(
@@ -100,10 +104,11 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   // the value `format` (which carries the metric's units).
   const pctFmt = makePercentFormatter(locale);
   const cls = className ? `mc-ab-strips ${className}` : "mc-ab-strips";
-  // Row tags are seat-gated — they drop, and give their lead gutter back to the
-  // strips, once the two rows are pitched closer than one em (see `abTagsFit`).
-  const showTags = abTagsFit(height, FONT);
-  const labelChars = showTags ? Math.max(seriesLabels[0].length, seriesLabels[1].length) : 0;
+  // Row tags are box-gated — they drop, and give their lead gutter back to the
+  // strips, once the rows are pitched closer than one em or the tags would claim
+  // most of the width (see `abTagChars`).
+  const labelChars = abTagChars({ width, height, fontSize: FONT, labels: seriesLabels });
+  const showTags = labelChars > 0;
 
   const probe = abStripsGeometry({
     width,

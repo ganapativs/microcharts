@@ -16,7 +16,8 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
-import { streakSparkGeometry, streakSparkRoom } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, streakSparkGeometry, streakSparkRoom } from "./geometry.js";
 import {
   StreakSpark as StaticStreakSpark,
   streakSparkSummary,
@@ -38,8 +39,8 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
     threshold,
     positive = "up",
     label = "current",
-    width = 96,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     title,
     summary,
@@ -57,6 +58,12 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
     defaultSelectedIndex,
     children,
   } = props;
+
+  // The hit box, the focus outline and the readout anchor are all measured in
+  // these units, so they have to be the same resolved box the static renders —
+  // a NaN width would put the picker on a scale the frame never had.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Runs are individual fixed-height typed segments (height encodes run TYPE,

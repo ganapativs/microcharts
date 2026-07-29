@@ -83,7 +83,16 @@ export function cycleGeometry(opts: {
   const allFinite = values.flat();
   if (allFinite.length === 0) return null;
 
-  const dom = opts.domain ?? extent(allFinite) ?? [allFinite[0]!, allFinite[0]!];
+  // A caller `domain` is validated, not trusted. `[NaN, NaN]` (the shape a host
+  // gets from `Math.min(...series)` when the series holds a null) and
+  // `[0, Infinity]` both make `scaleLinear` fall back to the range midpoint:
+  // every center and every slot line paints on one flat rule while the summary
+  // goes on announcing the real peak and dip. The painted scale has to be the
+  // scale that is announced, so a domain that isn't a scale drops to the extent.
+  const dom =
+    opts.domain && opts.domain.every((d) => Number.isFinite(d))
+      ? opts.domain
+      : (extent(allFinite) ?? [allFinite[0]!, allFinite[0]!]);
   const degenerate = dom[0] === dom[1];
   const sy = scaleLinear(dom, [height - pad, pad]); // y up
   const plotW = width - 2 * pad;

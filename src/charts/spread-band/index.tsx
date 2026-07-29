@@ -193,17 +193,21 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
-      {geo.crossings.map((c) => (
-        <circle key={`x${c[0]}-${c[1]}`} cx={c[0]} cy={c[1]} r={1.8} data-mc-ink="point" />
+      {/* Keyed by position in the list, not by coordinate: past ~8k points the
+          x step falls under the 2-dp rounding grid, so two adjacent crossings
+          round to the same pair and React saw duplicate keys (the shared 10k
+          edge case warns). The list is positional and never reorders. */}
+      {geo.crossings.map((c, i) => (
+        <circle key={i} cx={c[0]} cy={c[1]} r={1.8} data-mc-ink="point" />
       ))}
+      {/* `neutral` (a filled no-valence mark), not `muted` + an inline fill:
+          `muted` is fill:none/stroke, so the inline fill was papering over the
+          role — and being INLINE it outranked the forced-colors mapping, keeping
+          a warm gray in High Contrast Mode (`.mc-root` is
+          forced-color-adjust: none). Its stray 1-unit stroke also grew this dot
+          to the accent dot's size, so the reference stopped whispering. */}
       {!geo.coincident && geo.last ? (
-        <circle
-          cx={geo.last.x}
-          cy={geo.last.yb}
-          r={1.5}
-          data-mc-ink="muted"
-          style={{ fill: "var(--mc-neutral)" }}
-        />
+        <circle cx={geo.last.x} cy={geo.last.yb} r={1.5} data-mc-ink="neutral" />
       ) : null}
       {geo.last ? <circle cx={geo.last.x} cy={geo.last.ya} r={2} data-mc-ink="accent" /> : null}
       {showLabel && geo.last ? (

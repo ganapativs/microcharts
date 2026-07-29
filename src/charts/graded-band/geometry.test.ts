@@ -29,6 +29,27 @@ describe("gradedBandGeometry", () => {
     expect(geo.bands.map((b) => b.p)).toEqual([80, 50, 30]);
   });
 
+  it("levels that filter to nothing fall back to the default (never 'no data')", () => {
+    // `[]`, an out-of-range pair, and a NaN out of an empty number input all
+    // used to return null — which the component announces as "No data." over a
+    // perfectly good sample.
+    for (const levels of [[], [0, 100], [NaN], [Infinity]]) {
+      const geo = gradedBandGeometry({ ...base, data: SAMPLE, levels });
+      expect(geo, `levels=${JSON.stringify(levels)}`).not.toBeNull();
+      expect(geo!.bands.map((b) => b.p)).toEqual([95, 80, 50]);
+    }
+  });
+
+  it("a descending domain mirrors the bands instead of emitting negative widths", () => {
+    const asc = gradedBandGeometry({ ...base, data: SAMPLE, domain: [0, 100] })!;
+    const desc = gradedBandGeometry({ ...base, data: SAMPLE, domain: [100, 0] })!;
+    // SVG treats a negative `width` as an error — the band simply vanishes.
+    for (const b of desc.bands) expect(b.width).toBeGreaterThan(0);
+    // same spans, mirrored about the strip
+    expect(desc.bands.map((b) => b.width)).toEqual(asc.bands.map((b) => b.width));
+    expect(desc.bands[0]!.x).toBeCloseTo(80 - asc.bands[0]!.x - asc.bands[0]!.width, 2);
+  });
+
   it("all-equal draws → degenerate, tick only", () => {
     const geo = gradedBandGeometry({ ...base, data: [5, 5, 5, 5] })!;
     expect(geo.degenerate).toBe(true);

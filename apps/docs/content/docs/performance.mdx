@@ -17,21 +17,22 @@ the other 105. Sizes are gzip, measured by `pnpm size` and gated, so a chart tha
 
 <SizeDistribution />
 
-The `/interactive` subpath lands between **2.17 kB and 6.75 kB** gzip, with a **median of 5.07 kB**. That buys hover,
+The `/interactive` subpath lands between **2.18 kB and 6.94 kB** gzip, with a **median of 5.24 kB**. That buys hover,
 roving keyboard focus, select-to-pin, touch scrub, and live announcements. Its static twin is pure SVG with zero client
-JavaScript, and lands between **1 kB and 4.07 kB**, with a **median of 2.64 kB**. A page pays for interactivity only
+JavaScript, and lands between **1.08 kB and 4.25 kB**, with a **median of 2.76 kB**. A page pays for interactivity only
 where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the per-subpath gate measures
 standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Twenty-seven charts sit above the 3 kB static reference line, none of them by more than 1.07 kB. Sparkline, the most
+Thirty-two charts sit above the 3 kB static reference line, none of them by more than 1.25 kB. Sparkline, the most
 configurable primitive in the set, is the largest. Most of the rest are value-series charts that host annotations
 (ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
-SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, ShiftHistogram, StackedArea, ABStrips,
-PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, GradedBand and LikertStrip; the last two crossed
-the line when their percent labels moved onto a real `Intl` formatter. The annotation hosts carry a small shared walker
-that resolves `Threshold`, `Marker`, and the rest against the chart's scale, and you pay for it only on those charts.
+SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, PercentileTrace, ShiftHistogram,
+StackedArea, ABStrips, PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, MiniBar, BenchmarkStrip,
+EventTimeline, VolumeProfile, GradedBand and LikertStrip; the last two crossed the line when their percent labels moved
+onto a real `Intl` formatter. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
+the rest against the chart's scale, and you pay for it only on those charts.
 
 ### Splitting the stylesheet
 
@@ -61,7 +62,7 @@ A table of **500 sparklines becomes HTML in under six milliseconds**, streams as
 nothing. Across all 106 chart types the median **static** SSR render is about **0.03 ms per chart**. The heavier
 expressive and frontier instruments cost more geometry; the simple strips cost close to nothing.
 
-The summary kernel is just as cheap: `describeSeries` runs at roughly **892,000 calls per second** on a 24-point series,
+The summary kernel is just as cheap: `describeSeries` runs at roughly **840,000 calls per second** on a 24-point series,
 measured by `pnpm bench`. It writes the accessible sentence for every chart, so accessibility is not what slows a render
 down.
 

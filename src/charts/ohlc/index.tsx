@@ -10,27 +10,26 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import { round2 } from "../../core/types.js";
-import { ohlcGeometry, type OhlcInput } from "./geometry.js";
+import { ohlcGeometry, ohlcLastClose, ohlcValid, ohlcWindow, type OhlcInput } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 import { maxOf, minOf } from "../../core/scale.js";
 
 export type OhlcDatum = OhlcInput;
 
+/**
+ * Reads the run. Give it the periods that PAINT (`ohlcWindow`), never the raw
+ * `data`: past `maxPeriods` the chart draws the recent tail, and summarising the
+ * whole array announced a count, a change and a range covering candles nobody
+ * can see — 30 periods of data read out as "30 periods … range 99 to 131" over
+ * a picture of the last 20.
+ */
 export function ohlcSummary(
   periods: readonly OhlcDatum[],
   fmt: (n: number) => string,
   pctFmt: (n: number) => string,
   strings: OhlcStrings,
 ): string {
-  const valid = periods.filter(
-    (p) =>
-      [p.open, p.high, p.low, p.close].every(Number.isFinite) &&
-      p.high >= p.low &&
-      p.open >= p.low &&
-      p.open <= p.high &&
-      p.close >= p.low &&
-      p.close <= p.high,
-  );
+  const valid = periods.filter(ohlcValid);
   if (valid.length === 0) return strings.noData;
   const last = valid.at(-1)!;
   const first = valid[0]!;
@@ -93,20 +92,24 @@ export function Ohlc(props: OhlcProps): ReactNode {
   const fmt = makeFormatter(format, locale);
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
   const fontSize = labelFont(height, 0.4);
-  const lastClose = data.at(-1)?.close;
+  // The window, the label and the summary all read the same periods the marks
+  // do: a price the chart refuses to draw must not appear in the gutter or the
+  // accessible name.
+  const rendered = ohlcWindow(data, maxPeriods);
+  const lastClose = ohlcLastClose(rendered);
   const geo = ohlcGeometry({
     width,
     height,
     periods: data,
     maxPeriods,
     domain,
-    gutterCh: label === "last" && Number.isFinite(lastClose) ? fmt(lastClose as number).length : 0,
+    gutterCh: label === "last" && lastClose !== undefined ? fmt(lastClose).length : 0,
     fontSize,
   });
 
   if (geo.truncated) {
     devWarn(
-      `<Ohlc> ${data.length} periods — rendering the most recent ${maxPeriods}; OHLC cannot be downsampled without lying.`,
+      `<Ohlc> ${data.length} periods — rendering the most recent ${rendered.length}; OHLC cannot be downsampled without lying.`,
     );
   }
   if (geo.invalid.length > 0) {
@@ -115,7 +118,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
     );
   }
 
-  const accName = resolveSummary(summary, () => ohlcSummary(data, fmt, pctFmt, strings));
+  const accName = resolveSummary(summary, () => ohlcSummary(rendered, fmt, pctFmt, strings));
   const lastMark = geo.marks.at(-1);
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
@@ -177,6 +180,12 @@ export function Ohlc(props: OhlcProps): ReactNode {
               stroke={stroke}
               data-mc-w={m.up ? "support" : undefined}
               strokeWidth={m.up ? undefined : 0}
+              /* The hollow body is the only outlined mark that lacked this, and
+                 the interactive wrapper spreads `width: 100%` — so at any scale
+                 but 1:1 an up-candle's outline thickened while its own wick (and
+                 every filled down-candle) held a hairline, turning the shape code
+                 into a weight code. Down bodies stroke at 0, so they skip it. */
+              vectorEffect={m.up ? "non-scaling-stroke" : undefined}
               data-mc-ohlc={ink}
             />,
           ];
@@ -205,7 +214,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
           />,
         ];
       })}
-      {label === "last" && lastMark && Number.isFinite(lastClose) ? (
+      {label === "last" && lastMark && lastClose !== undefined ? (
         <text
           x={width - 1}
           y={Math.min(Math.max(lastMark.yC, fontSize * 0.55), height - fontSize * 0.55)}
@@ -214,7 +223,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
           textAnchor="end"
           data-mc-ink="accent"
         >
-          {fmt(lastClose as number)}
+          {fmt(lastClose)}
         </text>
       ) : null}
       {children}

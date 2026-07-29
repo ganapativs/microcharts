@@ -6,8 +6,15 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_WAVEFORM, type WaveformStrings } from "../../core/strings-waveform.js";
-import { isFiniteValue, type Value } from "../../core/types.js";
-import { barsPath, bucketCount, envelopePath, waveformGeometry } from "./geometry.js";
+import { chartSide, isFiniteValue, type Value } from "../../core/types.js";
+import {
+  barsPath,
+  bucketCount,
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  envelopePath,
+  waveformGeometry,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface WaveformProps {
@@ -41,20 +48,29 @@ export function waveformSummary(
   /** Percent formatter (FRACTION in) for "how far through". A position in the
    *  signal, not an amplitude, so it takes `locale` but never `format`. */
   posFmt: (fraction: number) => string = makePercentFormatter(undefined),
+  /** Sample COUNT — a tally, not an amplitude, so it never takes `format`
+   *  (a `format` of `{ style: "percent" }` announced "4,000% samples"). */
+  cntFmt: (n: number) => string = makeFormatter(undefined, undefined),
 ): string {
-  const finite = data.filter(isFiniteValue) as number[];
-  if (finite.length === 0) return strings.noData;
+  // Walked over the RAW indices, not a compacted copy: peak position is read
+  // off the same index space the buckets are cut from, so a clip whose first
+  // half is nulls no longer announces its spike at half the x it paints it at.
   let peak = 0;
   let peakIdx = 0;
-  finite.forEach((v, i) => {
+  let count = 0;
+  for (let i = 0; i < data.length; i++) {
+    const v = data[i];
+    if (!isFiniteValue(v)) continue;
+    count++;
     if (Math.abs(v) > peak) {
       peak = Math.abs(v);
       peakIdx = i;
     }
-  });
+  }
+  if (count === 0) return strings.noData;
   if (peak === 0) return strings.waveformSilent;
-  const pct = posFmt(peakIdx / Math.max(1, finite.length - 1));
-  return strings.waveform(fmt(peak), pct, fmt(finite.length));
+  const pct = posFmt(peakIdx / Math.max(1, data.length - 1));
+  return strings.waveform(fmt(peak), pct, cntFmt(count));
 }
 
 export function Waveform(props: WaveformProps): ReactNode {
@@ -64,8 +80,8 @@ export function Waveform(props: WaveformProps): ReactNode {
     mode = "bars",
     mirror = true,
     domain,
-    width = 120,
-    height = 24,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_WAVEFORM,
@@ -77,13 +93,23 @@ export function Waveform(props: WaveformProps): ReactNode {
     children,
   } = props;
 
+  // The box drives geometry, the hairline and the inline seat, none of which
+  // `Chart`'s own clamp reaches: a NaN width shipped `x2="NaN"` and a NaN height
+  // shipped `V NaN` bars plus `--mc-seat: NaN` inside a valid viewBox.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
+
   const fmt = makeFormatter(format, locale);
   // Position through the signal — a percent of its own, so `locale`, never `format`.
   const posFmt = makePercentFormatter(locale);
+  // …and the sample tally, likewise localised but never in the signal's units.
+  const cntFmt = makeFormatter(undefined, locale);
   const buckets = bucketCount(width, Math.max(1, data.length));
   const geo = waveformGeometry({ data, width, height, buckets, domain: domain ?? null, mirror });
   const cy = height / 2;
-  const accName = resolveSummary(summary, () => waveformSummary(data, strings, fmt, posFmt));
+  const accName = resolveSummary(summary, () =>
+    waveformSummary(data, strings, fmt, posFmt, cntFmt),
+  );
 
   const hasProgress = progress != null && Number.isFinite(progress);
   const playedIdx = hasProgress ? Math.round(Math.max(0, Math.min(1, progress)) * buckets) : 0;
@@ -112,12 +138,16 @@ export function Waveform(props: WaveformProps): ReactNode {
       style={style}
     >
       {mirror ? (
+        // An ink ROLE, not a literal `stroke`: `.mc-root` sets
+        // forced-color-adjust: none, so `var(--mc-neutral)` — a fixed warm gray
+        // — painted verbatim over the user's own High Contrast background. The
+        // role resolves to the same token here and to GrayText there.
         <line
           x1={1}
           x2={width - 1}
           y1={cy}
           y2={cy}
-          stroke="var(--mc-neutral)"
+          data-mc-ink="muted"
           strokeOpacity={0.3}
           data-mc-w="hair"
           vectorEffect="non-scaling-stroke"
@@ -125,23 +155,28 @@ export function Waveform(props: WaveformProps): ReactNode {
       ) : null}
 
       {mode === "envelope" ? (
-        // data-mc-ink="bar" enrolls the envelope area in the rise story (the
-        // inline fill still wins for color) — without it the selector matches
-        // nothing and the entrance drops to the whole-svg wipe fallback.
+        // data-mc-ink="bar" enrolls the envelope area in the scan story —
+        // without it the selector matches nothing and the entrance drops to the
+        // whole-svg wipe fallback. It also carries the fill: the inline
+        // `var(--mc-stroke)` this used to set was the same paint, but inline
+        // beats both the `:where()` consumer-override contract and the
+        // forced-colors mapping, so the envelope kept a theme ink in High
+        // Contrast Mode. Only the opacity stays on the mark.
         <path
           d={envelopePath({ data, width, height, buckets, domain: domain ?? null, mirror })}
           data-mc-ink="bar"
-          style={{ fill: "var(--mc-stroke)", fillOpacity: 0.85 }}
+          fillOpacity={0.85}
         />
       ) : hasProgress ? (
-        // Both halves of the split waveform carry "bar" ink so they rise as one
-        // body (inline fills keep the played/rest coloring).
+        // The unplayed remainder is an OFF state, so it takes the `neutral` fill
+        // role rather than an inline `var(--mc-neutral)`: the same warm gray
+        // here, GrayText under forced-colors. Inline, it survived High Contrast
+        // Mode as a 45%-opacity fixed gray and the whole unplayed stretch — most
+        // of the clip early on — went invisible. The played half keeps its
+        // inline accent (the house pattern; `--mc-accent` is itself remapped to
+        // Highlight there), and both halves stay in the scan selector.
         <>
-          <path
-            d={barsPath(rest, mirror, cy)}
-            data-mc-ink="bar"
-            style={{ fill: "var(--mc-neutral)", fillOpacity: 0.45 }}
-          />
+          <path d={barsPath(rest, mirror, cy)} data-mc-ink="neutral" fillOpacity={0.45} />
           <path
             d={barsPath(played, mirror, cy)}
             data-mc-ink="bar"

@@ -50,6 +50,28 @@ describe("interactive <GardenGrid>", () => {
     );
   });
 
+  it("announces the bin count the grid was actually bucketed against", async () => {
+    // Geometry clamps `steps` to a floor of 2; the live region used to read the
+    // RAW prop and say "step 2 of 1" over a grid split into 2.
+    const screen = await render(<GardenGrid data={WEEKS} steps={1 as unknown as 3} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(live.textContent).toBe("1 of 12: 34, step 2 of 2.");
+  });
+
+  it("roving walks the repaired row count, not the raw prop", async () => {
+    // `rows={0}` falls back to 7; the walk used to run on the raw 0, where
+    // ArrowRight landed back on the same cell and hover found nothing at all.
+    const screen = await render(<GardenGrid data={WEEKS} rows={0} />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{Home}{ArrowRight}");
+    expect(live.textContent).toBe("8 of 12: 8, step 2 of 5.");
+  });
+
   it("controlled selectedIndex pins a ring with no interaction", async () => {
     const screen = await render(<GardenGrid data={WEEKS} title="Activity" selectedIndex={3} />);
     const pins = screen.container.querySelectorAll('circle[data-mc-w="tick"]');

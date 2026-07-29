@@ -4,9 +4,9 @@
 // pattern — the face never pretends.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont, labelFitsY } from "../../core/labels.js";
+import { labelFont, labelFitsY, textGutter } from "../../core/labels.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
-import { dicePipsGeometry } from "./geometry.js";
+import { DEFAULT_SIZE, dicePipsGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface DicePipsProps {
@@ -24,7 +24,27 @@ export interface DicePipsProps {
   children?: ReactNode | undefined;
 }
 
-const PAD_DIVISOR = 0.28; // pip inset from the face edge
+const NUMERAL_FACTOR = 0.6; // the fallback numeral is the loudest mark on the face
+// `labelFont`'s own 7-unit floor, read from the helper rather than restated, so
+// the numeral's shrink range can never drift from the library's minimum.
+const NUMERAL_FLOOR = labelFont(0);
+
+/**
+ * Largest size the fallback numeral can be set at and still land inside the
+ * face — 0 when it cannot. `labelFitsY` only clears the numeral VERTICALLY, so
+ * a three-digit fallback (`value={120}`) was painted straight through the die
+ * and out into the page: at the default 16-unit box the reserved run is 18.6
+ * units against a 15-unit face, and `.mc-root` is `overflow: visible`, so it
+ * spilled rather than clipped. Shrink toward the floor first; below it the
+ * numeral drops and the summary carries the count, the same degradation
+ * TallyMarks makes with its `+N`.
+ */
+function numeralFont(chars: number, size: number, room: number): number {
+  for (let f = labelFont(size, NUMERAL_FACTOR); f >= NUMERAL_FLOOR; f--) {
+    if (textGutter(chars, f, 0) <= room && labelFitsY(size / 2, f, size)) return f;
+  }
+  return 0;
+}
 
 export function dicePipsSummary(value: number, strings: DiceStrings = EN_DICE): string {
   const v = Number.isFinite(value) ? Math.round(value) : NaN;
@@ -36,7 +56,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
   const {
     value,
     face = true,
-    size = 16,
+    size = DEFAULT_SIZE,
     strings = EN_DICE,
     title,
     summary,
@@ -46,15 +66,18 @@ export function DicePips(props: DicePipsProps): ReactNode {
     children,
   } = props;
 
-  const geo = dicePipsGeometry({ value, size, pad: size * PAD_DIVISOR });
-  const fontSize = labelFont(size, 0.6);
-  const showNumeral = geo.numeral !== null && labelFitsY(size / 2, fontSize, size);
+  const geo = dicePipsGeometry({ value, size });
+  // Everything below reads the RESOLVED box, never the prop (see resolveSize).
+  const box = geo.size;
+  const fitted = geo.numeral === null ? 0 : numeralFont(geo.numeral.length, box, geo.face.width);
+  const showNumeral = fitted > 0;
+  const fontSize = showNumeral ? fitted : labelFont(box, NUMERAL_FACTOR);
   const accName = resolveSummary(summary, () => dicePipsSummary(value, strings));
 
   return (
     <Chart
-      width={size}
-      height={size}
+      width={box}
+      height={box}
       title={title}
       summary={accName}
       id={id}
@@ -81,8 +104,8 @@ export function DicePips(props: DicePipsProps): ReactNode {
       ))}
       {showNumeral ? (
         <text
-          x={size / 2}
-          y={size / 2}
+          x={box / 2}
+          y={box / 2}
           fontSize={fontSize}
           dominantBaseline="central"
           textAnchor="middle"

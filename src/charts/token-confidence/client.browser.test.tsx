@@ -50,13 +50,18 @@ describe("interactive <TokenConfidence> children", () => {
     // The host is a paragraph: the pointer leaves a flagged token onto plain
     // text long before it leaves the host, so clearing only on `pointerleave`
     // left the chip parked over words it was not describing.
-    const screen = await render(<TokenConfidence data={SENT} title="Answer" />);
+    const screen = await render(
+      <TokenConfidence data={SENT} title="Answer">
+        <em data-testid="prose"> and so on</em>
+      </TokenConfidence>,
+    );
     const host = screen.container.querySelector(".mc-tc-live") as HTMLElement;
     const chip = (): string | undefined => host.querySelector(".mc-spark-readout")?.textContent;
     await userEvent.hover(host.querySelector(".mc-tc-guessing") as HTMLElement);
     await expect.poll(chip).toBe("guessing 0.22");
-    // a confident token carries no `data-mc-token` — the same as bare prose
-    await userEvent.hover(host.querySelector("span:not([data-mc-token])") as HTMLElement);
+    // prose inside the host carries no `data-mc-token`, the same as a confident
+    // token (which now renders as a bare text node, no element at all)
+    await userEvent.hover(host.querySelector('[data-testid="prose"]') as HTMLElement);
     await expect.poll(chip).toBeUndefined();
   });
 
@@ -100,10 +105,10 @@ describe("interactive <TokenConfidence> children", () => {
     const flaggedTokens = [...host.querySelectorAll("[data-mc-token]")];
     expect(flaggedTokens.length).toBe(2);
     // React attaches at the root, so the props themselves are the evidence:
-    // the token spans carry only identity attributes.
+    // the token spans carry only identity attributes plus their tier class.
     for (const el of flaggedTokens) {
       const attrs = [...el.attributes].map((a) => a.name).sort();
-      expect(attrs).toEqual(["data-mc-token", "id", "tabindex"]);
+      expect(attrs).toEqual(["class", "data-mc-token", "id", "tabindex"]);
     }
     // Delegation still drives both paths.
     const guessing = host.querySelector(".mc-tc-guessing") as HTMLElement;
@@ -111,5 +116,42 @@ describe("interactive <TokenConfidence> children", () => {
     await expect
       .poll(() => host.querySelector(".mc-spark-readout")?.textContent)
       .toBe("guessing 0.22");
+  });
+
+  // The marked word IS the tab stop: styles.css hangs the accent focus ring off
+  // `.mc-tc-live .mc-tc-*:focus-visible`, which never matched while the tab stop
+  // sat on a bare wrapper span around it. Confident tokens get no element at all.
+  it("the tab stop is the underlined word; unmarked tokens emit no element", async () => {
+    const screen = await render(<TokenConfidence data={SENT} title="Answer" />);
+    const host = screen.container.querySelector(".mc-tc-live") as HTMLElement;
+    const stop = host.querySelector('[tabindex="0"]') as HTMLElement;
+    expect(stop.className).toBe("mc-tc-unsure");
+    expect(stop.textContent).toBe("Paris");
+    // 3 tokens, 1 confident → 2 spans, plus the live region; no wrapper spans
+    expect(host.querySelectorAll(".mc-tc-unsure, .mc-tc-guessing").length).toBe(2);
+    expect(
+      [...host.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent),
+    ).toContain("The");
+  });
+
+  // A non-finite confidence already reads as `guessing`; the chip and the
+  // announcement said "NaN" while the underline was right.
+  it("non-finite confidence reads as an em-dash, never NaN", async () => {
+    const screen = await render(
+      <TokenConfidence
+        data={[
+          { token: "The", confidence: 0.98 },
+          { token: " 52", confidence: Number.NaN },
+        ]}
+        title="Answer"
+      />,
+    );
+    const host = screen.container.querySelector(".mc-tc-live") as HTMLElement;
+    (host.querySelector('[tabindex="0"]') as HTMLElement).focus();
+    const live = host.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("52: guessing, —.");
+    await expect
+      .poll(() => host.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("guessing —");
   });
 });

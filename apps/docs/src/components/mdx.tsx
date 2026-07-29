@@ -121,6 +121,7 @@ import { AnnotationHostShowcase } from "@/components/annotation-hosts";
 import { PackageTabs } from "@/components/ui/package-tabs";
 import { GrammarExplorer, AgentCheatSheet } from "@/components/charts/ai-guide";
 import { ProviderWall, SurfaceCards } from "@/components/charts/ai-static";
+import { McpClients } from "@/components/ui/mcp-clients";
 import { CatalogStrip } from "@/components/charts/catalog-strip";
 import { TokenSwatches, PresetDeltas } from "@/components/charts/token-swatches";
 import { TokenStudio } from "@/components/charts/token-studio";
@@ -350,6 +351,7 @@ export function getMDXComponents(components?: MDXComponents) {
     TokenStudio,
     ProviderWall,
     SurfaceCards,
+    McpClients,
     Snippet,
     AgentPromptCopy,
     CopyAgentSetup,

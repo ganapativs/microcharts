@@ -10,7 +10,8 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
-import { cometTrailGeometry } from "./geometry.js";
+import { lastFinite } from "../../core/stats.js";
+import { cometLabelBand, cometTrailGeometry, DEFAULT_TRAIL } from "./geometry.js";
 
 export interface CometTrailProps {
   /** The rolling window, oldest → newest (last = now). */
@@ -46,7 +47,7 @@ export function cometTrailSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { trail = 12, strings = EN_COMET_TRAIL, format, locale } = opts;
+  const { trail = DEFAULT_TRAIL, strings = EN_COMET_TRAIL, format, locale } = opts;
   const geo = cometTrailGeometry({ values: data, width: 60, height: 16, trail, pad: PAD });
   if (geo.count === 0) return strings.noData;
   const fmt = makeFormatter(format, locale);
@@ -57,7 +58,7 @@ export function cometTrailSummary(
 export function CometTrail(props: CometTrailProps): ReactNode {
   const {
     data,
-    trail = 12,
+    trail = DEFAULT_TRAIL,
     label = "last",
     domain,
     width = 60,
@@ -73,9 +74,20 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height);
+  // A host-computed `fontSize` can arrive NaN (`Number("")`) or 0. Left alone it
+  // reached the reserved gutter and, through it, every dot coordinate — a chart
+  // of `cx="NaN"` under a perfectly normal-looking accessible name.
+  const asked = props.fontSize ?? labelFont(height);
+  const fontSize = Number.isFinite(asked) && asked > 0 ? asked : labelFont(height);
+  const fmt = makeFormatter(format, locale);
 
-  const labelBand = label === "last" ? fontSize * 3 : 0;
+  // The gutter is reserved BEFORE geometry and sized from the text that will
+  // actually be printed — the static path may never measure text. `lastFinite`
+  // is the same value `geo.last` reports, and it does not depend on the box, so
+  // there is no circularity in asking for it first.
+  const last = lastFinite(data);
+  const labelText = label === "last" && last !== undefined ? fmt(last) : null;
+  const labelBand = cometLabelBand(labelText, fontSize, width, height);
   const geo = cometTrailGeometry({
     values: data,
     width: width - labelBand,
@@ -83,13 +95,12 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     domain,
     trail,
     pad: PAD,
-    vPad: label === "last" ? fontSize * 0.6 : 0,
+    vPad: labelBand > 0 ? fontSize * 0.6 : 0,
   });
   const accName =
     summary === false
       ? false
       : (summary ?? cometTrailSummary(data, { trail, strings, format, locale }));
-  const fmt = makeFormatter(format, locale);
 
   return (
     <Chart
@@ -125,7 +136,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
           style={color ? { fill: color } : undefined}
         />
       ) : null}
-      {label === "last" && geo.head && Number.isFinite(geo.last) ? (
+      {labelBand > 0 && geo.head ? (
         <text
           x={geo.labelX}
           y={Math.min(Math.max(geo.head.cy, fontSize * 0.6), geo.height - fontSize * 0.6)}
@@ -134,7 +145,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
           textAnchor="start"
           data-mc-ink="label"
         >
-          {fmt(geo.last)}
+          {labelText}
         </text>
       ) : null}
       {children}

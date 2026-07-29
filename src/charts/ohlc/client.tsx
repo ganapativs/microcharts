@@ -18,7 +18,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { ohlcGeometry } from "./geometry.js";
+import { ohlcGeometry, ohlcLastClose, ohlcWindow } from "./geometry.js";
 import { Ohlc as StaticOhlc, ohlcSummary, type OhlcProps } from "./index.js";
 
 export interface InteractiveOhlcProps extends OhlcProps, PickerProps {
@@ -76,7 +76,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     [format, locale],
   );
   const fontSize = labelFont(height, 0.4);
-  const lastClose = data.at(-1)?.close;
+  // Both entries derive the window the same way, or the interactive geometry
+  // (frame x, hit test) drifts off the candles the static child painted.
+  const rendered = useMemo(() => ohlcWindow(data, maxPeriods), [data, maxPeriods]);
+  const lastClose = ohlcLastClose(rendered);
   const geo = useMemo(
     () =>
       ohlcGeometry({
@@ -85,15 +88,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         periods: data,
         maxPeriods,
         domain,
-        gutterCh:
-          label === "last" && Number.isFinite(lastClose) ? fmt(lastClose as number).length : 0,
+        gutterCh: label === "last" && lastClose !== undefined ? fmt(lastClose).length : 0,
         fontSize,
       }),
     [width, height, data, maxPeriods, domain, label, lastClose, fmt, fontSize],
-  );
-  const rendered = useMemo(
-    () => (data.length > maxPeriods ? data.slice(-maxPeriods) : [...data]),
-    [data, maxPeriods],
   );
 
   // The navigable stops are the PAINTED candles, keyed by their period index in
@@ -160,7 +158,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : ohlcSummary(data, fmt, pctFmt, strings);
+        : ohlcSummary(rendered, fmt, pctFmt, strings);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const frame = (i: number, pinned: boolean) => {

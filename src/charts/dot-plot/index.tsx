@@ -81,7 +81,11 @@ export function DotPlot(props: DotPlotProps): ReactNode {
 
   // labels drop deterministically with density: category text needs
   // fontSize × 1.25 of row pitch, value text a full 8-unit row
-  const showCategories = geo.pitch >= fontSize * 1.25;
+  // Two independent reasons a category name drops, and BOTH have to gate it: no
+  // vertical room for a line of text, or no horizontal room for enough of the
+  // name to identify the row (`rowLabelChars` returns 0 for that). Without the
+  // second, a narrow plate rendered every label as a bare "…".
+  const showCategories = geo.pitch >= fontSize * 1.25 && maxLabelChars > 0;
   const showValues = label === "value" && geo.pitch >= 8;
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
@@ -107,15 +111,20 @@ export function DotPlot(props: DotPlotProps): ReactNode {
     >
       {geo.rows.map((row) => {
         const d = data[row.index]!;
-        if (row.x === null) return null;
+        const x = row.x;
+        // A null row keeps its NAME. Dropping the whole row painted a blank band
+        // between two labelled ones — the reader can see a gap but not whose it
+        // is, while the interactive entry still roves the row and announces
+        // "Kim: no data". The dot is what's missing, not the category.
+        if (x === null && !showCategories) return null;
         const isHl = highlight !== undefined && (highlight === d.label || highlight === row.index);
         return (
           <g key={row.index}>
-            {stem ? (
+            {stem && x !== null ? (
               <line
                 x1={row.stemX0}
                 y1={row.y}
-                x2={row.x}
+                x2={x}
                 y2={row.y}
                 data-mc-ink="muted"
                 data-mc-w="support"
@@ -123,13 +132,15 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                 vectorEffect="non-scaling-stroke"
               />
             ) : null}
-            <circle
-              cx={row.x}
-              cy={row.y}
-              r={2}
-              data-mc-ink={isHl ? "accent" : "point"}
-              style={!isHl && color ? { fill: color } : undefined}
-            />
+            {x !== null ? (
+              <circle
+                cx={x}
+                cy={row.y}
+                r={2}
+                data-mc-ink={isHl ? "accent" : "point"}
+                style={!isHl && color ? { fill: color } : undefined}
+              />
+            ) : null}
             {showCategories ? (
               <text
                 x={geo.labelX}
@@ -142,18 +153,36 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                 {truncateLabel(d.label, maxLabelChars)}
               </text>
             ) : null}
-            {showValues && isFiniteValue(d.value)
-              ? /* beside the dot; flips left when the estimate would overflow */
+            {showValues && x !== null && isFiniteValue(d.value)
+              ? /* beside the dot, right first */
                 (() => {
                   const text = fmt(d.value);
-                  const fits = row.x + 4 + text.length * fontSize * 0.62 <= width;
+                  const est = text.length * fontSize * 0.62;
+                  const right = x + 4 + est <= width;
+                  // The flip left is not a fallback that always works: an
+                  // end-anchored figure grows leftward, so a long number on a
+                  // low dot ran off the viewBox (`-999,999,999` reached x −54 in
+                  // a 60-wide box) and over the category gutter on its way out.
+                  // `.mc-root` is overflow: visible, so that spilled into the
+                  // page. When neither side has room the figure drops, the same
+                  // deterministic way the whole set drops under 8-unit rows.
+                  const left = x - 4 - est >= geo.x0;
+                  if (!right && !left) return null;
                   return (
                     <text
-                      x={fits ? row.x + 4 : row.x - 4}
+                      x={right ? x + 4 : x - 4}
                       y={row.y}
                       fontSize={fontSize}
                       dominantBaseline="central"
-                      textAnchor={fits ? "start" : "end"}
+                      textAnchor={right ? "start" : "end"}
+                      // A direct value label, so it takes the label ink like
+                      // every other one in the catalog: quieter than the dot it
+                      // annotates, and — the part that actually bites — the only
+                      // text fill High Contrast Mode maps to CanvasText. Bare
+                      // `<text>` keeps `--mc-stroke` verbatim under
+                      // `forced-color-adjust: none`, painting a fixed theme ink
+                      // against whatever background the user chose.
+                      data-mc-ink="label"
                     >
                       {text}
                     </text>

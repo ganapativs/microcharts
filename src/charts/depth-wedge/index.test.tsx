@@ -58,6 +58,28 @@ describe("<DepthWedge>", () => {
     expect(container.querySelector("text")!.textContent).toBe("0.2");
   });
 
+  it("no rendered wedge on a side drops the spread readout", () => {
+    // every bid has zero size — there is no bid, so there is no touch to
+    // measure. The raw-row-count gate printed "0" over the gap instead.
+    const { container } = draw(
+      <DepthWedge data={{ demand: [{ level: 99.9, amount: 0 }], supply: BOOK.supply }} />,
+    );
+    expect(container.querySelectorAll("path").length).toBe(1);
+    expect(container.querySelector("text")).toBeNull();
+  });
+
+  it("a levels window narrower than the book keeps the paint in the box", () => {
+    const { container } = draw(<DepthWedge data={BOOK} levels={0.1} title="Book" />);
+    const xs = [...container.querySelectorAll("path")].flatMap((p) =>
+      [...p.getAttribute("d")!.matchAll(/[ML]([\d.-]+) /g)].map((m) => Number(m[1])),
+    );
+    expect(xs.length).toBeGreaterThan(0);
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(100);
+    // and the announced ratio is the one the window paints, not the whole book
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("1.67×");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<DepthWedge data={BOOK} title="Order book" />);
     await expectNoA11yViolations(container);

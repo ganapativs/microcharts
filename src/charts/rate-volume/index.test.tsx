@@ -71,6 +71,13 @@ describe("<RateVolume>", () => {
     expect(label).toContain("across 12 periods");
   });
 
+  it("the endpoint readout leaves tabular-nums to styles.css", () => {
+    const { container } = draw(<RateVolume data={SAMPLE} />);
+    // inline paint would outrank the `:where()` rules the theming contract
+    // hands consumers, and styles.css already sets it on `.mc-root text`
+    expect(container.querySelector("text")!.style.fontVariantNumeric).toBe("");
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<RateVolume data={SAMPLE} title="Conversion rate" />);
     await expectNoA11yViolations(container);

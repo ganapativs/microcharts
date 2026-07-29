@@ -51,6 +51,33 @@ describe("microBoxGeometry", () => {
     expect(geo.box.w).toBeGreaterThanOrEqual(1);
   });
 
+  it("the box never outgrows a short frame", () => {
+    // Regression: the 4-unit readability floor on the box height was applied
+    // unconditionally, so below height 4 the box spilled above and below the
+    // viewBox (`.mc-root` is overflow: visible — nothing clips it).
+    const r = computeFive(RAW, undefined)!;
+    for (const height of [1, 2, 3, 4, 6, 8, 14, 32]) {
+      const geo = microBoxGeometry({
+        width: 40,
+        height,
+        five: r.five,
+        raw: r.raw,
+        whiskers: "minmax",
+      });
+      expect(geo.box.y).toBeGreaterThanOrEqual(0);
+      expect(geo.box.y + geo.box.h).toBeLessThanOrEqual(height + 0.01);
+    }
+  });
+
+  it("keeps the 4-unit box floor at every height it ships at", () => {
+    const r = computeFive(RAW, undefined)!;
+    const at = (height: number) =>
+      microBoxGeometry({ width: 40, height, five: r.five, raw: r.raw, whiskers: "minmax" }).box.h;
+    expect(at(14)).toBe(9);
+    expect(at(32)).toBe(27);
+    expect(at(8)).toBe(4); // short frame still gets the readable floor
+  });
+
   it("non-monotonic precomputed stats are refused", () => {
     expect(computeFive(undefined, { min: 5, q1: 3, median: 4, q3: 6, max: 7 })).toBeNull();
   });

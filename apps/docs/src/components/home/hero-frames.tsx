@@ -17,7 +17,7 @@ import { HERO_APPS, HERO_COLLECTIONS, HERO_SIZES, HERO_SVG_BYTES } from "./home-
  * `bench-summary.json`.
  *
  * `kb` is each TYPE's own interactive gzip and the fan's first callout shows it,
- * so the four frames also demonstrate the 4.77–6.75 kB range they claim.
+ * so the four frames also demonstrate the 4.86–6.94 kB range they claim.
  */
 
 export type HeroFrame = {
@@ -44,7 +44,7 @@ function Mark({ children }: { children: ReactNode }) {
 }
 
 /** A mono figure inside the serif sentence, matching the page's rule that every
- *  rendered number is JetBrains Mono with its unit. */
+ *  rendered number is Iosevka with its unit. */
 function Fig({ children }: { children: ReactNode }) {
   return <span className="font-mono text-[0.72em] tracking-[-0.04em]">{children}</span>;
 }
@@ -52,15 +52,15 @@ function Fig({ children }: { children: ReactNode }) {
 export const HERO_FRAMES: readonly HeroFrame[] = [
   {
     id: "sizes",
-    kb: 4.77,
+    kb: 2.18,
     name: "Every chart in the catalog, by size",
     sentence: (
       <>
-        It&rsquo;s small in the bundle too: the median chart is <Fig>5.07 kB</Fig>{" "}
+        It&rsquo;s small in the bundle too: the median chart is <Fig>5.24 kB</Fig>{" "}
         <Mark>
           {/* A rug, not a line: sorted sizes drawn as a Sparkline are an ogive
               that says nothing. Piling the ink up on one axis makes the dense
-              band at 4.7–5.5 kB the median the sentence quotes. */}
+              band at 4.9–5.6 kB the median the sentence quotes. */}
           <RugStrip
             data={[...HERO_SIZES]}
             width={W}
@@ -74,7 +74,7 @@ export const HERO_FRAMES: readonly HeroFrame[] = [
   },
   {
     id: "collections",
-    kb: 5.1,
+    kb: 5.09,
     name: "The catalog, split into four collections",
     sentence: (
       <>
@@ -98,7 +98,7 @@ export const HERO_FRAMES: readonly HeroFrame[] = [
   },
   {
     id: "apps",
-    kb: 5.67,
+    kb: 5.24,
     name: "Chart types used by each of the seven example apps",
     sentence: (
       <>
@@ -117,13 +117,13 @@ export const HERO_FRAMES: readonly HeroFrame[] = [
   },
   {
     id: "svg",
-    kb: 6.75,
+    kb: 6.94,
     name: "SVG each chart renders, in bytes",
     sentence: (
       <>
         On the page it stays just as light{" "}
         <Mark>
-          {/* This one earns the line: sorted, the 106 values sweep 238 → 7,505
+          {/* This one earns the line: sorted, the 106 values sweep 238 → 9,767
               with a real knee where the grid types start emitting a node per
               cell. */}
           <Sparkline
@@ -135,7 +135,7 @@ export const HERO_FRAMES: readonly HeroFrame[] = [
             title="Bytes of SVG each of the 106 charts renders for a 24-point series, smallest to largest"
           />
         </Mark>{" "}
-        and the median one draws <Fig>1,394</Fig> bytes of SVG.
+        and the median one draws <Fig>1,375</Fig> bytes of SVG.
       </>
     ),
   },

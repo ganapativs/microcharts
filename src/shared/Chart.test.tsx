@@ -86,3 +86,27 @@ describe("MicroProvider (theming, )", () => {
     expect(el.style.getPropertyValue("--mc-accent")).toBe("#f50");
   });
 });
+
+describe("non-finite box", () => {
+  // Six charts in the catalog audit reached this through their own width/height
+  // props. An invalid viewBox is dropped by the browser, so the chart renders at
+  // the wrong scale while still carrying a correct accessible name.
+  for (const [name, w, h] of [
+    ["NaN width", Number.NaN, 20],
+    ["Infinity height", 80, Number.POSITIVE_INFINITY],
+    ["zero width", 0, 20],
+    ["negative height", 80, -5],
+  ] as const) {
+    it(`${name} → a valid viewBox, never NaN/Infinity`, () => {
+      const { container } = render(
+        <Chart width={w} height={h} summary="s">
+          <rect x={0} y={0} width={1} height={1} />
+        </Chart>,
+      );
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("viewBox")).toMatch(/^0 0 \d+(\.\d+)? \d+(\.\d+)?$/);
+      for (const a of ["viewBox", "width", "height"])
+        expect(svg.getAttribute(a)).not.toMatch(/NaN|Infinity/);
+    });
+  }
+});

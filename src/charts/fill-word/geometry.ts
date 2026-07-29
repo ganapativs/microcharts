@@ -9,6 +9,23 @@ import { round2 } from "../../core/types.js";
 
 export type FillMode = "fill" | "drain";
 
+/**
+ * The one place `fontSize` becomes a number the box can be built from.
+ *
+ * Every coordinate in this chart is derived from it — there are no `width` /
+ * `height` props to fall back on — so a host that computes it (`base * scale`,
+ * or an empty input field through `Number("")`) used to emit `font-size="NaN"`,
+ * `y="NaN"`, `--mc-label-size: NaNpx` and a NaN inline seat, while the
+ * aria-label still announced an ordinary "uploading: 62% complete." A negative
+ * one was worse than blank: the seat went to 9, which throws the mark nine box
+ * heights off the line of text it is supposed to sit on.
+ *
+ * Non-finite or non-positive resolves to the documented default of 12.
+ */
+export function resolveFontSize(size: number | undefined): number {
+  return size !== undefined && Number.isFinite(size) && size > 0 ? size : 12;
+}
+
 export interface FillWordGeometry {
   /** Deterministic estimated glyph extent (textLength attr). */
   textLength: number;
@@ -41,7 +58,8 @@ export function fillWordGeometry(opts: {
    */
   numeralChars?: number;
 }): FillWordGeometry {
-  const { word, fontSize, pad, mode, label = false, numeralChars = 4 } = opts;
+  const { word, pad, mode, label = false, numeralChars = 4 } = opts;
+  const fontSize = resolveFontSize(opts.fontSize);
   const v = clamp(Number.isFinite(opts.value) ? opts.value : 0, 0, 1);
   const chars = word.length;
   const textLength = round2(chars * 0.62 * fontSize);

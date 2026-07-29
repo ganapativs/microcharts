@@ -21,8 +21,8 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
-import { isFiniteValue } from "../../core/types.js";
-import { stackedAreaGeometry } from "./geometry.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
+import { stackedAreaGeometry, stackedAreaLabelsFit } from "./geometry.js";
 import {
   StackedArea as StaticStackedArea,
   stackedAreaSummary,
@@ -48,8 +48,8 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     curve = "linear",
     domain,
     colors,
-    width = 60,
-    height = 16,
+    width: widthProp = 60,
+    height: heightProp = 16,
     format,
     locale,
     strings = EN_STACK,
@@ -69,6 +69,13 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
+
+  // Same clamp the static applies, for the same reason — and it has to happen
+  // here too: the overlay geometry and the pointer→column mapping are computed
+  // from these numbers, so an unclamped box would put the crosshair somewhere
+  // the marks are not.
+  const width = chartSide(widthProp);
+  const height = chartSide(heightProp);
 
   const series = useMemo(() => {
     let s = data.slice(0, 3);
@@ -93,8 +100,11 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         domain,
         curve: usedCurve,
         // MUST mirror the static: the endpoint-label gutter shrinks the plot,
-        // so an overlay computed without it lands off the rendered marks.
-        gutterCh: rest.label === "last" ? 4 : 0,
+        // so an overlay computed without it lands off the rendered marks — and
+        // the static drops the gutter with the labels, so the fit test is part
+        // of the mirror.
+        gutterCh:
+          rest.label === "last" && stackedAreaLabelsFit(height, series.length, fontSize) ? 4 : 0,
         fontSize,
       }),
     [width, height, series, domain, usedCurve, rest.label, fontSize],
@@ -129,18 +139,22 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   //
   // Listing bands as ONE nowrap line is what blew the cap before (206px past it
   // at three bands). Rows are the fix: the chip's width is now its widest ROW,
-  // not the sum of its bands, and `.mc-stacked-readout` caps the name column at
+  // not the sum of its bands, and `.mc-readout-rows` caps the name column at
   // 7em, so the whole chip is bounded by construction at ~11em — inside the 14em
   // ceiling regardless of label length or series count. Height is bounded by the
   // documented ≤ 3-series cap.
   const bandRows = useCallback(
-    (shares: readonly number[], col: number) =>
-      series.map((s, i) => ({
+    (shares: readonly number[], col: number) => {
+      // empty array = no override, matching the static: otherwise the swatch
+      // went unpainted while the band it mirrors kept the cat palette.
+      const pal = colors && colors.length > 0 ? colors : undefined;
+      return series.map((s, i) => ({
         name: s.label ?? strings.seriesFallback(i + 1),
         pct: isFiniteValue(s.values[col]) ? pctFmt(shares[i] ?? 0) : "—",
         cat: (i % 3) + 1,
-        fill: colors ? colors[i % colors.length] : `var(--mc-cat-${(i % 3) + 1})`,
-      })),
+        fill: pal ? pal[i % pal.length] : `var(--mc-cat-${(i % 3) + 1})`,
+      }));
+    },
     [series, pctFmt, strings, colors],
   );
   // index = column (x-sample) index; value = the stack total at that column

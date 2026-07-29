@@ -21,7 +21,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SCATTER, type ScatterStrings } from "../../core/strings-scatter.js";
-import { microScatterGeometry } from "./geometry.js";
+import { microScatterGeometry, scatterRadius } from "./geometry.js";
 import {
   MicroScatter as StaticMicroScatter,
   microScatterSummary,
@@ -70,7 +70,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
     defaultSelectedIndex,
     ...rest
   } = props;
-  const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
+  const rad = scatterRadius(props.r);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Dots settle onto the plot (the story). With `trend`, the least-squares line

@@ -6,9 +6,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import { labelFitsY } from "../../core/labels.js";
 import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
   NO_ZONES,
   chevronTier,
   tapeGaugeGeometry,
@@ -53,6 +55,14 @@ const TONE_INK: Record<Tone, Record<string, string | number>> = {
   neutral: { "data-mc-ink": "neutral" },
 };
 
+/** The floor auto-span already used, and the fallback for a window that isn't
+ *  one. */
+const MIN_SPAN = 10;
+/** A derived span can still overflow (zone bounds a float apart) or arrive NaN
+ *  (a non-finite reading), and an unrepresentable window divides every position
+ *  on the tape to NaN. One exit for both. */
+const finiteSpan = (s: number): number => (Number.isFinite(s) && s > 0 ? s : MIN_SPAN);
+
 /** Auto span: zones extent, else a rate-scaled window, else 10% of |value|. */
 export function autoSpan(
   value: number,
@@ -68,10 +78,37 @@ export function autoSpan(
       lo = Math.min(lo, z.from, z.to);
       hi = Math.max(hi, z.from, z.to);
     }
-    if (Number.isFinite(lo) && hi > lo) return (hi - lo) * 1.25;
+    if (Number.isFinite(lo) && hi > lo) return finiteSpan((hi - lo) * 1.25);
   }
-  if (rate != null && Number.isFinite(rate) && rate !== 0) return Math.max(10, 20 * Math.abs(rate));
-  return Math.max(10, Math.abs(value) * 0.1) || 10;
+  if (rate != null && Number.isFinite(rate) && rate !== 0)
+    return finiteSpan(Math.max(10, 20 * Math.abs(rate)));
+  return finiteSpan(Math.max(10, Math.abs(value) * 0.1));
+}
+
+/**
+ * The window this gauge actually draws, and the rate thresholds derived from
+ * it. `span` and `rateTiers` are caller props and only finite ones are a scale:
+ * `Infinity` passed the old `span > 0` test, so the zone stripe emitted
+ * `y="NaN"`, `[span/60, span/15]` went infinite, and the summary announced
+ * "steady" over a rising reading. Announced scale and painted scale have to be
+ * the same scale, so both entries resolve through here.
+ */
+export function resolveTapeScale(opts: {
+  value: number;
+  span?: number | undefined;
+  zones?: readonly Zone[] | undefined;
+  rate?: number | undefined;
+  rateTiers?: [number, number] | undefined;
+}): { span: number; tiers: [number, number] } {
+  const span =
+    isFiniteValue(opts.span) && opts.span > 0
+      ? opts.span
+      : autoSpan(opts.value, opts.zones, opts.rate);
+  const t = opts.rateTiers;
+  return {
+    span,
+    tiers: t && isFiniteValue(t[0]) && isFiniteValue(t[1]) ? t : [span / 60, span / 15],
+  };
 }
 
 /** Shared summary — value, rate word (a separate channel), containing zone. */
@@ -132,8 +169,8 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     rateTiers: tiersProp,
     orientation = "vertical",
     label = "value",
-    width = 46,
-    height = 60,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_TAPE_GAUGE,
@@ -145,8 +182,17 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     children,
   } = props;
 
-  const span = spanProp && spanProp > 0 ? spanProp : autoSpan(value, zones, rate);
-  const tiers = tiersProp ?? [span / 60, span / 15];
+  // The box drives every mark, the readout's own size, the tick drop-out rule
+  // and the seat — none of which `Chart`'s own clamp reaches (see `chartSide`).
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
+  const { span, tiers } = resolveTapeScale({
+    value,
+    span: spanProp,
+    zones,
+    rate,
+    rateTiers: tiersProp,
+  });
   const fmt = makeFormatter(format, locale);
   const tickFont = 7;
   const vertical = orientation !== "horizontal";
@@ -333,8 +379,4 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

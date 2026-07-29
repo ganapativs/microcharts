@@ -27,7 +27,13 @@ export function BrandNameSection() {
             </div>
             <ul className="prose space-y-2.5 text-[0.92rem]">
               <li>The mark may pair with the wordmark or stand alone.</li>
-              <li>Don&rsquo;t redraw the wordmark. Use the shipped lockup.</li>
+              <li>
+                Don&rsquo;t redraw the wordmark. Take{" "}
+                <a href="/brand/lockup.svg" download className="ulink">
+                  lockup.svg
+                </a>
+                .
+              </li>
             </ul>
           </div>
           <div className="plate flex h-full flex-col overflow-hidden">

@@ -6,7 +6,7 @@
 // null (or NaN) is a gap: it breaks the current run and starts a fresh one. 2-dp.
 import { labelFont } from "../../core/labels.js";
 import { clamp } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 /** One trial: a boolean/number outcome, or `null` (a gap that breaks runs). */
 export type StreakDatum = number | boolean | null | undefined;
@@ -28,6 +28,10 @@ export const streakSparkRoom = (height: number, label: StreakLabel): number =>
 
 /** Runs beyond this collapse the oldest into a single ellipsis slot (dev-warn). */
 export const MAX_RUNS = 40;
+
+/** Default box, shared by both entries so their fallbacks cannot drift. */
+export const DEFAULT_WIDTH = 96;
+export const DEFAULT_HEIGHT = 20;
 
 /** One placed run. `on` = a streak-outcome (ok) run; `!on` = a break (fail) run. */
 interface StreakRun {
@@ -96,6 +100,18 @@ export interface StreakSparkGeometryOptions {
   labelRoom?: number | undefined;
 }
 
+/**
+ * The pass bar, resolved once. A host computes this — a settings field, a config
+ * fetch, `Number(input.value)` on a cleared input — so a non-finite one is
+ * ordinary, and every comparison against NaN is false: `threshold={NaN}` turned
+ * a run of six passing deploys into one break run, painted red and announced as
+ * "Current run 6 failing; no completed streak". Anything non-finite falls back
+ * to the documented default, `v > 0`.
+ */
+function resolveThreshold(t: number | undefined): number | undefined {
+  return isFiniteValue(t) ? t : undefined;
+}
+
 /** Resolve a datum to pass / fail / gap. NaN, ±Infinity and null are gaps. */
 function resolvePass(v: StreakDatum, threshold: number | undefined): boolean | null {
   if (v === null || v === undefined) return null;
@@ -108,7 +124,8 @@ export function streakSparkGeometry(
   data: readonly StreakDatum[],
   opts: StreakSparkGeometryOptions,
 ): StreakSparkGeometry {
-  const { width, height, threshold, positive = "up", labelRoom = 0 } = opts;
+  const { width, height, positive = "up", labelRoom = 0 } = opts;
+  const threshold = resolveThreshold(opts.threshold);
   const pad = 1;
   // The runs live in the band BELOW the reserved label room and centre on it, so
   // the label always has its own space. Clamped so a caller asking for more room
@@ -202,7 +219,11 @@ export function streakSparkGeometry(
     const w = round2(Math.max(0.5, right - left));
     const isCurrent = idx === n - 1;
     const h = isCurrent ? hCurrent : r.on ? hOk : hFail; // already round2'd
-    const x = round2(clamp(left, pad, width - pad - w));
+    // The upper bound is floored at `pad`: in a box narrower than a run plus its
+    // two pads the bound goes negative, and `clamp` honours the bound over the
+    // floor, so a 1-unit-wide chart placed every run at x = -0.5. `.mc-root` is
+    // `overflow: visible`, so that paints onto the page instead of clipping.
+    const x = round2(clamp(left, pad, Math.max(pad, width - pad - w)));
     return {
       x,
       y: round2(mid - h / 2),

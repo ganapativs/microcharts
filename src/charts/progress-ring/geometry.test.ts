@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { ringGeometry, ringLabelFont } from "./geometry.js";
+import { RING_SIZE, ringGeometry, ringLabelFont, ringLabelSize, ringSize } from "./geometry.js";
 
 describe("ringGeometry", () => {
   it("fraction 0 → track only (no zero-length arc artifact)", () => {
@@ -57,6 +57,59 @@ describe("ringGeometry", () => {
       expect(v).toBeGreaterThanOrEqual(-0.01);
       expect(v).toBeLessThanOrEqual(24.01);
     }
+  });
+});
+
+describe("hostile scalars", () => {
+  it("size: only positive-finite survives", () => {
+    for (const bad of [Number.NaN, Infinity, -Infinity, 0, -5, undefined]) {
+      expect(ringSize(bad)).toBe(RING_SIZE);
+    }
+    expect(ringSize(40)).toBe(40);
+  });
+
+  it("weight: non-finite takes the default rather than NaN radii", () => {
+    const good = ringGeometry({ size: 24, fraction: 0.5, weight: 3, sweep: false });
+    for (const bad of [Number.NaN, undefined]) {
+      expect(ringGeometry({ size: 24, fraction: 0.5, weight: bad, sweep: false })).toEqual(good);
+    }
+  });
+
+  it("weight never clamps below 0 — a negative stroke-width drops the arc", () => {
+    for (const size of [1, 2, 3, 24]) {
+      const geo = ringGeometry({ size, fraction: 0.5, weight: 3, sweep: false });
+      expect(geo.weight).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("every geometry field stays finite under hostile size/weight", () => {
+    for (const bad of [Number.NaN, Infinity, -Infinity, 0, -5]) {
+      for (const geo of [
+        ringGeometry({ size: bad, fraction: 0.5, weight: 3, sweep: false, labelChars: 4 }),
+        ringGeometry({ size: 24, fraction: 0.5, weight: bad, sweep: false, labelChars: 4 }),
+      ]) {
+        for (const n of [geo.weight, geo.labelX, geo.labelY, geo.fontSize, geo.y0, geo.y1]) {
+          expect(Number.isFinite(n)).toBe(true);
+        }
+        expect(`${geo.track} ${geo.arc}`).not.toMatch(/NaN|Infinity/);
+      }
+    }
+  });
+});
+
+describe("ringLabelSize", () => {
+  it("agrees with the size the ring actually renders", () => {
+    // The interactive entry gates its chip on this, so the two must not drift.
+    for (const size of [16, 20, 24, 32, 48]) {
+      expect(ringLabelSize(size, 3, 4)).toBe(
+        ringGeometry({ size, fraction: 1, weight: 3, sweep: false, labelChars: 4 }).fontSize,
+      );
+    }
+  });
+
+  it("0 when the hole cannot seat the figure", () => {
+    expect(ringLabelSize(16, 3, 4)).toBe(0);
+    expect(ringLabelSize(32, 3, 4)).toBeGreaterThan(0);
   });
 });
 

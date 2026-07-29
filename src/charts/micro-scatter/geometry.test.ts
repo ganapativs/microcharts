@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { microScatterGeometry, relationshipTier } from "./geometry.js";
+import { microScatterGeometry, relationshipTier, scatterRadius } from "./geometry.js";
 
 const base = { width: 40, height: 24, trend: false };
 
@@ -58,6 +58,32 @@ describe("microScatterGeometry", () => {
     expect(geo.trendLine).not.toBeNull();
     const single = microScatterGeometry({ ...base, trend: true, points: [{ x: 1, y: 1 }] });
     expect(single.trendLine).toBeNull();
+  });
+
+  it("scatterRadius clamps to [1, 3] and rejects non-finite (default 1.5)", () => {
+    expect(scatterRadius(undefined)).toBe(1.5);
+    expect(scatterRadius(2)).toBe(2);
+    expect(scatterRadius(0)).toBe(1);
+    expect(scatterRadius(9)).toBe(3);
+    // The old Math.min/Math.max spelling passed these straight through, and a
+    // NaN radius poisons the scale range → every coordinate NaN.
+    expect(scatterRadius(Number.NaN)).toBe(1.5);
+    expect(scatterRadius(Number.POSITIVE_INFINITY)).toBe(1.5);
+    expect(scatterRadius(Number.NEGATIVE_INFINITY)).toBe(1.5);
+  });
+
+  it("a non-finite radius still yields finite dots and trend line", () => {
+    const geo = microScatterGeometry({
+      ...base,
+      trend: true,
+      r: Number.NaN,
+      points: [1, 2, 3, 4].map((v) => ({ x: v, y: v * 2 })),
+    });
+    for (const d of geo.dots) {
+      expect(Number.isFinite(d.x)).toBe(true);
+      expect(Number.isFinite(d.y)).toBe(true);
+    }
+    for (const v of Object.values(geo.trendLine!)) expect(Number.isFinite(v)).toBe(true);
   });
 
   it("relationshipTier heuristic (documented thresholds)", () => {

@@ -15,7 +15,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
-import { hexPath, honeycombGeometry } from "./geometry.js";
+import { hexPath, honeycombGeometry, resolveTotal, resolveValue } from "./geometry.js";
 import { Honeycomb as StaticHoneycomb, honeycombSummary, type HoneycombProps } from "./index.js";
 
 export interface InteractiveHoneycombProps extends HoneycombProps, PickerProps {
@@ -92,7 +92,9 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const locate = useCallback(
     (x: number, y: number) => {
       let best: number | null = null;
-      let bestD = cell * cell;
+      // The RESOLVED circumradius: a NaN `cell` prop made every comparison
+      // false, so nothing was ever pickable on a comb that drew fine.
+      let bestD = geo.cell * geo.cell;
       for (let i = 0; i < geo.cells.length; i++) {
         const c = geo.cells[i]!;
         const dx = x - c.cx;
@@ -105,7 +107,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
       }
       return best;
     },
-    [geo, cell],
+    [geo],
   );
 
   // Offset-row roving. ←/→ walk WITHIN a row (never wrapping into the next);
@@ -183,14 +185,16 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
     shown === null
       ? ""
       : strings.honeycombCell(shown + 1, geo.cells.length, geo.cells[shown]?.filled ?? false);
-  const readout = `${fmt(Math.max(0, Math.round(value)))} / ${fmt(Math.floor(total))}`;
+  // Through the same resolvers as the comb and the summary — the chip is the
+  // reading the chart paints, so it can never say "5 / NaN" over ten hexes.
+  const readout = `${fmt(resolveValue(value))} / ${fmt(resolveTotal(total))}`;
 
   const ring = (i: number, pinned: boolean) => {
     const c = geo.cells[i];
     if (!c) return null;
     return (
       <path
-        d={hexPath(c.cx, c.cy, cell)}
+        d={hexPath(c.cx, c.cy, geo.cell)}
         fill="none"
         stroke="var(--mc-accent)"
         data-mc-w={pinned ? "tick" : "support"}

@@ -72,12 +72,17 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     hasTarget && Number.isFinite(value - target!)
       ? `${value - target! >= 0 ? "+" : "−"}${fmt(Math.abs(value - target!))}`
       : "";
+  // `fmt` is Intl, which formats NaN as the literal "NaN" and Infinity as "∞".
+  // Both went into the chip and the live region verbatim while the accessible
+  // name beside them correctly read "No data.". Em-dash — the same no-value
+  // glyph the static label paints, so the two entries agree.
+  const shownValue = Number.isFinite(value) ? fmt(value) : "—";
   const readoutText =
     (rest.label ?? "none") === "both" && gap
       ? gap
       : hasTarget
-        ? `${fmt(value)} / ${fmt(target)}${gap ? ` · ${gap}` : ""}`
-        : fmt(value);
+        ? `${shownValue} / ${fmt(target)}${gap ? ` · ${gap}` : ""}`
+        : shownValue;
 
   // Measure only (target/bands are context). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({

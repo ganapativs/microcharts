@@ -11,11 +11,46 @@
 // bench-floor regression (superaudit). `volumeProfileGeometry` composes both
 // for callers that only need one shot (tests, the interactive entry).
 import { uniformBins } from "../../core/bin.js";
-import { isFiniteValue, round2 } from "../../core/types.js";
+import { textGutter } from "../../core/labels.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 
 export interface LevelRow {
   level: number;
   weight: number;
+}
+
+/** Box the chart falls back to when `width`/`height` are not drawable. */
+export const DEFAULT_WIDTH = 48;
+export const DEFAULT_HEIGHT = 32;
+/** Bin count when `bins` is absent or unusable. */
+export const DEFAULT_BINS = 12;
+/** The stated value-area convention, as a fraction of mass. */
+const DEFAULT_VALUE_AREA = 0.7;
+
+/** Bin ceiling — one bin is one level row, and `bins` is caller data. Same
+ *  ceiling FoldedDayBand caps its own at. */
+const MAX_BINS = 512;
+
+/** The bin count actually used. `bins` is the kind of prop a host computes: off
+ *  an empty input field (`Number("")` → NaN) it collapsed the bin array to
+ *  empty and announced "No data." over real observations; `Infinity` threw
+ *  `Invalid array length` out of `Array.from` and took the tree down; `1e6`
+ *  built a million rows (16 MB of markup). None of those is a bin count. */
+function resolveBins(bins: number): number {
+  return Number.isFinite(bins) ? Math.min(MAX_BINS, Math.max(1, Math.round(bins))) : DEFAULT_BINS;
+}
+
+/**
+ * The value-area fraction actually used, resolved ONCE so the shaded band and
+ * the announced convention are the same number. `Number("")` → NaN walked no
+ * bins outward and still announced "NaN% within 142–142", and `95` (a percent
+ * where a fraction belongs) shaded the whole range under "1,200%". Anything
+ * that is not a fraction falls back to the documented 70%.
+ */
+export function resolveValueArea(valueArea: number | undefined): number {
+  return typeof valueArea === "number" && valueArea > 0 && valueArea <= 1
+    ? valueArea
+    : DEFAULT_VALUE_AREA;
 }
 
 export interface ProfileBar {
@@ -53,7 +88,7 @@ export function binMass(
   const levels = weighted
     ? data.map((d) => (d && typeof d === "object" && isFiniteValue(d.level) ? d.level : NaN))
     : data.map((v) => (typeof v === "number" ? v : NaN));
-  const ub = uniformBins(levels, { bins });
+  const ub = uniformBins(levels, { bins: resolveBins(bins) });
   if (!ub) return [];
   const mass = Array.from({ length: ub.bins.length }, () => 0);
   if (weighted) {
@@ -190,7 +225,12 @@ export function profileLayout(opts: {
   fontSize: number;
   fmt: (n: number) => string;
 }): ReturnType<typeof layoutProfile> & { pocText: string | undefined } {
-  const { data, bins, valueArea, align, width, height, label, fontSize, fmt } = opts;
+  const { data, bins, valueArea, align, label, fontSize, fmt } = opts;
+  // A non-finite width/height lands as NaN bar coordinates inside a viewBox
+  // `Chart` clamped for itself — a normal-looking frame around nothing, with a
+  // correct-sounding accessible name still attached (see `chartSide`).
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const binned = binProfile(data, bins, valueArea);
   const pre = layoutProfile(binned, { align, width, height, gutter: 0 });
   const wanted = label === "poc" && pre.poc ? fmt(pre.poc.level) : undefined;
@@ -199,8 +239,8 @@ export function profileLayout(opts: {
   // it asks for MORE than the whole width, collapsing the bars to nothing and
   // still painting past the left edge. It DROPS once it would cost more than
   // half the box, and the gutter drops with it so the bars get the width back.
-  // Pure arithmetic on the per-char estimate: never measured.
-  const want = wanted ? wanted.length * fontSize * 0.6 + 2 : 0;
+  // Pure arithmetic on the shared per-char estimate: never measured.
+  const want = wanted ? textGutter(wanted.length, fontSize, 2) : 0;
   const pocText = want > 0 && want <= width * 0.5 ? wanted : undefined;
   const gutter = pocText ? want : 0;
   return { ...layoutProfile(binned, { align, width, height, gutter }), pocText };
@@ -225,8 +265,8 @@ export function volumeProfileGeometry(opts: {
   const binned = binProfile(opts.data, opts.bins, opts.valueArea);
   return layoutProfile(binned, {
     align: opts.align,
-    width: opts.width,
-    height: opts.height,
+    width: chartSide(opts.width, DEFAULT_WIDTH),
+    height: chartSide(opts.height, DEFAULT_HEIGHT),
     gutter: opts.gutter,
   });
 }

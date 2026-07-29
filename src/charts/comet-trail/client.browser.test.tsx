@@ -95,6 +95,31 @@ describe("interactive <CometTrail>", () => {
     await expect.poll(() => bareFig.querySelector(".mc-spark-readout")?.textContent).toBe("87");
   });
 
+  // The gutter reserved for the numeral sets the plot width, so the client has
+  // to resolve it off the same shared function as the static frame it composes.
+  // Computing it a second way here rings a dot that isn't there.
+  it("the focus ring lands on the dot the static frame painted", async () => {
+    const screen = await render(<CometTrail data={RISING} title="Price" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    const head = fig.querySelector(".mc-comet-head")!;
+    await expect
+      .poll(() => fig.querySelector('circle[data-mc-w="support"]')?.getAttribute("cx"))
+      .toBe(head.getAttribute("cx"));
+  });
+
+  it("chips the head when the numeral dropped for want of room", async () => {
+    // 60 units wide cannot seat "9,876,543", so `label="last"` prints nothing —
+    // and the chip is what the head reads out instead.
+    const screen = await render(<CometTrail data={[1234567, 7654321, 9876543]} title="Price" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('text[data-mc-ink="label"]')).toBeNull();
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    await expect.poll(() => fig.querySelector(".mc-spark-readout")?.textContent).toBe("9,876,543");
+  });
+
   it("readout={false} keeps the ring and onActive, drops only the chip", async () => {
     const seen: unknown[] = [];
     const screen = await render(

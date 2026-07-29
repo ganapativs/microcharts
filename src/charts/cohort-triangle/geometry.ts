@@ -7,7 +7,7 @@
 // share, never a continuous illusion; a measured-but-missing slot is a gap, not a
 // zero. Coords 2-dp, integer viewBox.
 import { stepIndex } from "../../shared/cell.js";
-import { labelFont, textGutter } from "../../core/labels.js";
+import { labelFont, textGutterProse } from "../../core/labels.js";
 import { clamp, maxOf } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
@@ -56,6 +56,11 @@ export interface CohortTriangleGeometry {
   width: number;
   height: number;
   step: number;
+  /** The resolved `cell` / `gap` the cells were actually laid out against.
+   *  Both entries must paint from THESE, never from the raw props — see
+   *  `resolve` for what a raw value can be. */
+  cell: number;
+  gap: number;
   fontSize: number;
   showLabels: boolean;
   /** Ring around the highlighted cohort row, if `highlight` matches a label. */
@@ -89,12 +94,23 @@ function detectScale(rows: readonly CohortRow[]): number {
 const norm = (v: Value, scale: number): number | null =>
   isFiniteValue(v) ? round2(clamp(v * scale, 0, 1)) : null;
 
+/** A sizing number the host computes rather than types: `cell={boxPx / ages}`
+ *  with `ages` momentarily 0 is `Infinity`, and `Number(input.value)` on an
+ *  empty field is `NaN`. Both flowed straight into `step`, so the chart emitted
+ *  `viewBox="0 0 NaN NaN"` and vanished while its accessible name still read
+ *  the retention correctly; a negative `gap` marched the rows up and left, out
+ *  of a viewBox `.mc-root` does not clip. Repair once, here, so every caller
+ *  reads the numbers the cells were built on. */
+function resolve(raw: number | undefined, fallback: number): number {
+  return raw !== undefined && Number.isFinite(raw) && raw >= 0 ? raw : fallback;
+}
+
 export function cohortTriangleGeometry(
   data: readonly CohortRow[],
   opts: CohortTriangleGeometryOptions = {},
 ): CohortTriangleGeometry {
-  const cell = opts.cell ?? 9;
-  const gap = opts.gap ?? 2;
+  const cell = resolve(opts.cell, 9);
+  const gap = resolve(opts.gap, 2);
   const step = cell + gap;
 
   const rows = data.slice(0, MAX_COHORTS);
@@ -103,9 +119,15 @@ export function cohortTriangleGeometry(
 
   const fontSize = labelFont(cell, 0.6);
   // labels seat only when the row is tall enough to hold the floor font; the
-  // gutter is then sized to the widest label (deterministic 0.62·em/char).
+  // gutter is then sized to the widest label, deterministically.
   const showLabels = opts.labels === true && nRows > 0 && cell >= fontSize + 0.8;
-  const gutter = showLabels ? textGutter(maxOf(rows.map((r) => r.label.length)), fontSize, 3) : 0;
+  // Cohort names are CALLER text ("Jan", "2024 ENTERPRISE"), not figures this
+  // library formatted, so they take the prose estimate. `textGutter`'s
+  // digit-calibrated 0.62 left an all-caps vintage painting ~27 units past the
+  // left edge of a viewBox `.mc-root` does not clip.
+  const gutter = showLabels
+    ? textGutterProse(maxOf(rows.map((r) => r.label.length)), fontSize, 3)
+    : 0;
 
   const cols = nRows === 0 ? 0 : Math.min(MAX_AGES, maxOf(rows.map((r) => r.values.length)));
 
@@ -181,8 +203,11 @@ export function cohortTriangleGeometry(
     }
   }
 
-  const width = nRows === 0 ? gutter : round2(gutter + cols * step - gap);
-  const height = nRows === 0 ? 0 : round2(nRows * step - gap);
+  // `cols * step - gap` goes NEGATIVE when every cohort is present but none has
+  // a reading yet (cols 0), which used to make the box narrower than the label
+  // gutter it still paints — the names hung off the left edge.
+  const width = nRows === 0 ? gutter : round2(gutter + Math.max(0, cols * step - gap));
+  const height = nRows === 0 ? 0 : round2(Math.max(0, nRows * step - gap));
 
   return {
     cells,
@@ -193,6 +218,8 @@ export function cohortTriangleGeometry(
     width,
     height,
     step,
+    cell,
+    gap,
     fontSize,
     showLabels,
     ring,

@@ -44,7 +44,9 @@ const FONTS = [
   { family: "Open Runde", file: "OpenRunde-600-latin.woff2", weight: "600" },
   { family: "Open Runde", file: "OpenRunde-700-latin.woff2", weight: "700" },
   { family: "Hanken Grotesk", file: "HankenGrotesk-latin.woff2", weight: "100 900" },
-  { family: "JetBrains Mono", file: "JetBrainsMono-latin.woff2", weight: "100 800" },
+  { family: "Iosevka", file: "Iosevka-400-latin.woff2", weight: "400" },
+  { family: "Iosevka", file: "Iosevka-500-latin.woff2", weight: "500" },
+  { family: "Iosevka", file: "Iosevka-700-latin.woff2", weight: "700" },
 ];
 
 // ── the featured charts — real components, realistic series ────────────────

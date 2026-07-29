@@ -7,10 +7,10 @@ import { Chart } from "../../shared/Chart.js";
 
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { round2 } from "../../core/types.js";
-import { eventTimelineGeometry } from "./geometry.js";
+import { eventTimelineGeometry, timelineBox } from "./geometry.js";
 
 export type EventKind = "neutral" | "positive" | "negative" | "accent";
 
@@ -136,8 +136,8 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
     domain,
     now,
     label = "none",
-    width = 80,
-    height = 12,
+    width: widthProp = 80,
+    height: heightProp = 12,
     format,
     locale,
     strings = EN_TIMELINE,
@@ -151,6 +151,9 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
 
   const items = normalizeItems(data);
   const win = timelineDomain(items, domain);
+  // Resolve the box once, the way <Chart> resolves it: the label size, the seat
+  // and the geometry all have to be computed against the box that gets painted.
+  const [width, height] = timelineBox(widthProp, heightProp);
   const fontSize = labelFont(height, 0.45);
   const geo = eventTimelineGeometry({
     width,
@@ -216,7 +219,10 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
           />
         );
       })}
-      {label === "spans"
+      {/* A centred label owns a full em-box vertically and `labelFont` floors at
+          7, so a lane shorter than the font can seat nothing: the whole set
+          drops rather than crossing both viewBox edges. */}
+      {label === "spans" && labelFitsBand(height, fontSize)
         ? geo.spans
             .filter((s) => s.labelFits)
             .map((s) => (
@@ -236,11 +242,13 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
         : null}
       {geo.points.map((p) => {
         const it = items[p.i]!;
-        const r = 1.25;
+        // Half-extent comes from geometry — it is the same number the x clamp
+        // used, so the diamond can't outgrow the box it was clamped into.
+        const r = geo.r;
         return (
           <path
             key={`p${p.i}`}
-            d={`M ${p.x} ${round2(p.y - r * 2)} L ${round2(p.x + r * 2)} ${p.y} L ${p.x} ${round2(p.y + r * 2)} L ${round2(p.x - r * 2)} ${p.y} Z`}
+            d={`M ${p.x} ${round2(p.y - r)} L ${round2(p.x + r)} ${p.y} L ${p.x} ${round2(p.y + r)} L ${round2(p.x - r)} ${p.y} Z`}
             data-mc-ink={KIND_INK[it.kind]}
           />
         );

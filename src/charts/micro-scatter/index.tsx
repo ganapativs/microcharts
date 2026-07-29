@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_SCATTER, type ScatterStrings } from "../../core/strings-scatter.js";
-import { microScatterGeometry, relationshipTier } from "./geometry.js";
+import { microScatterGeometry, relationshipTier, scatterRadius } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface ScatterPoint {
@@ -69,7 +69,7 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
     style,
     children,
   } = props;
-  const rad = Math.min(3, Math.max(1, props.r ?? 1.5));
+  const rad = scatterRadius(props.r);
 
   if (data.length > 60) {
     devWarn(

@@ -14,72 +14,17 @@ spawns.
 
 ## Add it to your client
 
-The package ships a `microcharts-mcp` binary, so every client below spawns the same thing. There is no install step of
-your own: `npx` fetches it on first run.
+The package ships a `microcharts-mcp` binary, so every client below spawns the same thing — `npx -y @microcharts/mcp`.
+There is no install step of your own: `npx` fetches it on first run.
 
-<Tabs items={["Claude Desktop", "Claude Code", "Cursor", "VS Code"]}>
+Open yours for its command, its config format, and where the file lives.
 
-<Tab value="Claude Desktop">
+<McpClients />
 
-In `claude_desktop_config.json`:
-
-```json title="claude_desktop_config.json"
-{
-  "mcpServers": {
-    "microcharts": {
-      "command": "npx",
-      "args": ["-y", "@microcharts/mcp"]
-    }
-  }
-}
-```
-
-</Tab>
-
-<Tab value="Claude Code">
-
-```bash
-claude mcp add microcharts -- npx -y @microcharts/mcp
-```
-
-</Tab>
-
-<Tab value="Cursor">
-
-In `.cursor/mcp.json` (project) or `~/.cursor/mcp.json` (global):
-
-```json title=".cursor/mcp.json"
-{
-  "mcpServers": {
-    "microcharts": {
-      "command": "npx",
-      "args": ["-y", "@microcharts/mcp"]
-    }
-  }
-}
-```
-
-</Tab>
-
-<Tab value="VS Code">
-
-In `.vscode/mcp.json`:
-
-```json title=".vscode/mcp.json"
-{
-  "servers": {
-    "microcharts": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@microcharts/mcp"]
-    }
-  }
-}
-```
-
-</Tab>
-
-</Tabs>
+A client that isn't listed takes the same two values, whatever it names the fields: the command is `npx`, and the
+arguments are `-y` and `@microcharts/mcp`. A client that reaches remote connectors only — ChatGPT on the web, a hosted
+agent builder, a browser-only IDE — cannot spawn a local process at all. Point it at [`/llms.txt`](/llms.txt) and
+[`/catalog.json`](/catalog.json) instead.
 
 <Callout type="info">
   Node 20 or newer. The server brings its own copy of `@microcharts/react`, so you do not need microcharts installed to

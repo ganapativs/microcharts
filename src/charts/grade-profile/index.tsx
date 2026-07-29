@@ -5,17 +5,19 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { clamp } from "../../core/scale.js";
+import { textGutter } from "../../core/labels.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
 import { EN_GRADE_PROFILE, type GradeProfileStrings } from "../../core/strings-grade-profile.js";
-import { gradeLayout, gradeProfileGeometry, type GradePoint } from "./geometry.js";
+import { DEFAULT_BINS, gradeLayout, gradeProfileGeometry, type GradePoint } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export type { GradePoint } from "./geometry.js";
 
 export interface GradeProfileProps {
   data: readonly GradePoint[];
-  /** Grade % thresholds (ascending) that quantize the four bins. */
+  /** Grade % thresholds (ascending) that quantize the four bins. Non-finite or
+   *  out-of-order thresholds fall back to the defaults `[3, 6, 10]`. */
   bins?: readonly [number, number, number] | undefined;
   /** `"max"` marks the steepest pitch; `"none"` renders the profile alone. */
   label?: "max" | "none" | undefined;
@@ -32,8 +34,6 @@ export interface GradeProfileProps {
   style?: CSSProperties | undefined;
   children?: ReactNode | undefined;
 }
-
-const DEFAULT_BINS = [3, 6, 10] as const;
 
 /** Percent formatter for grades — intrinsic units, so it ignores `format`.
  *  Takes a grade in PERCENTAGE POINTS (16 → "16%"), which is how geometry
@@ -98,7 +98,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
   // seat the summit label: enabled, a real climb, room in the top gutter, and
   // width to hold the text — otherwise it drops out and the profile reads clean.
   const labelText = geo.maxGrade > 0 ? strings.gradeMax(pct(geo.maxGrade)) : "";
-  const labelW = labelText.length * fontSize * 0.6 + 2;
+  const labelW = textGutter(labelText.length, fontSize, 2);
   const showLabel =
     label === "max" && geo.maxGrade > 0 && topPad >= fontSize + 0.8 && labelW <= width;
   const labelX = showLabel ? round2(clamp(geo.summitX, labelW / 2, width - labelW / 2)) : 0;

@@ -35,9 +35,9 @@ function bulletLabelText(
 export interface BulletProps {
   value: number;
   target?: number | undefined;
-  /** Ascending qualitative thresholds (e.g. `[50, 80]` on a 0–100 scale). */
+  /** Ascending qualitative thresholds (e.g. `[50, 80]` on a 0–100 scale); the lowest 200 draw. */
   bands?: readonly number[] | undefined;
-  /** Explicit `[0, max]`; auto-fit when omitted. */
+  /** Explicit ascending `[0, max]`; auto-fit when omitted, inverted or flat. */
   domain?: readonly [number, number] | undefined;
   /** Direct value/target readout in a reserved right gutter (deterministic drop-out). */
   label?: "none" | "value" | "target" | "both" | undefined;
@@ -172,7 +172,6 @@ export function Bullet(props: BulletProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           data-mc-ink="label"
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText}
         </text>

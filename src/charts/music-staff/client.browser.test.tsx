@@ -1,9 +1,24 @@
 import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
+import type { SeriesStrings } from "../../core/summary.js";
 import { MusicStaff } from "./client.js";
 
 const MELODY = [3, 5, 4, 8, 6, 9];
+
+/** Every template replaced by a sentinel, so any English left in the output was
+ *  written into the component rather than read from `strings`. */
+const SENTINEL: SeriesStrings = {
+  noData: "«noData»",
+  single: () => "«single»",
+  flat: () => "«flat»",
+  trendPct: () => "«trendPct»",
+  trendAbs: () => "«trendAbs»",
+  noChange: "«noChange»",
+  range: () => "«range»",
+  last: () => "«last»",
+  point: () => "«point»",
+};
 
 const key = (el: HTMLElement, k: string) =>
   el.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true }));
@@ -59,5 +74,25 @@ describe("interactive <MusicStaff>", () => {
   it("controlled selectedIndex pins the ring without focus", async () => {
     const screen = await render(<MusicStaff data={MELODY} selectedIndex={2} />);
     expect(screen.container.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
+  });
+
+  it("`strings` localizes the accessible NAME, not only the announcements", async () => {
+    // The wrapper's name came from an unlocalized describeSeries call, so a host
+    // that translated the roving readout still shipped an English name.
+    const screen = await render(<MusicStaff data={MELODY} strings={SENTINEL} />);
+    const wrap = screen.container.querySelector(".mc-staff-live")!;
+    expect(wrap.getAttribute("aria-label")).toBe("«trendPct» «range» «last»");
+  });
+
+  it("a non-finite box does not desync the overlay from the static chart", async () => {
+    // Both entries resolve width/height/fontSize through musicStaffFrame, so a
+    // hostile box lands on the documented default in both — the focus ring can't
+    // sit where no note was drawn.
+    const screen = await render(<MusicStaff data={MELODY} width={NaN} selectedIndex={5} />);
+    const svg = screen.container.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 60 28");
+    const ring = screen.container.querySelector('circle[data-mc-w="tick"]')!;
+    const lastNote = [...screen.container.querySelectorAll("ellipse")].at(-1)!;
+    expect(ring.getAttribute("cx")).toBe(lastNote.getAttribute("cx"));
   });
 });

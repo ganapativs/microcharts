@@ -48,6 +48,16 @@ const FLAT: Poly = [
 
 const BOX = 16;
 
+// `glyph` is a typed union, but it reaches this function untyped in practice —
+// off a JSON config, the same path Delta's `positive` guards. A plain `UP[glyph]`
+// crashed the whole render rather than degrading: an unknown name gave
+// `undefined`, and "constructor" / "toString" / "__proto__" resolved through
+// Object.prototype to a function, so `points.map` threw either way. Own keys
+// only, falling back to the documented default.
+function upShape(glyph: TrendGlyph): Poly {
+  return Object.hasOwn(UP, glyph) ? UP[glyph] : UP.arrow;
+}
+
 function toPath(points: Poly, scale: number, ox: number, oy: number, flipY: boolean): string {
   const cmds = points.map(([x, y], i) => {
     const yy = flipY ? BOX - y : y;
@@ -83,7 +93,7 @@ export function trendArrowGeometry(opts: {
   const d =
     direction === "flat"
       ? toPath(FLAT, scale, ox, oy, false)
-      : toPath(UP[glyph], scale, ox, oy, direction === "down");
+      : toPath(upShape(glyph), scale, ox, oy, direction === "down");
 
   const fontSize = Math.max(6, Math.min(round2(height * 0.5), 11));
   // Baseline sits so digits center optically on the glyph; clamp inside the box.

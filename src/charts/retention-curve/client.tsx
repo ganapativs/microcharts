@@ -6,7 +6,7 @@
 // the static component
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -82,7 +82,14 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       curve,
       domain: props.domain,
     });
-    const showLabel = (props.label ?? "last") === "last" && base != null;
+    // …including the static's DEGRADATION gate. Under a ~7-unit-tall box the
+    // static drops the readout and hands its gutter back to the plot; mirroring
+    // only the `label` prop kept reserving that gutter here, so `totalWidth`
+    // ran ~20 units wider than the SVG the pointer was actually over and every
+    // hit landed a period or two early.
+    const font = labelFont(height);
+    const showLabel =
+      (props.label ?? "last") === "last" && base != null && labelFitsY(height / 2, font, height);
     const gutterCh = showLabel ? fmt(base!.last.value).length : 0;
     return retentionGeometry({
       width,
@@ -93,7 +100,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       curve,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height),
+      fontSize: font,
     });
   }, [width, height, data, benchmark, plateau, curve, props.domain, props.label, fmt]);
 

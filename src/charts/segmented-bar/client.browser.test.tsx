@@ -26,6 +26,34 @@ describe("interactive <SegmentedBar>", () => {
     await expect.poll(() => live.textContent).toBe("Other: 2%, 20 over 2 categories.");
   });
 
+  it("announces and paints the same percent", async () => {
+    // The picker used to read its percents off the 2-dp-rounded geometry
+    // shares: this composition announced "55%" for a segment the summary and
+    // the printed label both called 54%.
+    const screen = await render(
+      <SegmentedBar
+        data={[
+          { label: "a", value: 626 },
+          { label: "b", value: 341 },
+          { label: "c", value: 189 },
+        ]}
+        width={300}
+        height={20}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-segbar-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toBe("a: 54%, 626.");
+    expect([...screen.container.querySelectorAll("text")].map((t) => t.textContent)).toEqual([
+      "54%",
+      "30%",
+      "16%",
+    ]);
+    expect(screen.container.querySelector(".mc-spark-readout")!.textContent).toBe("a 54% (626)");
+  });
+
   it("Enter selects the active segment: fires onSelect + pins an outline", async () => {
     const picks: unknown[] = [];
     const screen = await render(<SegmentedBar data={MIX} onSelect={(d) => picks.push(d)} />);

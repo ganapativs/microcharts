@@ -21,7 +21,8 @@ import {
   EN_PERCENTILE_TRACE,
   type PercentileTraceStrings,
 } from "../../core/strings-percentile-trace.js";
-import { percentileGeometry } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH, percentileGeometry } from "./geometry.js";
 import {
   PercentileTrace as StaticPercentileTrace,
   percentileSummary,
@@ -50,8 +51,8 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   const {
     data,
     unit = "step",
-    height = 20,
-    width = 80,
+    height: heightProp = DEFAULT_HEIGHT,
+    width: widthProp = DEFAULT_WIDTH,
     label = "last",
     format = INT,
     locale,
@@ -71,6 +72,12 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
+
+  // The static resolves a non-finite box to the documented one; the hit box and
+  // the crosshair have to be measured against the SAME box or the pointer maps
+  // onto a plot nobody drew.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const geo = useMemo(() => percentileGeometry({ width, height, data }), [width, height, data]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -105,6 +112,15 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   // Walk stop positions (never landing on a gap) but return data indices.
   const step = useCallback((cur: number, key: string) => navOrder(stops, cur, key), [stops]);
 
+  // One reading, one sentence — the announcement, the visible chip and
+  // `datum.formatted` all say it. It comes out of the string bundle because an
+  // inline `${unit} ${i}: ${v}` template left the chip the one rendered surface
+  // a localized `strings` could not reach.
+  const readingText = useCallback(
+    (i: number, v: number) => strings.percentileTraceAt(unit, i, pStr(v)),
+    [strings, unit, pStr],
+  );
+
   // `value` = the percentile rank at that reading (this chart's only channel).
   const datum = useCallback(
     (i: number) => {
@@ -112,10 +128,10 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
       return {
         index: i,
         value: pt?.value ?? null,
-        formatted: pt ? `${unit} ${pt.index}: ${pStr(pt.value)}` : undefined,
+        formatted: pt ? readingText(pt.index, pt.value) : undefined,
       };
     },
-    [pointAt, unit, pStr],
+    [pointAt, readingText],
   );
 
   // The static reserves a right gutter for the `label="last"` readout and
@@ -151,7 +167,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   const shown = active ?? selected;
   const p = shown !== null ? pointAt(shown) : undefined;
   const pinned = selected !== null && selected !== active ? pointAt(selected) : undefined;
-  const announced = p ? strings.percentileTraceAt(unit, p.index, pStr(p.value)) : "";
+  const announced = p ? readingText(p.index, p.value) : "";
 
   return (
     <span
@@ -213,7 +229,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
           className="mc-percentile-readout mc-spark-readout"
           style={crosshairReadoutStyle(p.x, vbWidth)}
         >
-          {`${unit} ${p.index}: ${pStr(p.value)}`}
+          {announced}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

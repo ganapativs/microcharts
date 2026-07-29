@@ -65,7 +65,6 @@ export interface WaterfallProps {
 export function Waterfall(props: WaterfallProps): ReactNode {
   const {
     data,
-    open = 0,
     totalBar = true,
     label = "delta",
     positive = "up",
@@ -82,6 +81,12 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     style,
     children,
   } = props;
+
+  // The opening level is a caller prop and it seeds every running total. A
+  // non-finite one made `lo`/`hi` NaN, which `clamp` quietly absorbed — so the
+  // bars drew at plausible positions while the accessible name announced "From
+  // NaN to NaN". The plot's own fallback is zero; the name has to use it too.
+  const open = isFiniteValue(props.open) ? props.open : 0;
 
   const geo = waterfallGeometry({
     width,
@@ -157,19 +162,23 @@ export function Waterfall(props: WaterfallProps): ReactNode {
       style={rootStyle}
     >
       {ann.under}
-      {geo.connectors.map((c, i) => (
-        <line
-          key={`c${i}`}
-          x1={c.x0}
-          y1={c.y}
-          x2={c.x1}
-          y2={c.y}
+      {/* One path, not N−1 <line>s. The connectors carry identical paint, sit
+          below every other mark and are excluded from the entrance (which
+          selects `rect[data-mc-ink]`), so nothing needs them addressable —
+          and a 100-step waterfall shipped 99 elements' worth of repeated
+          attributes into the RSC HTML to draw what is one polyline. Same
+          idiom as the Thermometer's tick rules. */}
+      {geo.connectors.length ? (
+        <path
+          d={geo.connectors.map((c) => `M${c.x0} ${c.y}H${c.x1}`).join("")}
+          fill="none"
           data-mc-ink="muted"
           data-mc-w="support"
           strokeOpacity={0.4}
+          shapeRendering="crispEdges"
           vectorEffect="non-scaling-stroke"
         />
-      ))}
+      ) : null}
       {geo.bars.map((b) => (
         <rect
           key={b.index}
@@ -199,7 +208,6 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           textAnchor="middle"
           data-mc-ink="label"
           fontSize={FONT}
-          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           {labelText(data[l.index]!.value as number)}
         </text>

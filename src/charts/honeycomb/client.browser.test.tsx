@@ -105,6 +105,31 @@ describe("interactive <Honeycomb>", () => {
     );
   });
 
+  // The chip is the reading the chart PAINTS, so it goes through the same
+  // resolvers as the comb: a computed `total` of NaN used to chip "5 / NaN".
+  it("the whole-comb chip reads the capacity the comb was built on", async () => {
+    const screen = await render(<Honeycomb value={5} total={Number.NaN} title="Seats" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await vi.waitFor(() =>
+      expect(fig.querySelector(".mc-spark-readout")!.textContent).toBe("5 / 10"),
+    );
+  });
+
+  // A NaN `cell` made every hit-test comparison false — nothing was pickable on
+  // a comb that drew fine — and put `d="MNaN NaN…"` on the pick ring.
+  it("picking survives a hostile cell prop", async () => {
+    const screen = await render(<Honeycomb value={6} total={10} cell={Number.NaN} title="Seats" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(live.textContent).toBe("Cell 1 of 10 — filled.");
+    expect(fig.querySelector('path[data-mc-w="support"]')!.getAttribute("d")).not.toMatch(
+      /NaN|Infinity/,
+    );
+  });
+
   it("controlled selectedIndex pins a hex with no interaction", async () => {
     const screen = await render(<Honeycomb value={6} total={10} selectedIndex={4} />);
     expect(screen.container.querySelectorAll('path[data-mc-w="tick"]').length).toBe(1);

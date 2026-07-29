@@ -49,6 +49,23 @@ export interface BenchmarkStripProps {
   children?: ReactNode | undefined;
 }
 
+/**
+ * Characters the right-hand readout reserves. `p100` is the longest percentile,
+ * so that branch is a fixed 4 and the box width holds still as the reading
+ * moves. A `label="value"` readout is caller-scaled: reserved at 4, a formatted
+ * `-1,234,567.89` ran back across the peer bands and painted over the focal
+ * dot. Exported so the interactive entry's viewBox can't drift from the
+ * static's — both entries must reserve the same gutter or hover lands off-mark.
+ */
+export function benchmarkGutterCh(
+  label: BenchmarkStripProps["label"],
+  value: number,
+  fmt: (n: number) => string,
+): number {
+  // `geo.dot.value` is `round2(value)`, so this measures the string painted.
+  return label === "value" ? Math.max(4, fmt(round2(value)).length) : 4;
+}
+
 export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   const {
     data,
@@ -87,7 +104,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
     value,
     range,
     domain,
-    gutterCh: showLabel ? 4 : 0,
+    gutterCh: showLabel ? benchmarkGutterCh(label, value, fmt) : 0,
     fontSize: FONT,
   });
 

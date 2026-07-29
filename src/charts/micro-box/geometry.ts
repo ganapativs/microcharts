@@ -65,7 +65,13 @@ export interface MicroBoxGeometry {
   statX: StatX;
   /** The five numbers actually drawn (whisker ends per mode). */
   five: FiveNumber;
-  /** Count of outliers NOT rendered (cap 3/side; carried in the summary). */
+  /**
+   * Count of outliers NOT rendered (cap 3/side). The three drawn per side are
+   * the FURTHEST, so the extremes always paint and the summary's stated range
+   * stays true; the clipped ones sit between the last dot and the fence. No
+   * caller reads this yet — announcing the outlier count needs a
+   * `SummaryStrings` token.
+   */
   clippedOutliers: number;
 }
 
@@ -117,7 +123,12 @@ export function microBoxGeometry(opts: {
   const x = axis(opts.domain, [Math.min(five.min, lo), Math.max(five.max, hi)], width);
 
   const midY = round2(height / 2);
-  const boxH = Math.max(4, height - 5);
+  // 4 units is the floor that keeps the box readable in a short chart — but the
+  // floor used to be applied unconditionally, so below height 4 the box grew
+  // TALLER than the frame and painted above and below it (`.mc-root` is
+  // overflow: visible, so that is a spill, not a clip). Cap it at the frame.
+  // No-op at every height ≥ 4, which is every size the chart actually ships at.
+  const boxH = Math.min(height, Math.max(4, height - 5));
   // degenerate IQR → 1-unit tick, still distinct from the median tick by height
   const boxW = Math.max(1, round2(x(five.q3) - x(five.q1)));
 

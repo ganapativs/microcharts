@@ -13,7 +13,7 @@ import {
 } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { labelFitsY } from "../../core/labels.js";
-import { type Value } from "../../core/types.js";
+import { chartSide, type Value } from "../../core/types.js";
 import { labelMetrics, sparkGeometry } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
@@ -70,8 +70,6 @@ export function Sparkline(props: SparklineProps): ReactNode {
   const {
     data,
     domain,
-    width = 80,
-    height = 20,
     curve = "linear",
     fill = false,
     band,
@@ -89,6 +87,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `Chart` clamps the FRAME, but every coordinate below is laid out against
+  // these, so the raw props have to be clamped too or the marks land outside a
+  // perfectly valid viewBox — `width={NaN}` drew `M2 18 L-2.5 10 L-7 2` inside
+  // `viewBox="0 0 1 20"`. One helper, so the frame and the marks agree.
+  const width = chartSide(props.width ?? 80, 80);
+  const height = chartSide(props.height ?? 20, 20);
 
   const fmt = makeFormatter(format, locale);
 

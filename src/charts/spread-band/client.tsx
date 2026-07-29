@@ -215,12 +215,16 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
                 data-mc-ink="accent"
               />
             ) : null}
+            {/* `neutral` rather than a bare inline neutral fill: an inline paint
+                outranks the forced-colors mapping and this dot kept a warm gray
+                in High Contrast Mode, where the crosshair beside it went
+                system-ink. */}
             {geo.referencePoints[shown!] ? (
               <circle
                 cx={geo.referencePoints[shown!]![0]}
                 cy={geo.referencePoints[shown!]![1]}
                 r={1.5}
-                style={{ fill: "var(--mc-neutral)" }}
+                data-mc-ink="neutral"
               />
             ) : null}
           </>

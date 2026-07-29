@@ -21,9 +21,10 @@ import {
 } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
+import { lastFinite } from "../../core/stats.js";
 import { EN_COMET_TRAIL, type CometTrailStrings } from "../../core/strings-comet-trail.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { cometTrailGeometry } from "./geometry.js";
+import { cometLabelBand, cometTrailGeometry, DEFAULT_TRAIL } from "./geometry.js";
 import {
   CometTrail as StaticCometTrail,
   cometTrailSummary,
@@ -50,7 +51,7 @@ const ring = (m: { cx: number; cy: number; r: number }, pinned: boolean) => (
 export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
   const {
     data,
-    trail = 12,
+    trail = DEFAULT_TRAIL,
     label = "last",
     domain,
     width = 60,
@@ -69,11 +70,26 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height);
+  // Same NaN/0 guard as the static entry — the two must resolve the identical
+  // font size or the composed frame and the overlays part company.
+  const asked = props.fontSize ?? labelFont(height);
+  const fontSize = Number.isFinite(asked) && asked > 0 ? asked : labelFont(height);
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
-  const labelBand = label === "last" ? fontSize * 3 : 0;
+  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Same three lines as the static entry, off the same shared resolver: the
+  // gutter decides the plot width, so computing it differently here would drift
+  // every overlay off the dots it is meant to ring.
+  const labelBand = useMemo(() => {
+    const last = lastFinite(data);
+    return cometLabelBand(
+      label === "last" && last !== undefined ? fmt(last) : null,
+      fontSize,
+      width,
+      height,
+    );
+  }, [data, label, fmt, fontSize, width, height]);
   const geo = useMemo(
     () =>
       cometTrailGeometry({
@@ -85,11 +101,10 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
         pad: 1,
         // Mirrors the static entry exactly — omitting vPad would compute a
         // different y scale than the SVG being composed and drift the overlays.
-        vPad: label === "last" ? fontSize * 0.6 : 0,
+        vPad: labelBand > 0 ? fontSize * 0.6 : 0,
       }),
-    [data, width, labelBand, height, domain, trail, label, fontSize],
+    [data, width, labelBand, height, domain, trail, fontSize],
   );
-  const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const prevHead = useRef<{ cx: number; cy: number } | null>(null);
 
   const accName =
@@ -220,12 +235,14 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
       <LiveRegion>{announced}</LiveRegion>
       {/* The head's value is already printed by `label="last"`, and the chip
           would land on top of that numeral — skip it there (SparkLine's rule),
-          and read out every earlier point in the trail. */}
+          and read out every earlier point in the trail. Gated on the RESERVED
+          gutter, not on the prop: a numeral that dropped for want of room isn't
+          printing anything for the chip to collide with. */}
       {readout &&
       shownMark &&
       shownValue !== undefined &&
       Number.isFinite(shownValue) &&
-      !(label === "last" && shown === marks.length - 1) ? (
+      !(labelBand > 0 && shown === marks.length - 1) ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(shownMark.cx, width)}>
           {fmt(shownValue)}
         </span>

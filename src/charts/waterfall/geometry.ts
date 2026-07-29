@@ -1,7 +1,7 @@
 // Floating bars are the documented encoding exception to zero-anchoring: each
 // bar's LENGTH is its own delta exactly; the connectors and the zero-anchored
 // total bar are the mandatory keys back to reality. 2-dp.
-import { clamp, scaleLinear } from "../../core/scale.js";
+import { clamp, maxOf, minOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
 interface Rect {
@@ -68,8 +68,11 @@ export function waterfallGeometry(opts: {
     levels.push(round2(running));
   }
 
-  const lo = Math.min(0, open, ...levels);
-  const hi = Math.max(0, open, ...levels);
+  // minOf/maxOf, never a spread: `levels` is one entry per step, and
+  // `Math.min(...levels)` on a long series is an argument list the engine has to
+  // put on the stack (it throws past ~125k entries) as well as being slower.
+  const lo = Math.min(0, open, minOf(levels));
+  const hi = Math.max(0, open, maxOf(levels));
   const domain =
     opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : ([lo, hi] as const);
   const y = (v: number) =>

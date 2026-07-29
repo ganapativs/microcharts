@@ -70,6 +70,95 @@ describe("<BubbleRow>", () => {
       const { container } = draw(<BubbleRow data={[{ label: "EMEA", value: null }]} />);
       expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
     });
+
+    it("a negative prints no numeral either — area cannot say 'minus'", () => {
+      // The row used to paint "-5" under a 0.5-radius presence ring while the
+      // summary silently dropped it: painted and announced disagreeing.
+      const { container } = draw(
+        <BubbleRow data={[{ label: "DEBT", value: -5 }, ...REGIONS.slice(1)]} />,
+      );
+      expect([...container.querySelectorAll("text")].map((t) => t.textContent)).toEqual([
+        "890",
+        "560",
+        "210",
+      ]);
+      expect(container.querySelectorAll("circle").length).toBe(4);
+      expect(container.querySelector("circle")!.getAttribute("r")).toBe("0.5");
+    });
+
+    it("all-negative reads as no data, and paints no numerals to contradict it", () => {
+      const { container } = draw(
+        <BubbleRow
+          data={[
+            { label: "A", value: -5 },
+            { label: "B", value: -2 },
+          ]}
+        />,
+      );
+      expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("No data.");
+      expect(container.querySelector("text")).toBeNull();
+    });
+  });
+
+  describe("hostile layout props", () => {
+    // A raw `height`/`gap`/`fontSize` reached viewBox, cx, cy, r, x, y and
+    // font-size, so one bad scalar rendered nothing while the summary read fine.
+    const HOSTILE = {
+      "height NaN": { height: Number.NaN },
+      "height Infinity": { height: Number.POSITIVE_INFINITY },
+      "gap NaN": { gap: Number.NaN },
+      "gap Infinity": { gap: Number.POSITIVE_INFINITY },
+      "gap negative": { gap: -100 },
+      "fontSize NaN": { fontSize: Number.NaN },
+      "fontSize negative": { fontSize: -8 },
+    } as const;
+    const markup = (props: object) =>
+      draw(<BubbleRow data={REGIONS} {...props} />).container.innerHTML;
+
+    for (const [name, props] of Object.entries(HOSTILE)) {
+      it(`${name} falls back to the documented default`, () => {
+        expect(markup(props)).toBe(markup({}));
+      });
+    }
+  });
+
+  it("numerals drop, never spill, when the box can no longer seat them", () => {
+    const { container } = draw(<BubbleRow data={REGIONS} height={8} />);
+    expect(container.querySelector("text")).toBeNull();
+    // …and the gutter goes with the label: no dead band left behind.
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 20 8");
+  });
+
+  it("stays inside the viewBox, marks and estimated text extents alike", () => {
+    // Per-char extents measured in core/labels.ts: 0.62 covers tabular figures,
+    // 0.95 covers arbitrary caller text (an all-caps label is the worst case).
+    for (const [mode, rate] of [
+      ["value", 0.62],
+      ["both", 0.95],
+    ] as const) {
+      const { container } = draw(
+        <BubbleRow data={[...REGIONS, { label: "WWWWWW", value: 40 }]} label={mode} />,
+      );
+      const svg = container.querySelector("svg")!;
+      const [, , w, h] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+      for (const c of svg.querySelectorAll("circle")) {
+        const [cx, cy, r] = ["cx", "cy", "r"].map((a) => Number(c.getAttribute(a)));
+        expect(cx! - r!, `${mode} circle left`).toBeGreaterThanOrEqual(0);
+        expect(cx! + r!, `${mode} circle right`).toBeLessThanOrEqual(w!);
+        expect(cy! - r!, `${mode} circle top`).toBeGreaterThanOrEqual(0);
+        expect(cy! + r!, `${mode} circle bottom`).toBeLessThanOrEqual(h!);
+      }
+      for (const t of svg.querySelectorAll("text")) {
+        const x = Number(t.getAttribute("x"));
+        const y = Number(t.getAttribute("y"));
+        const fs = Number(t.getAttribute("font-size"));
+        const half = (t.textContent!.length * rate * fs) / 2; // text-anchor: middle
+        expect(x - half, `${mode} text left`).toBeGreaterThanOrEqual(0);
+        expect(x + half, `${mode} text right`).toBeLessThanOrEqual(w!);
+        expect(y - fs * 0.78, `${mode} text ascent`).toBeGreaterThanOrEqual(0);
+        expect(y + fs * 0.22, `${mode} text descent`).toBeLessThanOrEqual(h!);
+      }
+    }
   });
 });
 

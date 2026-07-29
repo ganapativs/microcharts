@@ -4,8 +4,7 @@
 // (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
-import { isFiniteValue } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
 import {
   named,
   fillFor,
@@ -17,7 +16,15 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_RUBRIC } from "../../core/strings-rubric.js";
-import { UNIT_DOMAIN, rubricStripGeometry } from "./geometry.js";
+import {
+  DEFAULT_WIDTH,
+  ROW_GAP,
+  UNIT_DOMAIN,
+  defaultHeight,
+  rubricLabels,
+  rubricRowBands,
+  rubricStripGeometry,
+} from "./geometry.js";
 import {
   RubricStrip as StaticRubricStrip,
   rubricStripSummary,
@@ -39,7 +46,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
     data,
     labels = true,
     domain = UNIT_DOMAIN,
-    width = 80,
+    width: widthProp = DEFAULT_WIDTH,
     height: heightProp,
     format,
     locale,
@@ -63,25 +70,28 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       'rect[data-mc-ink="accent"], rect[data-mc-ink="positive"], rect[data-mc-ink="negative"]',
   });
 
-  const n = Math.max(1, data.length);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // The weight SHARE is a percent of the rubric, not a score — it takes `locale`
   // but never the score `format`. `${Math.round(x*100)}%` was an en-US percent.
   const weightFmt = useMemo(() => makePercentFormatter(locale), [locale]);
-  // Height / font / gutter mirror the static entry EXACTLY (same defaults, same
-  // label-fit rule) — both entries must land on identical geometry or the focus
-  // box drifts off the rows it is meant to frame.
-  const height = heightProp ?? Math.max(14, n * 13);
-  const fontSize = labelFont(height / n, 0.6);
-  const labelsFit = height / n >= fontSize * 1.15;
-  const longestLabel = useMemo(() => {
-    let longest = 1;
-    for (const d of data) if (d.label.length > longest) longest = d.label.length;
-    return longest;
-  }, [data]);
-  const labelGap = 8;
-  const gutter =
-    labels && labelsFit ? Math.min(width * 0.62, longestLabel * fontSize * 0.64 + labelGap) : 0;
+  // Box, bands and gutter come from the same shared functions the static entry
+  // calls — both entries must land on identical geometry or the focus box
+  // drifts off the rows it is meant to frame (and `chartSide` keeps a hostile
+  // side from moving the pointer map off the painted box).
+  const auto = defaultHeight(data.length);
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp ?? auto, auto);
+  const gutter = useMemo(
+    () =>
+      rubricLabels({
+        names: data.map((d) => d.label),
+        bands: rubricRowBands({ weights: data.map((d) => d.weight ?? 1), height, gap: ROW_GAP }),
+        width,
+        height,
+        show: labels,
+      }).gutter,
+    [data, labels, width, height],
+  );
   const geo = useMemo(
     () =>
       rubricStripGeometry({
@@ -90,7 +100,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         width,
         height,
         gutter,
-        gap: 1,
+        gap: ROW_GAP,
       }),
     [data, domain, width, height, gutter],
   );

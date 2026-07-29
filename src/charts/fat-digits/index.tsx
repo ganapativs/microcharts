@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
-import { fatDigitsGeometry, fatTier, type FatTiers } from "./geometry.js";
+import { fatDigitsGeometry, fatTier, resolveTiers, type FatTiers } from "./geometry.js";
 
 export interface FatDigitsProps {
   value: number;
@@ -30,6 +30,17 @@ export interface FatDigitsProps {
 }
 
 const PAD = 2;
+const FONT = 14;
+
+/** The numeral's size, in viewBox units. A non-finite or non-positive
+ *  `fontSize` reached the box as `NaN`/`Infinity`: `Chart` clamped the viewBox
+ *  to 1×1 (so nothing was visible) while the accessible name still read the
+ *  value perfectly, and `NaNpx` landed in `--mc-label-size` and `--mc-seat`.
+ *  Resolved once, before geometry, so the painted size and the reserved gutter
+ *  are the same number. */
+function resolveFontSize(fontSize: number | undefined): number {
+  return isFiniteValue(fontSize) && fontSize > 0 ? fontSize : FONT;
+}
 
 export function fatDigitsSummary(
   value: number,
@@ -42,10 +53,13 @@ export function fatDigitsSummary(
     locale?: string | string[] | undefined;
   } = {},
 ): string {
-  const { encode = "value", tiers = 5, domain, strings = EN_FAT, format, locale } = opts;
+  const { encode = "value", domain, strings = EN_FAT, format, locale } = opts;
   if (!isFiniteValue(value)) return strings.noData;
   const formatted = makeFormatter(format, locale)(value);
   if (encode === "digit") return strings.fatDigitsPlain(formatted);
+  // Announced scale = painted scale: both sides read the resolved table, so an
+  // off-table `tiers` can't say "of 4" over five-step weights.
+  const tiers = resolveTiers(opts.tiers);
   return strings.fatDigits(formatted, fatTier(value, domain, tiers).tier, tiers);
 }
 
@@ -54,8 +68,6 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
     value,
     domain,
     encode = "value",
-    tiers = 5,
-    fontSize = 14,
     format,
     locale,
     strings = EN_FAT,
@@ -66,6 +78,8 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
     style,
     children,
   } = props;
+  const tiers = resolveTiers(props.tiers);
+  const fontSize = resolveFontSize(props.fontSize);
 
   const formatted = isFiniteValue(value) ? makeFormatter(format, locale)(value) : "";
   const geo = fatDigitsGeometry({ formatted, value, domain, tiers, encode, fontSize, pad: PAD });

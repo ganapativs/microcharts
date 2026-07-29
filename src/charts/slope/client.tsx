@@ -4,7 +4,7 @@
 // rove categories ordered by their `to` value, announcing each slope; click /
 // Enter / Space selects a line (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
   named,
   fillFor,
@@ -58,6 +58,8 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
   useEntrance(hostRef, "draw", animate, { selector: "line" });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // Relative change — takes `locale`, never the value `format` (its units).
+  const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   // The overlay + hit-test must resolve against the SAME frame the composed
   // static renders — label gutters included (shared rule, never re-derived).
   const geo = useMemo(
@@ -134,7 +136,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : slopeSummary(data, strings);
+        : slopeSummary(data, strings, fmt, pctFmt);
   const ariaLabel = [title, accName].filter(Boolean).join(". ") || undefined;
 
   // Accent line over the whole row's slope. Transient for hover/focus; a
@@ -164,7 +166,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
     const okFrom = Number.isFinite(shownDatum.from);
     const okTo = Number.isFinite(shownDatum.to);
     if (okFrom && okTo) {
-      const c = pairChange(shownDatum.from, shownDatum.to);
+      const c = pairChange(shownDatum.from, shownDatum.to, pctFmt);
       return c
         ? strings.slopeAt(shownDatum.label, fmt(shownDatum.from), fmt(shownDatum.to), c.dir, c.pct)
         : strings.flatPair(fmt(shownDatum.from));

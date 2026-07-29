@@ -9,8 +9,10 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STREAK_SPARK, type StreakSparkStrings } from "../../core/strings-streak-spark.js";
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import {
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
   streakSparkFont,
   streakSparkGeometry,
   streakSparkRoom,
@@ -66,8 +68,8 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     threshold,
     positive = "up",
     label = "current",
-    width = 96,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     title,
     summary,
@@ -79,6 +81,13 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Everything below reads the RESOLVED box, never the prop. `Chart` clamps the
+  // frame it draws, but the geometry read the raw value: `height={NaN}` shipped
+  // `--mc-label-size: NaNpx`, a NaN seat and `y="NaN"` runs inside a viewBox
+  // that looked perfectly valid, and `width={0}` put every run at x = -1.5.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const fmt = makeFormatter(format, locale);
   const fontSize = streakSparkFont(height);

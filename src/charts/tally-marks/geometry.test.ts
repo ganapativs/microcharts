@@ -104,3 +104,33 @@ describe("tallyGeometry — count the way a human counts", () => {
     }
   });
 });
+
+describe("hostile `total`", () => {
+  const opts = {
+    height: 16,
+    pad: 2,
+    pen: "ruled" as const,
+    overflow: "numeral" as const,
+    fontSize: 9,
+  };
+
+  it("NaN total still draws marks and carries the remainder", () => {
+    const geo = tallyGeometry({ value: 7, total: Number.NaN, ...opts });
+    expect(geo.drawn).toBe(7);
+    expect(geo.overflow).toBe(0);
+    expect(geo.d).not.toBe("");
+    expect(geo.width).toBeGreaterThan(1);
+  });
+
+  it("NaN total saturates at the mark cap, numeral carries the rest", () => {
+    const geo = tallyGeometry({ value: 250, total: Number.NaN, ...opts });
+    expect(geo.drawn).toBe(TALLY_MAX_MARKS);
+    expect(geo.overflow).toBe(250 - TALLY_MAX_MARKS);
+    expect(geo.numeralX).not.toBeNull();
+  });
+
+  it("Infinity total behaves the same as before (saturates)", () => {
+    const geo = tallyGeometry({ value: 250, total: Number.POSITIVE_INFINITY, ...opts });
+    expect(geo.drawn).toBe(TALLY_MAX_MARKS);
+  });
+});

@@ -82,6 +82,26 @@ describe("interactive <Ohlc>", () => {
       .toBe("O20 H25 L18 C23");
   });
 
+  it("announces the candle it painted when maxPeriods is below 1", async () => {
+    // The client used to re-derive its window from the raw prop, and
+    // `slice(-0)` is `slice(0)`: geometry painted the LAST period while the
+    // readout named the FIRST one.
+    const five = Array.from({ length: 5 }, (_, i) => ({
+      open: 100 + i,
+      high: 102 + i,
+      low: 99 + i,
+      close: 101 + i,
+    }));
+    const screen = await render(<Ohlc data={five} maxPeriods={0} />);
+    const wrap = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect
+      .poll(() => live.textContent)
+      .toBe("Period 1 of 1: open 104, high 106, low 103, close 105.");
+  });
+
   it("controlled selectedIndex pins the frame with no interaction", async () => {
     const screen = await render(<Ohlc data={PERIODS} selectedIndex={0} />);
     const fig = screen.container.querySelector(".mc-ohlc-live") as HTMLElement;

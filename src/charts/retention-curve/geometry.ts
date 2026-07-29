@@ -26,7 +26,9 @@ export interface RetentionGeometry {
   /** Per-period positions — overlays + nearest-x. */
   points: RetentionPoint[];
   last: { x: number; y: number; value: number };
-  /** Present only when the documented plateau criterion holds. */
+  /** Present only when the documented plateau criterion holds. `from` is a
+   *  PERIOD index (the data index a consumer knows), never a position in the
+   *  compacted finite values. */
   plateau: { y: number; value: number; from: number; fromX: number } | null;
   labelX: number;
   labelY: number;
@@ -109,10 +111,21 @@ export function retentionGeometry(opts: {
     value: round2(values[lastIdx]!),
   };
 
-  // plateau: mean |Δ| over the last k = max(3, ⌈n/3⌉) periods < 0.005
+  // plateau: mean |Δ| over the last k = max(3, ⌈n/3⌉) measured periods < 0.005.
+  // The window is measured over the finite values (a gap is a missing reading,
+  // not a flat one), but `from` is carried back to the PERIOD it came from:
+  // it is both announced ("plateaus from week 5") and drawn at x(from), and an
+  // index into the compacted array seats the marker one period early for every
+  // gap ahead of it — the same period-vs-position slip the picker guards.
   let plateau: RetentionGeometry["plateau"] = null;
   if (opts.plateau !== false) {
-    const finite = values.filter(isFiniteValue);
+    const finite: number[] = [];
+    const finitePeriods: number[] = [];
+    values.forEach((v, i) => {
+      if (!isFiniteValue(v)) return;
+      finite.push(v);
+      finitePeriods.push(i);
+    });
     const k = Math.max(3, Math.ceil(finite.length / 3));
     if (finite.length > k) {
       const windowVals = finite.slice(finite.length - k);
@@ -122,7 +135,7 @@ export function retentionGeometry(opts: {
       const meanDelta = deltaSum / (windowVals.length - 1);
       if (meanDelta < 0.005) {
         const level = windowVals.reduce((s, v) => s + v, 0) / windowVals.length;
-        const from = finite.length - k;
+        const from = finitePeriods[finite.length - k]!;
         plateau = { y: y(level), value: round2(level), from, fromX: x(from) };
       }
     }

@@ -32,6 +32,22 @@ export interface EventTimelineGeometry {
   /** Merged-span fraction of the window, 2-dp. */
   coverage: number;
   track: { x0: number; x1: number; y: number };
+  /** Point-diamond half-extent, both axes. Clamped to the lane so the tips
+   *  can't leave the box; the renderer must use this, never its own 2.5. */
+  r: number;
+}
+
+/**
+ * The box `<Chart>` will actually paint: it clamps a non-finite or non-positive
+ * viewBox side to 1. Every consumer of `width`/`height` has to resolve it the
+ * same way or it lays marks out against a box nobody drew — `width={NaN}` put
+ * `x="NaN"` on every mark under a clean viewBox and a correct accessible name.
+ */
+export function timelineBox(width: number, height: number): readonly [number, number] {
+  return [
+    Number.isFinite(width) && width > 0 ? width : 1,
+    Number.isFinite(height) && height > 0 ? height : 1,
+  ];
 }
 
 export function eventTimelineGeometry(opts: {
@@ -43,14 +59,29 @@ export function eventTimelineGeometry(opts: {
   now?: number | undefined;
   fontSize: number;
 }): EventTimelineGeometry {
-  const { width, height, items, fontSize } = opts;
-  const pad = 2;
+  const { items, fontSize } = opts;
+  const [width, height] = timelineBox(opts.width, opts.height);
+  // Two units of margin at the default 80, but never more than a quarter of the
+  // box: a 4-unit-wide chart inverted the range to [2, 0] and ran time
+  // right-to-left.
+  const pad = Math.min(2, width / 4);
   const [d0, d1] =
     opts.domain[0] <= opts.domain[1] ? opts.domain : [opts.domain[1], opts.domain[0]];
   const x = scaleLinear([d0, d1 === d0 ? d0 + 1 : d1], [pad, width - pad]);
   const midY = height / 2;
-  const spanH = Math.min(6, height - 4);
-  const DIAMOND = 2.5; // point-diamond half-width — clamped inside the viewBox
+  // A `<rect>` height of 0 or less is an SVG error, so the browser drops the
+  // element: below height 5 every span disappeared while the summary still
+  // announced "2 spans covering 50% of the window".
+  const spanH = Math.min(height, clamp(height - 4, 1, 6));
+  // Point-diamond half-extent, clamped to the lane on both axes. The tips sit
+  // ±r from the midline and `.mc-root` is `overflow: visible`, so a short box
+  // spilled them onto the page rather than clipping them. Clamp AFTER round2:
+  // on a sub-centibox side, rounding alone can inflate past the fit.
+  const r = Math.min(width / 2, midY, Math.max(0, round2(Math.min(2.5, midY, width / 2))));
+  // Containment after round2 — a raw side of 0.009 rounds to 0.01 and would
+  // otherwise paint past the viewBox Chart actually drew.
+  const fitX = (n: number) => Math.min(width, Math.max(0, round2(n)));
+  const fitY = (n: number) => Math.min(height, Math.max(0, round2(n)));
 
   const spans: TimelineSpan[] = [];
   const points: TimelinePoint[] = [];
@@ -61,7 +92,11 @@ export function eventTimelineGeometry(opts: {
     if (!isSpan) {
       const t = item.start;
       if (t < d0 || t > d1) return; // outside the window
-      points.push({ x: round2(clamp(x(t), DIAMOND, width - DIAMOND)), y: round2(midY), i });
+      points.push({
+        x: Math.min(width - r, Math.max(r, fitX(clamp(x(t), r, width - r)))),
+        y: Math.min(height - r, Math.max(r, fitY(midY))),
+        i,
+      });
       return;
     }
     const s = Math.min(item.start, item.end as number);
@@ -69,14 +104,16 @@ export function eventTimelineGeometry(opts: {
     if (e < d0 || s > d1) return; // fully outside
     const cs = Math.max(s, d0);
     const ce = Math.min(e, d1);
-    const x0 = round2(x(cs));
-    const x1 = round2(x(ce));
+    const x0 = fitX(x(cs));
+    const x1 = fitX(x(ce));
+    const h = Math.min(height, Math.max(0, round2(spanH)));
+    const y = Math.min(height - h, Math.max(0, round2(midY - spanH / 2)));
     const estChars = (item.label ?? "").length;
     spans.push({
       x0,
       x1,
-      y: round2(midY - spanH / 2),
-      h: round2(spanH),
+      y,
+      h,
       i,
       // Span labels are CALLER text drawn inside the span, so the fit test has
       // to use the prose estimator: `0.62` is calibrated for the figures the
@@ -104,13 +141,14 @@ export function eventTimelineGeometry(opts: {
   const windowSpan = d1 - d0 || 1;
   const covered = merged.reduce((sum, [lo, hi]) => sum + (hi - lo), 0);
   const nowX =
-    opts.now !== undefined && Number.isFinite(opts.now) ? round2(x(clamp(opts.now, d0, d1))) : null;
+    opts.now !== undefined && Number.isFinite(opts.now) ? fitX(x(clamp(opts.now, d0, d1))) : null;
 
   return {
     spans,
     points,
     nowX,
     coverage: Math.round((covered / windowSpan) * 100) / 100,
-    track: { x0: pad, x1: round2(width - pad), y: round2(midY) },
+    track: { x0: fitX(pad), x1: fitX(width - pad), y: fitY(midY) },
+    r,
   };
 }

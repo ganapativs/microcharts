@@ -15,7 +15,15 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_VOLUME_PROFILE } from "../../core/strings-volume-profile.js";
-import { binMass, profileLayout } from "./geometry.js";
+import { chartSide } from "../../core/types.js";
+import {
+  DEFAULT_BINS,
+  DEFAULT_HEIGHT,
+  DEFAULT_WIDTH,
+  binMass,
+  profileLayout,
+  resolveValueArea,
+} from "./geometry.js";
 import {
   VolumeProfile as StaticVolumeProfile,
   volumeProfileSummary,
@@ -38,12 +46,12 @@ export interface InteractiveVolumeProfileProps extends VolumeProfileProps, Picke
 export function VolumeProfile(props: InteractiveVolumeProfileProps): React.ReactNode {
   const {
     data,
-    valueArea = 0.7,
+    valueArea: valueAreaProp,
     align = "left",
     label: labelProp = "poc",
-    bins = 12,
-    width = 48,
-    height = 32,
+    bins = DEFAULT_BINS,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_VOLUME_PROFILE,
@@ -59,6 +67,13 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same resolution the static runs, on the same terms — the hit box, the focus
+  // band and the readout's `top` are all sized off these, so a fallback the two
+  // entries disagreed about would anchor the overlays to unpainted bars.
+  const valueArea = resolveValueArea(valueAreaProp);
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "sweep", animate, {

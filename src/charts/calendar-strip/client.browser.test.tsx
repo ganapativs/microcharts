@@ -81,6 +81,25 @@ describe("interactive <CalendarStrip>", () => {
     await expect.poll(() => fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 
+  // Announced scale === painted scale, in the wrapper too: the static entry names
+  // the window it built, and the interactive name has to be the same string.
+  it("the wrapper names the painted window, not the raw `weeks`", async () => {
+    const fig = await mount(<CalendarStrip data={DATA} end={END} weeks={4.7} />);
+    expect(fig.getAttribute("aria-label")).toBe("Active 2 of 28 days over 4 weeks.");
+  });
+
+  // A poisoned length falls back in geometry; the ring metrics and the pointer
+  // pitch read it from there, so they can't drift from the grid that was drawn.
+  it("a non-finite `cell` falls back to the default grid, ring included", async () => {
+    const fig = await mount(<CalendarStrip data={DATA} end={END} cell={NaN} />);
+    expect(fig.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 55 31");
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    const ring = fig.querySelector('rect[stroke="var(--mc-accent)"]')!;
+    expect(ring.getAttribute("x")).toBe("-0.5"); // cell 0 at the resolved metrics
+    expect(ring.getAttribute("width")).toBe("8");
+  });
+
   it("controlled selectedIndex pins the ring with no interaction", async () => {
     const fig = await mount(<CalendarStrip data={DATA} end={END} selectedIndex={23} />);
     expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

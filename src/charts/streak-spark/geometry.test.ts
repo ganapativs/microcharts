@@ -90,6 +90,31 @@ describe("streakSparkGeometry (edge matrix, )", () => {
     expect(okRun.width).toBeGreaterThan(shortRun.width);
   });
 
+  // Regression: `v >= NaN` is false for every trial, so a non-finite threshold
+  // turned six passing deploys into one break run — painted AND announced as
+  // "Current run 6 failing". A host computes this prop; it falls back to `v > 0`.
+  it("a non-finite threshold falls back to the documented default (v > 0)", () => {
+    const data = [1, 1, 1, 0, 1, 1];
+    const expected = geo(data).runs.map((r) => [r.on, r.len]);
+    for (const t of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+      expect(geo(data, { threshold: t }).runs.map((r) => [r.on, r.len])).toEqual(expected);
+    }
+  });
+
+  it("a finite threshold of 0 still overrides (v >= 0 passes)", () => {
+    expect(geo([0, -1, 0], { threshold: 0 }).runs.map((r) => r.on)).toEqual([true, false, true]);
+  });
+
+  // `clamp` honours its upper bound over its floor, so in a box narrower than a
+  // run plus both pads the bound went negative and every run sat at x = -0.5 —
+  // outside a viewBox that `.mc-root` never clips.
+  it("a degenerate box never places a run at negative x", () => {
+    for (const w of [1, 2, 3, 4]) {
+      const g = streakSparkGeometry([true, false, true], { width: w, height: H });
+      for (const r of g.runs) expect(r.x).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it("caps runs, merging the oldest into an ellipsis slot", () => {
     const many: StreakDatum[] = [];
     for (let i = 0; i < 60; i++) many.push(i % 2 === 0, null); // 60 alternating runs

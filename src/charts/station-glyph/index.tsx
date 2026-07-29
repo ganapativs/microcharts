@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_STATION_GLYPH, type StationGlyphStrings } from "../../core/strings-station-glyph.js";
 import { octant } from "../../core/strings-wind-barb.js";
-import { stationGlyphGeometry, stationLayout } from "./geometry.js";
+import { hasWind, resolveStep, stationGlyphGeometry, stationLayout } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface Wind {
@@ -53,12 +53,15 @@ export function stationGlyphSummary(
   strings: StationGlyphStrings,
   fmt: (n: number) => string,
 ): string {
-  const { cloud, wind, step = 10, temp, dewpoint, pressure, station = "" } = props;
+  const { cloud, wind, temp, dewpoint, pressure, station = "" } = props;
+  // the same resolver the geometry uses — announced speed and painted feathers
+  // are one scale, or the glyph lies about its own quantum
+  const step = resolveStep(props.step);
   const f = cloud == null || !Number.isFinite(cloud) ? 0 : Math.max(0, Math.min(1, cloud));
   const okta = Math.round(f * 4);
 
   let windClause = "";
-  if (wind && Number.isFinite(wind.magnitude)) {
+  if (hasWind(wind)) {
     if (Math.abs(wind.magnitude) < step / 4) {
       windClause = strings.stationCalm;
     } else {
@@ -87,12 +90,11 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
   const {
     cloud,
     wind,
-    step = 10,
     temp,
     dewpoint,
     pressure,
     station,
-    size = 48,
+    size,
     format,
     locale,
     strings = EN_STATION_GLYPH,
@@ -104,6 +106,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     children,
   } = props;
 
+  const step = resolveStep(props.step);
   const fmt = makeFormatter(format, locale);
 
   const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
@@ -124,7 +127,8 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     gap,
     y0,
     y1,
-  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
+    box,
+  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT, station: stationT });
 
   const geo = stationGlyphGeometry({
     cloud: cloud ?? null,
@@ -133,8 +137,10 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     cx: dcx,
     cy: dcy,
     coreR: r,
-    // a compact barb that stays near the disc rather than reaching into the numerals
-    barbBox: size * 0.64,
+    // a compact barb that stays near the disc rather than reaching into the
+    // numerals — off the RESOLVED square, so a hostile `size` cannot leave the
+    // barb sized against a NaN the disc was never drawn at
+    barbBox: box * 0.64,
   });
   const accName = resolveSummary(summary, () => stationGlyphSummary(props, strings, fmt));
   const barb = geo.barb;
@@ -193,6 +199,17 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           {stationT}
         </text>
       ) : null}
+      {/* All three numerals take label ink. They carried `data-mc-cat` 1 and 2
+          (the paper station model's red temp / blue dew point) and were the only
+          <text> in the catalog painted from the categorical ramp, which cost
+          them both readings that matter more than the hue: the cat forced-colors
+          mapping is written for closed shapes — `fill: CanvasText; stroke:
+          Canvas; stroke-width: 0.5` — so High Contrast Mode knocked a Canvas
+          outline through numerals a stroke or so wide, and in light mode gold
+          reads 2.5:1 and azure 2.9:1 against paper, under even the 3.5:1 the
+          rest of the library's labels sit at. Corner POSITION is what names a
+          field here (it is the station model's own convention) and the summary
+          names it again, so the hue was carrying nothing the reader needed. */}
       {tempT ? (
         <text
           x={dcx - r - gap}
@@ -200,7 +217,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
-          data-mc-cat="1"
+          data-mc-ink="label"
         >
           {tempT}
         </text>
@@ -212,7 +229,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
           dominantBaseline="central"
           textAnchor="end"
           fontSize={font}
-          data-mc-cat="2"
+          data-mc-ink="label"
         >
           {dewT}
         </text>

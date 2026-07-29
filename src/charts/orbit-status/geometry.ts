@@ -5,10 +5,38 @@
 // (top) encodes NOTHING — only its speed does. All coords 2-dp.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { evenDashes, polarPoint } from "../../core/arc.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 
 /** Dash counts per rate step 1–5 (denser dashes = busier). */
 const DASH_COUNTS = [4, 8, 14, 22, 32] as const;
+
+/** Documented default box, shared by the geometry and both entries. */
+const DEFAULT_SIZE = 20;
+
+/**
+ * Glyph box, resolved once. `size` arrives from a host (a CSS var read back, a
+ * collapsed flex measurement, an empty numeric input), and every coordinate
+ * below derives from THIS value: the old code laid the marks out against the
+ * raw prop while exporting a clamped box, so `size={NaN}` emitted `cx="NaN"`
+ * inside the 1×1 viewBox `Chart` had already clamped to — an invisible glyph
+ * still announcing a latency — and `size={-20}` put the orbit at cx=-10 with a
+ * negative radius.
+ */
+function resolveSize(size: number): number {
+  return isFiniteValue(size) ? Math.max(1, Math.round(size)) : DEFAULT_SIZE;
+}
+
+/**
+ * Reserved gutter (viewBox units) for the ms numeral beside the orbit. The
+ * per-char estimate is `textGutter`'s 0.62 widened to 0.7 because this label is
+ * not digits-only — the "ms" glyphs run wider than tabular figures. Both
+ * entries call this rather than each keeping a copy of the expression: they
+ * size the same viewBox, and the interactive readout is positioned as a
+ * percentage of it.
+ */
+export function orbitLabelBand(chars: number, fontSize: number): number {
+  return Math.ceil(chars * 0.7 * fontSize + 2);
+}
 
 export interface OrbitStatusGeometry {
   center: { cx: number; cy: number; r: number };
@@ -33,16 +61,33 @@ export function orbitStatusGeometry(opts: {
   threshold?: number | undefined;
   pad: number;
 }): OrbitStatusGeometry {
-  const { size, pad } = opts;
+  const { pad } = opts;
+  const size = resolveSize(opts.size);
   const cx = round2(size / 2);
   const cy = round2(size / 2);
   const rCenter = round2(size * 0.09);
-  const rMax = size / 2 - pad - 1;
-  const rMin = rCenter + 1.5;
 
-  const unknown =
-    !(typeof opts.latency === "number" && Number.isFinite(opts.latency)) ||
-    !(typeof opts.rate === "number" && Number.isFinite(opts.rate));
+  const unknown = !isFiniteValue(opts.latency) || !isFiniteValue(opts.rate);
+
+  // Resolved once: the alert edge and the radius reserve below must agree on
+  // whether this chart has a threshold at all.
+  const threshold = isFiniteValue(opts.threshold) ? opts.threshold : null;
+  const satBase = Math.max(1, size * 0.06);
+  // The satellite RIDES on the orbit, so the outer bound has to leave room for
+  // the satellite's own radius. The old fixed `- 1` was that radius back when
+  // the satellite was always 1 unit; it stopped tracking once the satellite
+  // grew with `size` and doubled on alert, and at the default size an alerted
+  // satellite at the top of the domain hung 0.4 units ABOVE the viewBox
+  // (`.mc-root` is `overflow: visible`, so that paints on the page).
+  //
+  // Reserve for the largest satellite this chart can ever draw, not the one it
+  // is drawing now: a range that shrank the moment the threshold tripped would
+  // pull the orbit inward as latency ROSE past it.
+  const satReserve = threshold !== null ? satBase * 2 : satBase;
+  const rMax = Math.max(0, size / 2 - pad - satReserve);
+  // Ordered, or `clamp` returns `rMin` for every value — an orbit drawn outside
+  // its own bound at box sizes where the inner floor no longer fits.
+  const rMin = Math.min(rCenter + 1.5, rMax);
 
   const latency = unknown ? 0 : Math.max(0, opts.latency);
   const rate = unknown ? 0 : Math.max(0, opts.rate);
@@ -66,12 +111,10 @@ export function orbitStatusGeometry(opts: {
   }
   const dash = rateStep === 0 ? ([0, 0] as const) : evenDashes(orbitR, DASH_COUNTS[rateStep - 1]!);
 
-  const alerted =
-    !unknown &&
-    typeof opts.threshold === "number" &&
-    Number.isFinite(opts.threshold) &&
-    latency >= opts.threshold;
-  const satR = round2((alerted ? 2 : 1) * Math.max(1, size * 0.06));
+  const alerted = !unknown && threshold !== null && latency >= threshold;
+  // The `size / 2` cap only binds on a box too small to hold the satellite at
+  // all (size ≤ 2), where an uncapped radius reaches past the box edge.
+  const satR = round2(Math.min((alerted ? 2 : 1) * satBase, size / 2));
 
   // Satellite at the top (angle 0 = 12 o'clock); the angle encodes nothing.
   const [sx, sy] = polarPoint(cx, cy, orbitR, 0);
@@ -81,6 +124,6 @@ export function orbitStatusGeometry(opts: {
     orbit: { cx, cy, r: orbitR, dash, rateStep },
     satellite: { cx: round2(sx), cy: round2(sy), r: satR, alerted },
     unknown,
-    size: Math.max(1, Math.round(size)),
+    size,
   };
 }

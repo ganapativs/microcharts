@@ -10,8 +10,8 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
-import { isFiniteValue, type Value } from "../../core/types.js";
-import { stackedAreaGeometry } from "./geometry.js";
+import { chartSide, isFiniteValue, type Value } from "../../core/types.js";
+import { stackedAreaGeometry, stackedAreaLabelsFit } from "./geometry.js";
 
 export interface StackedAreaDatum {
   label?: string | undefined;
@@ -82,8 +82,8 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     colors,
     curve = "linear",
     domain,
-    width = 60,
-    height = 16,
+    width: widthProp = 60,
+    height: heightProp = 16,
     format,
     locale,
     strings = EN_STACK,
@@ -94,6 +94,14 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `Chart` clamps the box for the FRAME; geometry has to clamp it too or the
+  // marks land outside a valid viewBox — `height={-40}` drew the top edge at
+  // y = -40 and `width={0}` at x = -1, and `.mc-root` is `overflow: visible`,
+  // so both spill into the page. Non-finite sides emitted `NaN` coordinates,
+  // `--mc-label-size: NaNpx` and a `NaN` seat.
+  const width = chartSide(widthProp);
+  const height = chartSide(heightProp);
 
   if (data.length > 3) {
     devWarn("<StackedArea> ≤ 3 series is a hard cap — thickness reading degrades past it.");
@@ -117,13 +125,16 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   // ridge forces smooth silhouettes (documented)
   const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
+  // endpoint labels drop when rows are too dense for the series count — and the
+  // gutter goes with them, before geometry reserves it
+  const labelled = label === "last" && stackedAreaLabelsFit(height, series.length, fontSize);
   const geo = stackedAreaGeometry({
     width,
     height,
     series: series.map((s) => s.values),
     domain,
     curve: usedCurve,
-    gutterCh: label === "last" ? 4 : 0,
+    gutterCh: labelled ? 4 : 0,
     fontSize,
   });
   const accName =
@@ -131,8 +142,10 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
       ? false
       : (summary ?? stackedAreaSummary(series, geo.sharesAt.at(-1) ?? [], geo.n, pctFmt, strings));
 
-  // endpoint labels drop when rows are too dense for the series count
-  const labelsFit = height / Math.max(1, series.length) >= fontSize * 1.1;
+  // an empty `colors` array is "no override", not `colors[NaN]`: the areas fell
+  // back to the cat palette while the top hairlines lost their stroke outright,
+  // so one instance rendered half-themed.
+  const pal = colors && colors.length > 0 ? colors : undefined;
   const tip =
     labelAt !== undefined && labelAt >= 0 && labelAt < geo.n ? labelAt : Math.max(0, geo.n - 1);
   const tipShares = geo.sharesAt[tip] ?? [];
@@ -164,10 +177,13 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
             <path
               d={layer.dArea}
               data-mc-cat={(layer.index % CAT_N) + 1}
-              style={{
-                fillOpacity: mode === "ridge" ? 1 : 0.8,
-                ...(colors ? { fill: colors[layer.index % colors.length] } : null),
-              }}
+              // attribute, not inline style (Hypnogram's form): an inline
+              // fill-opacity outranks every stylesheet rule, which flattened the
+              // `[data-mc-cat]` LIGHTNESS ramp the forced-colors block builds —
+              // three bands reading as one CanvasText in High Contrast Mode —
+              // and put the value out of a consumer's `:where()` reach.
+              fillOpacity={mode === "ridge" ? 1 : 0.8}
+              style={pal ? { fill: pal[layer.index % pal.length] } : undefined}
             />
           ) : null}
           {layer.dTop ? (
@@ -182,8 +198,8 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
               stroke={
                 mode === "ridge"
                   ? "var(--mc-surface, Canvas)"
-                  : colors
-                    ? colors[layer.index % colors.length]
+                  : pal
+                    ? pal[layer.index % pal.length]
                     : `var(${CAT_TOKENS[layer.index % CAT_N]})`
               }
               data-mc-w={mode === "ridge" ? "support" : "tick"}
@@ -192,12 +208,16 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
           ) : null}
         </g>
       ))}
-      {label === "last" && labelsFit
+      {labelled
         ? geo.layers.map((layer) => (
             <text
               key={`t${layer.index}`}
               x={width - 1}
-              y={round2Y(geo, layer, height, fontSize)}
+              // slot from the TOP of the stack: layer 0 is the bottom band, so
+              // staggering by `index` printed the column upside down — the top
+              // band's share sat beside the bottom band, which is the one
+              // mis-read a composition chart cannot afford.
+              y={labelY(geo.layers.length - 1 - layer.index, height, fontSize)}
               fontSize={fontSize}
               textAnchor="end"
               data-mc-ink="label"
@@ -211,15 +231,10 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   );
 }
 
-function round2Y(
-  geo: { layers: { dTop: string }[] },
-  layer: { index: number },
-  height: number,
-  fontSize: number,
-): number {
-  // stagger endpoint labels down the right edge in layer order. Alphabetic
+function labelY(slot: number, height: number, fontSize: number): number {
+  // stagger endpoint labels down the right edge in stack order. Alphabetic
   // baseline: keep the em-box (≈0.78 above / 0.22 below) inside the viewBox.
-  const y = fontSize + layer.index * fontSize * 1.15;
+  const y = fontSize + slot * fontSize * 1.15;
   const lo = fontSize * 0.78;
   const hi = height - fontSize * 0.22;
   return Math.round(Math.min(Math.max(y, lo), hi) * 100) / 100;

@@ -8,9 +8,9 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
-import { labelFitsY, labelFont, proseCharsThatFit } from "../../core/labels.js";
+import { labelFitsY, rowLabelFont } from "../../core/labels.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
-import { dumbbellGeometry } from "./geometry.js";
+import { dumbbellGeometry, dumbbellLabelChars } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -60,7 +60,12 @@ export function dumbbellSummary(
   });
   const c = pairChange(top.from, top.to, pctFmt);
   if (!c) return strings.flatPair(fmt(top.from));
-  return strings.rows(finite.length, top.label ?? "", c.dir, c.pct);
+  // `label` is optional on this chart, and `rows` has a slot for the name: an
+  // unnamed leader left a hole mid-sentence — "2 rows. Largest change , up 200%."
+  // A row with no name is identified by its move instead, the same sentence the
+  // single-row summary uses.
+  if (!top.label) return strings.fromTo(fmt(top.from), fmt(top.to), c.dir, c.pct);
+  return strings.rows(finite.length, top.label, c.dir, c.pct);
 }
 
 export interface DumbbellProps {
@@ -111,23 +116,22 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
     devWarn(`<Dumbbell> ${data.length} rows — past 5 the comparison blurs (documented cap).`);
   }
 
-  const fontSize = labelFont(height, 0.42);
-  // Rows share the height evenly, so the row pitch IS the vertical room a row
-  // label gets. Once the pitch drops under a line of text the names stack on
-  // each other — the "Paris/Berlin/Rome in a tab header" failure. They DROP
-  // instead, all together (the pitch is uniform, so it is never a partial
-  // decision), and the gutter drops with them so the paired dots — the actual
-  // encoding — reclaim the full width and stay readable.
-  // Pure arithmetic: the static path may never measure text.
+  // Sized off the row PITCH, not the chart height: adding rows grows the height,
+  // so `labelFont(height, …)` grew the type while the room per row shrank — it
+  // pinned at the 11-unit ceiling from three rows on while DotPlot, doing the
+  // same job beside it, sat at 7.
+  const fontSize = rowLabelFont(data.length > 0 ? height / data.length : height);
   const rowPitch = data.length > 0 ? height / data.length : 0;
-  const showRowLabels = data.some((d) => d.label) && rowPitch >= fontSize + 0.5;
-  const longest = showRowLabels ? data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0) : 0;
-  // Cap by remaining width using the prose per-char estimate (row names are
-  // author text, not tabular figures — see textGutterProse). Keep ≥55% of the
-  // plot for the dumbbell itself.
-  const maxLabelChars = showRowLabels
-    ? Math.min(longest, Math.max(4, proseCharsThatFit(width * 0.42, fontSize, 4)))
-    : 0;
+  // Both entries share this budget (see dumbbellLabelChars) — the client
+  // re-derives it to place its overlay rings, and a second spelling drifts.
+  const maxLabelChars = dumbbellLabelChars({
+    width,
+    height,
+    rows: data.length,
+    fontSize,
+    longest: data.reduce((m, d) => Math.max(m, d.label?.length ?? 0), 0),
+  });
+  const showRowLabels = maxLabelChars > 0;
   const geo = dumbbellGeometry({
     width,
     height,
@@ -210,7 +214,9 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
           rightX + 4 + est(rightVal) <= width;
         return (
           <g key={row.index}>
-            {showRowLabels && d.label ? (
+            {/* length, not truthiness: a row named "0" is a named row, and it
+                had already been charged for the gutter it then left empty. */}
+            {showRowLabels && d.label !== undefined && d.label.length > 0 ? (
               <text
                 x={geo.labelX}
                 y={row.y}
@@ -259,12 +265,19 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
             ) : null}
             {showValues && leftX !== null && rightX !== null ? (
               <>
+                {/* Direct value labels take the label ink like every other one
+                    in the catalog: quieter than the dots they annotate, and —
+                    the part that bites — the only text fill High Contrast Mode
+                    maps to CanvasText. Bare <text> keeps `--mc-stroke` verbatim
+                    under `forced-color-adjust: none`, painting a fixed theme ink
+                    against whatever background the user chose. */}
                 <text
                   x={leftX - 4}
                   y={row.y}
                   fontSize={fontSize}
                   dominantBaseline="central"
                   textAnchor="end"
+                  data-mc-ink="label"
                 >
                   {fmt(leftVal)}
                 </text>
@@ -274,6 +287,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                   fontSize={fontSize}
                   dominantBaseline="central"
                   textAnchor="start"
+                  data-mc-ink="label"
                 >
                   {fmt(rightVal)}
                 </text>

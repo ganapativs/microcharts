@@ -50,6 +50,24 @@ describe("interactive <FoldedDayBand>", () => {
       .not.toBeNull();
   });
 
+  // `bins` and `period` are host-computed config, and this entry labels the
+  // fold axis from the RAW props while geometry draws from resolved ones:
+  // `bins={1e9}` saturates to 512 and put every bin at position 0, `period`
+  // from an empty input field (`Number("")`) announced "at NaN".
+  it("hostile bins/period never reach the chip or the live region", async () => {
+    const screen = await render(
+      <FoldedDayBand data={DATA} bins={1e9} period={NaN} width={200} height={40} />,
+    );
+    const wrap = screen.container.querySelector(".mc-folded-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "ArrowRight");
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toMatch(/^at \d+: median/);
+    const chip = screen.container.querySelector(".mc-spark-readout")!;
+    expect(chip.textContent).toMatch(/^\d+ · /);
+  });
+
   it("controlled selectedIndex pins the mark without focus", async () => {
     const screen = await render(
       <FoldedDayBand data={DATA} width={200} height={40} selectedIndex={5} />,

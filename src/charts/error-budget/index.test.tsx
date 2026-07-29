@@ -88,3 +88,11 @@ describe("ErrorBudget degradation", () => {
     expect(small.querySelectorAll("path").length).toBeGreaterThan(0);
   });
 });
+
+it("a non-finite `window` never reaches the accessible name", () => {
+  const { container } = draw(<ErrorBudget data={[1, 0.8, 0.6]} window={Number.NaN} />);
+  const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+  expect(label).not.toMatch(/NaN|Infinity/);
+  // The geometry already fell back to data.length; the name says the same.
+  expect(label).toContain("of 3");
+});

@@ -2,7 +2,41 @@
 // shaft angle + QUANTIZED magnitude as WMO barbs (pennant = 5·step, full = step,
 // half = step/2). Quantization is the honesty, not a limitation. 0° = up/north,
 // clockwise. Reused by station-glyph (chart-local import). 2-dp.
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
+
+/** Documented glyph square, in viewBox units. */
+export const DEFAULT_SIZE = 32;
+/** Documented full-barb quantum. */
+const DEFAULT_STEP = 10;
+
+/**
+ * Resolved barb quantum. `step` is host-computed as often as it is typed —
+ * `Number(field.value)` on an empty input is NaN — and every non-positive value
+ * broke the encoding a different way: NaN and 0 left a bare shaft with no
+ * feathers while the name still announced "magnitude 32", a negative step
+ * quantized 32 into three full barbs and a half (a WMO reading of 35 at the
+ * documented quantum), and `Infinity` painted the calm circle and announced
+ * "Calm." over a real wind. Geometry and summary both resolve through here, so
+ * the announced speed and the painted feather count are always one scale.
+ */
+export function resolveStep(step: number | undefined): number {
+  return chartSide(step ?? DEFAULT_STEP, DEFAULT_STEP);
+}
+
+/**
+ * Is this reading undrawable — the calm glyph rather than a barb?
+ *
+ * A barb is an ANGLE plus a feather count, so a non-finite `direction` has no
+ * honest shaft: it emitted `MNaN NaN` and then threw outright, because
+ * `compass8[octant(NaN)]` is `undefined` and the EN template capitalizes it.
+ * It now takes the answer a non-finite magnitude already had — the calm circle,
+ * in the paint and in the name alike. `step` is resolved here so a caller
+ * cannot ask this question on a different scale than the one that gets drawn.
+ */
+export function isCalm(direction: number, magnitude: number, step: number): boolean {
+  const m = Math.abs(magnitude);
+  return !Number.isFinite(direction) || !Number.isFinite(m) || m < resolveStep(step) / 4;
+}
 
 export interface Seg {
   x1: number;
@@ -40,14 +74,29 @@ export function windBarbGeometry(opts: {
   width: number;
   height: number;
 }): WindBarbGeometry {
-  const { direction, magnitude, step, width, height } = opts;
+  // Resolved once, here, because every coordinate below derives from these:
+  // `size={NaN}` drew a NaN shaft and a NaN seat inside the wrapper's fallback
+  // `viewBox="0 0 1 1"`, and `size={-20}` put the shaft at x=-18 — outside the
+  // box, and `.mc-root` is `overflow: visible`, so that paints on the page.
+  const width = chartSide(opts.width, DEFAULT_SIZE);
+  const height = chartSide(opts.height, DEFAULT_SIZE);
+  const step = resolveStep(opts.step);
+  const { direction, magnitude } = opts;
   const cx = round2(width / 2);
   const cy = round2(height / 2);
-  const R = Math.min(width, height) / 2 - 2;
+  // Floored: a box under 4 units gave the shaft a NEGATIVE radius, which points
+  // it backwards out of its own glyph. Below that size the mark collapses to the
+  // center dot instead.
+  const R = Math.max(0, Math.min(width, height) / 2 - 2);
   const m = Math.abs(magnitude);
 
-  // 0° = up/north, clockwise: dir = (sinθ, −cosθ) in screen coords (y down)
-  const θ = (direction * Math.PI) / 180;
+  // 0° = up/north, clockwise: dir = (sinθ, −cosθ) in screen coords (y down).
+  // Wrapped into one turn first, because a bearing is modular and `Math.sin`/
+  // `Math.cos` are not: past roughly 2^63 radians there are no bits left for
+  // argument reduction and they return NaN, so `direction={5.7e307}` — finite,
+  // and therefore past `isCalm`'s guard — produced a shaft and barbs at NaN
+  // coordinates. 361° and 1° are the same wind; now they are the same glyph.
+  const θ = ((((direction % 360) + 360) % 360) * Math.PI) / 180;
   const dx = Math.sin(θ);
   const dy = -Math.cos(θ);
   const center = { x: cx, y: cy };
@@ -56,7 +105,7 @@ export function windBarbGeometry(opts: {
   const y0 = round2(cy - R);
   const y1 = round2(cy + R);
 
-  if (!Number.isFinite(m) || m < step / 4) {
+  if (isCalm(direction, magnitude, step)) {
     return {
       shaft: { x1: cx, y1: cy, x2: cx, y2: cy },
       barbs: [],
@@ -93,14 +142,24 @@ export function windBarbGeometry(opts: {
   // otherwise emit trillions of marks — unbounded allocation AND a viewBox
   // escape. Clamp the DRAWN glyph count to what fits along the shaft; the summary
   // still reports the true magnitude, so the encoding stays honest.
+  // …and an ABSOLUTE ceiling on top of the shaft's capacity, because that
+  // capacity is itself derived from the box. `chartSide` only rejects a
+  // non-finite size, so `size={1e308}` is a legal box whose shaft has room for
+  // ~1.6e307 pennants: the loops below then allocate until the process dies.
+  // No WMO reading needs more feathers than this; past it the glyph has already
+  // stopped being readable and the summary carries the true magnitude anyway.
+  const MAX_GLYPHS = 24;
   const penStep = penW + 0.6;
-  const maxPennant = Math.max(0, Math.floor(R / penStep));
+  const maxPennant = Math.max(0, Math.min(MAX_GLYPHS, Math.floor(R / penStep)));
   if (pennant > maxPennant) {
     pennant = maxPennant;
     full = 0;
     half = 0;
   } else {
-    const maxFull = Math.max(0, Math.floor((R - pennant * penStep) / spacing));
+    const maxFull = Math.max(
+      0,
+      Math.min(MAX_GLYPHS, Math.floor((R - pennant * penStep) / spacing)),
+    );
     if (full > maxFull) {
       full = maxFull;
       half = 0;

@@ -7,6 +7,7 @@ import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 const UNIFORM = Array.from({ length: 20 }, (_, i) => i + 1); // 1..20
+const firstCx = (root: Element) => Number(root.querySelector("circle")!.getAttribute("cx"));
 
 describe("<QuantileDots>", () => {
   it("threshold summary uses frequency framing — the real string", () => {
@@ -56,6 +57,39 @@ describe("<QuantileDots>", () => {
     const none = draw(<QuantileDots data={UNIFORM} threshold={15} label="none" />).container;
     expect(labeled.querySelector("text")!.textContent).toBe("5 in 20");
     expect(none.querySelector("text")).toBeNull();
+  });
+
+  // Hostile CONFIG, not hostile data: `count` bound to an empty number field
+  // (`Number("")` → NaN) rendered a plausible-looking chart whose name read
+  // "0 in NaN chances above 15", with the threshold line at x="NaN".
+  it("non-finite count announces the default 20, never NaN", () => {
+    for (const count of [NaN, Infinity, -Infinity]) {
+      const { container } = draw(<QuantileDots data={UNIFORM} count={count} threshold={15} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("aria-label")).toBe("5 in 20 chances above 15.");
+      expect(container.querySelectorAll("circle").length).toBe(20);
+      expect(container.innerHTML).not.toContain("NaN");
+    }
+  });
+
+  it("a non-finite width/height never leaks NaN into the markup", () => {
+    for (const box of [{ width: NaN }, { height: NaN }, { width: 0, height: 0 }]) {
+      const { container } = draw(<QuantileDots data={UNIFORM} threshold={15} {...box} />);
+      expect(container.innerHTML).not.toContain("NaN");
+    }
+  });
+
+  it("domain fixes the value→x map instead of auto-fitting", () => {
+    const auto = draw(<QuantileDots data={UNIFORM} />).container;
+    const fixed = draw(<QuantileDots data={UNIFORM} domain={[0, 100]} />).container;
+    // 1..20 auto-fits the plot; against [0, 100] it crowds into the left fifth
+    expect(firstCx(auto)).toBeGreaterThan(firstCx(fixed));
+    expect(firstCx(fixed)).toBeLessThan(20);
+  });
+
+  it("labels leave tabular-nums to styles.css (:where() must stay overridable)", () => {
+    const { container } = draw(<QuantileDots data={UNIFORM} threshold={15} />);
+    expect(container.querySelector("text")!.style.fontVariantNumeric).toBe("");
   });
 
   it("is axe-clean", async () => {

@@ -10,7 +10,7 @@ import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spira
 import { makeFormatter, type Format } from "../../core/format.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
 import type { Value } from "../../core/types.js";
-import { spiralYearGeometry } from "./geometry.js";
+import { SPIRAL_PAD, spiralYearGeometry } from "./geometry.js";
 
 /** Opacity ramp indexed by step (up to 5). Newest/highest = most opaque. */
 const OPACITY = [0.16, 0.34, 0.52, 0.72, 1] as const;
@@ -40,8 +40,6 @@ export interface SpiralYearProps {
   style?: CSSProperties | undefined;
   children?: ReactNode | undefined;
 }
-
-const PAD = 1;
 
 function inferCadence(n: number, explicit?: "day" | "week"): "day" | "week" {
   if (explicit) return explicit;
@@ -117,7 +115,7 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
     steps,
     cadence,
     startIndex,
-    pad: PAD,
+    pad: SPIRAL_PAD,
     mark,
   });
   const accName =
@@ -137,7 +135,7 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
       // A disc: radially symmetric about the box centre with no bottom edge to
       // seat, so it centres on the cap band. Bounds are the padded square the
       // spiral is drawn into — how many turns it fills never moves them.
-      seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
+      seat={{ mode: "center", top: SPIRAL_PAD, bottom: geo.size - SPIRAL_PAD }}
       className={className ? `mc-spiral ${className}` : "mc-spiral"}
       style={style}
     >

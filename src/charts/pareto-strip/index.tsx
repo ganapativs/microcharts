@@ -5,11 +5,18 @@
 // REFERENCE, never a law; `Other` never participates in ranking.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { makePercentFormatter } from "../../core/format.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
-import { paretoGeometry, type ParetoGeometry } from "./geometry.js";
+import {
+  paretoGeometry,
+  DEFAULT_HEIGHT,
+  DEFAULT_MAX_ITEMS,
+  DEFAULT_THRESHOLD,
+  DEFAULT_WIDTH,
+  type ParetoGeometry,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Cumulative + per-bar shares go through `Intl`'s own percent style. The old
@@ -62,13 +69,13 @@ export interface ParetoStripProps {
 export function ParetoStrip(props: ParetoStripProps): ReactNode {
   const {
     data,
-    threshold = 80,
-    maxItems = 8,
+    threshold = DEFAULT_THRESHOLD,
+    maxItems = DEFAULT_MAX_ITEMS,
     unit = "causes",
     metric = "the total",
     label = "count",
-    width = 80,
-    height = 20,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     color,
     locale,
     strings = EN_PARETO,
@@ -79,6 +86,11 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
     style,
     children,
   } = props;
+
+  // Everything below reads the RESOLVED box, never the prop: `height={NaN}`
+  // used to set `--mc-label-size: NaNpx` and a NaN seat on a 1×1 frame.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const FONT = labelFont(height);
   const pct = paretoPercent(locale);
@@ -131,7 +143,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
   }
 
   const accName = resolveSummary(summary, () => paretoSummary(geo, { unit, metric }, strings, pct));
-  const accent = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
 
   return (
@@ -149,20 +160,30 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
       className={cls}
       style={rootStyle}
     >
-      {/* Vital few accent / rest muted; `color` overrides via inline fill. */}
+      {/* Vital few accent / rest muted; `color` overrides the vital few via an
+          inline fill. The muted rest keeps the neutral ink ROLE instead of an
+          inline `var(--mc-neutral)` — an inline fill survives `.mc-root`'s
+          `forced-color-adjust: none` verbatim, so under High Contrast the
+          muted bars painted a matte gray against the reader's own background
+          rather than mapping to GrayText. */}
       {geo.painted.map((i) => {
         const b = geo.bars[i]!;
+        const tinted = !!color && b.vital;
         return (
           <rect
-            key={b.label}
+            // The bar's rank, not its label: category names are caller data, so
+            // two bars can share one ("Timeouts" twice, or a caller category
+            // literally named "Other" beside the rolled-up one), and a
+            // duplicate key lets React drop or duplicate a bar on re-render.
+            key={i}
             x={b.x}
             y={b.y}
             width={b.width}
             height={b.height}
-            data-mc-ink={color ? "bar" : b.vital ? "accent" : "neutral"}
+            data-mc-ink={tinted ? "bar" : b.vital ? "accent" : "neutral"}
             fillOpacity={b.vital ? 1 : 0.5}
             shapeRendering="crispEdges"
-            style={color ? { fill: b.vital ? accent : "var(--mc-neutral)" } : undefined}
+            style={tinted ? { fill: color } : undefined}
           />
         );
       })}
@@ -193,8 +214,8 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           cx={geo.crossing.x}
           cy={geo.thresholdY}
           r={1.6}
-          data-mc-ink={color ? undefined : "accent"}
-          style={color ? { fill: accent } : undefined}
+          data-mc-ink="accent"
+          style={color ? { fill: color } : undefined}
         />
       ) : null}
       {showLabel ? (

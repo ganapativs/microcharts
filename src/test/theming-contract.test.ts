@@ -85,8 +85,9 @@ const PAGE = { light: hex("#ffffff"), dark: hex("#161616") } as const;
 
 const CATS = [1, 2, 3, 4, 5, 6] as const;
 
-/** The fill opacities PartitionStrip paints a LABELLED segment at (row 0). */
-const LABELLED_OPACITIES = [0.9, 0.85] as const;
+/** The fill opacity PartitionStrip paints a LABELLED segment at (row 0) — full,
+ *  so the label sits on the categorical hue rather than a lightened wash. */
+const LABELLED_OPACITIES = [1] as const;
 
 describe("on-fill label ink clears AA on the fills it lands on", () => {
   // Deep semantic fills: HeatCell's upper steps, TimeInRange zones,
@@ -106,20 +107,20 @@ describe("on-fill label ink clears AA on the fills it lands on", () => {
     }
   }
 
-  // Categorical fills are MID-tone by construction, so they take a different
-  // ink. Light-mode sapphire (cat-4) is the one deep cat and the one documented
-  // exception — styles.css hands that single step back to `--mc-on-fill`.
+  // Categorical fills take a PER-CAT ink. One `--mc-on-cat` per palette could
+  // not be made correct: measured across the shipped palettes, some cats need
+  // the light ink and some the dark one INSIDE THE SAME SCOPE, so the single
+  // token plus a hand-written cat-4 exception was always going to leave some
+  // fill under the floor. `scripts/gen-on-cat-ink.mjs` generates
+  // `--mc-on-cat-1..6` per scope; this asserts the generated answer is right.
   for (const theme of ["light", "dark"] as const) {
     const scope = theme === "light" ? LIGHT : DARK;
-    const onCat = tokenIn(scope.includes("--mc-on-cat") ? scope : LIGHT, "--mc-on-cat");
-    const onFill = tokenIn(scope, "--mc-on-fill");
     for (const n of CATS) {
-      const exempt = theme === "light" && n === 4;
-      it(`${theme}: cat-${n} label ink${exempt ? " (sapphire exception)" : ""}`, () => {
+      it(`${theme}: cat-${n} takes an ink that clears AA on itself`, () => {
         const cat = hex(tokenIn(scope, `--mc-cat-${n}`));
+        const ink = tokenIn(scope, `--mc-on-cat-${n}`);
         for (const fo of LABELLED_OPACITIES) {
           const bg = over(cat, fo, PAGE[theme]);
-          const ink = exempt ? onFill : onCat;
           expect(
             contrast(rgbaOver(ink, bg), bg),
             `cat-${n} at fill-opacity ${fo} in ${theme}`,
@@ -129,17 +130,25 @@ describe("on-fill label ink clears AA on the fills it lands on", () => {
     }
   }
 
-  it("the sapphire exception is scoped to light — dark cat-4 takes the cat ink", () => {
-    // If a future palette lifts light cat-4 enough for the cat ink, the
-    // exception (and these three rules in styles.css) should GO, not linger.
-    const cat4 = hex(tokenIn(LIGHT, "--mc-cat-4"));
-    const bg = over(cat4, 0.9, PAGE.light);
-    const onCat = rgbaOver(tokenIn(LIGHT, "--mc-on-cat"), bg);
-    expect(
-      contrast(onCat, bg),
-      "light cat-4 now clears AA on --mc-on-cat: delete the exception rules",
-    ).toBeLessThan(AA);
-    expect(css).toMatch(/rect\[data-mc-cat="4"\] \+ text/);
+  it("every palette scope that declares cats also declares their inks", () => {
+    // The generator writes both together; this catches a hand-edited palette
+    // that added a cat and forgot to re-run it.
+    for (const [, body] of [...css.matchAll(/\{([^{}]*--mc-cat-6:[^{}]*)\}/g)].map((m) => [
+      0,
+      m[1]!,
+    ])) {
+      if (!/--mc-cat-6:\s*#/.test(String(body))) continue; // color-mix palettes opt out
+      for (const n of CATS)
+        expect(String(body), `--mc-on-cat-${n} missing beside --mc-cat-${n}`).toMatch(
+          new RegExp(`--mc-on-cat-${n}:`),
+        );
+    }
+  });
+
+  it("the per-cat rules key off the cat the label sits on", () => {
+    for (const n of CATS) expect(css).toMatch(new RegExp(`rect\\[data-mc-cat="${n}"\\] \\+ text`));
+    // …and the fallback keeps the achromatic presets working.
+    expect(css).toContain("var(--mc-on-cat-1, var(--mc-on-cat))");
   });
 
   it("the rules reach for the tokens, not for the literals", () => {
@@ -148,8 +157,10 @@ describe("on-fill label ink clears AA on the fills it lands on", () => {
     // they could not.
     const strip = css.slice(css.indexOf(":where(.mc-trace, .mc-partition) :where(text)"));
     expect(strip.slice(0, 160)).toContain("var(--mc-on-fill)");
+    // The categorical base rule now covers SegmentedBar too, and each cat's own
+    // ink layers over it.
     expect(css).toMatch(
-      /:where\(\.mc-partition\) :where\(text\)\s*\{\s*fill:\s*var\(--mc-on-cat\)/,
+      /:where\(\.mc-partition, \.mc-segbar\) :where\(text\)\s*\{\s*fill:\s*var\(--mc-on-cat\)/,
     );
     // No rule outside the tokens layer may hardcode the on-fill literal.
     const charts = css.slice(css.indexOf("@layer microcharts.charts"));
@@ -349,3 +360,38 @@ function chartSources(): { path: string; text: string }[] {
   expect(out.length).toBeGreaterThan(200);
   return out;
 }
+
+// The on-fill suite above pairs each theme's ink with the SAME theme's fills, so
+// it can only catch a mistuned twin. The failure that actually shipped was a
+// cross-theme pairing: `@media (prefers-color-scheme: dark)` set `--mc-on-fill`
+// off the OS, while a host pinning light overrode the palette — light fills,
+// dark ink, 3.0–3.8:1 on the docs site with every other token correct. The
+// mechanism was that dark was expressible and light was not.
+describe("a host can pin light, not just dark", () => {
+  const EXPLICIT_LIGHT = block(':where([data-mc-theme="light"])');
+
+  it("an explicit-light scope exists to beat the dark media query", () => {
+    expect(EXPLICIT_LIGHT.trim().length).toBeGreaterThan(0);
+  });
+
+  // Every token the dark branch overrides must be restated here, or pinning
+  // light leaves that one token on the dark value — which is precisely the
+  // shape of the --mc-on-fill bug.
+  const overridden = [...DARK.matchAll(/(--mc-[a-z0-9-]+):/g)].map((m) => m[1]!);
+  for (const name of overridden) {
+    it(`explicit light restates ${name}`, () => {
+      expect(tokenIn(EXPLICIT_LIGHT, name)).toBe(tokenIn(LIGHT, name));
+    });
+  }
+
+  it("the pathological pairing is unreachable: light fills never meet the dark ink", () => {
+    const darkInk = tokenIn(DARK, "--mc-on-fill");
+    const lightInk = tokenIn(EXPLICIT_LIGHT, "--mc-on-fill");
+    expect(lightInk).not.toBe(darkInk);
+    // And the ink a pinned-light host now gets clears AA on its own fills.
+    for (const role of ["--mc-accent", "--mc-positive", "--mc-stroke"] as const) {
+      const fill = hex(tokenIn(EXPLICIT_LIGHT, role));
+      expect(contrast(rgbaOver(lightInk, fill), fill)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});

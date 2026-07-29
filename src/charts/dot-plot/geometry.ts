@@ -4,7 +4,12 @@
 // (magnitude read) — the prop flips the honesty regime. Coords 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { proseCharsThatFit, textGutterProse } from "../../core/labels.js";
+import {
+  ROW_LABEL_WIDTH_SHARE_WIDE,
+  rowLabelChars,
+  rowLabelFont,
+  textGutterProse,
+} from "../../core/labels.js";
 
 interface DotRow {
   /** Row center on the category axis. */
@@ -34,12 +39,12 @@ export interface DotPlotGeometry {
 /** Row-pitch-aware type size — denser than `labelFont` so micro DotPlots keep
  *  category labels, taller plates still climb to the shared 11-unit ceiling. */
 export function dotPlotFontSize(height: number, rows: number): number {
-  const pitch = rows > 0 ? height / rows : height;
-  // Progressive floor: 7 when rows are roomy (≥9), else 6 — never lower. Below
-  // 6 units the type is illegible; dense plates CULL via showCategories
-  // instead (shrinking the type is not an escape hatch — see labelFitsBand).
-  const floor = pitch >= 9 ? 7 : 6;
-  return Math.min(11, Math.max(floor, Math.round(pitch * 0.48)));
+  // One shared policy with every other row-label chart (core/labels): sized off
+  // the row PITCH, and floored at the library's own 7 rather than a private 6 —
+  // a 6-unit label read visibly smaller than the rest of the catalog, which is
+  // the complaint this pass started from. Dense plates still CULL via
+  // showCategories; shrinking the type is not an escape hatch.
+  return rowLabelFont(rows > 0 ? height / rows : height);
 }
 
 /** How many category characters the left gutter can afford at this width.
@@ -48,8 +53,9 @@ export function dotPlotFontSize(height: number, rows: number): number {
  *  hands the reservation over half the plot at mid widths. Floor of 6 keeps
  *  the micro default usable; cap of 14 stops labels from eating a figure. */
 export function dotPlotLabelChars(width: number, fontSize: number, longest: number): number {
-  const budget = Math.max(6, proseCharsThatFit(width * 0.32, fontSize, 3));
-  return Math.min(14, budget, Math.max(1, longest));
+  // Same width share and cap as every other row-label chart, and the same rule
+  // that a truncation too short to identify a row is dropped, not painted.
+  return rowLabelChars(width * ROW_LABEL_WIDTH_SHARE_WIDE, fontSize, longest, 3);
 }
 
 export function dotPlotGeometry(opts: {
@@ -112,7 +118,17 @@ export function dotPlotGeometry(opts: {
 }
 
 /** Truncate a category label by CHARACTER COUNT — text is never measured, so
- * the static path stays server-renderable. */
+ * the static path stays server-renderable.
+ *
+ * The budget stays in UTF-16 units rather than code points, because the gutter
+ * upstream was reserved from `label.length` and an astral glyph is roughly as
+ * wide as the two units it costs — counting code points here would let an emoji
+ * label paint past the gutter it was given. The one thing a raw `slice` gets
+ * wrong is the cut landing BETWEEN a surrogate pair: `"a🎉🎉🎉🎉"` truncated at 6
+ * shipped `a🎉🎉\uD83C…`, a literal replacement glyph. Back off a unit instead. */
 export function truncateLabel(label: string, max = 6): string {
-  return label.length <= max ? label : `${label.slice(0, max)}…`;
+  if (label.length <= max) return label;
+  const last = label.charCodeAt(max - 1);
+  const cut = last >= 0xd800 && last <= 0xdbff ? max - 1 : max;
+  return `${label.slice(0, cut)}…`;
 }

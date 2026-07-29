@@ -3,17 +3,32 @@
 // lie). A fractional last unit is a circular-segment / partial-rect PATH — not
 // a <clipPath>, which would need a generated id (canon: static components
 // never generate ids). Coords 2-dp.
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 
 /** Drawn-unit ceiling. One unit is one DOM node, and `total` is unbounded
  *  caller data — see the saturation note in `pictogramGeometry`. */
 const PICTOGRAM_MAX_UNITS = 200;
+
+/** The documented box. Exported so this geometry, the static entry and the
+ *  client entry all resolve a hostile `width`/`height` to the SAME fallback —
+ *  `<Chart>` clamps the frame on its own, and a second, different fallback here
+ *  would frame the row at one scale and lay it out at another. */
+export const DEFAULT_WIDTH = 60;
+export const DEFAULT_HEIGHT = 12;
 
 export interface PictogramUnit {
   cx: number;
   cy: number;
   /** Unit radius (dot) or half-edge (square). */
   r: number;
+  /**
+   * Radius / half-edge of the HOLLOW unit's ring, inset by a hairline so the
+   * stroke sits inside the unit rather than straddling its edge. Clamped: on a
+   * sub-pixel unit the inset is wider than the unit, and `r - 0.3` went negative
+   * — an SVG error, so the empty units silently dropped while the filled ones
+   * still painted, and the row read as full.
+   */
+  ringR: number;
   /** 0 = empty, 1 = filled, else the true fraction. */
   fill: number;
   /** Present when 0 < fill < 1 — the partial-fill path (left-anchored). */
@@ -60,7 +75,13 @@ export function pictogramGeometry(opts: {
   /** "clip" keeps the true partial unit; "round" snaps to whole units. */
   fractional: "clip" | "round";
 }): PictogramGeometry {
-  const { width, height, shape, fractional } = opts;
+  const { shape, fractional } = opts;
+  // A non-finite box is fatal in a way a bad mark is not: `<Chart>` clamps the
+  // viewBox but this ran on the raw prop, so `width={NaN}` emitted a frame of 1
+  // full of `cx="NaN"` units, and `width={Infinity}` emitted `cx="Infinity"`.
+  // Same function as the wrapper's, so the frame and the layout stay in step.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   // `total` is caller data with no upper bound in the type, and one unit is one
   // DOM node: an accidental `total={3e6}` (a raw count where a share was meant)
   // exhausts memory, and `1e21` throws `Invalid array length`. Saturate like
@@ -79,9 +100,17 @@ export function pictogramGeometry(opts: {
   const raw = Number.isFinite(opts.value) ? opts.value : 0;
   const value = fractional === "round" ? Math.round(raw) : raw;
 
-  const gap = shape === "square" ? 1 : 1.5;
+  // A FIXED inter-unit gap outgrows the row once the units get dense: at the
+  // default 60-unit width the gaps alone swallowed the box at total ≥ 41, so
+  // `size` went NEGATIVE and every unit rendered with r < 0 — an SVG error, i.e.
+  // a blank chart that still announced a count, with unit centres outside the
+  // viewBox. Cap the gap at half the per-unit pitch: exactly a no-op for every
+  // countable row (≤ 20 units in the documented box), and a denser or narrower
+  // one degrades to units that touch rather than to nothing at all.
+  const gap = Math.min(shape === "square" ? 1 : 1.5, width / total / 2);
   const size = Math.min(height, (width - gap * (total - 1)) / total);
   const r = round2((size / 2) * (shape === "dot" ? 0.92 : 0.9)); // breathing room
+  const ringR = round2(Math.max(0, r - 0.3));
   const step = (width - size) / Math.max(1, total - 1);
   const cy = round2(height / 2);
 
@@ -89,7 +118,7 @@ export function pictogramGeometry(opts: {
     const cx = round2(size / 2 + (total === 1 ? 0 : i * step));
     const f = Math.min(1, Math.max(0, value - i));
     const fill = round2(f);
-    const unit: PictogramUnit = { cx, cy, r, fill, index: i };
+    const unit: PictogramUnit = { cx, cy, r, ringR, fill, index: i };
     if (fill > 0 && fill < 1) {
       unit.partial =
         shape === "dot" ? circleSegment(cx, cy, r, fill) : squareSegment(cx, cy, r, fill);

@@ -16,6 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
+import { chartSide } from "../../core/types.js";
 import { rugGeometry } from "./geometry.js";
 import { RugStrip as StaticRugStrip, rugSummary, type RugStripProps } from "./index.js";
 
@@ -63,8 +64,11 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const width = props.width ?? (orientation === "horizontal" ? 60 : 10);
-  const height = props.height ?? (orientation === "horizontal" ? 10 : 60);
+  // Same clamp as the static entry: the picker's hit box and readout are laid
+  // out against this box, so a non-finite one has to be resolved here too or
+  // the two entries disagree about where a tick is (see `chartSide`).
+  const width = chartSide(props.width ?? (orientation === "horizontal" ? 60 : 10));
+  const height = chartSide(props.height ?? (orientation === "horizontal" ? 10 : 60));
   const length = orientation === "horizontal" ? width : height;
 
   const hostRef = useRef<HTMLSpanElement>(null);

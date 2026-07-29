@@ -13,7 +13,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { treeRingsGeometry } from "./geometry.js";
+import { treeRingsGeometry, treeRingsSize, TREE_PAD } from "./geometry.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import {
   TreeRings as StaticTreeRings,
@@ -38,7 +38,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   const {
     data,
     total,
-    size = 24,
+    size,
     label = "none",
     periodWord = "period",
     unit = "periods",
@@ -61,13 +61,23 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "grow", animate);
 
+  // Same resolver the static uses, so a hostile `size` cannot put the pointer
+  // basis and the painted disc on different scales.
+  const box = treeRingsSize(size);
   const geo = useMemo(
-    () => treeRingsGeometry({ values: data, size, pad: 1, total }),
-    [data, size, total],
+    () => treeRingsGeometry({ values: data, size: box, pad: TREE_PAD, total }),
+    [data, box, total],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // `periodWord[0]` is a UTF-16 code unit, not a character: an astral noun
+  // ("🌲 ring") capitalised to half a surrogate pair, and `periodWord=""` threw
+  // on mount (`undefined.toUpperCase()`) — a caller-supplied string crashing
+  // the whole chart.
   const periodLabel = useCallback(
-    (i: number) => `${periodWord[0]!.toUpperCase()}${periodWord.slice(1)} ${i + 1}`,
+    (i: number) => {
+      const head = [...periodWord][0] ?? "";
+      return `${head.toUpperCase()}${periodWord.slice(head.length)} ${i + 1}`.trim();
+    },
     [periodWord],
   );
 
@@ -123,8 +133,8 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   // basis has to follow it, or every angle is measured in a squeezed x-space.
   const { active, selected, bind } = useActivePicker({
     count: data.length,
-    width: treeRingsWidth({ data, size, label, fontSize: props.fontSize, fmt }),
-    height: size,
+    width: treeRingsWidth({ data, size: box, label, fontSize: props.fontSize, fmt }),
+    height: box,
     locate,
     datum,
     step,
@@ -157,10 +167,13 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         // Inline style, not the presentation attribute: the `data-mc-w` pin marker
         // below matches a stylesheet stroke-width rule, and any CSS declaration
         // beats a presentation attribute — inline style is what actually wins.
+        // No `non-scaling-stroke` either, for the same reason: this width is
+        // viewBox geometry, so pinning it to screen pixels made the halo stop
+        // covering its ring the moment the chart was rendered at anything other
+        // than 1:1. The width roles the sibling dials use are not geometry.
         style={{ strokeWidth: Math.max(1, rg.rOuter - rg.rInner) }}
         strokeOpacity={pinned ? 0.55 : 0.3}
         data-mc-w={pinned ? "tick" : undefined}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };
@@ -177,7 +190,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         {...rest}
         data={data}
         total={total}
-        size={size}
+        size={box}
         label={label}
         periodWord={periodWord}
         unit={unit}

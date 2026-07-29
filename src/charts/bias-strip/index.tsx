@@ -31,11 +31,15 @@ export function biasStripSummary(
 
 export interface BiasStripProps {
   data: readonly BiasPair[];
-  /** k in bias ± k·σ (default 1.96 ≈ 95% limits of agreement). */
+  /**
+   * k in bias ± k·σ (default 1.96 ≈ 95% limits of agreement). Non-finite or
+   * negative falls back to the default; limits that overflow to ±Infinity drop
+   * the band the way fewer than 5 pairs does.
+   */
   limits?: number | undefined;
   /** Seat-gated bias label. `"none"` hides it. */
   label?: "bias" | "none" | undefined;
-  /** Base dot radius in viewBox units, clamped to [1, 3]. */
+  /** Base dot radius in viewBox units, clamped to [1, 3]; non-finite → 1.5. */
   r?: number | undefined;
   width?: number | undefined;
   height?: number | undefined;

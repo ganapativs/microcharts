@@ -6,7 +6,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
-import { progressGeometry } from "./geometry.js";
+import { progressGeometry, resolveSegments } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Resolved Progress model — shared by the static and interactive entries. */
@@ -38,7 +38,15 @@ export function progressModel(props: ProgressProps): ProgressModel {
   const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const valFmt = makeFormatter(format, locale);
 
-  const done = usable && segments ? Math.floor(fraction * Math.floor(segments) + 1e-9) : 0;
+  // The drawn step count, resolved once — `segments` was read raw here and again
+  // in the geometry, so the two could describe different tracks.
+  const steps = resolveSegments(segments);
+  // Steps done rides the bar, which clamps: an unclamped count announced
+  // "10 of 5 steps." over five full slots, and "-3 of 5 steps." over none.
+  const done =
+    usable && steps !== null
+      ? Math.min(steps, Math.max(0, Math.floor(fraction * steps + 1e-9)))
+      : 0;
   const display = !usable
     ? label === "none"
       ? undefined
@@ -48,13 +56,13 @@ export function progressModel(props: ProgressProps): ProgressModel {
       : label === "value"
         ? valFmt(value)
         : label === "fraction"
-          ? `${segments ? done : valFmt(value)}/${segments ? Math.floor(segments) : valFmt(max)}`
+          ? `${steps !== null ? done : valFmt(value)}/${steps ?? valFmt(max)}`
           : undefined;
 
   const summary = !usable
     ? strings.noData
-    : segments && segments >= 2
-      ? strings.stepsDone(done, Math.floor(segments))
+    : steps !== null
+      ? strings.stepsDone(done, steps)
       : positive === "down"
         ? strings.remaining(pctFmt(Math.max(0, 1 - fraction)))
         : strings.progress(pctFmt(fraction));
@@ -142,9 +150,14 @@ export function Progress(props: ProgressProps): ReactNode {
       style={rootStyle}
     >
       {geo.segments ? (
-        geo.segments.map((s) => (
-          <g key={s.x}>
+        // Slots and their fills are two flat passes, not a <g> per slot: the
+        // group carried no transform and no meaning, and at the 200-slot
+        // ceiling it was 200 nodes of pure wrapper. Slots never overlap, so
+        // painting every track before every fill is the same picture.
+        <>
+          {geo.segments.map((s) => (
             <rect
+              key={s.x}
               x={s.x}
               y={geo.track.y}
               width={s.w}
@@ -152,20 +165,23 @@ export function Progress(props: ProgressProps): ReactNode {
               shapeRendering="crispEdges"
               data-mc-ink="band"
             />
-            {s.fill > 0 ? (
+          ))}
+          {geo.segments.map((s) =>
+            s.fillW > 0 ? (
               <rect
+                key={s.x}
                 x={s.x}
                 y={geo.track.y}
-                width={Math.round(s.w * s.fill * 100) / 100}
+                width={s.fillW}
                 height={geo.track.h}
                 shapeRendering="crispEdges"
                 data-mc-ink="accent"
                 className="mc-progress-fill"
                 style={fillStyle}
               />
-            ) : null}
-          </g>
-        ))
+            ) : null,
+          )}
+        </>
       ) : (
         <>
           <rect

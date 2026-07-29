@@ -6,7 +6,7 @@
 // the crosshair + in/out/net ticks + pinned net ring are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { chartSide } from "../../core/types.js";
 import {
   named,
   fillFor,
@@ -19,7 +19,13 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js";
 import { netFlowGeometry } from "./geometry.js";
-import { NetFlow as StaticNetFlow, netFlowSummary, signedNet, type NetFlowProps } from "./index.js";
+import {
+  NetFlow as StaticNetFlow,
+  netFlowLabel,
+  netFlowSummary,
+  signedNet,
+  type NetFlowProps,
+} from "./index.js";
 
 export interface InteractiveNetFlowProps extends NetFlowProps, PickerProps {
   strings?: NetFlowStrings;
@@ -35,8 +41,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
   const {
     data,
     mode,
-    height = 20,
-    width = 80,
     format,
     locale,
     strings = EN_NET_FLOW,
@@ -53,6 +57,11 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     ...rest
   } = props;
 
+  // Same clamp the static applies, so the pointer map and the overlay coords
+  // are measured against the box that actually got painted (see `chartSide`).
+  const width = chartSide(props.width ?? 80);
+  const height = chartSide(props.height ?? 20);
+
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);
 
@@ -62,17 +71,18 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
   // crosshair drifts from the cursor.
   const geo = useMemo(() => {
     const base = netFlowGeometry({ width, height, data, mode, domain: props.domain });
-    const showLabel =
-      (props.label ?? "last") === "last" && base != null && !base.degenerate && base.last != null;
-    const gutterCh = showLabel ? signedNet(base!.last!.net, fmt).length : 0;
+    // `netFlowLabel` is the static's own drop rule — asking it (rather than
+    // re-deriving from `label`) is what keeps the reserved gutter and the
+    // painted viewBox the same width in a box too short to seat the text.
+    const lab = base ? netFlowLabel(base, height, props.label ?? "last", fmt) : null;
     return netFlowGeometry({
       width,
       height,
       data,
       mode,
       domain: props.domain,
-      gutterCh,
-      fontSize: labelFont(height),
+      gutterCh: lab ? lab.text.length : 0,
+      fontSize: lab ? lab.font : 0,
     });
   }, [width, height, data, mode, props.domain, props.label, fmt]);
 

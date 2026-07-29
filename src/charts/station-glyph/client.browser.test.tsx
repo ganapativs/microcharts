@@ -69,6 +69,22 @@ describe("interactive <StationGlyph>", () => {
     expect(wrap.querySelectorAll(PIN).length).toBe(1);
   });
 
+  it("a non-finite wind direction is not a stop — the rove skips to sky", async () => {
+    // It announced "wind undefined 15" and drew a NaN shaft; an unpaintable
+    // field is an absent field, so it leaves the unit order entirely.
+    const screen = await render(
+      <StationGlyph {...OBS} wind={{ direction: Number.NaN, magnitude: 15 }} size={40} />,
+    );
+    const wrap = screen.container.querySelector(".mc-station-live") as HTMLElement;
+    expect(wrap.getAttribute("aria-label")).not.toContain("undefined");
+    wrap.focus();
+    const live = wrap.querySelector('[aria-live="polite"]')!;
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.poll(() => live.textContent).toBe("KSFO");
+    await userEvent.keyboard("{ArrowRight}");
+    await expect.poll(() => live.textContent).toBe("sky broken");
+  });
+
   it("forwards consumer children into the composed static glyph", async () => {
     const screen = await render(
       <StationGlyph {...OBS} size={40}>

@@ -29,8 +29,14 @@ export interface DeltaModel {
 export function deltaModel(props: DeltaProps): DeltaModel {
   const { value, from, positive = "up", format, locale, strings = EN_SCALAR } = props;
   const delta = from === undefined ? value : value - from;
-  const finite = Number.isFinite(delta);
   const shown = from === undefined ? value : from !== 0 ? delta / Math.abs(from) : delta;
+  // Finiteness is judged on the number actually SHOWN, not on the raw delta: a
+  // finite delta over a tiny base overflows the ratio (`value={1} from={1e-320}`,
+  // `value={1e308} from={0.5}`) and it was the ratio that got painted and
+  // announced — "+∞%" / "Up ∞%.". Same em-dash path as a NaN input.
+  const finite = Number.isFinite(shown);
+  // Direction still comes from the delta, so a magnitude that rounds to 0%
+  // (or underflows) keeps the arrow it earned.
   const sign: -1 | 0 | 1 = !finite ? 0 : delta > 0 ? 1 : delta < 0 ? -1 : 0;
 
   const fmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
@@ -39,7 +45,10 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   // "NaN%" — documented degenerate behavior.
   const magnitude = finite ? fmt(Math.abs(shown)) : "—";
   const display = finite ? `${sign > 0 ? "+" : sign < 0 ? "−" : ""}${magnitude}` : "—";
-  const goodDir = positive === "up" ? 1 : -1;
+  // Only the literal "down" flips valence. Testing for "up" instead handed every
+  // other value (an untyped `positive` off a JSON config) the INVERSE of the
+  // documented default — same fallback as TrendArrow.
+  const goodDir = positive === "down" ? -1 : 1;
 
   return {
     display,

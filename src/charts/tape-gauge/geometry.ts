@@ -5,7 +5,7 @@
 // center pointer + readout, and a rate chevron (a SEPARATE channel from level).
 // Ticks/labels are generated only within the window, so containment is by
 // construction — no clipPath. 2-dp.
-import { isFiniteValue, round2 } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import type { Orientation } from "../../core/types.js";
 
 export type { Orientation } from "../../core/types.js";
@@ -35,6 +35,11 @@ export interface TickLabel {
 
 /** Thin coloured band beside the pointer (viewBox units). */
 const ZONE = 2.4;
+
+/** Default box — the fallback both entries and this module clamp a bad `width`
+ *  / `height` prop back to (see `chartSide`). */
+export const DEFAULT_WIDTH = 46;
+export const DEFAULT_HEIGHT = 60;
 
 /** Empty zone list. Shared by BOTH entries so their defaults are one array:
  *  a literal `[]` default is a fresh array per render, which defeats the
@@ -86,11 +91,21 @@ export function tapeGaugeGeometry(opts: {
   window: [number, number];
   containingZone: Zone | null;
 } {
-  const { value, span, zones, tick, width, height, orientation } = opts;
+  const { value, span, zones, tick, orientation } = opts;
+  // `Chart` clamps the frame; the marks are laid out against the same resolved
+  // box, or a NaN `width` paints NaN coordinates inside a valid viewBox.
+  const width = chartSide(opts.width, DEFAULT_WIDTH);
+  const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const vertical = orientation !== "horizontal";
   const pad = 1;
   const lo = value - span / 2;
   const hi = value + span / 2;
+  // One gate for every mark placed by `posOf`. Each position divides by `span`,
+  // so a span of 0 or ±Infinity (and a non-finite `value`) makes the whole
+  // window unrepresentable. The tick loop already refused to run; the zone
+  // stripe did not, and shipped y="NaN" height="NaN" inside an otherwise
+  // ordinary-looking gauge.
+  const drawable = span > 0 && Number.isFinite(lo) && Number.isFinite(hi);
 
   // scale column: vertical → left of the pointer; horizontal → above it. Kept
   // narrow so the readout gutter beside it can seat a legible value.
@@ -112,15 +127,16 @@ export function tapeGaugeGeometry(opts: {
   // value, which `zones`-derived auto-span can also produce). Counting also
   // caps the work at a tick density anyone can read.
   const ticks: number[] = [];
-  if (Number.isFinite(lo) && Number.isFinite(hi) && Number.isFinite(step) && step > 0) {
+  if (drawable && Number.isFinite(step) && step > 0) {
     const first = Math.ceil(lo / step) * step;
     const n = Math.min(MAX_TICKS, Math.floor((hi - first) / step) + 1);
     for (let i = 0; i < n; i++) ticks.push(round2(first + i * step));
   }
 
-  // zone stripe: a thin band hugging the pointer, clipped to the window
+  // zone stripe: a thin band hugging the pointer, clipped to the window — and
+  // skipped outright when there is no drawable window to clip it to
   const zoneRects: TapeRect[] = [];
-  for (const z of zones) {
+  for (const z of drawable ? zones : NO_ZONES) {
     // A zone with a missing/non-finite bound has no extent on the scale. It has
     // to be rejected HERE: `b <= a` below is false for NaN, so an unguarded
     // zone sails past that check and emits y="NaN" height="NaN".

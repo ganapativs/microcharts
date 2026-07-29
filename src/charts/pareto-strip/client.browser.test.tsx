@@ -94,6 +94,19 @@ describe("interactive <ParetoStrip>", () => {
     expect(wrap.querySelector('rect[data-mc-w="support"]')).toBeNull();
   });
 
+  it("a non-finite box still roves: the picker uses the resolved one", async () => {
+    // The static clamps `height={NaN}` to the documented box; the client sizes
+    // the pointer map itself, so it has to resolve to the same one or the hit
+    // box is measured against a frame that no longer exists.
+    const screen = await render(<ParetoStrip data={CAUSES} height={NaN} title="Causes" />);
+    const wrap = screen.container.querySelector(".mc-pareto-strip-live") as HTMLElement;
+    expect(screen.container.querySelector("svg")!.outerHTML).not.toMatch(/NaN/);
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).toMatch(/^Timeouts: /);
+  });
+
   it("controlled selectedIndex pins the outline without focus", async () => {
     const screen = await render(<ParetoStrip data={CAUSES} width={200} selectedIndex={1} />);
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();

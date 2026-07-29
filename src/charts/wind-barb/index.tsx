@@ -8,9 +8,10 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutter } from "../../core/labels.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
-import { windBarbGeometry } from "./geometry.js";
+import { DEFAULT_SIZE, isCalm, resolveStep, windBarbGeometry } from "./geometry.js";
 
 export interface WindBarbProps {
   /** Degrees, from-direction per met convention (0 = up/north, clockwise). */
@@ -43,8 +44,8 @@ export function windBarbSummary(
   strings: WindBarbStrings,
   fmt: (n: number) => string,
 ): string {
+  if (isCalm(direction, magnitude, step)) return strings.windBarbCalm;
   const m = Math.abs(magnitude);
-  if (!Number.isFinite(m) || m < step / 4) return strings.windBarbCalm;
   const dir = magnitude < 0 ? direction + 180 : direction;
   // Round first, then normalize — else 359.6° rounds up to a bogus "360".
   const deg = ((Math.round(dir) % 360) + 360) % 360;
@@ -55,10 +56,10 @@ export function WindBarb(props: WindBarbProps): ReactNode {
   const {
     direction,
     magnitude,
-    step = 10,
+    step: stepProp,
     label = "none",
     mode = "barb",
-    size = 32,
+    size: sizeProp,
     format,
     locale,
     strings = EN_WIND_BARB,
@@ -74,11 +75,21 @@ export function WindBarb(props: WindBarbProps): ReactNode {
     devWarn("<WindBarb> negative magnitude — using |magnitude| with direction flipped 180°.");
   const dir = magnitude < 0 ? direction + 180 : direction;
   const mag = Math.abs(magnitude);
+  // Resolved once, and the summary resolves the same way, so the glyph and its
+  // accessible name can never be drawn against two different scales.
+  const step = resolveStep(stepProp);
+  const size = chartSide(sizeProp ?? DEFAULT_SIZE, DEFAULT_SIZE);
 
   const fmt = makeFormatter(format, locale);
   const fontSize = labelFont(size, 0.26);
-  const labelText = label === "value" || mode === "arrow" ? fmt(mag) : undefined;
-  const gutter = labelText ? labelText.length * fontSize * 0.62 + 3 : 0;
+  // A non-finite direction or magnitude has no reading to print: the glyph is
+  // the calm circle and the name says "Calm.", so the label printed "∞" — or a
+  // real "32" beside a circle announced as calm. A finite magnitude UNDER the
+  // quantum still has a direction and keeps its label; that pairing is the point
+  // of labelling a quantized glyph.
+  const readable = isFiniteValue(mag) && Number.isFinite(direction);
+  const labelText = (label === "value" || mode === "arrow") && readable ? fmt(mag) : undefined;
+  const gutter = labelText ? textGutter(labelText.length, fontSize, 3) : 0;
   const totalW = size + gutter;
 
   const geo = windBarbGeometry({ direction: dir, magnitude: mag, step, width: size, height: size });
@@ -158,9 +169,12 @@ export function WindBarb(props: WindBarbProps): ReactNode {
                   style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
                 />
               ) : null}
-              {geo.pennants.map((p, i) => (
-                <path key={i} d={p} data-mc-ink="point" />
-              ))}
+              {/* One path, not one per pennant: the triangles carry identical
+                  paint and share a winding, so nothing distinguishes them as
+                  nodes — and four of them blew the chart's own ≤ 3-node budget. */}
+              {geo.pennants.length > 0 ? (
+                <path d={geo.pennants.join("")} data-mc-ink="point" />
+              ) : null}
             </>
           )}
         </>
@@ -180,8 +194,4 @@ export function WindBarb(props: WindBarbProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

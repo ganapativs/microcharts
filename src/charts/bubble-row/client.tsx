@@ -5,7 +5,6 @@
 // low-precision area channel can't carry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { isFiniteValue } from "../../core/types.js";
 import {
   named,
   fillFor,
@@ -16,8 +15,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { labelFont } from "../../core/labels.js";
-import { bubbleRowGeometry } from "./geometry.js";
+import { PAD, bubbleLayout, bubbleRowGeometry, isBubbleValue } from "./geometry.js";
 import { EN_BUBBLE, type BubbleStrings } from "../../core/strings-bubble.js";
 import { BubbleRow as StaticBubbleRow, bubbleRowSummary, type BubbleRowProps } from "./index.js";
 
@@ -36,8 +34,6 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     data,
     align = "center",
     label = "value",
-    height = 30,
-    gap = 2,
     format,
     locale,
     title,
@@ -53,7 +49,15 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.34);
+  // Same resolver as the static entry, so a hostile or omitted scalar can't put
+  // the two geometries on different boxes and float the overlay ring.
+  const {
+    height,
+    gap,
+    fontSize,
+    band: labelBand,
+    charW,
+  } = bubbleLayout({ height: props.height, gap: props.gap, fontSize: props.fontSize, label });
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const hostRef = useRef<HTMLSpanElement>(null);
@@ -62,18 +66,17 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   // sequences the pop by real x position, left to right along the row.
   useEntrance(hostRef, "trail", animate, { selector: "circle", order: "x" });
 
-  const labelBand = label === "none" ? 0 : fontSize + 2;
   // Same numeral-width spread as the static, so the overlay ring aligns exactly.
   const labelWidths = useMemo(
     () =>
-      label === "none"
+      charW === 0
         ? undefined
         : data.map((d) => {
-            if (!isFiniteValue(d.value)) return 0;
+            if (!isBubbleValue(d.value)) return 0;
             const t = label === "both" ? `${d.label} ${fmt(d.value)}` : fmt(d.value);
-            return t.length * 0.72 * fontSize + fontSize;
+            return t.length * charW * fontSize + fontSize;
           }),
-    [data, label, fmt, fontSize],
+    [data, label, fmt, fontSize, charW],
   );
   const geo = useMemo(
     () =>
@@ -82,7 +85,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         height,
         gap,
         align,
-        pad: 1,
+        pad: PAD,
         labelBand,
         labelWidths,
       }),
@@ -105,18 +108,20 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     },
     [geo],
   );
-  // `value` = the bubble's magnitude (the encoded area), `null` when missing.
+  // `value` = the bubble's magnitude (the encoded area), `null` when the row
+  // couldn't encode one — `?? null` let a NaN through into a field documented
+  // as "the primary encoded number, or null".
   const datum = useCallback(
     (i: number) => {
       const d = data[i];
       const text = d
-        ? isFiniteValue(d.value)
+        ? isBubbleValue(d.value)
           ? strings.bubbleAt(d.label, fmt(d.value))
           : strings.bubbleEmpty(d.label)
         : "";
       return {
         index: i,
-        value: d?.value ?? null,
+        value: d && isBubbleValue(d.value) ? d.value : null,
         label: d?.label,
         formatted: text ? text.replace(/[.。]$/, "") : undefined,
       };
@@ -165,7 +170,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
   const shownDatum = shown !== null ? data[shown] : undefined;
   const announced =
     b && shownDatum
-      ? isFiniteValue(shownDatum.value)
+      ? isBubbleValue(shownDatum.value)
         ? strings.bubbleAt(shownDatum.label, fmt(shownDatum.value))
         : strings.bubbleEmpty(shownDatum.label)
       : "";

@@ -72,9 +72,45 @@ describe("polarClockGeometry — cyclic radial bars", () => {
   });
 
   it("the guide centre is the painted centre (client hit-testing shares it)", () => {
+    // The box is the integer the viewBox carries, so a fractional `size` centres
+    // on that box — not on the raw prop, which left the dial off-centre by up to
+    // half a unit from the frame the pointer is mapped over.
     const geo = g([1, 2, 3], { size: 25.5 });
-    expect(geo.guide.cx).toBe(12.75);
-    expect(geo.guide.cy).toBe(12.75);
+    expect(geo.size).toBe(26);
+    expect(geo.guide.cx).toBe(13);
+    expect(geo.guide.cy).toBe(13);
+  });
+
+  it("an unusable `size` falls back to the documented default, not to NaN marks", () => {
+    // Every radius went NaN, so annulusSector returned "" — a chart that painted
+    // nothing inside a 1×1 viewBox while announcing a full summary.
+    for (const size of [Number.NaN, Infinity, -Infinity, -40, 0]) {
+      const geo = g([10, 40, 20], { size });
+      expect(geo.size).toBe(24);
+      expect(geo.guide.cx).toBe(12);
+      expect(geo.segmentsPath).not.toBe("");
+      expect(geo.segmentsPath + geo.cardinalPath).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
+  it("the guide radius is never negative (an invalid SVG attribute)", () => {
+    for (const size of [1, 2, 3]) {
+      expect(g([10, 40, 20], { size }).guide.r).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("cardinal ticks stay inside the box at every size", () => {
+    // They ran to a fixed rMax + 1.4 against a 1-unit pad, so all four ended 0.4
+    // units past the viewBox — and `.mc-root` is overflow: visible.
+    for (const size of [1, 2, 8, 12, 24, 40, 80, 200]) {
+      const geo = g([10, 40, 20], { size });
+      const nums = geo.cardinalPath.match(/-?\d+\.?\d*/g)!.map(Number);
+      expect(nums.length).toBe(16); // four M…L… ticks, x/y each
+      for (const v of nums) {
+        expect(v).toBeGreaterThanOrEqual(0);
+        expect(v).toBeLessThanOrEqual(geo.size);
+      }
+    }
   });
 
   it("all-equal → flat", () => {

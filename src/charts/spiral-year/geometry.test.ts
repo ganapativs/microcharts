@@ -76,16 +76,68 @@ describe("spiralYearGeometry — calendar spiral", () => {
     expect(g([null, null]).marks.length).toBe(0);
   });
 
-  test.prop([fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 120 })])(
-    "every mark stays inside the box",
-    (values) => {
-      const geo = g(values, { cadence: "week" });
-      for (const m of geo.marks) {
-        expect(m.cx - m.r).toBeGreaterThanOrEqual(-0.6);
-        expect(m.cx + m.r).toBeLessThanOrEqual(geo.size + 0.6);
-        expect(m.cy - m.r).toBeGreaterThanOrEqual(-0.6);
-        expect(m.cy + m.r).toBeLessThanOrEqual(geo.size + 0.6);
-      }
-    },
-  );
+  // `.mc-root` is overflow: visible, so a mark past the viewBox is a spill, not
+  // a clip — asserted at every size because the mark radius tracks `size` while
+  // the pad does not, and the two only collided above ~36.
+  test.prop([
+    fc.array(fc.integer({ min: 0, max: 100 }), { minLength: 1, maxLength: 120 }),
+    fc.integer({ min: 1, max: 200 }),
+  ])("every mark stays inside the box, at any size", (values, size) => {
+    const geo = g(values, { cadence: "week", size });
+    for (const m of geo.marks) {
+      expect(m.cx - m.r).toBeGreaterThanOrEqual(0);
+      expect(m.cx + m.r).toBeLessThanOrEqual(geo.size);
+      expect(m.cy - m.r).toBeGreaterThanOrEqual(0);
+      expect(m.cy + m.r).toBeLessThanOrEqual(geo.size);
+    }
+  });
+});
+
+// Config a host computes rather than types by hand. Each case below either
+// painted NaN coordinates under a confident summary, spilled outside the box,
+// or threw and took the render down.
+describe("spiralYearGeometry — hostile config", () => {
+  const YEAR = Array.from({ length: 52 }, (_, i) => i);
+
+  it.each([NaN, Infinity, -Infinity, 0, -40])("size=%p falls back to the 24 default", (size) => {
+    const geo = g(YEAR, { size });
+    expect(geo.size).toBe(24);
+    for (const m of geo.marks) {
+      expect(Number.isFinite(m.cx) && Number.isFinite(m.cy) && Number.isFinite(m.r)).toBe(true);
+    }
+    expect(geo.stepPaths.join("") + geo.monthTicksPath).not.toMatch(/NaN|Infinity/);
+  });
+
+  it.each([1, 2, 3, 5, 12, 64])("size=%p keeps every mark and tick inside the box", (size) => {
+    const geo = g(YEAR, { size });
+    for (const m of geo.marks) {
+      expect(m.cx - m.r).toBeGreaterThanOrEqual(0);
+      expect(m.cx + m.r).toBeLessThanOrEqual(geo.size);
+      expect(m.cy - m.r).toBeGreaterThanOrEqual(0);
+      expect(m.cy + m.r).toBeLessThanOrEqual(geo.size);
+    }
+    for (const c of geo.monthTicksPath.match(/-?\d+(\.\d+)?/g) ?? []) {
+      expect(Number(c)).toBeGreaterThanOrEqual(0);
+      expect(Number(c)).toBeLessThanOrEqual(geo.size);
+    }
+  });
+
+  // `Array.from({ length })` throws RangeError on Infinity and allocates a
+  // million buckets on 1e6; NaN / 0 / -1 made zero, so nothing painted.
+  it.each([NaN, 0, -1, 2.5, 1e6, Infinity])("steps=%p resolves to the 5 default", (steps) => {
+    const geo = g(YEAR, { steps: steps as 5 });
+    expect(geo.stepPaths.length).toBe(5);
+    expect(geo.marks.every((m) => m.step >= 0 && m.step <= 4)).toBe(true);
+    // Every mark reaches a bucket — a lost mark is a value the chart drops.
+    expect(geo.stepPaths.join("")).not.toMatch(/undefined/);
+  });
+
+  it("steps=3 is still honored", () => {
+    expect(g(YEAR, { steps: 3 }).stepPaths.length).toBe(3);
+  });
+
+  it("an unknown mark kind reads back as the dot default", () => {
+    const geo = g(YEAR, { mark: "blob" as unknown as "dot" });
+    expect(geo.mark).toBe("dot");
+  });
 });

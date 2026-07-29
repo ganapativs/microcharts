@@ -23,6 +23,32 @@ describe("interactive <HeatCell>", () => {
     expect(document.querySelector(".mc-spark-readout")).toBeNull();
   });
 
+  // The static drops a numeral wider than the 12-unit cell. Suppressing the chip
+  // on `label="value"` alone left the announcement with nothing painted at all.
+  it('label="value" keeps the chip when the numeral does not fit', async () => {
+    const screen = await render(
+      <HeatCell value={4_200_000} domain={[0, 1e7]} label="value" format={(n) => `${n}`} />,
+    );
+    const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
+    expect(screen.container.querySelector("text")).toBeNull();
+    wrap.focus();
+    await expect
+      .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("4200000 — level 3 of 5");
+  });
+
+  it("chip names the resolved step scale, not a hostile `steps`", async () => {
+    const screen = await render(
+      <HeatCell value={42} domain={[0, 100]} steps={Number.NaN} title="Load" />,
+    );
+    const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;
+    expect(wrap.getAttribute("aria-label")).toBe("Load. 42 — level 3 of 5.");
+    wrap.focus();
+    await expect
+      .poll(() => document.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("42 — level 3 of 5");
+  });
+
   it("blur hides the readout", async () => {
     const screen = await render(<HeatCell value={42} domain={[0, 100]} />);
     const wrap = screen.container.querySelector(".mc-heat-cell-live") as HTMLElement;

@@ -92,6 +92,22 @@ describe("<Sparkline> static structure", () => {
     expect(smooth).toContain("C");
   });
 
+  it("curve='smooth' + fill never paints below the zero baseline", () => {
+    // A V-shaped series is the case that used to break: with uniform
+    // Catmull-Rom the smoothed area bulged past its own floor, painting a
+    // filled region at values the series never reached — and, zero-anchored,
+    // below the baseline the area is supposed to be anchored to.
+    const { container } = draw(
+      <Sparkline data={[0, 10, 0, 0, 6, 0]} curve="smooth" fill height={20} width={80} />,
+    );
+    const area = container.querySelector('[data-mc-ink="fill"]')!.getAttribute("d")!;
+    const ys = [...area.matchAll(/[ML C]?(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g)].map((m) =>
+      Number(m[2]),
+    );
+    // pad=2, so the plot floor (value 0, zero-anchored) is y = 18.
+    for (const y of ys) expect(y).toBeLessThanOrEqual(18.01);
+  });
+
   it("color overrides the line stroke inline (prop > token)", () => {
     const { container } = draw(<Sparkline data={D} color="#f50" />);
     const path = container.querySelector('[data-mc-ink="data"]') as SVGElement;

@@ -24,11 +24,25 @@ describe("<Seismogram>", () => {
   it("signed data → midline hairline + polarity coloring with positive set", () => {
     const { container } = draw(<Seismogram data={[4, -2, 3]} positive="up" />);
     expect(container.querySelector('[data-mc-ink="muted"]')).not.toBeNull();
-    const paths = [...container.querySelectorAll('path[data-mc-ink="data"]')];
-    expect(paths.length).toBe(2);
-    const strokes = paths.map((p) => (p as SVGElement).style.stroke);
-    expect(strokes).toContain("var(--mc-positive)");
-    expect(strokes).toContain("var(--mc-negative)");
+    // Valence is an ink ROLE, never an inline stroke: `.mc-root` sets
+    // forced-color-adjust: none, so inline paint survives into High Contrast
+    // Mode and outranks every `:where()` consumer override.
+    for (const ink of ["positive", "negative"]) {
+      const p = container.querySelector(`path[data-mc-ink="${ink}"]`) as SVGPathElement;
+      expect(p).not.toBeNull();
+      // literal fill="none" is the opt-in the stroked-valence rule selects on
+      expect(p.getAttribute("fill")).toBe("none");
+      expect(p.style.stroke).toBe("");
+    }
+  });
+
+  it("positive='down' flips which polarity carries which valence", () => {
+    // slots are 30 wide, so the up tick sits at x=15 and the down tick at x=45
+    const { container } = draw(<Seismogram data={[4, -2]} positive="down" width={60} />);
+    const d = (ink: string) =>
+      container.querySelector(`path[data-mc-ink="${ink}"]`)!.getAttribute("d");
+    expect(d("positive")).toMatch(/^M45 /); // down is good here
+    expect(d("negative")).toMatch(/^M15 /);
   });
 
   it("unsigned data → centered ticks, no midline (implied axis)", () => {
@@ -39,11 +53,11 @@ describe("<Seismogram>", () => {
 
   it("anomaly → spikes flare in the alert token", () => {
     const { container } = draw(<Seismogram data={[2, 9, 3, 12]} anomaly={8} />);
-    const strokes = [...container.querySelectorAll('path[data-mc-ink="data"]')].map(
-      (p) => (p as SVGElement).style.stroke,
-    );
-    expect(strokes).toContain("var(--mc-negative)"); // flagged path
-    expect(strokes.filter((s) => !s).length).toBeGreaterThan(0); // normal path (token default)
+    const flag = container.querySelector('path[data-mc-ink="negative"]') as SVGPathElement;
+    expect(flag).not.toBeNull();
+    expect(flag.getAttribute("fill")).toBe("none");
+    expect(flag.style.stroke).toBe(""); // token comes from the role, never inline
+    expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull(); // 2 and 3
   });
 
   it("summary computed from RAW values even when downsampled", () => {
@@ -51,6 +65,19 @@ describe("<Seismogram>", () => {
     const data = Array.from({ length: 500 }, (_, i) => (i % 5 === 0 ? (i === 250 ? 42 : 3) : 0));
     const { container } = draw(<Seismogram data={data} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("100 events, peak 42.");
+  });
+
+  it("a non-finite box paints inside a real frame, seat included", () => {
+    // `Chart` clamps the viewBox, so the frame looked fine while the ticks and
+    // `--mc-seat` were NaN — a chart that vanished under a correct-sounding name.
+    for (const box of [{ width: NaN }, { height: NaN }, { height: Infinity }, { width: -60 }]) {
+      const { container } = draw(<Seismogram data={[0, 3, 0, 8]} {...box} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("style") ?? "").not.toMatch(/NaN|Infinity/);
+      for (const p of container.querySelectorAll("path")) {
+        expect(p.getAttribute("d")).not.toMatch(/NaN|Infinity|-\d/);
+      }
+    }
   });
 
   it("node budget ≤ 2 for unsigned data (one path)", () => {

@@ -246,6 +246,21 @@ export async function renderChart(input: RenderInput): Promise<RenderResult> {
         `Call get_microchart("${type}") for a ready-to-render \`sample\`.`,
     );
 
+  // Check the CALLER's box, not the rendered one. The library degrades a
+  // non-positive `width`/`height` to its documented default so a chart in a
+  // page never disappears — which is right there, and wrong here: over a tool
+  // call it would hand an agent a plausible-looking chart at a size it did not
+  // ask for. The library's job is to keep rendering; this API's job is to say
+  // the call was wrong.
+  for (const side of ["width", "height", "size"] as const) {
+    const v = finalProps[side];
+    if (v !== undefined && (typeof v !== "number" || !Number.isFinite(v) || v <= 0))
+      throw new Error(
+        `render_microchart: "${type}" was given an invalid \`${side}\` (${JSON.stringify(v)}) — ` +
+          "a box must be a positive, finite number.",
+      );
+  }
+
   const [{ createElement, renderToStaticMarkup }, Comp] = await Promise.all([
     loadReact(),
     loadComponent(entry.slug, entry.staticImport, entry.name),

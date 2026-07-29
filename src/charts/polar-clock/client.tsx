@@ -4,7 +4,6 @@
 // segments circularly, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
 import { annulusSector } from "../../core/arc.js";
 import {
   named,
@@ -16,9 +15,10 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
-import { polarClockGeometry, polarStart } from "./geometry.js";
+import { POLAR_PAD, polarClockGeometry, polarStart } from "./geometry.js";
 import {
   PolarClock as StaticPolarClock,
+  polarClockLabel,
   polarClockSummary,
   type PolarClockProps,
 } from "./index.js";
@@ -76,14 +76,24 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
   useEntrance(hostRef, "grow", animate);
 
   const geo = useMemo(
-    () => polarClockGeometry({ values: data, size, inner, origin, pad: 1, mode, now }),
+    () => polarClockGeometry({ values: data, size, inner, origin, pad: POLAR_PAD, mode, now }),
     [data, size, inner, origin, mode, now],
   );
-  // The Chart viewBox gains a bottom gutter when the peak numeral is shown; the
-  // clock still sits in the top square, so the pointer must map over the full height.
-  const vbHeight =
-    geo.size + (rest.label === "max" ? Math.ceil((rest.fontSize ?? labelFont(size)) * 1.35) : 0);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
+  // The Chart viewBox gains a bottom gutter when the peak numeral is shown; the
+  // clock still sits in the top square, so the pointer must map over the full
+  // height. The static decides that band — including when it drops the numeral
+  // for not fitting — so ask it rather than re-deriving the arithmetic here.
+  const vbHeight =
+    geo.size +
+    polarClockLabel({
+      data,
+      peakIndex: geo.peakIndex,
+      box: geo.size,
+      fontSize: rest.fontSize,
+      label: rest.label ?? "none",
+      fmt,
+    }).band;
   const seg = useCallback(
     (i: number) => (segmentFormat ? segmentFormat(i, n) : defaultSegmentLabel(strings, i, n)),
     [segmentFormat, n, strings],

@@ -11,6 +11,7 @@ import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
 import { errorBudgetGeometry, type ErrorBudgetGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
+import { round2 } from "../../core/types.js";
 
 export function errorBudgetSummary(
   geo: ErrorBudgetGeometry,
@@ -64,7 +65,6 @@ export const RATE_FMT = (n: number): string => `${Math.round(n * 10) / 10}`;
 export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
   const {
     data,
-    window,
     rates,
     unit = "day",
     label = "remaining",
@@ -91,6 +91,12 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
   // the exhaustion line — so the trace stands on the text baseline. The floor is
   // fixed by the pad, so it holds for the empty chart too and both align.
   const seat = { mode: "floor", bottom: height - pad } as const;
+
+  // `window` is a caller prop and the summary reads it back as the denominator
+  // ("at day 3 of 30"). A non-finite one printed "of NaN" into the accessible
+  // name while the plot below it drew a perfectly ordinary elapsed axis, because
+  // the geometry falls back to `data.length`. One fallback, used by both.
+  const window = Number.isFinite(props.window) ? props.window : undefined;
 
   const probe = errorBudgetGeometry({ width, height, data, window, rates });
   // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
@@ -193,28 +199,17 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         style={{ stroke: lineColor }}
       />
       {geo.exhausted ? (
-        <>
-          <line
-            x1={geo.exhausted.x - 1.6}
-            y1={height - 2 - 1.6}
-            x2={geo.exhausted.x + 1.6}
-            y2={height - 2 + 1.6}
-            data-mc-ink="flag"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-            style={{ stroke: "var(--mc-negative)" }}
-          />
-          <line
-            x1={geo.exhausted.x - 1.6}
-            y1={height - 2 + 1.6}
-            x2={geo.exhausted.x + 1.6}
-            y2={height - 2 - 1.6}
-            data-mc-ink="flag"
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-            style={{ stroke: "var(--mc-negative)" }}
-          />
-        </>
+        // The exhaustion cross is ONE mark, so it is one path: two <line>s
+        // repeated every attribute, and the entrance treated the two strokes as
+        // two separate flags that could land on different beats.
+        <path
+          d={`M${round2(geo.exhausted.x - 1.6)} ${round2(height - 3.6)}l3.2 3.2M${round2(geo.exhausted.x - 1.6)} ${round2(height - 0.4)}l3.2 -3.2`}
+          fill="none"
+          data-mc-ink="flag"
+          data-mc-w="support"
+          vectorEffect="non-scaling-stroke"
+          style={{ stroke: "var(--mc-negative)" }}
+        />
       ) : (
         <circle cx={geo.remaining.x} cy={geo.remaining.y} r={1.8} style={{ fill: endColor }} />
       )}
@@ -225,10 +220,12 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           textAnchor="start"
           dominantBaseline="central"
           fontSize={FONT}
-          style={{
-            fontVariantNumeric: "tabular-nums",
-            fill: danger ? "var(--mc-negative)" : "var(--mc-neutral)",
-          }}
+          // The role has to be here whatever the paint: it is what the entrance
+          // reads to cast this readout into the closing beat with the other
+          // voice marks, and what the forced-colors mapping keys off. Only the
+          // danger hue is dynamic, so only that stays inline.
+          data-mc-ink="label"
+          style={danger ? { fill: "var(--mc-negative)" } : undefined}
         >
           {labelText}
         </text>

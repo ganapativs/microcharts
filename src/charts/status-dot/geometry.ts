@@ -28,10 +28,6 @@ export function statusDotGeometry(opts: {
   switch (glyph) {
     case "circle":
       return { kind: "circle", cx, cy, r: round2(3 * s), hollow: false };
-    case "ring":
-      // hollow: radius inset by half the ring stroke so it matches the disc's
-      // optical footprint instead of overshooting it
-      return { kind: "circle", cx, cy, r: round2(2.5 * s), hollow: true };
     case "triangle":
       // apex-up; sits 0.35 low of true center — optical correction for the
       // triangle's bottom-heavy mass beside circles on one row
@@ -44,5 +40,14 @@ export function statusDotGeometry(opts: {
       const d = `M${p(4, 1)} A${r} ${r} 0 0 1 ${p(4, 7)} Z`;
       return { kind: "half", d, cx, cy, r };
     }
+    // "ring", and — total by construction — any glyph outside the vocabulary.
+    // `states` is a public extension point, so a glyph can arrive from JSON that
+    // TypeScript never checked; falling off the switch returned undefined and
+    // the render threw on `mark.kind`. Landing on the ring degrades to the same
+    // silhouette `resolveStatus` uses for an unknown status.
+    // Hollow: radius inset by half the ring stroke so it matches the disc's
+    // optical footprint instead of overshooting it.
+    default:
+      return { kind: "circle", cx, cy, r: round2(2.5 * s), hollow: true };
   }
 }

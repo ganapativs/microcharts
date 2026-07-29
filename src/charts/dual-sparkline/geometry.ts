@@ -4,7 +4,7 @@
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { linePath, smoothPath, type Curve } from "../../core/path.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFitsY, textGutter } from "../../core/labels.js";
 
 type XY = readonly [number, number];
 
@@ -20,6 +20,8 @@ export interface DualGeometry {
   coincident: boolean;
   /** Band rect (shared grammar) or null. */
   band: { x: number; y: number; width: number; height: number } | null;
+  /** Did the endpoint label earn its gutter? `false` → don't paint it. */
+  labelled: boolean;
   plot: { x0: number; x1: number; y0: number; y1: number };
   /** Resolved shared value domain `[min,max]` — the annotation-host y-frame. */
   domain: readonly [number, number];
@@ -46,7 +48,17 @@ export function dualSparklineGeometry(opts: {
 }): DualGeometry {
   const { width, height, primary, compare, curve = "linear", gutterCh, fontSize } = opts;
   const pad = 2;
-  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
+  // A gutter wider than the box INVERTS the plot (`x1 < x0`): both lines then
+  // draw right-to-left from negative x, outside the viewBox — `.mc-root` is
+  // overflow: visible, so that spills onto the page instead of clipping.
+  // `1,234,567,890,123` on a 60-unit box asked for a 78-unit gutter and pulled
+  // the whole chart out to x = -72. So the label is seated only while ~12 units
+  // of series are left to annotate and the figure fits the box vertically; when
+  // it drops, its gutter drops with it and the lines reclaim the full width
+  // (labels.ts degradation rule). The summary still announces the value.
+  const want = gutterCh > 0 ? textGutter(gutterCh, fontSize, 4) : 0;
+  const labelled = want > 0 && width - want >= 16 && labelFitsY(height / 2, fontSize, height);
+  const gutter = labelled ? want : 0;
   const x0 = pad;
   const x1 = width - pad - gutter;
   const y0 = pad;
@@ -108,6 +120,7 @@ export function dualSparklineGeometry(opts: {
     lastCompare,
     coincident,
     band,
+    labelled,
     plot: { x0, x1, y0, y1 },
     domain,
   };

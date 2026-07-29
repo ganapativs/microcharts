@@ -21,7 +21,8 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
+import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from "./geometry.js";
 import {
   Seismogram as StaticSeismogram,
   seismogramSummary,
@@ -47,8 +48,8 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     data,
     mode = "intensity",
     domain,
-    width = 60,
-    height = 16,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_DIST,
@@ -65,6 +66,12 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // Same clamp as the static entry: the picker's hit box, the crosshair and the
+  // readout are laid out against this box, so a non-finite one has to resolve
+  // here too or the two entries disagree about where a slot is (`chartSide`).
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "wipe", animate);

@@ -6,7 +6,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makePercentFormatter } from "../../core/format.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
-import { hourglassGeometry } from "./geometry.js";
+import { labelFitsY } from "../../core/labels.js";
+import { isFiniteValue } from "../../core/types.js";
+import { hourglassGeometry, resolveGlassWidth, resolveHeight } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface HourglassProps {
@@ -16,7 +18,7 @@ export interface HourglassProps {
   stream?: boolean | undefined;
   /** Print the percent that matters to the context. */
   label?: "none" | "remaining" | "elapsed" | undefined;
-  /** Override the elapsed-sand color (default --mc-stroke). */
+  /** Override the sand color, both chambers (default --mc-moon). */
   color?: string | undefined;
   width?: number | undefined;
   height?: number | undefined;
@@ -64,8 +66,6 @@ export function Hourglass(props: HourglassProps): ReactNode {
     stream = true,
     label = "none",
     color,
-    height = 24,
-    fontSize = 8,
     locale,
     strings = EN_HOURGLASS,
     title,
@@ -76,19 +76,27 @@ export function Hourglass(props: HourglassProps): ReactNode {
     children,
   } = props;
 
+  const height = resolveHeight(props.height);
+  const boxW = resolveGlassWidth(props.width, height);
+  // `fontSize` is host-computed like the box, and an unresolved one reached the
+  // DOM verbatim — `font-size="NaN"`, and a NaN viewBox width through the gutter
+  // it sizes, which collapsed the glass along with the numeral. Documented
+  // default.
+  const fontSize = isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : 8;
+
   const e = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   const pct = hourglassPct(
     label === "remaining" ? 100 - Math.round(e * 100) : Math.round(e * 100),
     locale,
   );
-  const showLabel = label !== "none";
+  // A centred numeral owns a full em-box, so in a glass shorter than the font
+  // size it crosses both viewBox edges. Drop it (the labels.ts degradation rule)
+  // and hand the gutter back with it; the summary still states the percent.
+  const showLabel = label !== "none" && labelFitsY(height / 2, fontSize, height);
   // 0.72 em/char (not 0.62): the % glyph is wide and under-reserves at 0.62.
   // Measured off the FORMATTED string, so a locale that adds a NBSP before the
   // sign widens the gutter with it instead of spilling the numeral onto the page.
   const gutter = showLabel ? Math.ceil(pct.length * 0.72 * fontSize + 3) : 0;
-  // The glass box tracks height so the instrument keeps a natural hourglass
-  // proportion at ANY size — a fixed width made tall demos read as a thin sliver.
-  const boxW = props.width ?? Math.max(12, Math.round(height * 0.66));
   const width = boxW + gutter;
 
   const geo = hourglassGeometry({ value, width: boxW, height, pad: PAD });

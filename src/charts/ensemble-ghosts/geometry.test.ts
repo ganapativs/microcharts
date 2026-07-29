@@ -83,6 +83,43 @@ describe("ensembleGeometry", () => {
     expect(geo.memberCount).toBe(1);
   });
 
+  it("a non-finite ghosts count falls back to the documented default, not zero ghosts", () => {
+    // `Number("")` → NaN survived Math.round/min/max, so `k = NaN` selected no
+    // members at all: an empty frame under a summary announcing 24 paths.
+    const nan = ensembleGeometry({ ...base, data: ENS, ghosts: Number.NaN })!;
+    expect(nan.ghostPaths.map((g) => g.member)).toEqual(
+      ensembleGeometry({ ...base, data: ENS, ghosts: 8 })!.ghostPaths.map((g) => g.member),
+    );
+    // ±Infinity still clamps to the documented 1..12 window
+    expect(
+      ensembleGeometry({ ...base, data: ENS, ghosts: Number.POSITIVE_INFINITY })!.ghostPaths.length,
+    ).toBe(12);
+    expect(
+      ensembleGeometry({ ...base, data: ENS, ghosts: Number.NEGATIVE_INFINITY })!.ghostPaths.length,
+    ).toBe(1);
+  });
+
+  it("a non-finite domain falls back to the data extent — never NaN coordinates", () => {
+    const clean = ensembleGeometry({ ...base, data: ENS })!;
+    for (const domain of [
+      [Number.NaN, Number.NaN],
+      [Number.NaN, 60],
+      [0, Number.NaN],
+      [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY],
+    ] as const) {
+      const geo = ensembleGeometry({ ...base, data: ENS, domain })!;
+      expect(geo.domain).toEqual(clean.domain);
+      expect(geo.emphasisPath.d).toBe(clean.emphasisPath.d);
+      expect(geo.emphasisPath.d).not.toMatch(/NaN|Infinity/);
+    }
+  });
+
+  it("a finite explicit domain is still honoured", () => {
+    const geo = ensembleGeometry({ ...base, data: ENS, domain: [0, 100] })!;
+    expect(geo.domain).toEqual([0, 100]);
+    expect(geo.yFor(0)).toBe(18);
+  });
+
   it("all-invalid / empty → null", () => {
     expect(ensembleGeometry({ ...base, data: [] })).toBeNull();
     expect(ensembleGeometry({ ...base, data: [[NaN, NaN]] })).toBeNull();

@@ -53,14 +53,43 @@ describe("<StarSpoke>", () => {
     expect(labels.length).toBeLessThan(3);
   });
 
-  it("dots render endpoint markers", () => {
+  it("dots render endpoint markers in data ink, with no inline paint", () => {
     const { container } = draw(<StarSpoke data={PROFILE} dots="tips" size={64} />);
-    expect(container.querySelector('path[style*="--mc-accent"]')).not.toBeNull();
+    const tips = container.querySelector('path[data-mc-ink="point"]')!;
+    expect(tips).not.toBeNull();
+    // The tip dot says what the spoke end already says, so it takes the same
+    // ink. An inline `fill` here outranked the point role's forced-colors
+    // mapping and painted the brand accent verbatim in High Contrast Mode.
+    expect(tips.getAttribute("style")).toBeNull();
+    expect(tips.getAttribute("fill")).toBeNull();
   });
 
   it("compare draws a ghost baseline", () => {
     const { container } = draw(<StarSpoke data={PROFILE} compare={[0.5, 0.5, 0.5, 0.5, 0.5]} />);
     expect(container.querySelector('path[data-mc-ink="ghost"]')).not.toBeNull();
+  });
+
+  // The spoke angle is i/n, so a baseline shorter than the profile used to get
+  // its own smaller `n` and every ghost landed on the wrong axis.
+  it("a short compare keeps each baseline on its own axis", () => {
+    const { container } = draw(<StarSpoke data={PROFILE} compare={[0.5, 0.5]} />);
+    const tips = (ink: string) =>
+      container
+        .querySelector(`path[data-mc-ink="${ink}"]`)!
+        .getAttribute("d")!
+        .split("M")
+        .slice(1)
+        .map((seg) => seg.split("L")[1]!.split(" ").map(Number) as [number, number]);
+
+    const ghosts = tips("ghost");
+    const guides = tips("muted");
+    expect(ghosts).toHaveLength(PROFILE.length);
+    const C = 40; // centre of the 80-unit default box
+    ghosts.forEach(([gx, gy], i) => {
+      if (gx === C && gy === C) return; // no baseline for this metric — collapsed to the hub
+      const [rx, ry] = guides[i]!;
+      expect(Math.atan2(gy! - C, gx! - C)).toBeCloseTo(Math.atan2(ry! - C, rx! - C), 6);
+    });
   });
 
   it("fewer than 3 metrics warns", () => {
@@ -115,6 +144,61 @@ describe("<StarSpoke>", () => {
       );
       expect(container.querySelector('path[data-mc-ink="muted"]')!.getAttribute("d")).not.toBe("");
     });
+  });
+});
+
+// Hostile CONFIG, not hostile data: a host derives `domain` with a reduce over
+// a series holding a NaN, or binds `size` to an empty number field. Both used
+// to send every spoke coordinate to NaN — the path is then invalid and the
+// browser drops it, so the star painted EMPTY under an accessible name that
+// still read a perfectly normal profile.
+describe("<StarSpoke> hostile config", () => {
+  const labelOf = (c: HTMLElement) => c.querySelector("svg")!.getAttribute("aria-label");
+  const baseline = () => draw(<StarSpoke data={PROFILE} />).container;
+
+  for (const [name, domain] of [
+    ["both ends NaN", [NaN, NaN]],
+    ["low end NaN", [NaN, 1]],
+    ["high end NaN", [0, NaN]],
+    ["unbounded", [-Infinity, Infinity]],
+    ["span overflows", [-1e308, 1e308]],
+  ] as const) {
+    it(`non-finite domain (${name}) falls back to the unit domain`, () => {
+      const { container } = draw(<StarSpoke data={PROFILE} domain={domain} />);
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+      expect(container.querySelector('path[data-mc-ink="data"]')!.getAttribute("d")).toBe(
+        baseline().querySelector('path[data-mc-ink="data"]')!.getAttribute("d"),
+      );
+      expect(labelOf(container)).toBe(labelOf(baseline()));
+    });
+  }
+
+  for (const [name, size] of [
+    ["NaN", NaN],
+    ["Infinity", Infinity],
+    ["zero", 0],
+    ["negative", -20],
+  ] as const) {
+    it(`an unusable size (${name}) falls back to the default box, not NaN coords`, () => {
+      const { container } = draw(<StarSpoke data={PROFILE} size={size} />);
+      expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 80 80");
+      expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+    });
+  }
+
+  // A box smaller than twice the 2-unit pad inverted the radius: spokes ran
+  // backwards and the guide rim landed outside the viewBox (`.mc-root` is
+  // overflow: visible, so that paints on the page).
+  it("a sub-pad size keeps every mark inside the viewBox", () => {
+    const { container } = draw(<StarSpoke data={PROFILE} size={3} />);
+    expect(container.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 3 3");
+    // guide + spoke paths are absolute M/L only, so every number is a coord
+    for (const p of container.querySelectorAll("path")) {
+      for (const n of (p.getAttribute("d") || "").match(/-?\d+(\.\d+)?/g) ?? []) {
+        expect(Number(n)).toBeGreaterThanOrEqual(0);
+        expect(Number(n)).toBeLessThanOrEqual(3);
+      }
+    }
   });
 });
 

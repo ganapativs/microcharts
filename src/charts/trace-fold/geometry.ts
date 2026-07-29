@@ -92,6 +92,10 @@ export function criticalPath(data: readonly Span[]): boolean[] {
   return onPath;
 }
 
+/** Default box, here rather than in either entry so both fall back to the same
+ *  one when a caller passes an unusable `width` (see `chartSide`). */
+export const DEFAULT_WIDTH = 120;
+
 /** Default box height: rows tall enough to seat a legible in-bar label. Shared
  *  so both entries fold the same trace to the same size. */
 export function traceFoldHeight(depthCount: number): number {

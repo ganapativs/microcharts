@@ -24,13 +24,32 @@ interface DayCell {
 
 export interface CalendarStripGeometry {
   cells: DayCell[];
+  /** Week rows actually built — the window that was PAINTED, which is what the
+   *  summary must announce. `weeks` is caller config and arrives floored,
+   *  clamped and capped; announcing the raw prop said "over 4.7 weeks" (or
+   *  "over NaN weeks") above a grid that was never that tall. */
   rows: number;
   width: number;
   height: number;
   activeDays: number;
   /** Days in the window up to and including `end` (future cells excluded). */
   totalDays: number;
+  /** Resolved layout + ramp config the cells were built from. Every consumer —
+   *  the paint ramp, the mark metrics, the pointer pitch — reads these rather
+   *  than the raw prop, or the two disagree about the same grid. */
+  cell: number;
+  gap: number;
+  steps: number;
 }
+
+/** Week ceiling. Every week is seven more day objects and seven more DOM nodes,
+ *  and `weeks` is caller config: `weeks={1e6}` allocated seven million days
+ *  before painting anything. A full year still fits; past that the chart is
+ *  ActivityGrid, which the `weeks > 8` dev-warning already points at. */
+export const CALENDAR_MAX_WEEKS = 53;
+
+const len = (v: number | undefined, fallback: number): number =>
+  v !== undefined && Number.isFinite(v) ? Math.max(0, v) : fallback;
 
 export function calendarStripGeometry(opts: {
   weeks: number;
@@ -44,11 +63,19 @@ export function calendarStripGeometry(opts: {
   gap?: number | undefined;
   shape?: CellShape | undefined;
 }): CalendarStripGeometry | null {
-  const grid = weekGrid({ end: opts.end, weeks: opts.weeks, weekStart: opts.weekStart });
+  const weeks = Number.isFinite(opts.weeks)
+    ? Math.min(CALENDAR_MAX_WEEKS, Math.max(1, Math.floor(opts.weeks)))
+    : 1;
+  const grid = weekGrid({ end: opts.end, weeks, weekStart: opts.weekStart });
   if (!grid) return null;
-  const cell = opts.cell ?? 7;
-  const gap = opts.gap ?? 1;
-  const steps = Math.max(2, opts.steps);
+  // Lengths fall back to the documented defaults instead of poisoning the frame:
+  // `cell={NaN}` reached <Chart> as `viewBox="0 0 NaN NaN"`, which paints nothing.
+  const cell = len(opts.cell, 7);
+  const gap = len(opts.gap, 1);
+  // One ramp, resolved once. A non-finite `steps` bucketed every day to NaN and
+  // emitted `fill-opacity="NaN"`; browsers drop an invalid presentation value,
+  // so the whole intensity ramp silently flattened to full strength.
+  const steps = Number.isFinite(opts.steps) ? Math.max(2, Math.floor(opts.steps)) : 5;
 
   const values = [...opts.entries.values()].filter((v) => Number.isFinite(v) && v > 0);
   let d0 = 0;
@@ -101,5 +128,8 @@ export function calendarStripGeometry(opts: {
     height: grid.rows * cell + (grid.rows - 1) * gap,
     activeDays,
     totalDays,
+    cell,
+    gap,
+    steps,
   };
 }

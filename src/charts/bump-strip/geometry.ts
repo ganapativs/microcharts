@@ -4,6 +4,7 @@
 // diagonal interpolation. 2-dp.
 import { round2, type Value } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
+import { maxOf } from "../../core/scale.js";
 
 interface BumpPoint {
   x: number;
@@ -12,12 +13,30 @@ interface BumpPoint {
   index: number;
 }
 
+/**
+ * The `maxRank` a caller can actually be held to: a finite rank of at least 1.
+ * `maxRank` seeds the whole band scale, so a host that computed it from an empty
+ * field (`Number("")` → NaN) or from an empty row set (`Math.max()` → −Infinity)
+ * used to flatten every band onto rank 1 — or emit a path of NaN — while the
+ * accessible name still announced the real 5 → 2 run. `undefined` means "auto":
+ * scale to the data's own worst rank, the documented default.
+ */
+export function usableMaxRank(maxRank: number | undefined): number | undefined {
+  return maxRank !== undefined && Number.isFinite(maxRank) && maxRank >= 1 ? maxRank : undefined;
+}
+
 export interface BumpGeometry {
   /** Step-line path through the rank bands ("" when nothing plottable). */
   d: string;
   points: BumpPoint[];
   /** Rank-change moments (the dots). */
   changes: { x: number; y: number }[];
+  /**
+   * Ranked periods with no contiguous neighbour on either side. A lone point is
+   * a bare `M` in the path, which SVG never strokes, so without its own dot the
+   * period paints nothing while the name still announces its rank.
+   */
+  isolated: { x: number; y: number }[];
   firstLabel: { x: number; y: number; rank: number } | null;
   lastLabel: { x: number; y: number; rank: number } | null;
   /** Slot pitch for interactive lookup. */
@@ -45,8 +64,13 @@ export function bumpGeometry(opts: {
   const clean = ranks.map((r) =>
     typeof r === "number" && Number.isFinite(r) && r >= 1 ? Math.round(r) : null,
   );
-  const dataMax = Math.max(1, ...clean.filter((r): r is number => r !== null));
-  const maxRank = Math.max(opts.maxRank ?? dataMax, 1);
+  // maxOf, not `Math.max(...arr)`: a spread over a caller's series throws past
+  // ~125k arguments, and `data` is caller-sized.
+  const dataMax = maxOf(
+    clean.filter((r): r is number => r !== null),
+    1,
+  );
+  const maxRank = usableMaxRank(opts.maxRank) ?? dataMax;
 
   const bandY = (rank: number): number => {
     const clamped = Math.min(rank, maxRank);
@@ -69,12 +93,15 @@ export function bumpGeometry(opts: {
   // step path with gaps: horizontal to the next slot's x, then vertical
   let d = "";
   const changes: { x: number; y: number }[] = [];
+  const isolated: { x: number; y: number }[] = [];
   for (let i = 0; i < points.length; i++) {
     const p = points[i]!;
     const prev = i > 0 ? points[i - 1]! : null;
+    const next = points[i + 1] ?? null;
     const contiguous = prev !== null && p.index === prev.index + 1;
     if (!contiguous) {
       d += `M${p.x} ${p.y}`;
+      if (next === null || next.index !== p.index + 1) isolated.push({ x: p.x, y: p.y });
     } else {
       d += `H${p.x}`;
       if (prev.rank !== p.rank) {
@@ -92,6 +119,7 @@ export function bumpGeometry(opts: {
     d,
     points,
     changes,
+    isolated,
     firstLabel: first ? { x: round2(Math.max(0, x0 - 5)), y: first.y, rank: first.rank } : null,
     lastLabel: last ? { x: round2(Math.min(width, x1 + 5)), y: last.y, rank: last.rank } : null,
     pitch,

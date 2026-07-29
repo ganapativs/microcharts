@@ -11,7 +11,7 @@
 // static entry draws — hit boxes cannot drift from the marks.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { textGutter } from "../../core/labels.js";
+import { textGutter, textGutterProse } from "../../core/labels.js";
 import {
   named,
   fillFor,
@@ -29,7 +29,7 @@ import {
   stationGlyphSummary,
   type StationGlyphProps,
 } from "./index.js";
-import { stationGlyphGeometry, stationLayout } from "./geometry.js";
+import { hasWind, resolveStep, stationGlyphGeometry, stationLayout } from "./geometry.js";
 
 export interface InteractiveStationGlyphProps extends StationGlyphProps, PickerProps {
   /**
@@ -52,12 +52,11 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
   const {
     cloud,
     wind,
-    step = 10,
     temp,
     dewpoint,
     pressure,
     station,
-    size = 48,
+    size,
     format,
     locale,
     strings = EN_STATION_GLYPH,
@@ -73,6 +72,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     defaultSelectedIndex,
     ...rest
   } = props;
+  const step = resolveStep(props.step);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
@@ -91,8 +91,14 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
     const tempT = temp != null && Number.isFinite(temp) ? `${fmt(temp)}°` : null;
     const dewT = dewpoint != null && Number.isFinite(dewpoint) ? `${fmt(dewpoint)}°` : null;
     const presT = pressure != null && Number.isFinite(pressure) ? fmt(pressure) : null;
-    const lay = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT });
-    const { font, cx, cy, r, yOff, gap } = lay;
+    const lay = stationLayout({
+      size,
+      temp: tempT,
+      dew: dewT,
+      pressure: presT,
+      station: station || null,
+    });
+    const { font, cx, cy, r, yOff, gap, box } = lay;
     // per-char over-estimate — the static path never measures text either, and
     // it is the SHARED estimator (core/labels), so a hit box is exactly as wide
     // as the gutter `stationLayout` reserved for the same string
@@ -101,18 +107,22 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       return [right - w - 0.5, y - font * 0.7, w + 1, font * 1.4];
     };
     const out: Field[] = [];
-    if (station)
+    if (station) {
+      // the id is caller PROSE, so its box comes from the prose rate — the
+      // digits rate drew a focus ring narrower than the name it ringed
+      const idW = textGutterProse(station.length, font, 0);
       out.push({
         text: station,
         value: null, // a name, not a measurement
-        box: textBox(station, 0.5 + textGutter(station.length, font, 0), font),
+        box: [0, font - font * 0.7, idW + 1, font * 1.4],
       });
-    if (wind && Number.isFinite(wind.magnitude)) {
+    }
+    if (hasWind(wind)) {
       const calm = Math.abs(wind.magnitude) < step / 4;
       const dir = wind.magnitude < 0 ? wind.direction + 180 : wind.direction;
       const deg = Math.round(((dir % 360) + 360) % 360);
       const mag = Math.abs(wind.magnitude);
-      const bb = size * 0.64; // the barb's box (see index.tsx)
+      const bb = box * 0.64; // the barb's box, off the resolved square (see index.tsx)
       out.push({
         text: calm
           ? strings.stationFieldWindCalm

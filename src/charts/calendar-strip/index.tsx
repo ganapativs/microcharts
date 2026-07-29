@@ -51,7 +51,8 @@ export function calendarStripSummary(
 
 export interface CalendarStripProps {
   data: readonly CalendarStripDatum[];
-  /** Window length in whole weeks ending at `end`. Documented cap: 8. */
+  /** Window length in whole weeks ending at `end`. Dev-warns above 8 (that is
+   *  ActivityGrid's job) and is hard-capped at `CALENDAR_MAX_WEEKS` (53). */
   weeks?: number | undefined;
   /** Last day of the window. Defaults to today (UTC) — pin it in anything
    *  that must be deterministic (tests, docs, SSR snapshots). */
@@ -127,11 +128,14 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
     devWarn("<CalendarStrip> unparseable `end` date.");
     return null;
   }
-  const mark = cellMetrics(cell, shape);
+  const mark = cellMetrics(geo.cell, shape);
   const accName =
     summary === false
       ? false
-      : (summary ?? calendarStripSummary(geo.activeDays, geo.totalDays, weeks, strings));
+      : // geo.rows, never the raw `weeks`: the summary names the window the grid
+        // actually paints, so a floored, clamped or capped prop can't announce a
+        // calendar that isn't there.
+        (summary ?? calendarStripSummary(geo.activeDays, geo.totalDays, geo.rows, strings));
 
   return (
     <Chart
@@ -152,7 +156,12 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
         if (c.state === "empty")
           // no-data: a visible hollow outline — never the invisible 8% band
           // ("band" is reserved for true background bands); "muted" is the
-          // fill:none + neutral-stroke role this shape actually wants
+          // fill:none + neutral-stroke role this shape actually wants.
+          // The literal fill="none" is load-bearing, not redundant with the role:
+          // under forced-colors the muted mapping paints fill: GrayText, and only
+          // the hollow-mark rule (which reads this attribute) holds it back.
+          // Without it a no-record day filled solid in High Contrast Mode and
+          // outweighed a real low day — this chart's one honesty claim, inverted.
           return (
             <rect
               key={c.date}
@@ -162,6 +171,7 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
               height={c.size - mark.inset * 2}
               rx={mark.rx}
               shapeRendering={mark.crisp ? "crispEdges" : undefined}
+              fill="none"
               data-mc-ink="muted"
               data-mc-w="hair"
               strokeOpacity={0.45}
@@ -179,7 +189,7 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
             data-mc-ink="cell"
             // a real zero must read as present-but-lowest, not vanish into
             // the 0.06 empty-track look (keeps "empty ≠ zero" legible)
-            fillOpacity={c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, steps)}
+            fillOpacity={c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, geo.steps)}
             style={color && c.state === "value" ? { fill: color } : undefined}
           />
         );

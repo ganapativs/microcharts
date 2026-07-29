@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { fc, test } from "@fast-check/vitest";
-import { stackedAreaGeometry } from "./geometry.js";
+import { stackedAreaGeometry, stackedAreaLabelsFit } from "./geometry.js";
 
 const base = { width: 60, height: 16, curve: "linear" as const, gutterCh: 0, fontSize: 6 };
 
@@ -39,6 +39,21 @@ describe("stackedAreaGeometry", () => {
       ],
     });
     expect(geo.layers[1]!.lastShare).toBe(0);
+  });
+
+  it("the label gutter shrinks the plot, so its fit test gates both", () => {
+    expect(stackedAreaLabelsFit(60, 3, 11)).toBe(true);
+    expect(stackedAreaLabelsFit(8, 3, 7)).toBe(false);
+    const withGutter = stackedAreaGeometry({ ...base, width: 30, height: 8, series: [[1, 2]] });
+    const gutted = stackedAreaGeometry({
+      ...base,
+      width: 30,
+      height: 8,
+      gutterCh: 4,
+      series: [[1, 2]],
+    });
+    expect(withGutter.plot.x1).toBe(29);
+    expect(gutted.plot.x1).toBe(11); // 18 of 30 units reserved at fontSize 6
   });
 
   test.prop([

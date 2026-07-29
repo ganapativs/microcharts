@@ -30,7 +30,21 @@ export function pairedBarsSummary(
     value: number;
     ref: number;
   }[];
-  if (finite.length === 0) return strings.noData;
+  if (finite.length === 0) {
+    // A pair with a value but no `ref` still PAINTS its bar (documented: value
+    // bar alone, no ghost). Announcing "No data." over that ink told a screen
+    // reader the chart was empty while a bar sat on screen — the same sentence
+    // the interactive entry roves to says what is actually drawn. Lead with the
+    // longest bar, matching the largest-gap lead below.
+    let lone: { label: string; value: number } | null = null;
+    for (const d of data) {
+      if (!isFiniteValue(d.value)) continue;
+      if (lone === null || Math.abs(d.value) > Math.abs(lone.value)) {
+        lone = { label: d.label, value: d.value };
+      }
+    }
+    return lone ? strings.pairAtNoRef(lone.label, fmt(lone.value)) : strings.noData;
+  }
   let top = finite[0]!;
   for (const d of finite) {
     if (Math.abs(d.value - d.ref) > Math.abs(top.value - top.ref)) top = d;
@@ -43,7 +57,7 @@ export interface PairedBarsProps {
   /** `"overlay"` renders ref as a full-width ghost BEHIND the value bar. */
   mode?: "grouped" | "overlay" | undefined;
   orientation?: "horizontal" | "vertical" | undefined;
-  /** Over/under-reference valence — tints the value bar + summary wording. */
+  /** Over/under-reference valence — tints the value bar. */
   positive?: "up" | "down" | undefined;
   domain?: readonly [number, number] | undefined;
   width?: number | undefined;
@@ -180,7 +194,11 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
                 shapeRendering="crispEdges"
                 data-mc-ink={valueInk}
                 data-mc-origin={origin}
-                style={color ? { fill: color } : undefined}
+                // `color` repaints only the NEUTRAL bar. With `positive` set,
+                // fill is the valence channel; letting a brand hex through
+                // painted over/under-reference bars the same shade and deleted
+                // the encoding the prop exists to add (SparkBar's rule).
+                style={color && valueInk === "bar" ? { fill: color } : undefined}
               />
             ) : null}
           </g>

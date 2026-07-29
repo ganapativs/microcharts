@@ -59,6 +59,34 @@ describe("<Ohlc>", () => {
     const { container } = draw(<Ohlc data={many} />);
     expect(container.querySelectorAll("rect").length).toBe(20); // one candle body per rendered period
     expect(warn).toHaveBeenCalled();
+    // The sentence reads the PAINTED window. Summarising all 30 announced a
+    // count, a change and a range covering candles that are not on the chart.
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      "20 periods. Last close 30, up 200%; range 9 to 31.",
+    );
+  });
+
+  it("maxPeriods below 1 paints one period and says so", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { container } = draw(<Ohlc data={PERIODS} maxPeriods={0} />);
+    expect(container.querySelectorAll("rect").length).toBe(1);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toMatch(/^1 periods\./);
+    expect(warn).toHaveBeenCalled();
+  });
+
+  it("label='last' names the last PAINTED close, never a refused period's price", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const data = [
+      { open: 100, high: 102, low: 99, close: 101 },
+      { open: 101, high: 104, low: 100, close: 103 },
+      // corrupt (high < low): refused by geometry, so its 9 must not appear in
+      // the gutter — a price with no candle under it, contradicting the summary.
+      { open: 10, high: 8, low: 12, close: 9 },
+    ];
+    const { container } = draw(<Ohlc data={data} label="last" width={120} height={24} />);
+    expect(container.querySelectorAll("rect").length).toBe(2);
+    expect(container.querySelector("text")!.textContent).toBe("103");
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toContain("Last close 103");
   });
 
   it("is axe-clean", async () => {

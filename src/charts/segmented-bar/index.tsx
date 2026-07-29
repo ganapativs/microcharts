@@ -8,9 +8,10 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import {
   largestRemainderPercents,
+  MAX_SEGMENTS,
   rollup,
   segmentedBarGeometry,
   type RolledDatum,
@@ -29,8 +30,11 @@ export function sharesSummary(
   pct: (fraction: number) => string = makePercentFormatter(undefined),
 ): string {
   if (rolled.length === 0) return strings.noData;
-  const total = rolled.reduce((s, d) => s + d.value, 0);
-  const pcts = largestRemainderPercents(rolled.map((d) => d.value / total));
+  // Percents come off the ROLLED VALUES, which is exactly what the painted
+  // labels read. Dividing by the total first is the same arithmetic in theory
+  // and a different float in practice, and the two surfaces have to agree to
+  // the point.
+  const pcts = largestRemainderPercents(rolled.map((d) => d.value));
   const list = rolled
     .map((d, i) => strings.shareClause(d.label, pct((pcts[i] ?? 0) / 100)))
     .join(", ");
@@ -62,16 +66,18 @@ export interface SegmentedBarProps {
 }
 
 const CAT_N = 5; // --mc-cat-1 … --mc-cat-5 via data-mc-cat roles
+const DEFAULT_WIDTH = 60;
+const DEFAULT_HEIGHT = 10;
 
 export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   const {
     data,
-    maxSegments = 5,
+    maxSegments = MAX_SEGMENTS,
     order = "data",
     label = "percent",
     colors,
-    width = 60,
-    height = 10,
+    width: widthProp = DEFAULT_WIDTH,
+    height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
     strings = EN_COMPOSITION,
@@ -82,6 +88,13 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `Chart` clamps the frame, but the segments were laid out against the RAW
+  // prop: a host-computed width (`Number("")` → NaN, a collapsed flex box → 0)
+  // emitted `width="NaN"` rects inside a valid viewBox, and a NaN height went
+  // on to poison `--mc-seat` and drag the inline baseline with it.
+  const width = chartSide(widthProp, DEFAULT_WIDTH);
+  const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   if (data.some((d) => isFiniteValue(d.value) && d.value < 0)) {
     devWarn(
@@ -103,8 +116,11 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     fontSize,
   });
   const fmt = label === "none" ? null : makeFormatter(format, locale);
-  const pcts =
-    label === "percent" ? largestRemainderPercents(geo.segments.map((s) => s.share)) : null;
+  // Indexed by ROLLED position, from the same values `sharesSummary` reads.
+  // Deriving these from the geometry's 2-dp-rounded shares instead moved about
+  // one composition in five by a point: the segment painted "55%" while the
+  // accessible name announced 54%.
+  const pcts = label === "percent" ? largestRemainderPercents(rolled.map((d) => d.value)) : null;
   // Shares take `locale` but never the value `format` (which carries the units).
   const pctFmt = makePercentFormatter(locale);
   const accName = resolveSummary(summary, () => sharesSummary(rolled, strings, pctFmt));
@@ -138,7 +154,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
         // extra character to count against the segment's width.
         const text =
           label === "percent"
-            ? pctFmt((pcts![i] ?? 0) / 100)
+            ? pctFmt((pcts![seg.index] ?? 0) / 100)
             : label === "value"
               ? fmt!(d.value)
               : undefined;
@@ -156,12 +172,16 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
             />
             {text !== undefined && seg.labelFits(text.length) ? (
               <text
-                x={round2Mid(seg.x, seg.w)}
+                x={round2(seg.x + seg.w / 2)}
                 y={height / 2}
                 dominantBaseline="central"
                 fontSize={fontSize}
                 textAnchor="middle"
-                style={{ fill: "var(--mc-surface, Canvas)" }}
+                // No inline fill: the ink belongs to the fill this label sits
+                // ON, and `styles.css` picks it per cat (`rect[data-mc-cat=N] +
+                // text`). This used to knock out with `--mc-surface` — the page
+                // colour — which is 2.5:1 on cat-1 gold, the first and usually
+                // widest segment, i.e. the one most likely to carry a label.
               >
                 {text}
               </text>
@@ -172,8 +192,4 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       {children}
     </Chart>
   );
-}
-
-function round2Mid(x: number, w: number): number {
-  return Math.round((x + w / 2) * 100) / 100;
 }

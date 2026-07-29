@@ -13,6 +13,8 @@
     "gen:preview-live": "node scripts/gen-preview-live.mjs",
     "gen:playground-caps": "node scripts/gen-playground-caps.mjs",
     "gen:chart-modules": "node scripts/gen-chart-modules.mjs",
+    "gen:wordmark": "python3 scripts/gen-wordmark-path.py",
+    "gen:brand-kit": "node scripts/gen-brand-kit.mjs",
     "prebuild": "node scripts/gen-md.ts",
     "build": "next build",
     "start": "serve out -l 3001",

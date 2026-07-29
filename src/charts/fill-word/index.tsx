@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makePercentFormatter } from "../../core/format.js";
 import { EN_FILL_WORD, type FillWordStrings } from "../../core/strings-fill-word.js";
-import { fillWordGeometry, type FillMode } from "./geometry.js";
+import { fillWordGeometry, resolveFontSize, type FillMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export interface FillWordProps {
@@ -78,7 +78,6 @@ export function FillWord(props: FillWordProps): ReactNode {
     value,
     mode = "fill",
     label = "none",
-    fontSize = 12,
     locale,
     strings = EN_FILL_WORD,
     title,
@@ -89,6 +88,11 @@ export function FillWord(props: FillWordProps): ReactNode {
     children,
   } = props;
 
+  // The box, the painted font-size and the seat all come off ONE resolved
+  // number — see resolveFontSize. Resolving it here rather than only inside
+  // geometry is what keeps the `font-size` attribute and `--mc-label-size` on
+  // the same scale the viewBox was cut for.
+  const fontSize = resolveFontSize(props.fontSize);
   // The numeral is resolved BEFORE geometry so the gutter is reserved from the
   // string that actually gets painted, not from a fixed digit count.
   const numeral = shownPctText(value, mode, locale);
@@ -136,9 +140,16 @@ export function FillWord(props: FillWordProps): ReactNode {
     >
       {word.length > 0 ? (
         <>
-          {/* the base word — a faded "track" (the not-yet-filled remainder), so
-              the accent copy on top reads as clearly advanced/done */}
-          <text {...textProps} data-mc-ink="label" style={{ fillOpacity: 0.4 }}>
+          {/* The base word — a faded "track" (the not-yet-filled remainder), so
+              the accent copy on top reads as clearly advanced/done. The fade
+              carries the encoding on its own under `mono`, where --mc-accent and
+              --mc-neutral are both --mc-stroke.
+              A presentation ATTRIBUTE, not an inline style: `.mc-root` sets
+              forced-color-adjust: none, so an inline 0.4 reached High Contrast
+              Mode verbatim — CanvasText at 0.4 is ~2.8:1 on Canvas, and this text
+              is the task's name, not a mark. An attribute loses to any `:where()`
+              rule, so the stylesheet can raise it there. */}
+          <text {...textProps} data-mc-ink="label" data-mc-dim="" fillOpacity={0.4}>
             {word}
           </text>
           <text {...textProps} data-mc-ink="accent" style={{ clipPath: geo.clip ?? undefined }}>

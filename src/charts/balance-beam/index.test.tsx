@@ -51,6 +51,16 @@ describe("<BalanceBeam>", () => {
     expect(texts).toEqual(["620", "480"]);
   });
 
+  it("color overrides the fill but keeps the ink role", () => {
+    // The role is load-bearing beyond paint: the interactive entrance selects
+    // the weights by `data-mc-ink`, and dropping it left a coloured beam whose
+    // weights never settled in.
+    const { container } = draw(<BalanceBeam data={IN_OUT} color="#c0ffee" />);
+    const rects = [...container.querySelectorAll("rect")];
+    expect(rects.map((r) => r.getAttribute("data-mc-ink"))).toEqual(["accent", "point"]);
+    for (const r of rects) expect(r.style.fill).toBeTruthy();
+  });
+
   it("summary={false} hides it from assistive tech", () => {
     const { container } = draw(<BalanceBeam data={IN_OUT} summary={false} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
@@ -140,6 +150,46 @@ describe("<BalanceBeam> edge matrix (pair-shaped; mirrors src/test/edge-cases.ts
   it("a null pan leaves the beam level (never tilted as if the side were empty)", () => {
     const beam = draw(<BalanceBeam data={CASES["one null"]!} />).container.querySelector("line")!;
     expect(beam.getAttribute("y1")).toBe(beam.getAttribute("y2"));
+  });
+});
+
+// Containment is the hard rule (`.mc-root` is overflow: visible, so an escape
+// is a spill, not a clip). Both cases below painted a weight above y=0 with
+// otherwise ordinary props.
+describe("BalanceBeam containment under hostile config", () => {
+  const topEdges = (c: HTMLElement) =>
+    [...c.querySelectorAll("rect, circle")].map((el) =>
+      el.tagName === "rect"
+        ? Number(el.getAttribute("y"))
+        : Number(el.getAttribute("cy")) - Number(el.getAttribute("r")),
+    );
+
+  it("difference mode with a tiny domain keeps both weights in the box", () => {
+    const near = [
+      { label: "A", value: 100 },
+      { label: "B", value: 99 },
+    ] as const;
+    for (const shape of ["square", "round"] as const) {
+      const { container } = draw(
+        <BalanceBeam data={near} mode="difference" domain={[0, 1]} shape={shape} />,
+      );
+      for (const top of topEdges(container)) expect(top).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it("a hostile maxTilt emits no NaN and no out-of-box coordinate", () => {
+    for (const maxTilt of [Number.NaN, Infinity, -12, 400]) {
+      const { container } = draw(<BalanceBeam data={IN_OUT} maxTilt={maxTilt} />);
+      for (const el of container.querySelectorAll("*"))
+        for (const attr of ["x", "y", "x1", "x2", "y1", "y2", "width", "height"])
+          expect(el.getAttribute(attr) ?? "").not.toMatch(/NaN|Infinity/);
+      for (const top of topEdges(container)) expect(top).toBeGreaterThanOrEqual(0);
+      const beam = container.querySelector("line")!;
+      // the heavier pan is on the left, so its end can only ever be the lower one
+      expect(Number(beam.getAttribute("y1"))).toBeGreaterThanOrEqual(
+        Number(beam.getAttribute("y2")),
+      );
+    }
   });
 });
 
