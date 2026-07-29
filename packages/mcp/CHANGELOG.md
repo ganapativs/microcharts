@@ -1,5 +1,13 @@
 # @microcharts/mcp
 
+## 0.1.7
+
+### Patch Changes
+
+- [#91](https://github.com/ganapativs/microcharts/pull/91)
+  [`261610d`](https://github.com/ganapativs/microcharts/commit/261610daa87f61e6038d68cded968c99894f0852) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Refresh the embedded chart catalog after the 0.11.0 library release.
+
 ## 0.1.6
 
 ### Patch Changes
