@@ -1,5 +1,80 @@
 # @microcharts/react
 
+## 0.11.0
+
+### Minor Changes
+
+- [#88](https://github.com/ganapativs/microcharts/pull/88)
+  [`461a258`](https://github.com/ganapativs/microcharts/commit/461a2585c1e36477514fe9c1679693905d6a6d8b) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Catalog-wide correctness and accessibility pass over all 106 charts.
+
+  **Hostile config props no longer reach the accessible name.** A non-finite `width`, `height`, `domain`, `target`,
+  `open`, `window`, `total`, `step` — the kind a host produces with `Number(field.value)` on an empty input — used to
+  render a normal-looking chart while the `aria-label` announced "NaN". Every chart now resolves such a prop to its
+  documented default, and geometry and summary resolve through the same value, so the announced scale is always the
+  scale that was painted. `tests/craft/robust.mjs` grew a config pass that asserts this across the catalog (1255
+  chart×scenario renders).
+
+  **A non-finite box is no longer silently destructive.** `viewBox="0 0 NaN 20"` is invalid, so browsers drop the
+  attribute and the chart renders at the wrong scale with a correct-sounding name attached. `chartSide()` in
+  `core/types.ts` clamps it, and both `Chart` (the frame) and chart geometry (the marks) call it, so the two cannot
+  drift.
+
+  **Theming: a host can now pin light, not just dark.** `[data-mc-theme="dark"]` had no counterpart, so on a dark-OS
+  machine `prefers-color-scheme` won whatever the host said. Hosts that pin light usually override the palette but not
+  `--mc-on-fill`, which left light fills carrying dark knockout ink — measured at 3.0–3.8:1 on real pages, under the
+  4.5:1 text floor. Added `[data-mc-theme="light"]`, plus a guard asserting every token the dark branch overrides is
+  restated in the light one.
+
+  **Forced-colors gaps closed.** `--mc-accent` now maps to `Highlight` (roughly a hundred interactive entries draw focus
+  rings as a literal `stroke="var(--mc-accent)"`, which no role mapping reached); the accent element-split is repeated
+  inside the forced-colors block, which lives in a later cascade layer and was overriding it, painting open polylines as
+  solid wedges; `text[data-mc-on-fill]` and `text[data-mc-ink="label"]` take system colors instead of literal rgba.
+
+  **Summaries.** The paired templates (`Dumbbell`, `Slope`) concatenated an empty percent, announcing "From 0 to 5, up
+  ." whenever the baseline was zero. `round2` returned `±Infinity` for finite inputs past ~1.8e306, so charts announced
+  "∞". `Sparkline`'s interactive entry never passed `strings` to `describeSeries`, so a localized host still got an
+  English accessible name.
+
+  **WindBarb** could hang: a finite-but-huge `size` made the glyph draw loops iterate ~1e307 times. Bearings are also
+  wrapped into one turn before the trig, which both fixes `direction={5.7e307}` rendering at NaN coordinates and makes
+  361° draw the same glyph as 1°.
+
+  Per-subpath gzip grew by a mean of 113 B static / 118 B interactive, entirely from these guards; budgets are
+  re-baselined to match.
+
+- [#88](https://github.com/ganapativs/microcharts/pull/88)
+  [`461a258`](https://github.com/ganapativs/microcharts/commit/461a2585c1e36477514fe9c1679693905d6a6d8b) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - `curve="smooth"` no longer paints values the data does not contain.
+
+  The smooth interpolation was uniform Catmull-Rom, which overshoots: a series dipping back to zero bowed past it, and
+  with `fill` the area crossed the baseline it is anchored to — 1.33 viewBox units on a 20-unit-tall spark, 6.7% of the
+  plot. It now uses monotone cubic (Fritsch–Carlson) tangents, so a smoothed run stays inside the range its own points
+  span. Affects `Sparkline`, `DualSparkline`, `StackedArea`, `RetentionCurve`, `BurnChart`, `HistogramStrip` and
+  `CyclePlot`; those seven subpaths grow by 8–129 B gzip.
+
+  Also in this pass, per chart:
+
+  - **Waterfall** — the step connectors are one path instead of one `<line>` per gap: a 100-step waterfall ships 13.2 kB
+    of SSR markup across 107 nodes instead of 26.5 kB across 206. A non-finite `open` no longer reaches the accessible
+    name ("From NaN to NaN"), and the domain scan no longer spreads the level array into `Math.min`/`Math.max`.
+  - **ForecastCone** — the uncertainty bands paint through `--mc-cone-color` / `--mc-cone-opacity` instead of inline
+    `fill`, so they are themable and, in High Contrast Mode, visible at all; they previously carried a `mc-cone-band`
+    class that no rule matched.
+  - **ErrorBudget** — a non-finite `window` no longer reaches the accessible name; the exhaustion cross is one path; the
+    remaining-budget readout carries `data-mc-ink="label"`, so the entrance casts it with the other voice marks.
+  - **Thermometer** — a non-finite `domain` bound falls back to the documented default in both the geometry and the
+    summary, instead of announcing "on a NaN–100 scale" beside a normally drawn tube.
+  - **TallyMarks** — `total={NaN}` drew no marks and printed no overflow numeral while the summary still read the true
+    count; it now falls back to the mark cap.
+  - **ConfusionGrid** — axis initials take a code point, so a label starting with an astral character no longer renders
+    half a surrogate pair.
+  - **EtaBar** — the unrun track uses the same `data-mc-ink="band"` role `Progress` uses, which also gives it a
+    forced-colors mapping.
+
+  Direct value labels (`text[data-mc-ink="label"]`) now map to `CanvasText` under `forced-colors: active`. They painted
+  a fixed `--mc-neutral` gray against the user's chosen background, which is 3.5:1 on a white Canvas.
+
 ## 0.10.0
 
 ### Minor Changes
