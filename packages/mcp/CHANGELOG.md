@@ -1,5 +1,18 @@
 # @microcharts/mcp
 
+## 0.1.6
+
+### Patch Changes
+
+- [#88](https://github.com/ganapativs/microcharts/pull/88)
+  [`461a258`](https://github.com/ganapativs/microcharts/commit/461a2585c1e36477514fe9c1679693905d6a6d8b) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Refresh the embedded chart catalog and assets after the catalog
+  correctness pass, and harden render-core for non-finite chart box props.
+- Updated dependencies
+  [[`461a258`](https://github.com/ganapativs/microcharts/commit/461a2585c1e36477514fe9c1679693905d6a6d8b),
+  [`461a258`](https://github.com/ganapativs/microcharts/commit/461a2585c1e36477514fe9c1679693905d6a6d8b)]:
+  - @microcharts/react@0.11.0
+
 ## 0.1.5
 
 ### Patch Changes
