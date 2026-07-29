@@ -3,15 +3,17 @@
  *
  *   pnpm gen:promo
  *
- * `assets/promo.svg` and `assets/social.svg` are hand-authored layout TEMPLATES
+ * `assets/templates/{promo,social}.svg` are the hand-authored layout TEMPLATES
  * (ground, lockup, cards, copy) — but every chart in them is the REAL shipped
  * component. `<!--@chart name x= y= w= h=-->` slots are filled at generation
  * time by server-rendering the built `dist/` entries (react-dom/server) and
- * nesting the resulting `<svg class="mc-root">` markup at the slot position;
- * `dist/styles.css` is loaded into the page with the dark theme + cobalt
- * accent, so the marks carry the exact shipped tokens. Delta renders inline
- * HTML, so its slot becomes a `<foreignObject>`. Build the library before
- * running this (`pnpm build`) — the charts come from `dist/`, not `src/`.
+ * nesting the resulting `<svg class="mc-root">` markup at the slot position.
+ * The composed result is written to `assets/{promo,social}.svg` as a
+ * STANDALONE artifact — `dist/styles.css`, the dark theme + cobalt accent, and
+ * the brand fonts are all embedded, so the file renders complete anywhere
+ * (edit the template, never the composed output). Delta renders inline HTML,
+ * so its slot becomes a `<foreignObject>`. Build the library before running
+ * this (`pnpm build`) — the charts come from `dist/`, not `src/`.
  *
  * Rasterizes with Playwright Chromium, not sharp/librsvg: librsvg ignores
  * `@font-face` (brand webfonts would silently fall back) and can't style the
@@ -24,7 +26,14 @@
  * Kept out of the npm tarball (the README's relative path rewrites to the repo
  * raw URL on npm). Run this only when a template or featured chart changes.
  */
-import { copyFileSync, existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import React from "react";
@@ -212,20 +221,32 @@ const chartCss = readFileSync(join(ROOT, "dist/styles.css"), "utf8");
 const browser = await chromium.launch();
 try {
   for (const { name, scale } of IMAGES) {
-    const svgPath = join(ROOT, `assets/${name}.svg`);
-    if (!existsSync(svgPath)) throw new Error(`missing ${svgPath}`);
-    const svg = fillSlots(readFileSync(svgPath, "utf8"));
-    const [, w, h] = svg.match(/^<svg width="(\d+)" height="(\d+)"/) ?? [];
-    if (!w || !h) throw new Error(`${name}.svg must declare integer width/height on the root`);
+    const tplPath = join(ROOT, `assets/templates/${name}.svg`);
+    if (!existsSync(tplPath)) throw new Error(`missing ${tplPath}`);
+    let svg = fillSlots(readFileSync(tplPath, "utf8"));
+    const [rootTag, w, h] = svg.match(/^<svg width="(\d+)" height="(\d+)"[^>]*>/) ?? [];
+    if (!w || !h) throw new Error(`${name} template must declare integer width/height on the root`);
+
+    // Make the composed SVG standalone: dark chart tokens on the root + the
+    // shipped stylesheet and the brand fonts embedded inside the document.
+    // `assets/<name>.svg` is this composed artifact — open it anywhere and the
+    // real charts render; the hand-authored source stays in assets/templates/.
+    const themedRoot = rootTag.replace(
+      /^<svg /,
+      `<svg data-mc-theme="dark" style="--mc-accent:#528dff;--mc-font:'Open Runde','Hanken Grotesk',ui-sans-serif,system-ui,sans-serif" `,
+    );
+    // CDATA: the stylesheet contains `syntax: "<number>"` (@property), and a
+    // raw `<` inside <style> breaks the strict XML parse of a standalone .svg.
+    svg = svg.replace(rootTag, `${themedRoot}<style><![CDATA[${fontFaces}\n${chartCss}]]></style>`);
+    const svgOut = join(ROOT, `assets/${name}.svg`);
+    writeFileSync(svgOut, svg);
 
     const page = await browser.newPage({
       viewport: { width: Number(w), height: Number(h) },
       deviceScaleFactor: scale,
     });
-    // Dark theme + the site's cobalt accent — the same tokens the docs ship.
     await page.setContent(
-      `<style>${fontFaces}\n${chartCss}\nhtml,body{margin:0;background:transparent}svg{display:block}</style>` +
-        `<div data-mc-theme="dark" style="--mc-accent:#528dff;--mc-font:'Open Runde','Hanken Grotesk',ui-sans-serif,system-ui,sans-serif">${svg}</div>`,
+      `<style>html,body{margin:0;background:transparent}svg{display:block}</style>${svg}`,
     );
     // Force-load every face and fail loudly — a fallback face must never make
     // it into a shipped banner silently.
@@ -246,7 +267,7 @@ try {
     await sharp(raw).png({ compressionLevel: 9 }).toFile(png);
     copyFileSync(png, pub);
     const kb = (statSync(png).size / 1024).toFixed(1);
-    console.log(`${name}.png regenerated (${kb} kB) → assets/ + apps/docs/public/`);
+    console.log(`${name}.svg + ${name}.png regenerated (${kb} kB) → assets/ + apps/docs/public/`);
   }
 } finally {
   await browser.close();

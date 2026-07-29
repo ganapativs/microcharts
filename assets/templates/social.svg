@@ -1,0 +1,104 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" font-family="'Open Runde', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif">
+  <!-- Design language: the microcharts.dev marketing surface — flat #0a0b0f field,
+       one 152° accent wash + film grain ground, Open Runde display, Hanken body,
+       Iosevka mono metadata. Every chart is the REAL shipped component:
+       `@chart` slots are filled by scripts/gen-promo.mjs (react-dom/server over
+       dist/, rasterized in Chromium so @font-face + styles.css apply).
+       Layout: two flex-like rows, ten unique chart types, card widths sized to
+       each mark's natural aspect. -->
+  <defs>
+    <linearGradient id="wash" x1="0.15" y1="0" x2="0.62" y2="1">
+      <stop offset="0" stop-color="#528dff" stop-opacity="0.09"/>
+      <stop offset="0.55" stop-color="#528dff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <filter id="lift" x="-40%" y="-40%" width="180%" height="200%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000000" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <!-- ground: field + wash + grain (the site's `.site-wash` / `.site-grain`) -->
+  <rect width="1280" height="640" fill="#0a0b0f"/>
+  <rect width="1280" height="640" fill="url(#wash)"/>
+  <rect width="1280" height="640" filter="url(#grain)" opacity="0.055" style="mix-blend-mode:overlay"/>
+  <rect x="0.5" y="0.5" width="1279" height="639" fill="none" stroke="#ffffff" stroke-opacity="0.06"/>
+
+  <!-- brand mark -->
+  <g transform="translate(72,52) scale(1.9)">
+    <path d="M29.6 16L29.587 20.047L29.548 21.502L29.483 22.578L29.392 23.458L29.274 24.212L29.13 24.874L28.958 25.464L28.758 25.994L28.529 26.473L28.27 26.908L27.981 27.302L27.659 27.659L27.302 27.981L26.908 28.27L26.473 28.529L25.994 28.758L25.464 28.958L24.874 29.13L24.212 29.274L23.458 29.392L22.578 29.483L21.502 29.548L20.047 29.587L16 29.6L11.953 29.587L10.498 29.548L9.422 29.483L8.542 29.392L7.788 29.274L7.126 29.13L6.536 28.958L6.006 28.758L5.527 28.529L5.092 28.27L4.698 27.981L4.341 27.659L4.019 27.302L3.73 26.908L3.471 26.473L3.242 25.994L3.042 25.464L2.87 24.874L2.726 24.212L2.608 23.458L2.517 22.578L2.452 21.502L2.413 20.047L2.4 16L2.413 11.953L2.452 10.498L2.517 9.422L2.608 8.542L2.726 7.788L2.87 7.126L3.042 6.536L3.242 6.006L3.471 5.527L3.73 5.092L4.019 4.698L4.341 4.341L4.698 4.019L5.092 3.73L5.527 3.471L6.006 3.242L6.536 3.042L7.126 2.87L7.788 2.726L8.542 2.608L9.422 2.517L10.498 2.452L11.953 2.413L16 2.4L20.047 2.413L21.502 2.452L22.578 2.517L23.458 2.608L24.212 2.726L24.874 2.87L25.464 3.042L25.994 3.242L26.473 3.471L26.908 3.73L27.302 4.019L27.659 4.341L27.981 4.698L28.27 5.092L28.529 5.527L28.758 6.006L28.958 6.536L29.13 7.126L29.274 7.788L29.392 8.542L29.483 9.422L29.548 10.498L29.587 11.953Z" fill="#2f52d4"/>
+    <rect x="9" y="19" width="4" height="4" rx="1.2" fill="#faf7f1" opacity="0.4"/>
+    <rect x="14" y="14" width="4" height="4" rx="1.2" fill="#faf7f1" opacity="0.7"/>
+    <rect x="19" y="9" width="4" height="4" rx="1.2" fill="#faf7f1"/>
+  </g>
+
+  <!-- wordmark + tagline — Open Runde display, Hanken body -->
+  <text x="150" y="99" font-family="'Open Runde', ui-sans-serif, system-ui, sans-serif" font-size="56" font-weight="600" letter-spacing="-0.016em" fill="#e9e8e3">microcharts</text>
+  <text x="74" y="156" font-size="24" fill="#e9e8e3" opacity="0.58">Word-sized charts for React — built for AI, and for the people reading what it writes.</text>
+
+  <!-- ========== specimen field: two flex rows, ten real chart types ========== -->
+  <!-- row 1 · y=196 h=142 -->
+  <g>
+    <g transform="translate(72,196)">
+      <rect x="0.5" y="0.5" width="299" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart sparkline x=24 y=22 w=252 h=70-->
+      <text x="150" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKLINE</text>
+    </g>
+    <g transform="translate(388,196)">
+      <rect x="0.5" y="0.5" width="249" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart waveform x=24 y=28 w=202 h=58-->
+      <text x="125" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">WAVEFORM</text>
+    </g>
+    <g transform="translate(654,196)">
+      <rect x="0.5" y="0.5" width="209" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart sparkbar x=24 y=22 w=162 h=70-->
+      <text x="105" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SPARKBAR</text>
+    </g>
+    <g transform="translate(880,196)">
+      <rect x="0.5" y="0.5" width="179" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart delta x=20 y=26 w=140 h=40 fs=26-->
+      <text x="90" y="98" text-anchor="middle" font-size="12.5" fill="#e9e8e3" opacity="0.45">1,240 → 1,394</text>
+      <text x="90" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">DELTA</text>
+    </g>
+    <g transform="translate(1076,196)">
+      <rect x="0.5" y="0.5" width="131" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart ring x=28 y=14 w=76 h=76-->
+      <text x="66" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">PROGRESS</text>
+    </g>
+  </g>
+
+  <!-- row 2 · y=354 h=142 -->
+  <g>
+    <g transform="translate(72,354)">
+      <rect x="0.5" y="0.5" width="319" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart activity24 x=24 y=18 w=272 h=80-->
+      <text x="160" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">ACTIVITY</text>
+    </g>
+    <g transform="translate(408,354)">
+      <rect x="0.5" y="0.5" width="219" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart ohlc x=20 y=16 w=180 h=78-->
+      <text x="110" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">OHLC</text>
+    </g>
+    <g transform="translate(644,354)">
+      <rect x="0.5" y="0.5" width="139" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart donut x=36 y=16 w=68 h=68-->
+      <text x="70" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">DONUT</text>
+    </g>
+    <g transform="translate(800,354)">
+      <rect x="0.5" y="0.5" width="199" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart segmented x=22 y=50 w=156 h=18-->
+      <text x="100" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">SEGMENTED</text>
+    </g>
+    <g transform="translate(1016,354)">
+      <rect x="0.5" y="0.5" width="191" height="141" rx="18" fill="#ffffff" fill-opacity="0.045" stroke="#ffffff" stroke-opacity="0.1" filter="url(#lift)"/>
+      <!--@chart heatstrip x=20 y=50 w=152 h=20-->
+      <text x="96" y="122" text-anchor="middle" font-size="12" letter-spacing="0.08em" fill="#e9e8e3" opacity="0.34" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">HEAT STRIP</text>
+    </g>
+  </g>
+
+  <!-- footer: stat line + url, centered + stacked -->
+  <text x="640" y="556" text-anchor="middle" xml:space="preserve" font-size="14" fill="#e9e8e3" opacity="0.5" font-family="'Iosevka', ui-monospace, SFMono-Regular, Menlo, monospace">106 chart types<tspan opacity="0.55">   ·   </tspan>0 dependencies<tspan opacity="0.55">   ·   </tspan>~2–7 kB interactive · ~1–4 kB static<tspan opacity="0.55">   ·   </tspan>RSC-safe<tspan opacity="0.55">   ·   </tspan>accessible by default</text>
+  <text x="640" y="598" text-anchor="middle" font-size="17" fill="#528dff" font-family="\'Open Runde\', ui-sans-serif, system-ui, sans-serif" font-weight="500">microcharts.dev</text>
+</svg>
