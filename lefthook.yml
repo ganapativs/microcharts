@@ -28,9 +28,19 @@ pre-push:
   # the suite size — fixed in wind-barb/geometry.ts.)
   piped: true
   commands:
+    # First, because it is the cheapest way to be wrong: every committed
+    # generated artifact is regenerated and diffed (~7 s, build included). A
+    # failure has already written the correct files — commit them and push again.
+    # CI runs the identical check, so a stale artifact can never reach main.
+    0_generated:
+      run: pnpm gen:check
     1_typecheck:
       run: pnpm typecheck
     2_test_node:
       run: pnpm vitest run --project core --project dom
-    3_test_browser:
+    # ~2 s, and the only guard on the docs-side derived numbers (hero specimen
+    # literals, catalog.json, llms.txt, prose claims).
+    3_test_docs:
+      run: pnpm --filter @microcharts/docs test
+    4_test_browser:
       run: pnpm vitest run --project browser

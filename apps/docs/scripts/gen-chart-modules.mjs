@@ -59,7 +59,13 @@ ${lines}
 `;
 
 const out = join(chartsDir, "modules.generated.ts");
-writeFileSync(out, body);
 // Normalize to oxfmt so the committed snapshot stays clean under `format:check`.
-execFileSync("pnpm", ["exec", "oxfmt", out], { cwd: docsDir, stdio: "ignore" });
+// Over STDIN: `.oxfmtrc.json` ignores `**/*.generated.ts`, so oxfmt given the
+// written path finds zero targets and exits 2. Same workaround as gen-entries.
+const formatted = execFileSync("pnpm", ["exec", "oxfmt", "--stdin-filepath=modules.ts"], {
+  cwd: docsDir,
+  input: body,
+  encoding: "utf8",
+});
+writeFileSync(out, formatted);
 console.log(`gen-chart-modules: wrote ${slugs.length} lazy module loaders to ${out}`);
