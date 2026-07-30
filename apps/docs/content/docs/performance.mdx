@@ -34,6 +34,11 @@ EventTimeline, VolumeProfile, GradedBand and LikertStrip; the last two crossed t
 onto a real `Intl` formatter. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
 the rest against the chart's scale, and you pay for it only on those charts.
 
+Every number on this page is measured in this repo. For a reading nobody here produced, open the package on
+[Bundlephobia](https://bundlephobia.com/package/@microcharts/react): it installs the published tarball, counts the
+dependencies, and sizes the root entry. Its figure covers the package root rather than a per-chart subpath, so read it
+as a check on the dependency count, not as the number a chart costs you.
+
 ### Splitting the stylesheet
 
 `@microcharts/react/styles.css` is one artifact for the whole catalog, and importing it once is the right default: it is

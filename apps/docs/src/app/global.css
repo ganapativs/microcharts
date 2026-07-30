@@ -1128,7 +1128,10 @@ body {
     }
   }
 }
-.glass-rail[data-scrolled] {
+/* Scrolled surface. The `:root` attribute comes from the boot script in
+   layout.tsx, which sets it before hydration, so a reload at a restored offset
+   never paints a bare rail first. */
+:root[data-rail-scrolled] .glass-rail {
   background-color: color-mix(in oklab, var(--color-fd-background) 72%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
   backdrop-filter: blur(16px) saturate(var(--glass-sat)) brightness(var(--glass-bright));
@@ -1136,7 +1139,7 @@ body {
 /* While the mobile sheet is open the WHOLE header is solid page ink — rail and
    sheet must read as one seamless surface (the sheet can't frost, see above),
    so the rail drops its translucency instead of the sheet faking one. Wins
-   over [data-scrolled] by source order. */
+   over the scrolled surface by source order. */
 .glass-rail[data-menu-open] {
   background-color: var(--color-fd-background);
   -webkit-backdrop-filter: none;
@@ -1671,11 +1674,14 @@ figure:has(> pre) .shiki,
   border-top: 0;
 }
 /* Row headers (`<th scope="row">`, e.g. the compare tables) — same cell as a
-   td, not the mono column-header treatment. */
+   td, not the mono column-header treatment. Fumadocs' prose gives every `th` a
+   muted fill; on light that paints the first column a different colour from the
+   rest of the row, so clear it here. */
 .prose tbody th,
 .mc-table tbody th {
   border: 0;
   border-top: 1px solid color-mix(in oklab, var(--hairline) 50%, transparent);
+  background-color: transparent;
   padding: 0.7rem 1rem;
   vertical-align: top;
   text-align: left;

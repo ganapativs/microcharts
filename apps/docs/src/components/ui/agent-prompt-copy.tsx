@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Check, Copy, Link2 } from "lucide-react";
+import { CopyLabel } from "@/components/ui/copy";
 import { SITE } from "@/lib/site";
 import { track } from "@/lib/analytics";
 
@@ -35,7 +36,7 @@ export function AgentPromptCopy() {
         }}
       >
         {copied === "full" ? <Check className="size-4" /> : <Copy className="size-4" />}
-        {copied === "full" ? "Copied" : "Copy setup prompt"}
+        <CopyLabel copied={copied === "full"} idle="Copy setup prompt" done="Copied" />
       </button>
       <button
         type="button"
@@ -45,7 +46,7 @@ export function AgentPromptCopy() {
         onClick={() => copy(SHORT_PROMPT, "short")}
       >
         {copied === "short" ? <Check className="size-3.5" /> : <Link2 className="size-3.5" />}
-        {copied === "short" ? "Copied" : "Copy short version"}
+        <CopyLabel copied={copied === "short"} idle="Copy short version" done="Copied" />
       </button>
     </div>
   );

@@ -4,6 +4,7 @@ import {
   MUI_X_CHARTS,
   REACT_SPARKLINES_LEGACY,
   RECHARTS,
+  TANSTACK_CHARTS,
   VISX,
 } from "./competitor-facts";
 
@@ -45,6 +46,17 @@ describe("competitor-facts", () => {
     expect(MUI_X_CHARTS.runtimeDeps).toBe(10);
     expect(MUI_X_CHARTS.requiredPeers).toContain("@mui/material");
     expect(MUI_X_CHARTS.license).toBe("MIT");
+  });
+
+  it("pins TanStack Charts as a pre-release proof with a measured chart", () => {
+    expect(TANSTACK_CHARTS.version).toBe("0.0.0");
+    expect(TANSTACK_CHARTS.firstPublish).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(TANSTACK_CHARTS.license).toBe("MIT");
+    expect(TANSTACK_CHARTS.oneChartGzipKb).toBeGreaterThan(10);
+    expect(TANSTACK_CHARTS.oneChartGzipKb).toBeLessThan(50);
+    expect(TANSTACK_CHARTS.runtimeDeps).toBe(4);
+    expect(TANSTACK_CHARTS.reactPeer).toBe("^19.0.0");
+    expect(TANSTACK_CHARTS.measuredAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
   it("pins the visx minimal-sparkline measurement", () => {

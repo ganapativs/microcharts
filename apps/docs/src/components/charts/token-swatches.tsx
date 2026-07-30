@@ -4,6 +4,7 @@ import { Check, Copy } from "lucide-react";
 import { Sparkline } from "@microcharts/react/sparkline";
 import { MiniBar } from "@microcharts/react/mini-bar";
 import { cn } from "@/lib/cn";
+import { CopyLabel } from "@/components/ui/copy";
 import { SEMANTIC_TOKENS, CATEGORICAL_TOKENS, PRESETS, type ColorToken } from "@/lib/mc-tokens";
 import { serializeTokens } from "@/lib/token-export";
 
@@ -174,7 +175,7 @@ function CopyPresetTokens({ preset }: { preset: string }) {
       className="inline-flex items-center gap-1 rounded-md border border-fd-border/70 px-1.5 py-0.5 text-[0.62rem] font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-foreground"
     >
       {copied ? <Check className="size-3 text-fd-primary" /> : <Copy className="size-3" />}
-      {copied ? "Copied" : "Copy tokens"}
+      <CopyLabel copied={copied} idle="Copy tokens" done="Copied" />
     </button>
   );
 }

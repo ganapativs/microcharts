@@ -1,0 +1,76 @@
+---
+title: microcharts vs TanStack Charts — tiny charts comparison
+description:
+  TanStack Charts is a typed chart grammar over d3, published as a 0.0.0 proof; this page measures one of its React
+  charts and lists what each library decides for you.
+---
+
+[TanStack Charts](https://tanstack.com/charts) is a typed visualization grammar: you declare marks, channels, and d3
+scales, and an adapter renders SVG for React, Vue, Solid, Svelte, Angular, Lit, or the vanilla DOM. Its catalog covers
+full surfaces — lines, bars, heatmaps, treemaps, choropleths, streamgraphs. microcharts ships finished word-sized marks
+for React with the design decisions already made.
+
+Check the release status before you compare anything else. TanStack Charts went to npm as `0.0.0` on 2026-07-29, and its
+README calls the packages a product proof that is not ready for production. Everything measured below is that snapshot,
+and it will move.
+
+## The numbers
+
+<VsTanstackChartsTable />
+
+That <TanstackChartGzip /> is one line chart: `defineChart` with a single `lineY` mark and two d3 scales, through
+`@tanstack/react-charts`, with react external. TanStack publishes <TanstackVendorGzip /> for the same class of chart on
+the vanilla renderer, so the two readings agree. That is a fair price for a chart with axes, grid, guide margins, and
+tooltips. It is also about ten times the budget of a Sparkline that has to fit in a table cell.
+
+## What each library decides
+
+TanStack Charts hands you the composition. You pick the scales, the marks, the domains, the guides, and the label text,
+and the type system checks that they line up with your datum. That is the point of a grammar: the chart you need next
+year is the same API as the chart you need today.
+
+microcharts hands you the chart. The catalog is <CatalogTotal /> fixed types, so there is no grammar to grow into and no
+composition to assemble when the shape you want is missing. In exchange, areas anchor at zero, direction is never
+color-alone, labels reserve deterministic gutters, and empty or all-null data render documented placeholders. You pass
+`data` and get a mark that is already sized for a sentence.
+
+## Chrome and node count
+
+That one-line chart renders <TanstackSvgNodes /> SVG elements server-side, because guides, grid, and axis rules are part
+of what a chart surface means. A microchart runs about six nodes, because axes and legends are hard-coded away rather
+than configured off. Both counts are right for their job. Neither library is trying to hit the other one's number.
+
+## Server Components
+
+TanStack Charts renders SVG on the server, and the React `<Chart>` component reads that same prerendered markup. The
+component itself calls `useMemo`, `useId`, and `useLayoutEffect` and carries no `'use client'` directive, so in an RSC
+app it goes inside a client boundary and ships its JavaScript. The static microcharts entry is hook-free by design and
+renders from a Server Component with zero client JS; interactivity lives in a separate `/interactive` subpath.
+
+## Accessibility
+
+Both libraries treat the accessible name as required rather than optional. TanStack Charts types `ariaLabel` as a
+required prop and renders `role="img"` with `aria-roledescription="chart"`, so the sentence a screen reader announces is
+yours to write and keep in sync with the data. microcharts generates that sentence from the data with `describeSeries`,
+and `summary={false}` is the decorative opt-out.
+
+## Reach for TanStack Charts
+
+- You want one typed grammar for every chart in the product, at panel size
+- You need shapes microcharts excludes on purpose: treemaps, choropleths, networks, streamgraphs
+- You render charts from more than one framework and want the same definition in each
+- You are comfortable tracking a pre-1.0 API
+
+## Reach for microcharts
+
+- The mark belongs in a sentence, a table cell, a KPI, or a streamed reply
+- You want static RSC output at <SizeMarketing /> gzip with zero runtime dependencies
+- You want the accessible summary, the edge cases, and the design generated for you
+- You are on React 18 as well as React 19
+
+## Next
+
+- [When to use microcharts](/docs/when-to-use)
+- [Full chart libraries](/docs/full-chart-libraries) — the same decision against Recharts and Chart.js
+- [microcharts vs visx](/docs/vs-visx) — the other build-it-yourself fork in the road
+- [Design notes](/docs/design-notes) — the decisions microcharts makes for you

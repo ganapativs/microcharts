@@ -9,9 +9,10 @@ import { track } from "@/lib/analytics";
  * binary at full strength, verb quiet, package on the accent, so it recolours
  * with the palette. No box — the syntax colour already says "shell command".
  *
- * The button keeps its width when the label changes so the row never reflows, and
- * `aria-live` sits on a separate node: swapping the accessible name of the
- * control you just activated is announced as a different control.
+ * The row reserves the confirmation's box before it is shown, so clicking copy
+ * moves nothing. `aria-live` sits on a separate visually-hidden node: swapping
+ * the accessible name of the control you just activated is announced as a
+ * different control.
  */
 export function CopyLine({
   text,
@@ -55,8 +56,17 @@ export function CopyLine({
           <Copy aria-hidden className="size-3.5" style={{ color: "var(--ink-3)" }} />
         )}
       </button>
-      <span aria-live="polite" className="mono-s" style={{ color: "var(--ink-3)" }}>
-        {copied ? "copied" : ""}
+      {/* The confirmation reserves its box up front — width from the word, height
+          pinned by `leading-none` — so the row never grows when it appears. */}
+      <span
+        aria-hidden
+        className="mono-s leading-none transition-opacity duration-150"
+        style={{ color: "var(--ink-3)", opacity: copied ? 1 : 0 }}
+      >
+        copied
+      </span>
+      <span aria-live="polite" className="sr-only">
+        {copied ? "Copied" : ""}
       </span>
     </span>
   );

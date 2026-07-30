@@ -53,7 +53,12 @@ const featured = FEATURED_SLUGS.map((slug) => STABLE_CHARTS.find((c) => c.slug =
   (c): c is (typeof STABLE_CHARTS)[number] => c !== undefined,
 );
 
-const cols: { title: string; links: { href: string; label: string; external?: boolean }[] }[] = [
+// `external` = a plain <a> (a file this site serves, not a route); `offsite`
+// adds the new-tab treatment the rest of the outbound links here use.
+const cols: {
+  title: string;
+  links: { href: string; label: string; external?: boolean; offsite?: boolean }[];
+}[] = [
   {
     title: "Docs",
     links: [
@@ -62,6 +67,10 @@ const cols: { title: string; links: { href: string; label: string; external?: bo
       { href: "/docs/accessibility", label: "Accessibility" },
       { href: "/docs/performance", label: "Performance" },
       { href: "/docs/theming", label: "Theming" },
+      // The one link in this column that leaves the site: Bundlephobia installs
+      // the published tarball and counts its dependencies, so the size claims on
+      // /docs/performance have a reading next to them that nobody here produced.
+      { href: SITE.bundlephobia, label: "Bundle size ↗", external: true, offsite: true },
     ],
   },
   {
@@ -221,6 +230,8 @@ export function SiteFooter() {
                     <li key={l.href}>
                       <a
                         href={l.href}
+                        target={l.offsite ? "_blank" : undefined}
+                        rel={l.offsite ? "noreferrer noopener" : undefined}
                         className="text-fd-muted-foreground link-underline hover:text-fd-foreground"
                       >
                         {l.label}

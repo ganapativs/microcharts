@@ -7,6 +7,7 @@ import { ArrowUpRight, Check, Copy, Monitor, Moon, Palette, Sun } from "lucide-r
 import { Sparkline } from "@microcharts/react/sparkline";
 import { SegmentedBar } from "@microcharts/react/segmented-bar";
 import { cn } from "@/lib/cn";
+import { CopyLabel } from "@/components/ui/copy";
 import { PRESETS as MC_PRESETS } from "@/lib/mc-tokens";
 import { serializeTokens } from "@/lib/token-export";
 
@@ -331,7 +332,7 @@ export function AppearanceMenu() {
                   ) : (
                     <Copy className="size-3.5" />
                   )}
-                  {copied ? "Copied CSS" : "Copy tokens"}
+                  <CopyLabel copied={copied} idle="Copy tokens" done="Copied CSS" />
                 </button>
                 <Link
                   href="/docs/theming#copy-tokens"

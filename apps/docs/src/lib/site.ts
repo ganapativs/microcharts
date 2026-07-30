@@ -11,6 +11,9 @@ export const SITE = {
   pkg: "@microcharts/react",
   repo: "https://github.com/ganapativs/microcharts",
   npm: "https://www.npmjs.com/package/@microcharts/react",
+  /** Third-party read on the published package — dependency count and the size
+   *  of the root entry, measured by someone other than us. */
+  bundlephobia: "https://bundlephobia.com/package/@microcharts/react",
   author: "Ganapati V S",
   authorUrl: "https://meetguns.com",
   authorX: "https://x.com/ganapativs",

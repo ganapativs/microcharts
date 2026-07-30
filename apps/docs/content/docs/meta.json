@@ -27,6 +27,7 @@
     "vs-chartjs",
     "vs-react-sparklines",
     "vs-mui-x-sparkline",
-    "vs-visx"
+    "vs-visx",
+    "vs-tanstack-charts"
   ]
 }

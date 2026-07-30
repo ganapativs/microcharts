@@ -6,6 +6,7 @@ import {
   MUI_X_CHARTS,
   REACT_SPARKLINES_LEGACY,
   RECHARTS,
+  TANSTACK_CHARTS,
   VISX,
 } from "@/lib/competitor-facts";
 
@@ -188,6 +189,69 @@ export function VsVisxTable() {
         },
       ]}
       note={`visx size via esbuild bundle of LinePath + scaleLinear, react external, minify+gzip ${VISX.measuredAt}. microcharts from .size-limit.json (CI).`}
+    />
+  );
+}
+
+/** Pinned TanStack Charts readings, so /docs/vs-tanstack-charts prose never
+ *  hard-codes a competitor number. */
+export function TanstackChartGzip() {
+  return <span className="tabular-nums">{TANSTACK_CHARTS.oneChartGzipKb} kB</span>;
+}
+
+export function TanstackVendorGzip() {
+  return <span className="tabular-nums">{TANSTACK_CHARTS.vendorSvgChartGzipKb} kB</span>;
+}
+
+export function TanstackSvgNodes() {
+  return <span className="tabular-nums">{TANSTACK_CHARTS.ssrSvgNodes}</span>;
+}
+
+/** Orientation table for /docs/vs-tanstack-charts — a grammar in pre-release
+ *  against a finished word-sized catalog. */
+export function VsTanstackChartsTable() {
+  const spark = CHART_GZIP.sparkline;
+  const ts = TANSTACK_CHARTS;
+  return (
+    <CompareTable
+      competitor={`TanStack Charts ${ts.version}`}
+      rows={[
+        {
+          signal: "Gzip for one line chart",
+          them: `~${ts.oneChartGzipKb} kB (React adapter, react external)`,
+          us: `${spark?.static} kB static · ${spark?.interactive} kB interactive`,
+        },
+        {
+          signal: "Release status",
+          them: `${ts.status} — first published ${ts.firstPublish}`,
+          us: `stable on npm, ${CATALOG.total} charts`,
+        },
+        {
+          signal: "Runtime dependencies",
+          them: `${ts.runtimeDeps} d3 packages, plus ${ts.appInstalls.join(" + ")} in your app`,
+          us: "0 (React is a peer)",
+        },
+        {
+          signal: "React support",
+          them: `peer ${ts.reactPeer}`,
+          us: "peer ^18 || ^19",
+        },
+        {
+          signal: "Server Components",
+          them: "renders SVG on the server; the React component is hook-based, so it needs a client boundary",
+          us: "static entry renders in RSC, zero client JS",
+        },
+        {
+          signal: "Accessible name",
+          them: (
+            <>
+              required <code>ariaLabel</code> prop — you write the sentence
+            </>
+          ),
+          us: 'role="img" + summary from the data',
+        },
+      ]}
+      note={`TanStack Charts gzip via esbuild bundle of defineChart + lineY + d3 scales through @tanstack/react-charts, react external, minify+gzip ${ts.measuredAt}; status, deps, and markup read from the published ${ts.version} package the same day. microcharts from .size-limit.json (CI).`}
     />
   );
 }
