@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { CopyLabel } from "@/components/ui/copy";
 import { track } from "@/lib/analytics";
 
 function fetchPrompt() {
@@ -51,7 +52,7 @@ export function CopyAgentSetup({ className }: { className?: string }) {
       onClick={() => void copy()}
     >
       {copied ? <Check className="size-4 pop-in" /> : <Copy className="size-4" />}
-      {copied ? "Copied to clipboard" : "Copy setup prompt"}
+      <CopyLabel copied={copied} idle="Copy setup prompt" done="Copied to clipboard" />
     </button>
   );
 }

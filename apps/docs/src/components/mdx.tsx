@@ -144,10 +144,14 @@ import {
   CatalogTotal,
   ChartSize,
   SizeMarketing,
+  TanstackChartGzip,
+  TanstackSvgNodes,
+  TanstackVendorGzip,
   VsChartJsTable,
   VsMuiXTable,
   VsReactSparklinesTable,
   VsRechartsTable,
+  VsTanstackChartsTable,
   VsVisxTable,
 } from "@/components/ui/choose-facts";
 import dynamic from "next/dynamic";
@@ -376,6 +380,10 @@ export function getMDXComponents(components?: MDXComponents) {
     VsReactSparklinesTable,
     VsMuiXTable,
     VsVisxTable,
+    VsTanstackChartsTable,
+    TanstackChartGzip,
+    TanstackVendorGzip,
+    TanstackSvgNodes,
     ...components,
   } satisfies MDXComponents;
 }

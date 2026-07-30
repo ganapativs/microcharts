@@ -74,6 +74,13 @@ const mono = localFont({
 // Apply saved accent + chart preset before first paint.
 const ACCENT_SCRIPT = `try{var d=document.documentElement,a=localStorage.getItem("mc-accent");if(a&&a!=="cobalt")d.dataset.accent=a;var p=localStorage.getItem("mc-preset");if(p&&p!=="modern")d.dataset.mcPreset=p}catch(e){}`;
 
+// Mark the scrolled state on :root before hydration, so a reload at a restored
+// scroll offset paints the header's surface in the first frame instead of
+// materialising it a beat later (which is what a hydration-time effect does).
+// Scroll restoration can land before or after this script runs, so the state is
+// re-read on the next frame and on pageshow (bfcache) as well as on scroll.
+const RAIL_SCRIPT = `try{var d=document.documentElement,f=function(){d.toggleAttribute("data-rail-scrolled",(window.scrollY||0)>8)};f();addEventListener("scroll",f,{passive:true});addEventListener("pageshow",f);requestAnimationFrame(f)}catch(e){}`;
+
 // Console easter egg — unicode blocks of the hero sparkline series [3,5,4,8,6,9,7,11].
 const CONSOLE_SCRIPT = `try{console.log("%c▁▃▂▅▄▆▅█%c  ${SITE.name}%c\\n${SITE.tagline}\\nThat glyph is the hero's sparkline in text. Small enough for a sentence, a table cell, or a console.log.\\nZero dependencies, ~2–7 kB interactive · ~1–4 kB static per chart, accessible by default.\\n\\nDocs    ${SITE.url}/docs\\nSource  ${SITE.repo}","color:#2f52d4;font-size:15px;letter-spacing:1.5px","color:#2f52d4;font-weight:700;font-size:13px","color:#8a8986;font-size:11px;line-height:1.7")}catch(e){}`;
 
@@ -168,6 +175,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <div aria-hidden className="site-grain" />
         <div aria-hidden className="site-wash" />
         <script dangerouslySetInnerHTML={{ __html: ACCENT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: RAIL_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSOLE_SCRIPT }} />
         <script type="application/ld+json">{jsonLdScript(organizationJsonLd())}</script>
         <script type="application/ld+json">{jsonLdScript(websiteJsonLd())}</script>

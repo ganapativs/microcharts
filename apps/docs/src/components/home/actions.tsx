@@ -68,9 +68,12 @@ export function HeroActions() {
       </div>
       <div className="grid justify-items-start gap-y-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3.5">
         <CopyLine text={`pnpm add ${SITE.pkg}`} />
+        {/* No margin nudges: the separator sits on the row's own gap, equal on
+            both sides. The old -1.5/+1.5 pair corrected for a trailing gap
+            inside CopyLine that the copy control no longer reserves. */}
         <span
           aria-hidden
-          className="hidden select-none sm:-ml-1.5 sm:mr-1.5 sm:inline"
+          className="hidden select-none sm:inline"
           style={{ color: "var(--rule-2)" }}
         >
           /

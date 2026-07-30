@@ -77,6 +77,37 @@ export const VISX = {
   measuredAt: "2026-07-23",
 } as const;
 
+/** TanStack Charts — a typed chart grammar over granular d3 modules, published
+ *  as a `0.0.0` proof on 2026-07-29. Sizes measured 2026-07-30 via esbuild
+ *  minify+gzip on one `lineY` chart through `@tanstack/react-charts`, react
+ *  external. Markup facts read from the SSR output of that same bundle. */
+export const TANSTACK_CHARTS = {
+  name: "TanStack Charts",
+  pkg: "@tanstack/charts",
+  reactPkg: "@tanstack/react-charts",
+  version: "0.0.0",
+  firstPublish: "2026-07-29",
+  license: "MIT",
+  /** README, 2026-07-30: not published for production use yet. */
+  status: "unpublished 0.0.0 product proof",
+  /** One line chart (defineChart + lineY + two d3 scales) through the React
+   *  adapter, react/react-dom external, esbuild minify+gzip — 2026-07-30. */
+  oneChartGzipKb: 20.2,
+  /** tanstack.com/charts, 2026-07-30 — their own figure, vanilla renderer. */
+  vendorSvgChartGzipKb: "18.5–19.2",
+  /** d3-array, d3-geo, d3-scale, d3-shape (plus two @types packages). */
+  runtimeDeps: 4,
+  /** The app installs d3 scale/array itself; the docs install line says so. */
+  appInstalls: ["d3-array", "d3-scale"],
+  reactPeer: "^19.0.0",
+  /** SVG element count in the SSR output of that one-line chart, grid and axes
+   *  included — measured 2026-07-30. */
+  ssrSvgNodes: 28,
+  measuredAt: "2026-07-30",
+  docs: "https://tanstack.com/charts",
+  repo: "https://github.com/TanStack/charts",
+} as const;
+
 /** Chart.js + the usual React wrapper. Canvas-first, full chart surfaces. */
 export const CHART_JS = {
   name: "Chart.js",

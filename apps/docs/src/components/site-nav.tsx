@@ -60,7 +60,6 @@ const ctrl = "ghost-ctrl size-8";
 
 export function SiteNav() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   // The mobile sheet never survives a navigation or an Escape.
@@ -76,26 +75,13 @@ export function SiteNav() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 8));
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
   return (
-    <header
-      className="glass-rail sticky top-0 z-40"
-      data-scrolled={scrolled || undefined}
-      data-menu-open={open || undefined}
-    >
+    // The scrolled surface is not React's business. The boot script in
+    // layout.tsx sets `:root[data-rail-scrolled]` before hydration and keeps it
+    // on scroll, so a reload at a restored offset paints the right rail in the
+    // first frame — a hydration-time effect never can, which is what made the
+    // background appear a beat after the page.
+    <header className="glass-rail sticky top-0 z-40" data-menu-open={open || undefined}>
       <nav className="mx-auto flex h-14 max-w-shell items-center gap-5 px-4 sm:px-6">
         <Wordmark />
         <div className="hidden items-center gap-0.5 md:flex">

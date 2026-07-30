@@ -9,9 +9,10 @@ import { track } from "@/lib/analytics";
  * binary at full strength, verb quiet, package on the accent, so it recolours
  * with the palette. No box — the syntax colour already says "shell command".
  *
- * The button keeps its width when the label changes so the row never reflows, and
- * `aria-live` sits on a separate node: swapping the accessible name of the
- * control you just activated is announced as a different control.
+ * Copying swaps the trailing icon to a tick and nothing else: same box, same
+ * row, no reflow and no reserved gap. `aria-live` sits on a separate
+ * visually-hidden node, because swapping the accessible name of the control you
+ * just activated is announced as a different control.
  */
 export function CopyLine({
   text,
@@ -41,7 +42,7 @@ export function CopyLine({
   }
 
   return (
-    <span className="inline-flex items-center gap-3">
+    <span className="inline-flex items-center">
       <button
         type="button"
         onClick={copy}
@@ -55,8 +56,11 @@ export function CopyLine({
           <Copy aria-hidden className="size-3.5" style={{ color: "var(--ink-3)" }} />
         )}
       </button>
-      <span aria-live="polite" className="mono-s" style={{ color: "var(--ink-3)" }}>
-        {copied ? "copied" : ""}
+      {/* The tick IS the confirmation. A visible "copied" word either reflows the
+          row or reserves a gap that sits there permanently; the icon swap says
+          the same thing inside a box that never changes. */}
+      <span aria-live="polite" className="sr-only">
+        {copied ? "Copied" : ""}
       </span>
     </span>
   );
