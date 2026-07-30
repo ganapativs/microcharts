@@ -212,12 +212,16 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
+      {/* `muted` resolves to exactly the stroke this line already carried, so
+          the role repaints nothing; it is here because "today" moves along the
+          x axis as the sprint advances, and a today-rule that jumps while the
+          burn line under it glides is the one mark contradicting the update. */}
       <line
         x1={geo.today.x}
         y1={1}
         x2={geo.today.x}
         y2={height - 1}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"

@@ -153,14 +153,14 @@
   },
   "net-flow": {
     "static": 3.33,
-    "interactive": 5.77
+    "interactive": 5.78
   },
   "retention-curve": {
     "static": 3.44,
     "interactive": 5.99
   },
   "burn-chart": {
-    "static": 3.49,
+    "static": 3.48,
     "interactive": 6.06
   },
   "error-budget": {
@@ -316,8 +316,8 @@
     "interactive": 5.51
   },
   "eta-bar": {
-    "static": 2.23,
-    "interactive": 3.74
+    "static": 2.24,
+    "interactive": 3.75
   },
   "waveform": {
     "static": 2.67,

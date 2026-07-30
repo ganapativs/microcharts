@@ -221,12 +221,18 @@ export function NetFlow(props: NetFlowProps): ReactNode {
           <path d={geo.outArea.d} data-mc-ink={outRole} fillOpacity={AREA_OPACITY} />
         </>
       )}
+      {/* `muted` IS this line's paint — `fill: none; stroke: var(--mc-neutral)`,
+          the attribute it replaces — so the role costs nothing and buys two
+          things: the zero rule travels when a new domain moves it (a baseline
+          that jumps while the areas around it glide reads as two charts), and
+          it finally maps to GrayText under forced-colors instead of painting a
+          fixed warm gray on the user's chosen Canvas. */}
       <line
         x1={0}
         y1={geo.zeroY}
         x2={width}
         y2={geo.zeroY}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"

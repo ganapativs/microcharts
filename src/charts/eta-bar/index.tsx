@@ -156,7 +156,13 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           x2={dividerX}
           y1={geo.done.y - 0.5}
           y2={geo.done.y + geo.done.height + 0.5}
-          stroke="var(--mc-stroke)"
+          // `data` is the role that strokes in --mc-stroke, which is this
+          // divider's colour already — it takes the role to travel with the
+          // elapsed edge it marks, since the bars on both sides already do. The
+          // role also rounds line caps, and a round cap on a 0.75-wide tick
+          // overhangs the bar it is measured against, so the cap is pinned back.
+          data-mc-ink="data"
+          style={{ strokeLinecap: "butt" }}
           data-mc-w="tick"
           vectorEffect="non-scaling-stroke"
         />
