@@ -51,7 +51,6 @@ const BACKLOG: Record<string, number> = {
   "status-dot": 3,
   "tape-gauge": 1,
   "time-in-range": 1,
-  "tree-rings": 1,
 };
 
 /** Opening tags of geometry elements, brace-aware so JSX expressions survive. */
@@ -62,6 +61,17 @@ function geometryTags(src: string): string[] {
     let depth = 0;
     for (let i = m.index; i < src.length; i++) {
       const ch = src[i];
+      // A `//` comment inside a tag is prose, and this file's own charts write
+      // `<circle>` in one. Reading that as the tag's closing `>` cut the tag
+      // short and reported every attribute after the comment as absent —
+      // `tree-rings` looked role-less while carrying `data-mc-ink="data"` two
+      // lines below the comment that explains it.
+      if (ch === "/" && src[i + 1] === "/") {
+        const nl = src.indexOf("\n", i);
+        if (nl === -1) break;
+        i = nl;
+        continue;
+      }
       if (ch === "{") depth++;
       else if (ch === "}") depth--;
       else if (ch === ">" && depth === 0) {
