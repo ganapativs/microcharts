@@ -163,25 +163,34 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
         summary={false}
         style={fillFor(style)}
       >
+        {/* Both rules TRAVEL to the bin they name (styles.css glides
+            `data-mc-ui`). `x1`/`x2` have no CSS geometry property in any
+            engine, so the line sits at x=0 and a transitioned `translateX`
+            carries it — the fold axis is time-of-day, so only the pointer
+            moves, never a value. */}
         {pinned ? (
           <line
-            x1={pinned.x}
-            x2={pinned.x}
+            x1={0}
+            x2={0}
             y1={0.5}
             y2={height - 0.5}
             stroke="var(--mc-accent)"
+            data-mc-ui=""
             data-mc-w="support"
+            style={{ transform: `translateX(${pinned.x}px)` }}
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {s ? (
           <line
-            x1={s.x}
-            x2={s.x}
+            x1={0}
+            x2={0}
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="tick"
+            style={{ transform: `translateX(${s.x}px)` }}
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

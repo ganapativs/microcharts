@@ -1,6 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { HERO_FRAMES } from "./hero-frames";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { heroFrames, type HeroData } from "./hero-frames";
 
 /**
  * The fold's rotating claim: four sentences, each with its own mark set inside
@@ -27,7 +27,18 @@ const SWAP_MS = 460;
 /** A property of the mark, and which of the two rows names it. */
 type Callout = { text: string; row: 0 | 1 };
 
-export function HeroSentence({ callouts }: { callouts: readonly Callout[] }) {
+export function HeroSentence({
+  callouts,
+  data,
+}: {
+  callouts: readonly Callout[];
+  /** Measured by `heroData()` on the server — this component never reads the
+   *  registry itself (see `hero-data.ts`). */
+  data: HeroData;
+}) {
+  // The frames hold real charts, so rebuilding them on every pointer enter would
+  // remount four marks. `data` arrives once from a server component.
+  const frames = useMemo(() => heroFrames(data), [data]);
   const sayRef = useRef<HTMLDivElement>(null);
   const fanRef = useRef<HTMLDivElement>(null);
 
@@ -117,14 +128,14 @@ export function HeroSentence({ callouts }: { callouts: readonly Callout[] }) {
   // the transition suppressed — that is a flicker, which is what the preference
   // asks us not to do. Those readers keep frame 0; the rail still steps.
   useEffect(() => {
-    if (HERO_FRAMES.length < 2) return;
+    if (frames.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const t = setInterval(() => {
       if (held.current) return;
-      go((active + 1) % HERO_FRAMES.length);
+      go((active + 1) % frames.length);
     }, DWELL_MS);
     return () => clearInterval(t);
-  }, [active, go]);
+  }, [active, go, frames.length]);
 
   // Park the outgoing frame once it has gone, so its next turn enters from below
   // like every other frame.
@@ -145,7 +156,7 @@ export function HeroSentence({ callouts }: { callouts: readonly Callout[] }) {
       {/* One dot per claim, on the page's own left axis. Real buttons: rotating
           is the default, and a reader who steps keeps it. */}
       <div className="hero-rail mt-6 sm:mt-8" role="tablist" aria-label="What the chart is showing">
-        {HERO_FRAMES.map((f, i) => (
+        {frames.map((f, i) => (
           <button
             key={f.id}
             type="button"
@@ -182,7 +193,7 @@ export function HeroSentence({ callouts }: { callouts: readonly Callout[] }) {
           held.current = true;
         }}
       >
-        {HERO_FRAMES.map((f, i) => (
+        {frames.map((f, i) => (
           <p
             key={f.id}
             className="sentence"
@@ -226,7 +237,7 @@ export function HeroSentence({ callouts }: { callouts: readonly Callout[] }) {
                   `<li>` never changes width and the leader above it never moves. */}
               {i === 0 ? (
                 <span className="fan-swap-box">
-                  {HERO_FRAMES.map((f, fi) => (
+                  {frames.map((f, fi) => (
                     <span
                       key={f.id}
                       className="fan-swap"

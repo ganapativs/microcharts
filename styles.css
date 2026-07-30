@@ -1088,6 +1088,48 @@
     }
   }
 
+  /* Scrub response — the focus mark TRAVELS to the datum it names instead of
+     being repainted at the new one. Across a scrub the eye keeps hold of a mark
+     that moves and has to re-find one that teleports, which is the whole reason
+     this reads as a response rather than a redraw.
+
+     `transform` is the ONLY transitioned property, and that is the whole policy
+     — not an optimisation. A response mark travels if, and only if, it is
+     positioned by a transform. Which mark deserves to travel is a real
+     distinction:
+
+       - A crosshair tracks a CONTINUUM. Mid-glide it sits between two samples,
+         which is exactly where the pointer is, so it tells the truth the whole
+         way across and may travel. These are already built on a transform,
+         because `x1`/`y1`/`x2`/`y2` have no CSS geometry property in any engine
+         and a line placed by them cannot animate at all.
+       - A focus or selection RING names a DISCRETE UNIT — "this bar", "this
+         cell". Mid-glide it encloses no unit, so it names nothing while the
+         screen reader has already announced the new one. Rings are placed by
+         `x`/`y`/`cx`/`cy`/`d`, none of which are listed here, so they snap.
+         `focus-ring-symmetry.browser.test.tsx` exists because a ring once
+         inherited a geometry transition and lerped across a whole beam,
+         off-centre from the unit it named for the length of it.
+
+     Keying on the positioning method rather than on an attribute is what makes
+     this safe to apply library-wide: `data-mc-w` looked like a ring marker but
+     is really a stroke-width role that crosshairs carry too, so excluding it
+     would have stopped the very marks that should move. Transform also dodges
+     an engine floor — `x`/`cx`/`cy` only became animatable CSS properties in
+     Safari 17.4 and Firefox 128, while this package supports Safari 16.4+, so a
+     geometry-driven glide would run on Chrome and snap on a supported Safari.
+
+     120 ms is short on purpose. It has to finish inside the gap between two
+     pointer samples, or the mark visibly trails the cursor and the reading lags
+     the reader. The readout TEXT is never transitioned — the number swaps
+     instantly, so the value on screen is never mid-way between two data
+     points. */
+  :where(.mc-root [data-mc-ui], .mc-root [data-mc-ui] :is(g, rect, circle, line)) {
+    transition-property: transform;
+    transition-duration: 120ms;
+    transition-timing-function: var(--mc-easing);
+  }
+
   @keyframes mc-pulse {
     0% {
       transform: scale(1);

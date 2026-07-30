@@ -191,17 +191,23 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     if (!Number.isFinite(data[i])) return null;
     const x = xOf(i);
     return (
+      // The crosshair travels on `transform`: `x1`/`x2` have no CSS geometry
+      // property behind them in any engine, so a line placed by those
+      // attributes teleports between points instead of gliding to the one it
+      // names.
       <line
-        x1={x}
+        x1={0}
         y1={0}
-        x2={x}
+        x2={0}
         y2={height}
         stroke="var(--mc-accent)"
+        data-mc-ui=""
         // Pin is "support", not the usual "tick": the static break markers are
         // already line[data-mc-w="tick"], so tick can't identify the pin here.
         data-mc-w={pinned ? "support" : "tick"}
         strokeDasharray="1.5 1.5"
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateX(${x}px)` }}
       />
     );
   };

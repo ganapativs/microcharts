@@ -4,21 +4,37 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 import { SparkBar } from "@microcharts/react/sparkbar/interactive";
 import { SegmentedBar } from "@microcharts/react/segmented-bar/interactive";
 import { RugStrip } from "@microcharts/react/rug-strip/interactive";
-import { HERO_APPS, HERO_COLLECTIONS, HERO_SIZES, HERO_SVG_BYTES } from "./home-data";
 
 /**
  * The four things the fold says, each with the chart that proves it. The rotating
  * unit is the SENTENCE, so the mark inside it is always that claim's evidence.
  *
  * Three rules hold the set together: no repeated chart type, no repeated fact
- * (size, composition, real usage, render output), and every figure measured —
- * they all resolve from `home-data.ts`, which `home.test.ts` checks against
- * `chart-sizes.json`, `entries.generated.json`, `showcase.ts` and
- * `bench-summary.json`.
+ * (size, composition, real usage, render output), and every figure measured.
  *
- * `kb` is each TYPE's own interactive gzip and the fan's first callout shows it,
- * so the four frames also demonstrate the 4.86–6.94 kB range they claim.
+ * Nothing here is typed by hand. `hero-data.ts` reads `chart-sizes.json`,
+ * `bench-summary.json`, the entries registry and `showcase.ts` on the SERVER and
+ * hands the numbers down as props — this module stays a client component without
+ * pulling `entries.generated.json` (~236 kB) into the bundle with it. Every
+ * figure in the prose is computed from the series drawn beside it, so a sentence
+ * cannot quote a median its own mark does not plot.
  */
+
+/** Everything the fold states, measured. Built by `heroData()` on the server. */
+export type HeroData = {
+  /** Interactive gzip kB for every interactive entry in the stable catalog, ascending. */
+  sizes: readonly number[];
+  /** Bytes of SVG each stable chart renders for the bench's 24-point series, ascending. */
+  svgBytes: readonly number[];
+  /** The stable catalog split by collection, in catalog order. */
+  collections: readonly { label: string; value: number }[];
+  /** Chart types imported by each example app, in showcase order. */
+  apps: readonly number[];
+  /** Stable chart types in the catalog. */
+  total: number;
+  /** Each frame's OWN type, interactive gzip kB — what the fan's first callout shows. */
+  kb: { rugStrip: number; segmentedBar: number; sparkBar: number; sparkline: number };
+};
 
 export type HeroFrame = {
   id: string;
@@ -49,94 +65,114 @@ function Fig({ children }: { children: ReactNode }) {
   return <span className="font-mono text-[0.72em] tracking-[-0.04em]">{children}</span>;
 }
 
-export const HERO_FRAMES: readonly HeroFrame[] = [
-  {
-    id: "sizes",
-    kb: 2.18,
-    name: "Every chart in the catalog, by size",
-    sentence: (
-      <>
-        It&rsquo;s small in the bundle too: the median chart is <Fig>5.24 kB</Fig>{" "}
-        <Mark>
-          {/* A rug, not a line: sorted sizes drawn as a Sparkline are an ogive
-              that says nothing. Piling the ink up on one axis makes the dense
-              band at 4.9–5.6 kB the median the sentence quotes. */}
-          <RugStrip
-            data={[...HERO_SIZES]}
-            width={W}
-            height={H}
-            title="Interactive gzip size of all 105 interactive charts, kilobytes"
-          />
-        </Mark>{" "}
-        and the biggest is <Fig>&lt; 7 kB</Fig>.
-      </>
-    ),
-  },
-  {
-    id: "collections",
-    kb: 5.09,
-    name: "The catalog, split into four collections",
-    sentence: (
-      <>
-        There are <Fig>106</Fig> of them{" "}
-        <Mark>
-          <SegmentedBar
-            data={HERO_COLLECTIONS.map((c) => ({ ...c }))}
-            // No in-bar labels: at 132×30 a figure inside a 23-unit segment would
-            // be smaller than anything else this page sets, and the sentence
-            // around it already reads the four numbers out.
-            label="none"
-            order="data"
-            width={W}
-            height={H}
-            title="The 106 stable charts split across four collections"
-          />
-        </Mark>{" "}
-        in four collections, the largest being the <Fig>34</Fig> in core.
-      </>
-    ),
-  },
-  {
-    id: "apps",
-    kb: 5.24,
-    name: "Chart types used by each of the seven example apps",
-    sentence: (
-      <>
-        Seven example apps ship with it{" "}
-        <Mark>
-          <SparkBar
-            data={[...HERO_APPS]}
-            width={W}
-            height={H}
-            title="Chart types used by each of the seven example apps"
-          />
-        </Mark>{" "}
-        and between them they use all <Fig>106</Fig> types.
-      </>
-    ),
-  },
-  {
-    id: "svg",
-    kb: 6.94,
-    name: "SVG each chart renders, in bytes",
-    sentence: (
-      <>
-        On the page it stays just as light{" "}
-        <Mark>
-          {/* This one earns the line: sorted, the 106 values sweep 238 → 9,767
-              with a real knee where the grid types start emitting a node per
-              cell. */}
-          <Sparkline
-            data={[...HERO_SVG_BYTES]}
-            curve="smooth"
-            width={W}
-            height={H}
-            dots="auto"
-            title="Bytes of SVG each of the 106 charts renders for a 24-point series, smallest to largest"
-          />
-        </Mark>{" "}
-        and the median one draws <Fig>1,375</Fig> bytes of SVG.
-      </>
-    ),
-  },
-];
+/** The middle value of a sorted series — the same rule `docs-facts` uses, applied
+ *  to the array the mark beside the sentence actually draws. */
+const median = (xs: readonly number[]) => xs[Math.floor(xs.length / 2)] ?? 0;
+
+export function heroFrames(d: HeroData): readonly HeroFrame[] {
+  const max = d.sizes[d.sizes.length - 1] ?? 0;
+  const ceiling = Math.ceil(max);
+  // "< 7 kB" holds while every measured size is strictly under the whole number.
+  // A size that lands ON it states itself instead: sparkline measures 6,995 B,
+  // which `sync-sizes` rounds to 7.00 kB, and "< 7" beside a specimen sheet
+  // reading 7 kB is a contradiction a reader can see.
+  const biggest = max < ceiling ? `< ${ceiling} kB` : `${max} kB`;
+  const largest = [...d.collections].sort((a, b) => b.value - a.value)[0] ?? {
+    label: "",
+    value: 0,
+  };
+
+  return [
+    {
+      id: "sizes",
+      kb: d.kb.rugStrip,
+      name: "Every chart in the catalog, by size",
+      sentence: (
+        <>
+          It&rsquo;s small in the bundle too: the median chart is <Fig>{median(d.sizes)} kB</Fig>{" "}
+          <Mark>
+            {/* A rug, not a line: sorted sizes drawn as a Sparkline are an ogive
+                that says nothing. Piling the ink up on one axis makes the dense
+                band around the median the sentence quotes. */}
+            <RugStrip
+              data={d.sizes}
+              width={W}
+              height={H}
+              title={`Interactive gzip size of all ${d.sizes.length} interactive charts, kilobytes`}
+            />
+          </Mark>{" "}
+          and the biggest is <Fig>{biggest}</Fig>.
+        </>
+      ),
+    },
+    {
+      id: "collections",
+      kb: d.kb.segmentedBar,
+      name: "The catalog, split into four collections",
+      sentence: (
+        <>
+          There are <Fig>{d.total}</Fig> of them{" "}
+          <Mark>
+            <SegmentedBar
+              data={d.collections}
+              // No in-bar labels: at 132×30 a figure inside a 23-unit segment would
+              // be smaller than anything else this page sets, and the sentence
+              // around it already reads the four numbers out.
+              label="none"
+              order="data"
+              width={W}
+              height={H}
+              title={`The ${d.total} stable charts split across ${d.collections.length} collections`}
+            />
+          </Mark>{" "}
+          in four collections, the largest being the <Fig>{largest.value}</Fig>{" "}
+          {`in ${largest.label}.`}
+        </>
+      ),
+    },
+    {
+      id: "apps",
+      kb: d.kb.sparkBar,
+      name: "Chart types used by each of the seven example apps",
+      sentence: (
+        <>
+          Seven example apps ship with it{" "}
+          <Mark>
+            <SparkBar
+              data={d.apps}
+              width={W}
+              height={H}
+              title={`Chart types used by each of the ${d.apps.length} example apps`}
+            />
+          </Mark>{" "}
+          and between them they use all <Fig>{d.total}</Fig> types.
+        </>
+      ),
+    },
+    {
+      id: "svg",
+      kb: d.kb.sparkline,
+      name: "SVG each chart renders, in bytes",
+      sentence: (
+        <>
+          On the page it stays just as light{" "}
+          <Mark>
+            {/* This one earns the line: sorted, the values sweep two orders of
+                magnitude with a real knee where the grid types start emitting a
+                node per cell. */}
+            <Sparkline
+              data={d.svgBytes}
+              curve="smooth"
+              width={W}
+              height={H}
+              dots="auto"
+              title={`Bytes of SVG each of the ${d.svgBytes.length} charts renders for a 24-point series, smallest to largest`}
+            />
+          </Mark>{" "}
+          and the median one draws <Fig>{median(d.svgBytes).toLocaleString("en-US")}</Fig> bytes of
+          SVG.
+        </>
+      ),
+    },
+  ];
+}

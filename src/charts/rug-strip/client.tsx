@@ -146,25 +146,32 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
     // pin = "tick" (convention); the transient mark uses "full", not "support",
     // because the static already emits "support" ticks — "support" would collide.
     const w = pinned ? "tick" : "full";
+    // `data-mc-ui` glides the highlight to the tick it names. It rides a
+    // transform rather than its own endpoints: `x1`/`y1`/`x2`/`y2` have no CSS
+    // geometry property behind them in any engine, so they cannot transition.
     return orientation === "horizontal" ? (
       <line
-        x1={t.pos}
+        x1={0}
         y1={0}
-        x2={t.pos}
+        x2={0}
         y2={height}
         data-mc-ink="accent"
+        data-mc-ui=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateX(${t.pos}px)` }}
       />
     ) : (
       <line
         x1={0}
-        y1={t.pos}
+        y1={0}
         x2={width}
-        y2={t.pos}
+        y2={0}
         data-mc-ink="accent"
+        data-mc-ui=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateY(${t.pos}px)` }}
       />
     );
   };

@@ -190,14 +190,19 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
         ) : null}
         {crossX !== undefined ? (
           <>
+            {/* `x1`/`x2` have no CSS geometry property in any engine, so the
+                crosshair travels on `transform` — the two dots beside it glide
+                on their own `cx`/`cy`, and all three stay in step. */}
             <line
-              x1={crossX}
+              x1={0}
               y1={0}
-              x2={crossX}
+              x2={0}
               y2={height}
               data-mc-ink="muted"
+              data-mc-ui=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateX(${crossX}px)` }}
             />
             {geo.primaryPoints[shown!] ? (
               <circle

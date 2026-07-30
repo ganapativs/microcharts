@@ -161,6 +161,11 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     if (!slot) return null;
     // A missing item paints no glyph; ring the seed-sized spot on the soil.
     const b = stageGlyphBox(slot.stage ?? 0, slot.x, slot.baselineY, slot.baselineY - PAD);
+    // No scrub `data-mc-ui` here: `<ellipse>` is not in the shared rule's
+    // selector, and carrying it on a transformed `<g>` puts the ring's own
+    // coordinates at the origin — `getBBox()` reports a box in the element's
+    // own user space, so the concentric-ring guard would measure this ring
+    // against the glyph it names and find it half a chart away.
     return (
       <ellipse
         cx={round2((b.x0 + b.x1) / 2)}

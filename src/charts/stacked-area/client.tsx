@@ -245,26 +245,34 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
         labelAt={shown !== null ? shown : undefined}
         style={fillFor(style)}
       >
+        {/* Both crosshairs are `data-mc-ui`, so each glides to the column it
+            names instead of being repainted at it. They travel on a transform:
+            the `x1`/`x2` that place a line have no CSS geometry property behind
+            them in any engine, so tagging those would animate nothing. */}
         {selX !== undefined && selected !== active ? (
           <line
-            x1={selX}
+            x1={0}
             y1={0}
-            x2={selX}
+            x2={0}
             y2={height}
             data-mc-ink="accent"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${selX}px)` }}
           />
         ) : null}
         {shownX !== undefined ? (
           <line
-            x1={shownX}
+            x1={0}
             y1={0}
-            x2={shownX}
+            x2={0}
             y2={height}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${shownX}px)` }}
           />
         ) : null}
         {rest.children}

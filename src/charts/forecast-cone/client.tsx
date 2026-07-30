@@ -208,15 +208,21 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         summary={false}
       >
         {selected !== null && selected !== active ? dot(selected, true) : null}
+        {/* The crosshair travels with the dot beside it: `x1`/`x2` have no CSS
+            geometry property, so the line sits at x=0 and a transitioned
+            `translateX` carries it (the dot's `cx`/`cy` do the same job for a
+            circle, on the same 120 ms curve). */}
         {p ? (
           <line
-            x1={p.x}
+            x1={0}
             y1={0.5}
-            x2={p.x}
+            x2={0}
             y2={height - 0.5}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="support"
             strokeDasharray="1.5 2"
+            style={{ transform: `translateX(${p.x}px)` }}
             vectorEffect="non-scaling-stroke"
           />
         ) : null}

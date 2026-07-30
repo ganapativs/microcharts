@@ -175,14 +175,19 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
         ) : null}
         {active !== null && geo.points[active] ? (
           <>
+            {/* `x1`/`x2` have no CSS geometry property in any engine, so the
+                crosshair travels on `transform` and stays in step with the dot
+                beside it (which glides on its own `cx`/`cy`). */}
             <line
-              x1={geo.points[active]!.x}
-              x2={geo.points[active]!.x}
+              x1={0}
+              x2={0}
               y1={0.5}
               y2={height - 0.5}
               data-mc-ink="muted"
+              data-mc-ui=""
               data-mc-w="tick"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateX(${geo.points[active]!.x}px)` }}
             />
             <circle
               cx={geo.points[active]!.x}

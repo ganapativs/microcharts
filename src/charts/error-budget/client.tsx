@@ -186,12 +186,19 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {/* The live pair tracks a continuum, so it TRAVELS to the point it
+            names. Both marks ride one transformed group horizontally and the
+            dot carries its own vertical offset, so the two never separate —
+            a dot gliding beside a teleporting line is worse than both
+            snapping. Transform rather than coordinates because `x1`/`x2` have
+            no CSS geometry property in any engine, and `cy` has none before
+            Safari 17.4. */}
         {ap ? (
-          <>
+          <g data-mc-ui="" style={{ transform: `translateX(${ap.x}px)` }}>
             <line
-              x1={ap.x}
+              x1={0}
               y1={0.5}
-              x2={ap.x}
+              x2={0}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
               data-mc-w="support"
@@ -199,15 +206,16 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               vectorEffect="non-scaling-stroke"
             />
             <circle
-              cx={ap.x}
-              cy={ap.y}
+              cx={0}
+              cy={0}
               r={2.4}
               fill="none"
               stroke="var(--mc-accent)"
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateY(${ap.y}px)` }}
             />
-          </>
+          </g>
         ) : null}
         {rest.children}
       </StaticErrorBudget>

@@ -1,4 +1,5 @@
 import { HeroSentence } from "./hero-sentence";
+import { heroData } from "./hero-data";
 import { HeroActions } from "./actions";
 import { ScrollCue } from "./scroll-cue";
 
@@ -45,7 +46,10 @@ export function ActOne() {
           Charts that fit in a sentence.
         </h1>
 
-        <HeroSentence callouts={CALLOUTS} />
+        {/* The fold's figures are measured here, on the server: `heroData()`
+            reads the registry, and this act is the only thing between it and a
+            client component that must not import it. */}
+        <HeroSentence callouts={CALLOUTS} data={heroData()} />
 
         {/* Every word here has to hold for all four rotating frames: "the chart
             up there" rather than "that line", and "an array" rather than "an

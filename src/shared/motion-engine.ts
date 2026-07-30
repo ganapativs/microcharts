@@ -553,6 +553,35 @@ export function runEntrance(
 
     // Voice into story/link tail
     const voiceDelay = Math.max(linkEnd - BEAT, storyStart + BEAT);
+    // …but a label must never speak before the mark it names exists. The acts
+    // overlap by design (voice starts ~220 ms before the story ends), which on a
+    // drawing line put the endpoint's own number on screen a beat before the
+    // stroke reached the point it labels — the caption arriving before its
+    // subject. So each voice element also waits for the story FRONT to reach its
+    // own x: the stroke head for a `draw`, the stagger itself for sequenced
+    // marks. A left-hand label is unaffected (the front is already past it); a
+    // right-hand endpoint label now lands with its point.
+    //
+    // The result is CLAMPED to `storyEnd` so this only ever reorders the
+    // entrance, never lengthens it. The clamp is load-bearing, not defensive:
+    // on the `proportional` path `storySpan` is `win` while the front sweeps
+    // `win + dur`, so an unclamped right-hand label would be pushed a whole
+    // `dur` past the end of the story it is waiting for. `scan` is the mirror
+    // case — its marks all start together and the clip does the sequencing, so
+    // its stagger span overstates a front that never travels that way.
+    const seqSpan = propAt ? win : norms ? win : n > 0 ? stagger(n - 1, n, step) : 0;
+    const frontSpan = seqSpan + (kind === "draw" ? dur : 0);
+    const vbW = svg.viewBox?.baseVal?.width ?? 0;
+    const frontAt = (el: SVGGraphicsElement): number => {
+      if (frontSpan <= 0 || vbW <= 0) return 0;
+      try {
+        const b = el.getBBox();
+        const xn = Math.min(1, Math.max(0, (b.x + b.width / 2) / vbW));
+        return Math.min(storyEnd, storyStart + xn * frontSpan);
+      } catch {
+        return 0;
+      }
+    };
     for (const el of voiceEls) {
       if (spoken.has(el)) continue;
       // Text lifts in; accents/points scale-pop.
@@ -579,7 +608,7 @@ export function runEntrance(
               ],
           {
             duration: 1.5 * BEAT,
-            delay: voiceDelay,
+            delay: Math.max(voiceDelay, frontAt(el)),
             easing: isText ? EASE_EVEN : MC_EASE_ENTER,
             fill: "backwards",
           },

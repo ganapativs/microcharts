@@ -228,15 +228,20 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         ) : null}
         {p ? (
           <>
+            {/* The crosshair rides `transform`, not `x1`/`x2`: those attributes
+                have no CSS geometry property behind them in any engine, so a
+                line placed that way would teleport beside the gliding dot. */}
             <line
-              x1={p.x}
+              x1={0}
               y1={0.5}
-              x2={p.x}
+              x2={0}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
+              data-mc-ui=""
               data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateX(${p.x}px)` }}
             />
             <circle
               cx={p.x}

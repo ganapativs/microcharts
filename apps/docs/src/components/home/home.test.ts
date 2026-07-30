@@ -6,14 +6,8 @@ import { SHOWCASE } from "@/lib/showcase";
 import { PRESETS } from "@/lib/mc-tokens";
 import { CHART_GZIP } from "@/lib/stats";
 import { BENCH } from "@/lib/docs-facts";
-import {
-  SHARES,
-  CHECKOUT_P95,
-  DEGRADE,
-  FENCE_SERIES,
-  HERO_SIZES,
-  HERO_SVG_BYTES,
-} from "./home-data";
+import { SHARES, CHECKOUT_P95, DEGRADE, FENCE_SERIES } from "./home-data";
+import { heroData } from "./hero-data";
 
 /**
  * The home page's load-bearing claims, held by source rather than by review.
@@ -284,13 +278,14 @@ describe("the hero claim rotates without moving anything", () => {
 
   it("shows no chart type twice, and no dataset twice", () => {
     const src = stripComments(frames());
-    const types = [...src.matchAll(/^\s{10}<([A-Z]\w+)$/gm)].map((m) => m[1]!);
+    const types = [...src.matchAll(/^\s+<([A-Z]\w+)$/gm)].map((m) => m[1]!);
     expect(types).toHaveLength(4);
     // Two of one type is one claim wearing two costumes, and so is one dataset
     // drawn two ways. Both shipped for a few minutes and both read as padding —
     // the fold is meant to show the catalog's RANGE.
     expect(new Set(types).size, types.join(",")).toBe(4);
-    const data = [...src.matchAll(/data=\{\[\.\.\.(\w+)\]\}/g)].map((m) => m[1]!);
+    const data = [...src.matchAll(/data=\{d\.(\w+)\}/g)].map((m) => m[1]!);
+    expect(data).toHaveLength(4);
     expect(new Set(data).size, data.join(",")).toBe(data.length);
   });
 
@@ -312,21 +307,23 @@ describe("the hero claim rotates without moving anything", () => {
   });
 
   it("quotes each type's own measured weight in the callout", () => {
-    // Four types spanning 4.77–6.86 kB demonstrate the range the first sentence
+    // Four types spanning ~2–7 kB demonstrate the range the first sentence
     // claims. A hard-coded kB beside a mark that becomes three other charts is
-    // the exact drift this file exists to catch.
-    const quoted = [...frames().matchAll(/kb: ([\d.]+),/g)].map((m) => Number(m[1]));
+    // the exact drift this file exists to catch, so the callout reads
+    // `chart-sizes.json` by slug and this checks the four it resolves.
+    const quoted = Object.values(heroData().kb);
     expect(quoted).toHaveLength(4);
     const real = new Set(Object.values(CHART_GZIP).map((g) => g.interactive));
     for (const kb of quoted) expect(real, String(kb)).toContain(kb);
+    expect(stripComments(frames())).not.toMatch(/kb: [\d.]+,/);
   });
 
-  // The two hero series are literals: `hero-frames.tsx` is a client component,
-  // and deriving them there would pull `entries.generated.json` (~1 MB) into the
-  // bundle. The comment on each says it comes from `chart-sizes.json` /
-  // `bench-summary.json` — these two tests are what make that true.
+  // The hero's series are measured, not typed: `hero-data.ts` reads them on the
+  // server and `ActOne` passes them in, because `hero-frames.tsx` is a client
+  // component and importing the registry there would ship ~236 kB of JSON to
+  // plot 105 numbers. These tests hold both halves — that the arrays are the
+  // real ones, and that no figure in the prose is a literal.
   const stable = () => CHARTS.filter((c) => c.status === "stable");
-  const median = (xs: readonly number[]) => xs[Math.floor(xs.length / 2)]!;
 
   it("plots every measured interactive size, in order", () => {
     const measured = stable()
@@ -334,7 +331,7 @@ describe("the hero claim rotates without moving anything", () => {
       .filter((n): n is number => typeof n === "number")
       .sort((a, b) => a - b);
     // 105 of 106 — `wind-barb` ships static only.
-    expect([...HERO_SIZES]).toEqual(measured);
+    expect([...heroData().sizes]).toEqual(measured);
   });
 
   it("plots every measured SVG payload, in order", () => {
@@ -342,22 +339,43 @@ describe("the hero claim rotates without moving anything", () => {
       .map((c) => BENCH.chart(c.slug)?.avgBytes)
       .filter((n): n is number => typeof n === "number")
       .sort((a, b) => a - b);
-    expect([...HERO_SVG_BYTES]).toEqual(measured);
+    expect([...heroData().svgBytes]).toEqual(measured);
   });
 
-  it("quotes the median of each series it draws", () => {
-    // A sentence quoting a median beside a mark of the same numbers is the pair
-    // most likely to drift: the array gets regenerated and the prose doesn't.
+  it("splits the catalog by its real collections, and counts the real apps", () => {
+    const d = heroData();
+    expect(d.collections.reduce((n, c) => n + c.value, 0)).toBe(d.total);
+    expect(d.apps).toEqual(SHOWCASE.map((a) => a.charts.length));
+    // The sentence says "Seven example apps" in words; an eighth would make it
+    // false without touching a number.
+    expect(SHOWCASE.length).toBe(7);
+    expect(stripComments(frames())).toContain("Seven example apps");
+  });
+
+  it("types no figure of its own — every number comes from the data prop", () => {
+    // The sentences used to carry the medians as literals beside the arrays they
+    // describe, which is the pair most likely to drift: the array gets
+    // regenerated and the prose doesn't. Both are computed from `d` now.
     const src = stripComments(frames());
-    expect(src).toContain(`<Fig>${median(HERO_SIZES)} kB</Fig>`);
-    expect(src).toContain(`<Fig>${median(HERO_SVG_BYTES).toLocaleString("en-US")}</Fig> bytes`);
-    // "and the biggest is < 7 kB", one line below the rug.
-    expect(Math.max(...HERO_SIZES)).toBeLessThan(7);
+    expect(src).toContain("<Fig>{median(d.sizes)} kB</Fig>");
+    expect(src).toContain('<Fig>{median(d.svgBytes).toLocaleString("en-US")}</Fig>');
+    expect(src).not.toMatch(/<Fig>[\d,]/);
+  });
+
+  it("claims a ceiling only while every chart is under it", () => {
+    // "the biggest is < 7 kB" holds while the largest measured size is strictly
+    // below the whole number; sparkline is 6,995 B, which rounds to 7.00 kB, so
+    // the sentence states the max itself rather than an inequality it fails.
+    const sizes = heroData().sizes;
+    const max = sizes[sizes.length - 1]!;
+    const ceiling = Math.ceil(max);
+    expect(stripComments(frames())).toContain("const biggest = max < ceiling");
+    expect(max).toBeLessThanOrEqual(ceiling);
   });
 
   it("gives the rail one dot per claim, and every dot a name", () => {
     const src = stripComments(sentence());
-    expect(src).toMatch(/HERO_FRAMES\.map\(\(f, i\) => \(\s*<button/s);
+    expect(src).toMatch(/frames\.map\(\(f, i\) => \(\s*<button/s);
     expect(src).toContain("aria-label={f.name}");
     expect(src).toContain("aria-selected={i === active}");
     // State is never colour alone on this page, and its own furniture follows the

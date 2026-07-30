@@ -154,15 +154,21 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {/* Crosshair + value dot TRAVEL to the sample they name. `x1`/`x2` have
+            no CSS geometry property in any engine, so the line sits at x=0 and
+            a transitioned `translateX` carries it; the dot's `cx`/`cy` are real
+            CSS properties and glide on the same 120 ms curve. */}
         {crossX !== undefined ? (
           <>
             <line
-              x1={crossX}
+              x1={0}
               y1={0}
-              x2={crossX}
+              x2={0}
               y2={height}
               data-mc-ink="muted"
+              data-mc-ui=""
               data-mc-w="support"
+              style={{ transform: `translateX(${crossX}px)` }}
               vectorEffect="non-scaling-stroke"
             />
             {isFiniteValue(value) ? (

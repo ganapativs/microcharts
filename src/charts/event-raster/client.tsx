@@ -272,15 +272,21 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         summary={false}
         style={fillFor(style)}
       >
+        {/* The two probes travel on `transform`: `x1`/`x2` have no CSS geometry
+            property behind them in any engine, so a line placed by those
+            attributes teleports to the next event instead of gliding to it. The
+            lane ring beside them glides on its own `y`. */}
         {pinX !== undefined ? (
           <line
-            x1={xOf(pinX)}
-            x2={xOf(pinX)}
+            x1={0}
+            x2={0}
             y1={0.5}
             y2={height - 0.5}
             stroke="var(--mc-accent)"
+            data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${xOf(pinX)}px)` }}
           />
         ) : null}
         {shownLane !== null ? (
@@ -298,13 +304,15 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
         ) : null}
         {t !== undefined ? (
           <line
-            x1={xOf(t)}
-            x2={xOf(t)}
+            x1={0}
+            x2={0}
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${xOf(t)}px)` }}
           />
         ) : null}
         {rest.children}

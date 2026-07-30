@@ -140,18 +140,23 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
     defaultSelectedIndex,
   });
 
+  // The tick tracks a continuum, so it TRAVELS to the edge it names rather than
+  // being repainted at it. Carried on a transform because `x1`/`x2` have no CSS
+  // geometry property in any engine — see the scrub-response rule in styles.css.
   const tick = (i: number, pinned: boolean) => {
     const e = geo?.edges[i];
     if (!e) return null;
     return (
       <line
-        x1={e.x}
+        x1={0}
         y1={0.5}
-        x2={e.x}
+        x2={0}
         y2={height - 0.5}
         data-mc-ink="accent"
+        data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateX(${e.x}px)` }}
       />
     );
   };
