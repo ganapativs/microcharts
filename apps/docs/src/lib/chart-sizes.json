@@ -61,7 +61,7 @@
   },
   "dumbbell": {
     "static": 3.32,
-    "interactive": 5.94
+    "interactive": 5.95
   },
   "paired-bars": {
     "static": 2.96,
@@ -120,8 +120,8 @@
     "interactive": 6.2
   },
   "ohlc": {
-    "static": 2.82,
-    "interactive": 5.29
+    "static": 2.83,
+    "interactive": 5.3
   },
   "horizon": {
     "static": 2.88,
@@ -140,8 +140,8 @@
     "interactive": 4.89
   },
   "benchmark-strip": {
-    "static": 3.07,
-    "interactive": 5.42
+    "static": 3.08,
+    "interactive": 5.43
   },
   "percentile-ladder": {
     "static": 3.41,
@@ -184,8 +184,8 @@
     "interactive": 5.92
   },
   "shift-histogram": {
-    "static": 3.28,
-    "interactive": 5.91
+    "static": 3.29,
+    "interactive": 5.92
   },
   "pareto-strip": {
     "static": 2.89,
@@ -360,7 +360,7 @@
   },
   "calibration-strip": {
     "static": 2.81,
-    "interactive": 5.22
+    "interactive": 5.23
   },
   "confusion-grid": {
     "static": 2.79,

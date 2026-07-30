@@ -152,7 +152,12 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 cy={p.y}
                 r={DOT_R}
                 fill="none"
-                stroke={color ?? "var(--mc-accent)"}
+                // `data` is the hollow role, and its stroke loses to the inline
+                // one — so this changes no paint and puts the low-support point
+                // in the data-change transition alongside its confident
+                // siblings, which already carry a role.
+                data-mc-ink="data"
+                style={{ stroke: color ?? "var(--mc-accent)" }}
                 strokeOpacity={0.5}
                 data-mc-w="support"
                 vectorEffect="non-scaling-stroke"

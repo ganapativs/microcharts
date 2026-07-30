@@ -196,8 +196,11 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
             cx={p.x}
             cy={p.y}
             r={1.8}
-            fill="var(--mc-surface)"
-            stroke={lineColor}
+            // Surface fill (it punches through the volume bars beneath) and the
+            // series colour both go inline, covering everything `data` sets;
+            // the role is here so the ring travels with the line it sits on.
+            data-mc-ink="data"
+            style={{ fill: "var(--mc-surface)", stroke: lineColor }}
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
