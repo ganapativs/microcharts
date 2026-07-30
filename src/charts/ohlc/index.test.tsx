@@ -25,16 +25,10 @@ describe("<Ohlc>", () => {
   it("wick + body per period; hollow up / filled down; summary shape", () => {
     const { container } = draw(<Ohlc data={PERIODS} />);
     expect(container.querySelectorAll("rect").length).toBe(20); // one candle body per period
-    // The shape code, read where each half of it now lives: the hollow up-body
-    // states its surface fill inline (an attribute would lose to its own ink
-    // role), and the filled down-body IS the role — `data-mc-ink="negative"`
-    // resolves to `fill: var(--mc-negative); stroke: none`.
     const up = container.querySelector('[data-mc-ohlc="positive"]')!;
-    expect(up.getAttribute("style")).toContain("--mc-surface"); // hollow
-    expect(up.getAttribute("data-mc-ink")).toBe("positive");
+    expect(up.getAttribute("fill")).toContain("--mc-surface"); // hollow
     const down = container.querySelector('[data-mc-ohlc="negative"]')!;
-    expect(down.getAttribute("data-mc-ink")).toBe("negative"); // filled
-    expect(down.getAttribute("style")).toBeNull();
+    expect(down.getAttribute("fill")).toContain("--mc-negative"); // filled
     const label = container.querySelector("svg")!.getAttribute("aria-label")!;
     expect(label).toMatch(
       /^20 periods\. Last close [\d,.]+, (up|down) [\d.]+%; range [\d,.]+ to [\d,.]+\.$/,

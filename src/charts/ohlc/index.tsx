@@ -146,13 +146,6 @@ export function Ohlc(props: OhlcProps): ReactNode {
           this chart's SSR hot path. */}
       {geo.marks.flatMap((m) => {
         const ink = m.doji ? "neutral" : m.up ? "positive" : "negative";
-        // The same three colours as `ink`, reached by roles that STROKE rather
-        // than fill: the valence roles are element-split for `line`, and
-        // `muted` is `neutral`'s stroked twin. A wick painted by a `stroke`
-        // attribute instead carried no role, which kept it out of the
-        // data-change transition — bodies would have travelled while wicks
-        // jumped, and a half-animated candle reads as a rendering fault.
-        const lineInk = m.doji ? "muted" : m.up ? "positive" : "negative";
         const stroke = m.doji
           ? "var(--mc-neutral)"
           : m.up
@@ -167,7 +160,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y1={m.yH}
             x2={m.x}
             y2={m.yL}
-            data-mc-ink={lineInk}
+            stroke={stroke}
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />
@@ -183,14 +176,21 @@ export function Ohlc(props: OhlcProps): ReactNode {
               width={m.bodyW}
               height={round2(bodyH)}
               shapeRendering="crispEdges"
-              // The role IS the filled down-candle: `fill: valence`,
-              // `stroke: none`. The hollow up-candle keeps its surface fill and
-              // valence outline on an inline style, which outranks the role's
-              // own declarations, so the shape code survives intact while both
-              // bodies become reachable by every rule keyed on a role.
-              data-mc-ink={ink}
-              style={m.up ? { fill: "var(--mc-surface, Canvas)", stroke } : undefined}
+              /* No `data-mc-ink`, deliberately — and this is the one place in
+                 the catalog where withholding a role is the correct call. The
+                 role would put the body inside the data-change transition,
+                 but a wick is a <line>, and `x1`/`y1`/`x2`/`y2` are the SVG
+                 geometry attributes that no engine ever promoted to CSS
+                 properties (unlike `x`/`y`/`width`/`height`, which Safari 17.4
+                 and Firefox 128 did ship). So a wick cannot travel at all. A
+                 body that glides to its new close while its own high and low
+                 teleport does not read as a candle moving; it reads as a
+                 rendering fault. The candle snaps as one mark until `x1` is
+                 animatable. */
+              fill={m.up ? "var(--mc-surface, Canvas)" : stroke}
+              stroke={stroke}
               data-mc-w={m.up ? "support" : undefined}
+              strokeWidth={m.up ? undefined : 0}
               /* The hollow body is the only outlined mark that lacked this, and
                  the interactive wrapper spreads `width: 100%` — so at any scale
                  but 1:1 an up-candle's outline thickened while its own wick (and
@@ -209,7 +209,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y1={m.yO}
             x2={m.x}
             y2={m.yO}
-            data-mc-ink={lineInk}
+            stroke={stroke}
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />,
@@ -219,7 +219,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y1={m.yC}
             x2={round2(m.x + m.bodyW / 2)}
             y2={m.yC}
-            data-mc-ink={lineInk}
+            stroke={stroke}
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />,

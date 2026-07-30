@@ -222,11 +222,13 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         </>
       )}
       {/* `muted` IS this line's paint — `fill: none; stroke: var(--mc-neutral)`,
-          the attribute it replaces — so the role costs nothing and buys two
-          things: the zero rule travels when a new domain moves it (a baseline
-          that jumps while the areas around it glide reads as two charts), and
-          it finally maps to GrayText under forced-colors instead of painting a
-          fixed warm gray on the user's chosen Canvas. */}
+          the attribute it replaces — so the role repaints nothing and earns the
+          forced-colors mapping the literal could never have: `.mc-root` sets
+          `forced-color-adjust: none`, so a fixed warm gray survived verbatim
+          onto whatever Canvas the user chose. The role maps it to GrayText.
+          (Same move, same reason, as ShiftHistogram's mirror axis. It buys no
+          motion: a <line> is positioned by `x1`/`y1`, which are not CSS
+          properties in any engine, so no line mark can travel.) */}
       <line
         x1={0}
         y1={geo.zeroY}

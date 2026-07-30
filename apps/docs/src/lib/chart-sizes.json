@@ -120,8 +120,8 @@
     "interactive": 6.2
   },
   "ohlc": {
-    "static": 2.83,
-    "interactive": 5.3
+    "static": 2.82,
+    "interactive": 5.29
   },
   "horizon": {
     "static": 2.88,
@@ -316,8 +316,8 @@
     "interactive": 5.51
   },
   "eta-bar": {
-    "static": 2.24,
-    "interactive": 3.75
+    "static": 2.23,
+    "interactive": 3.74
   },
   "waveform": {
     "static": 2.67,

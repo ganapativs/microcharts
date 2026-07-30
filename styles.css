@@ -597,10 +597,17 @@
      swap outright.
 
      `d` is absent because no engine has ever had a CSS geometry property for it,
-     so the ~60 path-based charts cut rather than travel. The listed properties
-     became animatable in Safari 17.4 and Firefox 128 against a Safari 16.4
-     floor, so an older engine gets today's behaviour: it snaps. Both are stated
-     degradations, not silent ones.
+     so the ~60 path-based charts cut rather than travel. `x1`/`y1`/`x2`/`y2`
+     are absent for the same reason and it is easy to miss: SVG2 specified them
+     as geometry properties, no engine implemented them, and listing them here
+     is inert — so a `<line>` NEVER travels, whatever role it carries. That is
+     load-bearing when a chart mixes shapes: OHLC's bodies are rects and its
+     wicks are lines, so its bodies deliberately take no ink role rather than
+     glide away from their own high and low. `data-change-glide.browser.test.tsx`
+     asserts the platform fact so this comment cannot rot. The properties that
+     ARE listed became animatable in Safari 17.4 and Firefox 128 against a
+     Safari 16.4 floor, so an older engine gets today's behaviour: it snaps.
+     All stated degradations, not silent ones.
 
      200ms, not `--mc-duration`'s 300ms: a feed ticking faster than the
      transition would leave the mark permanently trailing its own data. Consumers
@@ -612,7 +619,7 @@
       .mc-root
       :is([data-mc-ink], [data-mc-cat], [data-mc-cone]):not([data-mc-ui], [data-mc-ui] *)
   ) {
-    transition-property: x, y, width, height, cx, cy, r, x1, y1, x2, y2;
+    transition-property: x, y, width, height, cx, cy, r;
     transition-duration: 200ms;
     transition-timing-function: var(--mc-easing);
   }

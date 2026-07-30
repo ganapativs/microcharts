@@ -213,9 +213,10 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         />
       ) : null}
       {/* `muted` resolves to exactly the stroke this line already carried, so
-          the role repaints nothing; it is here because "today" moves along the
-          x axis as the sprint advances, and a today-rule that jumps while the
-          burn line under it glides is the one mark contradicting the update. */}
+          the role repaints nothing, and it earns the forced-colors mapping a
+          literal `var(--mc-neutral)` cannot: `.mc-root` sets
+          `forced-color-adjust: none`, which preserved the fixed gray verbatim
+          in High Contrast Mode. The role maps it to GrayText. */}
       <line
         x1={geo.today.x}
         y1={1}

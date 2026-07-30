@@ -23,7 +23,15 @@ import { describe, expect, it } from "vitest";
 
 const chartsDir = resolve(import.meta.dirname, "../charts");
 const GEOMETRY_ELEMENTS = /^(rect|circle|line|ellipse)$/;
-const ANIMATABLE = ["x", "y", "width", "height", "cx", "cy", "r", "x1", "y1", "x2", "y2"];
+/**
+ * The SVG geometry attributes that are also CSS PROPERTIES, and so can be
+ * transitioned. `x1`/`y1`/`x2`/`y2` are deliberately absent: SVG2 specified them
+ * as geometry properties and no engine ever shipped them, so a `<line>` cannot
+ * travel however it is painted or roled. Counting a line mark as a fixable gap
+ * would grow this backlog with work that cannot be done — the assertion that
+ * pins the platform fact lives in `data-change-glide.browser.test.tsx`.
+ */
+const ANIMATABLE = ["x", "y", "width", "height", "cx", "cy", "r"];
 
 /**
  * Marks that do not travel, per chart. This started as a to-do list of paint
@@ -32,8 +40,14 @@ const ANIMATABLE = ["x", "y", "width", "height", "cx", "cy", "r", "x1", "y1", "x
  * number cannot drift back up unexamined.
  *
  * No interactive wrapper, so the rule never applies at all:
- *   - `hourglass`, `status-dot` — both are ambient glyphs with a static entry
- *     only. They swap outright and there is nothing to hook.
+ *   - `status-dot` — an ambient glyph with a static entry only. It swaps
+ *     outright and there is nothing to hook.
+ *
+ * A mark that would travel alone:
+ *   - `ohlc` — the body is a `<rect>` and could glide, but a candle's wicks are
+ *     `<line>`s and cannot (see ANIMATABLE above). A body easing to a new close
+ *     while its own high and low teleport reads as a rendering fault, so the
+ *     whole candle snaps until `x1` is animatable.
  *
  * Emphasis rings that name a DISCRETE unit. Mid-glide such a ring encloses no
  * unit while the screen reader has already announced the new one, which is the
@@ -52,8 +66,8 @@ const BACKLOG: Record<string, number> = {
   "cohort-triangle": 1,
   constellation: 1,
   "control-strip": 1,
-  hourglass: 1,
   "minimap-strip": 1,
+  ohlc: 1,
   "status-dot": 3,
 };
 

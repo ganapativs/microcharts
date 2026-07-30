@@ -25,6 +25,21 @@ import "../../styles.css";
 
 import { SparkBar } from "../charts/sparkbar/client.js";
 import { DotPlot } from "../charts/dot-plot/client.js";
+import { Ohlc } from "../charts/ohlc/client.js";
+
+const CANDLES_A = [
+  { open: 100, high: 108, low: 96, close: 106 },
+  { open: 106, high: 109, low: 98, close: 100 },
+  { open: 100, high: 104, low: 94, close: 103 },
+];
+// Deliberately not a translation of A. The domain is fitted to the data, so
+// shifting every value by a constant produces byte-identical geometry and
+// nothing transitions — the shape of the run has to change, not just its level.
+const CANDLES_B = [
+  { open: 101, high: 103, low: 88, close: 90 },
+  { open: 90, high: 118, low: 89, close: 116 },
+  { open: 116, high: 117, low: 112, close: 113 },
+];
 
 const BARS_A = [4, 9, 6, 12, 7, 10, 5];
 const BARS_B = [11, 3, 13, 5, 12, 6, 9];
@@ -125,6 +140,42 @@ describe("data change: value marks travel", () => {
     await change(DOTS_B);
     expect(liveTransitions(dot!).length, "the dot travels").toBeGreaterThan(0);
     expect(liveTransitions(ring!).length, "the ring snaps").toBe(0);
+  });
+
+  // A <line> cannot travel. `x1`/`y1`/`x2`/`y2` are SVG geometry ATTRIBUTES that
+  // no engine ever promoted to CSS properties — unlike `x`/`y`/`width`/`height`
+  // and `cx`/`cy`/`r`, which Safari 17.4 and Firefox 128 did ship — so listing
+  // them in a transition is inert. That is a fact about the platform, and the
+  // consequence for OHLC is a design decision: its wicks are lines, so if its
+  // bodies took an ink role they would glide to a new close while the high and
+  // low teleported. The candle snaps as one mark instead, and this test is what
+  // stops a well-meaning role from being added to the body alone.
+  it("ohlc snaps as one mark, because its wicks cannot travel", async () => {
+    await render(
+      <Harness initial={CANDLES_A} render={(d) => <Ohlc data={d} width={90} height={40} />} />,
+    );
+
+    const bodies = [...document.querySelectorAll("[data-mc-host] .mc-root rect[data-mc-ohlc]")];
+    const wicks = [...document.querySelectorAll("[data-mc-host] .mc-root line")];
+    expect(bodies.length).toBe(3);
+    expect(wicks.length).toBe(3);
+    for (const body of bodies) {
+      expect(body.getAttribute("data-mc-ink"), "the body must stay role-less").toBeNull();
+    }
+
+    await change(CANDLES_B);
+    for (const mark of [...bodies, ...wicks]) {
+      expect(liveTransitions(mark).length, "no half-animated candle").toBe(0);
+    }
+  });
+
+  it("x1/y1 are not CSS properties, so a line mark can never travel", () => {
+    expect(CSS.supports("x", "5px"), "rects travel").toBe(true);
+    expect(CSS.supports("cx", "5px"), "circles travel").toBe(true);
+    // If this ever starts passing, the line-shaped marks listed in
+    // `glide-coverage.test.ts` become real candidates again — and OHLC's body
+    // can take its ink role.
+    expect(CSS.supports("y1", "5px"), "lines do not").toBe(false);
   });
 });
 
