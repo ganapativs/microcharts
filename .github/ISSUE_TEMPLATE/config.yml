@@ -11,4 +11,4 @@ contact_links:
     about: Chart catalog, props reference, theming, and the AI/MCP guides. Machine surfaces at /llms.txt and /catalog.json.
   - name: Contributing guide
     url: https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md
-    about: Setup, the non-negotiables, commit style, and the per-chart Definition of Done.
+    about: What the project takes, why every PR starts as an agreed issue, setup, and the CI gates.

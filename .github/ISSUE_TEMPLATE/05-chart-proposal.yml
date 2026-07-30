@@ -1,12 +1,16 @@
 name: New chart type proposal
-description: Propose a chart the catalog doesn't have. Held to a deliberately high admission bar.
+description: Propose a chart the catalog doesn't have. Open, but held to a deliberately high admission bar.
 labels: ["enhancement", "chart-proposal", "needs-triage"]
 body:
   - type: markdown
     attributes:
       value: |
-        microcharts ships 106 chart types and **prefers uncommon questions over uncommon shapes**. A new type is
-        admitted only when it answers a practical decision the catalog cannot already answer well.
+        The catalog is open to new types, and it's already broad — 106 of them — so we refrain from adding one
+        unless it answers a real question the existing charts can't. Every new type is permanent surface with a
+        permanent test, docs, size, and visual-baseline cost, so the bar below is deliberately high.
+
+        microcharts **prefers uncommon questions over uncommon shapes**. Make the case that yours is a question the
+        catalog can't already answer well, and it can land.
 
         Some shapes are excluded on purpose — pie, needle gauges, battery, waffle, violin — each fails at micro
         scale or on the honest-encoding bar, and each has a strictly better in-catalog replacement (Bullet for
@@ -14,7 +18,7 @@ body:
         [`CLAUDE.md`](https://github.com/ganapativs/microcharts/blob/main/CLAUDE.md).
 
         Proposals that get accepted usually answer the "closest existing chart, and why it fails" question in one
-        crisp paragraph. Start there.
+        crisp paragraph. Start there — it decides most proposals either way.
 
   - type: input
     id: name
@@ -109,9 +113,10 @@ body:
     attributes:
       label: Implementation
       description: >-
-        A chart lands in **one PR**: static + interactive entries, geometry + property tests, edge-case fixtures,
-        an inline `seat`, a summary template, size-budget entry, bench scenario, doc page, catalog/gallery rows.
-        The full bar is in `CLAUDE.md` → "Quality bar".
+        Wait for a yes on this issue before writing code. Once agreed, a chart lands in **one PR**: static +
+        interactive entries, geometry + property tests, edge-case fixtures, an inline `seat`, a summary template,
+        size-budget entry, bench scenario, doc page, catalog/gallery rows. The full bar is in `CLAUDE.md` →
+        "Quality bar", and the policy is in `CONTRIBUTING.md`.
       options:
         - label: I'd like to implement this myself if it's accepted
         - label: I've read the per-chart Definition of Done and can meet it

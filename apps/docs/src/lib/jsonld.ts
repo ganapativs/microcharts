@@ -198,7 +198,7 @@ export const DOCS_INTRO_FAQS = [
   },
   {
     q: "How do I propose a new chart type?",
-    a: "Open an issue first. A new type must clear the admission bar: a unique data story the catalog can't already answer, one honest encoding channel, and readable at ≤ 200×60 px without training. It's a high bar on purpose — every shipped chart clears it, and CONTRIBUTING.md in the repository walks through the rest.",
+    a: "Open an issue first. The catalog is open to new types and already broad, so a proposal has to clear the admission bar: a data story the existing charts can't already tell, one honest encoding channel, and readable at ≤ 200×60 px without training. New props work the same way — bring the use case to an issue and wait for a yes before writing code. CONTRIBUTING.md in the repository has the policy.",
   },
 ] as const;
 

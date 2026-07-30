@@ -217,5 +217,9 @@
     "./theme": 2171,
     "./motion": 3090,
     "./styles.css": 3761
+  },
+  "kernels": {
+    "kernel:static": 2401,
+    "kernel:interactive": 4238
   }
 }

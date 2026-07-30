@@ -201,8 +201,10 @@ pnpm size      # gzip budgets (needs a build first)
 pnpm build
 ```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Issues and ideas welcome — new chart types are held to a high bar (≤ 200×60
-px, a unique data story, an honest channel, readable without training).
+Bug fixes and fixes to existing charts are the most useful thing to send. New props and new chart types are open but
+held to a high bar — the catalog is already broad at 106 types, so a new one needs a question the others can't answer.
+Either way, open an issue and wait for a yes before you open a PR. [CONTRIBUTING.md](./CONTRIBUTING.md) has the policy,
+the CI gates, and what a good bug report contains.
 
 ## License
 

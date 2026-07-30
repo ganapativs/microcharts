@@ -6,6 +6,12 @@
 
 Closes #
 
+<!-- Every PR starts as an issue that already has a yes. The only exceptions are a docs typo / broken
+     link / wrong number, and a small obvious fix for a bug you filed yourself with a repro. Without one
+     the PR goes back to the issue stage rather than review — see CONTRIBUTING.md. -->
+
+- [ ] The linked issue was agreed before I wrote this — or this is one of the two documented exceptions
+
 ## Type
 
 - [ ] Fix — behaviour was wrong

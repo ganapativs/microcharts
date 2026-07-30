@@ -29,17 +29,22 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    in the one `@microcharts/react` package. Any third-party dev-dependency must be verified actively maintained before
    adoption.
 2. **Budgets are CI gates:** ≤ 3 kB gzip per static subpath (≤ 2 kB target, simple "Delta-class" charts ≤ 1.5 kB),
-   interactive ≤ static + 1 kB, shared kernel ≤ 5 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client
-   JS for static charts in RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from
-   `scripts/size-budgets.json`), never hand-edited. Separately from the budgets, every PR is **diffed against its base
-   branch**: `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI re-measures it against
-   a fresh build (`size-snapshot.mjs --check`), and the `size-diff` job replies on the PR with a per-subpath table.
-   Growth over **1% on any subpath fails** — regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
-   `size-increase-approved` when an increase is deliberate. **Two of these ceilings no longer describe the shipped
-   budgets and need a decision** (recorded as `$seat` / `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB,
-   none by more than 1.25 kB; and `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries
-   are above that delta (median ~2.4 kB), because size-limit measures each subpath standalone and so charges every one
-   of them the full shared picker kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
+   interactive ≤ static + 1 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client JS for static charts in
+   RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from `scripts/size-budgets.json`), never
+   hand-edited. Separately from the budgets, every PR is **diffed against its base branch**:
+   `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI re-measures it against a fresh
+   build (`size-snapshot.mjs --check`), and the `size-diff` job replies on the PR with a per-subpath table. Growth over
+   **1% on any subpath fails** — regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
+   `size-increase-approved` when an increase is deliberate. The **shared kernel is tracked, not gated**: nothing in
+   `dist/` is the kernel (it is a set of hash-named chunks, and no chart imports all of them), so `size-snapshot.json`
+   carries a declared `kernels` reading — `kernel:static` ~2.4 kB, `kernel:interactive` ~4.2 kB, measured as `KERNELS`
+   in `size-snapshot.mjs` — and `size-diff` prints it beside the table so a uniform shift across ~200 rows has a stated
+   cause. Kernel growth is caught by the 1% per-subpath gate, which fires far earlier than any kernel ceiling would.
+   **Two of these ceilings no longer describe the shipped budgets and need a decision** (recorded as `$seat` /
+   `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB, none by more than 1.25 kB; and
+   `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries are above that delta (median
+   ~2.4 kB), because size-limit measures each subpath standalone and so charges every one of them the full shared picker
+   kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.
