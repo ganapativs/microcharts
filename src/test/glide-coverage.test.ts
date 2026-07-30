@@ -26,31 +26,35 @@ const GEOMETRY_ELEMENTS = /^(rect|circle|line|ellipse)$/;
 const ANIMATABLE = ["x", "y", "width", "height", "cx", "cy", "r", "x1", "y1", "x2", "y2"];
 
 /**
- * Marks that cannot travel today, per chart. Every one is a real value mark; the
- * reasons they are still here are paint plumbing (an attribute-painted mark that
- * would change color if given a role) or a chart with no interactive wrapper at
- * all (`hourglass`, `status-dot`), where the rule never applies.
+ * Marks that do not travel, per chart. This started as a to-do list of paint
+ * plumbing and is now down to the marks that are *right* to snap — each one for
+ * a reason the policy in `styles.css` already states, recorded here so the
+ * number cannot drift back up unexamined.
+ *
+ * No interactive wrapper, so the rule never applies at all:
+ *   - `hourglass`, `status-dot` — both are ambient glyphs with a static entry
+ *     only. They swap outright and there is nothing to hook.
+ *
+ * Emphasis rings that name a DISCRETE unit. Mid-glide such a ring encloses no
+ * unit while the screen reader has already announced the new one, which is the
+ * same reading `focus-ring-symmetry.browser.test.tsx` was written to protect:
+ *   - `cohort-triangle` — ring around one cohort cell.
+ *   - `constellation` — ring around the largest star.
+ *   - `control-strip` — ring on an out-of-limits point.
+ *
+ * A control, not a reading:
+ *   - `minimap-strip` — the window rect is the slider's thumb. `onPointerMove`
+ *     re-renders it on every drag frame, so a 200ms geometry transition would
+ *     put the thumb a fifth of a second behind the finger dragging it. Response
+ *     motion is timed to the pointer; this mark is the pointer.
  */
 const BACKLOG: Record<string, number> = {
-  "benchmark-strip": 1,
-  "burn-chart": 1,
-  "calibration-strip": 1,
   "cohort-triangle": 1,
   constellation: 1,
   "control-strip": 1,
-  dumbbell: 1,
-  "eta-bar": 1,
-  "graded-band": 1,
   hourglass: 1,
   "minimap-strip": 1,
-  "net-flow": 1,
-  ohlc: 4,
-  "partition-strip": 1,
-  "rate-volume": 1,
-  "shift-histogram": 1,
   "status-dot": 3,
-  "tape-gauge": 1,
-  "time-in-range": 1,
 };
 
 /** Opening tags of geometry elements, brace-aware so JSX expressions survive. */
@@ -86,6 +90,11 @@ function geometryTags(src: string): string[] {
 function unreachableMarks(src: string): number {
   return geometryTags(src).filter((tag) => {
     if (/data-mc-(ink|cat|cone)=/.test(tag)) return false;
+    // A spread carries an unknown set of attributes, and `partition-strip`,
+    // `tape-gauge` and `time-in-range` each pass their role in through one. A
+    // scanner reading source text cannot resolve it; assuming "no role" reported
+    // three marks that have travelled all along.
+    if (/\{\.\.\./.test(tag)) return false;
     // A literal coordinate is chrome (a frame, a rule, a fixed tick); only a
     // bound expression can be carrying a datum.
     return ANIMATABLE.some((attr) => {
