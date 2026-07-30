@@ -166,10 +166,10 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         vectorEffect="non-scaling-stroke"
       />
       {/* Before bins up from center (origin bottom — keep them on the axis). */}
-      {geo.bins.map((b) =>
+      {geo.bins.map((b, i) =>
         b.up > 0 ? (
           <rect
-            key={`b${b.x}`}
+            key={`b${i}`}
             x={b.x}
             y={round2(geo.centerY - b.up)}
             width={b.width}
@@ -182,7 +182,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         ) : null,
       )}
       {/* After bins: mirror down, or outline above in overlay mode. */}
-      {geo.bins.map((b) =>
+      {geo.bins.map((b, i) =>
         b.down > 0 ? (
           overlay ? (
             // overlay after-bins render ABOVE the axis (like before bins), so
@@ -194,7 +194,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             // costs the forced-colors mapping until that split covers hollow
             // rects.
             <rect
-              key={`a${b.x}`}
+              key={`a${i}`}
               x={b.x}
               y={round2(geo.centerY - b.down)}
               width={b.width}
@@ -214,7 +214,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             // High Contrast Mode while the before side mapped to system ink. A
             // caller `color` still wins inline; that one is theirs to own.
             <rect
-              key={`a${b.x}`}
+              key={`a${i}`}
               x={b.x}
               y={geo.centerY}
               width={b.width}

@@ -246,7 +246,13 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           sitting on the zero floor — a mark reading "burned down to nothing"
           for work that was never recorded. */}
       {geo.elapsed > 0 ? (
-        <circle cx={geo.today.x} cy={geo.today.y} r={1.8} style={{ fill: lineColor }} />
+        <circle
+          cx={geo.today.x}
+          cy={geo.today.y}
+          r={1.8}
+          data-mc-ink="accent"
+          style={{ fill: lineColor }}
+        />
       ) : null}
       {showLabel ? (
         <text

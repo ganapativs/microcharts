@@ -221,6 +221,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
                 cy={geo.subjectPoints[shown!]![1]}
                 r={2}
                 data-mc-ink="accent"
+                data-mc-ui=""
               />
             ) : null}
             {/* `neutral` rather than a bare inline neutral fill: an inline paint
@@ -233,6 +234,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
                 cy={geo.referencePoints[shown!]![1]}
                 r={1.5}
                 data-mc-ink="neutral"
+                data-mc-ui=""
               />
             ) : null}
           </>

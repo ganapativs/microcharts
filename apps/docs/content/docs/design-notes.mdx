@@ -70,6 +70,35 @@ draws: a line draws left-to-right along its time axis, bars grow from the baseli
 o'clock, and labels arrive last, because they annotate marks that already exist. Marks decelerate into place. They never
 bounce, loop, or pull the eye away from the data.
 
+## When the data changes
+
+An interactive chart whose `data` prop changes travels to the new reading instead of cutting to it. The transition is
+200 ms of CSS. No JavaScript runs, no extra render happens, and the marks are the same DOM nodes carrying new numbers.
+It needs no opt-in, because it answers an update you sent rather than starting on its own; `animate` stays reserved for
+the entrance. Static entries take no part in it: the rule is scoped to the interactive wrapper, so a chart rendered on
+the server behaves exactly as it did before.
+
+Three limits are worth knowing before you rely on it.
+
+Marks drawn as an SVG `<path>` cut to their new shape. No browser has a CSS geometry property for `d`, so every line,
+area, arc, and wedge in the catalog snaps rather than travels.
+
+The geometry properties this uses — `x`, `y`, `width`, `height`, `cx`, `cy`, `r` — became animatable in Safari 17.4 and
+Firefox 128. This package supports Safari 16.4, and there those charts snap too.
+
+Focus rings, selection rings, and crosshairs never travel on a data change. A ring names one unit, and a ring in flight
+encloses none while a screen reader has already announced the new one.
+
+To turn it off for a chart, one line of CSS is enough, because everything here ships at zero specificity:
+
+```css
+.my-chart [data-mc-ink] {
+  transition: none;
+}
+```
+
+`prefers-reduced-motion` already removes it.
+
 ## Budgets are build gates
 
 Size is a CI gate. A chart that grows past its gzip budget fails the build, the same way a failing test does, and the

@@ -167,10 +167,10 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
       style={rootStyle}
     >
       {/* Volume bars (ghost ink → forced-colors). */}
-      {geo.bars.map((b) =>
+      {geo.bars.map((b, i) =>
         b.height > 0 ? (
           <rect
-            key={b.x}
+            key={i}
             x={b.x}
             y={b.y}
             width={b.width}
@@ -189,10 +189,10 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
         />
       ) : null}
       {/* Low-n: hollow rings (shape, not color alone). */}
-      {geo.points.map((p) =>
+      {geo.points.map((p, i) =>
         p.low ? (
           <circle
-            key={p.x}
+            key={i}
             cx={p.x}
             cy={p.y}
             r={1.8}
@@ -204,7 +204,13 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
         ) : null,
       )}
       {showEndDot ? (
-        <circle cx={geo.last!.x} cy={geo.last!.y} r={1.8} style={{ fill: lineColor }} />
+        <circle
+          cx={geo.last!.x}
+          cy={geo.last!.y}
+          r={1.8}
+          data-mc-ink="accent"
+          style={{ fill: lineColor }}
+        />
       ) : null}
       {showLabel ? (
         <text

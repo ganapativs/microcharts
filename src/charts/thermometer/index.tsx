@@ -197,6 +197,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           cy={geo.bulb.cy}
           r={geo.bulb.r}
           data-mc-w="hair"
+          data-mc-ink="fill"
           style={{ fill: paint, stroke: "var(--mc-neutral)" }}
         />
       ) : null}
@@ -215,6 +216,12 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           width={geo.fill.width}
           height={geo.fill.height}
           rx={geo.fill.r}
+          // The mercury is painted by an inline fill, which used to mean it
+          // carried no role at all — and a mark with no role is invisible to
+          // every rule keyed on one, including the data-change transition. The
+          // role is inert here (the inline fill outranks it) and load-bearing
+          // everywhere else.
+          data-mc-ink="fill"
           style={{ fill: paint }}
         />
       ) : null}

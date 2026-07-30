@@ -556,62 +556,80 @@
     display: inline-flex;
     vertical-align: middle;
   }
-  /* @mc-chart progress */
-  /* interactive Progress: the fill glides to its new width (gated below) */
-  :where(.mc-progress-live .mc-progress-fill) {
-    transition: width var(--mc-duration) var(--mc-easing);
+  /* Data change — when the host sends new `data`, an interactive chart TRAVELS
+     to the new reading instead of cutting to it. A mark that teleports on every
+     update reads as a static image being replaced; a mark that moves is the same
+     mark holding a new value, which is what actually happened.
+
+     Three things make this one rule instead of a hundred:
+
+       - `[data-mc-host]` scopes it to interactive wrappers (`src/shared/
+         interactive.ts`). Static entries never carry it, so the static-first
+         contract holds structurally rather than by convention.
+       - `[data-mc-ink]`, or `[data-mc-cat]` for the categorical family and
+         `[data-mc-cone]` for graded bands, is the discriminator, and it costs
+         nothing because those attributes already mark every mark that encodes
+         something. (A categorical segment travels
+         on its WIDTH, which is a continuous quantity; its category is carried by
+         the attribute, and that swaps outright.) A focus or selection ring is
+         drawn as a literal `stroke="var(--mc-accent)"` with neither attribute in
+         ~100 entries — that is the house pattern, so rings fall out of this
+         selector for free and keep SNAPPING to the unit they name. Mid-glide a
+         ring encloses no unit while the screen reader has already announced the
+         new one. `focus-ring-symmetry.browser.test.tsx` exists because a ring
+         once inherited a geometry transition and lerped across a whole beam.
+         Because the gate IS the role, a prop must never take a role away:
+         `ink-role-stability.test.ts` fails a chart that drops `data-mc-ink` to
+         `undefined` when a `color` prop is passed, which used to leave those
+         marks out of this rule, out of the forced-colors remap, and out of every
+         other rule keyed on a role.
+       - `[data-mc-ui]` excludes the interaction overlay, whose own response
+         motion is the transform glide further down and is timed to the pointer,
+         not to the data.
+
+     Interpolating between two readings paints values that are not in the data —
+     a bar easing 5 to 8 passes through 6 and 7. That is admissible only for a
+     CONTINUOUS quantity, where the reading is "this value is changing", and only
+     for the mark's own geometry: label and readout TEXT is never transitioned,
+     so the number on screen is always one the host actually sent. Charts whose
+     mark names a discrete state rather than a quantity (dice pips, moon phase,
+     tally marks, trend arrow, hourglass, status dot) have no wrapper here and
+     swap outright.
+
+     `d` is absent because no engine has ever had a CSS geometry property for it,
+     so the ~60 path-based charts cut rather than travel. The listed properties
+     became animatable in Safari 17.4 and Firefox 128 against a Safari 16.4
+     floor, so an older engine gets today's behaviour: it snaps. Both are stated
+     degradations, not silent ones.
+
+     200ms, not `--mc-duration`'s 300ms: a feed ticking faster than the
+     transition would leave the mark permanently trailing its own data. Consumers
+     opt out with one zero-specificity line —
+     `.my-chart [data-mc-ink] { transition: none }` — and `prefers-reduced-motion`
+     already strips it in the block below. */
+  :where(
+    [data-mc-host]
+      .mc-root
+      :is([data-mc-ink], [data-mc-cat], [data-mc-cone]):not([data-mc-ui], [data-mc-ui] *)
+  ) {
+    transition-property: x, y, width, height, cx, cy, r, x1, y1, x2, y2;
+    transition-duration: 200ms;
+    transition-timing-function: var(--mc-easing);
   }
-  /* @mc-chart-end */
-  /* @mc-chart eta-bar */
-  /* interactive EtaBar: the elapsed/remainder split eases as the rate updates
-     (SVG geometry props; jumps where unsupported). Inside .mc-root → the
-     reduced-motion block below gates it. Never animate ahead of received data. */
-  :where(.mc-eta-live rect) {
-    transition:
-      x var(--mc-duration) var(--mc-easing),
-      width var(--mc-duration) var(--mc-easing);
-  }
-  /* @mc-chart-end */
   /* @mc-chart fill-word */
-  /* interactive FillWord: the ink edge glides along the word (the accent copy
-     is inside .mc-root, so the reduced-motion block below already gates it) */
+  /* interactive FillWord: the ink edge glides along the word. `clip-path` is not
+     a geometry property, so this stays outside the shared data-change rule above
+     and only borrows its 200ms. Reduced-motion is handled by the block below. */
   :where(.mc-fillword-live text[data-mc-ink="accent"]) {
-    transition: clip-path var(--mc-duration) var(--mc-easing);
+    transition: clip-path 200ms var(--mc-easing);
   }
   /* @mc-chart-end */
   /* @mc-chart fat-digits */
-  /* interactive FatDigits: the weight eases on variable fonts (snaps otherwise);
-     tspans are inside .mc-root, so reduced-motion gates it below */
+  /* interactive FatDigits: the weight eases on variable fonts (snaps otherwise).
+     A font axis is not a geometry property, so this stays outside the shared
+     data-change rule and only borrows its 200ms. */
   :where(.mc-fat-live tspan) {
-    transition: font-weight var(--mc-duration) var(--mc-easing);
-  }
-  /* @mc-chart-end */
-  /* @mc-chart thermometer */
-  /* interactive Thermometer: the fill glides to its new level (SVG geometry
-     properties; jumps where unsupported). Inside .mc-root → reduced-motion-gated */
-  :where(.mc-thermo-live rect) {
-    transition:
-      y var(--mc-duration) var(--mc-easing),
-      height var(--mc-duration) var(--mc-easing),
-      width var(--mc-duration) var(--mc-easing);
-  }
-  /* @mc-chart-end */
-  /* @mc-chart balance-beam */
-  /* interactive BalanceBeam: the beam + weights ease to the new tilt (SVG
-     geometry props; jump where unsupported). Inside .mc-root → reduced-motion-gated.
-     `:not([data-mc-w])` excludes the interaction overlay: a focus ring must SNAP
-     to the pan it names — lerping it across the beam leaves it visibly off-centre
-     for the whole transition, and a ring that trails the focus is a lie. */
-  :where(.mc-beam-live :is(line, rect, circle):not([data-mc-w])) {
-    transition:
-      x1 var(--mc-duration) var(--mc-easing),
-      y1 var(--mc-duration) var(--mc-easing),
-      x2 var(--mc-duration) var(--mc-easing),
-      y2 var(--mc-duration) var(--mc-easing),
-      x var(--mc-duration) var(--mc-easing),
-      y var(--mc-duration) var(--mc-easing),
-      cx var(--mc-duration) var(--mc-easing),
-      cy var(--mc-duration) var(--mc-easing);
+    transition: font-weight 200ms var(--mc-easing);
   }
   /* @mc-chart-end */
 }

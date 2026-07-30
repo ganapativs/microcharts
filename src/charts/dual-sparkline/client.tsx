@@ -184,6 +184,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
             r={3.2}
             fill="none"
             data-mc-ink="accent"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -210,6 +211,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
                 cy={geo.primaryPoints[shown!]![1]}
                 r={2}
                 data-mc-ink="accent"
+                data-mc-ui=""
               />
             ) : null}
             {/* `neutral` rather than an inline neutral fill: an inline paint
@@ -222,6 +224,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
                 cy={geo.comparePoints[shown!]![1]}
                 r={1.5}
                 data-mc-ink="neutral"
+                data-mc-ui=""
               />
             ) : null}
           </>

@@ -170,8 +170,8 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
           />
         ) : null,
       )}
-      {geo!.crossings.map((c) => (
-        <circle key={`x${c.x}`} cx={c.x} cy={c.y} r={1.8} data-mc-ink="point" />
+      {geo!.crossings.map((c, i) => (
+        <circle key={i} cx={c.x} cy={c.y} r={1.8} data-mc-ink="point" />
       ))}
       {/* biggest momentum swing — hair connector + seat-gated delta */}
       {swing ? (

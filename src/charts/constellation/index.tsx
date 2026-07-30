@@ -213,7 +213,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
             cx={s.cx}
             cy={s.cy}
             r={s.r}
-            data-mc-ink={isLargest ? "accent" : color ? undefined : "point"}
+            data-mc-ink={isLargest ? "accent" : "point"}
             style={!isLargest && color ? { fill: color } : undefined}
           />
         );

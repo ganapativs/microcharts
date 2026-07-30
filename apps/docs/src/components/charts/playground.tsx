@@ -33,7 +33,12 @@ import {
 // chart modules (each with its interactive twin) in this route's client bundle.
 import { useChartModule } from "@/lib/charts/use-chart-module";
 import { PLAYGROUND_CAPS } from "@/lib/charts/playground-caps.generated";
-import { injectChartProps } from "@/lib/charts/inject-chart-props";
+import {
+  injectChartProps,
+  measurementProps,
+  shuffleChartProps,
+} from "@/lib/charts/inject-chart-props";
+import { shuffleSeries } from "@/lib/charts/jitter";
 import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
 import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
@@ -436,6 +441,7 @@ function Shell({
   code,
   sampleData,
   morphKey,
+  resetKey,
   morphed,
   previewRef,
   themeScope,
@@ -452,8 +458,11 @@ function Shell({
   drawers?: Drawer[];
   code: string;
   sampleData?: SampleData[];
-  /** Discrete props only — never slider values (avoids morph strobe). */
+  /** Discrete props only — never slider values (avoids morph strobe), and never
+   *  the shuffle seed: new DATA must reach the same nodes so they can travel. */
   morphKey?: string;
+  /** Changes on new data too. Resets the error boundary without remounting. */
+  resetKey?: string;
   /** Has this playground already painted once? The morph marks a CHANGE — on
    *  first mount there is nothing to morph from, and fading the chart in reads
    *  as the page arriving late. */
@@ -508,7 +517,7 @@ function Shell({
           data-mc-theme={themeScope}
           className={`${morphed ? "mc-morph " : ""}flex w-full items-center justify-center`}
         >
-          <PreviewBoundary resetKey={morphKey}>{preview}</PreviewBoundary>
+          <PreviewBoundary resetKey={resetKey ?? morphKey}>{preview}</PreviewBoundary>
         </div>
         {aside}
       </div>
@@ -609,7 +618,13 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
   );
   const [data, setData] = useState<number[]>(spec?.data ?? []);
+  // Shuffled series for charts that do NOT thread `data` through their render.
+  // Kept separate from `data` on purpose: `data` also feeds the code snippet, and
+  // for these charts the snippet is written against their own literals.
+  const [injected, setInjected] = useState<(number | null)[] | null>(null);
   const [seed, setSeed] = useState(1);
+  /** Presses of the shuffle button. 0 at rest, so the first paint is the demo. */
+  const [shuffles, setShuffles] = useState(0);
   const [mode, setMode] = useState<"static" | "interactive">(() =>
     spec.renderInteractive ? "interactive" : "static",
   );
@@ -684,18 +699,39 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const threadsData = !!spec.data;
   const injectsData = !threadsData && PLAIN_SERIES.test(entry.dataShape) && entry.demo.length > 0;
   const canFixture = (threadsData || injectsData) && !!caps?.fixtures.length;
+  // A fixture composes ON TOP of a shuffle: pick "all null" after shuffling and
+  // you get the edge case, not the original demo series back.
+  const injectedBase = injected ?? entry.demo;
   const fixtureSeries = canFixture
-    ? applyFixture(fixture, threadsData ? data : entry.demo)
+    ? applyFixture(fixture, threadsData ? data : (injectedBase as number[]))
     : undefined;
   const shown = (threadsData ? (fixtureSeries ?? data) : data) as number[];
-  const dataOverride =
-    injectsData && fixture !== DEFAULT_FIXTURE ? (fixtureSeries as (number | null)[]) : undefined;
+  const dataOverride = injectsData
+    ? fixture !== DEFAULT_FIXTURE
+      ? (fixtureSeries as (number | null)[])
+      : (injected ?? undefined)
+    : undefined;
 
-  // Remount on discrete knobs / data / mode — not on slider drags.
-  const morphKey = spec.knobs
+  // Shuffle for every chart the playground can actually push a series into —
+  // the 7 hand-written ones keep theirs, and the rest get a reading derived from
+  // their own demo data. A chart whose data is not a plain numeric series (an
+  // OHLC bar, a labelled row, a ragged cohort) gets no button, because injecting
+  // a number[] into it would be the wrong shape rather than new data.
+  const seriesShuffle = !!spec.shuffle || threadsData || injectsData;
+
+  // Remount on discrete knobs / mode — not on slider drags, and NOT on shuffle.
+  //
+  // Shuffle used to be part of this key, which meant pressing it threw the chart
+  // away and built a new one. A remounted node has no previous geometry to
+  // travel from, so the data-change transition could never run on the one
+  // surface where a reader would look for it: the chart's own page. Shuffle now
+  // changes `data` and nothing else, so the marks glide to the new reading.
+  //
+  // Entrance motion keeps its own affordance — the replay button bumps `take`,
+  // which IS in this key — so nothing lost its way of being re-watched.
+  const mountKey = spec.knobs
     .filter((k) => k.kind !== "range")
     .map((k) => String(state[k.key]))
-    .concat(spec.shuffle ? [String(seed)] : [])
     .concat([
       mode,
       String(animate),
@@ -710,6 +746,13 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
       theme,
     ])
     .join("-");
+
+  // Everything the mount key covers, plus the shuffle seed. This is what
+  // changes when the READING changes rather than the component: the error
+  // boundary uses it so a shuffle can clear a thrown render, and the a11y probe
+  // uses it because the generated summary is different text for different data.
+  // Neither one remounts the chart.
+  const dataKey = shuffles ? `${mountKey}-${shuffles}` : mountKey;
 
   const importPath = interactive
     ? (entry.interactiveImport ?? entry.staticImport)
@@ -741,12 +784,30 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   const numbers: Record<string, unknown> = {};
   if (fmt.value) numbers.format = fmt.value;
   if (locale !== DEFAULT_LOCALE) numbers.locale = locale;
-  const preview = injectChartProps(rawPreview, {
+  const injectedPreview = injectChartProps(rawPreview, {
     ...(interactive ? cbProps : {}),
     ...naming,
     ...numbers,
     ...(dataOverride ? { data: dataOverride } : {}),
   });
+
+  // Charts whose data the playground can already replace shuffle through their
+  // own series above. Everything else — an OHLC bar, a labelled row, a station
+  // observation — shuffles at the PROP level instead, so the button reaches the
+  // whole catalog rather than the third of it that happens to plot a number[].
+  const propShuffle = !seriesShuffle && measurementProps(rawPreview).length > 0;
+  const canShuffle = seriesShuffle || propShuffle;
+  const preview = propShuffle ? shuffleChartProps(injectedPreview, shuffles) : injectedPreview;
+
+  const onShuffle = canShuffle
+    ? () => {
+        if (spec.shuffle) setData(spec.shuffle(seed));
+        else if (threadsData) setData(shuffleSeries(spec.data ?? [], seed) as number[]);
+        else if (injectsData) setInjected(shuffleSeries(entry.demo, seed));
+        setShuffles((n) => n + 1);
+        setSeed((s) => s + 1);
+      }
+    : undefined;
 
   // The snippet mirrors what's on screen: when the value lives in the panel, show
   // the real `readout={false}` + callback → external-node pattern.
@@ -789,7 +850,8 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
 
   return (
     <Shell
-      morphKey={morphKey}
+      morphKey={mountKey}
+      resetKey={dataKey}
       morphed={painted.current}
       mode={spec.renderInteractive ? mode : undefined}
       onMode={
@@ -801,14 +863,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
           : undefined
       }
       onReplay={ui.animate ? () => setTake((t) => t + 1) : undefined}
-      onShuffle={
-        spec.shuffle
-          ? () => {
-              setData(spec.shuffle!(seed));
-              setSeed((s) => s + 1);
-            }
-          : undefined
-      }
+      onShuffle={onShuffle}
       sampleData={mod?.entry.sampleData}
       preview={preview}
       aside={
@@ -976,7 +1031,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
           content: (
             <A11yPane
               chartRef={previewRef}
-              probeKey={morphKey}
+              probeKey={dataKey}
               interactive={interactive}
               // Pickers announce every unit you rove to; lean scalars announce on
               // value change; the range primitive announces no unit at all.

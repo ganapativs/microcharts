@@ -193,9 +193,16 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      {geo.slots.map((sl) =>
+      {geo.slots.map((sl, i) =>
         sl.n > 0 ? (
-          <circle key={sl.x0} cx={sl.center.x} cy={sl.center.y} r={1.3} style={{ fill: accent }} />
+          <circle
+            key={i}
+            cx={sl.center.x}
+            cy={sl.center.y}
+            r={1.3}
+            data-mc-ink="accent"
+            style={{ fill: accent }}
+          />
         ) : null,
       )}
       {ann.over}

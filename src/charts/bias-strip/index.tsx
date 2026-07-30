@@ -143,7 +143,7 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
           cx={x}
           cy={y}
           r={outside ? outlierRad : rad}
-          data-mc-ink={outside ? "negative" : color ? undefined : "point"}
+          data-mc-ink={outside ? "negative" : "point"}
           fillOpacity={outside ? 0.85 : 0.75}
           style={!outside && color ? { fill: color } : undefined}
         />

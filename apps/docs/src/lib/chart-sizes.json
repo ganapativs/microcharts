@@ -73,7 +73,7 @@
   },
   "micro-scatter": {
     "static": 2.1,
-    "interactive": 4.83
+    "interactive": 4.82
   },
   "segmented-bar": {
     "static": 2.68,
@@ -145,7 +145,7 @@
   },
   "percentile-ladder": {
     "static": 3.41,
-    "interactive": 5.82
+    "interactive": 5.83
   },
   "graded-band": {
     "static": 3.07,
@@ -160,12 +160,12 @@
     "interactive": 5.99
   },
   "burn-chart": {
-    "static": 3.48,
-    "interactive": 6.05
+    "static": 3.49,
+    "interactive": 6.06
   },
   "error-budget": {
     "static": 3,
-    "interactive": 5.42
+    "interactive": 5.43
   },
   "control-strip": {
     "static": 3.37,
@@ -201,11 +201,11 @@
   },
   "cycle-plot": {
     "static": 3.11,
-    "interactive": 5.94
+    "interactive": 5.95
   },
   "change-point": {
     "static": 3.66,
-    "interactive": 6.44
+    "interactive": 6.43
   },
   "ensemble-ghosts": {
     "static": 3.3,
@@ -228,7 +228,7 @@
     "interactive": 3.18
   },
   "thermometer": {
-    "static": 2.55,
+    "static": 2.56,
     "interactive": 4
   },
   "moon-phase": {
@@ -252,7 +252,7 @@
     "interactive": 4.63
   },
   "bubble-row": {
-    "static": 2.3,
+    "static": 2.29,
     "interactive": 4.71
   },
   "music-staff": {
@@ -273,7 +273,7 @@
   },
   "constellation": {
     "static": 3.16,
-    "interactive": 5.77
+    "interactive": 5.76
   },
   "polar-clock": {
     "static": 3.32,
@@ -293,15 +293,15 @@
   },
   "comet-trail": {
     "static": 2.45,
-    "interactive": 5.08
+    "interactive": 5.07
   },
   "orbit-status": {
     "static": 2.42,
     "interactive": 4.4
   },
   "rate-volume": {
-    "static": 2.92,
-    "interactive": 5.49
+    "static": 2.93,
+    "interactive": 5.5
   },
   "icon-array": {
     "static": 2.55,
@@ -356,7 +356,7 @@
   },
   "partition-strip": {
     "static": 2.55,
-    "interactive": 5.34
+    "interactive": 5.35
   },
   "calibration-strip": {
     "static": 2.81,
@@ -415,7 +415,7 @@
     "interactive": 5.89
   },
   "bias-strip": {
-    "static": 2.76,
+    "static": 2.75,
     "interactive": 5.29
   },
   "percentile-trace": {

@@ -170,7 +170,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
       {geo.segments.map((sg, i) =>
         i % 2 === 1 ? (
           <rect
-            key={sg.x0}
+            key={i}
             x={round2(geo.breaks[i - 1]!.x)}
             y={0}
             width={round2(
@@ -186,10 +186,10 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
         ) : null,
       )}
       {means
-        ? geo.segments.map((sg) =>
+        ? geo.segments.map((sg, i) =>
             Number.isFinite(sg.mean) ? (
               <line
-                key={`m${sg.x0}`}
+                key={`m${i}`}
                 x1={sg.x0}
                 y1={sg.meanY}
                 x2={sg.x1}
