@@ -9,13 +9,24 @@ body:
         [chart proposal form](https://github.com/ganapativs/microcharts/issues/new?template=05-chart-proposal.yml)
         instead.
 
-        Two constraints shape almost every answer here, so it's worth stating them up front:
+        A prop joins a grammar shared by 106 charts, ships forever under semver, spends bytes against an enforced
+        gzip ceiling, and multiplies the edge-case matrix. So the library gains props slowly, and the use case is
+        what decides it.
+
+        Lead with the problem, not the API. Sometimes it turns out to be reachable already — an existing prop used
+        differently, an annotation, a `--mc-*` token, or a few lines in your own app. When it isn't, this is where
+        the shape gets worked out.
+
+        Two constraints shape almost every answer here:
 
         - **One grammar.** The same prop name means the same thing on every chart (`domain`, `color`, `title`,
           `summary`, `label`, `dots`, `format`, `positive`). Variants are props; a new data shape is a new
           component. No option-bag objects on the common path.
         - **Budgets are CI gates.** Zero runtime dependencies, forever. Per-subpath gzip ceilings are enforced in
           CI, so "just add a small option" is never free.
+
+        Wait for a yes here before opening a PR — see
+        [CONTRIBUTING.md](https://github.com/ganapativs/microcharts/blob/main/CONTRIBUTING.md).
 
   - type: dropdown
     id: surface

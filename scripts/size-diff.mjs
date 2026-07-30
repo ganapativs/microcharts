@@ -53,16 +53,19 @@ function snapshotAt(ref) {
       maxBuffer: 16 * 1024 * 1024,
       stdio: ["ignore", "pipe", "ignore"],
     });
-    return JSON.parse(raw).entries ?? {};
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
-const base = baseFile
-  ? (JSON.parse(readFileSync(resolve(root, baseFile), "utf8")).entries ?? {})
+const baseSnapshot = baseFile
+  ? JSON.parse(readFileSync(resolve(root, baseFile), "utf8"))
   : snapshotAt(baseRef);
-const head = JSON.parse(readFileSync(resolve(root, "scripts/size-snapshot.json"), "utf8")).entries;
+const headSnapshot = JSON.parse(readFileSync(resolve(root, "scripts/size-snapshot.json"), "utf8"));
+
+const base = baseSnapshot ? (baseSnapshot.entries ?? {}) : null;
+const head = headSnapshot.entries;
 
 const kb = (b) => `${(b / 1000).toFixed(2)} kB`;
 const signed = (b) => `${b > 0 ? "+" : b < 0 ? "−" : ""}${Math.abs(b)} B`;
@@ -147,6 +150,38 @@ const table = (rows) => [
 lines.push(...table(changed.slice(0, MAX_ROWS)));
 if (changed.length > MAX_ROWS) {
   lines.push("", `… ${changed.length - MAX_ROWS} more changed subpath(s) omitted.`);
+}
+
+// Shared kernel: reported, never gated. Kernel bytes are already inside every
+// subpath above, so gating them here would fail the same change twice; what
+// this adds is the reason a couple hundred rows moved by the same amount.
+const baseKernels = baseSnapshot?.kernels ?? {};
+const headKernels = headSnapshot.kernels ?? {};
+const kernelKeys = [...new Set([...Object.keys(baseKernels), ...Object.keys(headKernels)])].sort();
+if (kernelKeys.length) {
+  const moved = kernelKeys.filter((k) => baseKernels[k] !== headKernels[k]);
+  lines.push("", "**Shared kernel** — tracked, not gated");
+  if (moved.length) {
+    lines.push(
+      "",
+      "| Kernel | Base | Head | Δ | Δ% |",
+      "| --- | ---: | ---: | ---: | ---: |",
+      ...moved.map((k) => {
+        const b = baseKernels[k];
+        const h = headKernels[k];
+        if (b === undefined || h === undefined)
+          return `| \`${k}\` | ${b === undefined ? "—" : kb(b)} | ${h === undefined ? "—" : kb(h)} | — | — |`;
+        return `| \`${k}\` | ${kb(b)} | ${kb(h)} | ${signed(h - b)} | ${pct(h - b, b)} |`;
+      }),
+      "",
+      "Kernel bytes land in every subpath that imports them, so a move here explains a uniform shift across the table above.",
+    );
+  } else {
+    lines.push(
+      "",
+      "Byte-identical. Every change above is local to the charts that moved, not the shared core.",
+    );
+  }
 }
 
 if (added.length) {
