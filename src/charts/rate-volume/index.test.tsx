@@ -30,8 +30,12 @@ describe("<RateVolume>", () => {
 
   it("minVolume renders low-denominator marks hollow (shape, not color)", () => {
     const { container } = draw(<RateVolume data={SAMPLE} minVolume={50} dots="none" />);
-    // period 3 (vol 38) is the only hollow ring
-    const rings = container.querySelectorAll('circle[fill="var(--mc-surface)"]');
+    // period 3 (vol 38) is the only hollow ring. The surface fill is inline —
+    // as an attribute it would lose to the ring's ink role, and that role is
+    // what puts the ring in the data-change transition.
+    const rings = [...container.querySelectorAll("circle")].filter((c) =>
+      c.getAttribute("style")?.includes("var(--mc-surface)"),
+    );
     expect(rings.length).toBe(1);
   });
 
