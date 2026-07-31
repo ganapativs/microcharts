@@ -1,6 +1,6 @@
 {
   "name": "@microcharts/mcp",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "MCP server + Vercel AI-SDK tools for microcharts — let a model find, wire, and render word-sized charts.",
   "keywords": [
     "ai",

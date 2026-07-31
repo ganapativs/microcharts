@@ -1,5 +1,14 @@
 # @microcharts/mcp
 
+## 0.1.9
+
+### Patch Changes
+
+- [#99](https://github.com/ganapativs/microcharts/pull/99)
+  [`fdef3ea`](https://github.com/ganapativs/microcharts/commit/fdef3ea2c88236684e65d0d2e6c85d1ffa8bb8f8) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Point the embedded catalog's `library` field at
+  `@microcharts/react@0.12.0` (the Version Packages bump left the generated snapshot on 0.11.0).
+
 ## 0.1.8
 
 ### Patch Changes
