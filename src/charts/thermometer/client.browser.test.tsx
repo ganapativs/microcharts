@@ -49,6 +49,28 @@ describe("interactive <Thermometer>", () => {
     expect(wrap.querySelector(".mc-spark-readout")).toBeNull();
   });
 
+  // A target draws a tick and is spoken in the summary. Before this it was never
+  // PAINTED anywhere: a sighted reader saw a line with no number, while a screen
+  // reader was told "target 80". The chip is the one surface with room for it.
+  it("the chip names the target when one is set", async () => {
+    const screen = await render(<Thermometer value={72} target={80} />);
+    const wrap = screen.container.querySelector(".mc-thermo-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    const chip = () => screen.container.querySelector(".mc-spark-readout")?.textContent;
+    await expect.poll(chip).toBe("72 / 80");
+  });
+
+  // `label="value"` prints the value beside the tube, so on its own the chip adds
+  // nothing (the case above). With a target it still holds half the reading.
+  it('label="value" still shows the chip when a target is set', async () => {
+    const screen = await render(<Thermometer value={72} target={80} label="value" />);
+    const wrap = screen.container.querySelector(".mc-thermo-live") as HTMLElement;
+    await userEvent.hover(wrap);
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("72 / 80");
+  });
+
   // Edge-only `onActive` — shared/interactive.ts; pointerAway() before blur (src/test/pointer.ts).
   it("onActive reports the reading once, then null when the active state clears", async () => {
     const seen: unknown[] = [];

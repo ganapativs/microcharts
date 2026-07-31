@@ -122,3 +122,66 @@ describe("a prop never removes a mark's role", () => {
     }
   });
 });
+
+// A role is only inert when the inline style covers EVERY property it sets.
+//
+// Three roles carry an opacity as well as a colour — `fill` (0.12), `ghost`, and
+// `region`. A mark that borrows one of them and overrides only `fill` keeps the
+// role's opacity, which is how the Thermometer's mercury came to be painted at
+// 12% and the whole instrument read as empty: the right colour, almost
+// invisible. It is the kind of defect no assertion in the suite would catch,
+// because every coordinate is still correct.
+describe("a role's opacity is never inherited by accident", () => {
+  const OPACITY_ROLES = new Set(["fill", "ghost", "region"]);
+
+  /**
+   * Marks that recolour an opacity-carrying role and MEAN to stay translucent.
+   * Sparkline's area is the role's own use case: a wash under the line, and a
+   * caller's `color` changes its hue without making it opaque enough to compete
+   * with the line it sits beneath.
+   */
+  const INTENTIONALLY_TRANSLUCENT = new Set(["sparkline/index.tsx:198"]);
+
+  it("a mark that overrides a colour also owns the opacity that came with it", () => {
+    const offenders: string[] = [];
+
+    for (const slug of readdirSync(chartsDir, { withFileTypes: true })) {
+      if (!slug.isDirectory()) continue;
+      for (const file of ["index.tsx", "client.tsx"]) {
+        let src: string;
+        try {
+          src = readFileSync(resolve(chartsDir, slug.name, file), "utf8");
+        } catch {
+          continue;
+        }
+        for (const m of src.matchAll(/<(rect|circle|line|ellipse|path)\b/g)) {
+          let depth = 0;
+          let tag = "";
+          for (let i = m.index; i < src.length; i++) {
+            const ch = src[i];
+            if (ch === "{") depth++;
+            else if (ch === "}") depth--;
+            else if (ch === ">" && depth === 0) {
+              tag = src.slice(m.index, i + 1);
+              break;
+            }
+          }
+          const role = tag.match(/data-mc-ink="([a-z]+)"/)?.[1];
+          if (!role || !OPACITY_ROLES.has(role)) continue;
+          // Only marks that repaint are at risk: one that takes the role's own
+          // colour wants the role's own opacity with it.
+          if (!/style=\{[^}]*fill/.test(tag)) continue;
+          if (/fillOpacity[:=]/.test(tag)) continue;
+          const at = `${slug.name}/${file}:${src.slice(0, m.index).split("\n").length}`;
+          if (INTENTIONALLY_TRANSLUCENT.has(at)) continue;
+          offenders.push(
+            `${at} <${m[1]}> ` +
+              `role="${role}" sets fill-opacity, but the inline style only overrides fill`,
+          );
+        }
+      }
+    }
+
+    expect(offenders, offenders.join("\n")).toEqual([]);
+  });
+});

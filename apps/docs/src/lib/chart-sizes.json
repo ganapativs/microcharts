@@ -229,7 +229,7 @@
   },
   "thermometer": {
     "static": 2.56,
-    "interactive": 4
+    "interactive": 4.04
   },
   "moon-phase": {
     "static": 1.7,
