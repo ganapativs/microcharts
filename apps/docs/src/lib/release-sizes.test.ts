@@ -37,7 +37,12 @@ describe("release size history", () => {
 
   it("keeps every ceiling under the kilobyte figure the hero sentence claims", () => {
     expect(CEILINGS.length).toBe(RELEASE_SIZES.length);
-    for (const max of CEILINGS) expect(max).toBeLessThan(CEILING_CLAIM);
+    // `toBeLessThanOrEqual`, not `toBeLessThan`: `chart-sizes.json` is rounded to
+    // two decimals, so a chart measuring 6,995 B reads 7.00 kB and would fail a
+    // strict comparison against a ceiling it is genuinely under. The hero
+    // sentence handles the tie itself — it quotes the max instead of "< n kB"
+    // whenever one lands on the whole number (see `hero-frames.tsx`).
+    for (const max of CEILINGS) expect(max).toBeLessThanOrEqual(CEILING_CLAIM);
     // …and the claim is the tightest whole number that holds, so the sentence
     // never rounds up to a number nobody would have to argue with.
     expect(CEILING_CLAIM - 1).toBeLessThan(Math.max(...CEILINGS));

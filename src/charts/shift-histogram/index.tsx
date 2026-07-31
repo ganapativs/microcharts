@@ -166,10 +166,10 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         vectorEffect="non-scaling-stroke"
       />
       {/* Before bins up from center (origin bottom — keep them on the axis). */}
-      {geo.bins.map((b) =>
+      {geo.bins.map((b, i) =>
         b.up > 0 ? (
           <rect
-            key={`b${b.x}`}
+            key={`b${i}`}
             x={b.x}
             y={round2(geo.centerY - b.up)}
             width={b.width}
@@ -182,25 +182,26 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         ) : null,
       )}
       {/* After bins: mirror down, or outline above in overlay mode. */}
-      {geo.bins.map((b) =>
+      {geo.bins.map((b, i) =>
         b.down > 0 ? (
           overlay ? (
             // overlay after-bins render ABOVE the axis (like before bins), so
             // they too grow up from the center line → pin the bottom edge.
-            // The literal stroke stays: rect isn't in the accent role's
-            // path/line/polyline element-split, so `data-mc-ink="accent"` here
-            // would beat this fill="none" and paint solid accent blocks over
-            // the before side. Same trade ConfusionGrid's ring documents — it
-            // costs the forced-colors mapping until that split covers hollow
-            // rects.
+            // `data`, not `accent`: a rect is not in the accent role's
+            // path/line/polyline element-split, so that role would beat
+            // fill="none" and paint solid blocks over the before side. `data`
+            // is hollow by definition, and its stroke loses to the inline one,
+            // so the role changes no paint and buys the bin its place in the
+            // data-change transition.
             <rect
-              key={`a${b.x}`}
+              key={`a${i}`}
               x={b.x}
               y={round2(geo.centerY - b.down)}
               width={b.width}
               height={b.down}
               fill="none"
-              stroke={afterFill}
+              data-mc-ink="data"
+              style={{ stroke: afterFill }}
               data-mc-origin="bottom"
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
@@ -214,7 +215,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             // High Contrast Mode while the before side mapped to system ink. A
             // caller `color` still wins inline; that one is theirs to own.
             <rect
-              key={`a${b.x}`}
+              key={`a${i}`}
               x={b.x}
               y={geo.centerY}
               width={b.width}

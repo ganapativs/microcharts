@@ -242,15 +242,20 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
               />
             ) : null}
             {row.x0 !== null && !single ? (
-              // hollow ring: circles can't take the fill-based accent ink role,
-              // so the color stays a justified literal (same pattern as
-              // calibration-strip's low-support marks); width still uses the role.
+              // hollow ring: on a <circle> the accent role FILLS, so the colour
+              // rides an inline style — which also outranks the `data` role's
+              // own stroke, leaving that role free to do the one job wanted
+              // here. Without it this endpoint sat outside the data-change
+              // transition while the right-hand endpoint below (a real ink
+              // role) travelled, and a dumbbell whose two ends move at
+              // different times is not reading as one span.
               <circle
                 cx={row.x0}
                 cy={row.y}
                 r={1.7}
                 fill="none"
-                stroke={isHl ? "var(--mc-accent)" : (color ?? "var(--mc-stroke)")}
+                data-mc-ink="data"
+                style={{ stroke: isHl ? "var(--mc-accent)" : (color ?? "var(--mc-stroke)") }}
                 data-mc-w="support"
               />
             ) : null}

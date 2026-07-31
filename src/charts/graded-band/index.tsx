@@ -212,15 +212,16 @@ export function GradedBand(props: GradedBandProps): ReactNode {
       />
       {geo.dot ? (
         // the observed value is a distinct hollow ring, never confused with the
-        // tick — fill stays the literal surface token (punches through the
-        // band beneath it, so the "data" ink role's forced fill:none doesn't
-        // fit); width alone moves to a role
+        // tick — the surface fill punches through the band beneath it, so it
+        // overrides the `data` role's fill:none from an inline style. The
+        // role's stroke is already this ring's stroke, so taking the role costs
+        // nothing and is what carries the observation across a data change.
         <circle
           cx={geo.dot.x}
           cy={round2(height / 2)}
           r={1.8}
-          fill="var(--mc-surface)"
-          stroke="var(--mc-stroke)"
+          data-mc-ink="data"
+          style={{ fill: "var(--mc-surface)" }}
           data-mc-w="support"
         />
       ) : null}

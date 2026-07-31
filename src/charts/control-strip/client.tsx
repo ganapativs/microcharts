@@ -149,15 +149,20 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
     if (!pt) return null;
     return (
       <>
+        {/* The crosshair rides `transform`, not `x1`/`x2`: those attributes have
+            no CSS geometry property in any engine, so a line placed that way
+            would teleport beside the gliding ring. */}
         <line
-          x1={pt.x}
+          x1={0}
           y1={0.5}
-          x2={pt.x}
+          x2={0}
           y2={height - 0.5}
           data-mc-ink="muted"
+          data-mc-ui=""
           data-mc-w={pinned ? "tick" : "support"}
           strokeDasharray={pinned ? undefined : "1.5 2"}
           vectorEffect="non-scaling-stroke"
+          style={{ transform: `translateX(${pt.x}px)` }}
         />
         {/* focus/pin ring stroke is state-dependent (negative when out), so it
             stays an attribute — a role can't switch color per point */}

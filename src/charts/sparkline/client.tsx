@@ -22,6 +22,12 @@ import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 const Static = memo(StaticSparkline);
 const SVG_NS = "http://www.w3.org/2000/svg";
 
+// Selection ring, then the live pair (crosshair + dot) on a wrapper that gets
+// moved as one. Built once per chart; see the effect below for why.
+const UI_MARKS =
+  '<circle r="3.2" fill="none" data-mc-ink="accent" data-mc-w="tick" vector-effect="non-scaling-stroke"/>' +
+  '<g><line data-mc-ink="muted" vector-effect="non-scaling-stroke"/><circle r="2.6" data-mc-ink="accent"/></g>';
+
 function uiGroup(svg: SVGSVGElement): SVGGElement {
   let g = svg.querySelector("g[data-mc-ui]") as SVGGElement | null;
   if (!g) {
@@ -158,37 +164,53 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
 
   // Scrub/selection marks — DOM, not React children — so memo(Static) can skip
   // rebuilding the series path on every active step.
+  //
+  // Built once and then MOVED, never replaced: a node recreated per pointer
+  // sample cannot transition, and styles.css glides these so the crosshair
+  // TRAVELS to the next datum instead of being repainted at it. Unused marks
+  // hide in place, which keeps their identity (and their transition) across a
+  // scrub that pins and unpins a point.
+  //
+  // Every axis of this travel is carried by `transform`, never by the marks' own
+  // coordinates. Two separate reasons, and both matter:
+  //   - `x1`/`x2` have no CSS geometry property in ANY engine, so a line
+  //     positioned that way cannot transition at all.
+  //   - `cx`/`cy` DO have one, but only from Safari 17.4 and Firefox 128, while
+  //     this package supports Safari 16.4+. Moving the dot vertically by `cy`
+  //     would glide on Chrome and snap on a supported Safari — a dot jumping
+  //     beside a gliding crosshair, which is worse than both snapping.
+  // So the wrapper carries the pair horizontally and the dot carries itself
+  // vertically, both through transform, which is animatable everywhere.
   useLayoutEffect(() => {
     const svg = hostRef.current?.querySelector("svg");
     if (!svg) return;
     const g = uiGroup(svg);
-    g.replaceChildren();
+    // Built on the first interaction, not at mount: the entrance engine casts
+    // every leaf in the SVG, so marks that exist while still hidden get picked
+    // up as stage ink and animated to `opacity: 1` — flashing a crosshair the
+    // reader never asked for. No interaction yet means nothing to reveal.
+    if (!g.childElementCount) {
+      if (!selPoint && !shownPoint) return;
+      g.innerHTML = UI_MARKS;
+    }
+    const kids = g.children as unknown as SVGElement[];
+    const live = kids[1]!;
+    const ring = kids[0]!;
+    ring.setAttribute("opacity", selPoint ? "1" : "0");
+    // The pin is placed by `cx`/`cy`, NOT by a transform, and that is what makes
+    // it snap: styles.css glides transforms only. A ring names one discrete
+    // point, and a ring in transit encloses none.
     if (selPoint) {
-      const ring = document.createElementNS(SVG_NS, "circle");
       ring.setAttribute("cx", String(selPoint[0]));
       ring.setAttribute("cy", String(selPoint[1]));
-      ring.setAttribute("r", "3.2");
-      ring.setAttribute("fill", "none");
-      ring.setAttribute("data-mc-ink", "accent");
-      ring.setAttribute("data-mc-w", "tick");
-      ring.setAttribute("vector-effect", "non-scaling-stroke");
-      g.appendChild(ring);
     }
+    live.setAttribute("opacity", shownPoint ? "1" : "0");
+    if (shownPoint) live.style.transform = `translateX(${shownPoint[0]}px)`;
     if (shownPoint) {
-      const line = document.createElementNS(SVG_NS, "line");
-      line.setAttribute("x1", String(shownPoint[0]));
-      line.setAttribute("y1", String(geo.plot.y0));
-      line.setAttribute("x2", String(shownPoint[0]));
-      line.setAttribute("y2", String(geo.plot.y1));
-      line.setAttribute("data-mc-ink", "muted");
-      line.setAttribute("vector-effect", "non-scaling-stroke");
-      g.appendChild(line);
-      const dot = document.createElementNS(SVG_NS, "circle");
-      dot.setAttribute("cx", String(shownPoint[0]));
-      dot.setAttribute("cy", String(shownPoint[1]));
-      dot.setAttribute("r", "2.6");
-      dot.setAttribute("data-mc-ink", "accent");
-      g.appendChild(dot);
+      const marks = live.children as unknown as SVGElement[];
+      marks[0]!.setAttribute("y1", String(geo.plot.y0));
+      marks[0]!.setAttribute("y2", String(geo.plot.y1));
+      marks[1]!.style.transform = `translateY(${shownPoint[1]}px)`;
     }
   }, [selPoint, shownPoint, geo.plot.y0, geo.plot.y1]);
 

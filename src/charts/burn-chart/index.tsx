@@ -212,12 +212,17 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           vectorEffect="non-scaling-stroke"
         />
       ) : null}
+      {/* `muted` resolves to exactly the stroke this line already carried, so
+          the role repaints nothing, and it earns the forced-colors mapping a
+          literal `var(--mc-neutral)` cannot: `.mc-root` sets
+          `forced-color-adjust: none`, which preserved the fixed gray verbatim
+          in High Contrast Mode. The role maps it to GrayText. */}
       <line
         x1={geo.today.x}
         y1={1}
         x2={geo.today.x}
         y2={height - 1}
-        stroke="var(--mc-neutral)"
+        data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
         vectorEffect="non-scaling-stroke"
@@ -246,7 +251,13 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           sitting on the zero floor — a mark reading "burned down to nothing"
           for work that was never recorded. */}
       {geo.elapsed > 0 ? (
-        <circle cx={geo.today.x} cy={geo.today.y} r={1.8} style={{ fill: lineColor }} />
+        <circle
+          cx={geo.today.x}
+          cy={geo.today.y}
+          r={1.8}
+          data-mc-ink="accent"
+          style={{ fill: lineColor }}
+        />
       ) : null}
       {showLabel ? (
         <text

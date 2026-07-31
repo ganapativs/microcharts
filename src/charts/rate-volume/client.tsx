@@ -177,15 +177,21 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
     const w = pinned ? "tick" : "support";
     return (
       <>
+        {/* `data-mc-ui` glides both marks to the period they name instead of
+            repainting them there. The crosshair travels on a transform because
+            `x1`/`x2` have no CSS geometry property behind them in any engine;
+            the ring's `cx`/`cy` do, so it moves on its own coordinates. */}
         <line
-          x1={cx}
+          x1={0}
           y1={0.5}
-          x2={cx}
+          x2={0}
           y2={height - 0.5}
           stroke="var(--mc-accent)"
+          data-mc-ui=""
           data-mc-w={w}
           strokeDasharray="1.5 2"
           vectorEffect="non-scaling-stroke"
+          style={{ transform: `translateX(${cx}px)` }}
         />
         {vp ? (
           <circle

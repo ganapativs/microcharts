@@ -187,26 +187,34 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
+        {/* Both crosshairs are `data-mc-ui`, so each glides to the slot it names
+            instead of being repainted at it. They travel on a transform: the
+            `x1`/`x2` that place a line have no CSS geometry property behind them
+            in any engine, so tagging those would animate nothing. */}
         {selected !== null && selected !== active ? (
           <line
-            x1={slotW * (selected + 0.5)}
+            x1={0}
             y1={0}
-            x2={slotW * (selected + 0.5)}
+            x2={0}
             y2={height}
             stroke="var(--mc-accent)"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${slotW * (selected + 0.5)}px)` }}
           />
         ) : null}
         {shown !== null ? (
           <line
-            x1={slotW * (shown + 0.5)}
+            x1={0}
             y1={0}
-            x2={slotW * (shown + 0.5)}
+            x2={0}
             y2={height}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${slotW * (shown + 0.5)}px)` }}
           />
         ) : null}
         {rest.children}

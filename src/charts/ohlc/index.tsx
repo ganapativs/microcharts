@@ -176,6 +176,17 @@ export function Ohlc(props: OhlcProps): ReactNode {
               width={m.bodyW}
               height={round2(bodyH)}
               shapeRendering="crispEdges"
+              /* No `data-mc-ink`, deliberately — and this is the one place in
+                 the catalog where withholding a role is the correct call. The
+                 role would put the body inside the data-change transition,
+                 but a wick is a <line>, and `x1`/`y1`/`x2`/`y2` are the SVG
+                 geometry attributes that no engine ever promoted to CSS
+                 properties (unlike `x`/`y`/`width`/`height`, which Safari 17.4
+                 and Firefox 128 did ship). So a wick cannot travel at all. A
+                 body that glides to its new close while its own high and low
+                 teleport does not read as a candle moving; it reads as a
+                 rendering fault. The candle snaps as one mark until `x1` is
+                 animatable. */
               fill={m.up ? "var(--mc-surface, Canvas)" : stroke}
               stroke={stroke}
               data-mc-w={m.up ? "support" : undefined}

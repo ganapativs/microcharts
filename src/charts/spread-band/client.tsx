@@ -185,27 +185,35 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       >
+        {/* Response marks carry `data-mc-ui`, so they glide to the reading they
+            name. The crosshairs travel on a transform because `x1`/`x2` have no
+            CSS geometry property in any engine; the dots move on `cx`/`cy`,
+            which do. */}
         {pinX !== undefined ? (
           <line
-            x1={pinX}
+            x1={0}
             y1={0}
-            x2={pinX}
+            x2={0}
             y2={height}
             data-mc-ink="accent"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${pinX}px)` }}
           />
         ) : null}
         {crossX !== undefined ? (
           <>
             <line
-              x1={crossX}
+              x1={0}
               y1={0}
-              x2={crossX}
+              x2={0}
               y2={height}
               data-mc-ink="muted"
+              data-mc-ui=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateX(${crossX}px)` }}
             />
             {geo.subjectPoints[shown!] ? (
               <circle
@@ -213,6 +221,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
                 cy={geo.subjectPoints[shown!]![1]}
                 r={2}
                 data-mc-ink="accent"
+                data-mc-ui=""
               />
             ) : null}
             {/* `neutral` rather than a bare inline neutral fill: an inline paint
@@ -225,6 +234,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
                 cy={geo.referencePoints[shown!]![1]}
                 r={1.5}
                 data-mc-ink="neutral"
+                data-mc-ui=""
               />
             ) : null}
           </>

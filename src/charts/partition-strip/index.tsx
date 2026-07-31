@@ -130,7 +130,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       className={className ? `mc-partition ${className}` : "mc-partition"}
       style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
     >
-      {geo.segments.flatMap((seg) => {
+      {geo.segments.flatMap((seg, i) => {
         const y = seg.row === 0 ? inset : inset + rowH + 1;
         // fills via ink/cat roles + .mc-partition rules in styles.css — flat
         // siblings, minimal attributes: the segment list is this chart's SSR
@@ -177,7 +177,12 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
           seg.row === 0 &&
           rowH >= fontSize + 0.8 &&
           seg.label.length <= proseCharsThatFit(seg.width, fontSize, 2);
-        const key = `${seg.row}-${seg.label}-${seg.x}`;
+        // Positional, not coordinate-derived: `seg.x` moves whenever any earlier
+        // share changes, which minted a new key and remounted every segment on
+        // an update — and a remounted node has no previous geometry to travel
+        // from. The row and index together are stable for a partition laid out
+        // in a fixed order.
+        const key = `${seg.row}-${i}`;
         const nodes = [
           <rect
             key={key}

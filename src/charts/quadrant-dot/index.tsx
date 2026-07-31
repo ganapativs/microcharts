@@ -193,7 +193,13 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
         <circle key={i} cx={g.x} cy={g.y} r={ghostR} data-mc-ink="ghost" fillOpacity={0.42} />
       ))}
       {/* Focal + filled halo (ring would let the cross cut through as a chord). */}
-      <circle cx={geo.dot.x} cy={geo.dot.y} r={haloR} style={{ fill: accent, fillOpacity: 0.18 }} />
+      <circle
+        cx={geo.dot.x}
+        cy={geo.dot.y}
+        r={haloR}
+        data-mc-ink="accent"
+        style={{ fill: accent, fillOpacity: 0.18 }}
+      />
       <circle
         cx={geo.dot.x}
         cy={geo.dot.y}

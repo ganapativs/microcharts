@@ -219,15 +219,21 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         ) : null}
         {p ? (
           <>
+            {/* `data-mc-ui` glides the response marks to the period they name.
+                The crosshair travels on a transform — `x1`/`x2` have no CSS
+                geometry property in any engine — while the dots move on their
+                own `cx`/`cy`, which do. */}
             <line
-              x1={p.x}
+              x1={0}
               y1={0.5}
-              x2={p.x}
+              x2={0}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
+              data-mc-ui=""
               data-mc-w="support"
               strokeDasharray="1.5 2"
               vectorEffect="non-scaling-stroke"
+              style={{ transform: `translateX(${p.x}px)` }}
             />
             <circle
               cx={p.x}

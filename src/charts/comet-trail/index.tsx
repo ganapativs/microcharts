@@ -132,7 +132,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
           cx={geo.head.cx}
           cy={geo.head.cy}
           r={geo.head.r}
-          data-mc-ink={color ? undefined : "accent"}
+          data-mc-ink="accent"
           style={color ? { fill: color } : undefined}
         />
       ) : null}

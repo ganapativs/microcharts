@@ -170,9 +170,9 @@ export function EventRaster(props: EventRasterProps): ReactNode {
         const strokeInk = emphasis ? (active ? "accent" : "muted") : "data";
         const cy = round2(lane.y + lane.laneH / 2);
         const nodes: ReactNode[] = lane.binned
-          ? lane.bins.map((b) => (
+          ? lane.bins.map((b, j) => (
               <rect
-                key={`b-${i}-${b.x}`}
+                key={`b-${i}-${j}`}
                 x={b.x}
                 y={round2(lane.y + lane.laneH * 0.16)}
                 width={b.width}

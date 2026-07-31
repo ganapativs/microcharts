@@ -241,6 +241,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
             x2={round2(selX)}
             y2={height - 1}
             data-mc-ink="accent"
+            data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />

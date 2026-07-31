@@ -141,14 +141,19 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
     const s = combined[i];
     if (!s) return null;
     return (
+      // The probe travels on `transform`: `x1`/`x2` have no CSS geometry
+      // property behind them in any engine, so a line placed by those
+      // attributes teleports to the next level instead of gliding to it.
       <line
-        x1={s.x}
-        x2={s.x}
+        x1={0}
+        x2={0}
         y1={0.5}
         y2={height - 0.5}
         data-mc-ink={pinned ? "accent" : "muted"}
+        data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateX(${s.x}px)` }}
       />
     );
   };

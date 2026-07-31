@@ -233,15 +233,19 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
               ]
             : dots === "all"
               ? [
-                  // custom `color` can't come from the static "point" role rule,
-                  // so it falls back to a plain fill attribute (no role → no CSS)
+                  // A custom `color` rides an INLINE fill, not a `fill`
+                  // attribute: an attribute loses to any stylesheet rule, so the
+                  // dot could only keep its custom color by dropping its ink
+                  // role — and a mark with no role is invisible to everything
+                  // keyed on one, including the data-change transition and the
+                  // forced-colors remap. Inline wins outright, so the role stays.
                   <circle
                     key={`a${i}`}
                     cx={p.x}
                     cy={p.y}
                     r={rDot}
-                    data-mc-ink={color ? undefined : "point"}
-                    fill={color}
+                    data-mc-ink="point"
+                    style={color ? { fill: color } : undefined}
                   />,
                 ]
               : [],

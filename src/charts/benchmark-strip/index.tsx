@@ -210,13 +210,17 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           fill={dotFill}
         />
       ) : null}
-      {/* Focal + surface halo (ink role would force stroke:none). */}
+      {/* Focal + surface halo. Both go inline, which covers everything the
+          `point` role sets — the role is here only to carry the mark, whose x
+          IS the reading, into the data-change transition. The bands behind it
+          already travelled, so the focal dot was the one thing on this strip
+          that jumped. */}
       <circle
         cx={geo.dot.x}
         cy={midY}
         r={2.4}
-        fill={dotFill}
-        stroke="var(--mc-surface)"
+        data-mc-ink="point"
+        style={{ fill: dotFill, stroke: "var(--mc-surface)" }}
         data-mc-w="support"
       />
       {showLabel ? (

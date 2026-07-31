@@ -32,12 +32,17 @@ describe("interactive <Sparkline>", () => {
 
   it("focusing shows an active crosshair + readout; blur clears them", async () => {
     const fig = await mount();
+    // The crosshair is built once and MOVED, so it is hidden rather than
+    // removed on blur — a node recreated per scrub step could not transition.
+    // What must hold is that it stops being SHOWN, and that the readout goes.
+    const cross = (): Element | null => fig.querySelector("g[data-mc-ui] > g");
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(fig.querySelector('line[data-mc-ink="muted"]')).not.toBeNull();
+    expect(cross()!.getAttribute("opacity")).toBe("1");
     expect(fig.querySelector(".mc-spark-readout")!.textContent).toBe("4");
     fig.blur();
-    await expect.poll(() => fig.querySelector('line[data-mc-ink="muted"]')).toBe(null);
+    await expect.poll(() => cross()!.getAttribute("opacity")).toBe("0");
+    expect(fig.querySelector(".mc-spark-readout")).toBe(null);
   });
 
   it("SVG visual layer is aria-hidden (name comes from the wrapper)", async () => {

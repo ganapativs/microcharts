@@ -197,6 +197,10 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           cy={geo.bulb.cy}
           r={geo.bulb.r}
           data-mc-w="hair"
+          // `accent`, NOT `fill`: the `fill` role is the TUBE's role and carries
+          // `fill-opacity: 0.12` with it. An inline `fill` overrides the colour
+          // and nothing else, so borrowing that role painted the bulb at 12%.
+          data-mc-ink="accent"
           style={{ fill: paint, stroke: "var(--mc-neutral)" }}
         />
       ) : null}
@@ -215,6 +219,16 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           width={geo.fill.width}
           height={geo.fill.height}
           rx={geo.fill.r}
+          // The mercury is painted by an inline fill, which used to mean it
+          // carried no role at all — and a mark with no role is invisible to
+          // every rule keyed on one, including the data-change transition.
+          //
+          // `accent`, not the `fill` role the tube above uses: that role exists
+          // to paint the empty tube and carries `fill-opacity: 0.12`. An inline
+          // `fill` overrides the COLOUR and not the opacity, so the mercury
+          // rendered at 12% and the thermometer read as empty. A role is only
+          // inert when the inline style covers every property it sets.
+          data-mc-ink="accent"
           style={{ fill: paint }}
         />
       ) : null}

@@ -180,6 +180,10 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {/* NOT tagged `data-mc-ui`: the crosshair's own `x1`/`x2` are read as
+            its position by a guard test, so it cannot be zeroed and carried by
+            a transform — and gliding the three ticks beside a line that
+            teleports reads as broken. They travel together or not at all. */}
         {ap ? (
           <>
             <line

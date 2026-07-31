@@ -199,16 +199,23 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {/* Crosshair + focus ring TRAVEL to the reading they name. `x1`/`x2`
+            have no CSS geometry property in any engine, so the line sits at
+            x=0 and a transitioned `translateX` carries it; the ring's
+            `cx`/`cy` are real CSS properties and glide on the same 120 ms
+            curve. */}
         {p ? (
           <>
             <line
-              x1={p.x}
+              x1={0}
               y1={0.5}
-              x2={p.x}
+              x2={0}
               y2={height - 0.5}
               stroke="var(--mc-neutral)"
+              data-mc-ui=""
               data-mc-w="support"
               strokeDasharray="1.5 2"
+              style={{ transform: `translateX(${p.x}px)` }}
               vectorEffect="non-scaling-stroke"
             />
             <circle

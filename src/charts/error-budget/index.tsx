@@ -211,7 +211,13 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           style={{ stroke: "var(--mc-negative)" }}
         />
       ) : (
-        <circle cx={geo.remaining.x} cy={geo.remaining.y} r={1.8} style={{ fill: endColor }} />
+        <circle
+          cx={geo.remaining.x}
+          cy={geo.remaining.y}
+          r={1.8}
+          data-mc-ink="accent"
+          style={{ fill: endColor }}
+        />
       )}
       {showLabel ? (
         <text

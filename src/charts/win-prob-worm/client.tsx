@@ -142,16 +142,21 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   const crosshair = (i: number, pinned: boolean) => {
     if (!isFiniteValue(data[i])) return null;
     const x = PAD + (i / lastX) * plotW;
+    // `data-mc-ui` glides the crosshair to the point it names. It rides a
+    // transform rather than its own endpoints: `x1`/`x2` have no CSS geometry
+    // property behind them in any engine, so they cannot transition.
     return (
       <line
-        x1={x}
+        x1={0}
         y1={0}
-        x2={x}
+        x2={0}
         y2={height}
         data-mc-ink="accent"
+        data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         strokeDasharray="1.5 1.5"
         vectorEffect="non-scaling-stroke"
+        style={{ transform: `translateX(${x}px)` }}
       />
     );
   };

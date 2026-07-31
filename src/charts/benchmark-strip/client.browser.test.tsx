@@ -88,7 +88,12 @@ describe("interactive <BenchmarkStrip>", () => {
     key(wrap, "Home");
     await expect.poll(() => document.querySelector(".mc-spark-readout")).not.toBeNull();
     const chip = document.querySelector(".mc-spark-readout") as HTMLElement;
-    const tickX = Number(wrap.querySelector("svg line[data-mc-ink='accent']")!.getAttribute("x1"));
+    // The tick is carried on a transform so it can glide to the edge it names,
+    // so its painted x is `x1` plus that translation — reading `x1` alone would
+    // report 0 and pass against a chip pinned to the left edge.
+    const line = wrap.querySelector("svg line[data-mc-ink='accent']") as SVGLineElement;
+    const dx = /translateX\(([-\d.]+)px\)/.exec(line.style.transform);
+    const tickX = Number(line.getAttribute("x1")) + (dx ? Number(dx[1]) : 0);
     const vbWidth = Number(wrap.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
     expect(Number.parseFloat(chip.style.left)).toBeCloseTo((tickX / vbWidth) * 100, 4);
   });

@@ -52,9 +52,17 @@ describe("interactive <Waveform>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     fig.focus();
     await userEvent.keyboard("{End}");
+    // The crosshair is carried on a transform so it can glide to the position it
+    // names, so its painted x is `x1` plus that translation — reading `x1` alone
+    // would report 0 for every pitch and assert nothing.
     await expect
-      .poll(() => fig.querySelector('line[data-mc-w="support"]')?.getAttribute("x1"))
-      .toBe("119");
+      .poll(() => {
+        const l = fig.querySelector<SVGLineElement>('line[data-mc-w="support"]');
+        if (!l) return undefined;
+        const dx = /translateX\(([-\d.]+)px\)/.exec(l.style.transform);
+        return Number(l.getAttribute("x1")) + (dx ? Number(dx[1]) : 0);
+      })
+      .toBe(119);
     // No bars are painted in envelope mode, so there is no rect to outline.
     await userEvent.keyboard("{Enter}");
     fig.blur();

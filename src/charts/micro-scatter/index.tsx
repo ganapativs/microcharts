@@ -125,7 +125,7 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
             cx={dot.x}
             cy={dot.y}
             r={rad}
-            data-mc-ink={isFocal ? "accent" : color ? undefined : "point"}
+            data-mc-ink={isFocal ? "accent" : "point"}
             fillOpacity={isFocal ? 1 : 0.75}
             style={!isFocal && color ? { fill: color } : undefined}
           />

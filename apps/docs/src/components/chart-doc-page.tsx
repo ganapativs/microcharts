@@ -22,6 +22,8 @@ import { getChart } from "@/lib/charts/entries";
 import type { ChartEntry } from "@/lib/charts/types";
 import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { chartSourcePath, chartSourceUrl } from "@/lib/charts/source";
+import { Code } from "lucide-react";
 
 /**
  * The honest-encoding facts, in the page header. Every chart type documents one
@@ -47,6 +49,27 @@ function EncodingFacts({ entry }: { entry: ChartEntry }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+/**
+ * Link to the chart's folder in the repo — `geometry.ts`, both entries, and the
+ * tests, which is what someone asking "how does it do that?" wants. Sits in the
+ * page-action row so it is reachable without scrolling a 4-screen reference; the
+ * `title` names the path so the destination is not a guess.
+ */
+function SourceLink({ slug }: { slug: string }) {
+  return (
+    <a
+      href={chartSourceUrl(slug)}
+      target="_blank"
+      rel="noreferrer noopener"
+      title={`${chartSourcePath(slug)} on GitHub`}
+      className="cta-ghost inline-flex items-center gap-2 rounded-md border px-2 py-1.5 text-xs font-medium no-underline [&_svg]:size-3.5 [&_svg]:text-fd-muted-foreground"
+    >
+      <Code aria-hidden />
+      Source
+    </a>
   );
 }
 
@@ -105,7 +128,7 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
         </DocsTitle>
         <DocsDescription className="mb-0 text-base">{page.data.description}</DocsDescription>
         {entry ? <EncodingFacts entry={entry} /> : null}
-        <div className="flex flex-row items-center gap-1.5 border-b border-hairline pb-6">
+        <div className="flex flex-row flex-wrap items-center gap-1.5 border-b border-hairline pb-6">
           {/* Fumadocs actions use cta-ghost like the rest of the site. */}
           <MarkdownCopyButton markdownUrl={markdownUrl} className="cta-ghost" />
           <ViewOptionsPopover
@@ -113,6 +136,9 @@ export async function ChartDocPage({ slug }: { slug: string[] }) {
             githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
             className="cta-ghost"
           />
+          {/* The chart itself, not this page: the popover's "Open in GitHub"
+              points at the .mdx behind the docs. Per-chart pages only. */}
+          {chartSlug ? <SourceLink slug={chartSlug} /> : null}
         </div>
         <DocsBody>
           <ChartSlugProvider slug={chartSlug}>

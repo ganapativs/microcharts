@@ -92,7 +92,22 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     props.summary === false ? undefined : typeof props.summary === "string" ? props.summary : text;
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const readoutText = isFiniteValue(value) ? fmt(value) : "";
+  // The chip names the GOAL as well as the reading. A target draws a tick on the
+  // tube and, until now, was spoken in the summary but never painted — a sighted
+  // reader saw a line with no number and no way to ask for one, while a screen
+  // reader was told "target 80". `Bullet` carries the same value-and-target
+  // shape and has always printed `value / target · gap`; this is that form.
+  //
+  // Punctuation only, no words: a visible chip that hardcoded English would sit
+  // outside `SummaryStrings` and never translate.
+  const hasTarget = target !== undefined && isFiniteValue(target);
+  // Em-dash for a missing value — the same no-value glyph the static label
+  // paints, so the two never disagree, and `Intl` never leaks a literal "NaN".
+  const readoutText = hasTarget
+    ? `${isFiniteValue(value) ? fmt(value) : "—"} / ${fmt(target)}`
+    : isFiniteValue(value)
+      ? fmt(value)
+      : "";
   // One reading, one selectable unit (index 0) — the same number the readout
   // shows, in domain units. One builder, so `onActive` and `onSelect` can never
   // report a different number or a different string than the chip paints.
@@ -142,8 +157,10 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
         style={fillFor(style)}
       />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
-      {/* Skip when `label="value"` already prints the numeral beside the tube. */}
-      {readout && hover && readoutText && props.label !== "value" ? (
+      {/* Skip when `label="value"` already prints the numeral beside the tube —
+          unless a target is set, because then the gutter holds only half the
+          reading and the goal it is measured against is still unpainted. */}
+      {readout && hover && readoutText && (props.label !== "value" || hasTarget) ? (
         <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
           {readoutText}
         </span>

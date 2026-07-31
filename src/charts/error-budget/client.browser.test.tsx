@@ -43,7 +43,12 @@ describe("interactive <ErrorBudget>", () => {
     const line = [...svg.querySelectorAll("line")].find(
       (l) => l.getAttribute("x1") === l.getAttribute("x2"),
     )!; // the vertical crosshair
-    const lineFrac = Number(line.getAttribute("x1")) / vbWidth;
+    // The crosshair rides a transformed group so it can glide to the point it
+    // names, so its painted x is `x1` plus that group's translation. Reading
+    // `x1` alone would report 0 and pass against a chip stuck at the left edge.
+    const group = line.parentElement as unknown as SVGGElement;
+    const dx = /translateX\(([-\d.]+)px\)/.exec(group.style?.transform ?? "");
+    const lineFrac = (Number(line.getAttribute("x1")) + (dx ? Number(dx[1]) : 0)) / vbWidth;
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
     const chipFrac = parseFloat(chip.style.left) / 100;
     expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);

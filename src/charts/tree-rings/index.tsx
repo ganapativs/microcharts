@@ -239,6 +239,11 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
                 cy={geo.center.cy}
                 r={accentRing.rOuter}
                 fill="none"
+                // `data`, not `accent`: on a <circle> the accent role fills, and
+                // this ring is stroked. The role's own stroke and width both lose
+                // to the inline style, so it changes nothing here and makes the
+                // ring reachable by every role-keyed rule.
+                data-mc-ink="data"
                 style={{ stroke: paint, strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
               />
             ) : null,

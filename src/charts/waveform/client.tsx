@@ -193,19 +193,29 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
             height={Math.max(selBar.height, 0.4) + 1}
             fill="none"
             stroke="var(--mc-accent)"
+            // NOT `data-mc-ui`, twice over: this outline hugs the bucket's bar,
+            // so its `y` and `height` are the envelope amplitude — a value, not
+            // a pointer position — and it names one discrete bucket, which a box
+            // in transit would not enclose. Placed by geometry attributes rather
+            // than a transform, which is what makes it snap.
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
         ) : null}
+        {/* The crosshair tracks a continuum, so unlike the bucket outline above
+            it TRAVELS to the position it names. Carried on a transform because
+            `x1`/`x2` have no CSS geometry property in any engine. */}
         {shownBar ? (
           <line
-            x1={shownX}
-            x2={shownX}
+            x1={0}
+            x2={0}
             y1={0.5}
             y2={height - 0.5}
             data-mc-ink="muted"
+            data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
+            style={{ transform: `translateX(${shownX}px)` }}
           />
         ) : null}
         {rest.children}

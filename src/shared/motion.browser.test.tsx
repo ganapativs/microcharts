@@ -118,6 +118,39 @@ describe("entrance motion (opt-in `animate`)", () => {
     }
   });
 
+  // The acts overlap, so voice used to start ~220 ms before the story ended and
+  // a right-hand label appeared while the line was still drawing toward the
+  // point it names. Each voice element now waits for the story front to reach
+  // its own x — and is clamped to the story's end, so the fix reorders the
+  // entrance without lengthening it.
+  it("a label never speaks before the mark it names arrives", async () => {
+    const screen = await render(<Sparkline data={D} title="Rev" label="last" animate />);
+    const svg = svgOf(screen.getByRole("img").element() as HTMLElement);
+    const end = (a: Animation): number => {
+      const t = a.effect!.getTiming();
+      return Number(t.delay ?? 0) + Number(t.duration ?? 0);
+    };
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    const anims = svg.getAnimations({ subtree: true });
+    const label = anims.find((a) => (a.effect as KeyframeEffect).target?.tagName === "text");
+    const line = anims.find(
+      (a) => (a.effect as KeyframeEffect).target?.getAttribute("data-mc-ink") === "data",
+    );
+    expect(label).toBeDefined();
+    expect(line).toBeDefined();
+    // The endpoint label starts only once the stroke has effectively reached it,
+    // and never outlives the story it is waiting for.
+    const lineTiming = line!.effect!.getTiming();
+    const drawStart = Number(lineTiming.delay ?? 0);
+    const drawEnd = end(line!);
+    const labelStart = Number(label!.effect!.getTiming().delay ?? 0);
+    expect(labelStart).toBeGreaterThan(drawStart + (drawEnd - drawStart) * 0.8);
+    expect(labelStart).toBeLessThanOrEqual(drawEnd);
+    await settled(svg);
+  });
+
   it("unmount mid-entrance cancels cleanly (no leaked animations)", async () => {
     const screen = await render(<Sparkline data={D} title="Rev" animate />);
     const svg = svgOf(screen.getByRole("img").element() as HTMLElement);

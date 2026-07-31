@@ -33,8 +33,11 @@ describe("<BenchmarkStrip>", () => {
   it("positive polarity colors the focal dot by which side of the band is good", () => {
     const up = draw(<BenchmarkStrip data={PEERS} value={38} positive="up" />).container;
     const down = draw(<BenchmarkStrip data={PEERS} value={38} positive="down" />).container;
-    expect(up.querySelector("circle")!.getAttribute("fill")).toContain("--mc-positive");
-    expect(down.querySelector("circle")!.getAttribute("fill")).toContain("--mc-negative");
+    // The valence rides an inline style, not a `fill` attribute: an attribute
+    // loses to the dot's own ink role, and the role is what carries the mark
+    // into the data-change transition.
+    expect(up.querySelector("circle")!.getAttribute("style")).toContain("--mc-positive");
+    expect(down.querySelector("circle")!.getAttribute("style")).toContain("--mc-negative");
   });
 
   it("label='value' reserves the gutter its own text needs, clearing the plot box", () => {
