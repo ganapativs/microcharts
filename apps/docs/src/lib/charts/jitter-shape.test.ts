@@ -22,8 +22,9 @@
 import { describe, expect, it } from "vitest";
 import { CHART_MODULE_LAZY } from "./modules.generated";
 import { measurementProps, shuffleChartProps } from "./inject-chart-props";
-import { jitter } from "./jitter";
+import { jitter, shuffleBase } from "./jitter";
 import type { KnobValue } from "./types";
+import { PLAIN_SERIES } from "@/components/charts/playground-options";
 
 const SEEDS = [1, 2, 3, 7, 42];
 
@@ -162,6 +163,41 @@ describe("playground shuffle keeps the chart recognisable", () => {
       if (!moved) unchanged.push(slug);
     }
     expect(unchanged, `these charts shuffle to themselves:\n${unchanged.join("\n")}`).toEqual([]);
+  });
+});
+
+// The playground does not always shuffle through `jitter`. When a chart's
+// `dataShape` is a plain numeric series it takes the `injectsData` branch
+// instead, which pushes `shuffleSeries(entry.demo)` in as the chart's `data`.
+// That is only correct while `entry.demo` IS the series the playground renders.
+// It frequently is not: `demo` doubles as the inline sparkline sample, so
+// `dual-window-meter` renders 60 loudness samples and carries `demo: [-22]` —
+// one point. Pressing shuffle replaced a 60-sample meter with a single reading.
+//
+// The two branches together are the whole shuffle surface, so a guard that only
+// covers `jitter` (as this file first did) certifies half of it and misses the
+// louder half.
+describe("the injected-series branch shuffles the series on screen", () => {
+  it("never swaps a rendered series for a shorter demo sample", async () => {
+    const wrong: string[] = [];
+    for (const slug of slugs) {
+      const mod = (await CHART_MODULE_LAZY[slug]!()).default;
+      const spec = mod.playground;
+      if (!spec || spec.data) continue;
+      if (!PLAIN_SERIES.test(mod.entry.dataShape) || mod.entry.demo.length === 0) continue;
+
+      const state: Record<string, KnobValue> = Object.fromEntries(
+        spec.knobs.map((k) => [k.key, k.init]),
+      );
+      const chart = findChart(spec.render(state, mod.entry.demo));
+      const rendered = chart?.props?.["data"];
+      if (!Array.isArray(rendered)) continue;
+      const base = shuffleBase(mod.entry.demo, rendered);
+      if (base.length !== rendered.length) {
+        wrong.push(`${slug}: renders ${rendered.length} points, shuffle base has ${base.length}`);
+      }
+    }
+    expect(wrong, `shuffle would resize these charts:\n${wrong.join("\n")}`).toEqual([]);
   });
 });
 

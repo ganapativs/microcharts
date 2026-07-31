@@ -194,6 +194,28 @@ export function jitter<T>(value: T, seed: number): T {
  * `null` is a gap in these series, not a small number — it passes through, so a
  * shuffle never fills one in or opens a new one.
  */
+/**
+ * The series a shuffle should actually perturb.
+ *
+ * `entry.demo` is the catalog's INLINE sample — the few points drawn in a
+ * sentence — and it is not always the series a playground renders. Shuffling
+ * the demo and injecting the result therefore did not give the chart a new
+ * reading, it gave it a different chart: `dual-window-meter` renders 60
+ * loudness samples and declares `demo: [-22]`, so one click collapsed the meter
+ * to a single point. Prefer what is on screen; fall back to the demo only when
+ * the preview has no numeric series of its own to re-read.
+ */
+export function shuffleBase(
+  demo: readonly (number | null)[],
+  rendered: unknown,
+): (number | null)[] {
+  const usable =
+    Array.isArray(rendered) &&
+    rendered.length > 1 &&
+    rendered.every((v) => v === null || typeof v === "number");
+  return usable ? (rendered as (number | null)[]) : [...demo];
+}
+
 export function shuffleSeries(base: readonly (number | null)[], seed: number): (number | null)[] {
   if (!seed) return [...base];
   let lo = Infinity;

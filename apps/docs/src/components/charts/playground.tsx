@@ -37,8 +37,9 @@ import {
   injectChartProps,
   measurementProps,
   shuffleChartProps,
+  chartSeries,
 } from "@/lib/charts/inject-chart-props";
-import { shuffleSeries } from "@/lib/charts/jitter";
+import { shuffleBase, shuffleSeries } from "@/lib/charts/jitter";
 import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
 import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
@@ -803,7 +804,16 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
     ? () => {
         if (spec.shuffle) setData(spec.shuffle(seed));
         else if (threadsData) setData(shuffleSeries(spec.data ?? [], seed) as number[]);
-        else if (injectsData) setInjected(shuffleSeries(entry.demo, seed));
+        // Shuffle the series the chart is DRAWING, not `entry.demo`. The two
+        // are the same for most charts and wildly different for some: `demo`
+        // doubles as the inline sparkline sample, so `dual-window-meter`
+        // renders 60 loudness readings while declaring `demo: [-22]`, and one
+        // click used to swap a meter for a single point. `rawPreview` is built
+        // before any injection, so this base stays the original series however
+        // many times the button is pressed.
+        else if (injectsData) {
+          setInjected(shuffleSeries(shuffleBase(entry.demo, chartSeries(rawPreview)), seed));
+        }
         setShuffles((n) => n + 1);
         setSeed((s) => s + 1);
       }

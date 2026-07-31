@@ -48,6 +48,16 @@ function findChart(node: ReactNode): ReactElement<Record<string, unknown>> | nul
   return null;
 }
 
+/**
+ * The chart's own `data` prop, as the playground rendered it.
+ *
+ * This is the series a shuffle should re-read. `entry.demo` is the inline
+ * sample and is often a different (much shorter) array.
+ */
+export function chartSeries(node: ReactNode): unknown {
+  return findChart(node)?.props["data"];
+}
+
 /** Measurement props actually present on this preview's chart. */
 export function measurementProps(node: ReactNode): string[] {
   const chart = findChart(node);
