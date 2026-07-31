@@ -19,7 +19,7 @@ export type ReleaseSize = {
 };
 
 /** The release the working tree is on; its numbers come from live data. */
-export const CURRENT_VERSION = "0.11.0";
+export const CURRENT_VERSION = "0.12.0";
 
 const HISTORY: ReleaseSize[] = [
   { version: "0.4.0", median: 3.57, max: 4.97 },
@@ -29,6 +29,8 @@ const HISTORY: ReleaseSize[] = [
   { version: "0.8.0", median: 5.03, max: 6.64 },
   { version: "0.9.0", median: 5.04, max: 6.64 },
   { version: "0.10.0", median: 5.07, max: 6.75 },
+  // Frozen from the `@microcharts/react@0.11.0` tag's chart-sizes.json.
+  { version: "0.11.0", median: 5.24, max: 6.94 },
 ];
 
 export const RELEASE_SIZES: readonly ReleaseSize[] = [
