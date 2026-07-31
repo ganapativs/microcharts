@@ -1,5 +1,17 @@
 # @microcharts/mcp
 
+## 0.1.8
+
+### Patch Changes
+
+- [#96](https://github.com/ganapativs/microcharts/pull/96)
+  [`48df549`](https://github.com/ganapativs/microcharts/commit/48df549d9138896c42e7e21a81cf47c4f670e3c4) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Refresh the embedded `styles.css` snapshot so the published server
+  matches the data-change glide CSS from `@microcharts/react`.
+- Updated dependencies
+  [[`c99fb68`](https://github.com/ganapativs/microcharts/commit/c99fb68023d5bc7a367b41742de17c0b2719dd75)]:
+  - @microcharts/react@0.12.0
+
 ## 0.1.7
 
 ### Patch Changes
