@@ -162,7 +162,7 @@ jobs:
   test-browser:
     runs-on: ubuntu-latest
     # Playwright's own image ships the browsers preinstalled and matched to
-    # @playwright/test 1.61.1, so the browser vitest project needs no per-leg
+    # @playwright/test 1.62.1, so the browser vitest project needs no per-leg
     # `playwright install` download (same trick as visual.yml).
     #
     # This tag and the package version move TOGETHER — a mismatch fails every
@@ -170,7 +170,7 @@ jobs:
     # release before MCR publishes its image (1.62.0 did), so check
     # https://mcr.microsoft.com/v2/playwright/tags/list before bumping either.
     container:
-      image: mcr.microsoft.com/playwright:v1.61.1-noble
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
     strategy:
       fail-fast: false
       matrix:
