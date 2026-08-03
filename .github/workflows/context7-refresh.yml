@@ -22,7 +22,7 @@ jobs:
             echo "CONTEXT7_API_KEY is not set; skipping refresh."
             exit 0
           fi
-          curl -sS -X POST https://context7.com/api/v1/refresh \
+          curl -sS --fail-with-body -X POST https://context7.com/api/v1/refresh \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $CONTEXT7_API_KEY" \
             -d '{"libraryName": "/${{ github.repository }}"}'
