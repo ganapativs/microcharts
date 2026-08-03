@@ -21,7 +21,8 @@ magnitude without a scale to measure against. The per-barb quantum is stated nex
 
 ## Reading the barb
 
-WindBarb has no interactive mode. A single glyph carries the whole reading, so its accessible name is the full sentence.
+A single glyph carries the whole reading, so its accessible name is the full sentence and the interactive entry has
+nothing to pick between — hover or focus reports the one reading through `onActive` / `onSelect`, with no index props.
 This gallery is the read-back key: each full barb is one `step`, a half barb is half a `step`, and a pennant is five.
 
 <LiveDemo label="compass — the same magnitude at eight bearings" code={`<WindBarb direction={45} magnitude={35} />`}>

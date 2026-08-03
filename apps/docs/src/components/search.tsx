@@ -12,22 +12,14 @@ import {
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
 import { useDocsSearch } from "fumadocs-core/search/client";
-import { oramaStaticClient } from "fumadocs-core/search/client/orama-static";
-import { create } from "@orama/orama";
+import { staticClient } from "fumadocs-core/search/client/orama-static";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { track } from "@/lib/analytics";
-
-function initOrama() {
-  return create({
-    schema: { _: "string" },
-    language: "english",
-  });
-}
 
 export default function DefaultSearchDialog(props: SharedProps) {
   const { locale } = useI18n();
   const { search, setSearch, query } = useDocsSearch({
-    client: oramaStaticClient({ initOrama, locale }),
+    client: staticClient({ locale }),
   });
 
   // Dialog is lazy-mounted only when opened — one open event per open.

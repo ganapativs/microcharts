@@ -141,28 +141,24 @@ export function forecastConeGeometry(opts: {
   mids.forEach((v, j) => midPts.push([fx(j), Y(v)]));
 
   const points: ConePoint[] = [
-    ...history.map(
-      (v, i): ConePoint => ({
-        x: X(i),
-        y: Y(v),
-        period: i + 1,
-        kind: "history",
-        value: round2(v),
-        lo: null,
-        hi: null,
-      }),
-    ),
-    ...mids.map(
-      (v, j): ConePoint => ({
-        x: fx(j),
-        y: Y(v),
-        period: H + j + 1,
-        kind: "forecast",
-        value: round2(v),
-        lo: round2(p80[j]![0]),
-        hi: round2(p80[j]![1]),
-      }),
-    ),
+    ...history.map((v, i): ConePoint => ({
+      x: X(i),
+      y: Y(v),
+      period: i + 1,
+      kind: "history",
+      value: round2(v),
+      lo: null,
+      hi: null,
+    })),
+    ...mids.map((v, j): ConePoint => ({
+      x: fx(j),
+      y: Y(v),
+      period: H + j + 1,
+      kind: "forecast",
+      value: round2(v),
+      lo: round2(p80[j]![0]),
+      hi: round2(p80[j]![1]),
+    })),
   ];
 
   const landing = { x: fx(F - 1), y: Y(mids[F - 1]!), value: round2(mids[F - 1]!) };

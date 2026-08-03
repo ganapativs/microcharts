@@ -140,9 +140,11 @@ describe("catalog shared + interactive props", () => {
     expect(token.animates).toBe(false);
     expect(token.sharedInteractive).toEqual(["readout"]);
 
+    // WindBarb is a one-glyph scalar: it has an interactive twin, but nothing to
+    // pick between, so it takes the lean whole-chart callbacks and no index props.
     const wind = catalog.charts.find((c) => c.slug === "wind-barb")!;
-    expect(wind.interactiveImport).toBeUndefined();
-    expect(wind.sharedInteractive).toBeUndefined();
+    expect(wind.interactiveImport).toBe("@microcharts/react/wind-barb/interactive");
+    expect(wind.sharedInteractive).toEqual(["animate", "live", "onActive", "onSelect", "readout"]);
   });
 
   // `readout` in `sharedInteractive` used to be derived by regexing the client

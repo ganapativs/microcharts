@@ -9,6 +9,23 @@ import { maxOf } from "../../core/scale.js";
 /** Documented default window (ms) — also the fallback for an unusable one. */
 export const DEFAULT_WINDOW = 60_000;
 
+/**
+ * The clock: the caller's `now` when it is finite, else the latest finite
+ * event, else 0. Shared by the static frame, the summary, and the live sweep
+ * so they can never disagree — and never Date.now (SSR determinism).
+ */
+export function resolveNow(events: readonly number[], now?: number): number {
+  if (typeof now === "number" && Number.isFinite(now)) return now;
+  let max = 0;
+  let seen = false;
+  for (const t of events)
+    if (Number.isFinite(t) && (!seen || t > max)) {
+      max = t;
+      seen = true;
+    }
+  return seen ? max : 0;
+}
+
 export interface HeartbeatGeometry {
   baseline: { x1: number; x2: number; y: number };
   /** ECG spikes, one glyph per in-window event; "" when there are none (down). */

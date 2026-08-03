@@ -31,6 +31,9 @@ export function confusionGridGeometry(opts: {
   /** Matrix block, top and bottom edges — below the reserved axis-label gutter. */
   y0: number;
   y1: number;
+  /** Centers of the k columns — where the axis initials sit, over the cells
+   *  they name. Derived here so the labels never re-derive the grid. */
+  colCenters: number[];
 } {
   const { size, k, counts, normalize, gutterCh } = opts;
   const inset = gutterCh; // reserve top + left for axis labels
@@ -48,6 +51,7 @@ export function confusionGridGeometry(opts: {
   let maxErrorCell: { row: number; col: number } | null = null;
 
   const cells: ConfusionCell[] = [];
+  const colCenters: number[] = [];
   for (let r = 0; r < k; r++) {
     for (let c = 0; c < k; c++) {
       const count = clean(counts[r]?.[c] ?? 0);
@@ -72,6 +76,7 @@ export function confusionGridGeometry(opts: {
       });
     }
   }
+  for (let i = 0; i < k; i++) colCenters.push(round2(inset + (i + 0.5) * cellW));
 
   return {
     cells,
@@ -80,5 +85,6 @@ export function confusionGridGeometry(opts: {
     maxErrorCell: maxError > 0 ? maxErrorCell : null,
     y0: round2(inset),
     y1: round2(inset + k * cellW),
+    colCenters,
   };
 }

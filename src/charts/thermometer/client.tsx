@@ -16,10 +16,11 @@ import {
   type ThermometerProps,
 } from "./index.js";
 
-// The value-fill capsule is the one rect with no data-mc-ink role (the tube is
-// "fill"-role track chrome, the outline is "muted") — this selector isolates
-// exactly the dynamic mark without touching the static markup.
-const FILL_SELECTOR = "rect:not([data-mc-ink])";
+// The value-fill capsule is the one rect painted in the accent ink — the tube
+// carries the "fill" ROLE (track chrome at `fill-opacity: 0.12`, `--mc-neutral`
+// under the accent) and the outline/ticks are "muted" — so the accent rect
+// isolates exactly the dynamic mark without touching the static markup.
+const FILL_SELECTOR = 'rect[data-mc-ink="accent"]';
 
 export interface InteractiveThermometerProps extends ThermometerProps {
   live?: boolean;

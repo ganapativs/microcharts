@@ -36,7 +36,7 @@ export interface ChartEntry {
    * `false` ⇒ no unit picker (`onActive`, `selectedIndex`, roving keyboard).
    * Lean scalars still take whole-chart `onSelect`; `minimap-strip` and
    * `token-confidence` are deliberate exceptions with their own props.
-   * Omitted ⇒ picker. No `interactiveImport` ⇒ outside the split (`wind-barb`).
+   * Omitted ⇒ picker. No `interactiveImport` ⇒ outside the split.
    */
   picker?: false;
   /**

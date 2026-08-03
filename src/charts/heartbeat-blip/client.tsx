@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
-import { heartbeatCount } from "./geometry.js";
+import { heartbeatCount, resolveNow } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -38,18 +38,6 @@ export interface InteractiveHeartbeatBlipProps extends HeartbeatBlipProps {
 
 const TICK_MS = 250; // drift cadence — coarse, so it's a readable sweep not a jitter
 
-function latest(events: readonly number[], now?: number): number {
-  if (typeof now === "number" && Number.isFinite(now)) return now;
-  let max = 0;
-  let seen = false;
-  for (const t of events)
-    if (Number.isFinite(t) && (!seen || t > max)) {
-      max = t;
-      seen = true;
-    }
-  return seen ? max : 0;
-}
-
 export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.ReactNode {
   const {
     events,
@@ -68,7 +56,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
-  const baseNow = useMemo(() => latest(events, now), [events, now]);
+  const baseNow = useMemo(() => resolveNow(events, now), [events, now]);
   // The live clock: starts at the latest event, advances while motion is active,
   // and resets to the latest whenever the data changes (new events anchor at now).
   const [liveNow, setLiveNow] = useState(baseNow);

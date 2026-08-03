@@ -46,6 +46,7 @@ import { VolumeProfile } from "../charts/volume-profile/client.js";
 import { SegmentedBar } from "../charts/segmented-bar/client.js";
 import { MicroDonut } from "../charts/micro-donut/client.js";
 import { ActivityGrid } from "../charts/activity-grid/client.js";
+import { WindBarb } from "../charts/wind-barb/client.js";
 
 /**
  * Every chart at its OWN default size — the size the docs demo it at and the
@@ -277,6 +278,7 @@ const CASES: Record<string, () => ReactElement> = {
       title="Commits"
     />
   ),
+  "wind-barb": () => <WindBarb direction={225} magnitude={32} title="Wind" />,
   // Controls: the audit found these already terse. They must stay green,
   // otherwise the assertion is measuring the harness rather than the readouts.
   "micro-scatter (control)": () => (

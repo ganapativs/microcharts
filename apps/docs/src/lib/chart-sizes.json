@@ -289,7 +289,7 @@
   },
   "heartbeat-blip": {
     "static": 2.42,
-    "interactive": 4
+    "interactive": 3.99
   },
   "comet-trail": {
     "static": 2.45,
@@ -336,7 +336,8 @@
     "interactive": 2.35
   },
   "wind-barb": {
-    "static": 2.75
+    "static": 2.76,
+    "interactive": 4.22
   },
   "star-spoke": {
     "static": 2.43,
@@ -364,7 +365,7 @@
   },
   "confusion-grid": {
     "static": 2.79,
-    "interactive": 5.35
+    "interactive": 5.34
   },
   "folded-day-band": {
     "static": 2.62,
@@ -375,8 +376,8 @@
     "interactive": 5.52
   },
   "phase-trace": {
-    "static": 2.56,
-    "interactive": 4.92
+    "static": 2.6,
+    "interactive": 4.96
   },
   "trace-fold": {
     "static": 2.52,

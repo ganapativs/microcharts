@@ -17,7 +17,7 @@ export interface InteractionEntryLike {
 const CONTRACT_EXCEPTIONS = new Set(["minimap-strip", "token-confidence"]);
 
 export function interactionKind(entry: InteractionEntryLike): InteractionKind {
-  if (!entry.interactiveImport) return "none"; // static-only (WindBarb)
+  if (!entry.interactiveImport) return "none";
   if (CONTRACT_EXCEPTIONS.has(entry.slug)) return "none";
   return entry.picker === false ? "single" : "picker";
 }

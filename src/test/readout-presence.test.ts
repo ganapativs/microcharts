@@ -42,7 +42,7 @@ const clients = readdirSync(CHARTS_DIR, { withFileTypes: true })
     try {
       return { name, src: readFileSync(join(CHARTS_DIR, name, "client.tsx"), "utf8") };
     } catch {
-      return null; // static-only (WindBarb)
+      return null;
     }
   })
   .filter((c): c is { name: string; src: string } => c !== null);

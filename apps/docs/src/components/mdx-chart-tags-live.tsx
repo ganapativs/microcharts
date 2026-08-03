@@ -1,7 +1,6 @@
 /** Interactive chart tags for the chart-docs MDX route. Overrides the static
  *  map from mdx.tsx so LiveDemo variants scrub. (RSC children are opaque —
- *  swapChartTree cannot rewrite server-rendered static tags.) WindBarb has
- *  no interactive twin and stays static. */
+ *  swapChartTree cannot rewrite server-rendered static tags.) */
 
 export { Sparkline } from "@microcharts/react/sparkline/interactive";
 export { SparkBar } from "@microcharts/react/sparkbar/interactive";
@@ -30,7 +29,7 @@ export { Waveform } from "@microcharts/react/waveform/interactive";
 export { EventRaster } from "@microcharts/react/event-raster/interactive";
 export { RubricStrip } from "@microcharts/react/rubric-strip/interactive";
 export { TokenConfidence } from "@microcharts/react/token-confidence/interactive";
-export { WindBarb } from "@microcharts/react/wind-barb";
+export { WindBarb } from "@microcharts/react/wind-barb/interactive";
 export { StarSpoke } from "@microcharts/react/star-spoke/interactive";
 export { MinimapStrip } from "@microcharts/react/minimap-strip/interactive";
 export { DualWindowMeter } from "@microcharts/react/dual-window-meter/interactive";

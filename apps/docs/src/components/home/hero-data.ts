@@ -22,7 +22,6 @@ const kbOf = (slug: string) => CHART_GZIP[slug]?.interactive ?? 0;
 
 export function heroData(): HeroData {
   return {
-    // 105 of 106 — `wind-barb` ships static only.
     sizes: asc(INTERACTIVE_SIZES),
     svgBytes: asc(
       STABLE_CHARTS.map((c) => BENCH.chart(c.slug)?.avgBytes).filter(

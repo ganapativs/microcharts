@@ -1,11 +1,14 @@
 import rawCatalog from "./catalog.generated.json";
-import type { Catalog, ChartEntry } from "./types";
+import type { Catalog, CatalogData, ChartEntry } from "./types";
+import { LIBRARY_VERSION } from "./version";
 
-export const catalog = rawCatalog as Catalog;
+export { LIBRARY_VERSION };
+
+// The committed snapshot carries chart data only; the library stamp is injected
+// at build time so a version bump never leaves this file stale (see version.ts).
+export const catalog: Catalog = { library: LIBRARY_VERSION, ...(rawCatalog as CatalogData) };
 
 export const CHARTS: ChartEntry[] = catalog.charts;
-
-export const LIBRARY_VERSION = catalog.library;
 
 const bySlug = new Map(CHARTS.map((c) => [c.slug, c] as const));
 

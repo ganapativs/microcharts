@@ -69,8 +69,8 @@ import { Sparkline } from "@microcharts/react/sparkline";
 <Sparkline data={[3, 5, 4, 8, 6, 9]} title="Weekly revenue" />;
 ```
 
-Each chart imports from its **own subpath**, so you only ship what you use. Nearly every chart follows the same
-two-entry pattern: a static default, and an `/interactive` twin (`WindBarb` is the lone static-only exception).
+Each chart imports from its **own subpath**, so you only ship what you use. Every chart follows the same two-entry
+pattern: a static default, and an `/interactive` twin.
 
 ## Add interactivity
 

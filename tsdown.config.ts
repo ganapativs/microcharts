@@ -184,6 +184,7 @@ export default defineConfig({
     "src/charts/token-confidence/index.tsx",
     "src/charts/token-confidence/client.tsx",
     "src/charts/wind-barb/index.tsx",
+    "src/charts/wind-barb/client.tsx",
     "src/charts/star-spoke/index.tsx",
     "src/charts/star-spoke/client.tsx",
     "src/charts/minimap-strip/index.tsx",

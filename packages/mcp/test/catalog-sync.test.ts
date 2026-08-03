@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import committed from "../src/catalog.generated.json";
+import { catalog, LIBRARY_VERSION } from "../src/catalog";
 import { AGENT_SETUP, STYLES } from "../src/assets.generated";
 import { SHARED_PROPS } from "../../../apps/docs/src/lib/charts/shared-props";
 import { extractAgentSetupPrompt } from "../../../apps/docs/src/lib/agent-setup";
@@ -30,13 +31,22 @@ describe("catalog snapshot is in sync with the source of truth", () => {
     const liveEntries = JSON.parse(
       read(resolve(docs, "src/lib/charts/entries.generated.json")),
     ) as RegistryEntry[];
-    expect(committed).toEqual(projectCatalog(liveEntries, SHARED_PROPS, committed.library));
+    expect(committed).toEqual(projectCatalog(liveEntries, SHARED_PROPS));
   });
 
-  it("carries a library content-version stamp", () => {
-    // A "generated from" marker, not a strict equality with the current release
-    // (a version-only bump legitimately doesn't re-gen), so just sanity-check it.
-    expect(committed.library).toMatch(/^\d+\.\d+\.\d+/);
+  it("holds no version stamp — the library version is a build-time define", () => {
+    // A committed stamp is what forced a second, post-release PR: `changeset
+    // version` bumps the root one commit after every PR that re-gens this file,
+    // so the snapshot went stale on main the moment a release landed and
+    // `gen:check` went red. The stamp now comes from `version.ts` at build time.
+    expect(committed).not.toHaveProperty("library");
+  });
+
+  it("stamps the library version the repo is currently at", () => {
+    const { version } = JSON.parse(read(resolve(root, "package.json"))) as { version: string };
+    expect(LIBRARY_VERSION).toBe(version);
+    // The served catalog still carries it, so consumers see no shape change.
+    expect(catalog.library).toBe(version);
   });
 
   it("embedded stylesheet matches the built styles.css", () => {

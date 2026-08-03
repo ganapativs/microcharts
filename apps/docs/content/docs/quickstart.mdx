@@ -54,7 +54,7 @@ section into `CLAUDE.md` on Windows.
 
 - One chart = one subpath import, e.g. `import { Sparkline } from "@microcharts/react/sparkline"`. The default export is
   static — RSC-safe, zero client JS. Add `/interactive` only when hover, keyboard, touch, or selection is needed. That
-  entry is a client component: in Next.js App Router, import it from a `"use client"` file. WindBarb is static-only.
+  entry is a client component: in Next.js App Router, import it from a `"use client"` file.
 - `data` alone always renders; single-value charts take `value` instead. Shared prop names mean the same thing
   everywhere — see `sharedProps` in `/catalog.json`. Chart-specific props and callbacks live on the chart's catalog
   entry and its `.md` page; don't memorize them.
@@ -279,8 +279,8 @@ entrance animation.
 
 ## Import paths
 
-Import each chart from its own subpath so you only ship what you use. Nearly every chart follows the same two-entry
-pattern — a static default and an `/interactive` twin (WindBarb is the lone static-only exception):
+Import each chart from its own subpath so you only ship what you use. Every chart follows the same two-entry pattern — a
+static default and an `/interactive` twin:
 
 | Chart        | Static                             | Interactive                                    |
 | ------------ | ---------------------------------- | ---------------------------------------------- |
@@ -290,8 +290,8 @@ pattern — a static default and an `/interactive` twin (WindBarb is the lone st
 | Bullet       | `@microcharts/react/bullet`        | `@microcharts/react/bullet/interactive`        |
 | ActivityGrid | `@microcharts/react/activity-grid` | `@microcharts/react/activity-grid/interactive` |
 
-Every other chart uses the same shape (WindBarb ships static-only, with no `/interactive` twin) — see
-[All charts](/docs/charts) for the full catalog, each page listing its own import path and props.
+Every other chart uses the same shape — see [All charts](/docs/charts) for the full catalog, each page listing its own
+import path and props.
 
 ## Compatibility
 

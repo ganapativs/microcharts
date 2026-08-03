@@ -736,6 +736,8 @@ export interface SummaryStrings {
   tokenConfidenceLabel: string;
   /** WindBarb reading, e.g. "Southwest (225°), magnitude 32." */
   windBarb: (compass: string, deg: string, value: string) => string;
+  /** Terse VISIBLE chip form, e.g. "southwest 225° · 32" (wind-barb). */
+  windBarbChip: (compass: string, deg: string, value: string) => string;
   /** Calm state, e.g. "Calm." (wind-barb). */
   windBarbCalm: string;
   /** Compass octant names, indexed N, NE, E, SE, S, SW, W, NW. Canonically

@@ -35,7 +35,7 @@ export function GlyphSpecimen() {
   const items: SpecimenItem[] = stable.map((c) => {
     const gzip = CHART_GZIP[c.slug];
     // Interactive where the chart has an interactive entry — that is the number
-    // the reader is choosing to spend. `wind-barb` is static-only by design.
+    // the reader is choosing to spend.
     const kb = gzip?.interactive ?? gzip?.static;
     return {
       slug: c.slug,

@@ -35,6 +35,17 @@ function exists(ref, path) {
   }
 }
 
+// Runs from the pre-push hook too, where the base ref may simply not be fetched
+// (fresh or shallow clone). CI always has it, and CI is the gate of record.
+try {
+  execFileSync("git", ["rev-parse", "--verify", "--quiet", `${base}^{commit}`], {
+    stdio: "ignore",
+  });
+} catch {
+  console.log(`mcp-changeset: ${base} is not available locally — skipped (CI still checks).`);
+  process.exit(0);
+}
+
 if (!exists(base, "packages/mcp/package.json")) {
   console.log(`mcp-changeset: packages/mcp is new on this branch — nothing to re-release.`);
   process.exit(0);
@@ -45,7 +56,16 @@ if (!exists(base, "packages/mcp/package.json")) {
 // writes CHANGELOG.md, and (through the chained sync script) rewrites
 // server.json. Without this, the guard would fail every release PR it exists to
 // enable — verified by running both paths over an identical diff.
-const headRef = process.env.GITHUB_HEAD_REF ?? "";
+// `GITHUB_HEAD_REF` in CI; the local branch name when the hook runs it.
+const headRef =
+  process.env.GITHUB_HEAD_REF ||
+  (() => {
+    try {
+      return git("rev-parse", "--abbrev-ref", "HEAD");
+    } catch {
+      return "";
+    }
+  })();
 if (headRef.startsWith("changeset-release/")) {
   console.log(`mcp-changeset: ${headRef} is the release branch — changesets already consumed.`);
   process.exit(0);

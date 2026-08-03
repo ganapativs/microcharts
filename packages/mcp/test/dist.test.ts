@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
@@ -42,9 +42,21 @@ describe.skipIf(!built)("the built stdio server", () => {
       arguments: { type: "sparkline", data: [3, 5, 4, 8, 6, 9] },
     });
     expect(rendered.isError).toBeFalsy();
-    const out = rendered.structuredContent as { svg: string; summary: string };
+    const out = rendered.structuredContent as { svg: string; summary: string; library: string };
     expect(out.svg).toContain('xmlns="http://www.w3.org/2000/svg"');
     expect(out.summary).toMatch(/trending/i);
+    // The library stamp is a build-time define (`__LIBRARY_VERSION__`), not a
+    // committed field, so only the built artifact can prove it was substituted —
+    // a missing define would ship an empty string here, not a build error.
+    expect(out.library).toMatch(/^\d+\.\d+\.\d+/);
+    // Exact match only in CI, which always builds immediately before testing.
+    // Locally a dist/ built before the last release legitimately lags the root.
+    if (process.env.CI) {
+      const { version } = JSON.parse(
+        readFileSync(resolve(here, "../../../package.json"), "utf8"),
+      ) as { version: string };
+      expect(out.library).toBe(version);
+    }
 
     // stdout is the JSON-RPC channel. The library warns about questionable data
     // (`[microcharts] <StatusDot> unknown status …`) — if any of that ever went

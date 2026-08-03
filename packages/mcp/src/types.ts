@@ -37,9 +37,18 @@ export interface ChartEntry {
   sample?: Record<string, unknown>;
 }
 
-/** Committed snapshot + library version stamp. */
-export interface Catalog {
-  library: string;
+/**
+ * The committed snapshot, exactly as `catalog.generated.json` holds it — no
+ * version stamp. The stamp is injected at build time instead (see `version.ts`),
+ * because the library version is only known after `changeset version` runs, one
+ * commit later than every PR that regenerates this file.
+ */
+export interface CatalogData {
   sharedProps: ChartProp[];
   charts: ChartEntry[];
+}
+
+/** The snapshot as it is served: `CatalogData` plus the build-time stamp. */
+export interface Catalog extends CatalogData {
+  library: string;
 }

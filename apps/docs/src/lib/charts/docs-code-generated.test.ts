@@ -46,7 +46,8 @@ describe("generated chart docs-code snapshot", () => {
 
   it("takes the playground snippet from the interactive entry when there is one", () => {
     expect(DOCS_CODE.sparkline!.playground).toContain('@microcharts/react/sparkline/interactive"');
-    // WindBarb is static-only — it must not advertise an interactive import.
-    expect(DOCS_CODE["wind-barb"]!.playground).toContain('@microcharts/react/wind-barb"');
+    expect(DOCS_CODE["wind-barb"]!.playground).toContain(
+      '@microcharts/react/wind-barb/interactive"',
+    );
   });
 });

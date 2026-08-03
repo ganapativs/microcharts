@@ -28,8 +28,8 @@ export type RegistryEntry = ChartEntry & {
   sampleData?: { name: string; code: string }[];
 };
 
-export interface Catalog {
-  library: string;
+/** What the snapshot file holds — chart data only, no version stamp. */
+export interface CatalogData {
   sharedProps: ChartProp[];
   charts: ChartEntry[];
 }
@@ -79,8 +79,7 @@ function projectEntry(raw: RegistryEntry, report?: ProjectionReport): ChartEntry
 export function projectCatalog(
   registry: RegistryEntry[],
   sharedProps: ChartProp[],
-  library: string,
   report?: ProjectionReport,
-): Catalog {
-  return { library, sharedProps, charts: registry.map((e) => projectEntry(e, report)) };
+): CatalogData {
+  return { sharedProps, charts: registry.map((e) => projectEntry(e, report)) };
 }
