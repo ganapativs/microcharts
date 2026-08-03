@@ -8,7 +8,7 @@ import { interactionNote } from "@/lib/charts/interaction-note";
  * `## Accessibility` section. The wording lives once in
  * `lib/charts/interaction-note.ts` and is chosen from the registry entry, so a
  * chart can never claim an interaction it doesn't have. Renders nothing for
- * static-only charts and for the two documented contract exceptions.
+ * the two documented contract exceptions.
  */
 export function InteractionNote({ slug }: { slug: string }) {
   const chart = getChart(slug);

@@ -330,7 +330,6 @@ describe("the hero claim rotates without moving anything", () => {
       .map((c) => CHART_GZIP[c.slug]?.interactive)
       .filter((n): n is number => typeof n === "number")
       .sort((a, b) => a - b);
-    // 105 of 106 — `wind-barb` ships static only.
     expect([...heroData().sizes]).toEqual(measured);
   });
 

@@ -90,7 +90,7 @@ ${chartLines}
 - Static charts ship no client JavaScript. Interactivity is a separate \`/interactive\` import.
 - No per-point event handlers, and no wrapping a chart in your own click target. A chart owns its whole gesture surface; use \`onActive\` / \`onSelect\` on the \`/interactive\` entry.
 - \`onPointFocus\` and \`onRunFocus\` were removed. Use \`onActive\` — same signal, one name across the catalog.
-- Not every chart is interactive. [WindBarb](${mdUrl(["charts", "wind-barb"])}) is static-only; [MinimapStrip](${mdUrl(["charts", "minimap-strip"])}) is a range slider with \`onWindowChange([lo, hi])\` rather than a unit picker.
+- Not every interactive chart is a unit picker. [MinimapStrip](${mdUrl(["charts", "minimap-strip"])}) is a range slider with \`onWindowChange([lo, hi])\` rather than a unit picker; [TokenConfidence](${mdUrl(["charts", "token-confidence"])}) moves focus into the text.
 `;
 
   return new Response(body, {
