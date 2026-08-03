@@ -8,6 +8,7 @@
  *
  *   git show "@microcharts/react@0.9.0:apps/docs/src/lib/chart-sizes.json"
  */
+import pkg from "@microcharts/react/package.json" with { type: "json" };
 import { SIZE } from "./docs-facts";
 
 export type ReleaseSize = {
@@ -18,8 +19,15 @@ export type ReleaseSize = {
   max: number;
 };
 
-/** The release the working tree is on; its numbers come from live data. */
-export const CURRENT_VERSION = "0.12.0";
+/**
+ * The release the working tree is on; its numbers come from live data.
+ *
+ * Read from the library manifest rather than written down here: `changeset
+ * version` rewrites `package.json` in its own release PR and touches nothing
+ * else, so a literal would be one release stale on every Version Packages PR
+ * and fail this module's own test until a follow-up sync landed.
+ */
+export const CURRENT_VERSION: string = pkg.version;
 
 const HISTORY: ReleaseSize[] = [
   { version: "0.4.0", median: 3.57, max: 4.97 },
@@ -31,10 +39,15 @@ const HISTORY: ReleaseSize[] = [
   { version: "0.10.0", median: 5.07, max: 6.75 },
   // Frozen from the `@microcharts/react@0.11.0` tag's chart-sizes.json.
   { version: "0.11.0", median: 5.24, max: 6.94 },
+  // …and from the `@microcharts/react@0.12.0` tag's.
+  { version: "0.12.0", median: 5.25, max: 7 },
 ];
 
+// The newest point is always live data. The frozen twin of whatever version the
+// tree is on drops out, so a release can be pinned to history the moment it is
+// tagged without the next bump leaving a duplicate behind.
 export const RELEASE_SIZES: readonly ReleaseSize[] = [
-  ...HISTORY,
+  ...HISTORY.filter((r) => r.version !== CURRENT_VERSION),
   { version: CURRENT_VERSION, median: SIZE.interactiveMedian, max: SIZE.interactiveMax },
 ];
 
