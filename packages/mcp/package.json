@@ -59,10 +59,10 @@
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
-    "ai": "^7.0.41",
+    "ai": "^7.0.48",
     "esbuild": "^0.28.1",
     "tsdown": "^0.22.14",
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.5",
     "vitest": "^4.1.10"
   },
   "peerDependencies": {
