@@ -1,5 +1,24 @@
 # @microcharts/mcp
 
+## 0.1.10
+
+### Patch Changes
+
+- [#106](https://github.com/ganapativs/microcharts/pull/106)
+  [`7d969b0`](https://github.com/ganapativs/microcharts/commit/7d969b0fac2dd2139312adf81c763a3bcbdba49a) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - **The catalog carries WindBarb's interactive entry.** `get_microchart`
+  and `/catalog.json` now hand a model `@microcharts/react/wind-barb/interactive` alongside the static import, so the
+  last static-only chart is no longer a special case.
+
+  **The library stamp is set at build time.** It used to be committed into `catalog.generated.json`, written one commit
+  before `changeset version` bumped the library — so every release published a snapshot naming the previous version and
+  left the generated file stale on `main` until a follow-up sync PR corrected it. The server now reports the
+  `@microcharts/react` version it was actually built against, and a chart change reaches npm from the PR that made it.
+
+- Updated dependencies
+  [[`7d969b0`](https://github.com/ganapativs/microcharts/commit/7d969b0fac2dd2139312adf81c763a3bcbdba49a)]:
+  - @microcharts/react@0.13.0
+
 ## 0.1.9
 
 ### Patch Changes

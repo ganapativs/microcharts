@@ -1,6 +1,6 @@
 {
   "name": "@microcharts/docs",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": true,
   "description": "microcharts documentation site — Fumadocs + Next.js, static-export, deploy anywhere.",
   "type": "module",
