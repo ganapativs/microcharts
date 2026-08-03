@@ -1,0 +1,39 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "microcharts",
+  "description": "Word-sized charts for React. 106 chart types, zero runtime dependencies, accessible by default, RSC-safe.",
+  "folders": ["apps/docs/content/docs", "packages/mcp"],
+  "excludeFolders": [
+    "*archive*",
+    "*archived*",
+    "old",
+    "*deprecated*",
+    "*legacy*",
+    "*previous*",
+    "*outdated*",
+    "*superseded*"
+  ],
+  "excludeFiles": [
+    "CHANGELOG.md",
+    "changelog.md",
+    "LICENSE.md",
+    "license.md",
+    "CODE_OF_CONDUCT.md",
+    "code_of_conduct.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CLAUDE.md",
+    "AGENTS.md"
+  ],
+  "rules": [
+    "Import each chart from its own subpath, not the package root: `import { Sparkline } from '@microcharts/react/sparkline'`.",
+    "The default export of every chart is static, hook-free, and RSC-safe. Import from `@microcharts/react/<chart>/interactive` only when the chart needs hover, focus, or keyboard interaction.",
+    "Import the stylesheet once at the app root: `import '@microcharts/react/styles.css'`. Charts render unstyled without it.",
+    "`data` is the only prop a chart needs. Every other prop is optional and has a correct default.",
+    "The same prop name means the same thing on every chart: `domain`, `color`, `title`, `summary`, `label`, `dots`, `format`, `positive`.",
+    "Annotations are children, not props. Import them from `@microcharts/react/annotations` and nest `<Threshold>`, `<TargetZone>`, `<Marker>`, or `<Callout>` inside a chart.",
+    "Every chart is `role=\"img\"` with a generated natural-language summary as its accessible name. Pass `summary={false}` only for decorative charts, and pass a string to override the generated text.",
+    "Theme with the `--mc-*` CSS custom properties or the `defineTheme` helper from `@microcharts/react/theme`. Do not target internal class names.",
+    "A different data shape means a different component, not an option object. Check the chart catalog before reshaping data to fit a chart."
+  ]
+}
