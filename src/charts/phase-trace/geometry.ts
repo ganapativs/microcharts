@@ -177,10 +177,24 @@ export function phaseTraceGeometry(opts: {
   if (n >= 2) {
     const a = screen[n - 2]!;
     const ang = Math.atan2(end.y - a.y, end.x - a.x);
+    // The barbs reach 0.87·L BEHIND the endpoint, so a trace ending at the plot
+    // edge used to paint its arrowhead outside the viewBox. Clamp the barbs
+    // into the plot box — identity when they fit, shortened (never redirected
+    // the wrong way) when the box boundary is closer than L.
     const L = Math.min(width, height) * 0.12;
-    const a1 = ang + (150 * Math.PI) / 180;
-    const a2 = ang - (150 * Math.PI) / 180;
-    arrow = `M${end.x} ${end.y}L${round2(end.x + Math.cos(a1) * L)} ${round2(end.y + Math.sin(a1) * L)}M${end.x} ${end.y}L${round2(end.x + Math.cos(a2) * L)} ${round2(end.y + Math.sin(a2) * L)}`;
+    const inPlot = (x: number, y: number): { x: number; y: number } => ({
+      x: round2(Math.min(Math.max(x, pad), width - pad)),
+      y: round2(Math.min(Math.max(y, pad), height - pad)),
+    });
+    const a1 = inPlot(
+      end.x + Math.cos(ang + (150 * Math.PI) / 180) * L,
+      end.y + Math.sin(ang + (150 * Math.PI) / 180) * L,
+    );
+    const a2 = inPlot(
+      end.x + Math.cos(ang - (150 * Math.PI) / 180) * L,
+      end.y + Math.sin(ang - (150 * Math.PI) / 180) * L,
+    );
+    arrow = `M${end.x} ${end.y}L${a1.x} ${a1.y}M${end.x} ${end.y}L${a2.x} ${a2.y}`;
   }
 
   return { trailPath, tailPath, end, arrow, start, heading, points, y0: plotY0, y1: plotY1 };

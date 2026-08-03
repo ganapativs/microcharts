@@ -141,5 +141,15 @@ describe("phaseTraceGeometry", () => {
       expect(p.y).toBeGreaterThanOrEqual(0);
       expect(p.y).toBeLessThanOrEqual(32.01);
     }
+    // The arrowhead barbs reach BACK from the endpoint, so a trace ending at a
+    // plot edge used to paint them past the viewBox — every coordinate the
+    // arrow emits must stay inside it.
+    const arrowCoords = (geo.arrow.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+    for (let i = 0; i < arrowCoords.length; i += 2) {
+      expect(arrowCoords[i]!).toBeGreaterThanOrEqual(0);
+      expect(arrowCoords[i]!).toBeLessThanOrEqual(40.01);
+      expect(arrowCoords[i + 1]!).toBeGreaterThanOrEqual(0);
+      expect(arrowCoords[i + 1]!).toBeLessThanOrEqual(32.01);
+    }
   });
 });

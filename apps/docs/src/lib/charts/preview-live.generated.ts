@@ -131,4 +131,5 @@ export const PREVIEW_LIVE: Record<string, () => Promise<{ default: ComponentType
   waterfall: () => import("./waterfall.live").then((m) => ({ default: m.PreviewLive! })),
   waveform: () => import("./waveform.live").then((m) => ({ default: m.PreviewLive! })),
   "win-prob-worm": () => import("./win-prob-worm.live").then((m) => ({ default: m.PreviewLive! })),
+  "wind-barb": () => import("./wind-barb.live").then((m) => ({ default: m.PreviewLive! })),
 };

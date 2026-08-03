@@ -124,9 +124,9 @@ chart. Set `live={false}` to silence it. A few throttle that announcement so a s
 Two charts throttle without taking `live` at all. **EtaBar** and **TapeGauge** re-announce their reading as it changes,
 but never more often than `announceEvery` milliseconds: 10 s and 5 s by default, and tunable per instance.
 
-Three charts sit outside the contract on purpose. **MinimapStrip** is a viewport-window slider (`role="slider"`, with
-its own `onWindowChange([lo, hi])` range payload). **TokenConfidence** flows as inline HTML text and moves real focus
-onto each _flagged_ token span; confident tokens carry no mark and are skipped. **WindBarb** ships static-only.
+Two charts sit outside the contract on purpose. **MinimapStrip** is a viewport-window slider (`role="slider"`, with its
+own `onWindowChange([lo, hi])` range payload). **TokenConfidence** flows as inline HTML text and moves real focus onto
+each _flagged_ token span; confident tokens carry no mark and are skipped.
 
 Static entries carry no listeners, so all of this is opt-in.
 

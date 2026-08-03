@@ -10,6 +10,11 @@ export const entry: ChartEntry = {
   collection: "frontier",
   tagline: "Which way it's flowing and roughly how hard, in one character.",
   staticImport: `${PKG}/wind-barb`,
+  interactiveImport: `${PKG}/wind-barb/interactive`,
+  // One glyph, one reading — the whole chart is the unit, so there is nothing to
+  // pick between. Same lean scalar shape as Thermometer: whole-chart
+  // `onActive`/`onSelect`, no index props.
+  picker: false,
   dataShape: "{ direction, magnitude }",
   encoding: { channel: "shaft angle + quantized barb count", precision: "medium" },
   nodeBudget: "≤ 3",

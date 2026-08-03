@@ -917,6 +917,11 @@
       "import": "./dist/charts/wind-barb/index.js",
       "default": "./dist/charts/wind-barb/index.js"
     },
+    "./wind-barb/interactive": {
+      "types": "./dist/charts/wind-barb/client.d.ts",
+      "import": "./dist/charts/wind-barb/client.js",
+      "default": "./dist/charts/wind-barb/client.js"
+    },
     "./star-spoke": {
       "types": "./dist/charts/star-spoke/index.d.ts",
       "import": "./dist/charts/star-spoke/index.js",
@@ -1191,7 +1196,7 @@
     "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.31.1",
     "@fast-check/vitest": "^0.4.1",
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.62.1",
     "@size-limit/preset-small-lib": "^13.0.3",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.18",
@@ -1200,12 +1205,12 @@
     "axe-core": "^4.12.1",
     "esbuild": "^0.28.1",
     "fast-check": "^4.9.0",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "knip": "^6.31.0",
     "lefthook": "^2.1.10",
-    "oxfmt": "^0.61.0",
-    "oxlint": "^1.76.0",
-    "playwright": "1.61.1",
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0",
+    "playwright": "1.62.1",
     "prettier": "^3.9.6",
     "publint": "^0.3.22",
     "react": "^19.2.8",

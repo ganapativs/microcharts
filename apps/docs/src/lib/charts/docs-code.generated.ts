@@ -2722,7 +2722,7 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
   },
   "wind-barb": {
     playground:
-      'import { WindBarb } from "@microcharts/react/wind-barb";\n\n<WindBarb\n  direction={225}\n  magnitude={32}\n/>',
+      'import { WindBarb } from "@microcharts/react/wind-barb/interactive";\n\n<WindBarb\n  direction={225}\n  magnitude={32}\n/>',
     recipes: [
       {
         label: "table cell",

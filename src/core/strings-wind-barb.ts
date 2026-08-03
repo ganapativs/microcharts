@@ -2,7 +2,10 @@
 // magnitude is quantized (the honesty, stated with a per-barb key).
 import type { SummaryStrings } from "./summary.js";
 
-export type WindBarbStrings = Pick<SummaryStrings, "windBarb" | "windBarbCalm" | "compass8">;
+export type WindBarbStrings = Pick<
+  SummaryStrings,
+  "windBarb" | "windBarbChip" | "windBarbCalm" | "compass8"
+>;
 
 export const EN_WIND_BARB: WindBarbStrings = {
   // `compass8` is canonically lowercase (shared key, used sentence-medially by
@@ -10,6 +13,8 @@ export const EN_WIND_BARB: WindBarbStrings = {
   // character itself — each locale owns its own casing.
   windBarb: (compass, deg, value) =>
     `${compass.charAt(0).toUpperCase() + compass.slice(1)} (${deg}°), magnitude ${value}.`,
+  // The hover chip is a tooltip, not a sentence — lowercase octant, no period.
+  windBarbChip: (compass, deg, value) => `${compass} ${deg}° · ${value}`,
   windBarbCalm: "Calm.",
   compass8: ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"],
 };

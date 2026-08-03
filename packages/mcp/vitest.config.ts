@@ -7,13 +7,22 @@ const { version } = JSON.parse(
   version: string;
 };
 
+// Mirrors tsdown.config.ts — the library stamp is a build-time define, so the
+// tests have to inject it the same way.
+const { version: libraryVersion } = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf8"),
+) as { version: string };
+
 /**
  * Standalone config so `vitest` run in this package doesn't inherit the root's
  * project matrix (core/dom/browser scoped to the library's `src/`). These are
  * plain Node tests — the tools are pure, and render uses `react-dom/server`.
  */
 export default defineConfig({
-  define: { __MCP_VERSION__: JSON.stringify(version) },
+  define: {
+    __MCP_VERSION__: JSON.stringify(version),
+    __LIBRARY_VERSION__: JSON.stringify(libraryVersion),
+  },
   test: {
     include: ["test/**/*.test.ts"],
     environment: "node",

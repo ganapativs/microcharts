@@ -10,7 +10,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
-import { DEFAULT_WINDOW, heartbeatCount, heartbeatGeometry } from "./geometry.js";
+import { DEFAULT_WINDOW, heartbeatCount, heartbeatGeometry, resolveNow } from "./geometry.js";
 
 export interface HeartbeatBlipProps {
   /** Event timestamps (ms). Not a value series. */
@@ -37,18 +37,6 @@ export interface HeartbeatBlipProps {
 }
 
 const PAD = 1;
-
-function resolveNow(events: readonly number[], now?: number): number {
-  if (typeof now === "number" && Number.isFinite(now)) return now;
-  let max = 0;
-  let seen = false;
-  for (const t of events)
-    if (Number.isFinite(t) && (!seen || t > max)) {
-      max = t;
-      seen = true;
-    }
-  return seen ? max : 0;
-}
 
 export function heartbeatSummary(
   events: readonly number[],

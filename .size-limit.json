@@ -13,7 +13,7 @@
   {
     "name": "@microcharts/react/sparkline/interactive",
     "path": "dist/charts/sparkline/client.js",
-    "limit": "7.08 kB",
+    "limit": "7 kB",
     "gzip": true
   },
   {
@@ -1016,6 +1016,12 @@
     "name": "@microcharts/react/wind-barb (static)",
     "path": "dist/charts/wind-barb/index.js",
     "limit": "2.81 kB",
+    "gzip": true
+  },
+  {
+    "name": "@microcharts/react/wind-barb/interactive",
+    "path": "dist/charts/wind-barb/client.js",
+    "limit": "4.31 kB",
     "gzip": true
   },
   {

@@ -1,5 +1,4 @@
 {
-  "library": "0.12.0",
   "sharedProps": [
     {
       "name": "data",
@@ -9060,6 +9059,8 @@
       "collection": "frontier",
       "tagline": "Which way it's flowing and roughly how hard, in one character.",
       "staticImport": "@microcharts/react/wind-barb",
+      "interactiveImport": "@microcharts/react/wind-barb/interactive",
+      "picker": false,
       "dataShape": "{ direction, magnitude }",
       "encoding": {
         "channel": "shaft angle + quantized barb count",

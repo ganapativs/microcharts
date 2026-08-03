@@ -43,8 +43,8 @@ const slugs = readdirSync(chartsDir)
 const res = await build({
   stdin: {
     contents: [
-      // `registry` covers all 106 (static halves, including the static-only
-      // WindBarb); the live modules then override the 105 that have one.
+      // `registry` covers all 106 static halves; the live modules then override
+      // each one with its interactive twin.
       `import { CHART_MODULES as STATIC_MODULES } from "./src/lib/charts/registry.ts";`,
       ...slugs.map((s, i) => `import m${i} from "./src/lib/charts/${s}.live";`),
       `export const CHART_MODULES = {`,

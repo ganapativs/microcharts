@@ -28,23 +28,33 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    `"react": "^18.0.0 || ^19.0.0"`. Scales, paths, easing, color, stats, summaries — all in-house. All chart types ship
    in the one `@microcharts/react` package. Any third-party dev-dependency must be verified actively maintained before
    adoption.
-2. **Budgets are CI gates:** ≤ 3 kB gzip per static subpath (≤ 2 kB target, simple "Delta-class" charts ≤ 1.5 kB),
-   interactive ≤ static + 1 kB, `styles.css` ≤ 12 kB, ≤ ~6 SVG nodes typical per chart, 0 client JS for static charts in
-   RSC. `.size-limit.json` is generated (`scripts/gen-size-limits.mjs` from `scripts/size-budgets.json`), never
-   hand-edited. Separately from the budgets, every PR is **diffed against its base branch**:
-   `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI re-measures it against a fresh
-   build (`size-snapshot.mjs --check`), and the `size-diff` job replies on the PR with a per-subpath table. Growth over
-   **1% on any subpath fails** — regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
-   `size-increase-approved` when an increase is deliberate. The **shared kernel is tracked, not gated**: nothing in
-   `dist/` is the kernel (it is a set of hash-named chunks, and no chart imports all of them), so `size-snapshot.json`
-   carries a declared `kernels` reading — `kernel:static` ~2.4 kB, `kernel:interactive` ~4.2 kB, measured as `KERNELS`
-   in `size-snapshot.mjs` — and `size-diff` prints it beside the table so a uniform shift across ~200 rows has a stated
-   cause. Kernel growth is caught by the 1% per-subpath gate, which fires far earlier than any kernel ceiling would.
-   **Two of these ceilings no longer describe the shipped budgets and need a decision** (recorded as `$seat` /
-   `$ceilings` in `size-budgets.json`): 32 statics sit above 3 kB, none by more than 1.25 kB; and
-   `interactive ≤ static + 1 kB` is currently unreachable — all 105 interactive entries are above that delta (median
-   ~2.4 kB), because size-limit measures each subpath standalone and so charges every one of them the full shared picker
-   kernel. A NEW chart is still held to 3 kB / +1 kB; the exceptions are not a precedent.
+2. **Budgets are CI gates**, applied in this order. **(1) Per-subpath budget:** every subpath carries its own limit in
+   `scripts/size-budgets.json`, set to measured + max(50 B, 2%); `styles.css` ≤ 12 kB. `.size-limit.json` is generated
+   (`scripts/gen-size-limits.mjs` from that file), never hand-edited. **(2) Regression diff:** every PR is diffed
+   against its base branch — `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI
+   re-measures against a fresh build (`size-snapshot.mjs --check`), and the `size-diff` job replies with a per-subpath
+   table. Growth over **1% on any subpath fails**; regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
+   `size-increase-approved` when an increase is deliberate. **(3) Admission bar for a NEW chart:** static ≤ 3 kB (≤ 2 kB
+   target, "Delta-class" ≤ 1.5 kB), interactive ≤ static + 3.25 kB, ≤ ~6 SVG nodes typical, 0 client JS for static
+   charts in RSC. **(4) Catalog ceiling:** static 4.35 kB / interactive **7 kB**. The interactive wall is hard — no
+   subpath crosses it, and no sign-off raises it, because "~2–7 kB interactive" is quoted in the README, the docs and
+   the package description. `sparkline` defines the top of both scales (4245 / 6995 measured) and its interactive budget
+   is pinned **at** the wall: 7000 B, 5 B of headroom. Growing that entry fails the gate on purpose — buy room by
+   shrinking it, never by raising the number.
+
+   The old `interactive ≤ static + 1 kB` rule is **retired**, and `static ≤ 3 kB` is an admission bar rather than a
+   catalog ceiling — the decision, its measurements, and the byte review behind it are recorded as `$ceilings` in
+   `size-budgets.json`. In short: size-limit bundles each subpath standalone, so every interactive entry is charged the
+   whole shared picker kernel (measured deltas 1.01–3.12 kB, median 2.45 kB across 106 pairs), and 32 shipped statics
+   run 3.02–4.25 kB because each carries a named feature — annotations host, direct-label gutter math, derived
+   statistics, a second series, a second orientation. 74 chart statics stay under 3 kB and a new chart still must.
+
+   The **shared kernel is tracked, not gated**: nothing in `dist/` is the kernel (it is a set of hash-named chunks, and
+   no chart imports all of them), so `size-snapshot.json` carries a declared `kernels` reading — `kernel:static` ~2.4
+   kB, `kernel:interactive` ~4.2 kB, measured as `KERNELS` in `size-snapshot.mjs` — and `size-diff` prints it beside the
+   table so a uniform shift across ~200 rows has a stated cause. Kernel growth is caught by the 1% per-subpath gate,
+   which fires far earlier than any kernel ceiling would.
+
 3. **Static-first architecture:** default exports are hook-free, listener-free, observer-free pure-SVG components —
    RSC-safe, SSR-static. Interactivity and animation live only in separate `'use client'` entries (`…/interactive`).
    Never blur this line.
@@ -209,6 +219,12 @@ The 2026-07 voice pass set the register for the whole repo. Exemplars: `apps/doc
   figma) are deliberately outside that set — run them by hand when the brand moves. Writing a `*.generated.*` file with
   oxfmt means formatting over `--stdin-filepath`: `.oxfmtrc.json` ignores those globs, so passing the written path gives
   oxfmt zero targets and it exits 2, which crashes the generator.
+- **One PR publishes both packages.** A chart change regenerates `@microcharts/mcp`'s embedded catalog, so that PR needs
+  changesets for `@microcharts/react` _and_ `@microcharts/mcp` — `scripts/check-mcp-changeset.mjs` fails the PR
+  (pre-push and in CI) when the second one is missing, because changesets does not cascade a bump to a public dependent
+  whose `workspace:^` range still covers the new library version. No generated file carries the library version:
+  `@microcharts/mcp` injects it as a build-time define (`__LIBRARY_VERSION__`, from the root `package.json`), so the
+  release build stamps the version being published and a release never leaves a snapshot stale on main.
 - Commit style: conventional commits, subject ≤ 50 chars, body only when the "why" isn't obvious.
 - Never add a dependency (even a dev one) without checking that it's actively maintained.
 - Every doc example must be a compiled fixture — never write snippets that don't build.

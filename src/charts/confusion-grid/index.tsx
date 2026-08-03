@@ -9,6 +9,7 @@ import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
+import { round2 } from "../../core/types.js";
 import { confusionGridGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -199,8 +200,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
 
       {/* Axis initials: predicted on top, actual on left. */}
       {labels.slice(0, kk).flatMap((lab, i) => {
-        const cellW = (size - rightGutter - gutterCh - 1) / kk;
-        const c = round2(gutterCh + cellW * (i + 0.5));
+        const c = geo.colCenters[i]!;
         // Code POINT, not code unit: `labels` is caller data, and charAt(0) on
         // an astral first character ("🐱 cat", "𝐀 class") emits a lone
         // surrogate, which paints as the replacement glyph on both axes.
@@ -259,8 +259,4 @@ export function confGeoAccuracy(counts: readonly (readonly number[])[], k: numbe
       if (r === c) trace += n;
     }
   return total > 0 ? trace / total : 0;
-}
-
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
 }

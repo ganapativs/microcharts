@@ -34,6 +34,11 @@ pre-push:
     # CI runs the identical check, so a stale artifact can never reach main.
     0_generated:
       run: pnpm gen:check
+    # Git-only, ~50 ms. A packages/mcp change without a `@microcharts/mcp`
+    # changeset publishes nothing, so npm keeps serving the old catalog until a
+    # second PR — the exact round trip this hook exists to catch before CI does.
+    0b_mcp_changeset:
+      run: node scripts/check-mcp-changeset.mjs
     1_typecheck:
       run: pnpm typecheck
     2_test_node:

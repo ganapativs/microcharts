@@ -111,5 +111,5 @@ export const CHART_MODULE_LAZY: Record<string, () => Promise<{ default: ChartMod
   waterfall: () => import("./waterfall.live"),
   waveform: () => import("./waveform.live"),
   "win-prob-worm": () => import("./win-prob-worm.live"),
-  "wind-barb": () => import("./wind-barb"),
+  "wind-barb": () => import("./wind-barb.live"),
 };

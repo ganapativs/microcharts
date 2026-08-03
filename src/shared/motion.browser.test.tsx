@@ -3,6 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { Sparkline } from "../charts/sparkline/client.js";
+import { Thermometer } from "../charts/thermometer/client.js";
 import "./motion-engine.js"; // consumer opt-in: import "@microcharts/react/motion"
 
 const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12];
@@ -159,6 +160,52 @@ describe("entrance motion (opt-in `animate`)", () => {
     });
     screen.unmount();
     expect(document.getAnimations().length).toBe(0);
+  });
+
+  // The thermometer's entrance must animate the MERCURY capsule, not degrade
+  // to the whole-svg wipe fallback: the fill rect used to carry no ink role,
+  // so `rect:not([data-mc-ink])` matched nothing and the engine bailed to the
+  // O(1) clip reveal (with a "matched no marks" warning). The mercury is the
+  // `accent` rect; the bulb shares the role but is a circle and the tube owns
+  // the "fill" role, so the selector cannot catch the wrong mark.
+  it("thermometer: the mercury rises, never the whole-svg wipe", async () => {
+    const screen = await render(<Thermometer value={40} title="Temp" animate />);
+    const svg = svgOf(screen.getByRole("img").element() as HTMLElement);
+    const mercury = svg.querySelector<SVGRectElement>('rect[data-mc-ink="accent"]');
+    expect(mercury).not.toBeNull();
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    const anims = svg.getAnimations({ subtree: true });
+    expect(anims.some((a) => (a.effect as KeyframeEffect | null)?.target === mercury)).toBe(true);
+    // The story act scales the mercury in; the tube stays stage chrome (fade
+    // only) — a per-mark rise, never the whole-svg wipe fallback.
+    const mercuryAnim = anims.find((a) => (a.effect as KeyframeEffect | null)?.target === mercury);
+    const keys = (mercuryAnim!.effect as KeyframeEffect).getKeyframes().map((k) => k.transform);
+    expect(keys.some((t) => typeof t === "string" && t.includes("scaleY"))).toBe(true);
+    await settled(svg);
+  });
+
+  it("thermometer: at rest, animated equals the static render byte-for-byte", async () => {
+    const screen = await render(
+      <>
+        <span data-test="plain">
+          <Thermometer value={40} title="Temp" />
+        </span>
+        <span data-test="animated">
+          <Thermometer value={40} title="Temp" animate />
+        </span>
+      </>,
+    );
+    const plainHTML = svgOf(
+      screen.container.querySelector<HTMLElement>('[data-test="plain"]')!,
+    ).outerHTML;
+    const svg = svgOf(screen.container.querySelector<HTMLElement>('[data-test="animated"]')!);
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    await settled(svg);
+    expect(svg.outerHTML).toBe(plainHTML);
   });
 });
 

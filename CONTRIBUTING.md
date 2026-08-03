@@ -93,7 +93,10 @@ Reviewers do not waive these:
    color, easing, formatting, and summaries are all in-house. Any new _dev_ dependency has to be actively maintained.
 2. **Budgets are gates.** Each of the 216 measured subpaths carries its own gzip ceiling in `scripts/size-budgets.json`;
    `pnpm size` enforces every one. `styles.css` has a single 12 kB ceiling for the whole library. A **new** chart is
-   held to ≤ 3 kB static and static + 1 kB interactive.
+   held to ≤ 3 kB static and static + 3.25 kB interactive. **No interactive subpath crosses 7 kB** — that wall is hard
+   and no sign-off raises it; the static ceiling is 4.35 kB. The interactive allowance looks wide because size-limit
+   bundles every subpath standalone and so charges each one the whole shared picker kernel — see `$ceilings` in
+   `scripts/size-budgets.json`.
 3. **No silent growth.** Separately from the ceilings, every PR is diffed against its base branch:
    `scripts/size-snapshot.json` records the measured bytes of all 216 subpaths, and **more than 1% growth on any subpath
    fails**. Regenerate with `pnpm build && pnpm size:snapshot`, and label the PR `size-increase-approved` when the
@@ -139,7 +142,9 @@ Docs consume the built library, so build it before running or building the site 
 3. Run `pnpm check`, `pnpm build`, `pnpm craft && pnpm robust && pnpm floor`, and `pnpm size` before pushing. Git hooks
    run a subset automatically.
 4. Run `pnpm gen:check` if you touched anything generated, and `pnpm format:md` if you touched Markdown.
-5. Add a changeset (`pnpm changeset`) unless the change is docs- or CI-only.
+5. Add a changeset (`pnpm changeset`) unless the change is docs- or CI-only. Select `@microcharts/mcp` as well when the
+   diff touches `packages/mcp` — a chart edit regenerates the embedded catalog, and without that second selection npm
+   keeps serving the old snapshot. Both packages then publish from this one PR.
 6. Fill in the PR template, including the linked issue.
 
 ## Commit style — Conventional Commits
@@ -168,6 +173,8 @@ For an agreed new chart, or a change that reshapes an existing one (the full bar
 - [ ] Visual baselines approved (light/dark × presets)
 - [ ] Same PR updates `package.json#exports`, the `tsdown` entries, `scripts/size-budgets.json` (regenerated), the
       catalog and gallery rows, the summary template, the doc page, and a bench scenario
+- [ ] Same PR carries changesets for both `@microcharts/react` and `@microcharts/mcp` (the new chart lands in the MCP
+      server's embedded catalog, and only a changeset publishes it)
 
 ## Reporting bugs
 

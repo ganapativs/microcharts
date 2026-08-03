@@ -26,11 +26,11 @@ a chart without changing what it says.
 
 ## Static first, interactivity opt-in
 
-Nearly every chart ships as two entries (WindBarb is static-only). The default is pure SVG: hook-free, listener-free,
-safe inside a React Server Component, and it renders to HTML with zero client JavaScript. Hover, roving keyboard focus,
-touch scrub, select-to-pin, and live announcements live in a separate `/interactive` subpath you import only where you
-need them. The two entries never mix, so you pay for interactivity only where you ask for it, and a static chart can't
-drag a listener into your server bundle.
+Every chart ships as two entries. The default is pure SVG: hook-free, listener-free, safe inside a React Server
+Component, and it renders to HTML with zero client JavaScript. Hover, roving keyboard focus, touch scrub, select-to-pin,
+and live announcements live in a separate `/interactive` subpath you import only where you need them. The two entries
+never mix, so you pay for interactivity only where you ask for it, and a static chart can't drag a listener into your
+server bundle.
 
 The interactive entry composes the static one rather than re-implementing it, so the two renderings can't drift. Every
 multi-unit chart resolves a gesture to a navigable _unit_ through the same kernel, so interaction is one thing to learn
