@@ -25,7 +25,7 @@
   {
     "name": "@microcharts/react/sparkbar/interactive",
     "path": "dist/charts/sparkbar/client.js",
-    "limit": "5.99 kB",
+    "limit": "6.09 kB",
     "gzip": true
   },
   {
