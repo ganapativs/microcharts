@@ -174,6 +174,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         x2={t.x}
         y2={h - 0.5}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

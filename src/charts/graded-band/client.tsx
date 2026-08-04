@@ -157,6 +157,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
           x2={b.x}
           y2={height - 0.5}
           data-mc-ink="accent"
+          data-mc-active=""
           data-mc-ui=""
           data-mc-w={w}
           vectorEffect="non-scaling-stroke"
@@ -167,6 +168,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
           x2={b.x + b.width}
           y2={height - 0.5}
           data-mc-ink="accent"
+          data-mc-active=""
           data-mc-ui=""
           data-mc-w={w}
           vectorEffect="non-scaling-stroke"

@@ -194,8 +194,8 @@ export function MiniBar(props: MiniBarProps): ReactNode {
       // category rows with no bottom to stand on, so it centres on the cap band.
       seat={
         orientation === "vertical"
-          ? { mode: "floor", bottom: height }
-          : { mode: "center", top: 0, bottom: height }
+          ? { mode: "floor", bottom: geo.y1 }
+          : { mode: "center", top: geo.y0, bottom: geo.y1 }
       }
       className={className ? `mc-minibar ${className}` : "mc-minibar"}
       style={

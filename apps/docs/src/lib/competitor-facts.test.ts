@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import * as facts from "./competitor-facts";
 import {
   CHART_JS,
   MUI_X_CHARTS,
@@ -64,5 +65,31 @@ describe("competitor-facts", () => {
     expect(VISX.minimalSparklineGzipKb).toBeGreaterThan(5);
     expect(VISX.minimalSparklineGzipKb).toBeLessThan(50);
     expect(VISX.shapeRuntimeDeps).toBe(5);
+  });
+
+  // Competitor numbers are pinned, not live: each entry carries the date it was
+  // measured, and the compare pages quote those numbers as current. A pin older
+  // than ~6 months stops being a fact and starts being an accusation, so this
+  // walks every exported entry (new competitors included, for free) and fails
+  // once any `measuredAt` ages past 180 days.
+  it("keeps every measuredAt within 180 days", () => {
+    const MAX_AGE_DAYS = 180;
+    const MS_PER_DAY = 86_400_000;
+    const now = Date.now();
+    for (const [exportName, entry] of Object.entries(facts)) {
+      if (typeof entry !== "object" || entry === null || !("measuredAt" in entry)) continue;
+      const measuredAt = (entry as { measuredAt: string }).measuredAt;
+      // "YYYY-MM" pins reads as the first of that month; "YYYY-MM-DD" as-is.
+      expect(measuredAt, `${exportName}.measuredAt`).toMatch(/^\d{4}-\d{2}(-\d{2})?$/);
+      const date = new Date(
+        `${measuredAt.length === 7 ? `${measuredAt}-01` : measuredAt}T00:00:00Z`,
+      );
+      const ageDays = Math.floor((now - date.getTime()) / MS_PER_DAY);
+      expect(
+        ageDays,
+        `${exportName} (${(entry as { name?: string }).name ?? exportName}) was measured ${measuredAt}, ` +
+          `${ageDays} days ago — re-measure with the method documented on the entry and update measuredAt`,
+      ).toBeLessThanOrEqual(MAX_AGE_DAYS);
+    }
   });
 });

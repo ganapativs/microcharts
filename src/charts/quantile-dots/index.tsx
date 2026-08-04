@@ -9,7 +9,12 @@ import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_QUANTILE_DOTS, type QuantileDotsStrings } from "../../core/strings-quantile-dots.js";
 import { chartSide } from "../../core/types.js";
-import { quantileDotsGeometry, type QuantileDotsGeometry, type ThresholdSide } from "./geometry.js";
+import {
+  QUANTILE_PAD,
+  quantileDotsGeometry,
+  type QuantileDotsGeometry,
+  type ThresholdSide,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function quantileDotsSummary(
@@ -125,7 +130,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - QUANTILE_PAD }}
         className={cls}
         style={style}
       >
@@ -151,7 +156,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
       // bottom row's rim is a real encoding floor and stands on the text
       // baseline like a bar. It's the padded frame, not the tallest column —
       // stack height is data, and seating it would bob the chart as odds shift.
-      seat={{ mode: "floor", bottom: height - geo.pad }}
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >

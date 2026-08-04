@@ -162,6 +162,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
           x2={s.x1}
           y2={s.y1}
           data-mc-ink="accent"
+          data-mc-active=""
           data-mc-ui=""
           data-mc-w={pinned ? "tick" : "full"}
           vectorEffect="non-scaling-stroke"

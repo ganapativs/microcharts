@@ -1,0 +1,87 @@
+---
+title: Motion
+description: >-
+  What the animate prop plays, what the engine costs, how marks respond when data changes, and what reduced motion turns
+  off.
+---
+
+Interactive charts take an `animate` prop. The prop is a flag; the code that runs the entrance ships in a separate
+side-effect import you add once, anywhere in your client bundle:
+
+```tsx
+"use client";
+import { Sparkline } from "@microcharts/react/sparkline/interactive";
+import "@microcharts/react/motion";
+
+export function Revenue({ data }: { data: number[] }) {
+  return <Sparkline data={data} animate title="Weekly revenue" />;
+}
+```
+
+Static entries never animate. A static chart is hook-free and ships zero client JavaScript, and an entrance is client
+work by definition, so `animate` exists only on `/interactive` entries. Without the engine import the flag does nothing
+in production and logs a one-line warning in development; a bundle that never imports `@microcharts/react/motion` ships
+byte-identical charts.
+
+## What the entrance plays
+
+Each chart draws on with the move that fits its mark: lines draw point to point, areas wipe left to right, bars rise
+from the baseline with a short stagger, cell grids reveal, radial charts unwind from the center, single glyphs pop.
+Twelve archetypes cover the catalog, and a chart's entrance is chosen in the library, not configured — `animate` is a
+boolean.
+
+The entrance follows four rules:
+
+- **Once per mount.** The entrance runs when the chart first mounts. Remount with a changed `key` to replay it.
+- **On screen only.** A chart below the fold holds its entrance until it scrolls into view, through one
+  `IntersectionObserver` shared by every chart on the page.
+- **Never over server HTML.** Markup that arrives server-rendered and hydrates is already visible, and an entrance would
+  animate content the reader has seen. Only fresh client mounts play.
+- **Capped.** Staggers spend a fixed window regardless of how many marks share it, and a grid past 80 marks collapses to
+  a single wipe instead of spawning one animation per cell.
+
+Duration, easing, and stagger are fixed per archetype and never derive from the data, so a bigger change does not get a
+slower entrance.
+
+To see an entrance before wiring one, open any chart's docs page: the playground has an animate toggle on the charts
+that support it.
+
+## What it costs
+
+`@microcharts/react/motion` measures **3.18 kB gzip**, paid once per bundle rather than per chart. The flag-handling
+code inside each chart is a single hook that returns early when the engine is absent.
+
+## When the data changes
+
+A mounted interactive chart whose `data` prop updates glides its marks to the new reading. This is plain CSS and needs
+neither the engine nor the flag:
+
+- Marks drawn as rects or circles (bars, dots, cells, bands) transition their geometry over 200 ms — quick enough that a
+  fast-ticking feed never leaves a mark trailing its own data.
+- Path-drawn marks, a sparkline's line among them, cut to the new shape: no browser implements `d` as a transitionable
+  property, so path charts swap rather than travel. `<line>` marks are in the same position.
+- Marks that name a discrete state (a status dot, a trend arrow) swap outright; there is no halfway value to show.
+- Text never transitions, so the number on screen is always one you sent.
+
+Opt out per chart with one zero-specificity line: `.my-chart [data-mc-ink] { transition: none }`.
+
+## Under reduced motion
+
+`prefers-reduced-motion: reduce` wins everywhere. The engine checks the setting before every entrance, so an opted-out
+reader gets the finished chart immediately, and the data-change glide sits inside a reduced-motion media block, so
+flipping the setting mid-session takes effect on the next change. No reading depends on motion, so turning it off loses
+nothing.
+
+## Matching your own UI
+
+The same import exports the tokens the charts move on, so surrounding UI can share the clock:
+
+```tsx
+import { MC_DUR, MC_EASE_ENTER, MC_EASE_MOVE } from "@microcharts/react/motion";
+```
+
+`MC_EASE_ENTER` is for things arriving, `MC_EASE_MOVE` for values changing in place, and `MC_DUR` carries three beats:
+`interact` (120 ms) for press and hover feedback, `update` (240 ms) for value changes, `enter` (360 ms) as the entrance
+base.
+
+If `animate` appears to do nothing, the checklist is in [Troubleshooting](/docs/troubleshooting#animate-does-nothing).

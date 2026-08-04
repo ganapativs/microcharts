@@ -171,7 +171,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
         width={m.bodyW + 2}
         height={height - 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

@@ -9,7 +9,7 @@ import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_BURN, type BurnStrings } from "../../core/strings-burn.js";
-import { burnGeometry, type BurnGeometry, type BurnMode } from "./geometry.js";
+import { BURN_PAD, burnGeometry, type BurnGeometry, type BurnMode } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function burnSummary(
@@ -138,7 +138,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - BURN_PAD }}
         className={cls}
         style={style}
       >
@@ -181,7 +181,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
   // (NOT geo.totalWidth) so overlays clamp to the plot, above the label gutter.
   const ann = resolveAnnotations(children, {
     x: scaleLinear([0, geo.spanEnd], [geo.pad, width - geo.pad]),
-    y: scaleLinear(geo.domain, [height - geo.pad, geo.pad]),
+    y: scaleLinear(geo.domain, [geo.y1, geo.y0]),
     width,
     height,
     fontSize: annotationFontSize(height),
@@ -196,8 +196,8 @@ export function BurnChart(props: BurnChartProps): ReactNode {
       id={id}
       // Zero-anchored: "nothing left to burn" is the bottom of the frame, and
       // that floor is the whole read, so it stands on the text baseline. The
-      // pad comes from the geometry so the seat can't drift from the scales.
-      seat={{ mode: "floor", bottom: height - geo.pad }}
+      // plot box comes from the geometry so the seat can't drift from the scales.
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={rootStyle}
     >

@@ -231,7 +231,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         height={Math.min(b[3], L.height - 0.25 - y)}
         rx={1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

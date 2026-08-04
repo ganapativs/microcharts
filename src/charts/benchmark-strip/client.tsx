@@ -153,6 +153,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
         x2={0}
         y2={height - 0.5}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

@@ -1,7 +1,7 @@
 "use client";
 // Interactive <ControlStrip>. One pointer listener + nearest-x. ←/→ step all
 // points; Home/End jump ends; Enter/Space/click pins a point (onSelect). (Tab is
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
   named,
@@ -21,6 +21,9 @@ import {
   controlSummary,
   type ControlStripProps,
 } from "./index.js";
+
+/** Ring ink for a point outside the limits — module-level so it is one object. */
+const OUT_INK = { "--mc-active-stroke": "var(--mc-negative)" } as CSSProperties;
 
 export interface InteractiveControlStripProps extends ControlStripProps, PickerProps {
   strings?: ControlStrings;
@@ -164,14 +167,18 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
           vectorEffect="non-scaling-stroke"
           style={{ transform: `translateX(${pt.x}px)` }}
         />
-        {/* focus/pin ring stroke is state-dependent (negative when out), so it
-            stays an attribute — a role can't switch color per point */}
+        {/* The ring's stroke is state-dependent — an out-of-control point rings
+            in the negative token — so this one overrides the shared active ink
+            per point instead of taking the catalog default. It stays on the
+            channel: a host retargeting `--mc-active-stroke` still moves every
+            in-control ring, and only the exception is spoken for here. */}
         <circle
           cx={pt.x}
           cy={pt.y}
           r={2.4}
           fill="none"
-          stroke={pt.out ? "var(--mc-negative)" : "var(--mc-accent)"}
+          data-mc-active=""
+          style={pt.out ? OUT_INK : undefined}
           data-mc-w="support"
           vectorEffect="non-scaling-stroke"
         />

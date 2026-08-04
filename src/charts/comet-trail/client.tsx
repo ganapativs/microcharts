@@ -42,7 +42,7 @@ const ring = (m: { cx: number; cy: number; r: number }, pinned: boolean) => (
     cy={m.cy}
     r={m.r + 1.5}
     fill="none"
-    stroke="var(--mc-accent)"
+    data-mc-active=""
     data-mc-w={pinned ? "tick" : "support"}
     vectorEffect="non-scaling-stroke"
   />

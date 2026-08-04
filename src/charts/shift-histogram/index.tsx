@@ -9,7 +9,12 @@ import { makeFormatter, withPlus, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
-import { shiftHistogramGeometry, type ShiftHistogramGeometry, type ShiftMode } from "./geometry.js";
+import {
+  SHIFT_HISTOGRAM_PAD,
+  shiftHistogramGeometry,
+  type ShiftHistogramGeometry,
+  type ShiftMode,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 /** Signed median shift string (sign in text). */
@@ -121,7 +126,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "center", top: 2, bottom: height - 2 }}
+        seat={{ mode: "center", top: SHIFT_HISTOGRAM_PAD, bottom: height - SHIFT_HISTOGRAM_PAD }}
         className={cls}
         style={style}
       >

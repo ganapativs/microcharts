@@ -175,7 +175,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
             cy={sp.netY}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />

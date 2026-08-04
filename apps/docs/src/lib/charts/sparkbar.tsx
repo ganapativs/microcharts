@@ -57,6 +57,13 @@ export const entry: ChartEntry = {
       description: '"up" (default); "down" flips which sign is good.',
     },
     {
+      name: "labels",
+      type: "(string | undefined)[]",
+      required: false,
+      interactive: true,
+      description: "Names for the bars, indexed like `data`; the readout shows them.",
+    },
+    {
       name: "title",
       type: "string",
       required: false,

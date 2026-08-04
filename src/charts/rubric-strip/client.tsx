@@ -160,7 +160,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         width={row.trackWidth + 1}
         height={row.height + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

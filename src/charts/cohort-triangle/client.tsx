@@ -186,7 +186,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         height={geo.cell + 1}
         rx={1.5}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

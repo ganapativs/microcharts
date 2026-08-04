@@ -9,6 +9,11 @@ import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
 export type BurnMode = "down" | "up";
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const BURN_PAD = 2;
+
 interface BurnPoint {
   period: number;
   x: number;
@@ -50,6 +55,10 @@ export interface BurnGeometry {
   spanEnd: number;
   /** Plot inset (viewBox units) shared by both scales. */
   pad: number;
+  /** Top edge of the plot box. */
+  y0: number;
+  /** Bottom edge of the plot box — the floor the seat stands on. */
+  y1: number;
 }
 
 // least-squares slope of y over consecutive integer x (per-period burn rate)
@@ -84,7 +93,7 @@ export function burnGeometry(opts: {
   if (actual.length === 0 && plan.length === 0) return null;
 
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? BURN_PAD;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;
@@ -184,5 +193,7 @@ export function burnGeometry(opts: {
     domain: [yMin, yMax],
     spanEnd: Math.max(1, spanEnd),
     pad,
+    y0: pad,
+    y1: round2(height - pad),
   };
 }

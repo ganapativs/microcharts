@@ -10,6 +10,11 @@ import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const CONTROL_STRIP_PAD = 2;
+
 export type ControlLimits = "sigma" | "percentile";
 export type ControlRules = "none" | "we";
 
@@ -58,7 +63,7 @@ export function controlGeometry(opts: {
   if (n === 0) return null;
 
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? CONTROL_STRIP_PAD;
   const W = width - 2 * pad;
 
   // `sum / n` is exact enough and cheap, but the running total overflows to

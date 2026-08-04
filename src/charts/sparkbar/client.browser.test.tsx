@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { render } from "vitest-browser-react";
 import { userEvent } from "vitest/browser";
 import { SparkBar } from "./client.js";
+import { EN_SERIES } from "../../core/summary.js";
+import { EN_SLOTS } from "../../core/strings-slots.js";
 
 const D = [3, 5, 4, 7, 6, 9, 8, 11];
 const mount = async () => {
@@ -65,5 +67,74 @@ describe("interactive <SparkBar>", () => {
     const screen = await render(<SparkBar data={D} selectedIndex={3} />);
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
+  });
+});
+
+describe("<SparkBar labels>", () => {
+  const MONTHS = ["Jun 2026", "Jul 2026", "Aug 2026"];
+
+  it("names the unit in the chip and the announcement", async () => {
+    const screen = await render(<SparkBar data={[1000, 1050, 1100]} labels={MONTHS} title="MRR" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    // The reported gap: the chip could only ever show the value, never the period.
+    expect(fig.querySelector(".mc-spark-readout")!.textContent).toBe("Aug 2026 · 1,100");
+    expect(live.textContent).toBe("Aug 2026. Point 3 of 3: 1,100.");
+  });
+
+  it("carries the name on the onActive payload", async () => {
+    const seen: (string | undefined)[] = [];
+    const screen = await render(
+      <SparkBar
+        data={[1000, 1050, 1100]}
+        labels={MONTHS}
+        title="MRR"
+        onActive={(d) => seen.push(d?.label)}
+      />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{Home}");
+    expect(seen).toEqual(["Jun 2026"]);
+  });
+
+  it("falls back to the positional wording for an unnamed unit", async () => {
+    const screen = await render(
+      <SparkBar data={[1000, 1050, 1100]} labels={["Jun 2026", "", undefined]} title="MRR" />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    fig.focus();
+    // A hole and an empty string are both "unnamed" — no stray separator.
+    await userEvent.keyboard("{End}");
+    expect(live.textContent).toBe("Point 3 of 3: 1,100.");
+    expect(fig.querySelector(".mc-spark-readout")!.textContent).toBe("1,100");
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(live.textContent).toBe("Point 2 of 3: 1,050.");
+  });
+
+  it("localizes the joins through the strings prop", async () => {
+    const screen = await render(
+      <SparkBar
+        data={[1000, 1100]}
+        labels={["Jun", "Jul"]}
+        title="MRR"
+        strings={{
+          ...EN_SERIES,
+          ...EN_SLOTS,
+          named: (n, body) => `${n} — ${body}`,
+          namedChip: (n, body) => `${n}/${body}`,
+        }}
+      />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    fig.focus();
+    await userEvent.keyboard("{End}");
+    expect(fig.querySelector(".mc-spark-readout")!.textContent).toBe("Jul/1,100");
+    expect(fig.querySelector('[aria-live="polite"]')!.textContent).toBe(
+      "Jul — Point 2 of 2: 1,100.",
+    );
   });
 });

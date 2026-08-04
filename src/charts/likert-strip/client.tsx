@@ -159,7 +159,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         width={s.width + 1}
         height={h - 2}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

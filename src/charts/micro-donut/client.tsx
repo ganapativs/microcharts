@@ -170,7 +170,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       <path
         d={w.d}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

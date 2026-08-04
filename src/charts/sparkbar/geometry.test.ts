@@ -49,6 +49,23 @@ describe("sparkBarGeometry (edge matrix, )", () => {
     expect(g.bars.at(-1)!.index).toBe(1);
   });
 
+  // The plot floor IS the viewBox bottom in bar mode — that zero bottom padding
+  // is what stands the bars on the text baseline inline. It was asserted
+  // nowhere, so a stray pad would have regressed inline seating silently, and it
+  // is load-bearing for hosts: a rule drawn at the SVG box bottom lands ON the
+  // bar feet, which is why the doc page tells them to put it below the box.
+  it("bar mode seats the plot floor flush with the viewBox bottom", () => {
+    const g = geo([2, 5, 3]);
+    expect(g.y1).toBe(H);
+    expect(g.baselineY).toBe(H);
+    for (const b of g.bars) expect(b.y + b.height).toBeCloseTo(H, 5);
+  });
+
+  it("win-loss keeps its bottom inset — a mid-line glyph has no floor to stand on", () => {
+    const g = geo([1, -1], { mode: "winloss" });
+    expect(g.y1).toBe(H - 1);
+  });
+
   it("win-loss: equal height, sign only, straddling the mid-line", () => {
     const g = geo([3, -9, 100, -1], { mode: "winloss" });
     const heights = new Set(g.bars.map((b) => b.height));
@@ -56,6 +73,49 @@ describe("sparkBarGeometry (edge matrix, )", () => {
     expect(g.bars.map((b) => b.sign)).toEqual([1, -1, 1, -1]);
     expect(g.bars[0]!.y).toBeLessThan(g.baselineY); // win above
     expect(g.bars[1]!.y).toBeCloseTo(g.baselineY, 5); // loss below
+  });
+
+  // A 12-month series with real zeros used to render a row of 0.5-unit
+  // hairlines that read as a dot-leader at word size, which pushed one consumer
+  // into passing `null` for known zeros — semantically wrong, since a null is
+  // absence and a zero is exact data.
+  it("an exact zero paints no ink but keeps its slot on the pitch", () => {
+    const g = geo([0, 3, 0, 5]);
+    const zeros = g.bars.filter((b) => b.value === 0);
+    expect(zeros).toHaveLength(2);
+    for (const b of zeros) expect(b.height).toBe(0);
+    // Still a bar, still on the pitch: index and x match the slot it occupies.
+    expect(g.bars.map((b) => b.index)).toEqual([0, 1, 2, 3]);
+    expect(g.bars[2]!.x).toBeCloseTo(g.x0 + 2 * g.slot + (g.slot - g.bars[2]!.width) / 2, 1);
+  });
+
+  it("a zero and a null are different things: zero holds a slot, null has none", () => {
+    expect(geo([0, 1]).bars.map((b) => b.index)).toEqual([0, 1]);
+    expect(geo([null, 1]).bars.map((b) => b.index)).toEqual([1]);
+  });
+
+  it("all-zero renders no ink at all", () => {
+    for (const b of geo([0, 0, 0, 0]).bars) expect(b.height).toBe(0);
+  });
+
+  it("negative zero is a zero, not a negative bar", () => {
+    const b = geo([-0, 4]).bars[0]!;
+    expect(b.height).toBe(0);
+    expect(b.sign).toBe(0);
+  });
+
+  // The floor is a VISIBILITY floor for unresolvable magnitudes, not a floor on
+  // zero — dropping it for nonzero values would make small counts vanish.
+  it("a nonzero value too small to resolve still keeps its minimum mark", () => {
+    const b = geo([0.0001, 10000]).bars[0]!;
+    expect(b.height).toBe(0.5);
+  });
+
+  it("win-loss keeps the tie dash: there 0 is a state, not a magnitude", () => {
+    const g = geo([1, 0, -1], { mode: "winloss" });
+    const tie = g.bars[1]!;
+    expect(tie.sign).toBe(0);
+    expect(tie.height).toBe(1);
   });
 
   it("gap widens the empty space between bars", () => {
@@ -151,7 +211,11 @@ describe("sparkBarGeometry (invariants)", () => {
         for (const b of g.bars) {
           expect(Number.isFinite(b.x + b.y + b.width + b.height)).toBe(true);
           expect(b.width).toBeGreaterThan(0);
-          expect(b.height).toBeGreaterThan(0);
+          // Zero ink for a zero magnitude, visible ink for everything else. In
+          // win-loss a 0 is a tie — a STATE, not a magnitude — so it keeps its
+          // dash.
+          if (mode === "bar" && b.value === 0) expect(b.height).toBe(0);
+          else expect(b.height).toBeGreaterThan(0);
           expect(b.x).toBeGreaterThanOrEqual(-1e-6);
           expect(b.y).toBeGreaterThanOrEqual(-1e-6);
           expect(b.x + b.width).toBeLessThanOrEqual(W + 1e-6);
@@ -170,7 +234,8 @@ describe("sparkBarGeometry (invariants)", () => {
       expect(b.y).toBeGreaterThanOrEqual(1 - 1e-6);
       expect(b.y + b.height).toBeLessThanOrEqual(H + 1e-6);
       expect(b.width).toBeGreaterThan(0);
-      expect(b.height).toBeGreaterThan(0);
+      if (b.value === 0) expect(b.height).toBe(0);
+      else expect(b.height).toBeGreaterThan(0);
     }
   });
 });

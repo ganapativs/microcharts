@@ -213,7 +213,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         height={c.size - m.inset * 2 + 1}
         rx={m.rx + 0.5}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

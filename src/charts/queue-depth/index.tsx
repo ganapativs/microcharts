@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_QUEUE_DEPTH, type QueueDepthStrings } from "../../core/strings-queue-depth.js";
-import { queueDepthGeometry, type QueueDepthGeometry } from "./geometry.js";
+import { QUEUE_DEPTH_PAD, queueDepthGeometry, type QueueDepthGeometry } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import type { Value } from "../../core/types.js";
@@ -144,7 +144,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - QUEUE_DEPTH_PAD }}
         className={cls}
         style={style}
       >

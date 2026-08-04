@@ -217,7 +217,7 @@ describe("focus rings sit concentric on the marks they enclose", () => {
         for (const k of (c.keys ?? rove)(i)) press(host, k);
 
         const find = (): SVGGraphicsElement | null =>
-          svg.querySelector<SVGGraphicsElement>('[data-mc-w][stroke="var(--mc-accent)"]');
+          svg.querySelector<SVGGraphicsElement>("[data-mc-w][data-mc-active]");
         // React flushes the keydown asynchronously under the test runner.
         await vi.waitFor(() => expect(find(), `${name}: no ring for unit ${i}`).not.toBeNull());
         const r = boxOf(find()!);

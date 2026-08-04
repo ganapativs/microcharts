@@ -176,12 +176,8 @@ export function Waveform(props: WaveformProps): ReactNode {
         // inline accent (the house pattern; `--mc-accent` is itself remapped to
         // Highlight there), and both halves stay in the scan selector.
         <>
-          <path d={barsPath(rest, mirror, cy)} data-mc-ink="neutral" fillOpacity={0.45} />
-          <path
-            d={barsPath(played, mirror, cy)}
-            data-mc-ink="bar"
-            style={{ fill: "var(--mc-accent)" }}
-          />
+          <path d={barsPath(rest)} data-mc-ink="neutral" fillOpacity={0.45} />
+          <path d={barsPath(played)} data-mc-ink="bar" style={{ fill: "var(--mc-accent)" }} />
         </>
       ) : (
         <>
@@ -190,7 +186,7 @@ export function Waveform(props: WaveformProps): ReactNode {
             // "bar" ink enrolls the peak in the scan reveal so it's uncovered by
             // the sweep like every other bar (inline fill keeps the accent color).
             <path
-              d={barsPath([geo.bars[geo.peakIndex]!], mirror, cy)}
+              d={barsPath([geo.bars[geo.peakIndex]!])}
               data-mc-ink="bar"
               style={{ fill: "var(--mc-accent)" }}
             />

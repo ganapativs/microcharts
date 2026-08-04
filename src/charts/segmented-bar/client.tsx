@@ -159,7 +159,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
         width={s.w + 1}
         height={height - 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

@@ -124,7 +124,10 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         el.setAttribute("stroke-linejoin", "round");
         el.setAttribute("stroke-linecap", "round");
         el.setAttribute("vector-effect", "non-scaling-stroke");
-        el.style.stroke = "var(--mc-accent)";
+        // The marker, not an inline `stroke`: an inline style beats the
+        // stylesheet, so painting the hop here would be the one strand in the
+        // catalog a host could not retarget with `--mc-active-stroke`.
+        el.setAttribute("data-mc-active", "");
         el.style.strokeWidth = "var(--mc-sw)";
         g.appendChild(el);
       }
@@ -287,7 +290,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       <path
         d={g.d}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeLinejoin="round"
         strokeLinecap="round"
         data-mc-w={pinned ? "tick" : "full"}

@@ -177,7 +177,7 @@ export function QuadrantDot(props: InteractiveQuadrantDotProps): React.ReactNode
         cy={t.y}
         r={haloR}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

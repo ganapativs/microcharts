@@ -10,6 +10,7 @@ import { labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import {
+  SEGBAR_INSET,
   largestRemainderPercents,
   MAX_SEGMENTS,
   rollup,
@@ -142,7 +143,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       // The bar is one fixed-length rule inset a unit at top and bottom: the
       // segments partition its length, never its height, so no edge is a data
       // floor. It centres on the cap band and reads as punctuation in the line.
-      seat={{ mode: "center", top: 1, bottom: height - 1 }}
+      seat={{ mode: "center", top: SEGBAR_INSET, bottom: height - SEGBAR_INSET }}
       className={className ? `mc-segbar ${className}` : "mc-segbar"}
       style={rootStyle}
     >
@@ -162,9 +163,9 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
           <g key={seg.index}>
             <rect
               x={seg.x}
-              y={1}
+              y={SEGBAR_INSET}
               width={seg.w}
-              height={height - 2}
+              height={height - SEGBAR_INSET * 2}
               shapeRendering="crispEdges"
               data-mc-ink={isOther ? "neutral" : undefined}
               data-mc-cat={isOther ? undefined : (i % CAT_N) + 1}

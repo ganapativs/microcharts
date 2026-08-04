@@ -158,7 +158,7 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
         cy={b.cy}
         r={b.r}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "full"}
         vectorEffect="non-scaling-stroke"
       />

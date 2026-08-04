@@ -127,6 +127,16 @@ never moving the valence hues; returns `vars`/`style`/`css(selector)`/`extend()`
 StackedArea, PartitionStrip, Hypnogram, MicroDonut) take a per-instance `colors[]` over `--mc-cat-*` (additive inline
 override — the `data-mc-cat` attribute stays for motion + forced-colors). (The principled preset is named `editorial`.)
 
+**The active state is a channel, not a hardcode.** Every interaction overlay carries `data-mc-active` and takes its
+paint from `styles.css`: `--mc-active-stroke` (ring), `--mc-active-fill` + `--mc-active-fill-opacity` (the wash inside
+it, closed primitives only — filling an open strand paints a wedge), `--mc-rest-opacity` (every other mark, via
+`:has([data-mc-active])`, so dimming costs no JS). Width stays on `data-mc-w`; ~20 charts tune hover vs pin in both
+directions and one channel per job keeps that. A client entry must never spell `stroke="var(--mc-accent)"` on an overlay
+— `theming-contract.test.ts` fails it, and the reason is the bug it replaced: an accent hairline over an accent-inked
+mark cancels out, which is why the default adds a 20% `--mc-on-fill` wash (the token defined as the ink that reads on a
+saturated fill, so it lands on every fill in both themes and stays invisible over empty plot). Forced colors collapses
+all four back to a system outline. The dim rule skips `[opacity]` — a mark that encodes in its own opacity keeps it.
+
 ## Component canon (every chart follows this)
 
 **File anatomy** (`src/charts/<name>/`): `geometry.ts` (pure, property/edge-tested in the node project) · `index.tsx`

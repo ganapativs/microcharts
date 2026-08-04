@@ -150,7 +150,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         y1={l.y0}
         x2={l.x1}
         y2={l.y1}
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
         vectorEffect="non-scaling-stroke"

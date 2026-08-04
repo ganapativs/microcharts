@@ -62,7 +62,7 @@ function maxAbs(values: readonly Value[]): number {
  * The amplitude a full-height bar stands for: the explicit domain's peak, or
  * the series' own. A host computes `domain` (often a min/max over a series that
  * hides a NaN), and a non-finite one made `frac` NaN → every bar collapsed to
- * the 0.4 silence tick while the summary still announced the real peak. Painted
+ * silence while the summary still announced the real peak. Painted
  * scale and announced scale have to be the same scale, so an unusable domain
  * falls back to the auto one instead of flattening the signal.
  */
@@ -126,18 +126,20 @@ export function waveformGeometry(opts: {
     return { x, y: round2(height - PAD - h), width: w, height: h, index: i };
   });
 
-  const path = barsPath(bars, mirror, cy);
+  const path = barsPath(bars);
   return { bars, path, peak: round2(peak), peakIndex, y0: PAD, y1: height - PAD };
 }
 
-/** One `<path>` of rect subpaths (1 node regardless of sample count). A
- *  zero-height bar draws a 0.4-unit tick so silence still reads as a bucket. */
-export function barsPath(bars: readonly WaveBar[], mirror: boolean, cy: number): string {
+/** One `<path>` of rect subpaths (1 node regardless of sample count). Silence
+ *  contributes no subpath: zero amplitude is zero ink. The 0.4-unit tick this
+ *  used to draw for a silent bucket contradicted `bars`, which carries an honest
+ *  `height: 0`, and turned a run of silence into a dotted rule instead of a
+ *  quiet stretch. Dropping the subpath also shortens `d` on sparse audio. */
+export function barsPath(bars: readonly WaveBar[]): string {
   let d = "";
   for (const b of bars) {
-    const h = b.height <= 0 ? 0.4 : b.height;
-    const y = b.height <= 0 ? (mirror ? cy - 0.2 : b.y) : b.y;
-    d += `M${b.x} ${round2(y)}h${b.width}v${round2(h)}h${-b.width}z`;
+    if (b.height <= 0) continue;
+    d += `M${b.x} ${b.y}h${b.width}v${b.height}h${-b.width}z`;
   }
   return d;
 }

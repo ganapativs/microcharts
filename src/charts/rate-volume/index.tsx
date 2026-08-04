@@ -9,6 +9,7 @@ import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
+  RATE_VOLUME_PAD,
   rateVolumeGeometry,
   type RateCurve,
   type RateVolumeGeometry,
@@ -136,7 +137,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - RATE_VOLUME_PAD }}
         className={cls}
         style={style}
       >

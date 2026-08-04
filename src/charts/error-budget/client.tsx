@@ -181,7 +181,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
             cy={sp.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -210,7 +210,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               cy={0}
               r={2.4}
               fill="none"
-              stroke="var(--mc-accent)"
+              data-mc-active=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
               style={{ transform: `translateY(${ap.y}px)` }}

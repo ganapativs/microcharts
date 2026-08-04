@@ -2,10 +2,11 @@
 // TRAVEL to the new reading, and the marks that name a discrete unit must not.
 //
 // The whole rollout is one rule in `styles.css` keyed on `[data-mc-ink]`, which
-// works only because of a house pattern: a focus or selection ring is drawn as a
-// literal `stroke="var(--mc-accent)"` and carries no ink role. That pattern is
-// not enforced anywhere else, so this file is what stops a chart from quietly
-// inking its ring and lerping it across the plot — the defect
+// works only because of a house pattern: a focus or selection ring is marked
+// `data-mc-active` — the interaction channel — and carries no ink role, so the
+// glide rule never sees it. `theming-contract.test.ts` enforces the marker;
+// nothing there stops a chart from ALSO inking its ring, so this file is what
+// keeps one from lerping across the plot — the defect
 // `focus-ring-symmetry.browser.test.tsx` was written for, arriving by a
 // different route.
 //

@@ -4,7 +4,7 @@
 // skipped). ←/→ step, Home/End jump ends, click / Enter / Space selects
 // (onSelect).crosshair + focus ring
 // + pin are overlay children.
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
@@ -28,6 +28,9 @@ import {
 } from "./index.js";
 
 type QueuePoint = NonNullable<ReturnType<typeof queueDepthGeometry>>["points"][number];
+
+/** Ring ink for a sample above the ceiling — module-level so it is one object. */
+const ABOVE_INK = { "--mc-active-stroke": "var(--mc-negative)" } as CSSProperties;
 
 export interface InteractiveQueueDepthProps extends QueueDepthProps, PickerProps {
   strings?: QueueDepthStrings;
@@ -187,7 +190,8 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
             cy={sp.y}
             r={2.4}
             fill="none"
-            stroke={sp.above ? "var(--mc-negative)" : "var(--mc-accent)"}
+            data-mc-active=""
+            style={sp.above ? ABOVE_INK : undefined}
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -216,7 +220,8 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
               cy={ap.y}
               r={2.4}
               fill="none"
-              stroke={ap.above ? "var(--mc-negative)" : "var(--mc-accent)"}
+              data-mc-active=""
+              style={ap.above ? ABOVE_INK : undefined}
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />

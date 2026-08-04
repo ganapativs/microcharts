@@ -282,7 +282,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
             x2={0}
             y1={0.5}
             y2={height - 0.5}
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
@@ -296,7 +296,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
             width={plotW + 1}
             height={laneH - 0.6}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             strokeOpacity={0.5}
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"

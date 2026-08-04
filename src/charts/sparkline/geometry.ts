@@ -1,6 +1,7 @@
 // Maps a series into viewBox pixel space so the static component is a thin
 // render over this. Kept here (not inline) so it is property/edge-tested in the
 // node project without a browser. Coords are 2-dp via the kernel.
+import { labelFitsY } from "../../core/labels.js";
 import { niceDomain, scaleLinear } from "../../core/scale.js";
 import { seriesStats } from "../../core/stats.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
@@ -54,7 +55,7 @@ export interface SparkGeometry {
  * the budget while the text still rendered at full length overhung the viewBox
  * by up to 8 units and broke containment.
  */
-export function labelMetrics(
+function labelMetrics(
   text: string,
   width: number,
   height: number,
@@ -92,6 +93,40 @@ export interface SparkGeometryOptions {
   /** Line-drawing point cap before min/max decimation kicks in (default 200).
    *  `Infinity` opts out. */
   maxPoints?: number | undefined;
+}
+
+/**
+ * Metrics for the `label="last"` endpoint figure, or `undefined` when it is not
+ * painted — either there is no label, or the box is too short to seat a line of
+ * it (`labelMetrics` fits the label's WIDTH budget and answers nothing about
+ * height). When it drops, so does its gutter, and the line reclaims the width.
+ *
+ * Shared by both entries: the interactive entry used to reserve this gutter
+ * whenever a label existed, skipping the height check the static applies, so on
+ * a short chart the two computed DIFFERENT plot boxes and the crosshair drifted
+ * off the painted line.
+ */
+export function lastLabelMetrics(
+  text: string | undefined,
+  width: number,
+  height: number,
+): { fontSize: number; gutter: number } | undefined {
+  const fitted = text === undefined ? undefined : labelMetrics(text, width, height);
+  return fitted && labelFitsY(height / 2, fitted.fontSize, height) ? fitted : undefined;
+}
+
+/**
+ * Font size for `label="minmax"` extremum labels, or 0 when they are omitted.
+ * Below ~28px tall the two gutters would crush the plot, so the labels drop
+ * (the summary still reads the range). The reserved gutter is `font && font + 1`.
+ *
+ * Lives here, in the chunk BOTH entries already import, because the static and
+ * the interactive entry must reserve byte-identical space — they each used to
+ * inline this arithmetic, which is two copies of one contract.
+ */
+export function minmaxFont(height: number, label: string | undefined): number {
+  const size = Math.max(5, Math.min(Math.round(height * 0.22), 9));
+  return label === "minmax" && height >= (size + 1) * 2 + 12 ? size : 0;
 }
 
 /**

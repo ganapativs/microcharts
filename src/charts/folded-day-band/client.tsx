@@ -174,7 +174,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
             x2={0}
             y1={0.5}
             y2={height - 0.5}
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-ui=""
             data-mc-w="support"
             style={{ transform: `translateX(${pinned.x}px)` }}

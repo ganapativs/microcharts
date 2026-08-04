@@ -208,7 +208,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             cy={row.y}
             r={3.25}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
             vectorEffect="non-scaling-stroke"
@@ -220,7 +220,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             cy={row.y}
             r={3.25}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
             vectorEffect="non-scaling-stroke"

@@ -16,6 +16,11 @@ function median(finite: readonly number[]): number {
   return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
 }
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const SHIFT_HISTOGRAM_PAD = 2;
+
 export type ShiftMode = "mirror" | "overlay";
 
 interface ShiftBin {
@@ -66,7 +71,7 @@ export function shiftHistogramGeometry(opts: {
   if (beforeAll.length === 0 && afterAll.length === 0) return null;
 
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? SHIFT_HISTOGRAM_PAD;
   const fontSize = opts.fontSize ?? 0;
   const gutterCh = opts.gutterCh ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;

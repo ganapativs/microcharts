@@ -22,7 +22,7 @@ export function docsMeta({
   description,
   path,
   image = "/og/default.png",
-  imageAlt = SITE.ogImageAlt,
+  imageAlt,
   noindex = false,
   markdown,
   type = "website",
@@ -30,6 +30,11 @@ export function docsMeta({
 }: MetaInput): Metadata {
   const url = abs(path);
   const imageUrl = abs(image);
+  /* Per-page OG cards render the page title on microcharts branding, so the
+     default alt names that card. The shared default.png (the chart-specimen
+     board) keeps the site-wide alt. */
+  const resolvedImageAlt =
+    imageAlt ?? (image === "/og/default.png" ? SITE.ogImageAlt : `${SITE.name} — ${title}`);
 
   return {
     /* Bare title — the root layout's `%s · ${SITE.name}` template appends the
@@ -56,7 +61,7 @@ export function docsMeta({
       description,
       url,
       locale: "en_US",
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: imageAlt }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: resolvedImageAlt }],
     },
     twitter: {
       card: "summary_large_image",
@@ -64,7 +69,7 @@ export function docsMeta({
       creator: SITE.authorXHandle,
       title,
       description,
-      images: [{ url: imageUrl, alt: imageAlt }],
+      images: [{ url: imageUrl, alt: resolvedImageAlt }],
     },
   };
 }

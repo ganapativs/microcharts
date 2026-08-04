@@ -133,7 +133,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
         height={c.h + 1}
         rx={c.rx + 0.5}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

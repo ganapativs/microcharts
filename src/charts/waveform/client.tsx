@@ -192,7 +192,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
             width={selBar.width + 1}
             height={Math.max(selBar.height, 0.4) + 1}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             // NOT `data-mc-ui`, twice over: this outline hugs the bucket's bar,
             // so its `y` and `height` are the envelope amplitude — a value, not
             // a pointer position — and it names one discrete bucket, which a box

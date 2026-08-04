@@ -177,7 +177,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         width={orientation === "vertical" ? bandW + 1 : width + 1}
         height={orientation === "vertical" ? height + 1 : bandW + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

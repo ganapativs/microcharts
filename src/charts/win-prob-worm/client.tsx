@@ -152,6 +152,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         x2={0}
         y2={height}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         strokeDasharray="1.5 1.5"

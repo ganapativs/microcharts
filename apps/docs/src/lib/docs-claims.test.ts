@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATALOG, SIZE, BENCH, SIZE_MARKETING } from "./docs-facts";
+import { CATALOG, SIZE, BENCH, SIZE_MARKETING, MOTION_ENGINE_KB } from "./docs-facts";
 
 // Guide MDX = the top-level docs pages (charts/** is owned by the chart shells).
 const dir = resolve(process.cwd(), "content/docs");
@@ -85,6 +85,17 @@ describe("docs guide claims stay true", () => {
     const occurrences = src.match(new RegExp(`${msPer}\\s*ms`, "g")) ?? [];
     // frontmatter description + body sentence — must agree, never drift apart.
     expect(occurrences.length, `expected 2 occurrences of "${msPer} ms"`).toBe(2);
+  });
+
+  // motion.mdx hand-types the measured engine size (frontmatter/prose can't
+  // import docs-facts) and the MC_DUR beats; this pins both to their sources.
+  it("motion.mdx quotes the measured engine size and the published MC_DUR beats", async () => {
+    const src = bySrc("motion.mdx");
+    expect(src).toContain(`**${MOTION_ENGINE_KB} kB gzip**`);
+    const { MC_DUR } = await import("@microcharts/react/motion");
+    expect(src).toContain(`\`interact\` (${MC_DUR.interact} ms)`);
+    expect(src).toContain(`\`update\` (${MC_DUR.update} ms)`);
+    expect(src).toContain(`\`enter\` (${MC_DUR.enter} ms)`);
   });
 
   it("performance.mdx quotes the measured describeSeries throughput, rounded", () => {

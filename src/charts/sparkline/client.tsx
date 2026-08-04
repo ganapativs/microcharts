@@ -14,9 +14,9 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
-import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
-import { labelMetrics, sparkGeometry } from "./geometry.js";
+import { lastLabelMetrics, minmaxFont, sparkGeometry } from "./geometry.js";
+import { lastFinite } from "../../core/stats.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
 const Static = memo(StaticSparkline);
@@ -25,7 +25,7 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // Selection ring, then the live pair (crosshair + dot) on a wrapper that gets
 // moved as one. Built once per chart; see the effect below for why.
 const UI_MARKS =
-  '<circle r="3.2" fill="none" data-mc-ink="accent" data-mc-w="tick" vector-effect="non-scaling-stroke"/>' +
+  '<circle r="3.2" fill="none" data-mc-active="" data-mc-w="tick" vector-effect="non-scaling-stroke"/>' +
   '<g><line data-mc-ink="muted" vector-effect="non-scaling-stroke"/><circle r="2.6" data-mc-ink="accent"/></g>';
 
 function uiGroup(svg: SVGSVGElement): SVGGElement {
@@ -84,9 +84,9 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const geo = useMemo(() => {
     const last = lastFinite(data);
     const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
-    const gutterRight = labelText !== undefined ? labelMetrics(labelText, width, height).gutter : 0;
-    const mmSize = Math.max(5, Math.min(Math.round(height * 0.22), 9));
-    const gutterY = label === "minmax" && height >= (mmSize + 1) * 2 + 12 ? mmSize + 1 : 0;
+    const gutterRight = lastLabelMetrics(labelText, width, height)?.gutter ?? 0;
+    const mmFont = minmaxFont(height, label);
+    const gutterY = mmFont && mmFont + 1;
     return sparkGeometry(data, {
       width,
       height,
@@ -205,8 +205,8 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       ring.setAttribute("cy", String(selPoint[1]));
     }
     live.setAttribute("opacity", shownPoint ? "1" : "0");
-    if (shownPoint) live.style.transform = `translateX(${shownPoint[0]}px)`;
     if (shownPoint) {
+      live.style.transform = `translateX(${shownPoint[0]}px)`;
       const marks = live.children as unknown as SVGElement[];
       marks[0]!.setAttribute("y1", String(geo.plot.y0));
       marks[0]!.setAttribute("y2", String(geo.plot.y1));
@@ -245,6 +245,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       shownValue !== null &&
       /* At the endpoint the persistent `label="last"` already shows this value —
          a floating readout there just collides with it. Skip it; every other
+         point still gets the readout. A NAMED point is not a duplicate: the
          point still gets the readout. */
       !(label === "last" && shown === stops[stops.length - 1]) ? (
         <span className="mc-spark-readout" style={crosshairReadoutStyle(shownPoint[0], width)}>

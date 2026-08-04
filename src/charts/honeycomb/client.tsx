@@ -196,7 +196,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
       <path
         d={hexPath(c.cx, c.cy, geo.cell)}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

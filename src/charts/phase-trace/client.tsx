@@ -167,7 +167,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             cy={pinned.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -178,7 +178,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             cy={pt.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />

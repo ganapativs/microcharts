@@ -44,7 +44,7 @@ describe("interactive <CalendarStrip>", () => {
     const fig = await mount(<CalendarStrip data={DATA} end={END} />);
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(fig.querySelector("rect[data-mc-active]")).not.toBeNull();
   });
 
   it("inner SVG fills the wrapper when a demo scales it via CSS width", async () => {
@@ -95,7 +95,7 @@ describe("interactive <CalendarStrip>", () => {
     expect(fig.querySelector("svg")!.getAttribute("viewBox")).toBe("0 0 55 31");
     fig.focus();
     await userEvent.keyboard("{Home}");
-    const ring = fig.querySelector('rect[stroke="var(--mc-accent)"]')!;
+    const ring = fig.querySelector("rect[data-mc-active]")!;
     expect(ring.getAttribute("x")).toBe("-0.5"); // cell 0 at the resolved metrics
     expect(ring.getAttribute("width")).toBe("8");
   });

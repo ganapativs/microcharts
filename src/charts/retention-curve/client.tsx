@@ -212,7 +212,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
             cy={pin.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -240,7 +240,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
               cy={p.y}
               r={2.4}
               fill="none"
-              stroke="var(--mc-accent)"
+              data-mc-active=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />

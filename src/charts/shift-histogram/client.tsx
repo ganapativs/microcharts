@@ -219,7 +219,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
         width={bin.width + 1.2}
         height={height - 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

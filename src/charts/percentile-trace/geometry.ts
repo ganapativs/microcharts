@@ -9,6 +9,11 @@ import { clamp, scaleLinear } from "../../core/scale.js";
 import { chartSide, isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
 
 /** Documented box, shared by the geometry and both entries. */
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const PERCENTILE_PAD = 2;
+
 export const DEFAULT_WIDTH = 80;
 export const DEFAULT_HEIGHT = 20;
 
@@ -85,7 +90,7 @@ export function percentileGeometry(opts: {
   const width = chartSide(opts.width, DEFAULT_WIDTH);
   const height = chartSide(opts.height, DEFAULT_HEIGHT);
 
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? PERCENTILE_PAD;
   // Below `2 * pad` the padded plot inverts and `clamp(v, 2, -1)` returns the
   // upper bound — the trace sat below a 1-unit-tall box. Half the box is the
   // pad's floor.

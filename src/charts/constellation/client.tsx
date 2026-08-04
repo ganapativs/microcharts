@@ -256,7 +256,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
             cy={selStar.cy}
             r={selStar.r + 1.5}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="full"
             vectorEffect="non-scaling-stroke"
           />
@@ -267,7 +267,7 @@ export function Constellation(props: InteractiveConstellationProps): React.React
             cy={activeStar.cy}
             r={activeStar.r + 1.5}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />

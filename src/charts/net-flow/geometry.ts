@@ -17,6 +17,11 @@ function zeroArea(pts: XY[], baselineY: number): string {
   return `M${pts[0]![0]} ${baselineY} L${tops} L${pts[pts.length - 1]![0]} ${baselineY} Z`;
 }
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const NET_FLOW_PAD = 2;
+
 export interface NetFlowPeriod {
   in: number;
   out: number;
@@ -96,7 +101,7 @@ export function netFlowGeometry(opts: {
   const width = chartSide(opts.width);
   const height = chartSide(opts.height);
 
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? NET_FLOW_PAD;
   // Below `2 * pad` the padded plot inverts, and `clamp(v, 2, -1)` returns the
   // upper bound — the areas painted above y=0. Half the box is the pad's floor.
   const padX = Math.min(pad, width / 2);

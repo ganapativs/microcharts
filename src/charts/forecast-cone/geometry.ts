@@ -9,6 +9,11 @@ import { linePath } from "../../core/path.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const FORECAST_PAD = 2;
+
 export interface ForecastInput {
   mid: readonly number[];
   p80: readonly (readonly [number, number])[];
@@ -88,7 +93,7 @@ export function forecastConeGeometry(opts: {
   if (F === 0) return null;
 
   const { width, height } = opts;
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? FORECAST_PAD;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   const gutter = gutterCh > 0 ? Math.ceil(gutterCh * fontSize * 0.72) + 4 : 0;

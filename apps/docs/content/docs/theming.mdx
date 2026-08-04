@@ -423,6 +423,40 @@ under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its t
 the system `Canvas`, so the chip adapts to light, dark, and forced-colors with no configuration. Point them at your
 popover tokens to match a themed surface. One set of tokens covers the hovered, focused, and pinned states alike.
 
+## The active state
+
+The chip names the active unit; the chart also paints it. By default that mark is an accent hairline around the unit
+plus a light wash inside it, and four tokens retune it. They are opt-in — the library declares none of them, so each one
+falls back to the default in the comment:
+
+```css
+.my-charts {
+  --mc-active-stroke: var(--mc-accent); /* ring color */
+  --mc-active-fill: var(--mc-on-fill); /* wash inside the ring */
+  --mc-active-fill-opacity: 0.2; /* its strength; 0 leaves a bare outline */
+  --mc-rest-opacity: 1; /* every OTHER mark, while something is active */
+}
+```
+
+The wash is why the ring reads on a mark the chart already emphasizes. SparkBar inks its endpoint bar with
+`--mc-accent`, and an accent outline on an accent fill cancels out — so the outline alone left the most-looked-at bar in
+the chart as the one that answered the pointer least.
+
+Set `--mc-rest-opacity` below 1 and every mark that isn't the active one steps back while the pointer is down. The chart
+is what knows which mark that is, so this is the one treatment you cannot write from the outside. Pair it with a solid
+fill to lift the picked unit out of its own dimmed self:
+
+```css
+.my-charts {
+  --mc-rest-opacity: 0.25;
+  --mc-active-fill: var(--mc-accent);
+  --mc-active-fill-opacity: 1;
+}
+```
+
+Under forced colors all four collapse back to a system-accent outline: a themed ink was picked against your palette, not
+the user's, and an opacity ramp has nothing to say in a two-ink mode.
+
 ## Dark mode and forced colors
 
 Dark values are hand-tuned per token, never auto-inverted, so overriding one light value can't break the dark surface.

@@ -172,7 +172,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
         width={z.width + 1}
         height={z.height + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

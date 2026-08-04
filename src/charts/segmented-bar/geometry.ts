@@ -4,6 +4,10 @@
 import { normalizeShares } from "../../core/stack.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 
+/** Vertical inset of the bar. Geometry owns it so the rendered rect and the
+ *  inline seat read one number instead of three copies of `1`. */
+export const SEGBAR_INSET = 1;
+
 export interface Segment {
   x: number;
   w: number;

@@ -195,7 +195,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
         cy={u.cy}
         r={u.r + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"
       />
@@ -206,7 +206,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
         width={(u.r + 1) * 2}
         height={(u.r + 1) * 2}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"
       />

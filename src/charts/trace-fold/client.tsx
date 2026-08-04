@@ -198,7 +198,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
         width={s.width + 0.8}
         height={s.height + 0.8}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

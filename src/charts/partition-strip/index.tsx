@@ -9,6 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_PARTITION, type PartitionStrings } from "../../core/strings-partition.js";
 import {
+  PARTITION_INSET,
   partitionBox,
   partitionStripGeometry,
   parentValue,
@@ -108,7 +109,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
   const [width, height] = partitionBox(widthProp, heightProp);
   const geo = partitionStripGeometry({ data, width, height, gap: 1 });
   const fontSize = labelFont(height, 0.42);
-  const inset = 0.5;
+  const inset = PARTITION_INSET;
   const rowH = (height - inset * 2 - 1) / 2;
   // Shares take `locale` but never the value `format` (which carries units).
   const pctFmt = makePercentFormatter(props.locale);

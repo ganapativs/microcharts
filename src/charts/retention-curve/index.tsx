@@ -10,7 +10,12 @@ import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { EN_RETENTION, type RetentionStrings } from "../../core/strings-retention.js";
-import { retentionGeometry, type RetentionCurveType, type RetentionGeometry } from "./geometry.js";
+import {
+  RETENTION_PAD,
+  retentionGeometry,
+  type RetentionCurveType,
+  type RetentionGeometry,
+} from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function retentionSummary(
@@ -132,7 +137,7 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - RETENTION_PAD }}
         className={cls}
         style={style}
       >

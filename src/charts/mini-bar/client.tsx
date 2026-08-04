@@ -160,7 +160,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
       <rect
         {...ring}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />
