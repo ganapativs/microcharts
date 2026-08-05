@@ -1,5 +1,117 @@
 # @microcharts/react
 
+## 0.14.0
+
+### Minor Changes
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - `SparkBar`'s interactive entry takes a `labels` prop, so the hover
+  readout can name the period it shows instead of only its value: `<SparkBar data={mrr} labels={months} />` reads "Aug
+  2026 · 1.1K" in the chip and announces "Aug 2026. Point 3 of 12: 1.1K." The name also arrives on `onActive` /
+  `onSelect` as `MicroDatum.label`. Hosts previously had to set `readout={false}` and rebuild the chip themselves to
+  show a period.
+
+  `labels` is indexed like the data. A hole or an empty string leaves that unit on the positional wording, and the two
+  joins are localizable through the new `named` / `namedChip` string templates.
+
+  Also fixes a geometry-parity bug in `Sparkline`'s interactive entry: it reserved the `label="last"` gutter whenever a
+  label existed, skipping the height check the static entry applies, so on a short chart the two computed different plot
+  boxes and the crosshair drifted off the painted line.
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - The active/hovered unit's treatment is now a supported `--mc-*`
+  channel, and its default is visible on marks the chart emphasizes.
+
+  Every interaction overlay carries `data-mc-active`, and `styles.css` paints it from four opt-in tokens:
+  `--mc-active-stroke` (ring color), `--mc-active-fill` + `--mc-active-fill-opacity` (the wash inside the ring, `0` for
+  a bare outline), and `--mc-rest-opacity` (every other mark, while something is active). Restyling the hover state used
+  to mean scoping CSS onto `data-mc-*` attributes from outside the package, and moving `--mc-accent` to recolor a ring
+  also repainted endpoint dots and emphasis bars. "Lift the picked unit, dim the rest" is now two declarations on the
+  host.
+
+  Fixes: the overlay was invisible on any mark the chart inks with `--mc-accent` — SparkBar's endpoint bar, Pareto's
+  leader, Thermometer's reading — because an accent outline over an accent fill cancels out. The default now adds a
+  20%-opacity `--mc-on-fill` wash inside the ring, which is the token defined as the ink that reads on a saturated data
+  fill, so the treatment lands on every fill in both themes and stays invisible inside a ring that encloses empty plot.
+
+  Under forced colors all four tokens collapse back to a system-accent outline: a host's themed ink was chosen against
+  its own palette, not the user's, and an opacity ramp has nothing to say in a two-ink mode.
+
+  Sizes moved by −20 bytes net across the catalog (the marker is shorter than the literal it replaced); no subpath grew
+  by more than 17 bytes.
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - A value of exactly `0` now paints no ink. `SparkBar` floored every
+  finite bar at 0.5 viewBox units, so a series with real zeros — a 12-month count where most months are zero — drew a
+  row of sub-pixel hairlines that read as a dot-leader at word size and claimed "small nonzero" about exact zeros. Bar
+  length encodes magnitude, and zero magnitude is zero length: the slot keeps its place on the pitch and stays empty.
+  The 0.5 floor still applies to every nonzero value, so a count too small to resolve keeps its minimum mark rather than
+  vanishing.
+
+  This brings `SparkBar` in line with `MiniBar`, `PairedBars` and `Funnel`, which already exempted zero from their
+  floors. `Waveform` had the same defect in a different place: its `bars` carried an honest `height: 0` for a silent
+  bucket while the emitted path floored it to a 0.4-unit tick, so silence read as a dotted rule. Silence now contributes
+  no subpath, which also shortens `d` on sparse audio.
+
+  Zero and no-data stay distinct where it counts. A `null` still occupies no slot, the generated summary counts a zero
+  in the range and skips a gap, and the interactive readout reads a zero as `0` where it reads a gap as "no data" — so
+  hosts no longer have to pass `null` for a known zero to get a readable chart. In `winloss` mode a `0` is still a tie
+  and keeps its dash on the mid-line, because there the sign is a state rather than a magnitude.
+
+  `SparkBar`'s bar-mode plot floor sitting flush with the viewBox bottom is now documented and pinned by a test. It has
+  always been deliberate — the zero bottom padding is what stands the bars on the text baseline inline — but nothing
+  asserted it, and hosts drawing their own rule need to know it lands on the bar feet.
+
+### Patch Changes
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Fix the `draw` entrance so a line chart reveals under one front.
+
+  The entrance now sweeps a single clip window across the chart in shared view-box units. Three things were wrong
+  before, and every chart in the `draw` family showed at least one of them:
+
+  - Only the primary `data`/`accent` path was in the story act. A companion series, a ghost, an area fill and a bare
+    `<line>` were treated as stage ink, so they faded in whole at t=0 and sat there finished while the primary was still
+    drawing — a dual sparkline showed its comparison line before its own.
+  - `stroke-dasharray` is measured along one subpath and restarts on the next, so any path with more than one — a series
+    with gaps, a worm split into two coloured halves, a staff of rules, a strip of small multiples — spawned a separate
+    front per subpath, all at once, each finishing at its own rate.
+  - A riding dot's pop was normalized against the other dots' extent, so the leftmost one always popped at t=0 instead
+    of when the front reached it.
+
+  Rings, spokes and trajectories that double back in x are not drawn along x, so they keep the true stroke reveal:
+  `progress-ring`, `micro-donut`, `star-spoke`, `phase-trace` and `constellation` pass the new `trace` entrance option.
+
+  A connector's destination now waits for the connector, so `dumbbell` reads a row in the order its data does: the
+  "before" ring lands, its bar grows across, then the "after" dot arrives where the change ended. Both endpoints were
+  story marks, so they popped together and the bar materialized between two dots already in place. `pareto-strip` and
+  `music-staff` pick up the same per-row timing — their labels ride the wave their own mark does instead of queueing at
+  one barrier.
+
+  `grade-profile`'s ridge draws across the terrain once it has risen, the way `pareto-strip`'s cumulative curve already
+  did. It is data, not context, and the opening stage fade put the whole profile on screen before any of the ground
+  under it existed.
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Internal: the inline seat now reads the plot box from geometry
+  everywhere, instead of components spelling the padding out again as a literal. No rendered output changes — every seat
+  resolves to the number it already resolved to — but the two copies can no longer drift apart.
+
+  `CitySkyline` was the worst case: both entries computed the ground line themselves, and the interactive one used `2`
+  where the static one used `PAD`, so moving the pad would have shifted the buildings and left the focus rings behind.
+  That band is now one exported function both entries call. `BurnChart`, `CyclePlot` and `QuantileDots` re-derived
+  `height - geo.pad` for the seat and again for the value scale; they export `y0`/`y1` now. `SegmentedBar` and
+  `PartitionStrip` each carried their inset in two places. Nine charts spelled `height - 2` in their no-data branch,
+  duplicating a `pad = opts.pad ?? 2` default that lives in the geometry; that default is exported and shared now.
+
+  A source guard (`src/test/seat-source-of-truth.test.ts`) fails any `seat={{...}}` that insets the box with a bare
+  numeric literal, so the next one is caught in CI rather than by a consumer whose divider no longer lines up.
+
 ## 0.13.0
 
 ### Minor Changes

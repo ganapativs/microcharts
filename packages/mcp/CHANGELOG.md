@@ -1,5 +1,25 @@
 # @microcharts/mcp
 
+## 0.1.11
+
+### Patch Changes
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Regenerate the embedded catalog for `SparkBar`'s new `labels` prop.
+
+- [#109](https://github.com/ganapativs/microcharts/pull/109)
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-embeds the library stylesheet and chart catalog after the
+  active-state theming channel landed, so the served assets carry the `--mc-active-*` and `--mc-rest-opacity` rules.
+- Updated dependencies
+  [[`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6),
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6),
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6),
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6),
+  [`bd8632c`](https://github.com/ganapativs/microcharts/commit/bd8632ca9c30a69305e01aa4674803de7c2b4af6)]:
+  - @microcharts/react@0.14.0
+
 ## 0.1.10
 
 ### Patch Changes
