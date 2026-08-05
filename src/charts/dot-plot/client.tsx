@@ -175,7 +175,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
         cy={row.y}
         r={3.25}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

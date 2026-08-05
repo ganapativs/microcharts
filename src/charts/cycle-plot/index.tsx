@@ -151,7 +151,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
   // Threshold/TargetZone y = data values on the shared value scale.
   const ann = resolveAnnotations(children, {
     x: (i) => geo.slots[Math.round(i)]?.center.x ?? NaN,
-    y: scaleLinear(geo.domain, [height - geo.pad, geo.pad]),
+    y: scaleLinear(geo.domain, [geo.y1, geo.y0]),
     width,
     height,
     fontSize: annotationFontSize(height),
@@ -167,7 +167,7 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
       // Spine and slot polylines are traces over one fitted value domain, so the
       // plot's bottom edge is the floor they stand on. `geo.pad` keeps the seat
       // tied to the scale's own inset rather than a number copied out of it.
-      seat={{ mode: "floor", bottom: height - geo.pad }}
+      seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
       style={style}
     >

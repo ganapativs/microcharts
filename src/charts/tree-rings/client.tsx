@@ -2,7 +2,7 @@
 // Interactive <TreeRings>. useActivePicker owns interaction: one pointer
 // listener + radial lookup (distance from centre → ring index). ←/→ (and ↑/↓)
 // step inner→outer, click / Enter / Space selects (onSelect).
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
   named,
@@ -161,7 +161,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         cy={geo.center.cy}
         r={(rg.rInner + rg.rOuter) / 2}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         // geometric, not a role: this literal IS the ring's own thickness
         // (the data-encoded channel), so the focus halo matches its width exactly.
         // Inline style, not the presentation attribute: the `data-mc-w` pin marker
@@ -171,7 +171,17 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         // viewBox geometry, so pinning it to screen pixels made the halo stop
         // covering its ring the moment the chart was rendered at anything other
         // than 1:1. The width roles the sibling dials use are not geometry.
-        style={{ strokeWidth: Math.max(1, rg.rOuter - rg.rInner) }}
+        //
+        // The overlay wash is off here, and this is the one chart where that is
+        // structural rather than taste: the halo is a CIRCLE whose stroke spans
+        // one ring, so filling it paints the entire disc and buries every inner
+        // ring under it. The outline is the whole treatment.
+        style={
+          {
+            strokeWidth: Math.max(1, rg.rOuter - rg.rInner),
+            "--mc-active-fill-opacity": 0,
+          } as CSSProperties
+        }
         strokeOpacity={pinned ? 0.55 : 0.3}
         data-mc-w={pinned ? "tick" : undefined}
       />

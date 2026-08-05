@@ -16,8 +16,10 @@ import {
   useActivePicker,
   wrap,
   crosshairReadoutStyle,
+  type LabeledSeriesProps,
   type PickerProps,
 } from "../../shared/interactive.js";
+import { announceNamed, chipNamed, type NamedStrings } from "../../core/strings-named.js";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, labelMetrics, sparkBarGeometry } from "./geometry.js";
 import { SparkBar as StaticSparkBar, type SparkBarProps } from "./index.js";
 
@@ -29,11 +31,14 @@ const BAR_SELECTOR =
 // Point announcement uses the shared series template + the slot `pointEmpty`
 // wording (a non-finite bar is an empty slot, not a zero). One default object so
 // the announcement stays byte-identical to `describeSeries` unless overridden.
-const DEFAULT_SERIES_STRINGS: SeriesStrings & SlotStrings = { ...EN_SERIES, ...EN_SLOTS };
+const DEFAULT_SERIES_STRINGS: SeriesStrings & SlotStrings & Partial<NamedStrings> = {
+  ...EN_SERIES,
+  ...EN_SLOTS,
+};
 
-export interface InteractiveSparkBarProps extends SparkBarProps, PickerProps {
+export interface InteractiveSparkBarProps extends SparkBarProps, PickerProps, LabeledSeriesProps {
   /** Localized announcement templates; defaults to the English series strings. */
-  strings?: SeriesStrings & SlotStrings;
+  strings?: SeriesStrings & SlotStrings & Partial<NamedStrings>;
   /**
    * Opt-in entrance motion (default `false`): the bars rise from the baseline
    * when the chart first mounts client-side. Inert on the server and on
@@ -60,6 +65,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     strings = DEFAULT_SERIES_STRINGS,
     animate = false,
     readout = true,
+    labels,
     className,
     style,
     onActive,
@@ -136,9 +142,10 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     (i: number) => ({
       index: i,
       value: isFiniteValue(data[i]) ? (data[i] as number) : null,
+      label: labels?.[i],
       formatted: isFiniteValue(data[i]) ? fmt(data[i] as number) : undefined,
     }),
-    [data, fmt],
+    [data, fmt, labels],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -161,7 +168,9 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
     const bar = barAt.get(i);
     if (!bar) return null;
     // focus / pinned outline over the bar — the static keeps the bar's own
-    // valence color; this reads as "measuring", not a recolor.
+    // valence color; this reads as "measuring", not a recolor. `data-mc-active`
+    // hands the paint to styles.css: the ring alone is invisible on the endpoint
+    // bar, which is itself accent-inked, so the token block adds the on-fill wash.
     return (
       <rect
         x={bar.x}
@@ -169,7 +178,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         width={bar.width}
         height={bar.height}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
         shapeRendering="crispEdges"
@@ -182,12 +191,17 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
   const shownValue = shownBar && isFiniteValue(shownBar.value) ? shownBar.value : null;
   // `shown` is a DATA index (bars are gap-compacted, so `stops.length` would
   // undercount) — total is `data.length` and `shown + 1` its 1-based position.
+  const name = labels?.[shown ?? -1];
   const announced =
     shown === null
       ? ""
-      : shownValue !== null
-        ? strings.point(shown + 1, data.length, fmt(shownValue))
-        : strings.pointEmpty(shown + 1, data.length);
+      : announceNamed(
+          shownValue !== null
+            ? strings.point(shown + 1, data.length, fmt(shownValue))
+            : strings.pointEmpty(shown + 1, data.length),
+          name,
+          strings,
+        );
 
   return (
     <span
@@ -221,7 +235,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
           className="mc-spark-readout"
           style={crosshairReadoutStyle(shownBar.x + shownBar.width / 2, width)}
         >
-          {fmt(shownValue)}
+          {chipNamed(fmt(shownValue), name, strings)}
         </span>
       ) : null}
     </span>

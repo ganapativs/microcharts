@@ -150,6 +150,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
         y1={0.5}
         y2={height - 0.5}
         data-mc-ink={pinned ? "accent" : "muted"}
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

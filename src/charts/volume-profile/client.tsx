@@ -166,7 +166,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         width={width - 1}
         height={b.height + 0.8}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeOpacity={0.6}
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

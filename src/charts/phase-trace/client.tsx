@@ -65,6 +65,9 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
     // The trajectory only. The quadrant grid shares the muted ink role (it needs
     // the forced-colors mapping) but it is chrome, so it never takes a beat.
     selector: 'path[data-mc-ink="muted"]:not([data-mc-w="hair"]), path[data-mc-ink="accent"]',
+    // A trajectory doubles back in x, so it is drawn along its own stroke in
+    // data order — a left→right front would uncover the return leg first.
+    trace: true,
     order: "index",
   });
 
@@ -167,7 +170,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             cy={pinned.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -178,7 +181,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             cy={pt.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"
           />

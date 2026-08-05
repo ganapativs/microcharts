@@ -65,12 +65,12 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // The worm is one line split into below-50 (muted) + above-50 (accent) paths;
-  // stagger 0 starts both draw fronts together so the single worm reads as one
-  // continuous trace, not two sequential strokes.
+  // The worm is one line split into below-50 (muted) + above-50 (accent) paths,
+  // each of which carries every lead change as its own subpath. The shared
+  // front crosses both under one x, so the worm reads as one continuous trace —
+  // starting them together (the old fix) still spawned a stroke per subpath.
   useEntrance(hostRef, "draw", animate, {
     selector: 'path[data-mc-ink="muted"], path[data-mc-ink="accent"]',
-    stagger: 0,
   });
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
@@ -152,6 +152,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         x2={0}
         y2={height}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         strokeDasharray="1.5 1.5"

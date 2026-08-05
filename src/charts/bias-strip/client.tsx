@@ -149,7 +149,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
         cy={d.y}
         r={(d.outside ? outlierRad : rad) + 1.25}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

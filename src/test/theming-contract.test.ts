@@ -277,6 +277,89 @@ describe("charts read the density-scaled stroke token", () => {
   });
 });
 
+describe("the interaction overlay is a channel, not a hardcode", () => {
+  // ~70 client entries drew their focus/selection mark as a literal
+  // `stroke="var(--mc-accent)"`. That put the entire hover state outside the
+  // `--mc-*` contract: a consumer could change its COLOUR only by moving the
+  // accent token, which also repaints endpoint dots and emphasis bars, and could
+  // change its SHAPE only by scoping CSS onto `data-mc-*` — package internals,
+  // from outside the package. `data-mc-active` + four tokens replaced it.
+  //
+  // Two charts are excused, both because their mark is filled rather than
+  // stroked and the block below would paint over what they encode.
+  const EXEMPT = new Set([
+    // The active sector is a FILLED accent wedge, not an outline — it repaints
+    // the arc it names. Giving it the marker would add a stroke it never had.
+    "polar-clock",
+  ]);
+
+  it("no client entry paints the overlay with a literal accent", () => {
+    const offenders = chartSources()
+      .filter((f) => f.path.endsWith("client.tsx"))
+      .filter((f) => /stroke[=:]\s*"var\(--mc-accent\)"/.test(f.text))
+      .map((f) => f.path);
+    expect(offenders).toEqual([]);
+  });
+
+  it("every chart that draws an overlay is on the channel", () => {
+    // `data-mc-w` is the overlay's own width role — in a client entry, nothing
+    // else carries it — so it is the cheap test for "this chart draws one".
+    const offenders = chartSources()
+      .filter((f) => f.path.endsWith("client.tsx"))
+      .filter((f) => f.text.includes("data-mc-w") && !f.text.includes("data-mc-active"))
+      .map((f) => f.path)
+      .filter((p) => !EXEMPT.has(p.split("/")[2]!));
+    expect(offenders).toEqual([]);
+    // …and the allowlist cannot go stale: an excused chart must still be one.
+    for (const name of EXEMPT) {
+      const client = chartSources().find((f) => f.path === `src/charts/${name}/client.tsx`);
+      expect(client, `${name} is excused but no longer exists`).toBeDefined();
+      expect(client!.text, `${name} joined the channel — drop the exemption`).not.toContain(
+        "data-mc-active",
+      );
+    }
+  });
+
+  it("styles.css resolves all four tokens with their documented defaults", () => {
+    const charts = css.slice(css.indexOf("@layer microcharts.charts"));
+    expect(charts).toContain("stroke: var(--mc-active-stroke, var(--mc-accent))");
+    expect(charts).toContain("fill: var(--mc-active-fill, var(--mc-on-fill))");
+    expect(charts).toContain("fill-opacity: var(--mc-active-fill-opacity, 0.2)");
+    expect(charts).toContain("opacity: var(--mc-rest-opacity, 1)");
+    // The wash is what makes the ring visible on an accent-inked mark, and it
+    // may only reach CLOSED primitives — filling an open strand (EnsembleGhosts'
+    // member, MicroDonut's arc) paints a wedge, the same split the ink roles make.
+    expect(charts).toMatch(/:is\(rect, circle, ellipse, polygon\)\[data-mc-active\]/);
+  });
+
+  it("forced-colors collapses the treatment back to a system outline", () => {
+    // A host's themed ink was chosen against ITS palette, not the user's forced
+    // one, and an opacity dim has nothing to say in a two-ink mode. Both have to
+    // be overridden here or High Contrast Mode ships the host's brand hex.
+    const fc = css.slice(css.indexOf("@media (forced-colors: active)"));
+    expect(fc).toMatch(/\[data-mc-active\]\)\s*\{\s*stroke:\s*Highlight/);
+    expect(fc).toMatch(/--mc-rest-opacity:\s*1/);
+    // The wash needs no rule of its own: every overlay keeps a literal
+    // `fill="none"`, which the blanket hollow-mark rule restores.
+    const hollow = fc.indexOf(':where(.mc-root [fill="none"])');
+    expect(hollow).toBeGreaterThan(-1);
+  });
+
+  it("every marked overlay still declares itself hollow", () => {
+    // …which is what the rule above relies on. A marked mark that dropped
+    // `fill="none"` would keep the host's wash in High Contrast Mode.
+    const offenders: string[] = [];
+    for (const { path, text } of chartSources()) {
+      if (!path.endsWith("client.tsx")) continue;
+      for (const el of jsxElements(text, /<(rect|circle|ellipse|polygon)\b/g)) {
+        if (!el.source.includes("data-mc-active")) continue;
+        if (!el.source.includes('fill="none"')) offenders.push(`${path}:${el.line} <${el.tag}>`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe("animated marks stay inside the viewBox", () => {
   it("the StatusDot halo's end scale keeps it in the box", () => {
     // Containment is a hard rule and a TRANSFORM does not escape it: `.mc-root`

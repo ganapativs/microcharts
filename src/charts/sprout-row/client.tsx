@@ -173,7 +173,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         rx={round2((b.x1 - b.x0) / 2 + RING_PAD)}
         ry={round2((b.y1 - b.y0) / 2 + RING_PAD)}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

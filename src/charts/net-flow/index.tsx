@@ -11,6 +11,7 @@ import { EN_NET_FLOW, type NetFlowStrings } from "../../core/strings-net-flow.js
 import { resolveSummary } from "../../core/summary.js";
 import { chartSide } from "../../core/types.js";
 import {
+  NET_FLOW_PAD,
   netFlowGeometry,
   type NetFlowGeometry,
   type NetFlowMode,
@@ -133,7 +134,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
         title={title}
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
-        seat={{ mode: "center", top: 2, bottom: height - 2 }}
+        seat={{ mode: "center", top: NET_FLOW_PAD, bottom: height - NET_FLOW_PAD }}
         className={cls}
         style={style}
       >

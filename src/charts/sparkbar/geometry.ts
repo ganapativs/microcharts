@@ -191,7 +191,14 @@ export function sparkBarGeometry(
     // `height="38"` bar in a 20-unit frame, straight across the text around it.
     // Truncating at the frame reads as "off the top"; overflow reads as a bug.
     const top = clamp(yScale(v), y0, y1);
-    const h = Math.max(0.5, Math.abs(top - baselineY));
+    // A bar's length encodes |value − 0|, so an exact zero has zero length: it
+    // holds its slot on the pitch and paints nothing. The 0.5 below is a
+    // VISIBILITY floor for magnitudes too small to resolve, never a floor on
+    // zero — applied to a true zero it drew a sub-pixel hairline, so a series
+    // with many zeros read as a dot-leader at word size and claimed "small
+    // nonzero" about exact zeros. Zero and no-data still part company: a null
+    // emits no rect at all, and the readout separates them via `pointEmpty`.
+    const h = v === 0 ? 0 : Math.max(0.5, Math.abs(top - baselineY));
     // A ~zero bar sitting on a floor baseline still pushes its min-height below
     // y1, so nudge it back inside rather than overflow.
     let y = Math.min(top, baselineY);

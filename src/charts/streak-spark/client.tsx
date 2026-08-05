@@ -153,7 +153,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         width={run.width}
         height={run.height}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
         shapeRendering="crispEdges"

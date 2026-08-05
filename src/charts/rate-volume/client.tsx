@@ -186,7 +186,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           y1={0.5}
           x2={0}
           y2={height - 0.5}
-          stroke="var(--mc-accent)"
+          data-mc-active=""
           data-mc-ui=""
           data-mc-w={w}
           strokeDasharray="1.5 2"
@@ -199,7 +199,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
             cy={vp.y}
             r={2.6}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w={w}
             vectorEffect="non-scaling-stroke"
           />

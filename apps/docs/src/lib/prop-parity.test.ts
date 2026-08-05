@@ -43,6 +43,29 @@ function interfaceProps(file: string): string[] {
   return [...body[1]!.matchAll(/^\s*(?:readonly\s+)?([A-Za-z_]\w*)\??\s*:/gm)].map((m) => m[1]!);
 }
 
+/**
+ * Shared interactive MIXINS a client entry opts into by name, and the props each
+ * one brings. `interfaceProps` reads only an interface's own body, so a prop
+ * arriving this way is public and invisible to every check below — which is how
+ * `labels` shipped on SparkBar documented nowhere. `PickerProps` is absent on
+ * purpose: it has its own guard further down, and its props are shared grammar
+ * that a per-chart table must NOT re-document.
+ */
+const MIXINS: Record<string, readonly string[]> = { LabeledSeriesProps: ["labels"] };
+
+/** Own-body props of a chart's client entry, plus whatever its mixins add. */
+function clientProps(slug: string): string[] {
+  const file = resolve(chartsDir, slug, "client.tsx");
+  const own = interfaceProps(file);
+  if (!existsSync(file)) return own;
+  const src = readFileSync(file, "utf8");
+  const heritage = src.match(/interface \w*Props\b([^{]*)\{/)?.[1] ?? "";
+  const mixed = Object.entries(MIXINS)
+    .filter(([name]) => new RegExp(`\\b${name}\\b`).test(heritage))
+    .flatMap(([, props]) => props);
+  return [...own, ...mixed];
+}
+
 // Everything a per-chart table is excused from must be documented SOMEWHERE —
 // the shared grammar / layout / i18n lists render into quickstart, the PropTable
 // footer and catalog.json's `sharedProps`. The only legitimate extras are the
@@ -85,7 +108,7 @@ describe("chart prop tables cover the component's public props", () => {
       it(`${chart.slug} (interactive)`, () => {
         // client.tsx extends the static props, so its interface body holds only
         // the interactive-only additions — each must be documented or shared.
-        const missing = interfaceProps(resolve(chartsDir, chart.slug, "client.tsx")).filter(
+        const missing = clientProps(chart.slug).filter(
           (p) =>
             !SHARED_INTERACTIVE.has(p) &&
             !documented.has(p) &&
@@ -109,9 +132,9 @@ describe("interactive-flagged props are interactive-only", () => {
     if (!flagged.length) continue;
     it(`${chart.slug}`, () => {
       const staticProps = new Set(interfaceProps(resolve(chartsDir, chart.slug, "index.tsx")));
-      const clientProps = new Set(interfaceProps(resolve(chartsDir, chart.slug, "client.tsx")));
+      const onClient = new Set(clientProps(chart.slug));
       const onStatic = flagged.filter((p) => staticProps.has(p));
-      const notOnClient = flagged.filter((p) => !clientProps.has(p));
+      const notOnClient = flagged.filter((p) => !onClient.has(p));
       expect(onStatic, `${chart.slug}: flagged interactive but on static: ${onStatic}`).toEqual([]);
       expect(
         notOnClient,

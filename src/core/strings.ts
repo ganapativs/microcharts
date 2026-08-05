@@ -88,6 +88,7 @@ import { EN_QUEUE_DEPTH } from "./strings-queue-depth.js";
 import { EN_SPREAD_BAND } from "./strings-spread-band.js";
 import { EN_BIAS_STRIP } from "./strings-bias-strip.js";
 import { EN_PERCENTILE_TRACE } from "./strings-percentile-trace.js";
+import { EN_NAMED } from "./strings-named.js";
 
 export const EN: SummaryStrings = {
   ...EN_SERIES,
@@ -119,6 +120,7 @@ export const EN: SummaryStrings = {
   ...EN_CATEGORY,
   ...EN_DIST,
   ...EN_SLOTS,
+  ...EN_NAMED,
   ...EN_PAIRED,
   ...EN_SCATTER,
   ...EN_COMPOSITION,

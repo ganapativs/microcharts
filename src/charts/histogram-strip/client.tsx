@@ -137,7 +137,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
         width={b.w + 1}
         height={height + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

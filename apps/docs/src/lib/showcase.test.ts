@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CHARTS } from "@/lib/charts/registry";
-import { SHOWCASE } from "@/lib/showcase";
+import { coveredCharts, SHOWCASE } from "@/lib/showcase";
 
 /**
  * What the showcase copy is allowed to say.
@@ -44,6 +44,28 @@ function typesNamedIn(text: string): string[] {
     n.forms.some((f) => new RegExp(`(^|[^a-z-])${f}([^a-z-]|$)`).test(hay)),
   ).map((n) => n.slug);
 }
+
+describe("the seven apps really do cover the catalog", () => {
+  // The homepage and /examples both claim the apps "between them use every one
+  // of the N chart types" — but each `charts` list is hand-transcribed from an
+  // app's imports, so a chart added to the catalog (or a slug mistyped in a
+  // list) would quietly turn that sentence into a lie. This pins the union to
+  // the registry in both directions.
+  const stable = new Set(CHARTS.filter((c) => c.status === "stable").map((c) => c.slug));
+
+  it("lists only real, stable chart slugs", () => {
+    for (const app of SHOWCASE) {
+      const unknown = app.charts.filter((slug) => !stable.has(slug));
+      expect(unknown, `${app.slug} lists slugs the registry does not have as stable`).toEqual([]);
+    }
+  });
+
+  it("covers every stable chart type between them", () => {
+    const covered = coveredCharts();
+    const missing = [...stable].filter((slug) => !covered.has(slug)).sort();
+    expect(missing, "stable chart types no example app renders").toEqual([]);
+  });
+});
 
 describe("showcase copy says only what the surface it lands on can back", () => {
   it("names no chart type in any blurb", () => {

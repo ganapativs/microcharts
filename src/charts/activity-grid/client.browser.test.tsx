@@ -46,7 +46,7 @@ describe("interactive <ActivityGrid>", () => {
     const fig = await mount(<ActivityGrid data={DATA} title="Commits" />);
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(fig.querySelector("rect[data-mc-active]")).not.toBeNull();
   });
 
   // Regression: the composed static SVG must FILL the wrapper. If a consumer
@@ -76,7 +76,7 @@ describe("interactive <ActivityGrid>", () => {
     const cy = r.top + r.height / 2;
     fig.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: cx, clientY: cy }));
     const ring = await vi.waitFor(() => {
-      const el = fig.querySelector('rect[stroke="var(--mc-accent)"]');
+      const el = fig.querySelector("rect[data-mc-active]");
       if (!el) throw new Error("no ring");
       return el;
     });

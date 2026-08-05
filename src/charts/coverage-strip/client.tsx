@@ -161,7 +161,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         height={c.h + 1.5}
         rx={c.rx + 0.75}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

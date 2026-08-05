@@ -36,6 +36,10 @@ export interface CycleGeometry {
   domain: readonly [number, number];
   /** Vertical inset (viewBox units) the value scale is padded by. */
   pad: number;
+  /** Top edge of the plot box. */
+  y0: number;
+  /** Bottom edge of the plot box — the floor the seat stands on. */
+  y1: number;
 }
 
 // Saturate the slot count. `period` is a caller prop; a non-physical value
@@ -177,5 +181,7 @@ export function cycleGeometry(opts: {
     degenerate,
     domain: dom,
     pad,
+    y0: pad,
+    y1: round2(height - pad),
   };
 }

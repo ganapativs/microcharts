@@ -175,7 +175,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         width={s.width + 1}
         height={rowH + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

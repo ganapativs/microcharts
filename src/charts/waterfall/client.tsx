@@ -148,7 +148,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         width={col.w + 1}
         height={height + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         // Deliberately NOT `data-mc-ui`: this box names one discrete column, and
         // a box in transit encloses none. It is placed by `x`/`width` rather
         // than a transform, which is what makes it snap — see the scrub-response

@@ -200,7 +200,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         y1={0}
         x2={0}
         y2={height}
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-ui=""
         // Pin is "support", not the usual "tick": the static break markers are
         // already line[data-mc-w="tick"], so tick can't identify the pin here.

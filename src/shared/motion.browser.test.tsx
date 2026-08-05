@@ -3,10 +3,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
 import { Sparkline } from "../charts/sparkline/client.js";
+import { DualSparkline } from "../charts/dual-sparkline/client.js";
+import { Dumbbell } from "../charts/dumbbell/client.js";
+import { ProgressRing } from "../charts/progress-ring/client.js";
 import { Thermometer } from "../charts/thermometer/client.js";
 import "./motion-engine.js"; // consumer opt-in: import "@microcharts/react/motion"
 
 const D = [4, 6, 5, 9, 7, 8, 11, 9, 13, 12];
+const D2 = [3, 4, 4, 6, 6, 7, 8, 9, 10, 11];
 
 const svgOf = (host: HTMLElement): SVGSVGElement => host.querySelector("svg")!;
 
@@ -149,6 +153,103 @@ describe("entrance motion (opt-in `animate`)", () => {
     const labelStart = Number(label!.effect!.getTiming().delay ?? 0);
     expect(labelStart).toBeGreaterThan(drawStart + (drawEnd - drawStart) * 0.8);
     expect(labelStart).toBeLessThanOrEqual(drawEnd);
+    await settled(svg);
+  });
+
+  // A `draw` is ONE front crossing the chart, so every strand it covers has to
+  // be in the story act. The default selector used to match only the primary
+  // `data`/`accent` path, which left a companion series as stage ink: it faded
+  // in WHOLE at t=0 and sat there finished while the primary was still drawing.
+  it("draw: every strand rides the same front, none of them appears early", async () => {
+    const screen = await render(
+      <DualSparkline data={D} compare={D2} title="Rev vs plan" animate />,
+    );
+    const svg = svgOf(screen.getByRole("img").element() as HTMLElement);
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    const anims = svg.getAnimations({ subtree: true });
+    const strands = [...svg.querySelectorAll<SVGPathElement>("path")];
+    expect(strands.length).toBeGreaterThan(1);
+    const timings = strands.map((el) => {
+      const a = anims.find((x) => (x.effect as KeyframeEffect | null)?.target === el);
+      expect(a, `strand ${el.getAttribute("data-mc-ink")} is not in the front`).toBeDefined();
+      const kf = (a!.effect as KeyframeEffect).getKeyframes();
+      // The front is a clip window, never stroke-dashoffset: a dash pattern
+      // restarts on every subpath, so a gap in the data (or a worm split into
+      // two coloured halves) would spawn one front per piece.
+      expect(kf.some((k) => typeof k["clipPath"] === "string")).toBe(true);
+      return a!.effect!.getTiming();
+    });
+    // One front means one shared timing — no strand leads or trails another.
+    for (const t of timings) {
+      expect(t.delay).toBe(timings[0]!.delay);
+      expect(t.duration).toBe(timings[0]!.duration);
+    }
+    await settled(svg);
+  });
+
+  // …but a chart whose mark is not drawn along x keeps the true stroke reveal:
+  // a left→right front would open a ring from both sides at once.
+  it("draw + trace: a ring still draws along its own arc", async () => {
+    const screen = await render(<ProgressRing value={0.62} title="Done" animate />);
+    const svg = svgOf(screen.getByRole("img").element() as HTMLElement);
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    const arc = svg.querySelector<SVGPathElement>('path[data-mc-ink="accent"]')!;
+    const a = svg
+      .getAnimations({ subtree: true })
+      .find((x) => (x.effect as KeyframeEffect | null)?.target === arc);
+    const kf = (a!.effect as KeyframeEffect).getKeyframes();
+    expect(kf.some((k) => typeof k["strokeDashoffset"] === "string")).toBe(true);
+    await settled(svg);
+  });
+
+  // A dumbbell row is a span, and its entrance tells it in the order the data
+  // reads: the "before" ring lands, its bar grows across, then the "after" dot
+  // arrives where the change ended. Both endpoints used to be story marks, so
+  // they popped together and the bar then materialized between two dots that
+  // were already in place.
+  it("dumbbell: ring, then the bar across, then the dot it arrives at", async () => {
+    const screen = await render(
+      <Dumbbell
+        data={[
+          { label: "Paris", from: 12, to: 28 },
+          { label: "Oslo", from: 20, to: 41 },
+          { label: "Lima", from: 8, to: 33 },
+        ]}
+        title="Change"
+        animate
+      />,
+    );
+    const svg = svgOf(screen.getByRole("img").element() as HTMLElement);
+    await vi.waitFor(() => {
+      expect(svg.getAnimations({ subtree: true }).length).toBeGreaterThan(0);
+    });
+    const anims = svg.getAnimations({ subtree: true });
+    const timingOf = (el: Element | null | undefined): { delay: number; end: number } => {
+      const a = anims.find((x) => (x.effect as KeyframeEffect | null)?.target === el);
+      expect(a, "mark has no entrance").toBeDefined();
+      const t = a!.effect!.getTiming();
+      const delay = Number(t.delay ?? 0);
+      return { delay, end: delay + Number(t.duration ?? 0) };
+    };
+    const rows = [...svg.querySelectorAll("g")].filter((g) => g.querySelector("line"));
+    expect(rows.length).toBe(3);
+    let previousRow = -1;
+    for (const row of rows) {
+      const ring = timingOf(row.querySelector('circle[data-mc-w="support"]'));
+      const bar = timingOf(row.querySelector("line"));
+      const dot = timingOf(row.querySelector('circle[data-mc-ink="point"]'));
+      // Within the row: the ring leads, the bar follows it, the dot lands as the
+      // bar arrives — never before it.
+      expect(ring.delay).toBeLessThan(bar.delay);
+      expect(dot.delay).toBeGreaterThanOrEqual(bar.end);
+      // …and rows still cascade top→down rather than firing at one barrier.
+      expect(ring.delay).toBeGreaterThan(previousRow);
+      previousRow = ring.delay;
+    }
     await settled(svg);
   });
 

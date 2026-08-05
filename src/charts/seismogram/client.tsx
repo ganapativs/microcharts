@@ -197,7 +197,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
             y1={0}
             x2={0}
             y2={height}
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"

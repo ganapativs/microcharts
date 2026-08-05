@@ -43,6 +43,9 @@ every chart describes itself in words, so a chart an LLM streams into a chat rep
   when the numbers do. → [Accessibility](https://microcharts.dev/docs/accessibility)
 - **Tiny.** **~2–7 kB interactive · ~1–4 kB static** gzip per chart, budget-gated in CI. Every type has one documented,
   honest encoding channel and a stated precision.
+- **Motion, opt-in.** Interactive charts draw on with `animate` plus one `import "@microcharts/react/motion"`, and glide
+  continuous marks when data updates. Entrances respect `prefers-reduced-motion` and never replay over server-rendered
+  HTML. → [Motion](https://microcharts.dev/docs/motion)
 
 ## Install
 

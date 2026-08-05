@@ -14,7 +14,7 @@
     },
     "sparkbar": {
       "static": "3.43 kB",
-      "interactive": "5.99 kB"
+      "interactive": "6.09 kB"
     },
     "delta": {
       "static": "1.18 kB",
@@ -91,7 +91,7 @@
       "static": "2.23 kB"
     },
     "motion": {
-      "static": "3.25 kB"
+      "static": "3.27 kB"
     },
     "segmented-bar": {
       "static": "2.74 kB",

@@ -19,6 +19,29 @@ interface SkylineBuilding {
   index: number;
 }
 
+export const PAD = 2;
+
+/**
+ * The vertical band: where the ground line sits and how tall a full building may
+ * be. Geometry owns this because both entries need the same numbers — the static
+ * one to seat the chart on the text baseline, the interactive one to place its
+ * overlays — and they used to compute it twice, the client entry with `2` where
+ * the component used `PAD`. A label reserves its own room: `label="value"` above
+ * the roofline, `labels` below the ground.
+ */
+export function skylineBands(
+  height: number,
+  fontSize: number,
+  label: string | undefined,
+  labels: boolean | undefined,
+): { groundY: number; maxH: number } {
+  // Labels sit BELOW the ground line with a fixed ~4px of air — hugging the
+  // baseline made them read as part of the skyline. A constant gap (not
+  // em-scaled) keeps the buildings tall even when the label font is large.
+  const groundY = height - (labels ? fontSize + 4 : PAD);
+  return { groundY, maxH: groundY - (label === "value" ? fontSize + 2 : PAD) };
+}
+
 export interface CitySkylineGeometry {
   buildings: SkylineBuilding[];
   ground: { x1: number; x2: number; y: number };

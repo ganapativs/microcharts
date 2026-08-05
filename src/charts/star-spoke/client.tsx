@@ -52,7 +52,10 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "draw", animate);
+  // `trace`: the spokes radiate from the center, so each is drawn along its own
+  // stroke and the glyph blooms outward. A left→right front would cross the
+  // star instead of growing it.
+  useEntrance(hostRef, "draw", animate, { trace: true });
 
   // Same two resolvers as the static entry, so a hostile `size`/`domain` can't
   // put the hit box, the focus mark and the readout on a different scale from
@@ -166,7 +169,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
           y1={s.y1}
           x2={s.x2}
           y2={s.y2}
-          stroke="var(--mc-accent)"
+          data-mc-active=""
           strokeLinecap="round"
           data-mc-w={pinned ? "tick" : "support"}
           vectorEffect="non-scaling-stroke"

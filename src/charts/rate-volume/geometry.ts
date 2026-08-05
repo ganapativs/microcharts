@@ -8,6 +8,11 @@ import { linePath, stepPath } from "../../core/path.js";
 import { clamp, extent, maxOf, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const RATE_VOLUME_PAD = 2;
+
 export interface RateVolumePoint {
   rate: number;
   volume: number;
@@ -64,7 +69,7 @@ export function rateVolumeGeometry(opts: {
   const n = data.length;
   if (n === 0) return null;
 
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? RATE_VOLUME_PAD;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;
   // 0.72·em/char over-estimates tabular digits + the wide "%" glyph

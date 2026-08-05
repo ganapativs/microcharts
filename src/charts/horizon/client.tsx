@@ -149,7 +149,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
             cy={geo.foldedY(selValue)}
             r={2.6}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />

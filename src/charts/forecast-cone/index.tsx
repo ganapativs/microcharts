@@ -9,7 +9,12 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_FORECAST, type ForecastStrings } from "../../core/strings-forecast.js";
-import { forecastConeGeometry, type ForecastConeGeometry, type ForecastInput } from "./geometry.js";
+import {
+  FORECAST_PAD,
+  forecastConeGeometry,
+  type ForecastConeGeometry,
+  type ForecastInput,
+} from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear, clamp } from "../../core/scale.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
@@ -106,7 +111,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         // Empty stands on the same padded floor a drawn cone would.
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - FORECAST_PAD }}
         className={cls}
         style={style}
       >
@@ -164,7 +169,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       // stands on the plot's padded floor like a sparkline (the same 2-unit
       // inset the annotation frame above uses). The cone's own edges are data
       // and the landing gutter only widens the viewBox; neither moves the seat.
-      seat={{ mode: "floor", bottom: height - 2 }}
+      seat={{ mode: "floor", bottom: height - FORECAST_PAD }}
       className={cls}
       style={rootStyle}
     >

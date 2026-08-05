@@ -188,7 +188,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
             x2={0}
             y1={0.5}
             y2={height - 0.5}
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-ui=""
             data-mc-w="support"
             vectorEffect="non-scaling-stroke"

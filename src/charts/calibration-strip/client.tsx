@@ -168,7 +168,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
             cy={pinned.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -194,7 +194,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
               cy={geo.points[active]!.y}
               r={2.4}
               fill="none"
-              stroke="var(--mc-accent)"
+              data-mc-active=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />

@@ -13,6 +13,11 @@ export const EDGE_SERIES: Record<string, readonly Value[]> = {
   empty: [],
   "single point": [5],
   "all equal": [4, 4, 4, 4, 4],
+  // Zeros are exact data, not absence — a chart may render them as no ink, but
+  // it must not crash, divide by a zero total, or route them through the
+  // no-data path. Interleaved catches the mixed case a real 12-month series has.
+  "all zero": [0, 0, 0, 0],
+  "zeros interleaved": [0, 5, 0, 8, 0, 2],
   "nulls interleaved": [3, null, 5, null, 8, 2],
   "all null": [null, null, null],
   "negative only": [-5, -2, -9, -1, -4],

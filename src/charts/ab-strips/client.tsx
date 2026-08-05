@@ -201,7 +201,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
         cy={e.row.y}
         r={2.6}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

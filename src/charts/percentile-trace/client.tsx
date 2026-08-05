@@ -194,7 +194,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
             cy={pinned.y}
             r={2.4}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"
           />
@@ -223,7 +223,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
               cy={p.y}
               r={2.4}
               fill="none"
-              stroke="var(--mc-accent)"
+              data-mc-active=""
               data-mc-w="support"
               vectorEffect="non-scaling-stroke"
             />

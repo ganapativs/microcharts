@@ -56,6 +56,22 @@ describe("waveformGeometry", () => {
     });
     expect(geo.peak).toBe(0);
     expect(geo.bars.every((b) => b.height === 0)).toBe(true);
+    // The PAINT has to agree with `bars`. It used to floor a silent bucket to a
+    // 0.4-unit tick, so a run of silence read as a dotted rule under bars that
+    // all reported zero.
+    expect(geo.path).toBe("");
+  });
+
+  it("silence contributes no subpath; sound still does", () => {
+    const geo = waveformGeometry({
+      data: [0, 0.8, 0, 0.4],
+      width: 40,
+      height: 24,
+      buckets: 4,
+      domain: null,
+      mirror: true,
+    });
+    expect(geo.path.match(/M/g)).toHaveLength(2);
   });
 
   test.prop([

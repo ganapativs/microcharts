@@ -37,6 +37,13 @@ a chart that fills its container — the viewBox keeps the aspect ratio.
 
 <Sizing chart="sparkbar" />
 
+### Where the plot floor sits
+
+In `bar` mode the bars stand on the bottom edge of the viewBox. There is no bottom padding, so a bar's foot and the box
+bottom are the same line. That is what seats the chart on the text baseline when it sits inline. Draw your own rule or
+divider _below_ the box rather than flush with it, or it covers the bar feet by a pixel or two. `winloss` mode insets
+its bottom edge instead, because a mid-line streak has no floor to stand on.
+
 ## Variants
 
 <LiveDemo label="bar (default)" code={`<SparkBar data={[4, 6, 2, 8, 5, 9]} />`}>
@@ -79,6 +86,38 @@ the English "8,600".
 An empty series renders no bars and an accessible name that says so, rather than a flat or invented baseline. A single
 value still renders as one zero-anchored bar, and `winloss` mode treats it the same way a longer streak would: a lone
 win, loss, or tie.
+
+<LiveDemo
+  label="zeros and gaps"
+  code={`// 0 is data and paints nothing; null is absence
+<SparkBar data={[4, 0, 6, null, 3, 0]} />`}
+>
+  <SparkBar data={[4, 0, 6, null, 3, 0]} title="Deploys per day" width={130} height={32} />
+</LiveDemo>
+
+A zero paints no bar. Bar length encodes magnitude, and zero magnitude is zero length, so the slot keeps its place on
+the pitch and stays empty. A period you have no reading for takes `null`, which occupies no slot at all. Pass the real
+zero rather than substituting `null` for it: the generated summary counts a zero in the range and skips a gap, and the
+interactive entry reads a zero as "0" where it reads a gap as "no data". In `winloss` mode a `0` is a tie instead — a
+state rather than a magnitude — so it keeps its dash on the mid-line.
+
+## Name the bars
+
+The interactive entry takes `labels`, indexed like `data`. The hover readout then names the period it shows instead of
+only its value, and the live region announces the name ahead of the position:
+
+```tsx
+import { SparkBar } from "@microcharts/react/sparkbar/interactive";
+
+<SparkBar data={mrr} labels={["Jun 2026", "Jul 2026", "Aug 2026"]} />;
+```
+
+The chip reads `Aug 2026 · 1.1K`, and the announcement reads "Aug 2026. Point 3 of 12: 1.1K." The name also arrives on
+`onActive` and `onSelect` as `datum.label`, so a host that renders its own readout gets it without a second lookup.
+
+A hole in the array, or an empty string, leaves that one bar on the positional wording. Both joins are localizable
+through the `named` and `namedChip` string templates. The static entry ignores `labels`: it has no readout to name, and
+the generated summary stays value-based.
 
 ## Four homes
 

@@ -24,7 +24,7 @@ describe("interactive <StreakSpark>", () => {
     await userEvent.keyboard("{Home}");
     await expect.poll(() => live.textContent).toBe("Run 1 of 3: 2 passing, record.");
     // active run gets an accent focus outline
-    expect(fig.querySelectorAll('rect[stroke="var(--mc-accent)"]').length).toBe(1);
+    expect(fig.querySelectorAll("rect[data-mc-active]").length).toBe(1);
     await userEvent.keyboard("{End}");
     await expect.poll(() => live.textContent).toBe("Run 3 of 3: 1 passing.");
     await userEvent.keyboard("{Escape}");

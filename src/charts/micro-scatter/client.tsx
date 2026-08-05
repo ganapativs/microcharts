@@ -170,7 +170,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
         cy={d.y}
         r={rad + 1.25}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

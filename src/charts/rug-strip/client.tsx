@@ -156,6 +156,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         x2={0}
         y2={height}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"
@@ -168,6 +169,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
         x2={width}
         y2={0}
         data-mc-ink="accent"
+        data-mc-active=""
         data-mc-ui=""
         data-mc-w={w}
         vectorEffect="non-scaling-stroke"

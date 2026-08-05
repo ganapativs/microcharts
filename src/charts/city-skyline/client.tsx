@@ -17,7 +17,7 @@ import {
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { citySkylineGeometry } from "./geometry.js";
+import { PAD, citySkylineGeometry, skylineBands } from "./geometry.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import {
   CitySkyline as StaticCitySkyline,
@@ -73,10 +73,9 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
   // instead of every building rising in lockstep.
   useEntrance(hostRef, "rise", animate, { selector: SKYLINE_SELECTOR, order: "x", window: 500 });
 
-  // Pads mirror the static EXACTLY (bottom = fontSize + 4, top = fontSize + 2
-  // when values are labelled) — a smaller pad here drew every building against
-  // a taller plot than the one rendered, so the rings sat off the roofs.
-  const groundY = height - (labels ? fontSize + 4 : 2);
+  // One band for both entries: a pad that differed here drew every building
+  // against a taller plot than the one rendered, so the rings sat off the roofs.
+  const { groundY, maxH } = skylineBands(height, fontSize, label, labels);
   const geo = useMemo(
     () =>
       citySkylineGeometry({
@@ -84,12 +83,12 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         bw,
         height,
         groundY,
-        maxH: groundY - (label === "value" ? fontSize + 2 : 2),
+        maxH,
         gap,
         domain,
-        pad: 2,
+        pad: PAD,
       }),
-    [data, bw, gap, domain, height, groundY, label, fontSize],
+    [data, bw, gap, domain, height, groundY, maxH],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // The lit fraction is a share of its own windows, so it takes `locale` but
@@ -158,7 +157,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
         width={bl.w + 2}
         height={bl.h + 2}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

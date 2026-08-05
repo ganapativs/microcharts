@@ -152,7 +152,7 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         y1={0.5}
         x2={statX[stop]}
         y2={height - 0.5}
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

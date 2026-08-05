@@ -144,7 +144,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         width={s.w + 1}
         height={geo.height + 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

@@ -39,7 +39,7 @@ const ring = (nt: { cx: number; cy: number; rx: number }, pinned: boolean): Reac
     cy={nt.cy}
     r={nt.rx + 1.5}
     fill="none"
-    stroke="var(--mc-accent)"
+    data-mc-active=""
     data-mc-w={pinned ? "tick" : "support"}
     vectorEffect="non-scaling-stroke"
   />

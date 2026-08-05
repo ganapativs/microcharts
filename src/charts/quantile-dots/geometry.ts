@@ -9,6 +9,11 @@ import { chartSide, round2 } from "../../core/types.js";
 
 export type ThresholdSide = "above" | "below";
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const QUANTILE_PAD = 2;
+
 export interface QuantileDotsGeometry {
   dots: { x: number; y: number; r: number; past: boolean }[];
   threshold: { x: number } | null;
@@ -27,6 +32,10 @@ export interface QuantileDotsGeometry {
   range: number;
   columns: number;
   pad: number;
+  /** Top edge of the plot box. */
+  y0: number;
+  /** Bottom edge of the plot box — the floor the seat stands on. */
+  y1: number;
   labelX: number;
   labelY: number;
   totalWidth: number;
@@ -79,7 +88,7 @@ export function quantileDotsGeometry(opts: {
   // width/height land as NaN coordinates inside a valid frame (see `chartSide`).
   const width = chartSide(opts.width);
   const height = chartSide(opts.height);
-  const pad = opts.pad ?? 2;
+  const pad = opts.pad ?? QUANTILE_PAD;
   const gutter = oddsGutter(opts.gutterCh ?? 0, opts.fontSize ?? 0);
   const side = opts.side ?? "above";
 
@@ -162,6 +171,8 @@ export function quantileDotsGeometry(opts: {
     range: round2(range),
     columns: plot.columns,
     pad,
+    y0: pad,
+    y1: round2(height - pad),
     labelX: round2(width + 3),
     labelY: round2(height / 2),
     totalWidth: width + gutter,

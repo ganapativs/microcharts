@@ -74,6 +74,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   // The selector spans every wedge — categories and the rolled-up "other".
   useEntrance(hostRef, "draw", animate, {
     selector: ".mc-donut-wedge",
+    trace: true, // a ring accumulates along its own arc, never across x
     proportional: true,
     window: 520, // whole-ring sweep span
   });
@@ -170,7 +171,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       <path
         d={w.d}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

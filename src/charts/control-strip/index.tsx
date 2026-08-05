@@ -12,6 +12,7 @@ import { round2 } from "../../core/types.js";
 import { EN_CONTROL, type ControlStrings } from "../../core/strings-control.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
+  CONTROL_STRIP_PAD,
   controlGeometry,
   type ControlGeometry,
   type ControlLimits,
@@ -94,7 +95,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         summary={resolveSummary(summary, () => strings.noData)}
         id={id}
         // Empty stands on the same padded floor a drawn trace would.
-        seat={{ mode: "floor", bottom: height - 2 }}
+        seat={{ mode: "floor", bottom: height - CONTROL_STRIP_PAD }}
         className={cls}
         style={style}
       >
@@ -150,7 +151,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
       // floor like a sparkline — the same 2-unit inset the annotation frame
       // above uses. The band is centre ± 3σ̂, i.e. DATA: seating that would make
       // the strip bob down the page every time the process shifted.
-      seat={{ mode: "floor", bottom: height - 2 }}
+      seat={{ mode: "floor", bottom: height - CONTROL_STRIP_PAD }}
       className={cls}
       style={style}
     >

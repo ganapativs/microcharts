@@ -172,7 +172,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         width={geo!.totalWidth - 1}
         height={r.height + 2}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeWidth={0.8}
         data-mc-w={pinned ? "tick" : undefined}
         vectorEffect="non-scaling-stroke"

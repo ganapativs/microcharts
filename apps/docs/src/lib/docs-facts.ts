@@ -31,6 +31,9 @@ export const STATIC_SIZES = staticSizes;
 export const INTERACTIVE_SIZES = interactiveSizes;
 export const SIZE_MARKETING = "~2–7 kB interactive · ~1–4 kB static";
 
+/** Measured gzip of the `./motion` entrance engine (kB) — quoted in motion.mdx. */
+export const MOTION_ENGINE_KB = CHART_GZIP["motion"]?.static;
+
 export const SIZE = {
   count: staticSizes.length,
   min: Math.min(...staticSizes),
@@ -56,11 +59,11 @@ const sized = STABLE_CHARTS.map((c) => ({
   .filter((c): c is { slug: string; name: string; kB: number } => typeof c.kB === "number")
   .sort((a, b) => a.kB - b.kB);
 
-/** Smallest / median / largest static chart across the catalog. */
+/** Smallest / median / largest chart by static size; each row also shows that chart's interactive size. */
 export const SIZE_SPAN = [
-  { ...sized[0]!, role: "smallest" },
-  { ...sized[Math.floor(sized.length / 2)]!, role: "median" },
-  { ...sized[sized.length - 1]!, role: "largest" },
+  { ...sized[0]!, role: "smallest static" },
+  { ...sized[Math.floor(sized.length / 2)]!, role: "median static" },
+  { ...sized[sized.length - 1]!, role: "largest static" },
 ] as const;
 
 export function sizeRow(slug: string) {

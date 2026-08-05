@@ -41,6 +41,35 @@ describe("docsMeta", () => {
     expect(m.alternates?.canonical).toBe(`${SITE.url}/docs/charts/sparkline`);
     expect(m.robots).toMatchObject({ index: true, follow: true });
   });
+
+  it("derives the OG alt from the page title on per-page cards", () => {
+    const m = docsMeta({
+      title: "Quickstart",
+      description: "Install and render",
+      path: "/docs/quickstart",
+      image: "/og/docs/quickstart/image.png",
+    });
+    const images = m.openGraph?.images as { alt?: string }[] | undefined;
+    expect(images?.[0]?.alt).toBe(`${SITE.name} — Quickstart`);
+  });
+
+  it("keeps the site-wide alt on the shared default card", () => {
+    const m = docsMeta({ title: "Brand", description: "Brand kit", path: "/brand" });
+    const images = m.openGraph?.images as { alt?: string }[] | undefined;
+    expect(images?.[0]?.alt).toBe(SITE.ogImageAlt);
+  });
+
+  it("honors an explicit imageAlt override", () => {
+    const m = docsMeta({
+      title: "Sparkline React Chart",
+      description: "Tiny trend",
+      path: "/docs/charts/sparkline",
+      image: "/og/docs/charts/sparkline/image.png",
+      imageAlt: "Sparkline React chart — word-sized SVG from microcharts",
+    });
+    const images = m.openGraph?.images as { alt?: string }[] | undefined;
+    expect(images?.[0]?.alt).toBe("Sparkline React chart — word-sized SVG from microcharts");
+  });
 });
 
 describe("json-ld", () => {

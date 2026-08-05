@@ -95,7 +95,7 @@ In development the chart logs this to the console when the engine is missing. Th
 none of them bugs: the reader has `prefers-reduced-motion: reduce`, the chart is a static entry (`animate` is an
 `/interactive`-only prop), or the markup came from the server and is being hydrated rather than freshly mounted, where
 an entrance would animate content the reader can already see. The entrance runs once per mount by design; remount with a
-changed `key` to replay it.
+changed `key` to replay it. The full contract is on [Motion](/docs/motion).
 
 ## The chart won't stretch to fill its container
 

@@ -130,6 +130,27 @@ export interface MicroDatum {
   formatted?: string | undefined;
 }
 
+/**
+ * Names for the navigable units, indexed the same way `MicroDatum.index` is
+ * (for a series chart, the data index). Mixed into every MULTI-UNIT interactive
+ * entry whose `data` is a bare numeric series — those charts can otherwise only
+ * say "Point 3 of 12", never "Aug 2026". Charts whose data already carries a
+ * `label` field name their units from that instead and don't take this prop.
+ *
+ * Sparse arrays are fine: a hole (or an empty string) falls back to the
+ * positional wording for that unit alone. Interactive-only by design — a static
+ * chart has no readout to name, and the generated summary stays value-based.
+ *
+ * Charts read this in their own `datum` callback (for `MicroDatum.label`) and
+ * hand `labels?.[i]` to `announceNamed` / `chipNamed`, rather than wiring it into
+ * `useActivePicker`: the kernel is bundled into all ~90 multi-unit interactive
+ * subpaths, so naming it there charged 23 B to the 61 charts that identify their
+ * units some other way.
+ */
+export interface LabeledSeriesProps {
+  labels?: readonly (string | undefined)[] | undefined;
+}
+
 /** Public interaction props shared by every `…/interactive` entry. */
 export interface PickerProps {
   /** Hover/focus unit; `null` when cleared. */

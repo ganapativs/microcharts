@@ -169,9 +169,8 @@ export async function chartDocMetadata(slug: string[]): Promise<Metadata> {
     description,
     path: page.url as `/${string}`,
     image: getPageImage(page).url as `/${string}`,
-    imageAlt: entry
-      ? `${entry.name} React chart — word-sized SVG from ${SITE.name}`
-      : SITE.ogImageAlt,
+    /* Non-chart pages fall through to docsMeta's title-derived per-page alt. */
+    imageAlt: entry ? `${entry.name} React chart — word-sized SVG from ${SITE.name}` : undefined,
     markdown: getPageMarkdownUrl(page).url as `/${string}`,
     type: "article",
     keywords: entry

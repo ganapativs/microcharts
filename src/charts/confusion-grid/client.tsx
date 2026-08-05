@@ -189,7 +189,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         height={c.w - 0.4}
         rx={1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         strokeWidth={1.2}
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"

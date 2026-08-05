@@ -11,7 +11,7 @@ import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
-import { citySkylineGeometry } from "./geometry.js";
+import { PAD, citySkylineGeometry, skylineBands } from "./geometry.js";
 
 export interface SkylineDatum {
   label: string;
@@ -44,8 +44,6 @@ export interface CitySkylineProps {
   style?: CSSProperties | undefined;
   children?: ReactNode | undefined;
 }
-
-const PAD = 2;
 
 export function citySkylineSummary(
   data: readonly SkylineDatum[],
@@ -93,13 +91,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
 
   const height = props.height ?? 24;
   const fontSize = props.fontSize ?? labelFont(height, 0.3);
-  const topPad = label === "value" ? fontSize + 2 : PAD;
-  // Labels sit BELOW the ground line with a fixed ~4px of air — hugging the
-  // baseline made them read as part of the skyline. A constant gap (not em-scaled)
-  // keeps the buildings tall even when the label font is large.
-  const botPad = labels ? fontSize + 4 : PAD;
-  const groundY = height - botPad;
-  const maxH = groundY - topPad;
+  const { groundY, maxH } = skylineBands(height, fontSize, label, labels);
   const geo = citySkylineGeometry({
     data,
     bw,

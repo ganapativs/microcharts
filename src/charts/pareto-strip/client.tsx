@@ -204,7 +204,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         width={b.width + 1.2}
         height={height - 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

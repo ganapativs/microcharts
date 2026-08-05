@@ -44,9 +44,20 @@ const report = JSON.parse(raw.slice(raw.indexOf("[")));
 const budgetsPath = resolve(root, "scripts/size-budgets.json");
 const budgets = JSON.parse(readFileSync(budgetsPath, "utf8"));
 
-/** measured bytes → budget string, with headroom. */
-const budgetFor = (bytes) => {
-  const withRoom = bytes + Math.max(50, bytes * 0.02);
+/**
+ * The catalog ceilings from `$ceilings`. The headroom formula is a FLOOR on a
+ * budget, never a licence to raise one through these: `sparkline.interactive`
+ * measures 6982 B, so `measured + 2%` asks for 7.13 kB and this script would
+ * have written it — silently moving a wall that CLAUDE.md says no sign-off
+ * raises, and that the README, the docs and the package description all quote
+ * as "~2–7 kB interactive". A budget is clamped here instead, and the clamp is
+ * reported: the entry has no room left, which is the fact worth acting on.
+ */
+const CEILINGS = { static: 4350, interactive: 7000 };
+
+/** measured bytes → budget string, with headroom, never above the ceiling. */
+const budgetFor = (bytes, kind) => {
+  const withRoom = Math.min(bytes + Math.max(50, bytes * 0.02), CEILINGS[kind]);
   return `${(Math.ceil(withRoom / 10) / 100).toFixed(2)} kB`;
 };
 
@@ -65,7 +76,7 @@ for (const entry of report) {
   const kind = live ? "interactive" : "static";
   const chart = budgets.charts?.[slug];
   if (!chart || chart[kind] === undefined) continue;
-  const next = budgetFor(entry.size);
+  const next = budgetFor(entry.size, kind);
   if (next !== chart[kind]) {
     changes.push({
       slug,
@@ -74,6 +85,7 @@ for (const entry of report) {
       to: next,
       bytes: entry.size,
       delta: entry.size - parseKb(chart[kind]),
+      clamped: parseKb(next) >= CEILINGS[kind],
     });
     if (!dry) chart[kind] = next;
   }
@@ -87,10 +99,21 @@ console.log(
 );
 for (const c of changes.slice(0, 20)) {
   console.log(
-    `  ${c.slug}.${c.kind}: ${c.from} → ${c.to} (measured ${c.bytes} B, ${c.delta > 0 ? "+" : ""}${Math.round(c.delta)} B vs old budget)`,
+    `  ${c.slug}.${c.kind}: ${c.from} → ${c.to} (measured ${c.bytes} B, ${c.delta > 0 ? "+" : ""}${Math.round(c.delta)} B vs old budget)${c.clamped ? "  ⚠ AT CEILING" : ""}`,
   );
 }
 if (changes.length > 20) console.log(`  … ${changes.length - 20} more`);
+
+// Surfaced separately from the list above, which truncates at 20: an entry
+// pinned at its ceiling has spent its headroom, so the next byte fails the gate.
+const pinned = changes.filter((c) => c.clamped);
+if (pinned.length) {
+  console.log(
+    `\n⚠ ${pinned.length} budget(s) clamped to the catalog ceiling — no headroom left, buy room by shrinking the entry:\n${pinned
+      .map((c) => `    ${c.slug}.${c.kind}: ${c.to} (measured ${c.bytes} B)`)
+      .join("\n")}`,
+  );
+}
 
 if (!dry) {
   writeFileSync(budgetsPath, `${JSON.stringify(budgets, null, 2)}\n`);

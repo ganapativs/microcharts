@@ -22,6 +22,14 @@ export interface SummaryStrings {
   point: (position: number, total: number, value: string) => string;
   /** Interactive announcement for an empty slot, e.g. "Point 3 of 12: no data." */
   pointEmpty: (position: number, total: number) => string;
+  /**
+   * Announcement for a unit named by `labels`, e.g. "Aug 2026. Point 3 of 12: 1.1K."
+   * `body` is the chart's own sentence, unchanged — the name is prepended, so the
+   * position stays available to a screen reader as series context.
+   */
+  named: (name: string, body: string) => string;
+  /** Terse VISIBLE chip form, e.g. "Aug 2026 · 1.1K" (no trailing period). */
+  namedChip: (name: string, body: string) => string;
   /** S4 scalar direction, e.g. "Up 12%." (trend-arrow; lands with it). */
   scalarDir: (direction: "up" | "down", amount: string) => string;
   /** S4 within-noise-floor change (trend-arrow flatBand). */

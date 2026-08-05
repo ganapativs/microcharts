@@ -60,13 +60,13 @@ describe("interactive <Seismogram>", () => {
     expect(picks.at(-1)).toMatchObject({ index: 1, value: 3 });
     // Pin survives blur (it is selection, not hover).
     fig.blur();
-    await expect.poll(() => fig.querySelector('line[stroke="var(--mc-accent)"]')).not.toBeNull();
+    await expect.poll(() => fig.querySelector("line[data-mc-active]")).not.toBeNull();
   });
 
   it("controlled selectedIndex pins the mark with no interaction", async () => {
     const screen = await render(<Seismogram data={DATA} selectedIndex={3} />);
     const fig = screen.getByRole("img").element() as HTMLElement;
-    expect(fig.querySelector('line[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(fig.querySelector("line[data-mc-active]")).not.toBeNull();
   });
 
   it("valence + anomaly ticks stroke from their ink role, and stay distinct", async () => {

@@ -18,6 +18,11 @@ interface QueuePoint {
   above: boolean;
 }
 
+/** Default plot inset. Exported so the no-data branch — which renders before
+ *  there is any geometry to read a box from — seats on the same number the
+ *  plotted chart does, instead of a literal that silently desyncs. */
+export const QUEUE_DEPTH_PAD = 2;
+
 export interface QueueDepthGeometry {
   /** Zero-anchored stock area path. */
   area: string;
@@ -75,7 +80,7 @@ export function queueDepthGeometry(opts: {
   fontSize?: number | undefined;
 }): QueueDepthGeometry | null {
   const { width, height } = opts;
-  const pad = 2;
+  const pad = QUEUE_DEPTH_PAD;
   const fontSize = opts.fontSize ?? 0;
 
   const n = opts.data.length;

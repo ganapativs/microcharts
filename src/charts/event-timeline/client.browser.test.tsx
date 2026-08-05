@@ -38,7 +38,7 @@ describe("interactive <EventTimeline>", () => {
     const fig = await mount(<EventTimeline data={DATA} domain={WINDOW} />);
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(fig.querySelector("rect[data-mc-active]")).not.toBeNull();
   });
 
   it("onActive reports the focused item; null once cleared", async () => {

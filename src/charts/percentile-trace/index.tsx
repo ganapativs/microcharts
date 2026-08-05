@@ -17,6 +17,7 @@ import {
 } from "../../core/strings-percentile-trace.js";
 import { chartSide, round2, type Polarity, type Value } from "../../core/types.js";
 import {
+  PERCENTILE_PAD,
   DEFAULT_HEIGHT,
   DEFAULT_WIDTH,
   percentileGeometry,
@@ -135,7 +136,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
         id={id}
         // No geometry to read the floor off; mirror its pad, halved under a
         // 4-unit box the same way geometry stops the plot inverting.
-        seat={{ mode: "floor", bottom: height - Math.min(2, height / 2) }}
+        seat={{ mode: "floor", bottom: height - Math.min(PERCENTILE_PAD, height / 2) }}
         className={cls}
         style={style}
       >

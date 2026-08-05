@@ -5,6 +5,10 @@
 // comparison channel (children tile their parent's x-range to the 2-dp grid).
 import { round2 } from "../../core/types.js";
 
+/** Vertical inset of the strip. Exported so the component seats on the same
+ *  number the geometry lays out with, instead of its own copy of it. */
+export const PARTITION_INSET = 0.5;
+
 export interface PartitionNode {
   label: string;
   value?: number | undefined;
@@ -64,7 +68,7 @@ export function partitionStripGeometry(opts: {
 }): { segments: PartitionSegment[]; total: number; groups: number } {
   const [width] = partitionBox(opts.width, opts.height);
   const { data, gap } = opts;
-  const inset = 0.5;
+  const inset = PARTITION_INSET;
 
   const parents = data.filter((p) => parentValue(p) > 0);
   const values = parents.map(parentValue);

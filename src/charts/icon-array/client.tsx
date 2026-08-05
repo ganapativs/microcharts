@@ -175,7 +175,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
         height={geo.cell + 1.5}
         rx={geo.rx + 0.75}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "full"}
         vectorEffect="non-scaling-stroke"
       />

@@ -571,10 +571,10 @@
          nothing because those attributes already mark every mark that encodes
          something. (A categorical segment travels
          on its WIDTH, which is a continuous quantity; its category is carried by
-         the attribute, and that swaps outright.) A focus or selection ring is
-         drawn as a literal `stroke="var(--mc-accent)"` with neither attribute in
-         ~100 entries — that is the house pattern, so rings fall out of this
-         selector for free and keep SNAPPING to the unit they name. Mid-glide a
+         the attribute, and that swaps outright.) A focus or selection ring
+         carries `data-mc-active` and neither of these in ~100 entries — that is
+         the house pattern, so rings fall out of this selector for free and keep
+         SNAPPING to the unit they name. Mid-glide a
          ring encloses no unit while the screen reader has already announced the
          new one. `focus-ring-symmetry.browser.test.tsx` exists because a ring
          once inherited a geometry transition and lerped across a whole beam.
@@ -677,6 +677,72 @@
   }
   :where(.mc-root [data-mc-w="hair"]) {
     stroke-width: calc(var(--mc-sw) / 3);
+  }
+  /* interaction overlay — the mark that names the unit under the pointer or the
+     keyboard cursor. `data-mc-active` is a marker, not a state: hover vs pin is
+     already carried by `data-mc-w`, which ~20 charts tune deliberately in both
+     directions (Constellation pins at `full`, ChangePoint inverts the pair), and
+     one channel per job keeps that tuning intact.
+
+     Three tokens, so the SHAPE of the active state is themeable and not only its
+     color. Restyling used to mean hand-scoping rules onto `data-mc-*` attributes
+     from outside the package, which is a private-API dependency:
+
+       --mc-active-stroke        ring color              (default: --mc-accent)
+       --mc-active-fill          wash inside the ring    (default: --mc-on-fill)
+       --mc-active-fill-opacity  its strength            (default: 0.2; 0 = outline only)
+       --mc-rest-opacity         every OTHER mark, while something is active (default: 1)
+
+     The wash is not decoration, it is the fix for a real blind spot: an accent
+     hairline over an accent-emphasized mark is invisible by construction, and 38
+     charts paint exactly one mark `data-mc-ink="accent"` (SparkBar's endpoint
+     bar, Pareto's leader, Thermometer's reading). `--mc-on-fill` resolves it
+     without a second element per chart, because it is DEFINED as the ink that
+     reads on a saturated data fill — `theming-contract.test.ts` already pins it
+     at ≥ 4.5:1 on accent/positive/stroke in both themes — and it is near the
+     page color by that same construction, so the wash stays invisible inside a
+     ring that encloses empty plot rather than a mark.
+
+     Closed primitives only. A `path`/`line`/`polyline` overlay is an open strand
+     (EnsembleGhosts' member, MicroDonut's arc) and filling one paints a wedge —
+     the same element split the ink roles make. This block sits BEFORE the muted
+     role below on purpose: a chart whose hover crosshair is `muted` and whose
+     pin is `accent` (DepthWedge, Seismogram) keeps the quiet half quiet, and
+     only the accent half answers to `--mc-active-stroke`. */
+  :where(.mc-root [data-mc-active]) {
+    stroke: var(--mc-active-stroke, var(--mc-accent));
+  }
+  :where(.mc-root :is(rect, circle, ellipse, polygon)[data-mc-active]) {
+    fill: var(--mc-active-fill, var(--mc-on-fill));
+    fill-opacity: var(--mc-active-fill-opacity, 0.2);
+  }
+  /* "dim the rest" — the third shape a host asks for, and the one no consumer
+     can write from outside, because only the chart knows which mark is active.
+     `:has()` reads the overlay's own presence, so this costs no JS and no
+     attribute on the wrapper. The overlay and the `data-mc-ui` response marks
+     stay at full strength; the default of 1 leaves the rule inert until a host
+     opts in. Pair it with `--mc-active-fill: var(--mc-accent)` +
+     `--mc-active-fill-opacity: 1` to repaint the picked unit solid over its own
+     dimmed self — that combination is the whole "lift one, dim the rest"
+     treatment, in two declarations on the host.
+
+     `:not([opacity])` is load-bearing, not tidiness. A CSS declaration beats a
+     presentation attribute, so without it this rule would flatten a mark that
+     encodes something IN its opacity the moment anything was picked —
+     EventRaster dims a lane that way, and every dimmed lane would have snapped
+     to full strength under the pointer. A mark that spells its own opacity out
+     keeps it and opts out of the host's dim; a mark that does not is free to
+     take one. */
+  :where(
+    .mc-root:has([data-mc-active])
+      :is([data-mc-ink], [data-mc-cat]):not(
+        [data-mc-active],
+        [data-mc-ui],
+        [data-mc-ui] *,
+        [opacity]
+      )
+  ) {
+    opacity: var(--mc-rest-opacity, 1);
   }
   :where(.mc-root [data-mc-ink="muted"]) {
     fill: none;
@@ -1309,6 +1375,21 @@
     :where(.mc-root :is(path, line, polyline)[data-mc-ink="accent"]) {
       fill: none;
       stroke: Highlight;
+    }
+    /* The interaction overlay, whatever a host themed it into. `--mc-accent` is
+       already remapped above, so the DEFAULT ring would land on Highlight on its
+       own — this covers the themed case: `--mc-active-stroke` is a brand hex a
+       host chose against ITS palette, not the user's forced one, and an opacity
+       dim is invisible here by definition (High Contrast Mode has two inks, not
+       a ramp). So the treatment collapses back to the one thing that always
+       reads: a system-accent outline on every picked mark. The wash needs no
+       rule — every overlay keeps a literal `fill="none"`, and the blanket
+       hollow-mark rule at the end of this block restores it. */
+    :where(.mc-root [data-mc-active]) {
+      stroke: Highlight;
+    }
+    :where(.mc-root) {
+      --mc-rest-opacity: 1;
     }
     :where(.mc-root [data-mc-ink="muted"]) {
       stroke: GrayText;

@@ -67,7 +67,7 @@ describe("interactive <CohortTriangle>", () => {
     const fig = await mount(<CohortTriangle data={COHORTS} title="Cohorts" />);
     fig.focus();
     await userEvent.keyboard("{Home}");
-    expect(fig.querySelector('rect[stroke="var(--mc-accent)"]')).not.toBeNull();
+    expect(fig.querySelector("rect[data-mc-active]")).not.toBeNull();
   });
 
   it("onActive reports the focused cell datum (index + retention + cohort); null on clear", async () => {

@@ -164,7 +164,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         cy={pt.y}
         r={2.4}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

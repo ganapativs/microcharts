@@ -4,7 +4,7 @@
 // ↑/↓ drills into observations within the active slot — held as local `{slot,cycle}`
 // keyed by slot (moving slots drops it). `step` eats ↑/↓; don't extend useActivePicker
 // to 2-D selection. onActive/onSelect still report the slot (readout depth only).
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -249,9 +249,19 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         y={0.5}
         width={Math.max(0, s.x1 - s.x0)}
         height={height - 1}
-        fill="var(--mc-accent)"
-        fillOpacity={pinned ? 0.14 : 0.08}
-        stroke="var(--mc-accent)"
+        fill="none"
+        // This chart tinted its season band long before there was a channel for
+        // it, and the tint is tuned to a band the width of a whole season rather
+        // than a bar — so it keeps its own accent at its own two strengths, set
+        // through the shared tokens instead of beside them. A host still
+        // retargets it; it just starts from a different default than the catalog.
+        style={
+          {
+            "--mc-active-fill": "var(--mc-accent)",
+            "--mc-active-fill-opacity": pinned ? 0.14 : 0.08,
+          } as CSSProperties
+        }
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "hair"}
         vectorEffect="non-scaling-stroke"
       />

@@ -184,6 +184,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
             r={3.2}
             fill="none"
             data-mc-ink="accent"
+            data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
             vectorEffect="non-scaling-stroke"

@@ -153,7 +153,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
         width={Math.max(1, run.x1 - run.x0) + 1}
         height={height - 1}
         fill="none"
-        stroke="var(--mc-accent)"
+        data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         vectorEffect="non-scaling-stroke"
       />

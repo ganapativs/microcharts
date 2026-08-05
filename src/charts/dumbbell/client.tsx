@@ -74,14 +74,18 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
   const height = props.height ?? data.length * 12;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // "trail" ordered by y — rows populate top→down, one at a time. Covers both
-  // endpoints regardless of shape: the "from" hollow ring has no data-mc-ink
-  // attribute, only the "to" dot does — a bare `circle` selector catches both.
-  // The connector is valence-encoded DATA (its color reads the change
-  // direction), so it must arrive WITH the endpoints, not materialize before
-  // them: `defer` casts it into the closing act so it draws in as the dots land.
+  // "trail" ordered by y — rows populate top→down, one at a time, and each row
+  // tells its span in the order the data reads: the "before" ring lands, its
+  // connector grows across, then the "after" dot arrives where the change ended.
+  // So the ring is the story, the bar is the `link`, and the "after" dot falls
+  // to the closing act on its own (`point`/`accent` are voice ink), where it
+  // waits for its own bar. Both endpoints in the story popped them together and
+  // the bar then materialized between two dots already in place.
+  //
+  // A degenerate row (from === to) draws one dot and no bar, so it has no ring
+  // to lead with — `:only-of-type` picks that lone dot up as its row's story.
   useEntrance(hostRef, "trail", animate, {
-    selector: "circle",
+    selector: 'circle[data-mc-w="support"], circle:only-of-type',
     order: "y",
     link: "line[data-mc-ink]",
   });
@@ -208,7 +212,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             cy={row.y}
             r={3.25}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
             vectorEffect="non-scaling-stroke"
@@ -220,7 +224,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             cy={row.y}
             r={3.25}
             fill="none"
-            stroke="var(--mc-accent)"
+            data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
             vectorEffect="non-scaling-stroke"

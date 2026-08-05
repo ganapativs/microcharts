@@ -55,7 +55,10 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   } = props;
   const { value, max = 1, sweep = false, format, locale } = rest;
   const hostRef = useRef<HTMLSpanElement>(null);
-  useEntrance(hostRef, "draw", animate);
+  // `trace`: the arc is drawn along its own stroke, clockwise from 12 o'clock.
+  // A ring is not x-monotone, so the shared left→right front would open it from
+  // both sides at once instead of accumulating like a value.
+  useEntrance(hostRef, "draw", animate, { trace: true });
   const fraction =
     Number.isFinite(value) && Number.isFinite(max) && max > 0 ? value / max : Number.NaN;
   const pctFmt = useMemo(

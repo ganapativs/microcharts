@@ -11,10 +11,9 @@ import {
   type SeriesStrings,
   resolveSummary,
 } from "../../core/summary.js";
-import { lastFinite } from "../../core/stats.js";
-import { labelFitsY } from "../../core/labels.js";
 import { chartSide, type Value } from "../../core/types.js";
-import { labelMetrics, sparkGeometry } from "./geometry.js";
+import { lastLabelMetrics, minmaxFont, sparkGeometry } from "./geometry.js";
+import { lastFinite } from "../../core/stats.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
 import { makeFormatter } from "../../core/format.js";
@@ -102,21 +101,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // the chart's box (containment rule). No DOM measurement.
   const last = lastFinite(data);
   const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
-  const fitted = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
-  // `labelMetrics` shrinks the figure to fit the gutter's WIDTH budget, down to
-  // a 5-unit floor; nothing there answers whether the box is tall enough to seat
-  // a line of it. Below that the readout DROPS — never painted half outside the
-  // viewBox — and because the gutter below is `metrics?.gutter`, the reserved
-  // space goes with it and the line reclaims the full width. Pure arithmetic:
-  // the static path may never measure text.
-  const metrics = fitted && labelFitsY(height / 2, fitted.fontSize, height) ? fitted : undefined;
+  const metrics = lastLabelMetrics(labelText, width, height);
 
   // "minmax" labels reserve top/bottom gutters BEFORE geometry and
   // sit above the max / below the min — the only spots the data can't occupy.
   // Documented affordance: below ~28px tall the gutters would crush the plot,
   // so the labels are omitted (the summary still reads the range).
-  const mmSize = Math.max(5, Math.min(Math.round(height * 0.22), 9));
-  const mmFont = label === "minmax" && height >= (mmSize + 1) * 2 + 12 ? mmSize : 0;
+  const mmFont = minmaxFont(height, label);
 
   const geo = sparkGeometry(data, {
     width,
