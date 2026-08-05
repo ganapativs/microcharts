@@ -22,7 +22,7 @@ export const MC_DUR = {
 
 /** Entrance archetypes — the family a chart's entrance belongs to. */
 export type EntranceArchetype =
-  | "draw" // line charts: stroke-dashoffset reveal; riding dots pop at the front
+  | "draw" // line charts: one clip front travels L→R; riding dots pop at the front
   | "wipe" // area charts: left→right clip reveal
   | "rise" // bar charts: scaleY from the baseline, staggered
   | "reveal" // cell grids: staggered fade
@@ -55,7 +55,16 @@ export interface EntranceOptions {
   /** Total span (ms) of an ordered sequence (default 380 trail / 300 others). */
   window?: number;
   /**
-   * `draw` only: draw the stroked marks as ONE continuous sweep at constant
+   * `draw` only: reveal each mark ALONG ITS OWN STROKE (stroke-dashoffset)
+   * instead of under the shared left→right front. For a ring, a spoke or a
+   * trajectory that doubles back, x is not the direction the mark is drawn in,
+   * so a front would uncover disconnected pieces that only later join up.
+   * Everything x-monotone — a line, an area, a worm, a slope, a set of small
+   * multiples — wants the front, which is the default.
+   */
+  trace?: boolean;
+  /**
+   * `draw` + `trace` only: draw the stroked marks as ONE continuous sweep at constant
    * speed — each mark's duration is proportional to its stroke length and marks
    * are baton-passed end to end (mark i+1 starts exactly as mark i finishes).
    * For a ring of arcs this is constant ANGULAR velocity clockwise from the

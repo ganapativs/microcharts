@@ -56,9 +56,23 @@ const EASE: Record<EntranceArchetype, string> = {
   scan: EASE_EVEN, // constant-rate sweep
 };
 
+// The reveal window both clip acts share: closed at the left edge, then open.
+// Measured in the SHARED `view-box`, never each mark's own box, so several
+// marks uncover at the same x — one front, not one reveal per mark.
+const CLIP_SWEEP = [
+  { clipPath: "inset(0% 100% 0% 0%) view-box" },
+  { clipPath: "inset(0% 0% 0% 0%) view-box" },
+];
+
 /** Primary marks per archetype — selected by the ink roles charts already emit. */
 const MARKS: Record<EntranceArchetype, string> = {
-  draw: 'path[data-mc-ink="data"], path[data-mc-ink="accent"]',
+  // Every strand the chart paints, not just the primary series: a companion
+  // line (`muted`, `ghost`), an area under the trace and a bare `<line>` all
+  // belong to the same front. Selecting only `data`/`accent` left the rest as
+  // stage ink, which fades in WHOLE at t=0 — a finished grey line sitting there
+  // while the black one was still drawing. A `band` is context and a `flag` is
+  // voice, so those two stay out; a chart excludes anything else via `defer`.
+  draw: ":is(path,line):not([data-mc-ink=band],[data-mc-ink=flag])",
   wipe: "", // whole-svg clip reveal; no per-mark selection
   rise: '[data-mc-ink="bar"], rect[data-mc-ink="data"]',
   reveal: '[data-mc-ink="cell"], [data-mc-ink="unit-off"], [data-mc-cat]',
@@ -83,6 +97,9 @@ const VOICE_INK =
   '[data-mc-ink="accent"], [data-mc-ink="point"], [data-mc-ink="flag"], [data-mc-ink="label"]';
 
 const STAGGER_CAP = 180;
+
+// How long a connector takes to draw itself between the marks it joins.
+const LINK_DUR = 200;
 
 // Archetypes that animate the whole SVG as one unit — they carry no per-mark
 // set (checked before and after a no-marks/dense fallback flips `kind` to wipe).
@@ -156,6 +173,9 @@ function dashDraw(
   cleanups: (() => void)[],
   timing: KeyframeAnimationOptions,
 ): Animation | null {
+  // A stroke that is already dashed encodes something (a projected series, a
+  // reference line); overwriting its pattern to reveal it would erase that.
+  if (el.getAttribute("stroke-dasharray")) return null;
   let len = 0;
   try {
     len = (el as SVGPathElement).getTotalLength();
@@ -198,6 +218,21 @@ function orderNorm(marks: SVGGraphicsElement[], order: "index" | "x" | "y"): num
 }
 
 /**
+ * Where a mark sits along the chart's own x, 0..1 — the moment the story front
+ * passes it. One definition, so a riding dot and the label that names it wait
+ * for the same instant.
+ */
+function xNorm(el: SVGGraphicsElement, vbW: number): number {
+  if (vbW <= 0) return 0;
+  try {
+    const b = el.getBBox();
+    return Math.min(1, Math.max(0, (b.x + b.width / 2) / vbW));
+  } catch {
+    return 0;
+  }
+}
+
+/**
  * Run the entrance for one chart. Returns a cancel function that resolves the
  * chart to its finished static frame (used on unmount).
  */
@@ -212,7 +247,12 @@ export function runEntrance(
   if (document.hidden) return () => {};
   const anims: Animation[] = [];
   const cleanups: (() => void)[] = [];
-  const step = options.stagger ?? 30;
+  // A `draw` is ONE front crossing the chart left→right, so its marks share a
+  // single timing — a stagger would make companion strands read as separate
+  // lines racing. `trace` charts (rings, spokes, a trajectory that doubles
+  // back) reveal along their own stroke instead and keep the stagger.
+  const front = archetype === "draw" && !options.trace;
+  const step = front ? 0 : (options.stagger ?? 30);
 
   const finishAll = (): void => {
     for (const a of anims) {
@@ -240,8 +280,13 @@ export function runEntrance(
   const start = (): void => {
     active.add(run);
     let kind = archetype;
+    // A deferred mark is cast into the closing act, so it is never a story
+    // mark — the archetype default selectors are broad enough to catch one
+    // (a dashed ideal line, a cumulative overlay) if this didn't subtract it.
     let marks = MARKS[kind]
-      ? Array.from(svg.querySelectorAll<SVGGraphicsElement>(options.selector ?? MARKS[kind]))
+      ? Array.from(
+          svg.querySelectorAll<SVGGraphicsElement>(options.selector ?? MARKS[kind]),
+        ).filter((el) => !options.defer || !el.matches(options.defer))
       : [];
     // A bare fade is not an entrance. Dense grids (a year of cells) don't get
     // 365 tracks, and a selector that matches nothing must not degrade to
@@ -299,18 +344,21 @@ export function runEntrance(
     const svgRect = svg.getBoundingClientRect();
     const vb = svg.viewBox?.baseVal;
     const screenK = vb && vb.width > 0 && svgRect.width > 0 ? svgRect.width / vb.width : 1;
+    const vbW = vb?.width ?? 0;
     const n = marks.length;
     // Sequential choreography: an explicit order (or the trail archetype)
     // spreads the marks across a window along the chart's own geometry.
     const win = options.window ?? (kind === "trail" ? TRAIL_WINDOW : 300);
     const norms =
-      options.order || kind === "trail" ? orderNorm(marks, options.order ?? "index") : null;
+      (options.order && !front) || kind === "trail"
+        ? orderNorm(marks, options.order ?? "index")
+        : null;
     // Proportional draw: measure each arc so one sweep advances at ONE constant
     // speed across the whole ring — mark i starts exactly where i-1 ended, and a
     // long arc takes proportionally longer than a short one (constant angular
     // velocity, not constant per-mark time). `propAt[i]` = normalized start [0,1).
     let propAt: number[] | null = null;
-    if (options.proportional && kind === "draw" && n > 0) {
+    if (options.proportional && !front && n > 0) {
       const lens = marks.map((el) => {
         try {
           return (el as SVGPathElement).getTotalLength() || 0;
@@ -335,22 +383,65 @@ export function runEntrance(
       const timing = { duration: dur, delay, easing: ease, fill: "backwards" as const };
       switch (kind) {
         case "draw": {
+          // The default front is a clip window, not stroke-dashoffset, and that
+          // is what makes a line chart's entrance honest. A dash pattern is
+          // measured along ONE subpath and restarts on the next, so a path with
+          // gaps (nulls), a worm split into two coloured halves, a staff of
+          // rules or a strip of small multiples used to spawn one front per
+          // subpath, all at once, each finishing at its own rate. A clip in
+          // shared view-box units has none of that: subpaths, several marks and
+          // an area fill all uncover at the same x, so the chart reveals under a
+          // single front travelling start → end. It also needs no length or
+          // scale measurement, so nothing can drift when a chart is rendered at
+          // a size the engine did not measure. A front IS a `scan`, one archetype
+          // up: the same clip window against the same shared box.
+          //
           // stroke-dashoffset only reveals a STROKE. A fill-only mark (a wedge,
-          // an area) has no stroke to draw, so `draw` is the wrong archetype for
+          // an area) has no stroke to draw, so `trace` is the wrong option for
           // it — author such shapes as a stroked centerline (a ring's value arc)
           // or give them a fill-appropriate archetype instead.
           // Proportional marks sweep at one constant speed (linear per segment,
           // baton-passed) so the ring fills like a value accumulating clockwise.
-          const drawTiming = propAt
-            ? {
-                duration: Math.max(60, ((propAt[i + 1] ?? 1) - propAt[i]!) * win),
-                delay: storyStart + propAt[i]! * win,
-                easing: "linear",
-                fill: "backwards" as const,
-              }
-            : timing;
-          const a = dashDraw(el, screenK, cleanups, drawTiming);
-          if (a) anims.push(a);
+          if (!front) {
+            const drawTiming = propAt
+              ? {
+                  duration: Math.max(60, ((propAt[i + 1] ?? 1) - propAt[i]!) * win),
+                  delay: storyStart + propAt[i]! * win,
+                  easing: "linear",
+                  fill: "backwards" as const,
+                }
+              : timing;
+            const a = dashDraw(el, screenK, cleanups, drawTiming);
+            if (a) anims.push(a);
+            break;
+          }
+          anims.push(el.animate(CLIP_SWEEP, timing));
+          break;
+        }
+        case "scan": {
+          // A clip window that sweeps left→right while opening from `origin`, so
+          // a MERGED bar/area path (one node, for the budget) reveals region by
+          // region — the signal scans in — instead of scaling as one block. The
+          // clip is measured against the shared `view-box`, NOT each path's own
+          // box, so several paths that split one chart (a played/rest waveform,
+          // a peak bar) uncover under ONE sweep at the same x — not independently.
+          const o = options.origin ?? "left";
+          anims.push(
+            el.animate(
+              o === "left"
+                ? CLIP_SWEEP
+                : [
+                    {
+                      clipPath:
+                        o === "center"
+                          ? "inset(50% 100% 50% 0) view-box"
+                          : "inset(100% 100% 0% 0%) view-box",
+                    },
+                    CLIP_SWEEP[1]!,
+                  ],
+              timing,
+            ),
+          );
           break;
         }
         case "rise":
@@ -403,25 +494,6 @@ export function runEntrance(
         case "reveal":
           anims.push(el.animate([{ opacity: 0 }, { opacity: 1 }], timing));
           break;
-        case "scan": {
-          // A clip window that sweeps left→right while opening from `origin`, so
-          // a MERGED bar/area path (one node, for the budget) reveals region by
-          // region — the signal scans in — instead of scaling as one block. The
-          // clip is measured against the shared `view-box`, NOT each path's own
-          // box, so several paths that split one chart (a played/rest waveform,
-          // a peak bar) uncover under ONE sweep at the same x — not independently.
-          const o = options.origin ?? "left";
-          const from =
-            o === "center"
-              ? "inset(50% 100% 50% 0) view-box"
-              : o === "bottom"
-                ? "inset(100% 100% 0% 0%) view-box"
-                : "inset(0% 100% 0% 0%) view-box";
-          anims.push(
-            el.animate([{ clipPath: from }, { clipPath: "inset(0% 0% 0% 0%) view-box" }], timing),
-          );
-          break;
-        }
         default:
           break;
       }
@@ -442,21 +514,13 @@ export function runEntrance(
       const dots = Array.from(svg.querySelectorAll<SVGGraphicsElement>(DRAW_DOTS)).filter(
         (el) => !spoken.has(el),
       );
-      // A lone dot still syncs to its real position along the line — an
-      // endpoint dot pops when the front ARRIVES, not at the start.
-      const vbWidth = svg.viewBox?.baseVal?.width || 0;
-      const dotNorms =
-        dots.length === 1 && vbWidth > 0
-          ? dots.map((el) => {
-              try {
-                const b = el.getBBox();
-                return Math.min(1, Math.max(0, (b.x + b.width / 2) / vbWidth));
-              } catch {
-                return 1;
-              }
-            })
-          : orderNorm(dots, "x");
-      dots.forEach((el, i) => {
+      // Every dot syncs to its REAL x in the chart, not to its rank among the
+      // other dots: `orderNorm` normalizes against the dots' own extent, so the
+      // leftmost one always popped at t=0 — a mid-line dot appearing before the
+      // front reached it, and the endpoint's dot landing early whenever a
+      // min/max dot sat further right. Absolute x, so a dot arrives with the
+      // front that draws it.
+      dots.forEach((el) => {
         spoken.add(el);
         el.style.transformBox = "fill-box";
         el.style.transformOrigin = "center";
@@ -472,7 +536,7 @@ export function runEntrance(
             ],
             {
               duration: 180,
-              delay: storyStart + dotNorms[i]! * dur * 0.92,
+              delay: storyStart + xNorm(el, vbW) * dur * 0.92,
               easing: MC_EASE_ENTER,
               fill: "backwards",
             },
@@ -525,20 +589,19 @@ export function runEntrance(
     // themselves on (dot→dot, stem→dot) via stroke-dashoffset, so the shape
     // visibly joins the marks it belongs to before the voice speaks.
     let linkEnd = storySettle;
+    // Per-pair rhythm: when the story is ORDERED, each connector draws right
+    // after its OWN marks land — staggered along the same axis — instead of
+    // every link firing at one barrier. A dumbbell connects row by row,
+    // top→down (each pair's bar grows as that pair's dots settle); a slur
+    // draws left→right chasing its notes. Unordered stories keep the single
+    // group draw (stems that all belong to one baseline).
+    const linkAxis = options.order ?? (kind === "trail" ? "index" : null);
     if (linkEls.length > 0) {
-      const linkDur = 200;
-      // Per-pair rhythm: when the story is ORDERED, each connector draws right
-      // after its OWN marks land — staggered along the same axis — instead of
-      // every link firing at one barrier. A dumbbell connects row by row,
-      // top→down (each pair's bar grows as that pair's dots settle); a slur
-      // draws left→right chasing its notes. Unordered stories keep the single
-      // group draw (stems that all belong to one baseline).
-      const linkAxis = options.order ?? (kind === "trail" ? "index" : null);
       const linkNorms = linkAxis && linkEls.length > 1 ? orderNorm(linkEls, linkAxis) : null;
       linkEls.forEach((el, i) => {
         const delay = linkNorms ? storyStart + linkNorms[i]! * win + dur * 0.5 : storySettle;
         const a = dashDraw(el, screenK, cleanups, {
-          duration: linkDur,
+          duration: LINK_DUR,
           delay,
           easing: EASE_EVEN,
           fill: "backwards" as const,
@@ -547,7 +610,7 @@ export function runEntrance(
           anims.push(a);
           spoken.add(el);
         }
-        linkEnd = Math.max(linkEnd, delay + linkDur);
+        linkEnd = Math.max(linkEnd, delay + LINK_DUR);
       });
     }
 
@@ -571,19 +634,16 @@ export function runEntrance(
     // its stagger span overstates a front that never travels that way.
     const seqSpan = propAt ? win : norms ? win : n > 0 ? stagger(n - 1, n, step) : 0;
     const frontSpan = seqSpan + (kind === "draw" ? dur : 0);
-    const vbW = svg.viewBox?.baseVal?.width ?? 0;
-    const frontAt = (el: SVGGraphicsElement): number => {
-      if (frontSpan <= 0 || vbW <= 0) return 0;
-      try {
-        const b = el.getBBox();
-        const xn = Math.min(1, Math.max(0, (b.x + b.width / 2) / vbW));
-        return Math.min(storyEnd, storyStart + xn * frontSpan);
-      } catch {
-        return 0;
-      }
-    };
-    for (const el of voiceEls) {
-      if (spoken.has(el)) continue;
+    const frontAt = (el: SVGGraphicsElement): number =>
+      Math.min(storyEnd, storyStart + xNorm(el, vbW) * frontSpan);
+    // A connector's DESTINATION waits for the connector. On a dumbbell each row
+    // reads in the order its data does — the "before" ring lands, its bar grows
+    // across, and only then does the "after" dot arrive — so a voice mark rides
+    // the same wave its own row's link does instead of queueing at the barrier,
+    // where every "after" dot used to snap in together after the last bar.
+    const voiceNorms = linkAxis && linkEls.length > 1 ? orderNorm(voiceEls, linkAxis) : null;
+    voiceEls.forEach((el, i) => {
+      if (spoken.has(el)) return;
       // Text lifts in; accents/points scale-pop.
       const isText = el.tagName === "text";
       const a = isText ? el.getAttribute("text-anchor") : null;
@@ -608,13 +668,15 @@ export function runEntrance(
               ],
           {
             duration: 1.5 * BEAT,
-            delay: Math.max(voiceDelay, frontAt(el)),
+            delay: voiceNorms
+              ? Math.min(linkEnd, storyStart + voiceNorms[i]! * win + dur * 0.5 + LINK_DUR)
+              : Math.max(voiceDelay, frontAt(el)),
             easing: isText ? EASE_EVEN : MC_EASE_ENTER,
             fill: "backwards",
           },
         ),
       );
-    }
+    });
 
     if (anims.length > 0) {
       Promise.allSettled(anims.map((a) => a.finished)).then(settle);

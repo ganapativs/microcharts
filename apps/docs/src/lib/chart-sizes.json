@@ -61,7 +61,7 @@
   },
   "dumbbell": {
     "static": 3.32,
-    "interactive": 5.95
+    "interactive": 5.97
   },
   "paired-bars": {
     "static": 2.96,
@@ -273,7 +273,7 @@
   },
   "constellation": {
     "static": 3.16,
-    "interactive": 5.77
+    "interactive": 5.76
   },
   "polar-clock": {
     "static": 3.32,
@@ -341,7 +341,7 @@
   },
   "star-spoke": {
     "static": 2.43,
-    "interactive": 4.94
+    "interactive": 4.95
   },
   "minimap-strip": {
     "static": 2.92,
@@ -377,7 +377,7 @@
   },
   "phase-trace": {
     "static": 2.6,
-    "interactive": 4.96
+    "interactive": 4.97
   },
   "trace-fold": {
     "static": 2.52,
@@ -401,7 +401,7 @@
   },
   "grade-profile": {
     "static": 2.63,
-    "interactive": 5.02
+    "interactive": 5.03
   },
   "win-prob-worm": {
     "static": 3.67,
@@ -430,6 +430,6 @@
     "static": 2.17
   },
   "motion": {
-    "static": 3.18
+    "static": 3.2
   }
 }

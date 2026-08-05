@@ -71,12 +71,15 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // The terrain builds along the route, left→right, re-enacting the traverse
-  // rather than rising all at once. (The ridge line stays context; a single
-  // entrance can't both rise the terrain and draw the ridge.)
+  // rather than rising all at once — then the ridge DRAWS across the ground it
+  // describes. The ridge is data, not context: leaving it to the opening stage
+  // fade put the whole profile on screen before any of the terrain under it
+  // existed. `link` is the act that draws a mark over the marks it summarises.
   useEntrance(hostRef, "rise", animate, {
     selector: SEGMENT_SELECTOR,
     order: "x",
     window: 450,
+    link: 'path[data-mc-w="full"]',
   });
 
   const { topPad } = gradeLayout(height, label);
