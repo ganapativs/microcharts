@@ -15,7 +15,7 @@ scales through SVG and CSS alone.
 | ---------------------------- | -------------------------------------------------------- |
 | A sensible default           | Pass nothing — every chart has an intrinsic box.         |
 | An exact pixel size          | Set `width` / `height` props (where the chart has them). |
-| To fill whatever contains it | Add `style={{ width: "100%", height: "auto" }}`.         |
+| To fill whatever contains it | Give it a width in CSS — the height follows.             |
 
 <Callout type="warn">
   Not every chart has `width`/`height`. Grid charts derive their box from the cell: `ActivityGrid`, `CalendarStrip`,
