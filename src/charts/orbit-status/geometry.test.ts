@@ -17,9 +17,47 @@ const g = (
     ...extra,
   });
 
+/** No caller domain on either channel — the defaults are the subject. */
+const auto = (
+  latency: number,
+  rate: number,
+  extra: Partial<Parameters<typeof orbitStatusGeometry>[0]> = {},
+) => g(latency, rate, { latencyDomain: undefined, rateDomain: undefined, ...extra });
+
 describe("orbitStatusGeometry — two live variables", () => {
   it("orbit radius grows with latency", () => {
     expect(g(100, 5).orbit.r).toBeLessThan(g(400, 5).orbit.r);
+  });
+
+  // The old default read `[0, latency * 2]`, so EVERY latency landed at exactly
+  // half the radius range: the default frame carried no information at all.
+  it("the default latency reference separates two latencies", () => {
+    expect(auto(80, 5).orbit.r).toBeLessThan(auto(240, 5).orbit.r);
+    expect(auto(240, 5).orbit.r).toBeLessThan(auto(800, 5).orbit.r);
+    // …and it is one frame, not one per datum: past the 1000ms reference the
+    // orbit rides its outer bound instead of re-scaling around the new value.
+    expect(auto(4000, 5).orbit.r).toBe(auto(1000, 5).orbit.r);
+  });
+
+  it("a threshold sets the default reference — the alert edge is the halfway orbit", () => {
+    // Reference [0, 2·threshold], so the radius reaches the middle of its own
+    // range exactly where the satellite doubles.
+    const floor = auto(0, 5, { threshold: 300 }).orbit.r;
+    const ceiling = auto(600, 5, { threshold: 300 }).orbit.r;
+    const atThreshold = auto(300, 5, { threshold: 300 });
+    expect(atThreshold.satellite.alerted).toBe(true);
+    expect(atThreshold.orbit.r).toBeCloseTo((floor + ceiling) / 2, 2);
+    expect(auto(150, 5, { threshold: 300 }).orbit.r).toBeLessThan(atThreshold.orbit.r);
+  });
+
+  it("the default rate steps by decade", () => {
+    expect(auto(240, 0.2).orbit.rateStep).toBe(1);
+    expect(auto(240, 4).orbit.rateStep).toBe(2);
+    expect(auto(240, 40).orbit.rateStep).toBe(3);
+    expect(auto(240, 400).orbit.rateStep).toBe(4);
+    expect(auto(240, 4000).orbit.rateStep).toBe(5);
+    // …and 0 calls/s is still a solid, dash-free orbit.
+    expect(auto(240, 0).orbit.rateStep).toBe(0);
   });
 
   it("rate quantizes to 5 dash steps; rate 0 → a solid (dash-free) orbit", () => {

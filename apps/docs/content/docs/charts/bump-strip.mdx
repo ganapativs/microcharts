@@ -1,12 +1,14 @@
 ---
 title: BumpStrip
-description: "Rank over time on an inverted ordinal scale, with #1 on top and gaps for unranked periods."
+description: "Rank over time on an inverted ordinal scale, banded to the ranks held, with gaps for unranked periods."
 ---
 
-BumpStrip plots one entrant's rank over a run of periods on an inverted ordinal scale, so #1 sits on top and climbing
-draws upward. Ranks are not values: a Sparkline would treat the gap between #2 and #3 as a real distance. End labels
-("#5" → "#1") anchor the ordinal read without an axis, and change dots mark only the periods where rank moved, so flat
-runs stay quiet and the eye lands on the transitions.
+BumpStrip plots one entrant's rank over a run of periods on an inverted ordinal scale, so climbing draws upward. The
+band is the range of ranks the series holds: a run between #4 and #7 fills the box, and #1 sits on top when the series
+gets there. Ranks are not values: a Sparkline would treat the gap between #2 and #3 as a real distance. End labels ("#5"
+→ "#1") anchor the ordinal read without an axis, and change dots mark only the periods where rank moved, so flat runs
+stay quiet and the eye lands on the transitions. Set `maxRank` to fix the band at #1 through that rank, which is what
+small multiples need to be read against each other.
 
 <LiveDemo label="BumpStrip" sizeOf="bump-strip">
   <BumpStrip data={[5, 5, 4, 4, 4, 3, 2, 2, 3, 2, 1, 1]} title="Category rank" width={220} height={26} />

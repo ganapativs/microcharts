@@ -58,7 +58,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   const {
     latency,
     rate,
-    latencyDomain,
+    domain,
+    latencyDomain: latencyDomainProp,
     rateDomain,
     threshold,
     size = 20,
@@ -75,6 +76,10 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     onSelect,
     ...rest
   } = props;
+
+  // Resolved once, then handed to both the geometry here and the static entry
+  // below: two spellings of one extent must not reach two different scales.
+  const latencyDomain = domain ?? latencyDomainProp;
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();

@@ -1,10 +1,11 @@
-// BumpStrip: Rank bands,
-// #1 at the TOP (inverted y, stated in docs and self-keyed by "#" end labels).
-// Step line only — a rank cannot be 2.4, and skipped periods stay gaps, never
-// diagonal interpolation. 2-dp.
+// BumpStrip: Rank bands, best rank at
+// the TOP (inverted y, stated in docs and self-keyed by "#" end labels). The
+// band is the occupied rank range unless `maxRank` fixes it. Step line
+// only — a rank cannot be 2.4, and skipped periods stay gaps, never diagonal
+// interpolation. 2-dp.
 import { round2, type Value } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
-import { maxOf } from "../../core/scale.js";
+import { maxOf, minOf } from "../../core/scale.js";
 
 interface BumpPoint {
   x: number;
@@ -64,19 +65,33 @@ export function bumpGeometry(opts: {
   const clean = ranks.map((r) =>
     typeof r === "number" && Number.isFinite(r) && r >= 1 ? Math.round(r) : null,
   );
-  // maxOf, not `Math.max(...arr)`: a spread over a caller's series throws past
-  // ~125k arguments, and `data` is caller-sized.
-  const dataMax = maxOf(
-    clean.filter((r): r is number => r !== null),
-    1,
-  );
-  const maxRank = usableMaxRank(opts.maxRank) ?? dataMax;
+  // maxOf/minOf, not `Math.max(...arr)`: a spread over a caller's series throws
+  // past ~125k arguments, and `data` is caller-sized.
+  const ranked = clean.filter((r): r is number => r !== null);
+  const dataMax = maxOf(ranked, 1);
 
-  const bandY = (rank: number): number => {
-    const clamped = Math.min(rank, maxRank);
-    // band centers: rank 1 at top
-    return round2(1.5 + ((clamped - 1) / Math.max(1, maxRank - 1)) * (height - 3));
-  };
+  // The rank band, top (best) rank first. Rank 1 used to be a hard top anchor: a
+  // run that never placed better than #4 spent the top half of the box on ranks
+  // it never held, and `maxRank` only ever moved the floor. So the DEFAULT band
+  // is the one the series occupies — a position encoding scaled to its own data,
+  // the way every other line in this catalog is. Better is still up, worse still
+  // down, and the "#" end labels plus the summary name the ranks the edges stand
+  // for. `maxRank` is unchanged and still the shared-scale escape hatch: it pins
+  // the top band at #1 and fixes the bottom one, which is what small multiples
+  // need to be read against each other.
+  const fixed = usableMaxRank(opts.maxRank);
+  const top = fixed === undefined ? minOf(ranked, dataMax) : 1;
+  const span = (fixed ?? dataMax) - top;
+
+  // A band with no extent (one rank, or a run that never moved) has nothing to
+  // spread over, so it rides the midline — `scaleLinear`'s degenerate rule, and
+  // the only placement that says "no movement".
+  const bandY = (rank: number): number =>
+    round2(
+      span > 0
+        ? 1.5 + ((Math.min(Math.max(rank, top), top + span) - top) / span) * (height - 3)
+        : height / 2,
+    );
   const pitch = n > 1 ? (x1 - x0) / (n - 1) : 0;
 
   const points: BumpPoint[] = [];

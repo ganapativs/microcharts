@@ -22,7 +22,7 @@ export const entry: ChartEntry = {
   interactiveImport: `${PKG}/bump-strip/interactive`,
   dataShape: "(number | null)[] of 1-based ranks per period (null = unranked)",
   encoding: {
-    channel: "vertical position on an inverted rank scale (#1 on top)",
+    channel: "vertical position on an inverted rank scale (best rank on top)",
     precision: "medium — end labels give the exact ranks; steps are ordinal",
   },
   nodeBudget: "≤ 10 (1 path + change dots + 2 end labels)",
@@ -39,7 +39,7 @@ export const entry: ChartEntry = {
       name: "maxRank",
       type: "number",
       required: false,
-      description: "Fix the band so small multiples share a rank scale.",
+      description: "Fix the band at #1 through this rank, so small multiples share a scale.",
     },
     {
       name: "dots",

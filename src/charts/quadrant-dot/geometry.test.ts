@@ -205,6 +205,48 @@ describe("quadrantDotGeometry", () => {
     });
   });
 
+  // The inset is the outermost mark's radius and nothing more. It used to add a
+  // flat 1.4-unit rim on top of a proportional focal, so the 24-unit default
+  // plotted the whole field into 16.4 of its 24 units.
+  it("the plot keeps the box the marks do not need", () => {
+    const { halo } = quadrantDotRadii(24, 24);
+    expect(halo).toBeLessThanOrEqual(3.2);
+    const lo = quadrantDotGeometry({
+      ...base,
+      data: { x: 0, y: 0 },
+      field: [{ x: 10, y: 10 }],
+    })!;
+    const hi = quadrantDotGeometry({
+      ...base,
+      data: { x: 10, y: 10 },
+      field: [{ x: 0, y: 0 }],
+    })!;
+    // …and both ends of the domain still land a full halo inside the frame.
+    expect(hi.dot.x - lo.dot.x).toBeGreaterThanOrEqual(17.6);
+    expect(lo.dot.x - halo).toBeGreaterThanOrEqual(0);
+    expect(hi.dot.x + halo).toBeLessThanOrEqual(24);
+  });
+
+  it("pad adds to the mark inset; it never plots under the halo", () => {
+    const { halo } = quadrantDotRadii(24, 24);
+    const tight = quadrantDotGeometry({ ...base, data: { x: 0, y: 5 }, field: [{ x: 10, y: 5 }] })!;
+    const under = quadrantDotGeometry({
+      ...base,
+      data: { x: 0, y: 5 },
+      field: [{ x: 10, y: 5 }],
+      pad: 0,
+    })!;
+    const wide = quadrantDotGeometry({
+      ...base,
+      data: { x: 0, y: 5 },
+      field: [{ x: 10, y: 5 }],
+      pad: 6,
+    })!;
+    expect(under.dot.x).toBe(tight.dot.x);
+    expect(tight.dot.x).toBe(halo);
+    expect(wide.dot.x).toBe(6);
+  });
+
   // Containment: `.mc-root` is `overflow: visible`, so the halo running past
   // the viewBox paints over the neighbouring line, it does not clip. The plot
   // used to be inset by a flat 3 while the halo grows with the box — at 120 px

@@ -44,7 +44,13 @@ const finite = (p: Pt): boolean => Number.isFinite(p.x) && Number.isFinite(p.y);
  * fixed one leaves the outer ring of a large dot dead to the pointer.
  *
  * `halo` is the outermost mark (the focal's soft disc, and the focus/selection
- * ring drawn on top of it), so it is what the plot has to be inset by.
+ * ring drawn on top of it), so it is what the plot has to be inset by — which
+ * makes the rim around the focal a tax on the plot, paid twice per axis. A flat
+ * 1.4 units of rim was that tax read at 56 units and charged at every size: the
+ * 24-unit default spent 3.8 of every 12 on the inset and plotted the field into
+ * 68% of its own box. The rim is now 30% of the focal it wraps, so it costs the
+ * plot the same fraction at every size, and it still stops at the 1.4 it always
+ * was (unchanged at 47 units and up, where it was already proportionate).
  */
 export function quadrantDotRadii(
   width: number,
@@ -56,7 +62,11 @@ export function quadrantDotRadii(
   // attribute as `2.4000000000000004`, and the plot inset derived from `halo`
   // then missed the frame by a float's width.
   const focal = round2(Math.max(1.6, Math.min(w, h) * 0.1));
-  return { focal, ghost: round2(Math.max(1, focal * 0.52)), halo: round2(focal + 1.4) };
+  return {
+    focal,
+    ghost: round2(Math.max(1, focal * 0.52)),
+    halo: round2(focal + Math.min(1.4, focal * 0.3)),
+  };
 }
 
 /**
@@ -93,6 +103,7 @@ export function quadrantDotGeometry(opts: {
   xDomain?: readonly [number, number] | undefined;
   domain?: readonly [number, number] | undefined;
   split?: readonly [number, number] | undefined;
+  /** Extra plot inset, added to the halo the marks already need. */
   pad?: number | undefined;
 }): QuadrantDotGeometry | null {
   const { data } = opts;
@@ -102,14 +113,18 @@ export function quadrantDotGeometry(opts: {
   const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const field = (opts.field ?? []).filter(finite);
 
-  // The plot is inset by the widest mark, not by a flat 3: the focal's halo
-  // scales with the box, so at 120 px a focal on the domain edge painted ~10
-  // units of accent OUTSIDE the viewBox — `.mc-root` is `overflow: visible`, so
-  // that is a spill over neighbouring text, not a clip. Capped at half the box
-  // so a mark wider than its own frame collapses to the centre instead of
-  // inverting the range.
+  // The plot is inset by the widest mark: the focal's halo scales with the box,
+  // so at 120 px a focal on the domain edge painted ~10 units of accent OUTSIDE
+  // the viewBox — `.mc-root` is `overflow: visible`, so that is a spill over
+  // neighbouring text, not a clip. The inset is now exactly that radius and no
+  // more; the flat 3 units it used to floor at bought nothing the halo was not
+  // already reserving, and below a 30-unit box it was pure margin (an 8-unit
+  // glyph plotted its field into 2 of its 8 units). `pad` adds to the floor, it
+  // cannot go under it: less than the halo is a mark painting off the frame.
+  // Capped at half the box so a mark wider than its own frame collapses to the
+  // centre instead of inverting the range.
   const { halo } = quadrantDotRadii(width, height);
-  const pad = Math.max(opts.pad ?? 3, halo);
+  const pad = Math.max(opts.pad ?? 0, halo);
   const padX = Math.min(pad, width / 2);
   const padY = Math.min(pad, height / 2);
 

@@ -7,8 +7,12 @@ description: >-
 OrbitStatus encodes two numbers in one glyph. The orbit radius is latency, so a wider orbit is a slower service, and the
 orbit's dash density is the call rate, so denser dashes mean more calls. In the interactive entry the satellite orbits
 at a speed that mirrors the rate. Both channels are low-precision ambient reads; for exact numbers use a `Sparkline` for
-latency and a `Delta` or `MiniBar` for rate. A lone orbit radius means nothing on its own, so pass explicit
-`latencyDomain` and `rateDomain` — the same steer as `FatDigits`.
+latency and a `Delta` or `MiniBar` for rate.
+
+Each channel reads against a stated reference. The radius spans 0–1000 ms, or 0–2× `threshold` when you set one, which
+lands the alert edge on the halfway orbit. Dash density steps by decade: under 1 call/s, then 1, 10, 100, and 1000 or
+more. Pass `domain` and `rateDomain` when you know the range you care about, because a service that answers in 40–90 ms
+reads better on its own frame than on the second-wide default.
 
 <LiveDemo label="OrbitStatus" sizeOf="orbit-status">
   <OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} rateDomain={[0, 20]} title="Payments API" size={40} />

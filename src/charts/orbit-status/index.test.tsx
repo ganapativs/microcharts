@@ -42,6 +42,18 @@ describe("<OrbitStatus>", () => {
     expect(container.querySelector('text[data-mc-ink="label"]')!.textContent).toBe("240ms");
   });
 
+  it("`domain` is the grammar-standard spelling of the latency extent", () => {
+    const orbitR = (ui: React.ReactNode) =>
+      draw(ui).container.querySelectorAll("circle")[0]!.getAttribute("r");
+    expect(orbitR(<OrbitStatus latency={240} rate={12} domain={[0, 500]} />)).toBe(
+      orbitR(<OrbitStatus latency={240} rate={12} latencyDomain={[0, 500]} />),
+    );
+    // …and it is a real scale change, not an ignored prop.
+    expect(orbitR(<OrbitStatus latency={240} rate={12} domain={[0, 500]} />)).not.toBe(
+      orbitR(<OrbitStatus latency={240} rate={12} />),
+    );
+  });
+
   it("summary={false} hides it", () => {
     const { container } = draw(<OrbitStatus latency={240} rate={12} summary={false} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBeNull();
