@@ -23,3 +23,8 @@ replaced only the width and `preserveAspectRatio` fitted the drawing to the axis
 painted 80px wide, centered, inside a 335px rail, with dead space either side. `.mc-root` now carries `height: auto`, so
 the height follows the width, and `max-width: 100%`, so a chart shrinks inside a container narrower than itself instead
 of spilling out of it.
+
+**The readout's shadow no longer glows on dark.** It mixed `CanvasText`, which inverts with the theme, so on a dark
+surface the blur painted a pale halo around the chip and bled onto the mark beneath it. The new `--mc-surface-shadow`
+token is dark in every theme, because a shadow is occlusion; on dark it goes quiet and the chip's 1px edge carries the
+separation. Override it like any other token if your surface wants a different weight.
