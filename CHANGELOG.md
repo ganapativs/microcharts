@@ -1,5 +1,91 @@
 # @microcharts/react
 
+## 0.15.0
+
+### Minor Changes
+
+- [#111](https://github.com/ganapativs/microcharts/pull/111)
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Slope and PercentileLadder stop losing the label you needed.
+
+  **Slope budgets label names by width.** Truncation was pinned at six characters — the truncator's own default, applied
+  at every size — so two rows whose names shared a six-character prefix both painted the same string, and a 300-unit
+  chart showed no more of a name than a 40-unit one. The budget now scales with the width, the way DotPlot, Dumbbell and
+  RubricStrip already do: at 300×54 a twenty-character name renders fourteen characters and an ellipsis, so rows that
+  shared a prefix read as different rows.
+
+  **Slope seats a label on its own line, or drops it.** Labels were spread to a full glyph pitch from their neighbours,
+  which moved them up to 36% of the chart height away from the line they named — measured on six rows, three of them
+  ended up nearer another row's line than their own. Each label now sits at its own endpoint, nudged only far enough to
+  clear the label above it, and is dropped when it cannot sit within half a pitch of its line. Expect fewer labels on a
+  crowded chart and every remaining one attached to the right line: six endpoints spanning 27 units cannot carry six
+  eight-unit labels, and a label 19 units from its line was not naming anything.
+
+  **PercentileLadder keeps the middle rung.** Labels were placed tail first, then p50, then the interiors, so a
+  collision always cost an interior label: `ps={[50, 90, 99]}` rendered 50 and 99 and dropped p90, the one you act on.
+  At the default width of 80 it dropped p90 as well, so the chart never showed all three of its own default percentiles
+  at its own default size. Labels are now spread to a minimum pitch first, which seats all of them at up to four rungs,
+  and only a spread that would put a label nearer another rung falls back to seating at the tick — interiors first, so a
+  drop lands on an end. Across 62,832 configurations, cases with a label nearer a foreign tick went from 18,153 to none,
+  and three-rung charts keeping every interior label went from 17% to 84%.
+
+- [#111](https://github.com/ganapativs/microcharts/pull/111)
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Interactive readouts stay on screen, and a CSS width fills the box.
+
+  **The readout can no longer be clipped.** It was `position: absolute; bottom: 100%`, so any ancestor with `overflow`
+  other than `visible` cut it off — a chart in a scrolling rail showed a sliver of its label — and it opened upward even
+  with no room above. It now renders in the top layer and is placed by CSS anchor positioning: it flips below the chart
+  when there is no room above, stops at the window edge and grows the other way instead of running off-screen, and hides
+  once its chart scrolls out of view. No measurement, no portal, no scroll listener, and no new props. Chrome, Edge and
+  Safari place it this way; Firefox has no anchor positioning yet and keeps the previous placement.
+
+  If you set `readout={false}`, reserved headroom, or raised a `z-index` to work around a clipped chip, you can drop it.
+
+  **Behavior change:** the chip is centered on the chart rather than on the hovered datum. The per-datum offset was an
+  inline `left`, and an inline `left` outranks the stylesheet — it is what prevented the browser from clamping the chip
+  to the screen. The crosshair inside the chart still marks the exact datum. `crosshairReadoutStyle` and
+  `rowReadoutStyle` are gone from the shared entry; neither was documented.
+
+  **A CSS width now fills the box.** Charts emitted `width` and `height` as SVG attributes, so a `className="w-full"`
+  replaced only the width and `preserveAspectRatio` fitted the drawing to the axis you had not touched: an 80×6 Bullet
+  painted 80px wide, centered, inside a 335px rail, with dead space either side. `.mc-root` now carries `height: auto`,
+  so the height follows the width, and `max-width: 100%`, so a chart shrinks inside a container narrower than itself
+  instead of spilling out of it.
+
+  **The readout's shadow no longer glows on dark.** It mixed `CanvasText`, which inverts with the theme, so on a dark
+  surface the blur painted a pale halo around the chip and bled onto the mark beneath it. The new `--mc-surface-shadow`
+  token is dark in every theme, because a shadow is occlusion; on dark it goes quiet and the chip's 1px edge carries the
+  separation. Override it like any other token if your surface wants a different weight.
+
+- [#111](https://github.com/ganapativs/microcharts/pull/111)
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Five charts now use the box they are given, without changing what a
+  mark means.
+
+  **OrbitStatus reads against a stated reference.** The default latency domain was `[0, 2 × latency]` and the default
+  rate domain `[0, 2 × rate]`, so every input landed at exactly half the radius range and in the middle dash step: the
+  glyph drew the same circle for a 40 ms service and a 4 s one, and only the summary carried the number. The radius now
+  spans 0–1000 ms, or 0–2× `threshold` when you set one, which puts the alert edge on the halfway orbit. Dash density
+  steps by decade: under 1 call/s, then 1, 10, 100, and 1000 or more. `domain` is accepted as the grammar-standard
+  spelling of `latencyDomain`.
+
+  **BumpStrip plots the ranks the series holds.** Rank 1 was a hard top anchor, so a run that never placed better than
+  [#4](https://github.com/ganapativs/microcharts/issues/4) spent the top half of the box on ranks it never held. The
+  band is now the occupied rank range: better is still up, worse still down, and the "#" end labels name what each edge
+  stands for. `maxRank` is unchanged and still pins the top band at
+  [#1](https://github.com/ganapativs/microcharts/issues/1), which is what small multiples need to share a scale.
+
+  **QuadrantDot keeps the box its marks do not need.** The plot was inset by the focal halo, and that halo carried a
+  flat 1.4-unit rim at every size, so the 24-unit default plotted its field into 16.4 of its 24 units. The rim is now
+  30% of the focal it wraps and still stops at 1.4, and the inset is that radius alone rather than a 3-unit floor on top
+  of it. The default box gains 1.6 units of plot per axis, an 8-unit glyph gains 1.8, and the halo stays inside the
+  viewBox.
+
+  **PercentileTrace and WinProbWorm take `domain`.** Both keep the full fixed frame as the default, because truncating a
+  percentile or a probability inflates a small move into a rout. Pass a narrower extent when you are reading a run that
+  lives in one corner of it; anything outside lands on the plot edge, never past it.
+
 ## 0.14.0
 
 ### Minor Changes
