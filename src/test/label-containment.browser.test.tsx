@@ -216,8 +216,8 @@ const CASES: Record<string, () => ReactElement> = {
   "slope (wide)": () => (
     <Slope
       data={[
-        { label: "SPECIALFLAGSINTERNAL", from: 20, to: 33 },
-        { label: "SPECIALFLAGSNAME", from: 44, to: 28 },
+        { label: "SUBSCRIPTIONRENEWALS", from: 20, to: 33 },
+        { label: "SUBSCRIPTIONRATE", from: 44, to: 28 },
       ]}
       width={300}
       height={54}

@@ -100,8 +100,8 @@ describe("slopeFrame (shared static/interactive frame)", () => {
     // truncated at 6, so both ends of the contract ignored the room available
     // and two 20-character names arrived as one string.
     const names = [
-      { from: 1, to: 2, label: "specialFlagsInternal" },
-      { from: 2, to: 1, label: "specialFlagsName" },
+      { from: 1, to: 2, label: "subscriptionRenewals" },
+      { from: 2, to: 1, label: "subscriptionRate" },
     ];
     const wide = slopeFrame({
       width: 300,

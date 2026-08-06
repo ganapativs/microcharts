@@ -86,8 +86,8 @@ describe("<Slope>", () => {
   // Six rows whose names share a 6-character prefix, in a box wide enough to
   // tell them apart. Both bugs this fixture pins were measured here.
   const PREFIXED = [
-    { label: "specialFlagsInternal", from: 40, to: 47 },
-    { label: "specialFlagsName", from: 55, to: 41 },
+    { label: "subscriptionRenewals", from: 40, to: 47 },
+    { label: "subscriptionRate", from: 55, to: 41 },
     { label: "southRegion", from: 30, to: 33 },
     { label: "northRegion", from: 50, to: 44 },
     { label: "midRegion", from: 20, to: 35 },
@@ -96,12 +96,12 @@ describe("<Slope>", () => {
 
   it("the name budget scales with the width, so a shared prefix stays readable", () => {
     // Was: `truncateLabel(d.label)` with no budget, so the truncator's own
-    // 6-character default applied at every width and `specialFlagsInternal` and
-    // `specialFlagsName` both painted "specia…" — two lines under one name.
+    // 6-character default applied at every width and `subscriptionRenewals` and
+    // `subscriptionRate` both painted "subscr…" — two lines under one name.
     const { container } = draw(<Slope data={PREFIXED} label="label" width={300} height={54} />);
     const texts = [...container.querySelectorAll("text")].map((t) => t.textContent ?? "");
-    const shared = texts.filter((t) => t.startsWith("special"));
-    expect(shared).toEqual(["specialFlagsIn…", "specialFlagsNa…"]);
+    const shared = texts.filter((t) => t.startsWith("subscription"));
+    expect(shared).toEqual(["subscriptionRe…", "subscriptionRa…"]);
     // no two rendered labels are the same string
     expect(new Set(texts).size).toBe(texts.length);
   });

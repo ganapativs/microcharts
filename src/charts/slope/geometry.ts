@@ -96,7 +96,7 @@ export function slopeFitFrame(opts: {
  * The budget was a hardcoded 6 on both sides of the contract — a reserved
  * `Math.min(6, label.length) + 1` here and a `truncateLabel(label)` default
  * there — so a 300-unit chart truncated exactly as hard as a 40-unit one and
- * `specialFlagsInternal` and `specialFlagsName` both painted `specia…`, two
+ * `subscriptionRenewals` and `subscriptionRate` both painted `subscr…`, two
  * lines under one name. This is the shared row-label policy every other
  * stacked-row chart already uses (same width share, same 14-char cap, same rule
  * that a stub too short to identify a row drops instead), so the budget grows
