@@ -4,10 +4,11 @@ description: >-
   PercentileTrace traces one entity's percentile rank over time against the fixed bands of the pack.
 ---
 
-PercentileTrace traces one entity's **percentile rank** over time on a scale **locked to 0–100**. Because the axis _is_
+PercentileTrace traces one entity's **percentile rank** over time on the **full 0–100 scale**. Because the axis _is_
 rank, the population is constant by definition: the middle-half (**p25–75**) and near-full (**p5–95**) bands are fixed
 fields, exact by construction rather than estimated from the traced series, and the only line on the chart is the entity
-itself. The axis is never truncated, which would hide how much headroom or floor is left.
+itself. The default axis is never truncated, which would hide how much headroom or floor is left; `domain` zooms it when
+you are reading a run that lives at the top of the ladder.
 
 <LiveDemo
   label="PercentileTrace"

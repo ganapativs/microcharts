@@ -79,6 +79,7 @@ export function percentileGeometry(opts: {
   width: number;
   height: number;
   data: readonly Value[];
+  domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): PercentileGeometry | null {
   const { data } = opts;
@@ -99,7 +100,14 @@ export function percentileGeometry(opts: {
   const n = data.length;
 
   const xScale = scaleLinear([0, Math.max(1, n - 1)], [padX, width - padX]);
-  const yScale = scaleLinear([0, 100], [height - padY, padY]);
+  // The frame is the full rank axis by default — truncating it inflates a drift
+  // of three percentile points into a plunge. A caller who wants the top of the
+  // ladder in detail says so with `domain`, and `y` clamps whatever falls
+  // outside it onto the plot edge rather than off the frame.
+  const yScale = scaleLinear(
+    opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : [0, 100],
+    [height - padY, padY],
+  );
   const x = (i: number) => round2(xScale(i));
   const y = (v: number) => round2(clamp(yScale(v), padY, height - padY));
 

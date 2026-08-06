@@ -36,6 +36,12 @@ export const entry: ChartEntry = {
       description: "A single win-probability series, clamped to 0–100.",
     },
     {
+      name: "domain",
+      type: "[number, number]",
+      required: false,
+      description: "Probability extent (default [0, 100] — the full range).",
+    },
+    {
       name: "sides",
       type: "[string, string]",
       required: false,

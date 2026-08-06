@@ -12,6 +12,10 @@ import { textGutter } from "../../core/labels.js";
 /** Symmetric inset (viewBox units) — the plot never touches the frame edge. */
 export const PAD = 2;
 
+/** The probability axis. Full range by default: a truncated frame turns a
+ *  2-point edge into a rout, which is the one thing this chart must not do. */
+const FRAME: readonly [number, number] = [0, 100];
+
 /** The winning side's own probability (≥50 → v, else its complement). */
 export const leaderProb = (v: number): number => (v >= 50 ? v : 100 - v);
 const leaderSide = (v: number, sides: readonly [string, string]): string =>
@@ -47,7 +51,7 @@ export interface WinProbWormGeometry {
   aboveD: string;
   /** Trailing (<50) stretches — one <path> of neutral strokes. */
   belowD: string;
-  /** y of the 50% midline (= height/2 at symmetric pad). */
+  /** y of the 50% midline (= height/2 on the default frame + symmetric pad). */
   midY: number;
   /** Interpolated 50% crossings — the lead changes. */
   crossings: { x: number; y: number }[];
@@ -74,6 +78,8 @@ export function winProbWormGeometry(opts: {
   data: readonly (number | null)[];
   /** Right gutter reserved for the "last" label (shrinks the plot). */
   gutterRight?: number | undefined;
+  /** Probability extent. Default [0, 100]. */
+  domain?: readonly [number, number] | undefined;
   pad?: number | undefined;
 }): WinProbWormGeometry | null {
   const { width, height, data } = opts;
@@ -84,7 +90,12 @@ export function winProbWormGeometry(opts: {
   const plotW = Math.max(0, width - 2 * pad - gutterRight);
   const lastX = Math.max(1, n - 1);
   const sx = (i: number): number => pad + (i / lastX) * plotW;
-  const sy = (v: number): number => height - pad - (v / 100) * plotH;
+  // Probabilities are clamped to 0–100 and the default frame is that range, so
+  // the fraction only leaves [0,1] on a caller's narrowed `domain` — where the
+  // mark belongs on the edge it ran off, never past it (the midline included).
+  const [d0, d1] = opts.domain?.every(Number.isFinite) ? opts.domain : FRAME;
+  const span = d1 - d0 || 1;
+  const sy = (v: number): number => height - pad - clamp((v - d0) / span, 0, 1) * plotH;
   const midY = round2(sy(50));
 
   // pass 1 — min/max, last finite, endpoint marker
@@ -194,18 +205,19 @@ export function resolveWormGeo(opts: {
   width: number;
   height: number;
   data: readonly (number | null)[];
+  domain?: readonly [number, number] | undefined;
   label: "last" | "none";
   font: number;
   /** Percent formatter (FRACTION in) for the endpoint probability label. */
   pctFmt: (fraction: number) => string;
 }): { geo: WinProbWormGeometry | null; gutter: number; lastText: string } {
-  const { width, height, data, label, font, pctFmt } = opts;
-  const probe = winProbWormGeometry({ width, height, data });
+  const { width, height, data, domain, label, font, pctFmt } = opts;
+  const probe = winProbWormGeometry({ width, height, data, domain });
   const showLast = label === "last" && probe != null && probe.end != null && height >= font + 0.8;
   const lastText = showLast ? wormPct(leaderProb(probe!.last as number), pctFmt) : "";
   const gutter = showLast ? wormGutter(lastText, font) : 0;
   const geo =
-    gutter > 0 ? winProbWormGeometry({ width, height, data, gutterRight: gutter }) : probe;
+    gutter > 0 ? winProbWormGeometry({ width, height, data, domain, gutterRight: gutter }) : probe;
   return { geo, gutter, lastText };
 }
 

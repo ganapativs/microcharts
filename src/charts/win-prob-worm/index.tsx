@@ -21,6 +21,8 @@ export { winProbWormSummary, wormGutter } from "./geometry.js";
 export interface WinProbWormProps {
   /** A single win-probability series, clamped to 0–100 (out-of-range dev-warns). */
   data: readonly (number | null)[];
+  /** Probability extent — the y-axis. Default [0, 100], the full range. */
+  domain?: readonly [number, number] | undefined;
   /** Names for the two sides — [`>50`, `<50`]. Default `["A", "B"]`. */
   sides?: readonly [string, string] | undefined;
   /** `"last"` prints the current leader's probability at the endpoint. */
@@ -44,6 +46,7 @@ export interface WinProbWormProps {
 export function WinProbWorm(props: WinProbWormProps): ReactNode {
   const {
     data,
+    domain,
     sides = ["A", "B"],
     label = "last",
     markSwing = true,
@@ -81,6 +84,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
     width,
     height,
     data,
+    domain,
     label,
     font: FONT,
     pctFmt,

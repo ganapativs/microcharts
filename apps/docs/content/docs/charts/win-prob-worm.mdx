@@ -3,10 +3,11 @@ title: WinProbWorm
 description: WinProbWorm plots win probability on a fixed 0–100 axis and marks every lead change.
 ---
 
-A model has the home side at 98% after three lead changes. WinProbWorm plots that series on a **fixed 0–100 axis that is
-never truncated**, so a 2-point edge always looks like a 2-point edge. It splits the worm at the 50% line: while your
-side leads the line reads accent, when it trails it reads neutral, and a dot marks each lead change. A win-probability
-curve is a modelled read, so the summary always says so, "per the supplied model".
+A model has the home side at 98% after three lead changes. WinProbWorm plots that series on the **full 0–100 axis**, so
+a 2-point edge always looks like a 2-point edge. The default frame is never truncated; `domain` narrows it when you are
+reading a game that never left the middle. It splits the worm at the 50% line: while your side leads the line reads
+accent, when it trails it reads neutral, and a dot marks each lead change. A win-probability curve is a modelled read,
+so the summary always says so, "per the supplied model".
 
 <LiveDemo label="WinProbWorm" sizeOf="win-prob-worm">
   <WinProbWorm

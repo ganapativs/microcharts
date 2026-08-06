@@ -50,6 +50,7 @@ export interface InteractivePercentileTraceProps extends PercentileTraceProps, P
 export function PercentileTrace(props: InteractivePercentileTraceProps): React.ReactNode {
   const {
     data,
+    domain,
     unit = "step",
     height: heightProp = DEFAULT_HEIGHT,
     width: widthProp = DEFAULT_WIDTH,
@@ -79,7 +80,10 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
-  const geo = useMemo(() => percentileGeometry({ width, height, data }), [width, height, data]);
+  const geo = useMemo(
+    () => percentileGeometry({ width, height, data, domain }),
+    [width, height, data, domain],
+  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pStr = useCallback((n: number) => strings.percentileValue(fmt(n)), [strings, fmt]);
 
@@ -180,6 +184,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
         {...rest}
         style={fillFor(style)}
         data={data}
+        domain={domain}
         width={width}
         height={height}
         label={label}
