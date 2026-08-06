@@ -17,11 +17,11 @@ the other 105. Sizes are gzip, measured by `pnpm size` and gated, so a chart tha
 
 <SizeDistribution />
 
-The `/interactive` subpath lands between **2.18 kB and 6.97 kB** gzip, with a **median of 5.27 kB**. That buys hover,
-roving keyboard focus, select-to-pin, touch scrub, and live announcements. Its static twin is pure SVG with zero client
-JavaScript, and lands between **1.08 kB and 4.25 kB**, with a **median of 2.76 kB**. A page pays for interactivity only
-where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the per-subpath gate measures
-standalone in every entry; a page using several interactive charts bundles it once.
+The `/interactive` subpath lands between **2.18 kB and 7 kB** gzip, with a **median of 5.32 kB**. That buys hover,
+roving keyboard focus, select-to-pin (and light dismiss), touch scrub, and live announcements. Its static twin is pure
+SVG with zero client JavaScript, and lands between **1.08 kB and 4.25 kB**, with a **median of 2.76 kB**. A page pays
+for interactivity only where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the
+per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 

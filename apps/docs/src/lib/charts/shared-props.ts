@@ -156,7 +156,7 @@ export const SHARED_INTERACTIVE_PROPS: ChartProp[] = [
     required: false,
     interactive: true,
     description:
-      "A unit was activated — click, tap, `Enter` or `Space`. On multi-unit pickers this pins the unit so it survives blur (`null` when cleared by re-selecting or `Escape`). On lean scalars there is only one unit, so the callback fires with no pinned state. Same `MicroDatum` payload as `onActive`.",
+      "A unit was activated — click, tap, `Enter` or `Space`. On multi-unit pickers this pins the unit so it survives blur (`null` when cleared by re-selecting, by `Escape`, or by a pointer press outside the chart). On lean scalars there is only one unit, so the callback fires with no pinned state. Same `MicroDatum` payload as `onActive`.",
   },
   {
     name: "selectedIndex",

@@ -289,7 +289,7 @@
   {
     "name": "@microcharts/react/micro-donut/interactive",
     "path": "dist/charts/micro-donut/client.js",
-    "limit": "5.52 kB",
+    "limit": "5.64 kB",
     "gzip": true
   },
   {
@@ -385,7 +385,7 @@
   {
     "name": "@microcharts/react/horizon/interactive",
     "path": "dist/charts/horizon/client.js",
-    "limit": "5.32 kB",
+    "limit": "5.43 kB",
     "gzip": true
   },
   {
@@ -409,7 +409,7 @@
   {
     "name": "@microcharts/react/event-timeline/interactive",
     "path": "dist/charts/event-timeline/client.js",
-    "limit": "5.84 kB",
+    "limit": "5.97 kB",
     "gzip": true
   },
   {
@@ -445,7 +445,7 @@
   {
     "name": "@microcharts/react/percentile-ladder/interactive",
     "path": "dist/charts/percentile-ladder/client.js",
-    "limit": "5.94 kB",
+    "limit": "6.09 kB",
     "gzip": true
   },
   {
@@ -487,7 +487,7 @@
   {
     "name": "@microcharts/react/burn-chart/interactive",
     "path": "dist/charts/burn-chart/client.js",
-    "limit": "6.15 kB",
+    "limit": "6.28 kB",
     "gzip": true
   },
   {
@@ -499,7 +499,7 @@
   {
     "name": "@microcharts/react/error-budget/interactive",
     "path": "dist/charts/error-budget/client.js",
-    "limit": "5.50 kB",
+    "limit": "5.63 kB",
     "gzip": true
   },
   {
@@ -511,7 +511,7 @@
   {
     "name": "@microcharts/react/control-strip/interactive",
     "path": "dist/charts/control-strip/client.js",
-    "limit": "5.91 kB",
+    "limit": "6.03 kB",
     "gzip": true
   },
   {
@@ -787,7 +787,7 @@
   {
     "name": "@microcharts/react/tree-rings/interactive",
     "path": "dist/charts/tree-rings/client.js",
-    "limit": "4.86 kB",
+    "limit": "4.98 kB",
     "gzip": true
   },
   {
@@ -1057,7 +1057,7 @@
   {
     "name": "@microcharts/react/dual-window-meter/interactive",
     "path": "dist/charts/dual-window-meter/client.js",
-    "limit": "5.25 kB",
+    "limit": "5.36 kB",
     "gzip": true
   },
   {
@@ -1069,7 +1069,7 @@
   {
     "name": "@microcharts/react/depth-wedge/interactive",
     "path": "dist/charts/depth-wedge/client.js",
-    "limit": "4.94 kB",
+    "limit": "5.05 kB",
     "gzip": true
   },
   {
@@ -1225,7 +1225,7 @@
   {
     "name": "@microcharts/react/win-prob-worm/interactive",
     "path": "dist/charts/win-prob-worm/client.js",
-    "limit": "6.14 kB",
+    "limit": "6.31 kB",
     "gzip": true
   },
   {
@@ -1237,7 +1237,7 @@
   {
     "name": "@microcharts/react/queue-depth/interactive",
     "path": "dist/charts/queue-depth/client.js",
-    "limit": "5.91 kB",
+    "limit": "6.04 kB",
     "gzip": true
   },
   {
@@ -1249,7 +1249,7 @@
   {
     "name": "@microcharts/react/spread-band/interactive",
     "path": "dist/charts/spread-band/client.js",
-    "limit": "5.98 kB",
+    "limit": "6.11 kB",
     "gzip": true
   },
   {
@@ -1273,7 +1273,7 @@
   {
     "name": "@microcharts/react/percentile-trace/interactive",
     "path": "dist/charts/percentile-trace/client.js",
-    "limit": "5.62 kB",
+    "limit": "5.77 kB",
     "gzip": true
   },
   {

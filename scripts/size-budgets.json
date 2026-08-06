@@ -6,6 +6,7 @@
   "$ceilings": "CEILING DECISION (resolved 2026-08-03; replaces the STALE-RULE NOTE of 2026-07-26). Two rules in CLAUDE.md had stopped describing the shipped catalog and neither was enforced per entry. Both are now settled, and the numbers below are measured from a fresh build of 217 subpaths. RETIRED: `interactive ≤ static + 1 kB`. It was never reachable. size-limit bundles each subpath standalone, so every interactive entry is charged the whole shared picker/announce/seat kernel — kernel:interactive minus kernel:static in size-snapshot.mjs, ~1.8 kB of chunk source, ~2.4 kB once bundled per entry. Measured deltas across the 106 pairs run 1.01–3.12 kB, median 2.45 kB, so all 106 broke the old rule and none of them broke anything real. The replacement admission bar is `interactive ≤ static + 3.25 kB`: the kernel plus ~0.85 kB of entry code. The whole catalog meets it, and it still fails an entry that re-implements shared work locally instead of composing the static and the picker. REFRAMED: `static ≤ 3 kB` is an ADMISSION bar for a new chart, not a catalog ceiling. 32 shipped statics measure 3.02–4.25 kB. Each one's size is the recorded cost of a named feature — the annotations host walker, direct-label gutter math, derived statistics, a second series or band, a second orientation — itemized in the $ notes below. A byte review on 2026-08-03 looked for slack and found none: the shared kernel tree-shakes correctly (micro-donut measures 2985 B and does not carry segmented-bar's 2684 B), dev warnings are not eliminable because their messages are call arguments (esbuild with `process.env.NODE_ENV` defined to production measures the same 2752 B on ohlc either way), and the largest entries are dense feature code rather than duplication. They stay, governed by rules (1) and (2) in $comment. 74 chart statics remain under 3 kB, so the bar that put them there is unchanged and these 32 are not a precedent. CATALOG CEILING: static 4.35 kB / interactive 7 kB. USER-SET 2026-08-03: 7 kB is a HARD wall on any interactive subpath, not crossable by sign-off. It is the number the README, the docs and the package description all quote (“~2–7 kB interactive”), so crossing it would make published copy false. Sparkline defines the top of both scales (4245 / 6995 measured) and its interactive budget is pinned AT the wall — 7000 B, 5 B of headroom — rather than at measured + 2%, which would have sat 135 B over it. Any growth on that subpath fails the size gate, by design; buy room by shrinking the entry, never by raising this number. Static 4.35 kB keeps its normal sign-off route.",
   "$polish": "CHART-POLISH PASS (2026-07-21): P0/P1 labelFont/fontWeight/motion-safety + sibling API parity (annotations hosts, optional labels, glyph pop entrances). Measured cost after one-pass gutter math on ensemble/net-flow/forecast-cone and gated label work: ensemble-ghosts +0.74 kB static (annotations walker + end label), bullet/micro-donut/honeycomb optional labels +0.24–0.35 kB even at default none (feature ships in the entry), annotation hosts ~+0.21–0.29 kB each, glyph useEntrance ~+0.22–0.31 kB interactive. Budgets re-measured with max(50 B, 2%) headroom. NEW charts still held to 3 kB / +1 kB.",
   "$hover": "HOVER-INDEX CORRECTNESS (2026-07-19): four charts emitted or consumed the wrong index space on hover — ohlc read a filtered position back against the unfiltered periods, retention-curve emitted a period but consumed a position, pareto-strip/percentile-ladder made unpainted marks navigable, polar-clock inverted a raw `start`. The fixes carry a source index through geometry and switch the sparse spaces to `navOrder`, costing: ohlc 2.64→2.65 / 4.61→4.73, retention-curve interactive 5.14→5.24, pareto-strip 2.45→2.49 / 4.51→4.62, polar-clock 3.07→3.09 / 5.12→5.15. percentile-ladder was unchanged. polar-clock's static exception listed in $seat moves 3.06→3.09; it stays under the other approved statics and is not a precedent.",
+  "$dismiss": "LIGHT-DISMISS RE-BASELINE (2026-08-06). The shared picker kernel (src/shared/interactive.ts) now binds `pointerdown` + `keydown` on the window WHILE a unit is pinned, so a press outside the chart — or Escape from anywhere — drops the selection; a pin used to be reachable only by re-selecting the same unit or by pressing Escape on a chart that still had focus. Measured on a fresh build: kernel:interactive 4144 -> 4198 B, and +~50 B gzip on each of the ~85 multi-unit interactive subpaths. 14 of them crossed their budget by 1-44 B and are re-based here at measured + max(50 B, 2%); the other ~71 absorbed it inside the headroom they already had. Statics are untouched — the kernel is client-only. SPARKLINE PAID FOR ITSELF: ./sparkline/interactive is pinned AT the 7 kB wall, which no sign-off raises, so the room came out of the entry instead. In the kernel: the wrap() default cache is a plain object with `??=` rather than a Map, `datum` is required (all 84 picker charts pass one, so the index-only fallback was dead weight), navOrder indexes its order array directly, the pointerdown stamp shares the `down` ref the tap/drag test already kept, and the listeners bind through the bare `addEventListener` globals. In the chart: uiGroup() is inlined into its only caller, the two UI marks are destructured once, and the readout gates on the geometry point rather than re-testing the value (which also stopped a pin that outlived its series, or one aimed at a gap, from announcing 'Point 0 of 3: NaN'). Net 6970 -> 6991 B, inside the wall by 9 B. NOT a precedent for spending the remaining margin: the next change to that entry has to find its own bytes.",
   "styles": "12 kB",
   "charts": {
     "sparkline": {
@@ -111,7 +112,7 @@
     },
     "micro-donut": {
       "static": "3.05 kB",
-      "interactive": "5.52 kB"
+      "interactive": "5.64 kB"
     },
     "funnel": {
       "static": "2.68 kB",
@@ -143,7 +144,7 @@
     },
     "horizon": {
       "static": "2.94 kB",
-      "interactive": "5.32 kB"
+      "interactive": "5.43 kB"
     },
     "calendar-strip": {
       "static": "2.76 kB",
@@ -151,7 +152,7 @@
     },
     "event-timeline": {
       "static": "3.10 kB",
-      "interactive": "5.84 kB"
+      "interactive": "5.97 kB"
     },
     "coverage-strip": {
       "static": "2.66 kB",
@@ -163,7 +164,7 @@
     },
     "percentile-ladder": {
       "static": "3.48 kB",
-      "interactive": "5.94 kB"
+      "interactive": "6.09 kB"
     },
     "graded-band": {
       "static": "3.14 kB",
@@ -187,15 +188,15 @@
     },
     "burn-chart": {
       "static": "3.56 kB",
-      "interactive": "6.15 kB"
+      "interactive": "6.28 kB"
     },
     "error-budget": {
       "static": "3.06 kB",
-      "interactive": "5.50 kB"
+      "interactive": "5.63 kB"
     },
     "control-strip": {
       "static": "3.44 kB",
-      "interactive": "5.91 kB"
+      "interactive": "6.03 kB"
     },
     "forecast-cone": {
       "static": "3.67 kB",
@@ -287,7 +288,7 @@
     },
     "tree-rings": {
       "static": "2.39 kB",
-      "interactive": "4.86 kB"
+      "interactive": "4.98 kB"
     },
     "city-skyline": {
       "static": "2.69 kB",
@@ -367,11 +368,11 @@
     },
     "dual-window-meter": {
       "static": "2.85 kB",
-      "interactive": "5.25 kB"
+      "interactive": "5.36 kB"
     },
     "depth-wedge": {
       "static": "2.54 kB",
-      "interactive": "4.94 kB"
+      "interactive": "5.05 kB"
     },
     "partition-strip": {
       "static": "2.61 kB",
@@ -423,15 +424,15 @@
     },
     "win-prob-worm": {
       "static": "3.75 kB",
-      "interactive": "6.14 kB"
+      "interactive": "6.31 kB"
     },
     "queue-depth": {
       "static": "3.44 kB",
-      "interactive": "5.91 kB"
+      "interactive": "6.04 kB"
     },
     "spread-band": {
       "static": "3.45 kB",
-      "interactive": "5.98 kB"
+      "interactive": "6.11 kB"
     },
     "bias-strip": {
       "static": "2.82 kB",
@@ -439,7 +440,7 @@
     },
     "percentile-trace": {
       "static": "3.11 kB",
-      "interactive": "5.62 kB"
+      "interactive": "5.77 kB"
     }
   },
   "$labelsize": "LABEL-SIZE PIN (2026-07-19): `styles.css` sets `font-size` on `.mc-root text`, and a CSS declaration outranks an SVG presentation attribute, so a chart's `fontSize={n}` was inert unless it also pinned `--mc-label-size`. 22 charts did not, and painted labels at 1.3-2.4x the size their gutters were computed for — measured spills up to 17.5 viewBox units past the viewBox, at default size, with the catalog's own sample data (src/test/label-containment.browser.test.tsx reproduces it). Pinning the var costs ~30 B gzip per affected subpath (+1.35 kB across the catalog). Twelve budgets are raised here to absorb it, each to ~60 B of headroom. Sparkline static 3.7 -> 3.8 kB touches the USER-APPROVED flagship exception above and needs the same sign-off. The alternative to paying these bytes is shipping charts whose labels paint into the page, so the bytes are not optional. STREAK-SPARK LABEL BAND (same pass): its geometry reserved no room above the runs, so the DEFAULT label=\"current\" rendered nothing below ~48 units against a default height of 20 — a documented prop that did nothing at word size. Reserving the band costs ~50 B static / ~20 B interactive; both budgets raised here.",

@@ -58,10 +58,10 @@ section into `CLAUDE.md` on Windows.
 - `data` alone always renders; single-value charts take `value` instead. Shared prop names mean the same thing
   everywhere — see `sharedProps` in `/catalog.json`. Chart-specific props and callbacks live on the chart's catalog
   entry and its `.md` page; don't memorize them.
-- Interactive entries share one contract: hover/arrows activate; click/tap/Enter/Space select; Escape clears. Prefer
-  each chart's `sharedInteractive` list when present (lean scalars may take only `onSelect`; MinimapStrip uses
-  `onWindowChange` in chart `props`). For entrance motion: pass `animate` and import `@microcharts/react/motion` once on
-  the client.
+- Interactive entries share one contract: hover/arrows activate; click/tap/Enter/Space select; Escape or a press outside
+  the chart clears. Prefer each chart's `sharedInteractive` list when present (lean scalars may take only `onSelect`;
+  MinimapStrip uses `onWindowChange` in chart `props`). For entrance motion: pass `animate` and import
+  `@microcharts/react/motion` once on the client.
 - `null`, `NaN`, or non-finite values in `data` are gaps, never zeros.
 - Accessibility is automatic (`role="img"` + a generated summary). Inline in a sentence: wrap in
   `<span className="mc-inline">` and pass `summary={false}`.
@@ -221,18 +221,20 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
 ### One interaction contract
 
 Every interactive chart behaves the same way, so you learn it once. Hover or arrow keys make a unit **active**; a click,
-tap, **Enter**, or **Space** **selects** it and pins the readout so it survives blur. **Escape** clears,
-**Home**/**End** jump to the ends, and arrows rove in both axes (←/↑ previous, →/↓ next). On touch, a tap pins and a
-drag scrubs. What a "unit" is depends on the chart — a point, a bar, a day cell, a segment — and each chart's page names
-its own.
+tap, **Enter**, or **Space** **selects** it and pins the readout so it survives blur. **Home**/**End** jump to the ends,
+and arrows rove in both axes (←/↑ previous, →/↓ next). On touch, a tap pins and a drag scrubs. What a "unit" is depends
+on the chart — a point, a bar, a day cell, a segment — and each chart's page names its own.
 
-| Prop                   | Type                                  | What it does                                                                         |
-| ---------------------- | ------------------------------------- | ------------------------------------------------------------------------------------ |
-| `onActive`             | `(datum: MicroDatum \| null) => void` | The active unit changed (pointer or keyboard). `null` when the chart clears.         |
-| `onSelect`             | `(datum: MicroDatum \| null) => void` | A unit was selected or unselected — click, tap, `Enter`, `Space`, `Escape`.          |
-| `selectedIndex`        | `number \| null`                      | Control the selection yourself.                                                      |
-| `defaultSelectedIndex` | `number \| null`                      | Seed the selection once, then let the chart own it.                                  |
-| `readout`              | `boolean`                             | Show the floating value chip on hover (default `true`). `false` hides only the chip. |
+A pin comes off three ways: select the same unit again, press **Escape** (from the chart or from anywhere on the page),
+or press anywhere outside the chart. Each of them fires `onSelect(null)`.
+
+| Prop                   | Type                                  | What it does                                                                               |
+| ---------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `onActive`             | `(datum: MicroDatum \| null) => void` | The active unit changed (pointer or keyboard). `null` when the chart clears.               |
+| `onSelect`             | `(datum: MicroDatum \| null) => void` | A unit was selected or unselected — click, tap, `Enter`, `Space`, `Escape`, outside press. |
+| `selectedIndex`        | `number \| null`                      | Control the selection yourself.                                                            |
+| `defaultSelectedIndex` | `number \| null`                      | Seed the selection once, then let the chart own it.                                        |
+| `readout`              | `boolean`                             | Show the floating value chip on hover (default `true`). `false` hides only the chip.       |
 
 `MicroDatum` is `{ index, value, label?, formatted? }`. Two of the fields carry the value in different forms, so you
 pick the one that fits. **`value`** is the raw primary number, for computing (`null` when the unit encodes nothing).

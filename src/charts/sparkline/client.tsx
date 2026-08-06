@@ -30,18 +30,6 @@ const UI_MARKS =
   '<circle r="3.2" fill="none" data-mc-active="" data-mc-w="tick"/>' +
   '<g><line data-mc-ink="muted"/><circle r="2.6" data-mc-ink="accent"/></g>';
 
-// Parsed rather than constructed: the marks below already rely on SVG-namespace
-// HTML parsing, so reusing it here drops the namespace constant and the
-// createElementNS/setAttribute pair with no change to the tree produced.
-function uiGroup(svg: SVGSVGElement): SVGGElement {
-  let g = svg.querySelector("g[data-mc-ui]") as SVGGElement | null;
-  if (!g) {
-    svg.insertAdjacentHTML("beforeend", "<g data-mc-ui></g>");
-    g = svg.lastElementChild as unknown as SVGGElement;
-  }
-  return g;
-}
-
 export interface InteractiveSparklineProps extends SparklineProps, PickerProps {
   /** Swappable announcement strings (defaults to EN). */
   strings?: SeriesStrings;
@@ -159,11 +147,22 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     summary === false ? undefined : (summary ?? describeSeries(data, { format, locale, strings }));
   // The unit shown by the crosshair + readout: the live hover/keyboard focus,
   // falling back to a pinned selection when the pointer has left.
+  //
+  // Every lookup goes through `?? -1` rather than a null test, which costs
+  // nothing and closes a real hole: a pin can outlive the data that made it (a
+  // live series shrinks while a point is pinned, or a `selectedIndex` names a
+  // gap), and an index that no longer resolves has to read as "nothing shown".
+  //
+  // `shownPoint` is what says the index IS shown: geometry emits a point only
+  // where the value is finite, so a gap and a runaway index are both `null`
+  // there. Announcement and chip gate on it, and read the value through it —
+  // indexing straight into `data` was how `undefined` reached the live region
+  // as a formatted number ("Point 0 of 3: NaN").
   const shown = active ?? selected;
-  const shownValue = shown !== null ? (data[shown] as number) : null;
-  const shownPoint = shown !== null ? geo.points[shown] : null;
-  const shownPos = shown !== null ? stops.indexOf(shown) + 1 : 0;
-  const selPoint = selected !== null ? geo.points[selected] : null;
+  const shownPoint = geo.points[shown ?? -1] ?? null;
+  const shownValue = data[shown ?? -1] as number;
+  const shownPos = stops.indexOf(shown ?? -1) + 1;
+  const selPoint = geo.points[selected ?? -1] ?? null;
   const svgStyle = useMemo(() => fillFor(style), [style]);
 
   // Scrub/selection marks — DOM, not React children — so memo(Static) can skip
@@ -188,32 +187,38 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   useLayoutEffect(() => {
     const svg = hostRef.current?.querySelector("svg");
     if (!svg) return;
-    const g = uiGroup(svg);
+    // The group is PARSED, not constructed: the marks below already rely on
+    // SVG-namespace HTML parsing, so reusing it here drops the namespace
+    // constant and the createElementNS/setAttribute pair with no change to the
+    // tree produced.
+    let g = svg.querySelector("g[data-mc-ui]");
+    if (!g) {
+      svg.insertAdjacentHTML("beforeend", "<g data-mc-ui></g>");
+      g = svg.lastElementChild!;
+    }
     // Built on the first interaction, not at mount: the entrance engine casts
     // every leaf in the SVG, so marks that exist while still hidden get picked
     // up as stage ink and animated to `opacity: 1` — flashing a crosshair the
     // reader never asked for. No interaction yet means nothing to reveal.
-    if (!g.childElementCount) {
+    if (!g.firstChild) {
       if (!selPoint && !shownPoint) return;
       g.innerHTML = UI_MARKS;
     }
-    const kids = g.children as unknown as SVGElement[];
-    const live = kids[1]!;
-    const ring = kids[0]!;
+    const [ring, live] = g.children as unknown as [SVGElement, SVGElement];
     ring.setAttribute("opacity", selPoint ? "1" : "0");
     // The pin is placed by `cx`/`cy`, NOT by a transform, and that is what makes
     // it snap: styles.css glides transforms only. A ring names one discrete
     // point, and a ring in transit encloses none.
     if (selPoint) {
-      ring.setAttribute("cx", String(selPoint[0]));
-      ring.setAttribute("cy", String(selPoint[1]));
+      ring.setAttribute("cx", `${selPoint[0]}`);
+      ring.setAttribute("cy", `${selPoint[1]}`);
     }
     live.setAttribute("opacity", shownPoint ? "1" : "0");
     if (shownPoint) {
       live.style.transform = `translateX(${shownPoint[0]}px)`;
       const marks = live.children as unknown as SVGElement[];
-      marks[0]!.setAttribute("y1", String(geo.plot.y0));
-      marks[0]!.setAttribute("y2", String(geo.plot.y1));
+      marks[0]!.setAttribute("y1", `${geo.plot.y0}`);
+      marks[0]!.setAttribute("y2", `${geo.plot.y1}`);
       marks[1]!.style.transform = `translateY(${shownPoint[1]}px)`;
     }
   }, [selPoint, shownPoint, geo.plot.y0, geo.plot.y1]);
@@ -242,11 +247,10 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
         {rest.children}
       </Static>
       <LiveRegion>
-        {shownValue !== null ? strings.point(shownPos, stops.length, fmt(shownValue)) : ""}
+        {shownPoint ? strings.point(shownPos, stops.length, fmt(shownValue)) : ""}
       </LiveRegion>
       {readout &&
       shownPoint &&
-      shownValue !== null &&
       /* At the endpoint the persistent `label="last"` already shows this value —
          a floating readout there just collides with it. Skip it; every other
          point still gets the readout. A NAMED point is not a duplicate: the
