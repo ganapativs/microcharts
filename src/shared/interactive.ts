@@ -83,33 +83,54 @@ export function wrap(
   };
 }
 
-/** Chip `left` as % of plot — not clamped; word-sized marks overhang honestly (text length capped instead). */
-function readoutLeft(x: number, width: number): string {
-  return `${(x / Math.max(1, width)) * 100}%`;
-}
+/**
+ * Chip attrs: put the readout in the TOP LAYER. `styles.css` anchors and clamps
+ * it there; the top layer is the only escape from an ancestor with a
+ * `transform`/`filter`/`contain`, which becomes the containing block and clips
+ * even `position: fixed`. A ref rather than an effect — one call, no cleanup
+ * (removing the element pops it) and no render cost on the 100 entries that
+ * spread this. The `catch` is for a detached element and for StrictMode's
+ * double attach — re-opening an open popover is a no-op in current browsers,
+ * not a throw. When the chip is NOT promoted the stylesheet still paints and
+ * places it: `display: block` there answers the UA's `[popover]:not(
+ * :popover-open) { display: none }`, which would otherwise hide it outright.
+ */
+export const CHIP = {
+  popover: "manual",
+  ref: (el: HTMLElement | null): void => {
+    // Promote ONLY where the stylesheet can place it. `popover` shipped years
+    // before anchor positioning (Firefox 125, Safari 17), and in that gap the
+    // two gates disagreed: the chip went to the top layer, where its containing
+    // block is the viewport, while the `@supports`-gated anchoring never
+    // applied — so `bottom: 100%` resolved against the WINDOW and the chip flew
+    // to y=-28 above a chart at y=200. Measured, not theorised. Left un-opened
+    // it stays an ordinary absolutely-positioned box against its wrapper, which
+    // is the pre-anchor behaviour this was always supposed to fall back to.
+    // `globalThis.CSS` rather than a `typeof` guard, and not memoized into a
+    // module-level flag: refs never run during SSR, so the guard bought nothing,
+    // and the flag measured +52 B on the shared kernel — enough to push two
+    // interactive subpaths past their budgets to save one support-query parse
+    // per hover. Bytes are the scarcer resource; the parse is not per-frame.
+    if (!el || !globalThis.CSS?.supports?.("anchor-name: --mc")) return;
+    try {
+      el.showPopover();
+    } catch {
+      /* detached, or already open under StrictMode's double attach */
+    }
+  },
+} as const;
 
-/** Crosshair chip: centred on the mark's x. */
-export function crosshairReadoutStyle(x: number, width: number): CSSProperties {
-  return {
-    left: readoutLeft(x, width),
-    transform: "translateX(-50%)",
-  };
-}
-
-/** Row-anchored chip — multi-row charts must not use `bottom: 100%` on the whole plate. */
-export function rowReadoutStyle(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): CSSProperties {
-  return {
-    left: readoutLeft(x, width),
-    top: `${(y / Math.max(1, height)) * 100}%`,
-    bottom: "auto",
-    transform: "translate(-50%, calc(-100% - 0.3em))",
-  };
-}
+/*
+ * `crosshairReadoutStyle` / `rowReadoutStyle` used to live here and returned an
+ * inline `left`/`top`/`transform` per datum. They are gone, and their absence is
+ * load-bearing rather than a tidy-up: an inline `left` beats every stylesheet
+ * rule, so it overrode the anchored insets in `styles.css` and the chip centred
+ * itself in the VIEWPORT instead of on its chart — measured at 73 of 100
+ * chart x layout combinations before they were removed. Placement is now the
+ * stylesheet's job alone, which is also what lets the engine clamp the chip to
+ * the screen; nothing here can fight it. The crosshair inside the SVG still
+ * marks the exact datum, so the chip names the value and the mark points at it.
+ */
 
 /**
  * Decorative only when no name (`summary={false}` AND no title) → `aria-hidden`.

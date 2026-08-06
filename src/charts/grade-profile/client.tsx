@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -178,7 +178,6 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   const shown = active ?? selected;
   const seg = shown !== null ? geo.segments[shown] : undefined;
   const announced = shown !== null ? (sentence(shown) ?? "") : "";
-  const midX = seg ? (seg.x0 + seg.x1) / 2 : 0;
 
   return (
     <span
@@ -206,7 +205,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
       </StaticGradeProfile>
       <LiveRegion>{announced}</LiveRegion>
       {readout && seg ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(midX, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chipText(announced)}
         </span>
       ) : null}

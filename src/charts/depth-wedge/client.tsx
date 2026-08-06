@@ -5,11 +5,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -185,7 +185,7 @@ export function DepthWedge(props: InteractiveDepthWedgeProps): React.ReactNode {
       </StaticDepthWedge>
       <LiveRegion>{announced}</LiveRegion>
       {readout && step ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(step.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${sideName} ${fmt(step.cum)} (± ${fmt(step.dist)})`}
         </span>
       ) : null}

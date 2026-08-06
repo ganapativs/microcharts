@@ -691,7 +691,7 @@
   {
     "name": "@microcharts/react/thermometer/interactive",
     "path": "dist/charts/thermometer/client.js",
-    "limit": "4.08 kB",
+    "limit": "4.17 kB",
     "gzip": true
   },
   {

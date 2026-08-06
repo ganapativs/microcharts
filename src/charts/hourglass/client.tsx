@@ -8,7 +8,7 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import {
   Hourglass as StaticHourglass,
@@ -153,7 +153,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
       {/* The sand is a rough gauge; the number behind it is invisible unless
           `label` prints it. Hover/focus reveals the elapsed percent. */}
       {readout && hover && (props.label ?? "none") === "none" ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

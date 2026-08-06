@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -216,7 +217,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
       </StaticTreeRings>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownRing ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {announced}
         </span>
       ) : null}

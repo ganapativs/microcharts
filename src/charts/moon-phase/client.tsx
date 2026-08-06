@@ -4,7 +4,13 @@
 // announces through a polite region, throttled to ≥1 s. Wrapper focus only.
 import { useEffect, useRef, useState } from "react";
 import { EN_MOON, type MoonStrings } from "../../core/strings-moon.js";
-import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import {
+  CHIP,
+  named,
+  fillFor,
+  wrap as wrapAttrs,
+  type MicroDatum,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
@@ -167,7 +173,7 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
       />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && hover ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {pct}
         </span>
       ) : null}

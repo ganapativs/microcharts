@@ -38,6 +38,12 @@ export const entry: ChartEntry = {
       description: "Percentile ranks 0–100, one per reading; out-of-range values are clamped.",
     },
     {
+      name: "domain",
+      type: "[number, number]",
+      required: false,
+      description: "Rank extent (default [0, 100] — the full ladder).",
+    },
+    {
       name: "showBands",
       type: "boolean",
       required: false,

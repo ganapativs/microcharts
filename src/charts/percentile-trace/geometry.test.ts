@@ -14,6 +14,29 @@ describe("percentileGeometry", () => {
     expect(geo.last.y).toBeCloseTo(base.height - 2, 1); // 0 → bottom (pad)
   });
 
+  it("`domain` is the escape hatch; the full ladder stays the default", () => {
+    const full = percentileGeometry({ ...base, data: SAMPLE })!;
+    const zoom = percentileGeometry({ ...base, data: SAMPLE, domain: [40, 85] })!;
+    const spread = (g: typeof full) =>
+      Math.max(...g.points.map((p) => p.y)) - Math.min(...g.points.map((p) => p.y));
+    expect(spread(zoom)).toBeGreaterThan(spread(full));
+    // a reading outside the caller's frame lands on the plot edge, never past it
+    const off = percentileGeometry({ ...base, data: [10, 90], domain: [40, 85] })!;
+    for (const p of off.points) {
+      expect(p.y).toBeGreaterThanOrEqual(off.y0);
+      expect(p.y).toBeLessThanOrEqual(off.y1);
+    }
+    // …and an unusable pair falls back to the locked frame rather than a NaN scale
+    for (const bad of [
+      [Number.NaN, 100],
+      [0, Infinity],
+    ] as [number, number][]) {
+      expect(percentileGeometry({ ...base, data: SAMPLE, domain: bad })!.points).toEqual(
+        full.points,
+      );
+    }
+  });
+
   it("delta is last − first in percentile points", () => {
     const geo = percentileGeometry({ ...base, data: SAMPLE })!;
     expect(geo.first.value).toBe(42);

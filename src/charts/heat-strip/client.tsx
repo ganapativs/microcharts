@@ -8,11 +8,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -176,10 +176,7 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
       </StaticHeatStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownCell.x + shownCell.w / 2, geo.width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {shownCell.value === null ? "—" : fmt(shownCell.value)}
         </span>
       ) : null}

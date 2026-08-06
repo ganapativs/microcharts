@@ -8,11 +8,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { chartSide } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -228,10 +228,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         {rest.children}
       </StaticNetFlow>
       {readout && rp ? (
-        <span
-          className="mc-net-flow-readout mc-spark-readout"
-          style={crosshairReadoutStyle(rp.x, geo!.totalWidth)}
-        >
+        <span className="mc-net-flow-readout mc-spark-readout" {...CHIP}>
           {`${fmt(rp.in)} / ${fmt(rp.out)} · ${signedNet(rp.net, fmt)}`}
         </span>
       ) : null}

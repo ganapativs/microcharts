@@ -6,11 +6,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { chartSide, isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -197,10 +197,7 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
       </StaticRubricStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && row ? (
-        <span
-          className="mc-spark-readout"
-          style={rowReadoutStyle(width / 2, row.y + row.height / 2, width, height)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${row.label} ${isFiniteValue(row.score) ? fmt(row.score) : "—"} (${weightPct})`}
         </span>
       ) : null}

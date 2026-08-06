@@ -21,6 +21,8 @@ export { winProbWormSummary, wormGutter } from "./geometry.js";
 export interface WinProbWormProps {
   /** A single win-probability series, clamped to 0–100 (out-of-range dev-warns). */
   data: readonly (number | null)[];
+  /** Probability extent — the y-axis. Default [0, 100], the full range. */
+  domain?: readonly [number, number] | undefined;
   /** Names for the two sides — [`>50`, `<50`]. Default `["A", "B"]`. */
   sides?: readonly [string, string] | undefined;
   /** `"last"` prints the current leader's probability at the endpoint. */
@@ -44,6 +46,7 @@ export interface WinProbWormProps {
 export function WinProbWorm(props: WinProbWormProps): ReactNode {
   const {
     data,
+    domain,
     sides = ["A", "B"],
     label = "last",
     markSwing = true,
@@ -81,6 +84,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
     width,
     height,
     data,
+    domain,
     label,
     font: FONT,
     pctFmt,
@@ -115,12 +119,15 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
   const end = geo!.end!;
 
   // annotations host contract: Marker x = point index across the (gutter-shrunk)
-  // plot, Threshold/TargetZone y = win probabilities on the fixed 0–100 axis.
+  // plot, Threshold/TargetZone y = win probabilities on the SAME axis the worm
+  // is drawn on. Reading `geo.domain` rather than restating [0, 100] is what
+  // keeps a caller's `domain` from moving the worm while leaving its thresholds
+  // behind on the default frame.
   const plotW = Math.max(0, width - 2 * PAD - gutter);
   const lastX = Math.max(1, data.length - 1);
   const ann = resolveAnnotations(children, {
     x: (i) => round2(PAD + (i / lastX) * plotW),
-    y: scaleLinear([0, 100], [height - PAD, PAD]),
+    y: scaleLinear(geo!.domain, [height - PAD, PAD]),
     width,
     height,
     fontSize: annotationFontSize(height),

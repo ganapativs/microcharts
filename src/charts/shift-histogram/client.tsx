@@ -9,12 +9,12 @@ import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import {
+  CHIP,
   named,
   fillFor,
   nav1d,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -252,10 +252,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
         {rest.children}
       </StaticShiftHistogram>
       {readout && b && geo ? (
-        <span
-          className="mc-shift-readout mc-spark-readout"
-          style={crosshairReadoutStyle(b.x + b.width / 2, geo.totalWidth)}
-        >
+        <span className="mc-shift-readout mc-spark-readout" {...CHIP}>
           {`${fmt(b.x0)}–${fmt(b.x1)}: ${pct(b.beforeShare)} / ${pct(b.afterShare)}`}
         </span>
       ) : null}

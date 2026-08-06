@@ -10,11 +10,11 @@ import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -280,10 +280,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
       </StaticStackedArea>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && shares && shownX !== undefined ? (
-        <span
-          className="mc-spark-readout mc-readout-rows"
-          style={crosshairReadoutStyle(shownX, width)}
-        >
+        <span className="mc-spark-readout mc-readout-rows" {...CHIP}>
           {bandRows(shares, shown).map((r, i) => (
             // Swatch + name + share. The swatch is redundant reinforcement, not
             // the key: the band is NAMED, so the chip never encodes by color

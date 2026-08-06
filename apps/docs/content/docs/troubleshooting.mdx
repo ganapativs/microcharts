@@ -99,18 +99,24 @@ changed `key` to replay it. The full contract is on [Motion](/docs/motion).
 
 ## The chart won't stretch to fill its container
 
-`.mc-root`, the chart's own `<svg>`, is `display: inline-block` by default, so it flows next to text instead of
-stretching. Give it fluid sizing explicitly:
+Give it a width and make sure the _parent_ is block-level (a flex or grid item, or a `div`). A chart can't grow past an
+inline parent no matter what you set on the chart itself.
 
 ```tsx
-<Sparkline data={data} style={{ width: "100%", height: "auto" }} />
+<Sparkline data={data} className="w-full" />
 ```
 
-and make sure the _parent_ is block-level (a flex or grid item, or a `div`). A chart can't grow past an inline parent no
-matter what you set on the chart itself. Interactive entries behave identically: `style`, `className`, and
-`width`/`height` size an interactive chart exactly the way they size its static twin, and hit-testing stays exact at any
-size, so the crosshair tracks the cursor and a touch drag scrubs the unit under the finger. Full recipes, including the
-inline-in-a-sentence case, are on [Sizing & scaling](/docs/sizing).
+`.mc-root`, the chart's own `<svg>`, is `display: inline-block` by default, so it flows next to text; add
+`display: block` when you want it on its own line.
+
+A width alone is enough, and it is enough on a `className`. Before 0.15 it wasn't: the chart set both `width` and
+`height` as SVG attributes, your CSS replaced only the width, and `preserveAspectRatio` then fitted the drawing to the
+axis you hadn't touched. The element stretched, the drawing didn't, and you got a small mark centered in a wide box —
+which reads as a chart that failed to load. If you carry a `h-auto` next to a `w-full` for that reason, you can drop it.
+Interactive entries behave identically: `style`, `className`, and `width`/`height` size an interactive chart exactly the
+way they size its static twin, and hit-testing stays exact at any size, so the crosshair tracks the cursor and a touch
+drag scrubs the unit under the finger. Full recipes, including the inline-in-a-sentence case, are on
+[Sizing & scaling](/docs/sizing).
 
 ## A chart stacks on its own line instead of sitting inline with text
 

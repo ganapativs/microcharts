@@ -6,11 +6,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -202,10 +202,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
       </StaticSegmentedBar>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownSeg && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownSeg.x + shownSeg.w / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {/* The rolled-up branch used to spend its parenthesis on a category
               COUNT and drop the value entirely — and it hardcoded English
               ("categories") in a visible chip, which the i18n canon forbids and

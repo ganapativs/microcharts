@@ -7,11 +7,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -230,10 +230,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         {rest.children}
       </StaticForecastCone>
       {readout && p ? (
-        <span
-          className="mc-forecast-readout mc-spark-readout"
-          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
-        >
+        <span className="mc-forecast-readout mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

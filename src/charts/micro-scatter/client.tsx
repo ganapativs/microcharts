@@ -9,12 +9,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, type Format } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -209,7 +209,7 @@ export function MicroScatter(props: InteractiveMicroScatterProps): React.ReactNo
       </StaticMicroScatter>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDot && shownPoint ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownDot.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(shownPoint.x)}, ${fmt(shownPoint.y)}`}
         </span>
       ) : null}

@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -244,7 +244,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       </StaticSpreadBand>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null && crossX !== undefined ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(crossX, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

@@ -6,12 +6,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   nav1d,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -238,10 +238,7 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         // suite measured 7px of overflow); stacked, the chip is only as wide as
         // its widest row. The parent row sits under the child exactly as the
         // parent BAR sits over it in the strip.
-        <span
-          className="mc-spark-readout mc-readout-rows"
-          style={crosshairReadoutStyle(seg.x + seg.width / 2, width)}
-        >
+        <span className="mc-spark-readout mc-readout-rows" {...CHIP}>
           <span
             className="mc-readout-key"
             data-mc-cat={(seg.group % CAT_N) + 1}

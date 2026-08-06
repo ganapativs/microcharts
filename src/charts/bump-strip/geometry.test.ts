@@ -42,6 +42,35 @@ describe("bumpGeometry", () => {
     }
   });
 
+  // Rank 1 used to be a hard top anchor, so a run that never placed better than
+  // #4 spent the top half of the box on ranks it never held.
+  it("the occupied rank band fills the plot", () => {
+    const geo = bumpGeometry({ ...base, ranks: [4, 6, 5, 7] });
+    const ys = geo.points.map((p) => p.y);
+    expect(Math.min(...ys)).toBeCloseTo(1.5, 2); // best rank (#4) at the top band
+    expect(Math.max(...ys)).toBeCloseTo(14.5, 2); // worst rank (#7) at the bottom
+    // …and the order is still rank order: #4 above #5 above #6 above #7.
+    const y = (rank: number) => geo.points.find((p) => p.rank === rank)!.y;
+    expect(y(4)).toBeLessThan(y(5));
+    expect(y(5)).toBeLessThan(y(6));
+    expect(y(6)).toBeLessThan(y(7));
+  });
+
+  it("a band with no extent rides the midline", () => {
+    for (const ranks of [[3], [3, 3, 3]]) {
+      const geo = bumpGeometry({ ...base, ranks });
+      for (const p of geo.points) expect(p.y).toBe(8);
+    }
+  });
+
+  it("maxRank is the escape hatch: it pins #1 back at the top", () => {
+    const geo = bumpGeometry({ ...base, ranks: [4, 6, 5, 7], maxRank: 10 });
+    expect(geo.points[0]!.y).toBeCloseTo(1.5 + (3 / 9) * 13, 2); // #4 of 10, not at the top
+    // small multiples on that scale share it, whatever band each series occupies
+    const other = bumpGeometry({ ...base, ranks: [1, 2], maxRank: 10 });
+    expect(other.points[0]!.y).toBeCloseTo(1.5, 2);
+  });
+
   it("maxRank fixes the band scale; ranks beyond clamp to the bottom", () => {
     const fixed = bumpGeometry({ ...base, ranks: [1, 2], maxRank: 10 });
     const auto = bumpGeometry({ ...base, ranks: [1, 2] });

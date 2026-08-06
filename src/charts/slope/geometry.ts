@@ -1,10 +1,17 @@
 // Slope: (, S2-paired projected on
 // time). Two aligned columns, one y-domain (per-column normalization would
 // fake convergence). Label fitting is deterministic: rows closer than
-// fontSize × 1.1 drop their labels (count × height, no measurement). 2-dp.
+// fontSize × 1.1 drop their labels (count × height, no measurement), and the
+// category name gets a character budget that scales with the width. 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
-import { labelFont, textGutter, textGutterProse } from "../../core/labels.js";
+import {
+  ROW_LABEL_WIDTH_SHARE,
+  labelFont,
+  rowLabelChars,
+  textGutter,
+  textGutterProse,
+} from "../../core/labels.js";
 
 interface SlopeLine {
   x0: number;
@@ -53,15 +60,16 @@ export function slopeFitFrame(opts: {
   domain?: readonly [number, number] | undefined;
   label: "none" | "value" | "label" | "both";
   fmt: (n: number) => string;
-}): { geo: SlopeGeometry; labelsDropped: boolean; fontSize: number } {
+}): { geo: SlopeGeometry; labelsDropped: boolean; fontSize: number; nameChars: number } {
   const { width, height, data, domain, label } = opts;
   // Measure the label CHARACTER counts once, outside the font loop. They are a
   // property of the data, not of the type size — and measuring them costs one
   // `fmt` call per row, so re-measuring per candidate multiplied an `Intl`
   // format over the whole series by the number of candidates (10k rows × 2
-  // columns × 6 fonts timed the shared edge suite out in CI).
+  // columns × 6 fonts timed the shared edge suite out in CI). The NAME budget
+  // does depend on the type size, so it is derived per candidate — from
+  // `chars.longest`, which costs no `fmt` call.
   const chars = slopeLabelChars(data, label, opts.fmt);
-  const wantLabel = label === "label" || label === "both";
 
   // Choose the size ARITHMETICALLY, then build the geometry once. The fit rule
   // reads only the gutters and the row pitch, so a candidate never needs the
@@ -69,16 +77,43 @@ export function slopeFitFrame(opts: {
   // per-row de-overlap scan up to six times over.
   let fontSize = SLOPE_FONT;
   for (let f = slopeLabelFont(height, width); f > SLOPE_FONT; f--) {
-    if (labelsFitAt({ width, height, rows: data.length, chars, wantLabel, fontSize: f })) {
+    if (labelsFitAt({ width, height, rows: data.length, chars, fontSize: f })) {
       fontSize = f;
       break;
     }
   }
   const pairs = data.map((d) => ({ from: d.from, to: d.to }));
   return {
-    ...frameFor({ width, height, pairs, domain, chars, wantLabel, fontSize }),
+    ...frameFor({ width, height, pairs, domain, chars, fontSize }),
     fontSize,
   };
+}
+
+/**
+ * How many characters of the category NAME the right gutter can afford at this
+ * width and type size, or 0 meaning drop the name.
+ *
+ * The budget was a hardcoded 6 on both sides of the contract — a reserved
+ * `Math.min(6, label.length) + 1` here and a `truncateLabel(label)` default
+ * there — so a 300-unit chart truncated exactly as hard as a 40-unit one and
+ * `subscriptionRenewals` and `subscriptionRate` both painted `subscr…`, two
+ * lines under one name. This is the shared row-label policy every other
+ * stacked-row chart already uses (same width share, same 14-char cap, same rule
+ * that a stub too short to identify a row drops instead), so the budget grows
+ * with the chart: 14 characters at width 300, where 6 was the whole story.
+ */
+function nameCharsFor(width: number, fontSize: number, longest: number): number {
+  return longest > 0 ? rowLabelChars(width * ROW_LABEL_WIDTH_SHARE, fontSize, longest, 3) : 0;
+}
+
+/** Right gutter in characters, counting what will actually PAINT:
+ *  `<value> <name…>` — the separator only when both parts are there, the
+ *  ellipsis only when the name was cut. The paint side truncates at the same
+ *  `name` count it is reserved from, so glyphs and gutter cannot drift. */
+function rightChars(chars: LabelChars, name: number): number {
+  return (
+    chars.right + (name > 0 ? name + (chars.right > 0 ? 1 : 0) + (chars.longest > name ? 1 : 0) : 0)
+  );
 }
 
 /** The `labelsFit` rule, without building the geometry: gutters at this type
@@ -89,21 +124,30 @@ function labelsFitAt(opts: {
   height: number;
   rows: number;
   chars: LabelChars;
-  wantLabel: boolean;
   fontSize: number;
 }): boolean {
-  const { width, height, rows, chars, wantLabel, fontSize } = opts;
+  const { width, height, rows, chars, fontSize } = opts;
   const r = 1.5;
   const gutterL = chars.left > 0 ? textGutter(chars.left, fontSize, 3) : 0;
-  const estimateRight = wantLabel ? textGutterProse : textGutter;
-  const gutterR = chars.right > 0 ? estimateRight(chars.right, fontSize, 3) : 0;
+  const name = nameCharsFor(width, fontSize, chars.longest);
+  const right = rightChars(chars, name);
+  // Prose rates apply only while a caller-supplied name is in the gutter; once
+  // it drops, what is left is a figure this library formatted.
+  const estimateRight = name > 0 ? textGutterProse : textGutter;
+  const gutterR = right > 0 ? estimateRight(right, fontSize, 3) : 0;
   const plot = round2(width - gutterR - r) - round2(gutterL + r);
   return plot >= Math.max(10, width * 0.35) && (rows === 0 || height / rows >= fontSize * 1.1);
 }
 
 interface LabelChars {
+  /** Left gutter: our own formatted `from` value. */
   left: number;
+  /** Right gutter: our own formatted `to` value. The name beside it is budgeted
+   *  separately, because that budget moves with the width and the type size. */
   right: number;
+  /** Longest category name in characters — a property of the DATA, so the font
+   *  loop measures it once and turns it into a budget per candidate. */
+  longest: number;
 }
 
 /** Deterministic label widths in CHARACTERS — independent of the type size, so
@@ -115,17 +159,20 @@ function slopeLabelChars(
 ): LabelChars {
   const wantLeft = label === "value" || label === "both";
   const wantLabel = label === "label" || label === "both";
-  if (label === "none") return { left: 0, right: 0 };
+  // `label="none"` has nothing to measure, so it must not walk the series at
+  // all — the 10k-row guard this file is written around means the loop below is
+  // the one thing standing between the default label mode and the whole data
+  // set. An earlier revision lost this and paid 3 dead branch tests per row.
+  if (!wantLeft && !wantLabel) return { left: 0, right: 0, longest: 0 };
   let left = 0;
   let right = 0;
+  let longest = 0;
   for (const d of data) {
     if (wantLeft && Number.isFinite(d.from)) left = Math.max(left, fmt(d.from).length);
-    const r =
-      (wantLeft && Number.isFinite(d.to) ? fmt(d.to).length : 0) +
-      (wantLabel ? Math.min(6, d.label.length) + 1 : 0);
-    if (r > right) right = r;
+    if (wantLeft && Number.isFinite(d.to)) right = Math.max(right, fmt(d.to).length);
+    if (wantLabel) longest = Math.max(longest, d.label.length);
   }
-  return { left: wantLeft ? left : 0, right };
+  return { left, right, longest };
 }
 
 /** One candidate frame: gutters at this type size, with the reclaim rule. */
@@ -135,21 +182,21 @@ function frameFor(opts: {
   pairs: readonly { from: number; to: number }[];
   domain?: readonly [number, number] | undefined;
   chars: LabelChars;
-  wantLabel: boolean;
   fontSize: number;
-}): { geo: SlopeGeometry; labelsDropped: boolean } {
-  const { width, height, pairs, domain, chars, wantLabel, fontSize } = opts;
+}): { geo: SlopeGeometry; labelsDropped: boolean; nameChars: number } {
+  const { width, height, pairs, domain, chars, fontSize } = opts;
+  const nameChars = nameCharsFor(width, fontSize, chars.longest);
   const geo = slopeGeometry({
     width,
     height,
     pairs,
     domain,
     gutterLeftCh: chars.left,
-    gutterRightCh: chars.right,
-    rightIsProse: wantLabel,
+    gutterRightCh: rightChars(chars, nameChars),
+    rightIsProse: nameChars > 0,
     fontSize,
   });
-  if (geo.labelsFit) return { geo, labelsDropped: false };
+  if (geo.labelsFit) return { geo, labelsDropped: false, nameChars };
   return {
     geo: slopeGeometry({
       width,
@@ -161,6 +208,7 @@ function frameFor(opts: {
       fontSize,
     }),
     labelsDropped: true,
+    nameChars,
   };
 }
 
@@ -179,7 +227,7 @@ export function slopeFrame(opts: {
   label: "none" | "value" | "label" | "both";
   fmt: (n: number) => string;
   fontSize?: number;
-}): { geo: SlopeGeometry; labelsDropped: boolean } {
+}): { geo: SlopeGeometry; labelsDropped: boolean; nameChars: number } {
   const { width, height, data, domain, label, fmt, fontSize = SLOPE_FONT } = opts;
   return frameFor({
     width,
@@ -187,7 +235,6 @@ export function slopeFrame(opts: {
     pairs: data.map((d) => ({ from: d.from, to: d.to })),
     domain,
     chars: slopeLabelChars(data, label, fmt),
-    wantLabel: label === "label" || label === "both",
     fontSize,
   });
 }

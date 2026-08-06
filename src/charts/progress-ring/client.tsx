@@ -4,7 +4,7 @@
 // (single mark) — hover/focus is a reveal of the percent, not a lookup.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -151,7 +151,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
           too small (a 16px ring), and gating on the request alone left the
           percent painted nowhere while the name still announced it. */}
       {readout && hover && !printsLabel ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

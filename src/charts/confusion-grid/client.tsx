@@ -6,11 +6,11 @@
 // useActivePicker owns interaction; the composed static component.
 import { useCallback, useMemo, useRef } from "react";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -232,7 +232,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
       </StaticConfusionGrid>
       <LiveRegion>{announced}</LiveRegion>
       {readout && cell ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(cell.x + cell.w / 2, size)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${labels[cell.row]}→${labels[cell.col]} ${pct} (${count})`}
         </span>
       ) : null}

@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -200,20 +200,7 @@ export function RugStrip(props: InteractiveRugStripProps): React.ReactNode {
       </StaticRugStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownTick ? (
-        <span
-          className="mc-spark-readout"
-          style={
-            orientation === "horizontal"
-              ? crosshairReadoutStyle(shownTick.pos, width)
-              : {
-                  left: "100%",
-                  top: `${(shownTick.pos / height) * 100}%`,
-                  bottom: "auto",
-                  transform: "translateY(-50%)",
-                  marginLeft: "0.3em",
-                }
-          }
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {fmt(shownTick.value)}
         </span>
       ) : null}

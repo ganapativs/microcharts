@@ -6,11 +6,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -171,7 +171,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
       </StaticHistogramStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && bar ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(bar.x + bar.w / 2, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(bar.x0)}–${fmt(bar.x1)}: ${countFmt(bar.count)}`}
         </span>
       ) : null}

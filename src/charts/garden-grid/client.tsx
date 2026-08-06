@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -217,7 +217,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
       </StaticGardenGrid>
       <LiveRegion>{announced}</LiveRegion>
       {readout && c ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(c.cx, geo.width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {/* The localized sentence minus its full stop — "step" must not be
               hand-composed in a VISIBLE chip (i18n canon). An empty cell keeps
               the dash: the localized "no data" sentence is carried by the live

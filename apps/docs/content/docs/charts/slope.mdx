@@ -90,8 +90,10 @@ line says nothing about the path between the moments, so use Sparkline when that
 
 End labels drop deterministically rather than by measurement: when the rows are denser than the label font (height ÷
 count), and when the reserved label gutters would squeeze the two columns under ~35% of the width. The reclaimed room
-goes back to the lines. Endpoints that would collide inside a column are nudged apart to a full glyph pitch instead of
-overlapping.
+goes back to the lines. A category name gets as many characters as the width affords, up to 14; under four it drops and
+hands its gutter back, so a wide chart shows a name a narrow one cannot. Each surviving label seats on its own endpoint
+and moves at most half a glyph pitch to clear the label above it. One that needs more than that drops, which keeps every
+name readable against the line it belongs to. Endpoints that would collide inside a column are nudged half a unit apart.
 
 ## Edge cases
 

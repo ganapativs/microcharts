@@ -5,11 +5,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -185,10 +185,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
       </StaticHypnogram>
       <LiveRegion>{announced}</LiveRegion>
       {readout && run ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle((run.x0 + run.x1) / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${run.state} ${fmt(run.t0)}–${fmt(run.t1)}`}
         </span>
       ) : null}

@@ -37,9 +37,7 @@ export function rowLabelFont(pitch: number, factor = ROW_LABEL_FACTOR): number {
   return labelFont(pitch, factor);
 }
 
-/** @knipignore — published row-label vocabulary; adopted by the charts in a
- *  follow-up pass, so nothing imports it yet.
- *  DEFAULT share of the chart's width a row-label gutter may claim, for charts
+/** DEFAULT share of the chart's width a row-label gutter may claim, for charts
  *  whose row is mostly plot. Charts pass their own where the row is
  *  label-forward — a DotPlot row is a name and one dot, so it earns more of the
  *  width than a Dumbbell row, which has to fit two dots and a connector. What is
@@ -48,7 +46,8 @@ export function rowLabelFont(pitch: number, factor = ROW_LABEL_FACTOR): number {
 export const ROW_LABEL_WIDTH_SHARE = 0.38;
 /** DotPlot-class rows: the name is half the mark. */
 export const ROW_LABEL_WIDTH_SHARE_WIDE = 0.5;
-/** @knipignore — see ROW_LABEL_WIDTH_SHARE.
+/** @knipignore — published row-label vocabulary; charts take it through
+ *  `rowLabelFont`'s default rather than by name.
  *  Row labels are label-forward by definition — you cannot read the row
  *  without its name — so they take the ~0.62 factor `labelFont` documents for
  *  that case, applied to the PITCH instead of the box. */
@@ -175,6 +174,52 @@ export function labelFitsY(y: number, fontSize: number, height: number, mid = tr
  */
 export function labelFitsBand(band: number, fontSize: number): boolean {
   return band >= fontSize;
+}
+
+/**
+ * Seat each label AT its own datum, or drop it.
+ *
+ * `spreadLabels` moves every label until they all clear `pitch`, which is right
+ * when the set has to stay complete. It is wrong when the label NAMES the mark
+ * it sits beside: six rows in a 54-unit box moved a Slope label 19 units, a
+ * third of the chart, and left three labels nearer a foreign line than their
+ * own, so a reader matched names to the wrong data.
+ *
+ * The rule here: walk the desired positions in order, seat each one at its own
+ * coordinate (clamped into `[min, max]`, nudged down to clear the last KEPT
+ * label by `pitch`), and DROP it when that seat lands more than **half a pitch**
+ * from where it wanted to be. Half a pitch is the bound that earns the
+ * association: two kept labels sit `pitch` apart and each is within `pitch / 2`
+ * of its own datum, so a kept label is never closer to another kept label's
+ * datum than to its own. Dropping rather than displacing is the same degradation
+ * `labelFitsY` and `labelFitsBand` apply — a label that cannot be seated is not
+ * painted somewhere else.
+ *
+ * `null` entries pass through as `null`, so a caller can hand in one slot per
+ * row and read the result back by row index. Kept seats stay in input order:
+ * each is at least `pitch` below the previous kept one.
+ */
+export function seatLabels(
+  desired: readonly (number | null)[],
+  pitch: number,
+  min: number,
+  max: number,
+): (number | null)[] {
+  const out: (number | null)[] = desired.map(() => null);
+  const order = desired
+    .map((y, i) => ({ y, i }))
+    .filter((o): o is { y: number; i: number } => o.y !== null)
+    .sort((a, b) => a.y - b.y); // Array#sort is stable
+  let prev = -Infinity;
+  for (const o of order) {
+    const want = Math.min(Math.max(o.y, min), max);
+    const seat = Math.max(want, prev + pitch);
+    if (seat <= max && Math.abs(seat - o.y) <= pitch / 2) {
+      out[o.i] = round2(seat);
+      prev = seat;
+    }
+  }
+  return out;
 }
 
 export function spreadLabels(

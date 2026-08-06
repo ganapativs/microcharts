@@ -7,11 +7,11 @@ import { makeFormatter, withPlus } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -201,10 +201,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       </StaticWaterfall>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shown * geo.pitch + geo.pitch / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {isTotal
             ? fmt(endLevel)
             : step

@@ -7,11 +7,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -257,10 +257,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         {rest.children}
       </StaticBurnChart>
       {readout && p ? (
-        <span
-          className="mc-burn-readout mc-spark-readout"
-          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
-        >
+        <span className="mc-burn-readout mc-spark-readout" {...CHIP}>
           {p.actual !== null
             ? `${fmt(p.actual)}${p.plan !== null ? ` / ${fmt(p.plan)}` : ""} ${workWord}`
             : p.projected !== null

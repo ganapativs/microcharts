@@ -7,11 +7,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -193,10 +193,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
       </StaticBenchmarkStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && edge ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(edge.x, geo!.totalWidth || width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${edge.name} ${fmt(edge.value)}`}
         </span>
       ) : null}

@@ -16,9 +16,14 @@ import { orbitLabelBand, orbitStatusGeometry } from "./geometry.js";
 export interface OrbitStatusProps {
   latency: number;
   rate: number;
-  /** Latency extent (documented as weak — pass an explicit domain). Default [0, 2·latency]. */
+  /**
+   * Latency extent — the orbit-radius scale. Default `[0, 2·threshold]` when you
+   * set a `threshold`, else `[0, 1000]` ms.
+   */
+  domain?: readonly [number, number] | undefined;
+  /** The same extent under its older name. `domain` wins when both are set. */
   latencyDomain?: readonly [number, number] | undefined;
-  /** Rate extent. Default [0, 2·rate]. */
+  /** Rate extent. Default: one dash step per decade (under 1/s, 1, 10, 100, 1000+). */
   rateDomain?: readonly [number, number] | undefined;
   /** Latency threshold: at/above it the satellite doubles + the summary flags it. */
   threshold?: number | undefined;
@@ -61,6 +66,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
   const {
     latency,
     rate,
+    domain,
     latencyDomain,
     rateDomain,
     threshold,
@@ -82,7 +88,9 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     latency,
     rate,
     size,
-    latencyDomain,
+    // `domain` is the grammar-standard spelling of the latency extent; the
+    // longer name predates it and still resolves to the same scale.
+    latencyDomain: domain ?? latencyDomain,
     rateDomain,
     threshold,
     pad: PAD,

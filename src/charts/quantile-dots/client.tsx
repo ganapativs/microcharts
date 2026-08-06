@@ -10,11 +10,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -250,10 +250,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
         {rest.children}
       </StaticQuantileDots>
       {readout && shown !== null && geo && geo.threshold && activeThreshold !== undefined ? (
-        <span
-          className="mc-quantile-dots-readout mc-spark-readout"
-          style={crosshairReadoutStyle(geo.threshold.x, boxW)}
-        >
+        <span className="mc-quantile-dots-readout mc-spark-readout" {...CHIP}>
           {strings.quantileDotsChip(geo.past, geo.count, side, fmt(activeThreshold))}
         </span>
       ) : null}

@@ -10,12 +10,12 @@ import { chartSide, isFiniteValue } from "../../core/types.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type LabeledSeriesProps,
   type PickerProps,
 } from "../../shared/interactive.js";
@@ -231,10 +231,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       </StaticSparkBar>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownBar && shownValue !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownBar.x + shownBar.width / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {chipNamed(fmt(shownValue), name, strings)}
         </span>
       ) : null}

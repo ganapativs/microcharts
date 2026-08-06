@@ -15,6 +15,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -351,7 +352,7 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
       </Static>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip(shown)}
         </span>
       ) : null}

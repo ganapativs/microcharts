@@ -1,8 +1,9 @@
 // <BumpStrip> — how did this entity's RANK move.
-// #5 → #2: position among competitors, not magnitude. Rank 1 sits at the TOP
-// (inverted y — stated here and self-keyed by the "#" end labels). Step line:
-// a rank cannot be 2.4. `positive` is ignored — lower is always better in rank
-// space (documented).
+// #5 → #2: position among competitors, not magnitude. The best rank in the band
+// sits at the TOP (inverted y — stated here and self-keyed by the "#" end
+// labels); the band defaults to the ranks the series occupies, and `maxRank` /
+// fixes it. Step line: a rank cannot be 2.4. `positive` is ignored —
+// lower is always better in rank space (documented).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
@@ -22,7 +23,10 @@ export function bumpSummary(ranks: readonly Value[], strings: FlowStrings): stri
 export interface BumpStripProps {
   /** 1-based integer ranks per period; null = unranked period (gap). */
   data: readonly Value[];
-  /** Fix the band domain so small multiples share a rank scale. */
+  /**
+   * Pin the top band at #1 and fix the bottom one at this rank, so small
+   * multiples share a scale. Default: the band the series occupies.
+   */
   maxRank?: number | undefined;
   /** `"changes"` marks the moments rank actually moved; `"none"`. */
   dots?: "changes" | "none" | undefined;
@@ -103,10 +107,10 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
       title={title}
       summary={accName}
       id={id}
-      // Rank space has no floor — the bottom band is the worst rank, not a zero,
-      // and #1 is pinned to the top — so the strip centres like a lane set. The
-      // bands inset symmetrically (1.5 either end), so the viewBox frame lands on
-      // the same midpoint the band geometry would.
+      // Rank space has no floor — the bottom band is the worst rank in the band,
+      // not a zero — so the strip centres like a lane set. The bands inset
+      // symmetrically (1.5 either end), so the viewBox frame lands on the same
+      // midpoint the band geometry would.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-bump ${className}` : "mc-bump"}
       style={rootStyle}

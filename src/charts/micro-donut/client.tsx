@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -216,7 +217,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
       </StaticMicroDonut>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownWedge && shownDatum ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {/* The localized sentence, minus its full stop — the chip must never
               hand-compose English (i18n canon), and this is the same text the
               live region announces. Siblings (TreeRings, SproutRow, BubbleRow)

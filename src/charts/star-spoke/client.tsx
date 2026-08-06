@@ -7,11 +7,11 @@ import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -208,15 +208,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
       </StaticStarSpoke>
       <LiveRegion>{announced}</LiveRegion>
       {readout && spoke && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            ...crosshairReadoutStyle(spoke.tx, size),
-            top: `${(spoke.ty / size) * 100}%`,
-            transform: "translate(-50%, -140%)",
-            bottom: "auto",
-          }}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${shownDatum.label} ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}

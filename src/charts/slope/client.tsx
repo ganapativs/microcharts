@@ -6,12 +6,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -206,14 +206,7 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
       </StaticSlope>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDatum && shownLine ? (
-        <span
-          className="mc-spark-readout"
-          style={
-            shownLine.y0 != null && shownLine.y1 != null
-              ? rowReadoutStyle(width / 2, (shownLine.y0 + shownLine.y1) / 2, width, height)
-              : { left: "50%", transform: "translateX(-50%)" }
-          }
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {Number.isFinite(shownDatum.from) && Number.isFinite(shownDatum.to)
             ? `${shownDatum.label}: ${fmt(shownDatum.from)} → ${fmt(shownDatum.to)}`
             : shownDatum.label}

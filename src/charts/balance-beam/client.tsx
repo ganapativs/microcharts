@@ -9,6 +9,7 @@ import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -218,7 +219,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
       </StaticBeam>
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && panKnown ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${pan!.label} ${fmt(pan!.value)}`}
         </span>
       ) : null}

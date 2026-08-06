@@ -7,11 +7,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -192,7 +192,6 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
             dateFmt(new Date(item.start)),
           )
       : "";
-  const readoutX = shownItem ? (shownItem.x + shownItem.xEnd) / 2 : 0;
 
   const outline = (o: { x: number; xEnd: number }, isPinned: boolean) => (
     <rect
@@ -234,7 +233,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       </StaticEventTimeline>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownItem && item ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(readoutX, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {item.end !== undefined
             ? `${item.label ?? strings.timelineFallback(shownItem.i + 1, "span")}: ${formatDuration(item.end - item.start)}`
             : `${item.label ?? strings.timelineFallback(shownItem.i + 1, "point")}: ${dateFmt(new Date(item.start))}`}

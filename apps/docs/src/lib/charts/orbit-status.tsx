@@ -36,7 +36,7 @@ export const entry: ChartEntry = {
       name: "latency",
       type: "number",
       required: true,
-      description: "Orbit radius (weak — pass a domain).",
+      description: "Orbit radius, on the latency reference below.",
     },
     {
       name: "rate",
@@ -45,16 +45,22 @@ export const entry: ChartEntry = {
       description: "Dash density / satellite speed.",
     },
     {
+      name: "domain",
+      type: "[number, number]",
+      required: false,
+      description: "Latency extent (default [0, 2·threshold], else [0, 1000] ms).",
+    },
+    {
       name: "latencyDomain",
       type: "[number, number]",
       required: false,
-      description: "Latency extent (insist on it — a lone radius is meaningless).",
+      description: "The same extent under its older name.",
     },
     {
       name: "rateDomain",
       type: "[number, number]",
       required: false,
-      description: "Rate extent (default [0, 2·rate]).",
+      description: "Rate extent (default: one dash step per decade).",
     },
     {
       name: "threshold",

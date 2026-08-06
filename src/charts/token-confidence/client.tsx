@@ -6,6 +6,7 @@
 // HTML host (the documented SVG exception); shares the pure tiering with
 // static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import { CHIP } from "../../shared/interactive.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -81,11 +82,12 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
   );
   const [active, setActive] = useState<number | null>(null);
   const [announced, setAnnounced] = useState("");
-  // The chip carries its own position: the host is a paragraph of flowing,
-  // wrapping text, so "above the chart" is meaningless — the chip has to sit
-  // over the token itself, which means measuring it. A client entry may
-  // measure; the static one may not.
-  const [chip, setChip] = useState<{ text: string; left: number; top: number } | null>(null);
+  // Text only. The chip used to carry measured `left`/`top` so it could sit
+  // over the token; `styles.css` places it now, so those two numbers had no
+  // reader left — and computing them cost two `getBoundingClientRect()` per
+  // hover move and per arrow key, which is a layout read on the hot path of a
+  // streamed reply.
+  const [chip, setChip] = useState<string | null>(null);
   const baseId = useId();
 
   const accName =
@@ -119,19 +121,11 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
 
   const showChip = useCallback(
     (tokenIndex: number) => {
-      const host = hostRef.current;
-      const el = tokenEl(tokenIndex);
       const t = tokens[tokenIndex];
-      if (!readout || !host || !el || !t) return;
-      const h = host.getBoundingClientRect();
-      const r = el.getBoundingClientRect();
-      setChip({
-        text: strings.tokenChip(strings.tokenTierNames[TIER_INDEX[t.tier]]!, conf(t.confidence)),
-        left: r.left - h.left + r.width / 2,
-        top: r.top - h.top,
-      });
+      if (!readout || !t) return;
+      setChip(strings.tokenChip(strings.tokenTierNames[TIER_INDEX[t.tier]]!, conf(t.confidence)));
     },
-    [readout, tokens, strings, conf, tokenEl],
+    [readout, tokens, strings, conf],
   );
 
   const focusFlagged = useCallback(
@@ -189,6 +183,11 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       className={rootClass}
       style={style as CSSProperties}
       ref={hostRef}
+      /* TokenConfidence builds its own wrapper rather than going through
+         `wrap()`, so it never emitted `data-mc-host` — and that attribute is
+         what `styles.css` hangs `anchor-name`/`anchor-scope` on. Without it the
+         chip reached the top layer with no anchor to resolve against. */
+      data-mc-host=""
       {...(decorative ? { "aria-hidden": true as const } : { role: "img", "aria-label": label })}
       onKeyDown={decorative ? undefined : onKeyDown}
       onPointerOver={
@@ -266,16 +265,8 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       {children}
       <LiveRegion>{announced}</LiveRegion>
       {readout && chip ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: chip.left,
-            top: chip.top,
-            bottom: "auto",
-            transform: "translate(-50%, calc(-100% - 0.2em))",
-          }}
-        >
-          {chip.text}
+        <span className="mc-spark-readout" {...CHIP}>
+          {chip}
         </span>
       ) : null}
     </span>

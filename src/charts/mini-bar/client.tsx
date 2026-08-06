@@ -7,12 +7,11 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_CATEGORY, type CategoryStrings } from "../../core/strings-category.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -206,14 +205,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
           announces "no data", and reads out as an em dash — never a silent
           hover. */}
       {readout && shownBar && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={
-            orientation === "vertical"
-              ? crosshairReadoutStyle(shownBar.x + shownBar.w / 2, width)
-              : rowReadoutStyle(width / 2, shownBar.y + shownBar.h / 2, width, height)
-          }
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${shownDatum.label}: ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}

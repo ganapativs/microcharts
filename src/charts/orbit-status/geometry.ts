@@ -2,13 +2,18 @@
 // orbit DASH DENSITY = call rate (quantized to 5 steps — denser = busier). which
 // the interactive entry mirrors as angular SPEED. Both are LOW-precision ordinal
 // channels (docs steer exact reads elsewhere). The satellite's static angle
-// (top) encodes NOTHING — only its speed does. All coords 2-dp.
+// (top) encodes NOTHING — only its speed does. Both channels read against a
+// stated reference when the caller passes no domain (see `ld`/`rateStep`). All
+// coords 2-dp.
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { evenDashes, polarPoint } from "../../core/arc.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 
 /** Dash counts per rate step 1–5 (denser dashes = busier). */
 const DASH_COUNTS = [4, 8, 14, 22, 32] as const;
+
+/** Latency reference (ms) with no `domain` and no `threshold` to derive one from. */
+const LATENCY_REF_MS = 1000;
 
 /** Documented default box, shared by the geometry and both entries. */
 const DEFAULT_SIZE = 20;
@@ -92,22 +97,48 @@ export function orbitStatusGeometry(opts: {
   const latency = unknown ? 0 : Math.max(0, opts.latency);
   const rate = unknown ? 0 : Math.max(0, opts.rate);
 
+  // Default latency reference. `latency` is ONE number, so it carries no extent
+  // of its own, and the old default read `[0, latency * 2]` — the datum defining
+  // its own domain. Every input then landed at exactly half the radius range:
+  // the orbit was a constant, two services 10× apart drew the same circle, and
+  // only the summary carried the ms.
+  //
+  // So the frame comes from outside the datum. A `threshold` is the caller's own
+  // scale (the budget this service is judged against), so it sets the reference
+  // and the alert edge falls on the halfway orbit — the radius crosses the
+  // middle of its range exactly when the satellite doubles. With no threshold
+  // the reference is 0–1000 ms: one second is the human-scale ceiling on a
+  // dependency call, it is the same frame for every glyph on the page (rows of a
+  // service table compare), and anything slower rides the outer orbit while the
+  // summary still states the exact ms.
+  const twiceThreshold = threshold !== null && threshold > 0 ? threshold * 2 : 0;
   const ld: [number, number] =
     opts.latencyDomain && opts.latencyDomain.every((d) => Number.isFinite(d))
       ? [opts.latencyDomain[0]!, opts.latencyDomain[1]!]
-      : [0, Math.max(1, latency * 2)];
-  const rd: [number, number] =
+      : [0, isFiniteValue(twiceThreshold) && twiceThreshold > 0 ? twiceThreshold : LATENCY_REF_MS];
+  const rd: [number, number] | null =
     opts.rateDomain && opts.rateDomain.every((d) => Number.isFinite(d))
       ? [opts.rateDomain[0]!, opts.rateDomain[1]!]
-      : [0, Math.max(1, rate * 2)];
+      : null;
 
   const orbitR = round2(clamp(scaleLinear(ld, [rMin, rMax])(latency), rMin, rMax));
 
   // Rate → 1..5 step (0 when the rate is 0 → a solid, dash-free orbit).
+  //
+  // The default was `[0, rate * 2]`, which pinned every nonzero rate to step 3.
+  // The replacement is not a fixed extent, because call rates run over orders of
+  // magnitude (a nightly job at 0.2/s beside an edge service at 4k/s) and this
+  // channel is five ordinal steps rather than a length: one step IS one decade —
+  // under 1 call/s, then 1, 10, 100, 1000 and up. An explicit `rateDomain`
+  // splits its own extent into the same five steps linearly.
   let rateStep: 0 | 1 | 2 | 3 | 4 | 5 = 0;
   if (rate > 0) {
-    const frac = rd[1] > rd[0] ? clamp((rate - rd[0]) / (rd[1] - rd[0]), 0, 1) : 1;
-    rateStep = Math.min(5, Math.max(1, Math.ceil(frac * 5))) as 1 | 2 | 3 | 4 | 5;
+    const step = rd
+      ? rd[1] > rd[0]
+        ? Math.ceil(clamp((rate - rd[0]) / (rd[1] - rd[0]), 0, 1) * 5)
+        : 5
+      : Math.floor(Math.log10(rate)) + 2;
+    rateStep = clamp(step, 1, 5) as 1 | 2 | 3 | 4 | 5;
   }
   const dash = rateStep === 0 ? ([0, 0] as const) : evenDashes(orbitR, DASH_COUNTS[rateStep - 1]!);
 

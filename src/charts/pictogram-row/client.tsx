@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  crosshairReadoutStyle,
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -242,10 +242,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
         {live && props.summary !== false ? (shown === null ? announced : unitSpoken) : ""}
       </LiveRegion>
       {readout && shown !== null && geo.units[shown] ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(geo.units[shown]!.cx, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {chipTextOf(shown)}
         </span>
       ) : null}

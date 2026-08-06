@@ -7,11 +7,11 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -191,10 +191,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
       {/* A stage with no value keeps its band and its "no data" announcement,
           so it reads out as an em dash — a share of nothing is not 0%. */}
       {readout && st && stDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(st.x + st.w / 2, geo.width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {isFiniteValue(stDatum.value)
             ? `${stDatum.label} ${pctFmt(st.share)} (${fmt(stDatum.value)})`
             : `${stDatum.label} —`}

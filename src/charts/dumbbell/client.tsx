@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -273,15 +273,7 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
       </StaticDumbbell>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownRow && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={rowReadoutStyle(
-            ((shownRow.x0 ?? 0) + (shownRow.x1 ?? shownRow.x0 ?? 0)) / 2,
-            shownRow.y,
-            width,
-            height,
-          )}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${okFrom ? fmt(shownDatum.from) : "—"} → ${okTo ? fmt(shownDatum.to) : "—"}${shownChange ? ` (${changeWords(strings, shownChange)})` : ""}`}
         </span>
       ) : null}

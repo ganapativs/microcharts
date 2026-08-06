@@ -6,12 +6,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -176,7 +176,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
       </StaticBumpStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && point ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(point.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`#${point.rank}`}
         </span>
       ) : null}

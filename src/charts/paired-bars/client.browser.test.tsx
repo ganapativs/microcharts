@@ -62,33 +62,39 @@ describe("interactive <PairedBars>", () => {
     const screen = await render(<PairedBars data={four} orientation="horizontal" />);
     const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
     wrap.focus();
-    const leftAfter = async (k: string) => {
+    const centreAfter = async (k: string) => {
       key(wrap, k);
       await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
       return (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left;
     };
-    const lefts = [
-      await leftAfter("Home"),
-      await leftAfter("ArrowDown"),
-      await leftAfter("ArrowDown"),
-      await leftAfter("ArrowDown"),
+    // No row may set an inline `left`: the chip is placed by the stylesheet, so
+    // it cannot drift by row and cannot escape the screen (see
+    // shared/interactive.ts). This file renders without the stylesheet.
+    const centres = [
+      await centreAfter("Home"),
+      await centreAfter("ArrowDown"),
+      await centreAfter("ArrowDown"),
+      await centreAfter("ArrowDown"),
     ];
-    // every row reports at the same x — and that x is the chart's midline
-    expect(new Set(lefts).size).toBe(1);
-    expect(lefts[0]).toBe("50%");
+    expect(new Set(centres)).toEqual(new Set([""]));
   });
 
-  it("vertical orientation still tracks the chip to the pair's band", async () => {
+  // Was "vertical orientation still tracks the chip to the pair's band". It no
+  // longer does, deliberately: a per-datum offset is an inline `left`, and an
+  // inline `left` is what stopped the chip being clamped to the screen. Both
+  // orientations now park it over the chart; the band is named in the readout
+  // text and marked by the focus ring.
+  it("vertical orientation parks the chip over the chart, band to band", async () => {
     const screen = await render(<PairedBars data={DATA} />);
     const wrap = screen.container.querySelector(".mc-paired-live") as HTMLElement;
     wrap.focus();
+    const centre = () => (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left;
     key(wrap, "Home");
     await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
-    const first = (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left;
+    const first = centre();
     key(wrap, "ArrowRight");
-    await expect
-      .poll(() => (wrap.querySelector(".mc-spark-readout") as HTMLElement).style.left)
-      .not.toBe(first);
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    expect(centre()).toBe(first);
   });
 
   it("controlled selectedIndex pins the outline without focus", async () => {

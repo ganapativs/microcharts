@@ -8,11 +8,11 @@ import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { EN_STREAK_SPARK } from "../../core/strings-streak-spark.js";
@@ -202,10 +202,7 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
       </StaticStreakSpark>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownRun ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownRun.x + shownRun.width / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(shownRun.len)} ${word}${shownRun.record ? strings.streakRecord : ""}`}
         </span>
       ) : null}

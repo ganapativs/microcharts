@@ -41,6 +41,8 @@ export function percentileSummary(
 export interface PercentileTraceProps {
   /** Percentile ranks per reading, 0–100 (out-of-range values are clamped). */
   data: readonly Value[];
+  /** Rank extent. Default [0, 100] — the full ladder, the honest frame. */
+  domain?: readonly [number, number] | undefined;
   /** Draw the fixed p25–75 + p5–95 population bands (default true). */
   showBands?: boolean | undefined;
   /** Which direction is good — colors the endpoint dot (default "up"). */
@@ -91,6 +93,7 @@ export const percentileLabelFits = (height: number): boolean =>
 export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const {
     data,
+    domain,
     showBands = true,
     positive = "up",
     label = "last",
@@ -119,7 +122,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const pStr = (n: number) => strings.percentileValue(fmt(n));
   const cls = className ? `mc-percentile-trace ${className}` : "mc-percentile-trace";
 
-  const geo = percentileGeometry({ width, height, data });
+  const geo = percentileGeometry({ width, height, data, domain });
   const accName =
     summary === false
       ? false

@@ -26,6 +26,29 @@ describe("winProbWormGeometry", () => {
     expect(geo.belowD).toContain("M");
   });
 
+  it("`domain` is the escape hatch; the full 0–100 frame stays the default", () => {
+    const ys = (d: string) =>
+      [...d.matchAll(/[ML](-?[\d.]+) (-?[\d.]+)/g)].map((m) => Number(m[2]));
+    const spread = (g: NonNullable<ReturnType<typeof winProbWormGeometry>>) => {
+      const all = [...ys(g.aboveD), ...ys(g.belowD)];
+      return Math.max(...all) - Math.min(...all);
+    };
+    const full = winProbWormGeometry({ ...base, data: TIGHT })!;
+    const zoom = winProbWormGeometry({ ...base, data: TIGHT, domain: [45, 55] })!;
+    expect(spread(zoom)).toBeGreaterThan(spread(full));
+    // Nothing paints outside the plot, midline included, on a frame that
+    // excludes 50 entirely.
+    const off = winProbWormGeometry({ ...base, data: TIGHT, domain: [60, 100] })!;
+    for (const y of [...ys(off.aboveD), ...ys(off.belowD), off.midY]) {
+      expect(y).toBeGreaterThanOrEqual(PAD - 0.01);
+      expect(y).toBeLessThanOrEqual(base.height - PAD + 0.01);
+    }
+    // …and an unusable pair falls back to the full frame, never a NaN scale
+    expect(winProbWormGeometry({ ...base, data: TIGHT, domain: [0, Number.NaN] })!.aboveD).toBe(
+      full.aboveD,
+    );
+  });
+
   it("endpoint + last carry the clamped current value", () => {
     const geo = winProbWormGeometry({ ...base, data: GAME })!;
     expect(geo.last).toBe(98);
@@ -150,4 +173,30 @@ describe("winProbWormGeometry", () => {
       }
     },
   );
+
+  // Both cases put the whole series on the plot FLOOR before `scaleLinear`
+  // replaced the hand-rolled affine map: a zero span hit the `|| 1` fallback,
+  // and a span that overflows to Infinity divided every value to 0.
+  it("a degenerate or overflowing domain centres the series, never floors it", () => {
+    const mid = (base.height - 2) / 2 + 1; // range midpoint between the pads
+    const flat = winProbWormGeometry({ ...base, data: [50, 50, 50], domain: [50, 50] })!;
+    expect(flat.end!.y).toBeCloseTo(mid, 5);
+    const huge = winProbWormGeometry({
+      ...base,
+      data: [50, 50, 50],
+      domain: [-1.5e308, 1.5e308],
+    })!;
+    expect(huge.end!.y).toBeCloseTo(mid, 5);
+  });
+
+  it("exposes the resolved domain so annotations share the worm's axis", () => {
+    expect(winProbWormGeometry({ ...base, data: TIGHT })!.domain).toEqual([0, 100]);
+    expect(winProbWormGeometry({ ...base, data: TIGHT, domain: [45, 55] })!.domain).toEqual([
+      45, 55,
+    ]);
+    // a non-finite end falls back to the full frame, like every other chart
+    expect(winProbWormGeometry({ ...base, data: TIGHT, domain: [0, Number.NaN] })!.domain).toEqual([
+      0, 100,
+    ]);
+  });
 });

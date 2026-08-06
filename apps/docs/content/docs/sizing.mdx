@@ -15,7 +15,7 @@ scales through SVG and CSS alone.
 | ---------------------------- | -------------------------------------------------------- |
 | A sensible default           | Pass nothing — every chart has an intrinsic box.         |
 | An exact pixel size          | Set `width` / `height` props (where the chart has them). |
-| To fill whatever contains it | Add `style={{ width: "100%", height: "auto" }}`.         |
+| To fill whatever contains it | Give it a width in CSS — the height follows.             |
 
 <Callout type="warn">
   Not every chart has `width`/`height`. Grid charts derive their box from the cell: `ActivityGrid`, `CalendarStrip`,
@@ -63,24 +63,35 @@ screen.
 
 ## Fill the container
 
-To make a chart fluid, drop its pixel size and let CSS drive the width instead. The `viewBox` keeps the aspect ratio, so
-`height: auto` follows the width. This is the one-liner for a KPI card, a responsive dashboard tile, or a full-width
-hero:
+Set a width in CSS. The height follows on its own, because the `viewBox` keeps the aspect ratio and `.mc-root` ships
+`height: auto`. This is the one-liner for a KPI card, a responsive dashboard tile, or a full-width hero:
 
 ```tsx
-<Sparkline data={data} style={{ width: "100%", height: "auto" }} />
+<Sparkline data={data} className="w-full" />
 ```
+
+A class and a `style` do the same thing here, and either one is enough:
+
+```tsx
+<Sparkline data={data} style={{ width: "100%" }} />
+```
+
+Spelling `height: auto` yourself is still fine. It changes nothing, because that is the shipped default.
 
 The chart now grows and shrinks with its parent. To constrain it, size the container or give it a `max-width`:
 
 ```tsx
 <div style={{ width: "100%", maxWidth: 320 }}>
-  <Sparkline data={data} style={{ width: "100%", height: "auto" }} />
+  <Sparkline data={data} className="w-full" />
 </div>
 ```
 
-You can still pass `width`/`height` alongside fluid CSS: they become the chart's intrinsic aspect ratio and its size
-before CSS overrides the width. Utility classes work the same way (`className="w-full h-auto"`).
+A chart also never overflows a container narrower than itself: `.mc-root` carries `max-width: 100%`, so a 80-unit Bullet
+in a 60px cell shrinks to 60px instead of spilling.
+
+You can still pass `width`/`height` alongside fluid CSS. They set the chart's aspect ratio and its size before CSS takes
+over the width, and geometry still resolves in those units, so a wider `width` prop spreads a series further apart
+rather than magnifying it.
 
 To give a whole row of charts one identical box rather than sizing each by hand, put `width`/`height` on `SparkGroup`:
 it enforces them on every series child that didn't set its own, and shares one scale at the same time. See
@@ -111,6 +122,27 @@ import { Sparkline } from "@microcharts/react/sparkline/interactive";
   land under the cursor, a touch drag scrubs the unit beneath the finger, and a pinned selection stays on the right unit
   when the box reflows. An interactive chart is its static twin plus interaction, at the same size.
 </Callout>
+
+## The readout in a tight container
+
+Put an interactive chart anywhere: a scrolling side rail, a table cell, a sticky header, a panel with
+`overflow: hidden`. The hover readout renders in the
+[top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and is placed by CSS anchor positioning, so it
+doesn't need room inside your container and no ancestor can clip it.
+
+Three behaviors follow, and none of them costs you a prop:
+
+- It **flips below** the chart when there isn't room above.
+- It **stops at the window edge** and grows the other way instead of running off-screen. A chart flush against the right
+  edge opens its readout to the left.
+- It **hides** when the chart scrolls out of view, rather than floating over unrelated UI.
+
+Chrome, Edge, and Safari place it this way. Firefox has no anchor positioning yet, so it keeps the older placement:
+above the chart, positioned against the chart's own box. That degrades the placement, never the reading — the value and
+the announcement are identical either way.
+
+You don't need to reserve headroom, add padding, raise a `z-index`, or set `readout={false}` to stop a clipped chip. If
+you set `readout={false}` for that reason, you can drop it.
 
 ## Inline in a sentence
 

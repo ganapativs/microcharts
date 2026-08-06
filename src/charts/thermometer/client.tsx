@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
-import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
@@ -162,7 +162,7 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
           unless a target is set, because then the gutter holds only half the
           reading and the goal it is measured against is still unpainted. */}
       {readout && hover && readoutText && (props.label !== "value" || hasTarget) ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

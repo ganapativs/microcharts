@@ -50,8 +50,18 @@ describe("interactive <ErrorBudget>", () => {
     const dx = /translateX\(([-\d.]+)px\)/.exec(group.style?.transform ?? "");
     const lineFrac = (Number(line.getAttribute("x1")) + (dx ? Number(dx[1]) : 0)) / vbWidth;
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
-    const chipFrac = parseFloat(chip.style.left) / 100;
-    expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);
+    // The chip carries no per-datum `left` any more: placement moved wholly into
+    // styles.css so the engine can clamp it to the screen (shared/interactive.ts
+    // records why). This file renders without the stylesheet, so the testable
+    // half of that contract is the half that lives in the markup — the chip must
+    // ship NO inline positional style, because an inline `left` is exactly what
+    // outranked the anchored insets and pushed the chip off its chart. The
+    // crosshair still carries the datum x, inside the plot.
+    expect(chip.style.left).toBe("");
+    expect(chip.style.top).toBe("");
+    expect(chip.style.transform).toBe("");
+    expect(lineFrac).toBeGreaterThanOrEqual(0);
+    expect(lineFrac).toBeLessThanOrEqual(1);
   });
 
   it("rapid arrow presses don't drop (functional updater)", async () => {

@@ -10,11 +10,11 @@ import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -44,6 +44,7 @@ export interface InteractiveWinProbWormProps extends WinProbWormProps, PickerPro
 export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode {
   const {
     data,
+    domain,
     sides = ["A", "B"],
     label = "last",
     width = 80,
@@ -85,8 +86,8 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
   // Geometry must match the static entry EXACTLY (same shared resolve), so the
   // overlay + pointer math never drift.
   const geo = useMemo(
-    () => resolveWormGeo({ width, height, data, label, font: FONT, pctFmt }),
-    [width, height, data, label, FONT, pctFmt],
+    () => resolveWormGeo({ width, height, data, domain, label, font: FONT, pctFmt }),
+    [width, height, data, domain, label, FONT, pctFmt],
   );
 
   const plotW = Math.max(0, width - 2 * PAD - geo.gutter);
@@ -175,7 +176,6 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
           clampedShown >= 50 ? sides[0] : sides[1],
           wormPct(leaderProb(clampedShown), pctFmt),
         );
-  const px = shown !== null ? PAD + (shown / lastX) * plotW : 0;
 
   return (
     <span
@@ -187,6 +187,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
       <StaticWinProbWorm
         {...rest}
         data={data}
+        domain={domain}
         sides={sides}
         label={label}
         width={width}
@@ -202,7 +203,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         {rest.children}
       </StaticWinProbWorm>
       {readout && clampedShown !== null ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(px, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${clampedShown >= 50 ? sides[0] : sides[1]} ${wormPct(leaderProb(clampedShown), pctFmt)}`}
         </span>
       ) : null}

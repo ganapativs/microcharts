@@ -10,7 +10,13 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
-import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import {
+  CHIP,
+  named,
+  fillFor,
+  wrap as wrapAttrs,
+  type MicroDatum,
+} from "../../shared/interactive.js";
 import { WindBarb as StaticWindBarb, windBarbSummary, type WindBarbProps } from "./index.js";
 import { isCalm, resolveStep } from "./geometry.js";
 
@@ -149,7 +155,7 @@ export function WindBarb(props: InteractiveWindBarbProps): React.ReactNode {
           direction reading needs naming (the chip carries the octant the
           static label never paints). */}
       {readout && hover && chipText && props.label !== "value" && props.mode !== "arrow" ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chipText}
         </span>
       ) : null}

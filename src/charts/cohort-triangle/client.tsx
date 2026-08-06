@@ -8,11 +8,11 @@ import { makeFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import {
@@ -231,10 +231,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
       </StaticCohortTriangle>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownCell.x + geo.cell / 2, w)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {/* The localized sentence minus its full stop — a bare number left the
               reader to work out WHICH cohort at WHICH age they were pointing at,
               while the live region beside it named both. Same text, same

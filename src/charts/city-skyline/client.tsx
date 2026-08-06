@@ -8,11 +8,11 @@ import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -210,7 +210,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
       </StaticCitySkyline>
       <LiveRegion>{announced}</LiveRegion>
       {readout && b && announced ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(b.x + b.w / 2, geo.width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {announced}
         </span>
       ) : null}

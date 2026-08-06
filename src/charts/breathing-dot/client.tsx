@@ -9,7 +9,7 @@
 // which the glyph alone never shows.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
@@ -181,7 +181,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
           `label="value"` prints the percent. Hover/focus reveals percent +
           band — skipped when the permanent label already shows the percent. */}
       {readout && hover && props.label !== "value" ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

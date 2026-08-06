@@ -9,11 +9,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { maxPerBucket } from "../../core/downsample.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -221,10 +221,7 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
       </StaticSeismogram>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shown !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(slotW * (shown + 0.5), width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {isFiniteValue(shownValue) ? fmt(shownValue) : "—"}
         </span>
       ) : null}

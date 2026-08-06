@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import type { ZoneKey } from "./geometry.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -182,14 +182,6 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   const shown = active ?? selected;
   const zone = shown !== null ? geo.zones[shown] : undefined;
   const announced = zone ? strings.tirZone(nameByKey[zone.key]!, pctFmt(pct[zone.key]!)) : "";
-  // Horizontal: clamp to the zone mid-x. Vertical: float ABOVE the column —
-  // a centered chip sits inside a ~34px KPI and collides with the default
-  // `bottom: 100%` rule, so the value never appears.
-  const chipPos = zone
-    ? horizontal
-      ? crosshairReadoutStyle(zone.x + zone.width / 2, width)
-      : { left: "50%", bottom: "100%", top: "auto", transform: "translateX(-50%)" }
-    : undefined;
   const chipText = zone ? `${nameByKey[zone.key]} ${pctFmt(pct[zone.key]!)}` : "";
 
   return (
@@ -211,7 +203,7 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
       </StaticTimeInRange>
       <LiveRegion>{announced}</LiveRegion>
       {readout && zone ? (
-        <span className="mc-spark-readout" style={chipPos}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chipText}
         </span>
       ) : null}

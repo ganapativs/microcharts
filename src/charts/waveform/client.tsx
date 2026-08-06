@@ -7,11 +7,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { maxPerBucket } from "../../core/downsample.js";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -222,7 +222,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       </StaticWaveform>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownBar ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownX, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${pct} · ${shownAmp}`}
         </span>
       ) : null}
