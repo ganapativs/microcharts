@@ -10,7 +10,7 @@ import { scaleLinear } from "../../core/scale.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
-import { spreadLabels } from "../../core/labels.js";
+import { seatLabels } from "../../core/labels.js";
 import { pairChange, type DumbbellDatum } from "../dumbbell/index.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
 import { slopeFitFrame } from "./geometry.js";
@@ -107,10 +107,9 @@ export function Slope(props: SlopeProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const wantLeft = label === "value" || label === "both";
-  const wantLabel = label === "label" || label === "both";
   // gutters ate the plot → drop labels AND give the reclaimed room back to
   // the lines (a squeezed slope with labels is a pile, without them a sliver)
-  const { geo, labelsDropped, fontSize } = slopeFitFrame({
+  const { geo, labelsDropped, fontSize, nameChars } = slopeFitFrame({
     width,
     height,
     data,
@@ -124,16 +123,17 @@ export function Slope(props: SlopeProps): ReactNode {
 
   const goodDir = positive === "down" ? -1 : 1;
   const showLabels = label !== "none" && !labelsDropped;
-  // per-column label layout: baselines spread to a full glyph pitch inside
-  // the frame (deterministic sweep, core/labels) — close endpoints nudge
-  // apart instead of colliding; an impossible column drops its labels
-  const layoutColumn = (ys: (number | null)[]): (number | null)[] => {
-    const present: number[] = [];
-    for (const y of ys) if (y !== null) present.push(y);
-    const spread = spreadLabels(present, fontSize * 1.05, fontSize * 0.5, height - fontSize * 0.5);
-    let k = 0;
-    return ys.map((y) => (y === null || !spread ? null : spread[k++]!));
-  };
+  // Per-column label layout (deterministic, core/labels): each label seats on
+  // its OWN endpoint, moves at most half a glyph pitch to clear the label above
+  // it, and drops when that is not enough. The previous pass spread the whole
+  // column to a full pitch instead, which at six rows in a 54-unit box moved a
+  // label 19 units and left three of them nearer a foreign line than their own.
+  // A name on the wrong line reads as data, so the label goes instead.
+  // The band is the containment band (a centred glyph owns fontSize / 2 above
+  // and below its baseline), which sits fontSize / 2 − 1.5 inside the endpoint
+  // band; the outermost row absorbs that as its clamp.
+  const layoutColumn = (ys: (number | null)[]): (number | null)[] =>
+    seatLabels(ys, fontSize * 1.05, fontSize * 0.5, height - fontSize * 0.5);
   const leftYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y0)) : [];
   const rightYs = showLabels ? layoutColumn(geo.lines.map((l) => l.y1)) : [];
 
@@ -251,7 +251,11 @@ export function Slope(props: SlopeProps): ReactNode {
                 {fmt(d.from)}
               </text>
             ) : null}
-            {showLabels && rightYs[line.index] !== null ? (
+            {/* `nameChars` is 0 when the name was too narrow to identify a row
+                and handed its gutter back; with `label="label"` that leaves the
+                right column with nothing to say, so it renders no node at all
+                rather than an empty one. */}
+            {showLabels && rightYs[line.index] !== null && (wantLeft || nameChars > 0) ? (
               <text
                 x={geo.rightLabelX}
                 y={rightYs[line.index]!}
@@ -265,8 +269,11 @@ export function Slope(props: SlopeProps): ReactNode {
                 data-mc-ink="label"
               >
                 {wantLeft ? fmt(d.to) : ""}
-                {wantLeft && wantLabel ? " " : ""}
-                {wantLabel ? truncateLabel(d.label) : ""}
+                {wantLeft && nameChars > 0 ? " " : ""}
+                {/* The budget the gutter was RESERVED from, never the
+                    truncator's own default — the two constants are one
+                    contract, and 6 of them was the whole bug. */}
+                {nameChars > 0 ? truncateLabel(d.label, nameChars) : ""}
               </text>
             ) : null}
           </g>

@@ -95,6 +95,37 @@ describe("slopeFrame (shared static/interactive frame)", () => {
     expect(both.geo.colX1).toBeLessThan(none.geo.colX1);
   });
 
+  it("budgets the category name from the width, not from a constant", () => {
+    // The reservation used `Math.min(6, label.length) + 1` while the paint side
+    // truncated at 6, so both ends of the contract ignored the room available
+    // and two 20-character names arrived as one string.
+    const names = [
+      { from: 1, to: 2, label: "specialFlagsInternal" },
+      { from: 2, to: 1, label: "specialFlagsName" },
+    ];
+    const wide = slopeFrame({
+      width: 300,
+      height: 54,
+      data: names,
+      label: "label",
+      fmt,
+      fontSize: 8,
+    });
+    const narrow = slopeFrame({
+      width: 100,
+      height: 54,
+      data: names,
+      label: "label",
+      fmt,
+      fontSize: 8,
+    });
+    expect(wide.nameChars).toBe(14); // ROW_LABEL_MAX_CHARS, the shared cap
+    expect(narrow.nameChars).toBe(4);
+    // and the gutter reserved for it moves with the budget — the paint side
+    // truncates at this same count, so glyphs and gutter cannot drift
+    expect(300 - wide.geo.colX1).toBeGreaterThan(100 - narrow.geo.colX1);
+  });
+
   it("drops labels and reclaims the room when the gutters ate the plot", () => {
     const tight = slopeFrame({ width: 24, height: 6, data, label: "both", fmt });
     expect(tight.labelsDropped).toBe(true);

@@ -83,6 +83,58 @@ describe("<Slope>", () => {
     expect(container.querySelectorAll("circle").length).toBe(1);
   });
 
+  // Six rows whose names share a 6-character prefix, in a box wide enough to
+  // tell them apart. Both bugs this fixture pins were measured here.
+  const PREFIXED = [
+    { label: "specialFlagsInternal", from: 40, to: 47 },
+    { label: "specialFlagsName", from: 55, to: 41 },
+    { label: "southRegion", from: 30, to: 33 },
+    { label: "northRegion", from: 50, to: 44 },
+    { label: "midRegion", from: 20, to: 35 },
+    { label: "farRegion", from: 10, to: 60 },
+  ];
+
+  it("the name budget scales with the width, so a shared prefix stays readable", () => {
+    // Was: `truncateLabel(d.label)` with no budget, so the truncator's own
+    // 6-character default applied at every width and `specialFlagsInternal` and
+    // `specialFlagsName` both painted "specia…" — two lines under one name.
+    const { container } = draw(<Slope data={PREFIXED} label="label" width={300} height={54} />);
+    const texts = [...container.querySelectorAll("text")].map((t) => t.textContent ?? "");
+    const shared = texts.filter((t) => t.startsWith("special"));
+    expect(shared).toEqual(["specialFlagsIn…", "specialFlagsNa…"]);
+    // no two rendered labels are the same string
+    expect(new Set(texts).size).toBe(texts.length);
+  });
+
+  it("a rendered label sits on its own line — or is not rendered", () => {
+    // Was: every label spread to a full glyph pitch, which displaced one by 17
+    // units (32% of the height) and left 3 of 6 nearer a foreign line.
+    const { container } = draw(<Slope data={PREFIXED} label="label" width={300} height={54} />);
+    const rows = [...container.querySelectorAll("g")].map((g) => {
+      const dots = [...g.querySelectorAll("circle")];
+      const text = g.querySelector("text");
+      return {
+        // the right column's endpoint — the line this row's label names
+        end: Number(dots[dots.length - 1]!.getAttribute("cy")),
+        y: text ? Number(text.getAttribute("y")) : null,
+      };
+    });
+    const ends = rows.map((r) => r.end);
+    expect(rows.filter((r) => r.y !== null).length).toBeGreaterThan(0);
+    for (const row of rows) {
+      if (row.y === null) continue;
+      const own = Math.abs(row.y - row.end);
+      // half the de-collision pitch (fontSize 8 × 1.05 / 2), the seat allowance
+      expect(own).toBeLessThanOrEqual(4.2);
+      for (const end of ends) expect(own).toBeLessThanOrEqual(Math.abs(row.y - end) + 1e-9);
+    }
+    // labels stay in the order of the lines they name
+    const seated = rows.filter((r) => r.y !== null);
+    for (let i = 1; i < seated.length; i++) {
+      expect(seated[i]!.y! > seated[i - 1]!.y!).toBe(seated[i]!.end > seated[i - 1]!.end);
+    }
+  });
+
   it("labels drop deterministically when rows are cramped", () => {
     const spacious = draw(<Slope data={DATA.slice(0, 2)} label="value" height={40} />).container;
     expect(spacious.querySelectorAll("text").length).toBeGreaterThan(0);

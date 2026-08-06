@@ -209,6 +209,22 @@ const CASES: Record<string, () => ReactElement> = {
       title="Slope"
     />
   ),
+  // The same chart with a name budget that scales: at 300 units the right
+  // gutter carries 10 characters of caller text plus a value, where the 140-unit
+  // case carries 5. A budget that grows without the reservation growing with it
+  // paints straight out of the box, which is what this case watches.
+  "slope (wide)": () => (
+    <Slope
+      data={[
+        { label: "SPECIALFLAGSINTERNAL", from: 20, to: 33 },
+        { label: "SPECIALFLAGSNAME", from: 44, to: 28 },
+      ]}
+      width={300}
+      height={54}
+      label="both"
+      title="Slope"
+    />
+  ),
   sparkbar: () => <SparkBar data={[3, 6, 2, 8, 1234567]} label="last" title="Bars" />,
   "sparkline-last": () => <Sparkline data={[3, 6, 2, 8, 1234567]} label="last" title="Line" />,
   // sparkline is the only chart in the catalog emitting TWO distinct label sizes

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import {
+  seatLabels,
   spreadLabels,
   rowLabelFont,
   rowLabelChars,
@@ -51,6 +52,74 @@ describe("spreadLabels", () => {
     for (const v of out!) {
       expect(v).toBeGreaterThanOrEqual(-0.01);
       expect(v).toBeLessThanOrEqual(100.01);
+    }
+  });
+});
+
+describe("seatLabels", () => {
+  it("leaves already-spaced labels exactly where they are", () => {
+    expect(seatLabels([10, 30, 50], 6, 0, 60)).toEqual([10, 30, 50]);
+  });
+
+  it("nudges a colliding label at most half a pitch, then drops it", () => {
+    // 22 clears 20 by 2, so it moves to 26 — 4 units, past half of 6.
+    expect(seatLabels([20, 22], 6, 0, 60)).toEqual([20, null]);
+    // 24 only needs 2 units to clear, which it is allowed.
+    expect(seatLabels([20, 24], 6, 0, 60)).toEqual([20, 26]);
+  });
+
+  it("passes null slots through, so a caller can read back by row", () => {
+    expect(seatLabels([10, null, 30], 6, 0, 60)).toEqual([10, null, 30]);
+  });
+
+  it("clamps into the band, and drops what cannot be clamped into it", () => {
+    // 4 units of clamping is more than half a 6-unit pitch, so both drop.
+    expect(seatLabels([-4, 64], 6, 0, 60)).toEqual([null, null]);
+    // 2 units is inside the allowance: the outermost label rides the edge.
+    expect(seatLabels([-2, 62], 6, 0, 60)).toEqual([0, 60]);
+  });
+
+  it("a dropped label leaves its room to the next one", () => {
+    // 21 cannot seat (it would move 5 of a 6-unit pitch); 28 can, at 28.
+    expect(seatLabels([20, 21, 28], 6, 0, 60)).toEqual([20, null, 28]);
+  });
+
+  it("empty input → empty output", () => {
+    expect(seatLabels([], 5, 0, 10)).toEqual([]);
+  });
+
+  test.prop([
+    fc.array(fc.oneof(fc.double({ min: -20, max: 120, noNaN: true }), fc.constant(null)), {
+      minLength: 1,
+      maxLength: 12,
+    }),
+    fc.double({ min: 0.5, max: 20, noNaN: true }),
+  ])("a kept label is inside the band, in order, and near its own datum", (ys, pitch) => {
+    const out = seatLabels(ys, pitch, 0, 100);
+    expect(out.length).toBe(ys.length);
+    const kept: { want: number; seat: number }[] = [];
+    ys.forEach((y, i) => {
+      if (out[i] === null) return;
+      expect(y).not.toBeNull();
+      kept.push({ want: y!, seat: out[i]! });
+    });
+    kept.sort((a, b) => a.want - b.want);
+    for (let k = 0; k < kept.length; k++) {
+      const { want, seat } = kept[k]!;
+      // inside the band
+      expect(seat).toBeGreaterThanOrEqual(-0.01);
+      expect(seat).toBeLessThanOrEqual(100.01);
+      // near its own datum — the bound that keeps a label on its own mark
+      expect(Math.abs(seat - want)).toBeLessThanOrEqual(pitch / 2 + 0.01);
+      // rank order survives, at a full pitch
+      if (k > 0) expect(seat - kept[k - 1]!.seat).toBeGreaterThanOrEqual(pitch - 0.02);
+    }
+    // …and therefore no kept label is closer to another kept label's datum
+    for (const a of kept) {
+      for (const b of kept) {
+        if (a === b) continue;
+        expect(Math.abs(a.seat - a.want)).toBeLessThanOrEqual(Math.abs(a.seat - b.want) + 0.01);
+      }
     }
   });
 });
