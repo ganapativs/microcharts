@@ -67,6 +67,20 @@ function pinned(svg: SVGSVGElement): boolean {
   return el !== null && el.getAttribute("opacity") !== "0";
 }
 
+/** A finger, at the centre of `el`: down, up, click — the sequence a tap sends. */
+function tap(el: Element): void {
+  const r = el.getBoundingClientRect();
+  const at = {
+    bubbles: true,
+    pointerId: 7,
+    clientX: r.x + r.width / 2,
+    clientY: r.y + r.height / 2,
+  };
+  el.dispatchEvent(new PointerEvent("pointerdown", { ...at, pointerType: "touch" }));
+  el.dispatchEvent(new PointerEvent("pointerup", { ...at, pointerType: "touch" }));
+  el.dispatchEvent(new MouseEvent("click", at));
+}
+
 describe("light dismiss", () => {
   it("an outside click drops the pin and reports it once", async () => {
     const picks = vi.fn<(d: MicroDatum | null) => void>();
@@ -84,6 +98,23 @@ describe("light dismiss", () => {
     // Once, not once per listener and not again on the click that follows the
     // dismissing pointerdown.
     expect(picks.mock.calls.filter(([d]) => d === null)).toHaveLength(1);
+  });
+
+  it("a tap elsewhere drops a tapped pin", async () => {
+    // The case the fix was reported from: a phone has no hover to fall back on,
+    // and a tap does not reliably move focus, so Escape was never available
+    // either. The pin has to come off the way it went on.
+    const picks = vi.fn<(d: MicroDatum | null) => void>();
+    const { host, svg, outside } = await mount(
+      <SparkBar data={BARS} title="Weekly" onSelect={picks} />,
+    );
+
+    tap(host);
+    await expect.poll(() => pinned(svg)).toBe(true);
+
+    tap(outside);
+    await expect.poll(() => pinned(svg)).toBe(false);
+    expect(picks.mock.lastCall?.[0]).toBeNull();
   });
 
   it("a click inside the chart is not an outside click", async () => {
