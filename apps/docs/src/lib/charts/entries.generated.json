@@ -1701,7 +1701,7 @@
     "interactiveImport": "@microcharts/react/bump-strip/interactive",
     "dataShape": "(number | null)[] of 1-based ranks per period (null = unranked)",
     "encoding": {
-      "channel": "vertical position on an inverted rank scale (#1 on top)",
+      "channel": "vertical position on an inverted rank scale (best rank on top)",
       "precision": "medium — end labels give the exact ranks; steps are ordinal"
     },
     "nodeBudget": "≤ 10 (1 path + change dots + 2 end labels)",
@@ -1718,7 +1718,7 @@
         "name": "maxRank",
         "type": "number",
         "required": false,
-        "description": "Fix the band so small multiples share a rank scale."
+        "description": "Fix the band at #1 through this rank, so small multiples share a scale."
       },
       {
         "name": "dots",
@@ -5071,7 +5071,7 @@
         "name": "latency",
         "type": "number",
         "required": true,
-        "description": "Orbit radius (weak — pass a domain)."
+        "description": "Orbit radius, on the latency reference below."
       },
       {
         "name": "rate",
@@ -5080,16 +5080,22 @@
         "description": "Dash density / satellite speed."
       },
       {
+        "name": "domain",
+        "type": "[number, number]",
+        "required": false,
+        "description": "Latency extent (default [0, 2·threshold], else [0, 1000] ms)."
+      },
+      {
         "name": "latencyDomain",
         "type": "[number, number]",
         "required": false,
-        "description": "Latency extent (insist on it — a lone radius is meaningless)."
+        "description": "The same extent under its older name."
       },
       {
         "name": "rateDomain",
         "type": "[number, number]",
         "required": false,
-        "description": "Rate extent (default [0, 2·rate])."
+        "description": "Rate extent (default: one dash step per decade)."
       },
       {
         "name": "threshold",

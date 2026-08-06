@@ -101,15 +101,15 @@
   },
   "likert-strip": {
     "static": 3.19,
-    "interactive": 5.51
+    "interactive": 5.52
   },
   "waterfall": {
     "static": 3.11,
     "interactive": 5.5
   },
   "bump-strip": {
-    "static": 2.37,
-    "interactive": 4.74
+    "static": 2.41,
+    "interactive": 4.78
   },
   "dual-sparkline": {
     "static": 3.73,
@@ -144,8 +144,8 @@
     "interactive": 5.42
   },
   "percentile-ladder": {
-    "static": 3.41,
-    "interactive": 5.81
+    "static": 3.47,
+    "interactive": 5.87
   },
   "graded-band": {
     "static": 3.07,
@@ -172,7 +172,7 @@
     "interactive": 5.81
   },
   "forecast-cone": {
-    "static": 3.59,
+    "static": 3.6,
     "interactive": 6.03
   },
   "quantile-dots": {
@@ -196,8 +196,8 @@
     "interactive": 5.41
   },
   "quadrant-dot": {
-    "static": 2.61,
-    "interactive": 5.05
+    "static": 2.62,
+    "interactive": 5.06
   },
   "cycle-plot": {
     "static": 3.12,
@@ -209,10 +209,10 @@
   },
   "ensemble-ghosts": {
     "static": 3.3,
-    "interactive": 6.43
+    "interactive": 6.44
   },
   "tally-marks": {
-    "static": 1.67,
+    "static": 1.68,
     "interactive": 3.17
   },
   "dice-pips": {
@@ -240,12 +240,12 @@
     "interactive": 3.8
   },
   "balance-beam": {
-    "static": 2.5,
+    "static": 2.51,
     "interactive": 4.99
   },
   "sprout-row": {
     "static": 2.22,
-    "interactive": 4.71
+    "interactive": 4.7
   },
   "garden-grid": {
     "static": 2.06,
@@ -277,7 +277,7 @@
   },
   "polar-clock": {
     "static": 3.32,
-    "interactive": 5.76
+    "interactive": 5.77
   },
   "spiral-year": {
     "static": 2.98,
@@ -296,8 +296,8 @@
     "interactive": 5.06
   },
   "orbit-status": {
-    "static": 2.42,
-    "interactive": 4.36
+    "static": 2.46,
+    "interactive": 4.42
   },
   "rate-volume": {
     "static": 2.93,
@@ -357,7 +357,7 @@
   },
   "partition-strip": {
     "static": 2.56,
-    "interactive": 5.34
+    "interactive": 5.33
   },
   "calibration-strip": {
     "static": 2.81,
@@ -385,7 +385,7 @@
   },
   "tape-gauge": {
     "static": 3.42,
-    "interactive": 4.94
+    "interactive": 4.95
   },
   "station-glyph": {
     "static": 3.48,
