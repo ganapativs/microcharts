@@ -1,5 +1,20 @@
 # @microcharts/mcp
 
+## 0.1.12
+
+### Patch Changes
+
+- [#111](https://github.com/ganapativs/microcharts/pull/111)
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Rebuilds the embedded catalog against `@microcharts/react` with the
+  readout and sizing fixes.
+
+- Updated dependencies
+  [[`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f),
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f),
+  [`4985dd9`](https://github.com/ganapativs/microcharts/commit/4985dd94070e7facaa94812e11db3014109c2e2f)]:
+  - @microcharts/react@0.15.0
+
 ## 0.1.11
 
 ### Patch Changes
