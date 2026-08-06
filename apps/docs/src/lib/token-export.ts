@@ -179,6 +179,7 @@ export const BASE_TOKENS: BaseToken[] = [
     note: "Readout chip ink",
   },
   { cssVar: "--mc-surface-edge", light: "color-mix(in oklab, CanvasText 16%, transparent)", category: "surface", note: "Readout chip edge" }, // prettier-ignore
+  { cssVar: "--mc-surface-shadow", light: "color-mix(in oklab, #000 28%, transparent)", category: "surface", note: "Readout chip shadow — dark in every theme, so no dark twin" }, // prettier-ignore
   {
     cssVar: "--mc-on-fill",
     light: "rgba(255, 255, 255, 0.96)",
