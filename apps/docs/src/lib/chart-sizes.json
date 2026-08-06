@@ -1,11 +1,11 @@
 {
   "sparkline": {
     "static": 4.25,
-    "interactive": 6.98
+    "interactive": 6.94
   },
   "sparkbar": {
     "static": 3.36,
-    "interactive": 5.96
+    "interactive": 5.94
   },
   "delta": {
     "static": 1.12,
@@ -13,11 +13,11 @@
   },
   "bullet": {
     "static": 2.39,
-    "interactive": 3.77
+    "interactive": 3.81
   },
   "activity-grid": {
     "static": 2.48,
-    "interactive": 5.41
+    "interactive": 5.39
   },
   "trend-arrow": {
     "static": 1.98,
@@ -29,91 +29,91 @@
   },
   "heat-cell": {
     "static": 2.11,
-    "interactive": 3.46
+    "interactive": 3.47
   },
   "progress": {
     "static": 2.21,
-    "interactive": 3.59
+    "interactive": 3.6
   },
   "rug-strip": {
     "static": 2.52,
-    "interactive": 4.88
+    "interactive": 4.82
   },
   "mini-bar": {
     "static": 3.16,
-    "interactive": 5.72
+    "interactive": 5.64
   },
   "pictogram-row": {
     "static": 2.23,
-    "interactive": 4.83
+    "interactive": 4.82
   },
   "seismogram": {
     "static": 2.71,
-    "interactive": 5.24
+    "interactive": 5.23
   },
   "heat-strip": {
     "static": 2.64,
-    "interactive": 4.98
+    "interactive": 4.96
   },
   "dot-plot": {
     "static": 2.67,
-    "interactive": 5.24
+    "interactive": 5.18
   },
   "dumbbell": {
     "static": 3.32,
-    "interactive": 5.97
+    "interactive": 5.91
   },
   "paired-bars": {
     "static": 2.96,
-    "interactive": 5.5
+    "interactive": 5.42
   },
   "slope": {
     "static": 4.06,
-    "interactive": 6.71
+    "interactive": 6.63
   },
   "micro-scatter": {
     "static": 2.1,
-    "interactive": 4.82
+    "interactive": 4.8
   },
   "segmented-bar": {
     "static": 2.68,
-    "interactive": 5.15
+    "interactive": 5.13
   },
   "histogram-strip": {
     "static": 2.35,
-    "interactive": 4.69
+    "interactive": 4.67
   },
   "micro-box": {
     "static": 2.88,
-    "interactive": 5.24
+    "interactive": 5.23
   },
   "progress-ring": {
     "static": 2.65,
-    "interactive": 4.17
+    "interactive": 4.19
   },
   "micro-donut": {
     "static": 2.99,
-    "interactive": 5.41
+    "interactive": 5.43
   },
   "funnel": {
     "static": 2.62,
-    "interactive": 5.04
+    "interactive": 5.01
   },
   "likert-strip": {
     "static": 3.19,
-    "interactive": 5.54
+    "interactive": 5.51
   },
   "waterfall": {
     "static": 3.11,
-    "interactive": 5.53
+    "interactive": 5.5
   },
   "bump-strip": {
     "static": 2.37,
-    "interactive": 4.76
+    "interactive": 4.74
   },
   "dual-sparkline": {
     "static": 3.73,
-    "interactive": 6.14
+    "interactive": 6.13
   },
   "stacked-area": {
     "static": 3.38,
@@ -121,7 +121,7 @@
   },
   "ohlc": {
     "static": 2.82,
-    "interactive": 5.29
+    "interactive": 5.27
   },
   "horizon": {
     "static": 2.88,
@@ -129,83 +129,83 @@
   },
   "calendar-strip": {
     "static": 2.71,
-    "interactive": 5.51
+    "interactive": 5.48
   },
   "event-timeline": {
     "static": 3.09,
-    "interactive": 5.78
+    "interactive": 5.75
   },
   "coverage-strip": {
     "static": 2.6,
-    "interactive": 4.88
+    "interactive": 4.86
   },
   "benchmark-strip": {
     "static": 3.08,
-    "interactive": 5.43
+    "interactive": 5.42
   },
   "percentile-ladder": {
     "static": 3.41,
-    "interactive": 5.83
+    "interactive": 5.81
   },
   "graded-band": {
     "static": 3.07,
-    "interactive": 5.52
+    "interactive": 5.49
   },
   "net-flow": {
     "static": 3.33,
-    "interactive": 5.78
+    "interactive": 5.76
   },
   "retention-curve": {
     "static": 3.44,
-    "interactive": 6
+    "interactive": 5.99
   },
   "burn-chart": {
     "static": 3.49,
-    "interactive": 6.07
+    "interactive": 6.06
   },
   "error-budget": {
     "static": 3,
-    "interactive": 5.43
+    "interactive": 5.42
   },
   "control-strip": {
     "static": 3.37,
-    "interactive": 5.82
+    "interactive": 5.81
   },
   "forecast-cone": {
     "static": 3.59,
-    "interactive": 6.04
+    "interactive": 6.03
   },
   "quantile-dots": {
     "static": 2.89,
-    "interactive": 5.52
+    "interactive": 5.5
   },
   "ab-strips": {
     "static": 3.25,
-    "interactive": 5.92
+    "interactive": 5.86
   },
   "shift-histogram": {
     "static": 3.29,
-    "interactive": 5.92
+    "interactive": 5.9
   },
   "pareto-strip": {
     "static": 2.89,
-    "interactive": 5.46
+    "interactive": 5.43
   },
   "data-diff": {
     "static": 2.91,
-    "interactive": 5.47
+    "interactive": 5.41
   },
   "quadrant-dot": {
     "static": 2.61,
-    "interactive": 5.07
+    "interactive": 5.05
   },
   "cycle-plot": {
     "static": 3.12,
-    "interactive": 5.97
+    "interactive": 5.96
   },
   "change-point": {
     "static": 3.66,
-    "interactive": 6.43
+    "interactive": 6.41
   },
   "ensemble-ghosts": {
     "static": 3.3,
@@ -221,7 +221,7 @@
   },
   "fill-word": {
     "static": 1.86,
-    "interactive": 3.33
+    "interactive": 3.35
   },
   "fat-digits": {
     "static": 1.89,
@@ -229,51 +229,51 @@
   },
   "thermometer": {
     "static": 2.56,
-    "interactive": 4.04
+    "interactive": 4.05
   },
   "moon-phase": {
     "static": 1.7,
-    "interactive": 3.31
+    "interactive": 3.33
   },
   "hourglass": {
     "static": 2.19,
-    "interactive": 3.78
+    "interactive": 3.8
   },
   "balance-beam": {
     "static": 2.5,
-    "interactive": 4.98
+    "interactive": 4.99
   },
   "sprout-row": {
     "static": 2.22,
-    "interactive": 4.7
+    "interactive": 4.71
   },
   "garden-grid": {
     "static": 2.06,
-    "interactive": 4.62
+    "interactive": 4.6
   },
   "bubble-row": {
     "static": 2.29,
-    "interactive": 4.71
+    "interactive": 4.69
   },
   "music-staff": {
     "static": 2.94,
-    "interactive": 5.3
+    "interactive": 5.28
   },
   "tree-rings": {
     "static": 2.34,
-    "interactive": 4.77
+    "interactive": 4.78
   },
   "city-skyline": {
     "static": 2.65,
-    "interactive": 5.11
+    "interactive": 5.08
   },
   "honeycomb": {
     "static": 2.26,
-    "interactive": 4.93
+    "interactive": 4.94
   },
   "constellation": {
     "static": 3.16,
-    "interactive": 5.76
+    "interactive": 5.74
   },
   "polar-clock": {
     "static": 3.32,
@@ -281,43 +281,43 @@
   },
   "spiral-year": {
     "static": 2.98,
-    "interactive": 5.45
+    "interactive": 5.46
   },
   "breathing-dot": {
     "static": 1.98,
-    "interactive": 3.62
+    "interactive": 3.63
   },
   "heartbeat-blip": {
     "static": 2.42,
-    "interactive": 3.99
+    "interactive": 4.01
   },
   "comet-trail": {
     "static": 2.45,
-    "interactive": 5.07
+    "interactive": 5.06
   },
   "orbit-status": {
     "static": 2.42,
-    "interactive": 4.4
+    "interactive": 4.36
   },
   "rate-volume": {
     "static": 2.93,
-    "interactive": 5.5
+    "interactive": 5.49
   },
   "icon-array": {
     "static": 2.55,
-    "interactive": 5.09
+    "interactive": 5.06
   },
   "time-in-range": {
     "static": 2.58,
-    "interactive": 5.08
+    "interactive": 5.03
   },
   "hypnogram": {
     "static": 2.94,
-    "interactive": 5.52
+    "interactive": 5.49
   },
   "eta-bar": {
     "static": 2.23,
-    "interactive": 3.74
+    "interactive": 3.75
   },
   "waveform": {
     "static": 2.64,
@@ -325,103 +325,103 @@
   },
   "event-raster": {
     "static": 2.8,
-    "interactive": 5.87
+    "interactive": 5.86
   },
   "rubric-strip": {
     "static": 2.88,
-    "interactive": 5.39
+    "interactive": 5.33
   },
   "token-confidence": {
     "static": 1.08,
-    "interactive": 2.35
+    "interactive": 2.34
   },
   "wind-barb": {
     "static": 2.76,
-    "interactive": 4.22
+    "interactive": 4.24
   },
   "star-spoke": {
     "static": 2.43,
-    "interactive": 4.95
+    "interactive": 4.9
   },
   "minimap-strip": {
     "static": 2.92,
-    "interactive": 4.35
+    "interactive": 4.33
   },
   "dual-window-meter": {
     "static": 2.79,
-    "interactive": 5.16
+    "interactive": 5.15
   },
   "depth-wedge": {
     "static": 2.49,
-    "interactive": 4.87
+    "interactive": 4.86
   },
   "partition-strip": {
     "static": 2.56,
-    "interactive": 5.36
+    "interactive": 5.34
   },
   "calibration-strip": {
     "static": 2.81,
-    "interactive": 5.23
+    "interactive": 5.22
   },
   "confusion-grid": {
     "static": 2.79,
-    "interactive": 5.35
+    "interactive": 5.33
   },
   "folded-day-band": {
     "static": 2.62,
-    "interactive": 4.95
+    "interactive": 4.94
   },
   "volume-profile": {
     "static": 3.02,
-    "interactive": 5.52
+    "interactive": 5.49
   },
   "phase-trace": {
     "static": 2.6,
-    "interactive": 4.97
+    "interactive": 4.92
   },
   "trace-fold": {
     "static": 2.52,
-    "interactive": 5.28
+    "interactive": 5.25
   },
   "tape-gauge": {
     "static": 3.42,
-    "interactive": 4.93
+    "interactive": 4.94
   },
   "station-glyph": {
     "static": 3.48,
-    "interactive": 6.18
+    "interactive": 6.15
   },
   "cohort-triangle": {
     "static": 2.7,
-    "interactive": 5.33
+    "interactive": 5.3
   },
   "streak-spark": {
     "static": 2.81,
-    "interactive": 5.13
+    "interactive": 5.11
   },
   "grade-profile": {
     "static": 2.63,
-    "interactive": 5.03
+    "interactive": 5
   },
   "win-prob-worm": {
     "static": 3.67,
-    "interactive": 6.04
+    "interactive": 6.02
   },
   "queue-depth": {
     "static": 3.37,
-    "interactive": 5.83
+    "interactive": 5.82
   },
   "spread-band": {
     "static": 3.38,
-    "interactive": 5.9
+    "interactive": 5.89
   },
   "bias-strip": {
     "static": 2.75,
-    "interactive": 5.29
+    "interactive": 5.27
   },
   "percentile-trace": {
     "static": 3.04,
-    "interactive": 5.53
+    "interactive": 5.52
   },
   "annotations": {
     "static": 1.63
