@@ -89,17 +89,33 @@ export function wrap(
  * `transform`/`filter`/`contain`, which becomes the containing block and clips
  * even `position: fixed`. A ref rather than an effect — one call, no cleanup
  * (removing the element pops it) and no render cost on the 100 entries that
- * spread this. `showPopover` throws if the element is already open or detached;
- * either way the chip still paints, because the stylesheet positions it whether
- * or not it reaches the top layer.
+ * spread this. The `catch` is for a detached element and for StrictMode's
+ * double attach — re-opening an open popover is a no-op in current browsers,
+ * not a throw. When the chip is NOT promoted the stylesheet still paints and
+ * places it: `display: block` there answers the UA's `[popover]:not(
+ * :popover-open) { display: none }`, which would otherwise hide it outright.
  */
 export const CHIP = {
   popover: "manual",
   ref: (el: HTMLElement | null): void => {
+    // Promote ONLY where the stylesheet can place it. `popover` shipped years
+    // before anchor positioning (Firefox 125, Safari 17), and in that gap the
+    // two gates disagreed: the chip went to the top layer, where its containing
+    // block is the viewport, while the `@supports`-gated anchoring never
+    // applied — so `bottom: 100%` resolved against the WINDOW and the chip flew
+    // to y=-28 above a chart at y=200. Measured, not theorised. Left un-opened
+    // it stays an ordinary absolutely-positioned box against its wrapper, which
+    // is the pre-anchor behaviour this was always supposed to fall back to.
+    // `globalThis.CSS` rather than a `typeof` guard, and not memoized into a
+    // module-level flag: refs never run during SSR, so the guard bought nothing,
+    // and the flag measured +52 B on the shared kernel — enough to push two
+    // interactive subpaths past their budgets to save one support-query parse
+    // per hover. Bytes are the scarcer resource; the parse is not per-frame.
+    if (!el || !globalThis.CSS?.supports?.("anchor-name: --mc")) return;
     try {
-      el?.showPopover();
+      el.showPopover();
     } catch {
-      /* already open, detached, or no popover support — CSS still places it */
+      /* detached, or already open under StrictMode's double attach */
     }
   },
 } as const;

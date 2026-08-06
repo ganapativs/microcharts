@@ -193,6 +193,10 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
             snapping. Transform rather than coordinates because `x1`/`x2` have
             no CSS geometry property in any engine, and `cy` has none before
             Safari 17.4. */}
+        {/* No `vectorEffect` inside this group: styles.css pins it for every
+            stroked mark under `[data-mc-ui]`, and a presentation attribute
+            loses to a CSS declaration anyway. The mark above is outside the
+            group, so it keeps its own. */}
         {ap ? (
           <g data-mc-ui="" style={{ transform: `translateX(${ap.x}px)` }}>
             <line
@@ -203,7 +207,6 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               stroke="var(--mc-neutral)"
               data-mc-w="support"
               strokeDasharray="1.5 2"
-              vectorEffect="non-scaling-stroke"
             />
             <circle
               cx={0}
@@ -212,7 +215,6 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
               fill="none"
               data-mc-active=""
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
               style={{ transform: `translateY(${ap.y}px)` }}
             />
           </g>

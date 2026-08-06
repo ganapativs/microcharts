@@ -159,6 +159,11 @@ function slopeLabelChars(
 ): LabelChars {
   const wantLeft = label === "value" || label === "both";
   const wantLabel = label === "label" || label === "both";
+  // `label="none"` has nothing to measure, so it must not walk the series at
+  // all — the 10k-row guard this file is written around means the loop below is
+  // the one thing standing between the default label mode and the whole data
+  // set. An earlier revision lost this and paid 3 dead branch tests per row.
+  if (!wantLeft && !wantLabel) return { left: 0, right: 0, longest: 0 };
   let left = 0;
   let right = 0;
   let longest = 0;

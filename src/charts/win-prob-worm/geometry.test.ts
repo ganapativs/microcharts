@@ -173,4 +173,30 @@ describe("winProbWormGeometry", () => {
       }
     },
   );
+
+  // Both cases put the whole series on the plot FLOOR before `scaleLinear`
+  // replaced the hand-rolled affine map: a zero span hit the `|| 1` fallback,
+  // and a span that overflows to Infinity divided every value to 0.
+  it("a degenerate or overflowing domain centres the series, never floors it", () => {
+    const mid = (base.height - 2) / 2 + 1; // range midpoint between the pads
+    const flat = winProbWormGeometry({ ...base, data: [50, 50, 50], domain: [50, 50] })!;
+    expect(flat.end!.y).toBeCloseTo(mid, 5);
+    const huge = winProbWormGeometry({
+      ...base,
+      data: [50, 50, 50],
+      domain: [-1.5e308, 1.5e308],
+    })!;
+    expect(huge.end!.y).toBeCloseTo(mid, 5);
+  });
+
+  it("exposes the resolved domain so annotations share the worm's axis", () => {
+    expect(winProbWormGeometry({ ...base, data: TIGHT })!.domain).toEqual([0, 100]);
+    expect(winProbWormGeometry({ ...base, data: TIGHT, domain: [45, 55] })!.domain).toEqual([
+      45, 55,
+    ]);
+    // a non-finite end falls back to the full frame, like every other chart
+    expect(winProbWormGeometry({ ...base, data: TIGHT, domain: [0, Number.NaN] })!.domain).toEqual([
+      0, 100,
+    ]);
+  });
 });

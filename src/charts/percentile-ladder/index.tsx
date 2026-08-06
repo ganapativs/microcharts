@@ -108,7 +108,7 @@ export function ladderLabelLayout(
   // order IS the sorted order, and a set that cannot fit falls out of the
   // `x >= min` test below. Calling the shared one measured +114 B gzip on a
   // subpath that ends this change with 11 B under its 3.48 kB budget.
-  const spread = xs.map((x) => Math.min(Math.max(x, min), max));
+  const spread = xs.map((x) => clamp(x, min, max));
   for (let i = 1; i < n; i++)
     spread[i] = Math.min(Math.max(spread[i]!, spread[i - 1]! + pad * 2), max);
   for (let i = n - 2; i >= 0; i--) spread[i] = Math.min(spread[i]!, spread[i + 1]! - pad * 2);
@@ -123,7 +123,10 @@ export function ladderLabelLayout(
     // inside the frame is a drop, same as a collision, and so is a clamp that
     // drags the text onto a neighbouring rung.
     if (min > max || !owns(cx, i)) return;
-    if (out.every((o) => o === null || Math.abs(o - cx) >= pad * 2)) out[i] = cx;
+    // round2 like the spread path above: `min` is a sum of thirds and paddings,
+    // so a clamped x is 2-dp in exact arithmetic but not in binary floating
+    // point, and every coordinate this repo emits is rounded at generation.
+    if (out.every((o) => o === null || Math.abs(o - cx) >= pad * 2)) out[i] = round2(cx);
   };
   for (let i = 1; i < n - 1; i++) place(i);
   place(n - 1);

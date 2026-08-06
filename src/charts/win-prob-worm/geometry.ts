@@ -5,7 +5,7 @@
 // stretches (<50) read neutral. Crossings are the lead changes; the largest
 // |Δ| between adjacent points is the momentum swing. Coords 2-dp.
 import { round2, isFiniteValue } from "../../core/types.js";
-import { clamp } from "../../core/scale.js";
+import { clamp, scaleLinear } from "../../core/scale.js";
 import type { WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
 import { textGutter } from "../../core/labels.js";
 
@@ -47,6 +47,10 @@ const signed = (d: number, fmt: (n: number) => string): string =>
   `${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d))}`;
 
 export interface WinProbWormGeometry {
+  /** The resolved y-domain. The annotations frame reads it so a caller's
+   *  `domain` moves the thresholds with the worm instead of leaving them on
+   *  the default 0-100 axis. */
+  domain: readonly [number, number];
   /** Leading (>50) stretches — one <path> of accent strokes. */
   aboveD: string;
   /** Trailing (<50) stretches — one <path> of neutral strokes. */
@@ -86,16 +90,21 @@ export function winProbWormGeometry(opts: {
   const n = data.length;
   const pad = opts.pad ?? PAD;
   const gutterRight = opts.gutterRight ?? 0;
-  const plotH = height - 2 * pad;
   const plotW = Math.max(0, width - 2 * pad - gutterRight);
   const lastX = Math.max(1, n - 1);
   const sx = (i: number): number => pad + (i / lastX) * plotW;
   // Probabilities are clamped to 0–100 and the default frame is that range, so
   // the fraction only leaves [0,1] on a caller's narrowed `domain` — where the
   // mark belongs on the edge it ran off, never past it (the midline included).
-  const [d0, d1] = opts.domain?.every(Number.isFinite) ? opts.domain : FRAME;
-  const span = d1 - d0 || 1;
-  const sy = (v: number): number => height - pad - clamp((v - d0) / span, 0, 1) * plotH;
+  const domain: readonly [number, number] =
+    opts.domain && opts.domain.every((d) => Number.isFinite(d)) ? opts.domain : FRAME;
+  // `scaleLinear` rather than the affine one-liner it replaced, and not for
+  // tidiness: that version divided by `d1 - d0 || 1`, which put a degenerate
+  // `domain={[50, 50]}` — and any span that overflows to Infinity — on the plot
+  // FLOOR. `scaleLinear` maps both to the range midpoint, which is what every
+  // other domain-taking chart does and what its property tests already cover.
+  const yScale = scaleLinear(domain, [height - pad, pad]);
+  const sy = (v: number): number => clamp(yScale(v), pad, height - pad);
   const midY = round2(sy(50));
 
   // pass 1 — min/max, last finite, endpoint marker
@@ -173,6 +182,7 @@ export function winProbWormGeometry(opts: {
   }
 
   return {
+    domain,
     aboveD: D[0]!,
     belowD: D[1]!,
     midY,

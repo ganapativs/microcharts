@@ -373,13 +373,13 @@
 
        `max-width: 100%` stops a fixed-width mark overflowing a container
        narrower than itself, mirroring `[data-mc-host]` so the static entry and
-       its interactive twin size identically. `align-self: start` keeps a flex
-       row from stretching the box: `height: auto` makes the cross size
-       stretchable, and a stretched box would letterbox on the other axis —
-       trading the bug for its mirror image. */
+       its interactive twin size identically. There is deliberately NO `align-self` here: it would
+       defeat a parent's `align-items` outright rather than lose a specificity
+       contest, so it broke this package's own `.mc-group { align-items: center }`
+       and made a static chart align differently from its interactive twin in
+       the same flex row — the "one component, two layouts" bug in a new axis. */
     height: auto;
     max-width: 100%;
-    align-self: start;
     /* density-scaled stroke weight consumed by the ink + width roles below, so
        one --mc-density retunes every stroke without touching the base token.
        This is the token a MARK reads, in the stylesheet and in an inline
@@ -1102,16 +1102,29 @@
      opaque surface so the figure stays legible over any mark or content it
      floats above. Zero-specificity, so a component's inline position wins. */
   :where(.mc-spark-readout) {
+    /* The chip carries `popover`, so the UA sheet for `[popover]` applies to it:
+       `position: fixed; inset: 0; margin: auto; border: solid; padding: .25em;
+       overflow: auto`. Every one of those has to be answered HERE, in the base
+       rule, not only in the anchored block below — a browser with popover but
+       without anchor positioning gets this rule and the UA's, nothing else.
+       Measured before this reset: a 3px `currentColor` border on every chip,
+       which swallowed the 1px `--mc-surface-edge` hairline meant to define it. */
+    border: 0;
+    /* The UA hides an un-opened popover (`[popover]:not(:popover-open)`), and
+       the chip is only opened where anchor positioning exists. Without this it
+       is invisible everywhere else — including in SERVER-RENDERED HTML, where a
+       pinned chip ships `display: none` until hydration runs the ref. The rows
+       form re-declares `display: grid` below and still wins. */
+    display: block;
     position: absolute;
-    bottom: 100%;
+    inset: auto auto 100% 50%;
     /* Centred on the chart, not on the datum. The per-datum `left` these chips
        used to carry inline is what made them unclampable (see shared/
        interactive.ts) — and on word-sized marks the two placements differ by
        less than the chip's own width anyway. The crosshair keeps pointing at
        the datum. */
-    left: 50%;
     transform: translateX(-50%);
-    margin-bottom: 0.3em;
+    margin: 0 0 0.3em 0;
     padding: 0.05em 0.4em;
     border-radius: 0.4em;
     background: var(--mc-surface);
@@ -1168,8 +1181,8 @@
          the chip on its chart AND clamps it to the band, which is the
          "touch the right edge, expand to the left" behaviour a tooltip owes a
          reader. The engine does the clamping; nothing measures a rect.
-       - `position-try-fallbacks: flip-block` opens the chip downward when there
-         is no room above it.
+       - `position-try-fallbacks` opens the chip downward when there is no room
+         above it, via the `--mc-readout-below` block at the end of this rule.
        - `position-visibility: anchors-visible` hides the chip once its chart
          scrolls out of the rail, instead of leaving it floating in the top
          layer over unrelated UI.
@@ -1207,18 +1220,26 @@
          to fit ellipsizes by exactly the padding (measured: 4px on trace-fold,
          caught by readout-containment.browser.test.tsx). */
       justify-self: anchor-center;
+      /* Restate the runaway cap. The `max(100%, 14em)` above now resolves its
+         `100%` against the viewport-wide band, so it bounds the chip to the
+         SCREEN — 736px measured on an 80px chart, 3x looser than the bound it
+         was written to be. `anchor-size(width)` names the chart itself, which
+         is what `100%` used to mean here. (The 4px ellipsis regression an
+         earlier revision blamed on this cap came from `inline-size:
+         max-content`, which is gone.) */
+      max-inline-size: max(anchor-size(width), 14em);
       margin: 0 0 0.3em 0;
-      position-try-fallbacks: flip-block;
+      /* NOT `flip-block`: the built-in flip mirrors the insets but carries the
+         0.3em stand-off with them, so the chip lands ON the mark it names. The
+         custom block below flips and re-hangs the margin on the other side.
+         This used to be two declarations in two equal-specificity rules, where
+         the later simply won and the `flip-block` was dead. */
+      position-try-fallbacks: --mc-readout-below;
       position-visibility: anchors-visible;
     }
-    /* `flip-block` puts the chip BELOW the mark; the 0.3em stand-off has to
-       follow it there or the chip sits on the mark it names. */
     @position-try --mc-readout-below {
       inset: anchor(bottom) 2px auto 2px;
       margin: 0.3em 0 0 0;
-    }
-    :where(.mc-spark-readout) {
-      position-try-fallbacks: --mc-readout-below;
     }
   }
 
