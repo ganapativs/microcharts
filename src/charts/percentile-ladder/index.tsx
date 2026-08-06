@@ -7,8 +7,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { EN_QUANTILE, type QuantileStrings } from "../../core/strings-quantile.js";
+import { clamp } from "../../core/scale.js";
 import { chartSide, round2, type Value } from "../../core/types.js";
-import { labelFitsY } from "../../core/labels.js";
+import { labelFitsY, textGutter } from "../../core/labels.js";
 import { percentileLadderGeometry, type PercentileLadderGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -69,9 +70,20 @@ const LABEL_MIN_WIDTH = 56;
 export const ladderFont = (height: number): number =>
   Math.min(9, Math.max(6, Math.round(height * 0.5)));
 
-/** Places tick labels at their tick x (clamped inside the box), ENDPOINT-FIRST:
- *  p50 and the tail always win; an interior label is dropped (→ null) when it
- *  would collide — so clustered percentiles never merge into unreadable text
+/** Seats the tick labels, SPREAD FIRST: at most four rungs share the row, so
+ *  nudging the labels apart to a minimum pitch keeps all of them rather than
+ *  losing one to its neighbour. A spread stands only while every label stays no
+ *  nearer another tick than the one it names; past that the reader matches the
+ *  label to the wrong rung, which is a misread, not a layout. Where the spread
+ *  fails, step two seats each label at its own tick, clamped inside the frame,
+ *  under that same rule — interiors first, dropping (→ null) whatever still
+ *  collides. A dropped end still reads: the tail tick is the tallest and carries
+ *  the flag ink, p50 is the floor. A dropped interior reads as nothing, so it
+ *  goes last.
+ *
+ *  Step two, run endpoints-first, used to be the whole layout, and the interior
+ *  was structurally the loser: at the default 80×12 the chart dropped p90 and
+ *  showed two of its own three default percentiles.
  * */
 export function ladderLabelLayout(
   geo: PercentileLadderGeometry,
@@ -79,29 +91,43 @@ export function ladderLabelLayout(
   width: number,
   font: number,
 ): (number | null)[] {
-  const n = geo.ticks.length;
-  const half = texts.map((t) => (t.length * font * 0.62) / 2);
-  const clampX = (i: number) =>
-    Math.min(width - 3 - half[i]!, Math.max(geo.track.x0 - 3 + half[i]!, geo.ticks[i]!.x));
-  const out: (number | null)[] = Array.from({ length: n }, () => null);
-  const boxes: { lo: number; hi: number }[] = [];
+  const n = texts.length;
+  const xs = texts.map((_, i) => geo.ticks[i]!.x);
+  // Half the WIDEST label's reserved gutter, breathing room folded in: one
+  // number bounds every label, pitches them and de-collides them.
+  const pad = textGutter(Math.max(...texts.map((t) => t.length)), font, 1) / 2;
+  // everything left of the track's own pad belongs to the `log` tag
+  const lead = geo.track.x0 - 3;
+  const min = lead + pad;
+  const max = width - pad;
+  /** Is this seat still on rung `i` — no nearer any other tick than its own?
+   *  (Tick `i` itself compares equal, so it needs no special case.) */
+  const owns = (x: number, i: number) => xs.every((t) => Math.abs(x - xs[i]!) <= Math.abs(x - t));
+  // The greedy sweep `spreadLabels` runs, inlined without its sort, its null
+  // return or its rounding pass: percentiles arrive ascending, so the input
+  // order IS the sorted order, and a set that cannot fit falls out of the
+  // `x >= min` test below. Calling the shared one measured +114 B gzip on a
+  // subpath that ends this change with 11 B under its 3.48 kB budget.
+  const spread = xs.map((x) => Math.min(Math.max(x, min), max));
+  for (let i = 1; i < n; i++)
+    spread[i] = Math.min(Math.max(spread[i]!, spread[i - 1]! + pad * 2), max);
+  for (let i = n - 2; i >= 0; i--) spread[i] = Math.min(spread[i]!, spread[i + 1]! - pad * 2);
+  if (spread.every((x, i) => x >= min && owns(x, i))) return spread.map(round2);
+
+  const out: (number | null)[] = xs.map(() => null);
   const place = (i: number) => {
-    const cx = clampX(i);
-    // A label wider than the box inverts clampX's range (its low bound passes
-    // its high one), and the winning bound put half the text in the margin —
-    // `.mc-root` is overflow: visible, so that is a spill onto the page, not a
-    // clip. Too wide to sit inside the frame is a drop, same as a collision.
-    if (cx - half[i]! < 0 || cx + half[i]! > width) return;
-    const lo = cx - half[i]! - 1;
-    const hi = cx + half[i]! + 1;
-    if (boxes.some((b) => lo < b.hi && hi > b.lo)) return;
-    out[i] = round2(cx);
-    boxes.push({ lo, hi });
+    const cx = clamp(xs[i]!, min, max);
+    // `min > max` is a gutter wider than the room left over, which inverts the
+    // clamp and put half the text in the margin — `.mc-root` is overflow:
+    // visible, so that is a spill onto the page, not a clip. Too wide to sit
+    // inside the frame is a drop, same as a collision, and so is a clamp that
+    // drags the text onto a neighbouring rung.
+    if (min > max || !owns(cx, i)) return;
+    if (out.every((o) => o === null || Math.abs(o - cx) >= pad * 2)) out[i] = cx;
   };
-  // endpoints first (p50 anchors the read, the tail is the point), then interiors
-  if (n >= 1) place(n - 1);
-  if (n >= 2) place(0);
   for (let i = 1; i < n - 1; i++) place(i);
+  place(n - 1);
+  place(0);
   return out;
 }
 

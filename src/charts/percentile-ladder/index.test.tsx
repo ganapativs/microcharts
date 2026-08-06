@@ -38,6 +38,33 @@ describe("<PercentileLadder>", () => {
     expect(narrow.querySelectorAll("text").length).toBe(0);
   });
 
+  it("the default ladder labels all three of its default percentiles", () => {
+    // Regression: endpoint-first placement dropped the MIDDLE label, so at its
+    // own default 80×12 the chart marked p50/p90/p99 and named p50 and p99.
+    // A ladder that hides the rung a reader acts on is worse than a wider one.
+    for (const width of [80, 110, 151]) {
+      const { container } = draw(<PercentileLadder data={SAMPLE} width={width} />);
+      const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
+      expect(texts).toEqual(["50", "90", "99"]);
+    }
+  });
+
+  it("a spread label stays on the rung it names", () => {
+    // The spread nudges labels apart; the bound is that none of them lands
+    // nearer another tick than its own, or the reader matches it to the wrong
+    // percentile. Ticks and labels are in the same (ascending) DOM order.
+    const { container } = draw(<PercentileLadder data={SAMPLE} width={80} />);
+    const ticks = [...container.querySelectorAll("line[data-mc-ink]")]
+      .filter((l) => l.getAttribute("data-mc-ink") !== "muted")
+      .map((l) => Number(l.getAttribute("x1")));
+    const labels = [...container.querySelectorAll("text")].map((t) => Number(t.getAttribute("x")));
+    expect(labels.length).toBe(ticks.length);
+    labels.forEach((x, i) => {
+      const own = Math.abs(x - ticks[i]!);
+      for (const t of ticks) expect(own).toBeLessThanOrEqual(Math.abs(x - t) + 1e-9);
+    });
+  });
+
   it("a hostile ps announces the ladder that was painted", () => {
     // p200 painted the maximum (quantiles clamps p) while the name announced
     // "p200 … the slowest -100%"; an empty ps announced "No data." over a
@@ -68,8 +95,9 @@ describe("<PercentileLadder>", () => {
   });
 
   it("a label too wide for the box drops instead of painting into the margin", () => {
-    // clampX's range inverts once the text is wider than the frame, and
-    // `.mc-root` is overflow: visible — the winning bound spilled onto the page.
+    // The seat clamp inverts once the text is wider than the room left over,
+    // and `.mc-root` is overflow: visible — the winning bound spilled onto the
+    // page.
     const wide = [1234567, 2234567, 9234567];
     const { container } = draw(
       <PercentileLadder data={wide} label="both" width={56} height={18} />,
