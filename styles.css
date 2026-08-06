@@ -100,6 +100,13 @@
     --mc-surface: Canvas;
     --mc-surface-ink: CanvasText;
     --mc-surface-edge: color-mix(in oklab, CanvasText 16%, transparent);
+    /* The chip's drop shadow. Black, and NOT a `CanvasText` mix like the edge
+       above — that was the bug: `CanvasText` inverts with the theme, so on dark
+       the blur rendered as a white halo around the chip instead of a shadow.
+       A shadow is occlusion; occlusion is dark whatever the surface is, which
+       is also why this needs no dark twin. On dark it goes quiet and the 1px
+       edge carries the separation, which is how the ring earns its place. */
+    --mc-surface-shadow: color-mix(in oklab, #000 28%, transparent);
     /* Label ink on a SATURATED SEMANTIC fill (heat cells, progress fill, event
        spans) — the deep accent/positive/stroke end of the palette, where a light
        ink is the legible one. Measured against the default light tokens:
@@ -1111,7 +1118,7 @@
     color: var(--mc-surface-ink);
     box-shadow:
       0 0 0 1px var(--mc-surface-edge),
-      0 2px 6px -2px color-mix(in oklab, CanvasText 40%, transparent);
+      0 2px 6px -2px var(--mc-surface-shadow);
     font: var(--mc-label-size, 0.75em) var(--mc-font, inherit);
     font-variant-numeric: tabular-nums;
     line-height: 1.35;
