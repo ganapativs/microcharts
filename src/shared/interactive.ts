@@ -83,33 +83,38 @@ export function wrap(
   };
 }
 
-/** Chip `left` as % of plot — not clamped; word-sized marks overhang honestly (text length capped instead). */
-function readoutLeft(x: number, width: number): string {
-  return `${(x / Math.max(1, width)) * 100}%`;
-}
+/**
+ * Chip attrs: put the readout in the TOP LAYER. `styles.css` anchors and clamps
+ * it there; the top layer is the only escape from an ancestor with a
+ * `transform`/`filter`/`contain`, which becomes the containing block and clips
+ * even `position: fixed`. A ref rather than an effect — one call, no cleanup
+ * (removing the element pops it) and no render cost on the 100 entries that
+ * spread this. `showPopover` throws if the element is already open or detached;
+ * either way the chip still paints, because the stylesheet positions it whether
+ * or not it reaches the top layer.
+ */
+export const CHIP = {
+  popover: "manual",
+  ref: (el: HTMLElement | null): void => {
+    try {
+      el?.showPopover();
+    } catch {
+      /* already open, detached, or no popover support — CSS still places it */
+    }
+  },
+} as const;
 
-/** Crosshair chip: centred on the mark's x. */
-export function crosshairReadoutStyle(x: number, width: number): CSSProperties {
-  return {
-    left: readoutLeft(x, width),
-    transform: "translateX(-50%)",
-  };
-}
-
-/** Row-anchored chip — multi-row charts must not use `bottom: 100%` on the whole plate. */
-export function rowReadoutStyle(
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): CSSProperties {
-  return {
-    left: readoutLeft(x, width),
-    top: `${(y / Math.max(1, height)) * 100}%`,
-    bottom: "auto",
-    transform: "translate(-50%, calc(-100% - 0.3em))",
-  };
-}
+/*
+ * `crosshairReadoutStyle` / `rowReadoutStyle` used to live here and returned an
+ * inline `left`/`top`/`transform` per datum. They are gone, and their absence is
+ * load-bearing rather than a tidy-up: an inline `left` beats every stylesheet
+ * rule, so it overrode the anchored insets in `styles.css` and the chip centred
+ * itself in the VIEWPORT instead of on its chart — measured at 73 of 100
+ * chart x layout combinations before they were removed. Placement is now the
+ * stylesheet's job alone, which is also what lets the engine clamp the chip to
+ * the screen; nothing here can fight it. The crosshair inside the SVG still
+ * marks the exact datum, so the chip names the value and the mark points at it.
+ */
 
 /**
  * Decorative only when no name (`summary={false}` AND no title) → `aria-hidden`.

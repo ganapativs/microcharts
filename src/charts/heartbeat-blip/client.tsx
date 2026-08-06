@@ -6,7 +6,7 @@
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
 // on data change) and on-screen (paused off-viewport).
 import { useEffect, useMemo, useRef, useState } from "react";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { heartbeatCount, resolveNow } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
@@ -170,7 +170,7 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
       {/* Spike density IS the rate, but the count behind it is invisible unless
           `label="count"` prints it. Hover/focus reveals it. */}
       {readout && hover && props.label !== "count" ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

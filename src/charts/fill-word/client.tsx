@@ -5,7 +5,7 @@
 // Wrapper focus only (one value) — but hover/focus reveals the percent, which
 // the fill edge alone only approximates.
 import { useEffect, useRef, useState } from "react";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -160,7 +160,7 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
       {/* The word's ink edge is a rough gauge; the percent behind it is
           invisible unless `label="value"` prints it. */}
       {readout && hover && props.label !== "value" ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

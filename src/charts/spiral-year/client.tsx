@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
@@ -200,7 +201,7 @@ export function SpiralYear(props: InteractiveSpiralYearProps): React.ReactNode {
       </StaticSpiralYear>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownMark && chip ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

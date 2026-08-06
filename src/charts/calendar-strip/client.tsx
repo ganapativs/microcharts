@@ -13,11 +13,11 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
@@ -253,10 +253,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
       </StaticCalendarStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell && shown !== null ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownCell.x + shownCell.size / 2, geo.width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {shownCell.value === null
             ? `${dayLabelAt(shown)}: —`
             : `${dayLabelAt(shown)}: ${fmt(shownCell.value)}`}

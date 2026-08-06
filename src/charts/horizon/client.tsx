@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -186,7 +186,7 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
       </StaticHorizon>
       <LiveRegion>{announced}</LiveRegion>
       {readout && crossX !== undefined ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(crossX, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {isFiniteValue(value) ? fmt(value) : "—"}
         </span>
       ) : null}

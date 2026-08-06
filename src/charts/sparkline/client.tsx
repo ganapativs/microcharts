@@ -3,12 +3,12 @@
 import { memo, useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -20,20 +20,24 @@ import { lastFinite } from "../../core/stats.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
 
 const Static = memo(StaticSparkline);
-const SVG_NS = "http://www.w3.org/2000/svg";
 
 // Selection ring, then the live pair (crosshair + dot) on a wrapper that gets
 // moved as one. Built once per chart; see the effect below for why.
+// `vector-effect` is not spelled here: styles.css pins it on every stroked
+// `[data-mc-ui]` mark, which is where these live. Same painted stroke, and the
+// bytes it frees are what buys the readout its place in the top layer.
 const UI_MARKS =
-  '<circle r="3.2" fill="none" data-mc-active="" data-mc-w="tick" vector-effect="non-scaling-stroke"/>' +
-  '<g><line data-mc-ink="muted" vector-effect="non-scaling-stroke"/><circle r="2.6" data-mc-ink="accent"/></g>';
+  '<circle r="3.2" fill="none" data-mc-active="" data-mc-w="tick"/>' +
+  '<g><line data-mc-ink="muted"/><circle r="2.6" data-mc-ink="accent"/></g>';
 
+// Parsed rather than constructed: the marks below already rely on SVG-namespace
+// HTML parsing, so reusing it here drops the namespace constant and the
+// createElementNS/setAttribute pair with no change to the tree produced.
 function uiGroup(svg: SVGSVGElement): SVGGElement {
   let g = svg.querySelector("g[data-mc-ui]") as SVGGElement | null;
   if (!g) {
-    g = document.createElementNS(SVG_NS, "g");
-    g.setAttribute("data-mc-ui", "");
-    svg.appendChild(g);
+    svg.insertAdjacentHTML("beforeend", "<g data-mc-ui></g>");
+    g = svg.lastElementChild as unknown as SVGGElement;
   }
   return g;
 }
@@ -248,7 +252,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
          point still gets the readout. A NAMED point is not a duplicate: the
          point still gets the readout. */
       !(label === "last" && shown === stops[stops.length - 1]) ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownPoint[0], width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {fmt(shownValue)}
         </span>
       ) : null}

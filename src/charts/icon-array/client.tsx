@@ -8,7 +8,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
-  crosshairReadoutStyle,
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -213,10 +213,7 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
       </StaticIconArray>
       <LiveRegion>{announced}</LiveRegion>
       {readout && unit ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(unit.x + geo.cell / 2, geo.totalWidth)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {strings.iconArrayChip(shown! + 1, geo.n, unit.filled)}
         </span>
       ) : null}

@@ -13,11 +13,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { textGutter, textGutterProse } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -267,13 +267,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       </StaticStationGlyph>
       <LiveRegion>{shownField ? shownField.text : ""}</LiveRegion>
       {readout && shownField ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(
-            shownField.box ? shownField.box[0] + shownField.box[2] / 2 : L.width / 2,
-            L.width,
-          )}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {shownField.text}
         </span>
       ) : null}

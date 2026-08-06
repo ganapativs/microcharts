@@ -4,7 +4,7 @@
 // announcement parity ("42 — level 3 of 5.").
 import { useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -135,7 +135,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
       />
       <LiveRegion>{active ? text : ""}</LiveRegion>
       {readout && active && geo.step !== null && !numeralPainted ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

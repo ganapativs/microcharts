@@ -8,12 +8,12 @@ import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -230,10 +230,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         {rest.children}
       </StaticQueueDepth>
       {readout && rp ? (
-        <span
-          className="mc-queue-readout mc-spark-readout"
-          style={crosshairReadoutStyle(rp.x, vbWidth)}
-        >
+        <span className="mc-queue-readout mc-spark-readout" {...CHIP}>
           {`${fmt(rp.value)}${rp.above ? strings.queueAbove : ""}`}
         </span>
       ) : null}

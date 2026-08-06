@@ -4,7 +4,7 @@
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
 import { useRef, useState } from "react";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter } from "../../core/format.js";
 import { EN_BULLET } from "../../core/strings-bullet.js";
@@ -137,7 +137,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
           which is what `useSeatHoist` was standing in for. */}
       <LiveRegion>{open ? readoutText : ""}</LiveRegion>
       {readout && open ? (
-        <span className="mc-spark-readout" style={{ right: 0 }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

@@ -12,11 +12,11 @@ import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { EN_ACTIVITY, type ActivityStrings } from "../../core/strings-activity.js";
 import { EN_SLOTS, type SlotStrings } from "../../core/strings-slots.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { activityGridGeometry } from "./geometry.js";
@@ -262,10 +262,7 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
       </StaticActivityGrid>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownCell ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(shownCell.x + shownCell.size / 2, w)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${shownDay === null ? "" : `${shownDay}: `}${shownCell.value === null ? "—" : fmt(shownCell.value)}`}
         </span>
       ) : null}

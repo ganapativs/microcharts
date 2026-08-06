@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import {
-  crosshairReadoutStyle,
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -243,7 +243,7 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
       shownValue !== undefined &&
       Number.isFinite(shownValue) &&
       !(labelBand > 0 && shown === marks.length - 1) ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownMark.cx, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {fmt(shownValue)}
         </span>
       ) : null}

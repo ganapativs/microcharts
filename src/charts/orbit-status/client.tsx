@@ -14,11 +14,11 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFitsY, labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
-import { named, fillFor, wrap, crosshairReadoutStyle } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { orbitLabelBand, orbitStatusGeometry } from "./geometry.js";
+import { orbitStatusGeometry } from "./geometry.js";
 import {
   OrbitStatus as StaticOrbitStatus,
   orbitStatusSummary,
@@ -141,7 +141,6 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     labelFitsY(geo.size / 2 + labelFontSize * 0.34, labelFontSize, geo.size, false)
       ? strings.orbitLatency(fmt(Math.max(0, latency)))
       : null;
-  const vbWidth = geo.size + (labelText ? orbitLabelBand(labelText.length, labelFontSize) : 0);
 
   // Orbit the satellite (only when motion is allowed and the rate is nonzero).
   useEffect(() => {
@@ -208,7 +207,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
           too small to seat it drops it, and asking for `label="latency"` there
           used to suppress the chip too, leaving nothing to read. */}
       {readout && open && labelText === null ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(geo.size / 2, vbWidth)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency)))}
         </span>
       ) : null}

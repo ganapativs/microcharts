@@ -8,11 +8,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -204,7 +204,7 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
       </StaticCalibrationStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && pt ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(pt.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {strings.calibrationChip(
             fmt(pt.predicted),
             fmt(pt.observed),

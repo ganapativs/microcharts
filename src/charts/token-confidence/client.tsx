@@ -6,6 +6,7 @@
 // HTML host (the documented SVG exception); shares the pure tiering with
 // static entry.
 import { useCallback, useId, useMemo, useRef, useState, type CSSProperties } from "react";
+import { CHIP } from "../../shared/interactive.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TOKEN_CONFIDENCE } from "../../core/strings-token-confidence.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -266,15 +267,7 @@ export function TokenConfidence(props: InteractiveTokenConfidenceProps): React.R
       {children}
       <LiveRegion>{announced}</LiveRegion>
       {readout && chip ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            left: chip.left,
-            top: chip.top,
-            bottom: "auto",
-            transform: "translate(-50%, calc(-100% - 0.2em))",
-          }}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {chip.text}
         </span>
       ) : null}

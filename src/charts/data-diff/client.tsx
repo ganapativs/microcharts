@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, withPlus } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -214,10 +214,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         {rest.children}
       </StaticDataDiff>
       {readout && row && geo ? (
-        <span
-          className="mc-data-diff-readout mc-spark-readout"
-          style={rowReadoutStyle(geo.centerX, row.y + 4, geo.totalWidth, height)}
-        >
+        <span className="mc-data-diff-readout mc-spark-readout" {...CHIP}>
           {`${row.key}: +${fmt(row.addedValue)} · −${fmt(row.removedValue)} (${signed(row.net, fmt)})`}
         </span>
       ) : null}

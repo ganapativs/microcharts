@@ -95,7 +95,14 @@ describe("interactive <BenchmarkStrip>", () => {
     const dx = /translateX\(([-\d.]+)px\)/.exec(line.style.transform);
     const tickX = Number(line.getAttribute("x1")) + (dx ? Number(dx[1]) : 0);
     const vbWidth = Number(wrap.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
-    expect(Number.parseFloat(chip.style.left)).toBeCloseTo((tickX / vbWidth) * 100, 4);
+    // Placement moved into styles.css so the chip can be clamped to the screen
+    // (shared/interactive.ts records why); this file renders without the
+    // stylesheet, so what stays testable is that the chip ships no inline
+    // positional style, and the tick it names is still inside the viewBox.
+    expect(chip.style.left).toBe("");
+    expect(chip.style.transform).toBe("");
+    expect(tickX).toBeGreaterThanOrEqual(0);
+    expect(tickX).toBeLessThanOrEqual(vbWidth);
   });
 
   it("controlled selectedIndex pins the tick without focus", async () => {

@@ -7,12 +7,12 @@ import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -241,10 +241,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
         {rest.children}
       </StaticParetoStrip>
       {readout && b && geo ? (
-        <span
-          className="mc-pareto-readout mc-spark-readout"
-          style={crosshairReadoutStyle(b.x + b.width / 2, geo.totalWidth)}
-        >
+        <span className="mc-pareto-readout mc-spark-readout" {...CHIP}>
           {`${b.label} ${pct(b.share)} · ${pct(b.cum)}`}
         </span>
       ) : null}

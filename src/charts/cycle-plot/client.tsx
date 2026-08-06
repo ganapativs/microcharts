@@ -8,11 +8,11 @@ import { useCallback, useMemo, useRef, useState, type CSSProperties } from "reac
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -307,10 +307,7 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         {rest.children}
       </StaticCyclePlot>
       {readout && sl && geo && shown !== null ? (
-        <span
-          className="mc-cycle-plot-readout mc-spark-readout"
-          style={crosshairReadoutStyle(sl.center.x, width)}
-        >
+        <span className="mc-cycle-plot-readout mc-spark-readout" {...CHIP}>
           {obs !== undefined
             ? `${slotName(slots, shown)} ${cycle + 1}/${cycleVals.length}: ${fmt(obs)}`
             : !isFiniteValue(sl.center.value)

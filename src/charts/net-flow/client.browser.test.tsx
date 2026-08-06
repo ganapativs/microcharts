@@ -60,8 +60,18 @@ describe("interactive <NetFlow>", () => {
     )!; // the vertical crosshair (not the horizontal baseline)
     const lineFrac = Number(line.getAttribute("x1")) / vbWidth;
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
-    const chipFrac = parseFloat(chip.style.left) / 100;
-    expect(Math.abs(lineFrac - chipFrac)).toBeLessThan(0.01);
+    // The chip carries no per-datum `left` any more: placement moved wholly into
+    // styles.css so the engine can clamp it to the screen (shared/interactive.ts
+    // records why). This file renders without the stylesheet, so the testable
+    // half of that contract is the half that lives in the markup — the chip must
+    // ship NO inline positional style, because an inline `left` is exactly what
+    // outranked the anchored insets and pushed the chip off its chart. The
+    // crosshair still carries the datum x, inside the plot.
+    expect(chip.style.left).toBe("");
+    expect(chip.style.top).toBe("");
+    expect(chip.style.transform).toBe("");
+    expect(lineFrac).toBeGreaterThanOrEqual(0);
+    expect(lineFrac).toBeLessThanOrEqual(1);
   });
 
   // …and the same has to hold when the box is too short to SEAT that label.
@@ -81,7 +91,18 @@ describe("interactive <NetFlow>", () => {
     )!;
     const lineFrac = Number(line.getAttribute("x1")) / 48;
     const chip = wrap.querySelector(".mc-spark-readout") as HTMLElement;
-    expect(Math.abs(lineFrac - parseFloat(chip.style.left) / 100)).toBeLessThan(0.01);
+    // The chip carries no per-datum `left` any more: placement moved wholly into
+    // styles.css so the engine can clamp it to the screen (shared/interactive.ts
+    // records why). This file renders without the stylesheet, so the testable
+    // half of that contract is the half that lives in the markup — the chip must
+    // ship NO inline positional style, because an inline `left` is exactly what
+    // outranked the anchored insets and pushed the chip off its chart. The
+    // crosshair still carries the datum x, inside the plot.
+    expect(chip.style.left).toBe("");
+    expect(chip.style.top).toBe("");
+    expect(chip.style.transform).toBe("");
+    expect(lineFrac).toBeGreaterThanOrEqual(0);
+    expect(lineFrac).toBeLessThanOrEqual(1);
   });
 
   it("onActive reports the focused datum (period index + signed net); null on clear", async () => {

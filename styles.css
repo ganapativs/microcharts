@@ -351,6 +351,28 @@
     vertical-align: middle;
     overflow: visible;
     font: var(--mc-font);
+    /* Let the drawing follow a CSS width instead of letterboxing inside it.
+       `Chart` emits width AND height as presentation attributes, so a consumer
+       `className="w-full"` beat the width attribute and left the height one
+       standing: `preserveAspectRatio="xMidYMid meet"` then fitted an 80x6 mark
+       into a 335x6 box at scale 1 and centred it, painting 127px of dead space
+       each side. It read as a chart that failed to load.
+
+       `height: auto` releases the second axis so the viewBox ratio drives it.
+       It is a CSS declaration, so it outranks the presentation attribute; it is
+       inside `:where()`, so any consumer rule still outranks it. With no
+       consumer CSS at all the used height is unchanged — `auto` against a
+       definite width resolves through the same ratio the attribute encoded.
+
+       `max-width: 100%` stops a fixed-width mark overflowing a container
+       narrower than itself, mirroring `[data-mc-host]` so the static entry and
+       its interactive twin size identically. `align-self: start` keeps a flex
+       row from stretching the box: `height: auto` makes the cross size
+       stretchable, and a stretched box would letterbox on the other axis —
+       trading the bug for its mirror image. */
+    height: auto;
+    max-width: 100%;
+    align-self: start;
     /* density-scaled stroke weight consumed by the ink + width roles below, so
        one --mc-density retunes every stroke without touching the base token.
        This is the token a MARK reads, in the stylesheet and in an inline
@@ -1075,6 +1097,13 @@
   :where(.mc-spark-readout) {
     position: absolute;
     bottom: 100%;
+    /* Centred on the chart, not on the datum. The per-datum `left` these chips
+       used to carry inline is what made them unclampable (see shared/
+       interactive.ts) — and on word-sized marks the two placements differ by
+       less than the chip's own width anyway. The crosshair keeps pointing at
+       the datum. */
+    left: 50%;
+    transform: translateX(-50%);
     margin-bottom: 0.3em;
     padding: 0.05em 0.4em;
     border-radius: 0.4em;
@@ -1106,6 +1135,84 @@
     max-width: max(100%, 14em);
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  /* Escape the page. `position: absolute` above is clipped by ANY ancestor with
+     `overflow` other than `visible`, and `bottom: 100%` opens upward
+     unconditionally — so a chart in a scrolling rail showed a sliver of its
+     chip, and a chart near the top of the viewport put the chip off-screen.
+     Measured in a consumer app: seven nested clipping boxes above one strip.
+
+     The upgrade is CSS anchor positioning, which needs no measurement, no
+     portal and no scroll listener — the three things this package spends no
+     bytes on:
+
+       - `position: fixed` takes the chip out of every ancestor's overflow, and
+         the top layer (`popover`, opened by the client entry) takes it out of
+         the one case fixed positioning cannot escape: an ancestor with a
+         `transform`/`filter`/`contain`, which becomes the containing block.
+       - `anchor-scope` is what makes ONE anchor name safe for a whole page.
+         Without it the name resolves to the last matching element in the
+         document, so with two charts on a page both chips flew to the second
+         one — measured, and the reason this is not just `anchor-name`. Scoping
+         the name to the host's own subtree binds each chip to its own chart,
+         and costs no per-instance id (a `useId` would be ~100 B x 100 entries).
+       - `justify-self: anchor-center` inside a viewport-wide inset band centres
+         the chip on its chart AND clamps it to the band, which is the
+         "touch the right edge, expand to the left" behaviour a tooltip owes a
+         reader. The engine does the clamping; nothing measures a rect.
+       - `position-try-fallbacks: flip-block` opens the chip downward when there
+         is no room above it.
+       - `position-visibility: anchors-visible` hides the chip once its chart
+         scrolls out of the rail, instead of leaving it floating in the top
+         layer over unrelated UI.
+
+     The `max(100%, 14em)` cap above is deliberately NOT restated here. It was
+     written when the chip had no bound at all ("a phase-trace readout 217px
+     wide against a 44px chart"); the band now bounds it — a chip physically
+     cannot leave the viewport, which is the bound that was missing. Restating
+     it as `max(anchor-size(width), 14em)` measured 4px TIGHTER than the rule it
+     replaced and ellipsized trace-fold's readout at its default size, which
+     readout-containment.browser.test.tsx caught. `100%` still resolves — now
+     against the band — so the declaration above stays live and harmless.
+
+     Firefox has no anchor positioning yet, so it keeps the rule above — today's
+     behaviour exactly, not a regression. */
+  @supports (anchor-name: --mc) and (position-area: block-start) {
+    :where([data-mc-host]) {
+      anchor-name: --mc-chart;
+      anchor-scope: --mc-chart;
+    }
+    :where(.mc-spark-readout) {
+      position: fixed;
+      position-anchor: --mc-chart;
+      /* the fallback rule's centring transform would shift the anchored box
+         half its own width off the mark — alignment does the centring here */
+      transform: none;
+      /* band = the viewport minus a hair, so a clamped chip still shows its
+         shadow rather than bleeding off the edge */
+      inset: auto 2px anchor(top) 2px;
+      /* `anchor-center` makes this an ALIGNED box, so it is already
+         shrink-to-fit inside the band — it must not also be given an
+         `inline-size: max-content`. Under the `box-sizing: border-box` above,
+         that sizes the BORDER box to the content's max-content width and then
+         subtracts the padding from the content area, so the text it was meant
+         to fit ellipsizes by exactly the padding (measured: 4px on trace-fold,
+         caught by readout-containment.browser.test.tsx). */
+      justify-self: anchor-center;
+      margin: 0 0 0.3em 0;
+      position-try-fallbacks: flip-block;
+      position-visibility: anchors-visible;
+    }
+    /* `flip-block` puts the chip BELOW the mark; the 0.3em stand-off has to
+       follow it there or the chip sits on the mark it names. */
+    @position-try --mc-readout-below {
+      inset: anchor(bottom) 2px auto 2px;
+      margin: 0.3em 0 0 0;
+    }
+    :where(.mc-spark-readout) {
+      position-try-fallbacks: --mc-readout-below;
+    }
   }
 
   /* Row form — for a datum that IS a composition (StackedArea's bands), where a
@@ -1215,6 +1322,14 @@
      the reader. The readout TEXT is never transitioned — the number swaps
      instantly, so the value on screen is never mid-way between two data
      points. */
+  /* Response marks are built as an HTML string by the client entries, so every
+     `vector-effect` they spell costs bytes in a subpath measured standalone.
+     Pinning it here paints the identical stroke — these are overlay marks, not
+     the `data-mc-ink="data"` marks `theming-contract.test.ts` audits, so the
+     attribute was never the contract for them. */
+  :where(.mc-root [data-mc-ui] :is(circle, line, path, rect)) {
+    vector-effect: non-scaling-stroke;
+  }
   :where(.mc-root [data-mc-ui], .mc-root [data-mc-ui] :is(g, rect, circle, line)) {
     transition-property: transform;
     transition-duration: 120ms;

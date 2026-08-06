@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -220,10 +220,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         {rest.children}
       </StaticErrorBudget>
       {readout && rp ? (
-        <span
-          className="mc-error-budget-readout mc-spark-readout"
-          style={crosshairReadoutStyle(rp.x, geo!.totalWidth)}
-        >
+        <span className="mc-error-budget-readout mc-spark-readout" {...CHIP}>
           {`${fmt(rp.value)} · ${RATE_FMT(rp.rate)}×`}
         </span>
       ) : null}

@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -213,15 +214,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         /* Pinned to the bars' base edge: level labels + the poc flag sit at
            the bar TIPS, so the base side is the one spot the chip can never
            cover chart text. */
-        <span
-          className="mc-spark-readout"
-          style={{
-            top: `${((bar.y + bar.height / 2) / height) * 100}%`,
-            ...(align === "right" ? { left: "auto", right: 4 } : { left: 4 }),
-            transform: "translateY(-50%)",
-            bottom: "auto",
-          }}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(bar.level)} · ${mass} (${pctFmt(share)})${bar.poc ? strings.volumePoc : ""}`}
         </span>
       ) : null}

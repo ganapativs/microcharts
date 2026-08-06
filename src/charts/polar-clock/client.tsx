@@ -6,6 +6,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { annulusSector } from "../../core/arc.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -222,7 +223,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
       </StaticPolarClock>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownSeg !== undefined ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

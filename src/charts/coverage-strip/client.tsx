@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -206,10 +206,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         {rest.children}
       </StaticCoverageStrip>
       {readout && cell ? (
-        <span
-          className="mc-coverage-readout mc-spark-readout"
-          style={crosshairReadoutStyle(cell.x + cell.w / 2, geo.totalWidth)}
-        >
+        <span className="mc-coverage-readout mc-spark-readout" {...CHIP}>
           {/* no hardcoded English in the chip (i18n canon): non-values show a
               dash; the live region carries the localized full sentence */}
           {cell.present && cell.value !== null ? fmt(cell.value) : "—"}

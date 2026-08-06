@@ -4,11 +4,11 @@
 import { useCallback, useMemo, useRef, type CSSProperties } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -212,10 +212,7 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
         {rest.children}
       </StaticControlStrip>
       {readout && p && value !== undefined ? (
-        <span
-          className="mc-control-readout mc-spark-readout"
-          style={crosshairReadoutStyle(p.x, width)}
-        >
+        <span className="mc-control-readout mc-spark-readout" {...CHIP}>
           {strings.controlChip(
             fmt(value),
             side,

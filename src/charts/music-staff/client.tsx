@@ -5,12 +5,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -189,7 +189,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
         {shownNote ? strings.point(shownPos, stops.length, fmt(shownNote.value)) : ""}
       </span>
       {readout && shownNote ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownNote.cx, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {fmt(shownNote.value)}
         </span>
       ) : null}

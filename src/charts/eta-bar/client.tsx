@@ -5,7 +5,7 @@
 // hover OR focus reveals the forecast chip, the reveal-on-hover scalar pattern.
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -176,7 +176,7 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       />
       <LiveRegion>{announced}</LiveRegion>
       {readout && open && chip ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chip}
         </span>
       ) : null}

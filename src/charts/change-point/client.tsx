@@ -8,12 +8,12 @@ import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   nav1d,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -237,7 +237,6 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
     }
   }
 
-  const px = shown !== null && geo ? xOf(shown) : 0;
   // The chip is a VISIBLE surface, so its regime badge goes through the same
   // `SummaryStrings` token the announcement uses — it was hardcoded English,
   // which a `strings` override could not reach.
@@ -277,10 +276,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         {rest.children}
       </StaticChangePoint>
       {readout && shown !== null && geo ? (
-        <span
-          className="mc-change-point-readout mc-spark-readout"
-          style={crosshairReadoutStyle(px, totalWidth)}
-        >
+        <span className="mc-change-point-readout mc-spark-readout" {...CHIP}>
           {readoutText}
         </span>
       ) : null}

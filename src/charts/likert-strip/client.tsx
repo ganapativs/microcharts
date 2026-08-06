@@ -5,11 +5,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -215,7 +215,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         {announced}
       </span>
       {readout && seg && segDatum ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(seg.x + seg.width / 2, w)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${segDatum.label} ${pctFmt(seg.share)} (${segCount})`}
         </span>
       ) : null}

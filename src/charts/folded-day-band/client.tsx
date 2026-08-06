@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -198,7 +198,7 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
       </StaticFoldedDayBand>
       <LiveRegion>{announced}</LiveRegion>
       {readout && s ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(s.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(binPosition(s.bin, bins, period))} · ${fmt(s.median)} (${fmt(s.q1)}–${fmt(s.q3)})`}
         </span>
       ) : null}

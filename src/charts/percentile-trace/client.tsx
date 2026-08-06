@@ -7,12 +7,12 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -232,10 +232,7 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
         {rest.children}
       </StaticPercentileTrace>
       {readout && p ? (
-        <span
-          className="mc-percentile-readout mc-spark-readout"
-          style={crosshairReadoutStyle(p.x, vbWidth)}
-        >
+        <span className="mc-percentile-readout mc-spark-readout" {...CHIP}>
           {announced}
         </span>
       ) : null}

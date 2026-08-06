@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -241,7 +242,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
         {live && props.summary !== false ? (shown === null ? announced : cellSpoken) : ""}
       </LiveRegion>
       {showChip && (hover || shown !== null) ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {shown === null ? readout : cellReadout}
         </span>
       ) : null}

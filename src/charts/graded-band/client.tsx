@@ -6,11 +6,11 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -211,10 +211,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
         {rest.children}
       </StaticGradedBand>
       {readout && band && geo ? (
-        <span
-          className="mc-graded-band-readout mc-spark-readout"
-          style={crosshairReadoutStyle(band.x + band.width / 2, geo.totalWidth)}
-        >
+        <span className="mc-graded-band-readout mc-spark-readout" {...CHIP}>
           {`${levelFmt(band.p / 100)} ${fmt(band.lo)}–${fmt(band.hi)}`}
         </span>
       ) : null}

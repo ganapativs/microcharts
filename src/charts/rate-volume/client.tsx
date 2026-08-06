@@ -8,11 +8,11 @@ import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -252,10 +252,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
         {rest.children}
       </StaticRateVolume>
       {readout && sBar && sDatum ? (
-        <span
-          className="mc-rate-volume-readout mc-spark-readout"
-          style={crosshairReadoutStyle(sBar.x + sBar.width / 2, geo!.totalWidth)}
-        >
+        <span className="mc-rate-volume-readout mc-spark-readout" {...CHIP}>
           {valid(shown!)
             ? strings.rateVolumeChip(
                 fmt(sDatum.rate),

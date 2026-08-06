@@ -6,11 +6,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -238,10 +238,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
       </StaticTraceFold>
       <LiveRegion>{announced}</LiveRegion>
       {readout && span ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle(span.x + span.width / 2, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {/* Depth is the span's own y-row and share is its own width — both are
               already on screen, so repeating them cost 31px past the cap to say
               nothing new. `, critical` was hardcoded English while

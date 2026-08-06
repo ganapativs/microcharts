@@ -8,12 +8,12 @@ import { makeFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -221,7 +221,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
       </StaticOhlc>
       <LiveRegion>{announced}</LiveRegion>
       {readout && mark && period ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(mark.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`O${fmt(period.open)} H${fmt(period.high)} L${fmt(period.low)} C${fmt(period.close)}`}
         </span>
       ) : null}

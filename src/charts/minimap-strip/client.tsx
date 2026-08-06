@@ -5,7 +5,7 @@
 // edges the slider reports to assistive tech are visible too.
 import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
-import { crosshairReadoutStyle, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
 import {
@@ -181,10 +181,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
           only `aria-valuetext` carried them — a sighted reader dragging saw a
           rectangle and no numbers. The chip rides over the window's centre. */}
       {readout && open ? (
-        <span
-          className="mc-spark-readout"
-          style={crosshairReadoutStyle((((win[0] + win[1]) / 2 - domain[0]) / span) * width, width)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(win[0])}–${fmt(win[1])}`}
         </span>
       ) : null}

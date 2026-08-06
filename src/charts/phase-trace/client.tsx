@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -190,15 +190,7 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
       </StaticPhaseTrace>
       <LiveRegion>{announced}</LiveRegion>
       {readout && pt ? (
-        <span
-          className="mc-spark-readout"
-          style={{
-            ...crosshairReadoutStyle(pt.x, w),
-            top: `${(pt.y / h) * 100}%`,
-            transform: "translate(-50%, -140%)",
-            bottom: "auto",
-          }}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {/* Same grammar as quadrant-dot: the axis names are chart-constant
               context, not part of the datum, and repeating them on every hover
               pushed a two-number readout past its cap on a 40px chart. */}

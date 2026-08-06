@@ -7,7 +7,7 @@
 // ; the scale window stays centered on value.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -188,7 +188,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
       />
       <LiveRegion>{announced}</LiveRegion>
       {readout && hover && valueText && !painted ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {valueText}
         </span>
       ) : null}

@@ -5,7 +5,7 @@
 // mark) — hover/focus is a reveal of the reading, for the `label="none"` bar
 // that prints nothing.
 import { useEffect, useRef, useState } from "react";
-import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -122,7 +122,7 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
       <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && hover && chipText ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {chipText}
         </span>
       ) : null}

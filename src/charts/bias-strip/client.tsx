@@ -15,12 +15,12 @@ import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
 import { biasLayout, biasStripGeometry } from "./geometry.js";
 import { BiasStrip as StaticBiasStrip, biasStripSummary, type BiasStripProps } from "./index.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 
@@ -192,7 +192,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
       </StaticBiasStrip>
       <LiveRegion>{announced}</LiveRegion>
       {readout && shownDot && shownPair ? (
-        <span className="mc-spark-readout" style={crosshairReadoutStyle(shownDot.x, width)}>
+        <span className="mc-spark-readout" {...CHIP}>
           {`${fmt(mean)}, ${fmtSigned(diff)}${shownDot.outside ? strings.biasOutside : ""}`}
         </span>
       ) : null}

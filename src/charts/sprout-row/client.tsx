@@ -6,6 +6,7 @@
 import { useCallback, useMemo, useRef } from "react";
 import { round2 } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
@@ -207,7 +208,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
       </StaticSproutRow>
       <LiveRegion>{announced}</LiveRegion>
       {readout && announced ? (
-        <span className="mc-spark-readout" style={{ left: "50%", transform: "translateX(-50%)" }}>
+        <span className="mc-spark-readout" {...CHIP}>
           {announced}
         </span>
       ) : null}

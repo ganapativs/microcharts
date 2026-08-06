@@ -7,11 +7,11 @@
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -221,10 +221,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
           so it reads out too — as an em dash, the shared empty-chip form. Its
           dot has no x to sit over, so the chip centres on the row instead. */}
       {readout && shownRow && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={rowReadoutStyle(shownRow.x ?? width / 2, shownRow.y, width, height)}
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {`${shownDatum.label}: ${isFiniteValue(shownDatum.value) ? fmt(shownDatum.value) : "—"}`}
         </span>
       ) : null}

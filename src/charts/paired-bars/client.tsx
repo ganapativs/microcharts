@@ -7,12 +7,11 @@ import { makeFormatter } from "../../core/format.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
+  CHIP,
   named,
   fillFor,
   useActivePicker,
   wrap,
-  rowReadoutStyle,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -195,8 +194,6 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
         ? strings.pairAtNoRef(shownDatum.label, fmt(shownDatum.value))
         : strings.pairAtEmpty(shownDatum.label);
 
-  const shownPos = shown !== null ? shown * geo.pitch : 0;
-
   return (
     <span ref={hostRef} {...wrap("mc-paired-live", className, style)} {...named(label)} {...bind}>
       <StaticPairedBars
@@ -222,14 +219,7 @@ export function PairedBars(props: InteractivePairedBarsProps): React.ReactNode {
           `pairAtEmpty`, so it reads out as an em dash rather than nothing. A
           missing REF alone keeps the value and drops the second half. */}
       {readout && shownPair && shownDatum ? (
-        <span
-          className="mc-spark-readout"
-          style={
-            orientation === "vertical"
-              ? crosshairReadoutStyle(shownPos + bandW / 2, width)
-              : rowReadoutStyle(width / 2, shownPos + bandW / 2, width, height)
-          }
-        >
+        <span className="mc-spark-readout" {...CHIP}>
           {!isFiniteValue(shownDatum.value)
             ? `${shownDatum.label}: —`
             : isFiniteValue(shownDatum.ref)

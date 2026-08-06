@@ -8,12 +8,12 @@ import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
+  CHIP,
   named,
   fillFor,
   navOrder,
   useActivePicker,
   wrap,
-  crosshairReadoutStyle,
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
@@ -261,10 +261,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
         {rest.children}
       </StaticRetentionCurve>
       {readout && p ? (
-        <span
-          className="mc-retention-readout mc-spark-readout"
-          style={crosshairReadoutStyle(p.x, geo!.totalWidth)}
-        >
+        <span className="mc-retention-readout mc-spark-readout" {...CHIP}>
           {p.bench === null ? fmt(p.value) : `${fmt(p.value)} · ${fmt(p.bench)}`}
         </span>
       ) : null}
