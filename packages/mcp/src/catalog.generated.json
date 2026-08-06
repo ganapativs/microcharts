@@ -13508,6 +13508,12 @@
           "description": "A single win-probability series, clamped to 0–100."
         },
         {
+          "name": "domain",
+          "type": "[number, number]",
+          "required": false,
+          "description": "Probability extent (default [0, 100] — the full range)."
+        },
+        {
           "name": "sides",
           "type": "[string, string]",
           "required": false,
@@ -13895,6 +13901,12 @@
           "type": "number[]",
           "required": true,
           "description": "Percentile ranks 0–100, one per reading; out-of-range values are clamped."
+        },
+        {
+          "name": "domain",
+          "type": "[number, number]",
+          "required": false,
+          "description": "Rank extent (default [0, 100] — the full ladder)."
         },
         {
           "name": "showBands",

@@ -404,8 +404,8 @@
     "interactive": 5
   },
   "win-prob-worm": {
-    "static": 3.67,
-    "interactive": 6.02
+    "static": 3.73,
+    "interactive": 6.09
   },
   "queue-depth": {
     "static": 3.37,
@@ -420,8 +420,8 @@
     "interactive": 5.27
   },
   "percentile-trace": {
-    "static": 3.04,
-    "interactive": 5.52
+    "static": 3.08,
+    "interactive": 5.56
   },
   "annotations": {
     "static": 1.63
