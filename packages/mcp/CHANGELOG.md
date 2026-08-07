@@ -1,5 +1,18 @@
 # @microcharts/mcp
 
+## 0.1.13
+
+### Patch Changes
+
+- [#113](https://github.com/ganapativs/microcharts/pull/113)
+  [`e87cd0d`](https://github.com/ganapativs/microcharts/commit/e87cd0dd9933e61023bc49c8d11f78c004d97c66) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-embed the catalog: `onSelect` now documents the third way a
+  selection clears — a pointer press outside the chart — alongside re-selecting the unit and `Escape`, and the per-chart
+  interaction note says the same.
+- Updated dependencies
+  [[`e87cd0d`](https://github.com/ganapativs/microcharts/commit/e87cd0dd9933e61023bc49c8d11f78c004d97c66)]:
+  - @microcharts/react@0.16.0
+
 ## 0.1.12
 
 ### Patch Changes
