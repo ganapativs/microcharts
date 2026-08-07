@@ -29,6 +29,12 @@ export const entry: ChartEntry = {
     precision: "high (rects, no trapezoid interpolation)",
   },
   nodeBudget: "2/stage − 1 (≤ 6 stages)",
+  maxWidth: 260,
+  maxHeight: 80,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "Past 6 stages the drops blur; the component dev-warns past the cap.",
+  ],
   bestFor: ["per-campaign funnels in tables", "conversion in cards"],
   avoidFor: ["unordered categories (MiniBar)", "> 6 stages"],
   props: [

@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
     precision: "medium — shape read; the shift label is the takeaway",
   },
   nodeBudget: "2 per bin + 4",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     'a "the fix, proven" read in a KPI card',
     "before/after distributions in an experiments table",

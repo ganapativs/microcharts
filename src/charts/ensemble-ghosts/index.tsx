@@ -46,6 +46,11 @@ export interface EnsembleGhostsProps {
   height?: number | undefined;
   color?: string | undefined;
   strings?: EnsembleStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -68,6 +73,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
     height = 20,
     color,
     strings = EN_ENSEMBLE,
+    labelSize,
     title,
     summary,
     id,
@@ -102,7 +108,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
   }
 
   const fmt = makeFormatter(format, locale);
-  const FONT = label === "end" ? labelFont(height) : 0;
+  const FONT = label === "end" ? labelFont(height, 0.55, labelSize) : 0;
   const showLabel = FONT > 0 && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(geo.landing.value) : "";
   const box = ensembleEndLabel(width, height, geo.landing.y, labelText, FONT);
@@ -110,7 +116,7 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
   const accName = resolveSummary(summary, () => ensembleSummary(geo, fmt, strings));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
-    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+    ? ({ ...style, "--mc-label-px": `${FONT}px` } as CSSProperties)
     : style;
 
   const ann = children

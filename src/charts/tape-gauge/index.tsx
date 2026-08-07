@@ -37,6 +37,11 @@ export interface TapeGaugeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TapeGaugeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -174,6 +179,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     format,
     locale,
     strings = EN_TAPE_GAUGE,
+    labelSize,
     title,
     summary,
     id,
@@ -288,7 +294,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       // pointer line in either orientation, which is the one place the eye reads.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-tape ${className}` : "mc-tape"}
-      style={{ ...style, "--mc-label-size": `${tickFont}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${tickFont}px` } as CSSProperties}
     >
       {finite ? (
         <>
@@ -335,7 +341,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={readoutFont}
-              // The root pins `--mc-label-size` to the TICK size (7), and
+              // The root pins `--mc-label-px` to the TICK size (7), and
               // `:where(.mc-root text)` outranks the presentation attribute — so
               // the hero number was painted at tick size while its clearance was
               // reserved for 7–13. An inline font-size is the one thing that

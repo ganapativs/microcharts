@@ -29,6 +29,15 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "≤ 14 (1 per item + track + now tick, ≤ 12 items documented)",
+  maxWidth: 320,
+  maxHeight: 50,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "One track by design. Items share a single row and there are no lanes — render one chart per service and fix `domain` across them for small multiples.",
+    "Geometry caps the marks: the span bar stops at 6 viewBox units, the point diamond at 2.5, and the track inset at 2. Height past the authored maximum becomes whitespace.",
+    "Items entirely outside `domain` are excluded, reversed spans are dropped, and a zero-duration span renders as a point event.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["per-service uptime rows", "on-call shifts and release windows in cards"],
   avoidFor: ["more than ~12 items", "aggregated durations (MiniBar of totals)"],
   props: [

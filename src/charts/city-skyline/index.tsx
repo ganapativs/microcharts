@@ -37,6 +37,11 @@ export interface CitySkylineProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: SkylineStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
     format,
     locale,
     strings = EN_SKYLINE,
+    labelSize,
     title,
     summary,
     id,
@@ -90,7 +96,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
   } = props;
 
   const height = props.height ?? 24;
-  const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  const fontSize = props.fontSize ?? labelFont(height, 0.3, labelSize);
   const { groundY, maxH } = skylineBands(height, fontSize, label, labels);
   const geo = citySkylineGeometry({
     data,
@@ -136,7 +142,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       // text, and seating the box bottom would push the whole skyline up by it.
       seat={{ mode: "floor", bottom: groundY }}
       className={className ? `mc-skyline ${className}` : "mc-skyline"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {ann.under}
       {ground ? (

@@ -76,9 +76,9 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
         data,
         capacity,
         domain: props.domain,
-        fontSize: labelFont(height),
+        fontSize: labelFont(height, 0.55, props.labelSize),
       }),
-    [width, height, data, capacity, props.domain],
+    [width, height, data, capacity, props.domain, props.labelSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
@@ -130,7 +130,7 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
   // basis (otherwise every hit lands right of the cursor and the last readings
   // are unreachable).
   const vbWidth = geo
-    ? queueDepthLabels(geo, { width, height, capacity, label, fmt }).totalWidth
+    ? queueDepthLabels(geo, { width, height, capacity, label, fmt, labelSize: props.labelSize }).totalWidth
     : width;
 
   const { active, selected, bind } = useActivePicker({

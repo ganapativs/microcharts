@@ -26,6 +26,11 @@ export interface EtaBarProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: EtaBarStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -67,6 +72,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
     format,
     locale,
     strings = EN_ETA_BAR,
+    labelSize,
     title,
     summary,
     id,
@@ -77,7 +83,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const p = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
-  const fontSize = labelFont(height, 0.62);
+  const fontSize = labelFont(height, 0.62, labelSize);
 
   // preliminary geometry to know remaining time for the label
   const pre = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width, height });
@@ -117,7 +123,7 @@ export function EtaBar(props: EtaBarProps): ReactNode {
       // gutter beside it, which never moves the mark off the line.
       seat={{ mode: "center", top: geo.done.y, bottom: geo.done.y + geo.done.height }}
       className={className ? `mc-eta ${className}` : "mc-eta"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* The unrun track is the same mark <Progress> draws, so it carries the
           same role. It used to paint `--mc-neutral` at 0.14 inline, which put

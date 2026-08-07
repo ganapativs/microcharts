@@ -26,6 +26,11 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "2 per row + 2",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+  ],
   bestFor: [
     "a table cell per dataset version",
     "a KPI card for a sync or import job",

@@ -56,6 +56,11 @@ export interface GradedBandProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -84,6 +89,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
     format,
     locale,
     strings = EN_QUANTILE,
+    labelSize,
     title,
     summary,
     id,
@@ -93,7 +99,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   } = props;
 
   // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
-  const FONT = labelFont(height, 0.62);
+  const FONT = labelFont(height, 0.62, labelSize);
   const fmt = makeFormatter(format, locale);
   // `labelFont` floors at 7 viewBox units: under a 7-unit box the median
   // readout cannot sit inside the frame, so it DROPS rather than painting above
@@ -142,7 +148,7 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const outer = geo.bands[0];
   const bandColor = color ?? "var(--mc-accent)";
   // pin the label size to viewBox units (see coverage-strip)
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

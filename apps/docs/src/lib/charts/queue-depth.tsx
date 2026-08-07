@@ -20,6 +20,11 @@ export const entry: ChartEntry = {
     precision: "high for the depth; the trend glyph is a low-precision direction cue",
   },
   nodeBudget: "≤ 7",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a support-queue backlog in a KPI card",
     "a work-in-progress stock vs its WIP limit",

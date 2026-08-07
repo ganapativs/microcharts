@@ -120,7 +120,7 @@ describe("<TreeRings>", () => {
       const { container } = draw(<TreeRings data={YEARS} label="last" fontSize={Number.NaN} />);
       const svg = container.querySelector("svg")!;
       expect(svg.getAttribute("viewBox")).toBe("0 0 43 24");
-      expect(svg.getAttribute("style")).toContain("--mc-label-size: 11px");
+      expect(svg.getAttribute("style")).toContain("--mc-label-px: 11px");
       expect(container.querySelector("text")!.getAttribute("font-size")).toBe("11");
     });
 

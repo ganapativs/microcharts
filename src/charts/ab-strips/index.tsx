@@ -66,6 +66,11 @@ export interface ABStripsProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ABStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -87,6 +92,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
     format,
     locale,
     strings = EN_AB,
+    labelSize,
     title,
     summary,
     id,
@@ -98,7 +104,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   // two stacked rows share the height, so the A/B tags of adjacent rows must
   // not collide — the row centers are only height/2 apart, so keep the font
   // safely under that (real-browser getBBox verified at 80×20, not just craft)
-  const FONT = labelFont(height, 0.3);
+  const FONT = labelFont(height, 0.3, labelSize);
   const fmt = makeFormatter(format, locale);
   // The delta + overlap are shares of their own, so they take `locale` but never
   // the value `format` (which carries the metric's units).
@@ -156,7 +162,7 @@ export function ABStrips(props: ABStripsProps): ReactNode {
   }
 
   const accName = resolveSummary(summary, () => abSummary(geo, fmt, seriesLabels, strings, pctFmt));
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   // delta valence: which direction is good (sign is also in the text) — B always
   // uses accent ink (or `color` if set); A stays neutral, the baseline row

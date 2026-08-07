@@ -91,6 +91,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     height,
     rows: rowsN,
     maxChars: labelCh,
+    labelSize: props.labelSize,
   });
   const geo = useMemo(
     () =>

@@ -15,6 +15,12 @@ export const entry: ChartEntry = {
   dataShape: "number[]",
   encoding: { channel: "position (length along a line)", precision: "high" },
   nodeBudget: "≤ 6",
+  maxWidth: 340,
+  maxHeight: 100,
+  gotchas: [
+    "Series longer than `maxPoints` (default 200) decimate to an index-preserving min/max envelope. Spikes and gaps survive, and the summary and dots still read the raw data.",
+    '`label="minmax"` needs about 28 units of height; below that the labels are omitted and the summary carries the range.',
+  ],
   bestFor: ["inline trend", "table-cell trend", "KPI sparkline", "dense dashboards"],
   avoidFor: ["part-to-whole", "exact category comparison"],
   props: [

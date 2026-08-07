@@ -23,6 +23,11 @@ export const entry: ChartEntry = {
   dataShape: "{ x: number; y?: number; m?: number }[]",
   encoding: { channel: "position (x = time, y = value) + area-true dot size", precision: "medium" },
   nodeBudget: "n+1",
+  maxWidth: 240,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "sparse incidents or outages on a timeline",
     "milestones with a magnitude (severity, size)",

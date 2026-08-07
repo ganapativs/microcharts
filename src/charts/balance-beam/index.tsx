@@ -39,6 +39,11 @@ export interface BalanceBeamProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BeamStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -96,6 +101,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     format,
     locale,
     strings = EN_BEAM,
+    labelSize,
     title,
     summary,
     id,
@@ -103,7 +109,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     style,
     children,
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.4);
+  const fontSize = props.fontSize ?? labelFont(height, 0.4, labelSize);
   const fmt = makeFormatter(format, locale);
   // Degradation: the two numerals sit side by side under their own pans, and
   // `labelX` below clamps each inside the box — so on a narrow beam the clamp
@@ -184,7 +190,7 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
       // and keeps the whole mark inside the line box.
       seat={{ mode: "floor", bottom: labelBand > 0 ? labelY : height - PAD }}
       className={className ? `mc-beam ${className}` : "mc-beam"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <path d={geo.fulcrum} data-mc-ink="neutral" />
       <line

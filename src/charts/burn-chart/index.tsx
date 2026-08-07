@@ -62,6 +62,11 @@ export interface BurnChartProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BurnStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -85,6 +90,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     format,
     locale,
     strings = EN_BURN,
+    labelSize,
     title,
     summary,
     id,
@@ -97,7 +103,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
   // display text, so an English default here would survive a localized bundle.
   const workWord = work ?? strings.burnWork;
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-burn-chart ${className}` : "mc-burn-chart";
   const { plan, actual } = data;
@@ -161,7 +167,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           strings,
         ));
   const lineColor = color ?? "var(--mc-accent)";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   // gap valence: late (positive delta) is bad, early is good — double-encoded
   // with the sign in the text, so the color never carries direction alone.
   // An ink ROLE, not an inline fill: `.mc-root` sets forced-color-adjust: none,

@@ -85,9 +85,9 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         height,
         threshold,
         positive,
-        labelRoom: streakSparkRoom(height, label),
+        labelRoom: streakSparkRoom(height, label, props.labelSize),
       }),
-    [data, width, height, threshold, positive, label],
+    [data, width, height, threshold, positive, label, props.labelSize],
   );
 
   // nearest run by x-distance to its centre in viewBox space — never a DOM node

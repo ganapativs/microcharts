@@ -60,6 +60,11 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value }[]",
   encoding: { channel: "bar length, zero-anchored", precision: "high" },
   nodeBudget: "1 per bar (≤ 8 documented)",
+  maxWidth: 200,
+  maxHeight: 70,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["per-row category mix in tables", "small comparisons in cards"],
   avoidFor: ["> 8 categories (full bar chart)", "time series (SparkBar)"],
   props: [

@@ -28,6 +28,11 @@ export interface HeartbeatBlipProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: HeartbeatStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     format,
     locale,
     strings = EN_HEARTBEAT,
+    labelSize,
     title,
     summary,
     id,
@@ -91,7 +97,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
   // A host-computed size (`Number(field.value)` on an empty input → NaN) used to
   // reach the reserved band, and from there every coordinate in the chart.
   const fs = props.fontSize;
-  const fontSize = fs !== undefined && Number.isFinite(fs) && fs > 0 ? fs : labelFont(height);
+  const fontSize = fs !== undefined && Number.isFinite(fs) && fs > 0 ? fs : labelFont(height, 0.55, labelSize);
 
   const resolvedNow = resolveNow(events, now);
   // The tally is a pure time filter — width-independent — so the numeral is
@@ -148,7 +154,7 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
       // the baseline lands low in the cap band the way a real trace reads.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-heartbeat ${className}` : "mc-heartbeat"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <line
         x1={geo.baseline.x1}

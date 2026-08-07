@@ -38,6 +38,10 @@ export const entry: ChartEntry = {
     precision: "low — steer to SparkBar when exact comparison matters",
   },
   nodeBudget: "1 per cell",
+  gotchas: [
+    "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+    "`anchor` dates the grid; without it the cells carry positions rather than dates.",
+  ],
   bestFor: ["daily activity", "streaks and cadence", "seasonality at a glance"],
   avoidFor: ["exact values", "precise comparison between two cells"],
   props: [

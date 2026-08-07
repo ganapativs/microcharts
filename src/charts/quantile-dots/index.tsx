@@ -47,6 +47,11 @@ export interface QuantileDotsProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileDotsStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -69,6 +74,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     format,
     locale,
     strings = EN_QUANTILE_DOTS,
+    labelSize,
     title,
     summary,
     id,
@@ -78,12 +84,12 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
   } = props;
 
   // The box drives the label font, the seat and the geometry, none of which
-  // `Chart`'s own clamp reaches — a NaN height shipped `--mc-label-size: NaNpx`
+  // `Chart`'s own clamp reaches — a NaN height shipped `--mc-label-px: NaNpx`
   // and NaN dot centers inside a perfectly valid viewBox (see `chartSide`).
   const width = chartSide(widthProp);
   const height = chartSide(heightProp);
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-quantile-dots ${className}` : "mc-quantile-dots";
   const hasThreshold = threshold !== undefined && Number.isFinite(threshold);
@@ -143,7 +149,7 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     summary === false
       ? false
       : (summary ?? quantileDotsSummary(geo, fmt, { threshold, side }, strings));
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

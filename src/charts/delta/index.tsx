@@ -1,7 +1,7 @@
 // <Delta> — change vs prior: direction glyph + signed value.
 // Inline HTML (not a tiny SVG) so the number flows like text; glyph is inline SVG.
 // Direction is always double-encoded — triangle shape AND color — never color alone.
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, unsigned, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -39,11 +39,14 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   // (or underflows) keeps the arrow it earned.
   const sign: -1 | 0 | 1 = !finite ? 0 : delta > 0 ? 1 : delta < 0 ? -1 : 0;
 
-  const fmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
+  const fmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
 
   // Non-finite input (NaN/±Infinity) renders the flat/em-dash form rather than
   // "NaN%" — documented degenerate behavior.
-  const magnitude = finite ? fmt(Math.abs(shown)) : "—";
+  // `unsigned` because the sign is THIS component's job: it formats a magnitude
+  // and prepends the direction below, so a formatter that signs its own output
+  // (`signDisplay: "always"`, or a custom function) printed `++0.7 pp`.
+  const magnitude = finite ? unsigned(fmt(Math.abs(shown))) : "—";
   const display = finite ? `${sign > 0 ? "+" : sign < 0 ? "−" : ""}${magnitude}` : "—";
   // Only the literal "down" flips valence. Testing for "up" instead handed every
   // other value (an untyped `positive` off a JSON config) the INVERSE of the
@@ -67,7 +70,11 @@ export interface DeltaProps {
   from?: number | undefined;
   /** Which direction is "good" — flips only the color, never the glyph. */
   positive?: "up" | "down" | undefined;
-  /** Number formatting; defaults to a locale-aware percent. */
+  /**
+   * Number formatting; defaults to a locale-aware percent. Delta prints the
+   * sign itself and formats the absolute magnitude, so a sign in `format` is
+   * dropped rather than doubled.
+   */
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;

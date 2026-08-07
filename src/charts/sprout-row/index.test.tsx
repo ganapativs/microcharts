@@ -94,7 +94,7 @@ describe("hostile config never reaches the markup", () => {
   // `height`, `step` and `fontSize` are host-computed as often as typed —
   // `Number("")` on a cleared input, a container measured mid-collapse. Each of
   // these painted `d="M9.55 NaN…"` glyphs, an `x2="Infinity"` soil line, or
-  // `--mc-label-size: NaNpx` inside a viewBox `Chart` had already clamped to 1.
+  // `--mc-label-px: NaNpx` inside a viewBox `Chart` had already clamped to 1.
   const cases = {
     "height=NaN": <SproutRow data={ACCT} height={NaN} />,
     "height=Infinity": <SproutRow data={ACCT} height={Infinity} />,

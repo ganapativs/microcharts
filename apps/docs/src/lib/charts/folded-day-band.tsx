@@ -25,6 +25,8 @@ export const entry: ChartEntry = {
   dataShape: "{ t, value }[] (raw observations folded by t mod period)",
   encoding: { channel: "median line + percentile envelopes", precision: "medium" },
   nodeBudget: "≤ 5",
+  maxWidth: 480,
+  maxHeight: 130,
   bestFor: ["typical-day traffic / load profiles", "on-call or energy capacity"],
   avoidFor: ["a raw time series (Sparkline)", "a single period (no folding)"],
   props: [

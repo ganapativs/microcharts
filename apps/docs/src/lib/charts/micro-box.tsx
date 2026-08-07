@@ -30,6 +30,9 @@ export const entry: ChartEntry = {
     precision: "high for the five numbers",
   },
   nodeBudget: "≤ 4 (+ ≤ 3 outlier dots/side in tukey)",
+  maxWidth: 260,
+  maxHeight: 60,
+  gotchas: ["Non-monotonic stats are refused rather than drawn as a plausible-looking lie."],
   bestFor: ["latency percentile rows", "spread beside a stat"],
   avoidFor: ["modality/shape (HistogramStrip)", "< 5 observations (renders dots)"],
   props: [

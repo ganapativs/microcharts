@@ -33,6 +33,11 @@ export const entry: ChartEntry = {
     precision: "medium — the net line restores the precise decision value",
   },
   nodeBudget: "≤ 6",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "cash flow per account row",
     "user in/out (signups vs churn) in a KPI card",

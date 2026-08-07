@@ -38,6 +38,19 @@ const getOutput = {
   encoding: z.object({ channel: z.string(), precision: z.string() }),
   staticImport: z.string(),
   interactiveImport: z.string().optional(),
+  maxWidth: z
+    .number()
+    .optional()
+    .describe(
+      "Authored maximum width prop, viewBox units. Past it the geometry stops scaling and the extra box is whitespace — scale with CSS instead. Absent on charts sized by cell, by content, or by CSS.",
+    ),
+  maxHeight: z.number().optional().describe("Authored maximum height prop, viewBox units."),
+  gotchas: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Behavior no prop description carries: documented caps, inputs the component derives, how format meets the chart's own sign or unit, and sizing knobs that are not width/height. Read before writing props.",
+    ),
   bestFor: z.array(z.string()),
   avoidFor: z.array(z.string()),
   props: z.array(chartProp),

@@ -21,6 +21,24 @@ function cachedNumberFormat(
   return nf;
 }
 
+// `toPrecision` passes ±Infinity/NaN through unchanged. Exact integers carry
+// no binary-float noise, so skip the round-trip for them — `toPrecision(12)`
+// would corrupt integers with 13+ digits (e.g. 1234567890123 → …120).
+const clean = (n: number): number => (Number.isInteger(n) ? n : Number(n.toPrecision(12)));
+
+const wrapFn =
+  (fn: (n: number) => string) =>
+  (n: number): string =>
+    fn(clean(n));
+
+function fromOptions(
+  locale: string | string[] | undefined,
+  options: Intl.NumberFormatOptions | undefined,
+): (n: number) => string {
+  const nf = cachedNumberFormat(locale, options);
+  return (n) => nf.format(clean(n));
+}
+
 /**
  * Resolves the shared `format`/`locale` props into a formatter function.
  * Custom functions pass through; `Intl` options hit the cached instance. Both
@@ -29,22 +47,70 @@ function cachedNumberFormat(
  * `format` function is written for clean data, not for IEEE arithmetic. The
  * number is snapped to 12 significant digits first — far more than any label
  * shows, well inside the ~15–17 digits where binary-float noise appears.
+ *
+ * For a chart that has unit defaults of its own, use `makeUnitFormatter`. This
+ * one carries no merge logic ON PURPOSE: size-limit bundles every subpath
+ * standalone, so the ~75 charts that format a bare number would each be charged
+ * for a branch they can never reach. Measured at 95 B gzip per subpath, which is
+ * the difference between `./sparkline/interactive` sitting under the 7 kB wall
+ * and over it.
  */
 export function makeFormatter(
   format: Format | undefined,
   locale: string | string[] | undefined,
-  defaults?: Intl.NumberFormatOptions,
 ): (n: number) => string {
-  // `toPrecision` passes ±Infinity/NaN through unchanged. Exact integers carry
-  // no binary-float noise, so skip the round-trip for them — `toPrecision(12)`
-  // would corrupt integers with 13+ digits (e.g. 1234567890123 → …120).
-  const clean = (n: number) => (Number.isInteger(n) ? n : Number(n.toPrecision(12)));
+  // Written out rather than delegating to the two helpers below: a chart that
+  // formats a bare number pulls in only this function, and the two extra symbol
+  // definitions measured +7 B on `./sparkline/interactive`, which has single
+  // digits of room against the wall. The helpers stay for the two entry points
+  // that share them.
   if (typeof format === "function") {
     const fn = format;
     return (n) => fn(clean(n));
   }
-  const nf = cachedNumberFormat(locale, format ?? defaults);
+  const nf = cachedNumberFormat(locale, format);
   return (n) => nf.format(clean(n));
+}
+
+/**
+ * `makeFormatter` for a chart that has formatting opinions of its own — a unit
+ * (`style: "percent"` on the share labels of Funnel, Progress, StackedArea and
+ * 15 others) and a precision calibrated to it.
+ *
+ * `defaults` MERGE UNDER the caller's options rather than being replaced by
+ * them. Replacing the whole object meant `format={{ notation: "compact" }}`
+ * silently changed 3% into 0.03 — a plausible wrong number, in the label a
+ * reader is most likely to quote, with no warning. Per-key merging keeps the
+ * unit; an explicit `{ style: "decimal" }` still opts out of it.
+ */
+export function makeUnitFormatter(
+  format: Format | undefined,
+  locale: string | string[] | undefined,
+  defaults: Intl.NumberFormatOptions,
+): (n: number) => string {
+  if (typeof format === "function") return wrapFn(format);
+  if (!format) return fromOptions(locale, defaults);
+  // A caller's explicit `style` REPLACES the chart's unit, and the chart's digit
+  // defaults were calibrated for that unit — `maximumFractionDigits: 0` reads as
+  // "3%", but kept under `style: "decimal"` it rounds 0.03 to 0. So changing the
+  // unit voids the whole default rather than half of it.
+  if (format.style && format.style !== defaults.style) return fromOptions(locale, format);
+  const opts = { ...defaults, ...format };
+  // A chart default that lands on the wrong side of a caller's bound stops being
+  // a default and becomes a `RangeError` — `Intl` rejects min > max outright,
+  // and a chart that throws on a legal prop is worse than one that rounds oddly.
+  // The caller's number is the intentional one, so the chart's yields — but only
+  // when the caller did not set the other bound themselves: two incoherent
+  // numbers from the SAME object are their own bug to see.
+  const lo = opts.minimumFractionDigits;
+  if (
+    lo !== undefined &&
+    format.maximumFractionDigits === undefined &&
+    (opts.maximumFractionDigits ?? 20) < lo
+  ) {
+    opts.maximumFractionDigits = lo;
+  }
+  return fromOptions(locale, opts);
 }
 
 /**
@@ -59,14 +125,16 @@ export function makeFormatter(
  *
  * Takes a FRACTION (0.42 → "42%"), matching `Intl`'s own `style: "percent"`
  * contract, so a caller can never be unsure whether to pre-multiply. Routed
- * through `makeFormatter` for the same shared cache — one `Intl.NumberFormat` per
- * locale × digit count across the whole catalog, not one per chart instance.
+ * through the same cached instance — one `Intl.NumberFormat` per locale × digit
+ * count across the whole catalog, not one per chart instance. There is no
+ * caller `format` here to merge against, so it takes the options path directly
+ * and charts using it pay nothing for `makeUnitFormatter`.
  */
 export function makePercentFormatter(
   locale: string | string[] | undefined,
   maximumFractionDigits = 0,
 ): (fraction: number) => string {
-  return makeFormatter(undefined, locale, { style: "percent", maximumFractionDigits });
+  return fromOptions(locale, { style: "percent", maximumFractionDigits });
 }
 
 /** Prepend `+` for positive values only when `fmt` did not already emit a sign.
@@ -75,6 +143,18 @@ export function withPlus(n: number, fmt: (n: number) => string): string {
   if (!(n > 0)) return fmt(n);
   const s = fmt(n);
   return s.startsWith("+") || s.startsWith("-") || s.startsWith("−") ? s : `+${s}`;
+}
+
+/**
+ * Drop a leading sign the formatter already emitted. The mirror of `withPlus`,
+ * for charts that format a MAGNITUDE and print the direction themselves: they
+ * pass `Math.abs(v)` and then prepend their own `+`/`−`, so a caller passing
+ * `format={{ signDisplay: "always" }}` — a legal thing to write — got `++3%`,
+ * and a negative got `−+3%`. Only the three signs `withPlus` tests for; a custom
+ * function returning some other marker is beyond what a string test can know.
+ */
+export function unsigned(s: string): string {
+  return s.startsWith("+") || s.startsWith("-") || s.startsWith("−") ? s.slice(1) : s;
 }
 
 // Cached date/time formatting — same caching

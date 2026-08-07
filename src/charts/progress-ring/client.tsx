@@ -3,7 +3,7 @@
 // threshold crossings only (documented anti-spam rule). No pointer lookup
 // (single mark) — hover/focus is a reveal of the percent, not a lookup.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -62,7 +62,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   const fraction =
     Number.isFinite(value) && Number.isFinite(max) && max > 0 ? value / max : Number.NaN;
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
 

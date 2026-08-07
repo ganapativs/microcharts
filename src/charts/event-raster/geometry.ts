@@ -47,10 +47,12 @@ export function rasterLabels(opts: {
   lanes: number;
   /** Chars in the widest lane name. */
   maxChars: number;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): RasterLabelLayout {
   const { labels, width, height, lanes, maxChars } = opts;
   const laneH = height / Math.max(1, lanes);
-  const fontSize = labelFont(laneH, 0.56);
+  const fontSize = labelFont(laneH, 0.56, opts.labelSize);
   const gutter = textGutterProse(Math.max(1, maxChars), fontSize, 4);
   const show = labels && labelFitsBand(laneH, fontSize) && gutter <= width * 0.45;
   return { show, gutter: show ? gutter : 0, fontSize };

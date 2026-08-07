@@ -33,6 +33,12 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value }[]",
   encoding: { channel: "wedge angle", precision: "LOW — SegmentedBar for any comparative read" },
   nodeBudget: "≤ 5 (4 wedges + Other)",
+  maxWidth: 100,
+  maxHeight: 100,
+  gotchas: [
+    "Negative values are excluded — a composition cannot contain negative parts.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["mix icon beside a printed number", "KPI card corners"],
   avoidFor: ["comparative reads (SegmentedBar)", "precision of any kind"],
   props: [

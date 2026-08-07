@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import type { EmptyCellStyle } from "../../core/types.js";
@@ -31,6 +31,11 @@ export interface HoneycombProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: HoneycombStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -73,6 +78,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
     format,
     locale,
     strings = EN_HONEYCOMB,
+    labelSize,
     title,
     summary,
     id,
@@ -92,13 +98,13 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
   let labelText: string | undefined;
   let fontSize = 0;
   if (label !== "none") {
-    fontSize = labelFont(Math.min(geo.width, geo.height), 0.28);
+    fontSize = labelFont(Math.min(geo.width, geo.height), 0.28, labelSize);
     const fmt = makeFormatter(format, locale);
     labelText =
       label === "count"
         ? `${fmt(filled)}/${fmt(cap)}`
         : cap > 0
-          ? makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 })(
+          ? makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 })(
               filled / cap,
             )
           : undefined;
@@ -110,7 +116,7 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
       : (summary ?? honeycombSummary(filled, { total: cap, unit, strings, format, locale }));
   const fill = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
-    ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+    ? ({ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties)
     : style;
 
   return (

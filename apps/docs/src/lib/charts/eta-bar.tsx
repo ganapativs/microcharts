@@ -16,6 +16,11 @@ export const entry: ChartEntry = {
   dataShape: "{ progress, elapsed, rate? }",
   encoding: { channel: "time axis — elapsed vs predicted-remaining", precision: "high / medium" },
   nodeBudget: "≤ 4",
+  maxWidth: 320,
+  maxHeight: 40,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["download / export progress", "job-queue ETA"],
   avoidFor: ["fraction-only progress (Progress)", "unbounded counters (Delta)"],
   props: [

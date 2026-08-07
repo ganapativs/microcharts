@@ -52,6 +52,11 @@ export interface PercentileLadderProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -148,6 +153,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     format,
     locale,
     strings = EN_QUANTILE,
+    labelSize,
     title,
     summary,
     id,
@@ -225,7 +231,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const texts = rendered.map((t) => labelText(t.p, t.value));
   const labelX = showLabels ? ladderLabelLayout(geo, texts, w, FONT) : null;
   // pin the label size to viewBox units (see coverage-strip / )
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

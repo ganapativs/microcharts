@@ -36,6 +36,11 @@ export interface PartitionStripProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PartitionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -93,6 +98,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
     width: widthProp = 120,
     height: heightProp = 24,
     strings = EN_PARTITION,
+    labelSize,
     title,
     summary,
     id,
@@ -108,7 +114,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
 
   const [width, height] = partitionBox(widthProp, heightProp);
   const geo = partitionStripGeometry({ data, width, height, gap: 1 });
-  const fontSize = labelFont(height, 0.42);
+  const fontSize = labelFont(height, 0.42, labelSize);
   const inset = PARTITION_INSET;
   const rowH = (height - inset * 2 - 1) / 2;
   // Shares take `locale` but never the value `format` (which carries units).
@@ -129,7 +135,7 @@ export function PartitionStrip(props: PartitionStripProps): ReactNode {
       // values. It centres on the cap band.
       seat={{ mode: "center", top: inset, bottom: height - inset }}
       className={className ? `mc-partition ${className}` : "mc-partition"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.segments.flatMap((seg, i) => {
         const y = seg.row === 0 ? inset : inset + rowH + 1;

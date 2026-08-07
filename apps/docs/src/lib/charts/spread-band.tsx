@@ -21,6 +21,8 @@ export const entry: ChartEntry = {
     precision: "medium — the filled gap is the read; hover for the exact lead",
   },
   nodeBudget: "≤ 8 (2 band fills + 2 lines + crossing/endpoint dots + label)",
+  maxWidth: 320,
+  maxHeight: 80,
   bestFor: ["lead-vs-reference in KPI cards", "actual-vs-plan where the flip matters"],
   avoidFor: ["3+ series (SparkGroup)", "unpaired series or different units (never dual axes)"],
   props: [

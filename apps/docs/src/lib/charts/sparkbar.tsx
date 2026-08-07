@@ -23,6 +23,8 @@ export const entry: ChartEntry = {
   dataShape: "number[]",
   encoding: { channel: "length (bar height from a zero baseline)", precision: "high" },
   nodeBudget: "1 per bar",
+  maxWidth: 340,
+  maxHeight: 100,
   bestFor: ["discrete magnitudes", "win–loss streaks", "period-over-period counts"],
   avoidFor: ["continuous trend shape", "many hundreds of points"],
   props: [

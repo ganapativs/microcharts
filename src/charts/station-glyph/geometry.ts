@@ -109,9 +109,11 @@ export function stationLayout(opts: {
   dew: string | null;
   pressure: string | null;
   station?: string | null | undefined;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): StationLayout {
   const size = resolveSize(opts.size);
-  const font = labelFont(size, 0.24);
+  const font = labelFont(size, 0.24, opts.labelSize);
   const gap = 3;
   const gutW = (s: string | null): number => (s ? textGutter(s.length, font, gap) : 1);
   const padXL = round2(Math.max(gutW(opts.temp), gutW(opts.dew)) + 0.5);

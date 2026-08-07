@@ -62,10 +62,12 @@ export function hypnogramLabels(opts: {
   rows: number;
   /** Chars in the widest state name. */
   maxChars: number;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): HypnoLabelLayout {
   const { labels, width, height, rows, maxChars } = opts;
   const n = Math.max(1, rows);
-  const fontSize = labelFont(height / n, 0.62);
+  const fontSize = labelFont(height / n, 0.62, opts.labelSize);
   const gutter = textGutterProse(Math.max(1, maxChars), fontSize, 4);
   // the pitch geometry actually lays the rows out on — the padded band, split n ways
   const rowPitch = (height - PAD * 2) / n;

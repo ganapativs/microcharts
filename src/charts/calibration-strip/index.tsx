@@ -103,14 +103,17 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
       className={className ? `mc-calib ${className}` : "mc-calib"}
       style={style}
     >
-      {/* support lane — one path, one node, whatever `bins` is (see supportPath) */}
+      {/* Support lane — one path, one node, whatever `bins` is (see
+          supportPath). No `crispEdges`: the lane's channel is column HEIGHT
+          (`count / maxCount * supportHeight`, geometry.ts:161) with no floor
+          under it, so a bin holding one observation against a busy bin is a
+          fraction of a unit tall. Snapped to the device grid that column
+          painted nothing — the lane said "no observations here" about a bin
+          that has some. The stylesheet relaxes the hint per-rect
+          (`rect[height^="0."]`), but these columns are ONE path, and the hint
+          applies to the whole path or none of it. */}
       {geo.supportBars.length > 0 ? (
-        <path
-          d={supportPath(geo.supportBars)}
-          shapeRendering="crispEdges"
-          data-mc-ink="neutral"
-          fillOpacity={0.35}
-        />
+        <path d={supportPath(geo.supportBars)} data-mc-ink="neutral" fillOpacity={0.35} />
       ) : null}
 
       <path

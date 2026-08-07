@@ -66,6 +66,11 @@ export interface RateVolumeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: RateVolumeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -91,6 +96,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
     format,
     locale,
     strings = EN_RATE_VOLUME,
+    labelSize,
     title,
     summary,
     id,
@@ -100,7 +106,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
   } = props;
 
   // label size in viewBox units (~0.62·height, clamped 7–11) — see graded-band
-  const FONT = labelFont(height, 0.62);
+  const FONT = labelFont(height, 0.62, labelSize);
   const fmt = makeFormatter(format, locale);
   const fmtVol = makeFormatter(volumeFormat, locale);
   const cls = className ? `mc-rate-volume ${className}` : "mc-rate-volume";
@@ -150,7 +156,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
   const lineColor = color ?? "var(--mc-accent)";
   // endpoint dot only when it isn't already a hollow low ring
   const showEndDot = dots !== "none" && geo.last != null && !geo.last.low;
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

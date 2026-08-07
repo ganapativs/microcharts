@@ -15,7 +15,8 @@ export type StreakDatum = number | boolean | null | undefined;
 export type StreakLabel = "current" | "both" | "none";
 
 /** The count label's font in viewBox units. */
-export const streakSparkFont = (height: number): number => labelFont(height, 0.4);
+export const streakSparkFont = (height: number, min?: number | undefined): number =>
+  labelFont(height, 0.4, min);
 
 /**
  * The band reserved above the runs for the count labels — the ONE source both
@@ -23,8 +24,11 @@ export const streakSparkFont = (height: number): number => labelFont(height, 0.4
  * that recomputed geometry without it would draw its focus outline on runs the
  * static never placed there (the overlay would sit a band too high).
  */
-export const streakSparkRoom = (height: number, label: StreakLabel): number =>
-  label === "none" ? 0 : streakSparkFont(height);
+export const streakSparkRoom = (
+  height: number,
+  label: StreakLabel,
+  min?: number | undefined,
+): number => (label === "none" ? 0 : streakSparkFont(height, min));
 
 /** Runs beyond this collapse the oldest into a single ellipsis slot (dev-warn). */
 export const MAX_RUNS = 40;

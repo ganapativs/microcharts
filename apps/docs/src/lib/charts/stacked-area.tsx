@@ -22,6 +22,13 @@ export const entry: ChartEntry = {
     precision: "low — thickness reads approximately; hover for exact shares",
   },
   nodeBudget: "≤ 7 (≤ 3 area paths + labels)",
+  maxWidth: 260,
+  maxHeight: 70,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "Three series is a hard cap — the thickness read degrades past it.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["traffic/revenue mix in KPI cards", "share-shift stories in sentences"],
   avoidFor: ["4+ series", "exact values over time (SparkGroup of Sparklines)"],
   props: [

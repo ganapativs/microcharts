@@ -18,6 +18,9 @@ export const entry: ChartEntry = {
   dataShape: "{ x, y }[] (unordered pairs)",
   encoding: { channel: "2-D position on common scales", precision: "high" },
   nodeBudget: "1 per point (≤ 60)",
+  maxWidth: 220,
+  maxHeight: 140,
+  gotchas: ["Past 60 points overplot wins; bin the data instead (documented cap)."],
   bestFor: ["correlation in a sentence", "two-metric relationships in cards"],
   avoidFor: ["> 60 points (bin instead)", "time series (Sparkline)"],
   props: [

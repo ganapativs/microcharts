@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
 import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { round2 } from "../../core/types.js";
@@ -103,6 +103,11 @@ export interface EventTimelineProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TimelineStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -141,6 +146,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
     format,
     locale,
     strings = EN_TIMELINE,
+    labelSize,
     title,
     summary,
     id,
@@ -154,7 +160,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
   // Resolve the box once, the way <Chart> resolves it: the label size, the seat
   // and the geometry all have to be computed against the box that gets painted.
   const [width, height] = timelineBox(widthProp, heightProp);
-  const fontSize = labelFont(height, 0.45);
+  const fontSize = labelFont(height, 0.45, labelSize);
   const geo = eventTimelineGeometry({
     width,
     height,
@@ -166,7 +172,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
   const dropped = items.filter((it) => (it.end ?? it.start) < win[0] || it.start > win[1]).length;
   if (dropped > 0) devWarn(`<EventTimeline> ${dropped} item(s) outside the domain excluded.`);
 
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName =
     summary === false
       ? false
@@ -177,7 +183,7 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

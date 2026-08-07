@@ -3,7 +3,7 @@
 // clamps at 100%; past that the LABEL carries the truth ("112%").
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { labelFont, labelFitsBand } from "../../core/labels.js";
 import { progressGeometry, resolveSegments } from "./geometry.js";
@@ -35,7 +35,7 @@ export function progressModel(props: ProgressProps): ProgressModel {
   const fraction = usable ? value / max : Number.NaN;
   const clamped = usable ? Math.min(1, Math.max(0, fraction)) : 0;
 
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const valFmt = makeFormatter(format, locale);
 
   // The drawn step count, resolved once — `segments` was read raw here and again
@@ -86,6 +86,11 @@ export interface ProgressProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -100,6 +105,7 @@ export function Progress(props: ProgressProps): ReactNode {
     width = 48,
     height = 8,
     color,
+    labelSize,
     title,
     summary,
     id,
@@ -109,7 +115,7 @@ export function Progress(props: ProgressProps): ReactNode {
   } = props;
 
   const model = progressModel(props);
-  const fontSize = labelFont(height, 0.75);
+  const fontSize = labelFont(height, 0.75, labelSize);
   // Degrade, don't overlap: the percent is centred on the track's midline, so
   // below one em of box height its em-box crosses the viewBox edge. Drop it —
   // and with it the gutter, since `progressGeometry` hangs the gutter off the
@@ -132,7 +138,7 @@ export function Progress(props: ProgressProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

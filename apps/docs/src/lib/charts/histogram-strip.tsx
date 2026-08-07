@@ -34,6 +34,11 @@ export const entry: ChartEntry = {
   dataShape: "number[] (raw observations, binned internally)",
   encoding: { channel: "bar height per uniform bin", precision: "medium (bin-level)" },
   nodeBudget: "1 per bin (≤ 12)",
+  maxWidth: 260,
+  maxHeight: 70,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+  ],
   bestFor: ["latency clusters in a sentence", "distributions per row"],
   avoidFor: ["pre-aggregated counts (SparkBar)", "raw marks (RugStrip)"],
   props: [

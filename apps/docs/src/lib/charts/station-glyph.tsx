@@ -26,6 +26,8 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "1 disc + 1 sector + 1 barb + ≤3 numerals",
+  maxWidth: 200,
+  maxHeight: 200,
   bestFor: ["a dense weather station model", "any multi-field reading that must fit one cell"],
   avoidFor: ["a single value (Delta)", "a trend over time (Sparkline)"],
   props: [

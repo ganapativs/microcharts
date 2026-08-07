@@ -22,6 +22,8 @@ export const entry: ChartEntry = {
     precision: "high — the σ̂ estimator is the moving-range one, stated",
   },
   nodeBudget: "≤ 6 + 1 per violation",
+  maxWidth: 320,
+  maxHeight: 70,
   bestFor: [
     "a production line / metric in a table cell",
     "an SPC control chart in a KPI card",

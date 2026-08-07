@@ -6,7 +6,7 @@
 import { useRef, useState } from "react";
 import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, unsigned } from "../../core/format.js";
 import { EN_BULLET } from "../../core/strings-bullet.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -70,7 +70,7 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
   // prints it. When `label="both"` already shows value/target, float only the gap.
   const gap =
     hasTarget && Number.isFinite(value - target!)
-      ? `${value - target! >= 0 ? "+" : "−"}${fmt(Math.abs(value - target!))}`
+      ? `${value - target! >= 0 ? "+" : "−"}${unsigned(fmt(Math.abs(value - target!)))}`
       : "";
   // `fmt` is Intl, which formats NaN as the literal "NaN" and Infinity as "∞".
   // Both went into the chip and the live region verbatim while the accessible

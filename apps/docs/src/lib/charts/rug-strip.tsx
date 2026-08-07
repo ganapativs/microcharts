@@ -20,6 +20,9 @@ export const entry: ChartEntry = {
     precision: "high per observation, medium for density",
   },
   nodeBudget: "≤ 4 (opacity-tiered tick paths + markValue)",
+  maxWidth: 240,
+  maxHeight: 40,
+  gotchas: ["The default box follows `orientation`: 60×10 horizontal, 10×60 vertical."],
   bestFor: ['"you are here" in a band', "distribution beside a stat", "margin composition"],
   avoidFor: ["> 400 observations (HistogramStrip)", "trends over time (Sparkline)"],
   props: [

@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
 import { EN_FREQ, type FreqStrings } from "../../core/strings-freq.js";
 import type { Polarity } from "../../core/types.js";
 import {
@@ -51,6 +51,11 @@ export interface IconArrayProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: FreqStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -72,6 +77,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
     format,
     locale,
     strings = EN_FREQ,
+    labelSize,
     title,
     summary,
     id,
@@ -81,7 +87,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
   } = props;
 
   const total = resolveTotal(rawTotal);
-  const plan = iconArrayLabelPlan({ label, total, width, height });
+  const plan = iconArrayLabelPlan({ label, total, width, height, labelSize });
   const { font: FONT, gutterCh, show: showLabel } = plan;
   const geo = iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT });
 
@@ -94,7 +100,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
     devWarn("<IconArray> total=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
   }
 
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => iconArraySummary(geo, pctFmt, strings));
 
   // no custom color: the fill role token IS the ink role (bound in
@@ -112,7 +118,7 @@ export function IconArray(props: IconArrayProps): ReactNode {
   const labelText =
     label === "percent" ? pctFmt(geo.k / geo.n) : strings.iconArrayRatio(geo.k, geo.n);
   // pin the label size to viewBox units (see coverage-strip)
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

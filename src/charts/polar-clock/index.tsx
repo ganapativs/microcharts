@@ -35,6 +35,11 @@ export interface PolarClockProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PolarClockStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -64,11 +69,12 @@ export function polarClockLabel(opts: {
   peakIndex: number;
   box: number;
   fontSize: number | undefined;
+  labelSize?: number | undefined;
   label: "max" | "none";
   fmt: (n: number) => string;
 }): { text: string | null; band: number; fontSize: number } {
   const { fontSize: asked, box } = opts;
-  const fontSize = isFiniteValue(asked) && asked > 0 ? asked : labelFont(box);
+  const fontSize = isFiniteValue(asked) && asked > 0 ? asked : labelFont(box, 0.55, opts.labelSize);
   const peak = opts.label === "max" && opts.peakIndex >= 0 ? opts.data[opts.peakIndex] : undefined;
   if (!isFiniteValue(peak)) return { text: null, band: 0, fontSize };
   const text = opts.fmt(peak);
@@ -129,6 +135,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     format,
     locale,
     strings = EN_POLAR_CLOCK,
+    labelSize,
     title,
     summary,
     id,
@@ -153,6 +160,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
     peakIndex: geo.peakIndex,
     box: geo.size,
     fontSize: props.fontSize,
+    labelSize,
     label,
     fmt,
   });
@@ -169,7 +177,7 @@ export function PolarClock(props: PolarClockProps): ReactNode {
       // appends a text band below, which would otherwise drag the dial upward.
       seat={{ mode: "center", top: POLAR_PAD, bottom: geo.size - POLAR_PAD }}
       className={className ? `mc-polar ${className}` : "mc-polar"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <circle
         cx={geo.guide.cx}

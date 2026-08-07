@@ -89,8 +89,9 @@ export function RubricStrip(props: InteractiveRubricStripProps): React.ReactNode
         width,
         height,
         show: labels,
+        labelSize: props.labelSize,
       }).gutter,
-    [data, labels, width, height],
+    [data, labels, width, height, props.labelSize],
   );
   const geo = useMemo(
     () =>

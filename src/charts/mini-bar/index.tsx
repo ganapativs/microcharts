@@ -69,6 +69,11 @@ export interface MiniBarProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CategoryStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -92,6 +97,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
     format,
     locale,
     strings = EN_CATEGORY,
+    labelSize,
     title,
     summary,
     id,
@@ -124,7 +130,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
   let topPad = 0;
   let labelW = 0;
   if (label === "max" && orientation === "vertical") {
-    fontSize = labelFont(height, 0.45);
+    fontSize = labelFont(height, 0.45, labelSize);
     let maxVal = -Infinity;
     for (let i = 0; i < sorted.length; i++) {
       const v = sorted[i]!.value;
@@ -200,7 +206,7 @@ export function MiniBar(props: MiniBarProps): ReactNode {
       className={className ? `mc-minibar ${className}` : "mc-minibar"}
       style={
         maxText !== undefined
-          ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+          ? ({ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties)
           : style
       }
     >

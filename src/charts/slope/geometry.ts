@@ -60,6 +60,8 @@ export function slopeFitFrame(opts: {
   domain?: readonly [number, number] | undefined;
   label: "none" | "value" | "label" | "both";
   fmt: (n: number) => string;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): { geo: SlopeGeometry; labelsDropped: boolean; fontSize: number; nameChars: number } {
   const { width, height, data, domain, label } = opts;
   // Measure the label CHARACTER counts once, outside the font loop. They are a
@@ -75,8 +77,12 @@ export function slopeFitFrame(opts: {
   // reads only the gutters and the row pitch, so a candidate never needs the
   // line set — and building it per candidate meant paying `slopeGeometry`'s
   // per-row de-overlap scan up to six times over.
-  let fontSize = SLOPE_FONT;
-  for (let f = slopeLabelFont(height, width); f > SLOPE_FONT; f--) {
+  // The bottom of the ramp is `labelSize` when the caller raised it: the walk
+  // stops there and `frameFor` DROPS the labels rather than setting them under
+  // the floor an app asked for.
+  const floor = Math.max(SLOPE_FONT, opts.labelSize ?? 0);
+  let fontSize = floor;
+  for (let f = Math.max(floor, slopeLabelFont(height, width)); f > floor; f--) {
     if (labelsFitAt({ width, height, rows: data.length, chars, fontSize: f })) {
       fontSize = f;
       break;

@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
@@ -61,6 +61,11 @@ export interface StackedAreaProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StackStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -87,6 +92,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     format,
     locale,
     strings = EN_STACK,
+    labelSize,
     title,
     summary,
     id,
@@ -99,7 +105,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   // marks land outside a valid viewBox — `height={-40}` drew the top edge at
   // y = -40 and `width={0}` at x = -1, and `.mc-root` is `overflow: visible`,
   // so both spill into the page. Non-finite sides emitted `NaN` coordinates,
-  // `--mc-label-size: NaNpx` and a `NaN` seat.
+  // `--mc-label-px: NaNpx` and a `NaN` seat.
   const width = chartSide(widthProp);
   const height = chartSide(heightProp);
 
@@ -121,8 +127,8 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     );
   }
 
-  const fontSize = labelFont(height, 0.3);
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const fontSize = labelFont(height, 0.3, labelSize);
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   // ridge forces smooth silhouettes (documented)
   const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
   // endpoint labels drop when rows are too dense for the series count — and the
@@ -154,7 +160,7 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

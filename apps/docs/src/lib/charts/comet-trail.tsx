@@ -23,6 +23,12 @@ export const entry: ChartEntry = {
     precision: "medium",
   },
   nodeBudget: "trail + 2",
+  maxWidth: 240,
+  maxHeight: 70,
+  gotchas: [
+    "`trail` caps at 20 dots (default 12); a longer stream keeps the newest.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a live price or metric with a little recency context",
     "a realtime KPI that should show momentum",

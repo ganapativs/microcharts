@@ -28,6 +28,12 @@ export const entry: ChartEntry = {
     precision: "medium",
   },
   nodeBudget: "≤ 4",
+  maxWidth: 200,
+  maxHeight: 140,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["volume-at-price / level-of-activity", "load by tier"],
   avoidFor: ["a time series (Sparkline)", "when timing matters (use a trend chart)"],
   props: [

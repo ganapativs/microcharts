@@ -28,6 +28,11 @@ export interface WindBarbProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: WindBarbStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -63,6 +68,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
     format,
     locale,
     strings = EN_WIND_BARB,
+    labelSize,
     title,
     summary,
     id,
@@ -81,7 +87,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
   const size = chartSide(sizeProp ?? DEFAULT_SIZE, DEFAULT_SIZE);
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = labelFont(size, 0.26);
+  const fontSize = labelFont(size, 0.26, labelSize);
   // A non-finite direction or magnitude has no reading to print: the glyph is
   // the calm circle and the name says "Calm.", so the label printed "∞" — or a
   // real "32" beside a circle announced as calm. A finite magnitude UNDER the
@@ -120,7 +126,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
       // disc, not the drawn shaft, or the mark would hop as the wind turned.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-windbarb ${className}` : "mc-windbarb"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.calm ? (
         <circle

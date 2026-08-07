@@ -26,6 +26,11 @@ export interface MusicStaffProps {
   /** Swappable summary strings (defaults to EN) — the accessible name is
    *  generated, so this is how a non-English host localizes it. */
   strings?: SeriesStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -47,6 +52,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     height: heightProp = DEFAULT_HEIGHT,
     format,
     locale,
+    labelSize,
     title,
     summary,
     strings,
@@ -65,6 +71,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
     width: widthProp,
     height: heightProp,
     fontSize: props.fontSize,
+    labelSize,
     labelText,
   });
   const showLabel = labelText !== undefined && gutter > 0;
@@ -93,7 +100,7 @@ export function MusicStaff(props: MusicStaffProps): ReactNode {
       // band out of geometry.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-staff ${className}` : "mc-staff"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* Staff + ledger opacity is a presentation ATTRIBUTE, not inline style:
           `.mc-root` sets `forced-color-adjust: none`, so an inline declaration

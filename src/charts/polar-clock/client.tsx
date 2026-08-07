@@ -92,6 +92,7 @@ export function PolarClock(props: InteractivePolarClockProps): React.ReactNode {
       peakIndex: geo.peakIndex,
       box: geo.size,
       fontSize: rest.fontSize,
+      labelSize: rest.labelSize,
       label: rest.label ?? "none",
       fmt,
     }).band;

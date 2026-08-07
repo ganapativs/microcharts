@@ -21,6 +21,11 @@ export const entry: ChartEntry = {
   dataShape: "{ latency: number; rate: number }",
   encoding: { channel: "orbit radius = latency, dash density / speed = rate", precision: "low" },
   nodeBudget: "3",
+  maxWidth: 120,
+  maxHeight: 120,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a live dependency health dot in a service table",
     "latency + rate together in one small mark",

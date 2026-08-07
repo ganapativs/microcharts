@@ -35,6 +35,11 @@ export interface StreakSparkProps {
   height?: number | undefined;
   /** Tints the current (accent) bar; valence runs keep their tokens. */
   color?: string | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   format?: Format | undefined;
@@ -71,6 +76,7 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
     width: widthProp = DEFAULT_WIDTH,
     height: heightProp = DEFAULT_HEIGHT,
     color,
+    labelSize,
     title,
     summary,
     format,
@@ -84,13 +90,13 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
 
   // Everything below reads the RESOLVED box, never the prop. `Chart` clamps the
   // frame it draws, but the geometry read the raw value: `height={NaN}` shipped
-  // `--mc-label-size: NaNpx`, a NaN seat and `y="NaN"` runs inside a viewBox
+  // `--mc-label-px: NaNpx`, a NaN seat and `y="NaN"` runs inside a viewBox
   // that looked perfectly valid, and `width={0}` put every run at x = -1.5.
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = streakSparkFont(height);
+  const fontSize = streakSparkFont(height, labelSize);
   // Reserve the label's own band before geometry (canon: gutters are reserved,
   // never measured). One font is enough even for the record run, which carries a
   // triangle tick between bar and number: runs centre inside the band below the
@@ -99,7 +105,7 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
   // tick. Reserving `fontSize + TRIANGLE_H` instead would take 51% of a default
   // 20-unit box and shrink the current run from 10 units to 4.9, turning a
   // streak chart into a number with a hairline under it.
-  const labelRoom = streakSparkRoom(height, label);
+  const labelRoom = streakSparkRoom(height, label, labelSize);
   const geo = streakSparkGeometry(data, { width, height, threshold, positive, labelRoom });
   if (geo.truncated)
     devWarn(
@@ -155,7 +161,7 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

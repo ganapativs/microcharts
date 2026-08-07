@@ -204,11 +204,21 @@ export function sparkBarGeometry(
     let y = Math.min(top, baselineY);
     if (y + h > y1) y = y1 - h;
     if (y < y0) y = y0;
+    // Round the two EDGES, then derive the extent from the rounded pair — the
+    // clamp-the-ends discipline above, applied to rounding. Rounding `y` and
+    // `h` independently let EACH move up by 0.005, so a bar the clamp had
+    // seated flush on `y1` came back as `y + height = 20.01` in a 20-unit
+    // frame and painted a hundredth of a unit into the page, which does not
+    // clip. Off the rounded edges, `y + height === bottom <= y1` holds by
+    // construction. A true zero keeps `bottom === y`, so it still emits
+    // `height: 0` and paints nothing.
+    const yTop = round2(y);
+    const yBot = round2(Math.min(y + h, y1));
     bars.push({
       x: round2(x0 + i * slot + inset),
-      y: round2(y),
+      y: yTop,
       width: barW,
-      height: round2(h),
+      height: round2(yBot - yTop),
       value: v,
       index: i,
       sign: v > 0 ? 1 : v < 0 ? -1 : 0,

@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
     precision: "high — percentile stated",
   },
   nodeBudget: "≤ 6",
+  maxWidth: 320,
+  maxHeight: 50,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["a value against its cohort", "per-row peer comparison in tables", "SLA context"],
   avoidFor: ["a single trend (Sparkline)", "two groups (ABStrips)"],
   props: [

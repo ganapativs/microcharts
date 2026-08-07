@@ -36,6 +36,11 @@ export interface StationGlyphProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StationGlyphStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -98,6 +103,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     format,
     locale,
     strings = EN_STATION_GLYPH,
+    labelSize,
     title,
     summary,
     id,
@@ -128,7 +134,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     y0,
     y1,
     box,
-  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT, station: stationT });
+  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT, station: stationT, labelSize });
 
   const geo = stationGlyphGeometry({
     cloud: cloud ?? null,
@@ -158,7 +164,7 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
       // reserved by string length, so the box grows but the center holds.
       seat={{ mode: "center", top: y0, bottom: y1 }}
       className={className ? `mc-station ${className}` : "mc-station"}
-      style={{ ...style, "--mc-label-size": `${font}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${font}px` } as CSSProperties}
     >
       {barb ? (
         <>

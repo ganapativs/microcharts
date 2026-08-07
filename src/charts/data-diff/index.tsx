@@ -5,14 +5,16 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { round2 } from "../../core/types.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, unsigned, type Format } from "../../core/format.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_DATA_DIFF, type DataDiffStrings } from "../../core/strings-data-diff.js";
 import { dataDiffGeometry, dataDiffLayout, type DataDiffGeometry } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
+// `unsigned` because the sign below is ours: a caller's signed formatter
+// (`signDisplay: "always"`) would otherwise print `++5` / `−+5`.
 const signed = (n: number, fmt: (v: number) => string): string =>
-  `${n > 0 ? "+" : n < 0 ? "−" : ""}${fmt(Math.abs(n))}`;
+  `${n > 0 ? "+" : n < 0 ? "−" : ""}${unsigned(fmt(Math.abs(n)))}`;
 
 export function dataDiffSummary(
   geo: DataDiffGeometry,
@@ -49,6 +51,11 @@ export interface DataDiffProps {
   width?: number | undefined;
   height?: number | undefined;
   strings?: DataDiffStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -71,6 +78,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
     width = 80,
     height = 20,
     strings = EN_DATA_DIFF,
+    labelSize,
     title,
     summary,
     id,
@@ -96,7 +104,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
     footer: footerH,
     tagFont,
     keyChars,
-  } = dataDiffLayout({ data, labels, label, maxItems, width, height });
+  } = dataDiffLayout({ data, labels, label, maxItems, width, height, labelSize });
   const showTotals = footerH > 0;
   const showTags = tagFont > 0;
 
@@ -136,7 +144,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   }
 
   const accName = resolveSummary(summary, () => dataDiffSummary(geo, fmt, strings));
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart
@@ -214,7 +222,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               data-mc-ink="label"
               fontSize={tagFont}
               // inline font-size beats the zero-specificity `:where(.mc-root
-              // text)` rule that would otherwise pin every tag to --mc-label-size
+              // text)` rule that would otherwise pin every tag to --mc-label-px
               style={{ fontSize: tagFont }}
             >
               {r.key}

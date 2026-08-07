@@ -18,7 +18,7 @@
  */
 export const INTERACTIVE_READOUT_CLAIMS: Record<string, readonly string[]> = {
   // de-DE variant of the static name; no demo on the page passes a locale.
-  // EN_BIAS_STRIP.biasStrip + makeFormatter(…, { signDisplay: "exceptZero" }).
+  // EN_BIAS_STRIP.biasStrip + makeUnitFormatter(…, { signDisplay: "exceptZero" }).
   "bias-strip": ["Bias +2,21 across 20 pairs; 90% within the limits of agreement."],
   // client.tsx → strings.bubbleAt(label, fmt(value)) — EN_BUBBLE.bubbleAt.
   "bubble-row": ["EMEA: 1,240."],

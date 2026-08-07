@@ -32,6 +32,11 @@ export interface StarSpokeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: StarSpokeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     format,
     locale,
     strings = EN_STAR_SPOKE,
+    labelSize,
     title,
     summary,
     id,
@@ -102,7 +108,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     devWarn("<StarSpoke> value outside domain — clamped.");
 
   const showLabels = labels && size >= 44;
-  const fontSize = showLabels ? labelFont(size, 0.1) : labelFont(size, 0.14);
+  const fontSize = showLabels ? labelFont(size, 0.1, labelSize) : labelFont(size, 0.14, labelSize);
   // reserve a label ring when labels are shown, so tip text stays inside
   const pad = showLabels ? Math.max(fontSize * 2, size * 0.22) : 2;
   const geo = starSpokeGeometry({
@@ -145,7 +151,7 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       // and it stays put whether or not `labels` widens the ring.
       seat={{ mode: "center", top: 0, bottom: size }}
       className={className ? `mc-star ${className}` : "mc-star"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {guides ? (
         <path

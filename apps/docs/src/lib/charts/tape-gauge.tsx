@@ -24,6 +24,8 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "1 pointer + 1 tick path + ≤4 zone rects",
+  maxWidth: 190,
+  maxHeight: 240,
   bestFor: [
     "a live changing reading (airspeed, throughput, temp)",
     "value + trend + safe/caution band at a glance",

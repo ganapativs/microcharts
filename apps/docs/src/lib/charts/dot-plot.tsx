@@ -26,6 +26,12 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value }[]",
   encoding: { channel: "dot position on a common scale", precision: "high" },
   nodeBudget: "≤ 2 per row + text (rows ≤ 7)",
+  maxWidth: 240,
+  maxHeight: 110,
+  gotchas: [
+    "Past 7 rows the rows blur; the component dev-warns past the cap.",
+    "Height is derived from the row count when you pass none.",
+  ],
   bestFor: ["KPI leaderboards", "named comparisons in cards", "rows where bars would lie"],
   avoidFor: ["> 7 rows", "time series (Sparkline)"],
   props: [

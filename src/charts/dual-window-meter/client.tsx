@@ -3,7 +3,7 @@
 // listener + nearest-sample-by-x math, roving keyboard (←/→/Home/End). touch
 // tap-to-pin, and the onActive/onSelect contract — never a DOM node per sample.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { lastFinite } from "../../core/stats.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -68,7 +68,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
   // readout, live announcement and accessible name don't over-claim precision on
   // raw rolling-mean floats — and the label gutter matches the composed static.
   const fmt = useMemo(
-    () => makeFormatter(format, locale, { maximumFractionDigits: 1 }),
+    () => makeUnitFormatter(format, locale, { maximumFractionDigits: 1 }),
     [format, locale],
   );
   // Same font metric as the static — it sizes the label gutter, and therefore

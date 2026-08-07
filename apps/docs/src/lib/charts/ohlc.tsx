@@ -26,6 +26,12 @@ export const entry: ChartEntry = {
     precision: "medium — hover announces the exact four prices",
   },
   nodeBudget: "≤ 40 (~2 nodes per candle, ≤ 20 periods)",
+  maxWidth: 320,
+  maxHeight: 70,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["watchlist table rows", "ticker KPI cards"],
   avoidFor: ["a single close series (Sparkline)", "more than ~20 periods"],
   props: [

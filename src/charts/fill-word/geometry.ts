@@ -15,7 +15,7 @@ export type FillMode = "fill" | "drain";
  * Every coordinate in this chart is derived from it — there are no `width` /
  * `height` props to fall back on — so a host that computes it (`base * scale`,
  * or an empty input field through `Number("")`) used to emit `font-size="NaN"`,
- * `y="NaN"`, `--mc-label-size: NaNpx` and a NaN inline seat, while the
+ * `y="NaN"`, `--mc-label-px: NaNpx` and a NaN inline seat, while the
  * aria-label still announced an ordinary "uploading: 62% complete." A negative
  * one was worse than blank: the seat went to 9, which throws the mark nine box
  * heights off the line of text it is supposed to sit on.

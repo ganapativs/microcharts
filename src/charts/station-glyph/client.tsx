@@ -97,6 +97,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       dew: dewT,
       pressure: presT,
       station: station || null,
+      labelSize: props.labelSize,
     });
     const { font, cx, cy, r, yOff, gap, box } = lay;
     // per-char over-estimate — the static path never measures text either, and

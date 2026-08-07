@@ -98,7 +98,7 @@ describe("<FatDigits> degenerate domains (tests/craft/robust.mjs)", () => {
 describe("<FatDigits> hostile config props (tests/craft/robust.mjs)", () => {
   // A non-finite/non-positive fontSize used to reach the box as NaN: `Chart`
   // clamped the viewBox to 1×1 (nothing visible) while the accessible name still
-  // read the value, and `NaNpx` landed in --mc-label-size and --mc-seat.
+  // read the value, and `NaNpx` landed in --mc-label-px and --mc-seat.
   const SIZES: Record<string, unknown> = {
     NaN: Number.NaN,
     Infinity: Number.POSITIVE_INFINITY,
@@ -115,7 +115,7 @@ describe("<FatDigits> hostile config props (tests/craft/robust.mjs)", () => {
       );
       const svg = container.querySelector("svg")!;
       expect(svg.getAttribute("viewBox")).toBe("0 0 48 20");
-      expect(svg.getAttribute("style")).toContain("--mc-label-size: 14px");
+      expect(svg.getAttribute("style")).toContain("--mc-label-px: 14px");
       expect(svg.getAttribute("style")).not.toMatch(/NaN|Infinity|null/);
       expect(container.querySelector("text")!.getAttribute("font-size")).toBe("14");
       expect(container.querySelector("text")!.getAttribute("y")).toBe("10");

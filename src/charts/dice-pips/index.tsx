@@ -16,6 +16,11 @@ export interface DicePipsProps {
   face?: boolean | undefined;
   size?: number | undefined;
   strings?: DiceStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -25,9 +30,6 @@ export interface DicePipsProps {
 }
 
 const NUMERAL_FACTOR = 0.6; // the fallback numeral is the loudest mark on the face
-// `labelFont`'s own 7-unit floor, read from the helper rather than restated, so
-// the numeral's shrink range can never drift from the library's minimum.
-const NUMERAL_FLOOR = labelFont(0);
 
 /**
  * Largest size the fallback numeral can be set at and still land inside the
@@ -38,9 +40,14 @@ const NUMERAL_FLOOR = labelFont(0);
  * spilled rather than clipped. Shrink toward the floor first; below it the
  * numeral drops and the summary carries the count, the same degradation
  * TallyMarks makes with its `+N`.
+ *
+ * The floor is `labelFont`'s own, read from the helper rather than restated, so
+ * the numeral's shrink range can never drift from the library's minimum — and
+ * so `labelSize` moves the bottom of the range with it.
  */
-function numeralFont(chars: number, size: number, room: number): number {
-  for (let f = labelFont(size, NUMERAL_FACTOR); f >= NUMERAL_FLOOR; f--) {
+function numeralFont(chars: number, size: number, room: number, min: number | undefined): number {
+  const floor = labelFont(0, NUMERAL_FACTOR, min);
+  for (let f = labelFont(size, NUMERAL_FACTOR, min); f >= floor; f--) {
     if (textGutter(chars, f, 0) <= room && labelFitsY(size / 2, f, size)) return f;
   }
   return 0;
@@ -58,6 +65,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
     face = true,
     size = DEFAULT_SIZE,
     strings = EN_DICE,
+    labelSize,
     title,
     summary,
     id,
@@ -69,9 +77,9 @@ export function DicePips(props: DicePipsProps): ReactNode {
   const geo = dicePipsGeometry({ value, size });
   // Everything below reads the RESOLVED box, never the prop (see resolveSize).
   const box = geo.size;
-  const fitted = geo.numeral === null ? 0 : numeralFont(geo.numeral.length, box, geo.face.width);
+  const fitted = geo.numeral === null ? 0 : numeralFont(geo.numeral.length, box, geo.face.width, labelSize);
   const showNumeral = fitted > 0;
-  const fontSize = showNumeral ? fitted : labelFont(box, NUMERAL_FACTOR);
+  const fontSize = showNumeral ? fitted : labelFont(box, NUMERAL_FACTOR, labelSize);
   const accName = resolveSummary(summary, () => dicePipsSummary(value, strings));
 
   return (
@@ -86,7 +94,7 @@ export function DicePips(props: DicePipsProps): ReactNode {
       // the pip grid is laid out inside it, so the seat survives the switch.
       seat={{ mode: "center", top: geo.face.y, bottom: geo.face.y + geo.face.height }}
       className={className ? `mc-dice ${className}` : "mc-dice"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {face ? (
         <rect

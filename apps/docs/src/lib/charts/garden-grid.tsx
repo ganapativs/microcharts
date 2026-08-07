@@ -16,6 +16,10 @@ export const entry: ChartEntry = {
   dataShape: "(number | null)[]",
   encoding: { channel: "dot area, quantized to 5 ordinal steps", precision: "medium" },
   nodeBudget: "1 per cell (cap 400)",
+  gotchas: [
+    "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+    "Over 400 cells the component dev-warns — downsample upstream.",
+  ],
   bestFor: [
     "a contribution or activity rhythm you print or read in grayscale",
     "a per-repo or per-team activity strip",

@@ -27,6 +27,10 @@ export const entry: ChartEntry = {
     precision: "low — use MiniBar/DotPlot for precise comparison",
   },
   nodeBudget: "≤ 2 (cell + optional value label)",
+  gotchas: [
+    "One fixed intrinsic box: size it with CSS, not `width`/`height`.",
+    "A zero-width `domain` renders the single mid step.",
+  ],
   bestFor: ["table-cell matrices", "calendar-like grids you lay out yourself", "intensity chips"],
   avoidFor: ["precise value comparison", "per-cell auto-scaling (share one domain!)"],
   props: [

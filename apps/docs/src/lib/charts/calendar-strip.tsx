@@ -26,6 +26,11 @@ export const entry: ChartEntry = {
     precision: "low per day, high for rhythm — ActivityGrid for longer histories",
   },
   nodeBudget: "≤ 56 (1 per day, weeks ≤ 8 documented cap)",
+  gotchas: [
+    "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+    "`end` defaults to the current date, which differs between the server render and the client one — pass it explicitly under SSR.",
+    "Past 8 weeks use ActivityGrid (documented cap).",
+  ],
   bestFor: ["habit/deploy cadence in KPI cards", "week-aligned recent activity"],
   avoidFor: ["long ordinal histories (ActivityGrid)", "exact per-day values (MiniBar)"],
   props: [

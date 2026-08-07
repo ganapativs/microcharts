@@ -70,7 +70,14 @@ export function histogramGeometry(opts: {
   let modalBin = -1;
   const bars: HistogramBar[] = binned.bins.map((b, index) => {
     if (modalBin < 0 || b.count > binned.bins[modalBin]!.count) modalBin = index;
-    const h = binned.maxCount > 0 ? round2((b.count / binned.maxCount) * usableH) : 0;
+    // An EMPTY bin has no bar at all (index.tsx drops `h <= 0`); a bin holding
+    // observations always gets one. The 0.5 is a VISIBILITY floor for counts
+    // too small to resolve against the modal bin — 4 against 400 wants 0.16
+    // units, which paints as 6% of one pixel row at word size and reads as the
+    // empty bin next to it. It is never a floor on empty: the count gate below
+    // keeps zero and some-observations apart, which is the whole question a
+    // long-tailed distribution asks.
+    const h = b.count > 0 ? Math.max(0.5, round2((b.count / binned.maxCount) * usableH)) : 0;
     const x = round2(index * pitch);
     return {
       x,

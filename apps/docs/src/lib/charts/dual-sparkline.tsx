@@ -26,6 +26,12 @@ export const entry: ChartEntry = {
     precision: "medium — the gap between the lines is the read; hover for exact pairs",
   },
   nodeBudget: "≤ 8 (2 paths + band + endpoint dots + label)",
+  maxWidth: 260,
+  maxHeight: 70,
+  gotchas: [
+    "A `compare` series that is all null means Sparkline is the chart.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["metric-vs-benchmark in table cells", "actual-vs-plan in KPI cards"],
   avoidFor: ["3+ series (SparkGroup)", "different units per series (never dual axes)"],
   props: [

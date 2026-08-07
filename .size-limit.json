@@ -1295,6 +1295,12 @@
     "gzip": true
   },
   {
+    "name": "@microcharts/react/fluid (static)",
+    "path": "dist/fluid.js",
+    "limit": "0.46 kB",
+    "gzip": true
+  },
+  {
     "name": "styles.css (shared, whole library)",
     "path": "dist/styles.css",
     "limit": "12 kB",

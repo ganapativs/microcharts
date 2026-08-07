@@ -40,6 +40,11 @@ export interface TimeInRangeProps {
   height?: number | undefined;
   locale?: string | string[] | undefined;
   strings?: TimeInRangeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -107,6 +112,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
     height: heightProp = DEFAULT_HEIGHT,
     locale,
     strings = EN_TIME_IN_RANGE,
+    labelSize,
     title,
     summary,
     id,
@@ -118,7 +124,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
   // `Chart` clamps the frame, but the zones were laid out against the RAW prop:
   // a host-computed side (`Number("")` → NaN, a collapsed flex box → 0) emitted
   // `width="NaN"` rects inside a valid viewBox, `Infinity` ones outside it, and
-  // a NaN height went on to poison `--mc-label-size` and `--mc-seat` — dragging
+  // a NaN height went on to poison `--mc-label-px` and `--mc-seat` — dragging
   // the inline baseline with it.
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
@@ -126,7 +132,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
   const geo = timeInRangeGeometry({ data, width, height, orientation });
   const pct = zonePercentMap(data);
   const pctFmt = tirPercent(locale);
-  const fontSize = labelFont(Math.min(width, height), 0.55);
+  const fontSize = labelFont(Math.min(width, height), 0.55, labelSize);
   const accName = resolveSummary(summary, () => timeInRangeSummary(data, strings, pctFmt));
   const horizontal = orientation !== "vertical";
 
@@ -143,7 +149,7 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
       // nothing to stand on — it centres on the cap band either way.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-tir ${className}` : "mc-tir"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.zones.flatMap((z) => {
         const paint = ZONE_INK[z.key];

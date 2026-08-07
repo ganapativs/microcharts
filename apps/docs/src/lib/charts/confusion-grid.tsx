@@ -30,6 +30,13 @@ export const entry: ChartEntry = {
   dataShape: "{ labels: string[], counts: number[][] } (k×k, k ∈ [2,4])",
   encoding: { channel: "row-normalized cell ink; diagonal accented by shape", precision: "medium" },
   nodeBudget: "k² + k + 2k labels",
+  maxWidth: 220,
+  maxHeight: 220,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "`counts` must be a square k×k matrix with k between 2 and 4; anything else is rejected.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["classifier evaluation dashboards", "any paired-classification agreement"],
   avoidFor: ["a single accuracy number (Delta)", "k > 4 classes (full heatmap)"],
   props: [

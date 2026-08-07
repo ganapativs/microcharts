@@ -94,6 +94,9 @@
     "motion": {
       "static": "3.27 kB"
     },
+    "fluid": {
+      "static": "0.46 kB"
+    },
     "segmented-bar": {
       "static": "2.74 kB",
       "interactive": "5.27 kB"

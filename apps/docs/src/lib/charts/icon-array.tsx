@@ -17,6 +17,12 @@ export const entry: ChartEntry = {
     precision: "high — unit-countable",
   },
   nodeBudget: "1 per unit + label",
+  maxWidth: 560,
+  maxHeight: 120,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "`total={100}` needs at least 40×40 units, below which the unit size falls under the crispness floor.",
+  ],
   bestFor: ["risk in a sentence", "uptake / adoption rates", "lay-audience probabilities"],
   avoidFor: ["a trend (Sparkline)", "a distribution (QuantileDots)"],
   props: [

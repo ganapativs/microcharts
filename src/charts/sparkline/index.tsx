@@ -48,6 +48,11 @@ export interface SparklineProps {
   /** Swappable summary strings (defaults to EN) — the accessible name is
    *  generated, so this is how a non-English host localizes it. */
   strings?: SeriesStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   /** Number formatting for the label + summary (`Intl` options or a fn). */
@@ -75,6 +80,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
     dots = "auto",
     label = "none",
     color,
+    labelSize,
     title,
     summary,
     strings,
@@ -157,7 +163,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // exclusive (`label` is a single enum).
   const pinFont = metrics?.fontSize ?? (mmFont || undefined);
   const rootStyle = pinFont
-    ? { ...style, "--mc-label-size": `${pinFont}px` }
+    ? { ...style, "--mc-label-px": `${pinFont}px` }
     : (style as CSSProperties);
 
   return (

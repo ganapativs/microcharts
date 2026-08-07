@@ -37,6 +37,8 @@ export const entry: ChartEntry = {
     precision: "medium — Sparkline for levels, EventTimeline for labeled events",
   },
   nodeBudget: "≤ 2 typical (tick path; +1 flag path, +1 signed midline)",
+  maxWidth: 260,
+  maxHeight: 70,
   bestFor: ["error bursts per service", "alert density", "activity texture in rows"],
   avoidFor: ["level tracking (Sparkline)", "labeled events (EventTimeline)"],
   props: [

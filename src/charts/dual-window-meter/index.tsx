@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
@@ -28,6 +28,11 @@ export interface DualWindowMeterProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DualWindowStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -76,6 +81,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
     format,
     locale,
     strings = EN_DUAL_WINDOW,
+    labelSize,
     title,
     summary,
     id,
@@ -94,8 +100,8 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
   // the raw rolling mean of a noisy series is a full float ("-23.858"), which
   // both over-claims precision and outgrows the gutter it was measured for. One
   // fraction digit is the DEFAULT only — an explicit `format` still wins.
-  const fmt = makeFormatter(format, locale, { maximumFractionDigits: 1 });
-  const fontSize = labelFont(height, 0.32);
+  const fmt = makeUnitFormatter(format, locale, { maximumFractionDigits: 1 });
+  const fontSize = labelFont(height, 0.32, labelSize);
   // the two O(n·window) rolling means are computed ONCE and reused for both
   // the preliminary (gutter-sizing) pass and the final layout pass below —
   // each pass used to recompute both means, quietly doubling the real cost
@@ -179,7 +185,7 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
       // data-derived seat would make the meter bob every time a window updated.
       seat={{ mode: "floor", bottom: geo.y1 }}
       className={className ? `mc-dualwin ${className}` : "mc-dualwin"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.bandRect ? (
         // fill via inline STYLE (see graded-band/benchmark-strip): the band

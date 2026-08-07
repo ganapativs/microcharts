@@ -8,7 +8,7 @@
 // data index stays in the announcement). `value` is the DIFFERENCE (a − b).
 // encoded y channel; the pair's mean travels as `label`.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter, makePercentFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, makeUnitFormatter } from "../../core/format.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_BIAS_STRIP } from "../../core/strings-bias-strip.js";
@@ -54,7 +54,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r);
+  const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r, props.labelSize);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Dots settle in left→right along the mean axis (the same axis ←/→ nav
@@ -67,7 +67,7 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const fmtSigned = useMemo(
-    () => makeFormatter(format, locale, { signDisplay: "exceptZero" }),
+    () => makeUnitFormatter(format, locale, { signDisplay: "exceptZero" }),
     [format, locale],
   );
   // Within-limits share — a percent of its own, so it takes `locale` but never

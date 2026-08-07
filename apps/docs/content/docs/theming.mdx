@@ -54,6 +54,39 @@ token high and every chart below inherits it; override it lower and only that su
 Bind `--mc-accent` to your existing brand variable and every chart follows your design system without a per-chart prop
 or a duplicated color value.
 
+## Where the library's rules sit in the cascade
+
+`styles.css` opens by declaring four cascade layers, and every rule it ships lives in one of them:
+
+```css
+@layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion;
+```
+
+Tokens are unaffected by this. You set a token on a scope of your own, the library never claims that scope, and your
+value wins.
+
+Overriding a **rule** works differently, because layer order beats specificity and the last layer declared wins. If your
+app declares its own layers (Tailwind's `@layer theme, base, components, utilities`, or a framework that sets that up
+for you) and `styles.css` is imported after them, the four microcharts layers are declared last and outrank your
+utility classes. A class you add to a chart still lands on the element and still matches a real rule of yours. It loses
+the cascade and paints nothing, with no warning anywhere.
+
+Declare the order yourself to fix it. Put the microcharts layers first, above every import in your entry stylesheet,
+and your own layers then win by being later:
+
+```css
+/* app entry CSS, before the imports */
+@layer microcharts.tokens, microcharts.base, microcharts.charts, microcharts.motion, theme, base, components,
+  utilities;
+```
+
+`!important` also crosses the boundary, because importance inverts layer order: an important declaration in an earlier
+layer beats an important one in a later layer, and both beat every normal declaration. Reach for it to unblock a
+single rule, and reach for the layer statement above to stop hitting this at all.
+
+Unlayered CSS never meets any of this. Plain rules beat every layered rule regardless of order, so an app with no
+`@layer` of its own already wins.
+
 ## The token set
 
 That's the whole mechanism; the rest is vocabulary. About two dozen custom properties cover the entire surface, and
@@ -419,9 +452,17 @@ dedicated face, a tabular numeric font or a mono for a data-dense KPI, without c
 ## The readout surface
 
 The one opaque plane in the library is the value chip an interactive chart shows for its active unit: under the pointer,
-under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its three `--mc-surface*` tokens default to
-the system `Canvas`, so the chip adapts to light, dark, and forced-colors with no configuration. Point them at your
-popover tokens to match a themed surface. One set of tokens covers the hovered, focused, and pinned states alike.
+under keyboard focus, or pinned in place after a click, tap, or **Enter**. Its `--mc-surface`, `--mc-surface-ink`, and
+`--mc-surface-edge` tokens default to the system `Canvas`, so the chip adapts to light, dark, and forced-colors with no
+configuration. Point them at your popover tokens to match a themed surface. One set of tokens covers the hovered,
+focused, and pinned states alike.
+
+The fourth token, `--mc-surface-shadow`, stays a black mix in every theme, and that is deliberate. The chip renders in
+the top layer over ground the library cannot know, so its drop shadow reads as occlusion rather than as part of the
+palette, and occlusion is dark on a dark surface too. An earlier version mixed `CanvasText` the way the edge does,
+which inverts with the theme and painted a white halo around the chip on dark. On dark the shadow now goes quiet and
+the 1px `--mc-surface-edge` ring carries the separation. Override it if your surface needs a different depth; don't
+give it a theme twin.
 
 ## The active state
 
@@ -460,12 +501,27 @@ the user's, and an opacity ramp has nothing to say in a two-ink mode.
 ## Dark mode and forced colors
 
 Dark values are hand-tuned per token, never auto-inverted, so overriding one light value can't break the dark surface.
-microcharts follows `prefers-color-scheme` by default, and you can force a scope with `data-mc-theme="dark"`. Charts
-never paint their own background, so they sit on whatever surface you give them.
+Charts never paint their own background, so they sit on whatever surface you give them.
 
-If your app toggles theme with a **class** (next-themes `.dark`, a `[data-theme]` attribute, …) rather than the OS media
-query, rebind the tokens under that class the same way you bind accent — the library's media-query defaults are
-`:where()` zero-specificity, so your class rules win:
+The library reads the theme two ways. `prefers-color-scheme` is the default, and `data-mc-theme="light"` or
+`data-mc-theme="dark"` on any scope pins that subtree regardless of the OS.
+
+### Tell the charts which theme your app picked
+
+If your app switches theme with a **class**, the charts do not see it. `.dark` on `<html>` is what next-themes,
+fumadocs, and most Tailwind setups write, and it means nothing to a stylesheet that is reading `prefers-color-scheme`.
+A reader on a light OS who picks dark mode gets your dark chrome with light-tuned charts on it, and a reader on a dark
+OS who picks light gets the reverse. Both are legible enough to ship by accident and wrong enough to notice.
+
+Set `data-mc-theme` wherever you set the class, and the two agree:
+
+```tsx
+<html className={theme} data-mc-theme={theme}>
+```
+
+That hands the charts the shipped dark bundle, hand-tuned token by token. If you'd rather paint them from your own
+palette, rebind the tokens under your class instead. The library's defaults are `:where()` zero specificity, so your
+class rules win:
 
 ```css
 :root {
@@ -476,9 +532,13 @@ query, rebind the tokens under that class the same way you bind accent — the l
   --mc-positive: #45a385;
   --mc-negative: #df7856;
   --mc-accent: var(--brand);
-  /* …or data-mc-theme="dark" on a scope, if you prefer the shipped dark bundle */
 }
 ```
+
+Rebinding by hand means rebinding `--mc-on-fill` too. It is the ink that reads on a saturated fill, it flips between
+themes, and it is the one nobody restates: leave it on the dark branch under a light palette and the in-fill labels on
+TraceFold, TimeInRange, and PartitionStrip drop to around 3.3:1 while every other token on the page is correct.
+`data-mc-theme` carries it for you.
 
 ### Frosted or translucent surfaces
 

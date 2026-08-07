@@ -82,6 +82,8 @@ export interface CohortTriangleGeometryOptions {
   labels?: boolean | undefined;
   /** Cohort label to ring (equal-maturity comparison focus). */
   highlight?: string | undefined;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }
 
 // A share may arrive as 0–1 or 0–100; a max over 1.001 means percent input.
@@ -117,7 +119,7 @@ export function cohortTriangleGeometry(
   const nRows = rows.length;
   const scale = detectScale(rows);
 
-  const fontSize = labelFont(cell, 0.6);
+  const fontSize = labelFont(cell, 0.6, opts.labelSize);
   // labels seat only when the row is tall enough to hold the floor font; the
   // gutter is then sized to the widest label, deterministically.
   const showLabels = opts.labels === true && nRows > 0 && cell >= fontSize + 0.8;

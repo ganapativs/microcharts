@@ -18,6 +18,12 @@ export const entry: ChartEntry = {
   dataShape: "{ direction, magnitude }",
   encoding: { channel: "shaft angle + quantized barb count", precision: "medium" },
   nodeBudget: "≤ 3",
+  maxWidth: 130,
+  maxHeight: 130,
+  gotchas: [
+    "A negative magnitude renders as its absolute value with the direction flipped 180°.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["wind / current direction + strength", "traffic flow, net migration, request routing"],
   avoidFor: ["exact magnitude (label it)", "a time series (Sparkline)"],
   props: [

@@ -32,6 +32,11 @@ export const entry: ChartEntry = {
     precision: "high for rate, low-deliberate for volume",
   },
   nodeBudget: "1 per bar + ≤ 5",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a conversion / error rate with its denominator",
     "a KPI card where the rate is the headline",

@@ -20,6 +20,12 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number }",
   encoding: { channel: "pulse rate + amplitude (static: ring offset) by level", precision: "low" },
   nodeBudget: "3",
+  maxWidth: 70,
+  maxHeight: 70,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "an ambient 'how strained is it right now' read",
     "a live status dot in a header or KPI card",

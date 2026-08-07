@@ -18,6 +18,9 @@ export const entry: ChartEntry = {
   dataShape: "number[] + period: number",
   encoding: { channel: "slot-mean spine + within-slot micro-trend", precision: "medium" },
   nodeBudget: "2 per slot + 2 (cap 12)",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: ["A `period` outside 4–12 stops the cycle read working."],
   bestFor: [
     "a KPI card — the week (or month) has a shape",
     "weekday traffic, hourly load, monthly sales seasonality",

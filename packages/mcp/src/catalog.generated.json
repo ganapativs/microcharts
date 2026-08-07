@@ -167,6 +167,12 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 340,
+      "maxHeight": 100,
+      "gotchas": [
+        "Series longer than `maxPoints` (default 200) decimate to an index-preserving min/max envelope. Spikes and gaps survive, and the summary and dots still read the raw data.",
+        "`label=\"minmax\"` needs about 28 units of height; below that the labels are omitted and the summary carries the range."
+      ],
       "bestFor": [
         "inline trend",
         "table-cell trend",
@@ -263,6 +269,8 @@
         "precision": "high"
       },
       "nodeBudget": "1 per bar",
+      "maxWidth": 340,
+      "maxHeight": 100,
       "bestFor": [
         "discrete magnitudes",
         "win–loss streaks",
@@ -361,6 +369,10 @@
         "precision": "high — it is the number"
       },
       "nodeBudget": "2 (glyph + value, HTML)",
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "Renders inline HTML rather than an `<svg>`: it takes no `width`/`height`, inherits the surrounding font size, and owns its own baseline, so it needs no `mc-inline` wrapper."
+      ],
       "bestFor": [
         "KPI change",
         "period-over-period %",
@@ -432,6 +444,13 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 70,
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "Its only interaction callback is `onSelect`.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "progress to goal",
         "SLA / budget vs target",
@@ -513,6 +532,10 @@
         "precision": "low — steer to SparkBar when exact comparison matters"
       },
       "nodeBudget": "1 per cell",
+      "gotchas": [
+        "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+        "`anchor` dates the grid; without it the cells carry positions rather than dates."
+      ],
       "bestFor": [
         "daily activity",
         "streaks and cadence",
@@ -651,6 +674,10 @@
         "precision": "low — use Delta when the magnitude matters"
       },
       "nodeBudget": "≤ 2 (glyph + optional value)",
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "One fixed intrinsic box: size it with CSS, not `width`/`height`."
+      ],
       "bestFor": [
         "table direction columns",
         "dense dashboards",
@@ -718,6 +745,10 @@
         "precision": "n/a — categorical"
       },
       "nodeBudget": "≤ 2 (mark + optional pulse halo)",
+      "gotchas": [
+        "One fixed intrinsic box: size it with CSS, not `width`/`height`.",
+        "An unrecognized `status` renders the \"off\" glyph."
+      ],
       "bestFor": [
         "service lists",
         "inline state in a sentence",
@@ -778,6 +809,10 @@
         "precision": "low — use MiniBar/DotPlot for precise comparison"
       },
       "nodeBudget": "≤ 2 (cell + optional value label)",
+      "gotchas": [
+        "One fixed intrinsic box: size it with CSS, not `width`/`height`.",
+        "A zero-width `domain` renders the single mid step."
+      ],
       "bestFor": [
         "table-cell matrices",
         "calendar-like grids you lay out yourself",
@@ -847,6 +882,12 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 4 continuous · ≤ 3 + segments",
+      "maxWidth": 200,
+      "maxHeight": 40,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "KPI cards",
         "table completion columns",
@@ -911,6 +952,11 @@
         "precision": "high per observation, medium for density"
       },
       "nodeBudget": "≤ 4 (opacity-tiered tick paths + markValue)",
+      "maxWidth": 240,
+      "maxHeight": 40,
+      "gotchas": [
+        "The default box follows `orientation`: 60×10 horizontal, 10×60 vertical."
+      ],
       "bestFor": [
         "\"you are here\" in a band",
         "distribution beside a stat",
@@ -991,6 +1037,11 @@
         "precision": "high"
       },
       "nodeBudget": "1 per bar (≤ 8 documented)",
+      "maxWidth": 200,
+      "maxHeight": 70,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "per-row category mix in tables",
         "small comparisons in cards"
@@ -1077,6 +1128,11 @@
         "precision": "high — it is the number"
       },
       "nodeBudget": "1 per unit (total ≤ 20 documented)",
+      "maxWidth": 240,
+      "maxHeight": 50,
+      "gotchas": [
+        "Past 20 units counting fails; use Progress (documented cap)."
+      ],
       "bestFor": [
         "seats and slots in a sentence",
         "ratings",
@@ -1142,6 +1198,8 @@
         "precision": "medium — Sparkline for levels, EventTimeline for labeled events"
       },
       "nodeBudget": "≤ 2 typical (tick path; +1 flag path, +1 signed midline)",
+      "maxWidth": 260,
+      "maxHeight": 70,
       "bestFor": [
         "error bursts per service",
         "alert density",
@@ -1239,6 +1297,8 @@
         "precision": "low — Sparkline when shape matters"
       },
       "nodeBudget": "1 per cell (≤ 60 documented)",
+      "maxWidth": 260,
+      "maxHeight": 40,
       "bestFor": [
         "per-tenant load rows",
         "intensity ribbons in tables",
@@ -1322,6 +1382,12 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 2 per row + text (rows ≤ 7)",
+      "maxWidth": 240,
+      "maxHeight": 110,
+      "gotchas": [
+        "Past 7 rows the rows blur; the component dev-warns past the cap.",
+        "Height is derived from the row count when you pass none."
+      ],
       "bestFor": [
         "KPI leaderboards",
         "named comparisons in cards",
@@ -1401,6 +1467,13 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 3 per row (rows ≤ 5)",
+      "maxWidth": 240,
+      "maxHeight": 100,
+      "gotchas": [
+        "Past 5 rows the comparison blurs; the component dev-warns past the cap.",
+        "Height is derived from the row count when you pass none.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "salary bands",
         "before/after per row",
@@ -1464,6 +1537,12 @@
         "precision": "high"
       },
       "nodeBudget": "2 per pair (pairs ≤ 5)",
+      "maxWidth": 240,
+      "maxHeight": 80,
+      "gotchas": [
+        "Past 5 pairs the grouped read blurs; the component dev-warns past the cap.",
+        "Every `ref` missing means MiniBar is the chart, and the component says so."
+      ],
       "bestFor": [
         "budget vs actual per region",
         "target vs result rows"
@@ -1548,6 +1627,11 @@
         "precision": "medium-high"
       },
       "nodeBudget": "≤ 3 per category (≤ 7)",
+      "maxWidth": 200,
+      "maxHeight": 160,
+      "gotchas": [
+        "Past 7 categories the crossings tangle (documented cap)."
+      ],
       "bestFor": [
         "before/after experiments",
         "rank shuffles",
@@ -1632,6 +1716,11 @@
         "precision": "high"
       },
       "nodeBudget": "1 per point (≤ 60)",
+      "maxWidth": 220,
+      "maxHeight": 140,
+      "gotchas": [
+        "Past 60 points overplot wins; bin the data instead (documented cap)."
+      ],
       "bestFor": [
         "correlation in a sentence",
         "two-metric relationships in cards"
@@ -1798,6 +1887,11 @@
         "precision": "medium-high"
       },
       "nodeBudget": "≤ 6 + labels",
+      "maxWidth": 260,
+      "maxHeight": 40,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "traffic mix per row",
         "composition in cards"
@@ -1882,6 +1976,11 @@
         "precision": "medium (bin-level)"
       },
       "nodeBudget": "1 per bin (≤ 12)",
+      "maxWidth": 260,
+      "maxHeight": 70,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      ],
       "bestFor": [
         "latency clusters in a sentence",
         "distributions per row"
@@ -2072,6 +2171,11 @@
         "precision": "high for the five numbers"
       },
       "nodeBudget": "≤ 4 (+ ≤ 3 outlier dots/side in tukey)",
+      "maxWidth": 260,
+      "maxHeight": 60,
+      "gotchas": [
+        "Non-monotonic stats are refused rather than drawn as a plausible-looking lie."
+      ],
       "bestFor": [
         "latency percentile rows",
         "spread beside a stat"
@@ -2136,6 +2240,11 @@
         "precision": "medium — Progress when the % must read precisely"
       },
       "nodeBudget": "≤ 3",
+      "maxWidth": 100,
+      "maxHeight": 100,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      ],
       "bestFor": [
         "tab headers",
         "KPI card corners",
@@ -2206,6 +2315,12 @@
         "precision": "LOW — SegmentedBar for any comparative read"
       },
       "nodeBudget": "≤ 5 (4 wedges + Other)",
+      "maxWidth": 100,
+      "maxHeight": 100,
+      "gotchas": [
+        "Negative values are excluded — a composition cannot contain negative parts.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "mix icon beside a printed number",
         "KPI card corners"
@@ -2302,6 +2417,12 @@
         "precision": "high (rects, no trapezoid interpolation)"
       },
       "nodeBudget": "2/stage − 1 (≤ 6 stages)",
+      "maxWidth": 260,
+      "maxHeight": 80,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "Past 6 stages the drops blur; the component dev-warns past the cap."
+      ],
       "bestFor": [
         "per-campaign funnels in tables",
         "conversion in cards"
@@ -2382,6 +2503,13 @@
         "precision": "medium — MiniBar for exact per-level values"
       },
       "nodeBudget": "≤ 10 (≤ 7 segments + hairline + 2 labels)",
+      "maxWidth": 260,
+      "maxHeight": 60,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "7 levels is the legibility bar; more are rejected.",
+        "Negative counts are treated as 0."
+      ],
       "bestFor": [
         "survey question rows (SparkGroup shared scale)",
         "sentiment in cards"
@@ -2454,6 +2582,12 @@
         "precision": "medium — label='delta' or the interactive readout for exact steps"
       },
       "nodeBudget": "≤ 15 (≤ 7 step rects + connectors + total bar)",
+      "maxWidth": 280,
+      "maxHeight": 80,
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "P&L bridges in table cells",
         "net-change decomposition in KPI cards"
@@ -2539,6 +2673,13 @@
         "precision": "medium — end labels give the exact ranks; steps are ordinal"
       },
       "nodeBudget": "≤ 10 (1 path + change dots + 2 end labels)",
+      "maxWidth": 260,
+      "maxHeight": 70,
+      "gotchas": [
+        "Ranks are 1-based ordinals: non-integers round, and values below 1 are dropped.",
+        "A rank past `maxRank` is clamped to the bottom band.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "leaderboard rows",
         "category-rank trends in KPI cards"
@@ -2609,6 +2750,12 @@
         "precision": "medium — the gap between the lines is the read; hover for exact pairs"
       },
       "nodeBudget": "≤ 8 (2 paths + band + endpoint dots + label)",
+      "maxWidth": 260,
+      "maxHeight": 70,
+      "gotchas": [
+        "A `compare` series that is all null means Sparkline is the chart.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "metric-vs-benchmark in table cells",
         "actual-vs-plan in KPI cards"
@@ -2711,6 +2858,13 @@
         "precision": "low — thickness reads approximately; hover for exact shares"
       },
       "nodeBudget": "≤ 7 (≤ 3 area paths + labels)",
+      "maxWidth": 260,
+      "maxHeight": 70,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "Three series is a hard cap — the thickness read degrades past it.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "traffic/revenue mix in KPI cards",
         "share-shift stories in sentences"
@@ -2838,6 +2992,12 @@
         "precision": "medium — hover announces the exact four prices"
       },
       "nodeBudget": "≤ 40 (~2 nodes per candle, ≤ 20 periods)",
+      "maxWidth": 320,
+      "maxHeight": 70,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "watchlist table rows",
         "ticker KPI cards"
@@ -3016,6 +3176,8 @@
         "precision": "low — a density read; Sparkline when exact shape matters"
       },
       "nodeBudget": "≤ 6 (≤ 3 fold paths per direction)",
+      "maxWidth": 320,
+      "maxHeight": 60,
       "bestFor": [
         "dense monitoring rows (dozens stacked)",
         "wide-range series in tight cells"
@@ -3098,6 +3260,11 @@
         "precision": "low per day, high for rhythm — ActivityGrid for longer histories"
       },
       "nodeBudget": "≤ 56 (1 per day, weeks ≤ 8 documented cap)",
+      "gotchas": [
+        "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+        "`end` defaults to the current date, which differs between the server render and the client one — pass it explicitly under SSR.",
+        "Past 8 weeks use ActivityGrid (documented cap)."
+      ],
       "bestFor": [
         "habit/deploy cadence in KPI cards",
         "week-aligned recent activity"
@@ -3260,6 +3427,15 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 14 (1 per item + track + now tick, ≤ 12 items documented)",
+      "maxWidth": 320,
+      "maxHeight": 50,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "One track by design. Items share a single row and there are no lanes — render one chart per service and fix `domain` across them for small multiples.",
+        "Geometry caps the marks: the span bar stops at 6 viewBox units, the point diamond at 2.5, and the track inset at 2. Height past the authored maximum becomes whitespace.",
+        "Items entirely outside `domain` are excluded, reversed spans are dropped, and a zero-duration span renders as a point event.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "per-service uptime rows",
         "on-call shifts and release windows in cards"
@@ -3355,6 +3531,12 @@
         "precision": "high — binary presence per slot"
       },
       "nodeBudget": "1 per cell (≤ 120 documented)",
+      "maxWidth": 320,
+      "maxHeight": 40,
+      "gotchas": [
+        "Slots cap at 120; a longer series is truncated.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "data-quality cells beside a metric",
         "sensor uptime rows",
@@ -3442,6 +3624,11 @@
         "precision": "high — percentile stated"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 50,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a value against its cohort",
         "per-row peer comparison in tables",
@@ -3560,6 +3747,12 @@
         "precision": "high — point estimates per percentile"
       },
       "nodeBudget": "≤ 8",
+      "maxWidth": 320,
+      "maxHeight": 50,
+      "gotchas": [
+        "`data` is a raw sample; the component derives the quantiles.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "latency SLOs in a sentence",
         "tail per endpoint in tables",
@@ -3829,6 +4022,11 @@
         "precision": "medium — interval read"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 50,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a forecast with its uncertainty",
         "estimate-vs-actual in a KPI card",
@@ -4055,6 +4253,12 @@
         "precision": "high — unit-countable"
       },
       "nodeBudget": "1 per unit + label",
+      "maxWidth": 560,
+      "maxHeight": 120,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "`total={100}` needs at least 40×40 units, below which the unit size falls under the crispness floor."
+      ],
       "bestFor": [
         "risk in a sentence",
         "uptake / adoption rates",
@@ -4120,6 +4324,11 @@
         "precision": "high for rate, low-deliberate for volume"
       },
       "nodeBudget": "1 per bar + ≤ 5",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a conversion / error rate with its denominator",
         "a KPI card where the rate is the headline",
@@ -4230,6 +4439,11 @@
         "precision": "medium — the net line restores the precise decision value"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "cash flow per account row",
         "user in/out (signups vs churn) in a KPI card",
@@ -4343,6 +4557,11 @@
         "precision": "high — the full range is the honest frame for a share"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a cohort retention curve in a KPI card",
         "your decay vs an industry benchmark",
@@ -4433,6 +4652,11 @@
         "precision": "high for history, low-deliberate for the dotted projection"
       },
       "nodeBudget": "≤ 7",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a sprint burndown in a tab header",
         "will-we-finish in a KPI card",
@@ -4525,6 +4749,11 @@
         "precision": "high — position against the pace that exactly spends the window"
       },
       "nodeBudget": "≤ 8",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "an SLO error budget in a KPI card",
         "a service list where each row is a budget",
@@ -4603,6 +4832,8 @@
         "precision": "high — the σ̂ estimator is the moving-range one, stated"
       },
       "nodeBudget": "≤ 6 + 1 per violation",
+      "maxWidth": 320,
+      "maxHeight": 70,
       "bestFor": [
         "a production line / metric in a table cell",
         "an SPC control chart in a KPI card",
@@ -4698,6 +4929,11 @@
         "precision": "medium — the widening itself is the message"
       },
       "nodeBudget": "≤ 8",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a \"will we hit Q4?\" forecast in a KPI card",
         "a projection with honest uncertainty in a sentence",
@@ -4815,6 +5051,12 @@
         "precision": "high for the count, medium for shape"
       },
       "nodeBudget": "1 per dot + 3",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "`data` is a raw sample or a set of posterior draws; the component bins it into dots.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a \"will we miss the SLA?\" read in a sentence",
         "odds you can count in a KPI card",
@@ -5075,6 +5317,11 @@
         "precision": "medium — interval read; the delta label restores a number"
       },
       "nodeBudget": "≤ 10",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "an A/B experiment result in a KPI card",
         "control vs test in an experiments table",
@@ -5299,6 +5546,11 @@
         "precision": "medium — shape read; the shift label is the takeaway"
       },
       "nodeBudget": "2 per bin + 4",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a \"the fix, proven\" read in a KPI card",
         "before/after distributions in an experiments table",
@@ -5568,6 +5820,11 @@
         "precision": "high"
       },
       "nodeBudget": "1 per bar + 4",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a \"fix these three\" read in a KPI card",
         "incident causes or support tags in a tab header",
@@ -5677,6 +5934,11 @@
         "precision": "high"
       },
       "nodeBudget": "2 per row + 2",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled."
+      ],
       "bestFor": [
         "a table cell per dataset version",
         "a KPI card for a sync or import job",
@@ -5778,6 +6040,8 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 5 + 1 per ghost (cap 30)",
+      "maxWidth": 120,
+      "maxHeight": 120,
       "bestFor": [
         "a table cell per initiative — the classic prioritization 2×2",
         "an effort vs impact read in a KPI card",
@@ -5923,6 +6187,11 @@
         "precision": "medium"
       },
       "nodeBudget": "2 per slot + 2 (cap 12)",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "A `period` outside 4–12 stops the cycle read working."
+      ],
       "bestFor": [
         "a KPI card — the week (or month) has a shape",
         "weekday traffic, hourly load, monthly sales seasonality",
@@ -6053,6 +6322,12 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 6 + 3 per break",
+      "maxWidth": 320,
+      "maxHeight": 70,
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "context for an anomaly — a spike means nothing without the regime it broke",
         "error rate / latency / cost that stepped to a new level",
@@ -6153,6 +6428,11 @@
         "precision": "low"
       },
       "nodeBudget": "≤ 14 at cap",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a KPI card — the futures, not the average",
         "Monte-Carlo / simulation output where paths disagree in shape",
@@ -6509,6 +6789,9 @@
         "precision": "high"
       },
       "nodeBudget": "2 (strokes + overflow numeral)",
+      "gotchas": [
+        "Width is derived from the count; only `height` is yours to set."
+      ],
       "bestFor": [
         "a small running count in a sentence or cell",
         "a live event or score counter",
@@ -6571,6 +6854,11 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 7 (face + 6 pips)",
+      "maxWidth": 70,
+      "maxHeight": 70,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "severity or rating 0–6 in a cell",
         "an at-a-glance small count in a sentence",
@@ -6625,6 +6913,9 @@
         "precision": "medium"
       },
       "nodeBudget": "2 (+1 numeral)",
+      "gotchas": [
+        "One fixed intrinsic box: size it with CSS, not `width`/`height`."
+      ],
       "bestFor": [
         "a labelled progress read in a sentence or cell",
         "a sync / upload status where the label names the task",
@@ -6692,6 +6983,9 @@
         "precision": "high"
       },
       "nodeBudget": "1 (value) / ≤ len (digit)",
+      "gotchas": [
+        "One fixed intrinsic box: size it with CSS, not `width`/`height`."
+      ],
       "bestFor": [
         "a dense numeric table column you scan for the big ones",
         "a KPI number that should carry its own magnitude",
@@ -6762,6 +7056,11 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 200,
+      "maxHeight": 200,
+      "gotchas": [
+        "The default box follows `orientation`: 48×16 horizontal, 16×48 vertical."
+      ],
       "bestFor": [
         "a fundraising or goal progress read",
         "a capacity or utilization gauge in a cell",
@@ -6842,6 +7141,8 @@
         "precision": "medium"
       },
       "nodeBudget": "3",
+      "maxWidth": 70,
+      "maxHeight": 70,
       "bestFor": [
         "sprint or quota progress in a sentence",
         "a billing-period or release-cycle marker",
@@ -6897,6 +7198,11 @@
         "precision": "medium"
       },
       "nodeBudget": "4",
+      "maxWidth": 70,
+      "maxHeight": 100,
+      "gotchas": [
+        "Width tracks height when you pass none, so the instrument keeps its proportion."
+      ],
       "bestFor": [
         "a deadline or session-expiry read in a sentence",
         "a TTL cell where remaining is the story",
@@ -6956,6 +7262,11 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 200,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a buy vs sell or in vs out read in a sentence",
         "a pro vs con weight in a KPI card",
@@ -7029,6 +7340,10 @@
         "precision": "high"
       },
       "nodeBudget": "n + 1 (+ n labels)",
+      "gotchas": [
+        "Width is derived from the item count; only `height` is yours to set.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "account or project maturity across a small set",
         "a health column in a portfolio table",
@@ -7119,6 +7434,10 @@
         "precision": "medium"
       },
       "nodeBudget": "1 per cell (cap 400)",
+      "gotchas": [
+        "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+        "Over 400 cells the component dev-warns — downsample upstream."
+      ],
       "bestFor": [
         "a contribution or activity rhythm you print or read in grayscale",
         "a per-repo or per-team activity strip",
@@ -7218,6 +7537,9 @@
         "precision": "low — for precise comparison, use MiniBar"
       },
       "nodeBudget": "2 per bubble (n ≤ 8)",
+      "gotchas": [
+        "Width is derived from the item count; only `height` is yours to set."
+      ],
       "bestFor": [
         "a few magnitudes with physical presence in a sentence",
         "a market-size or segment impression in a KPI card",
@@ -7300,6 +7622,8 @@
         "precision": "medium"
       },
       "nodeBudget": "n + 2 (n ≤ 16)",
+      "maxWidth": 240,
+      "maxHeight": 120,
       "bestFor": [
         "a weekly-rhythm read in a sentence",
         "the shape of a sprint or short series in a cell",
@@ -7368,6 +7692,11 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 4 (merged ring path + highlighted ring + centre dot + label)",
+      "maxWidth": 100,
+      "maxHeight": 100,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "account or company age at a glance",
         "a cohort-age marker in a table cell",
@@ -7462,6 +7791,10 @@
         "precision": "high height / low lit"
       },
       "nodeBudget": "2 per building + 1 (n ≤ 8)",
+      "gotchas": [
+        "Width is derived from the bar count and `gap`; there is no `width` prop.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "team or region size plus an activation read",
         "an org KPI where two variables are the story",
@@ -7572,6 +7905,12 @@
         "precision": "high"
       },
       "nodeBudget": "2",
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "Over 60 cells stops being countable; use Progress (documented cap).",
+        "Sized by `cell`, not `width`/`height` — the box follows from the cell count.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "seats or licenses taken of a capacity",
         "an occupancy read in a KPI card",
@@ -7651,6 +7990,11 @@
         "precision": "medium"
       },
       "nodeBudget": "n+1",
+      "maxWidth": 240,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "sparse incidents or outages on a timeline",
         "milestones with a magnitude (severity, size)",
@@ -7749,6 +8093,11 @@
         "precision": "medium"
       },
       "nodeBudget": "4",
+      "maxWidth": 120,
+      "maxHeight": 120,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "the shape of a 24-hour or 7-day cycle",
         "when a metric is busy across the cycle",
@@ -7864,6 +8213,8 @@
         "precision": "low"
       },
       "nodeBudget": "≤ 6 (merged month-tick path + ≤ 5 step paths)",
+      "maxWidth": 130,
+      "maxHeight": 130,
       "bestFor": [
         "the seasonal shape of a year at a glance",
         "spotting a busy season or a quiet stretch",
@@ -7996,6 +8347,12 @@
         "precision": "low"
       },
       "nodeBudget": "3",
+      "maxWidth": 70,
+      "maxHeight": 70,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "an ambient 'how strained is it right now' read",
         "a live status dot in a header or KPI card",
@@ -8063,6 +8420,11 @@
         "precision": "medium"
       },
       "nodeBudget": "3",
+      "maxWidth": 240,
+      "maxHeight": 70,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "at-a-glance liveness of a service or stream",
         "request or event rate in a header",
@@ -8137,6 +8499,12 @@
         "precision": "medium"
       },
       "nodeBudget": "trail + 2",
+      "maxWidth": 240,
+      "maxHeight": 70,
+      "gotchas": [
+        "`trail` caps at 20 dots (default 12); a longer stream keeps the newest.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a live price or metric with a little recency context",
         "a realtime KPI that should show momentum",
@@ -8212,6 +8580,11 @@
         "precision": "low"
       },
       "nodeBudget": "3",
+      "maxWidth": 120,
+      "maxHeight": 120,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a live dependency health dot in a service table",
         "latency + rate together in one small mark",
@@ -8304,6 +8677,11 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 5 rects + ≤ 3 labels",
+      "maxWidth": 320,
+      "maxHeight": 120,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "SLO / uptime corridors",
         "glucose-style time-in-range KPI"
@@ -8359,6 +8737,12 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 3 paths",
+      "maxWidth": 560,
+      "maxHeight": 70,
+      "gotchas": [
+        "States outside `states` are appended rather than dropped, so an unlisted state still renders.",
+        "Height is derived from the state count when you pass none."
+      ],
       "bestFor": [
         "sleep stages",
         "deploy / machine / incident state over time"
@@ -8482,6 +8866,11 @@
         "precision": "high / medium"
       },
       "nodeBudget": "≤ 4",
+      "maxWidth": 320,
+      "maxHeight": 40,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "download / export progress",
         "job-queue ETA"
@@ -8554,6 +8943,11 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 3",
+      "maxWidth": 480,
+      "maxHeight": 100,
+      "gotchas": [
+        "Buckets are `min(⌊width / 2⌋, samples)` and cap at 64, so a wider box buys resolution and a narrower one costs it."
+      ],
       "bestFor": [
         "voice-memo / audio scrubbers",
         "high-frequency log volume"
@@ -8812,6 +9206,11 @@
         "precision": "high / medium"
       },
       "nodeBudget": "1 path per lane, cap 12",
+      "maxWidth": 480,
+      "maxHeight": 60,
+      "gotchas": [
+        "Lanes cap at 12; extra lanes are dropped."
+      ],
       "bestFor": [
         "service events across sources",
         "agent steps / cron / sensor triggers"
@@ -8915,6 +9314,12 @@
         "precision": "high / medium"
       },
       "nodeBudget": "≤ 2 per row, cap 8",
+      "maxWidth": 320,
+      "maxHeight": 40,
+      "gotchas": [
+        "Non-positive weights are treated as an equal split, and scores outside `domain` are clamped.",
+        "Height is derived from the criterion count when you pass none."
+      ],
       "bestFor": [
         "model / code-review scorecards",
         "weighted vendor comparison"
@@ -8988,6 +9393,10 @@
         "precision": "low by design"
       },
       "nodeBudget": "1 span per token (HTML, not SVG)",
+      "gotchas": [
+        "Renders inline HTML rather than an `<svg>`: it takes no `width`/`height` and inherits the surrounding font size.",
+        "Moves real focus through its token spans instead of using the shared picker, so it takes neither `onActive` nor `selectedIndex`."
+      ],
       "bestFor": [
         "LLM answers in chat / transcripts",
         "flagging text to review"
@@ -9080,6 +9489,12 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 3",
+      "maxWidth": 130,
+      "maxHeight": 130,
+      "gotchas": [
+        "A negative magnitude renders as its absolute value with the direction flipped 180°.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "wind / current direction + strength",
         "traffic flow, net migration, request routing"
@@ -9151,6 +9566,13 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 4",
+      "maxWidth": 320,
+      "maxHeight": 320,
+      "gotchas": [
+        "Fewer than 3 metrics reads better as PairedBars or MiniBar.",
+        "Values outside `domain` are clamped.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "entity profiles in small multiples",
         "skill / capability comparison"
@@ -9242,6 +9664,11 @@
         "precision": "high / low"
       },
       "nodeBudget": "≤ 5",
+      "maxWidth": 480,
+      "maxHeight": 70,
+      "gotchas": [
+        "Takes `onWindowChange([lo, hi])` instead of the shared picker callbacks."
+      ],
       "bestFor": [
         "document / log position",
         "long-timeline navigation"
@@ -10518,6 +10945,13 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 400,
+      "maxHeight": 100,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "A fast window at or above the slow window is swapped.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "loudness / LUFS metering",
         "latency SLO or CPU-headroom compliance"
@@ -10646,6 +11080,11 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 4",
+      "maxWidth": 400,
+      "maxHeight": 100,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "order-book depth / liquidity",
         "supply vs demand posture"
@@ -10744,6 +11183,12 @@
         "precision": "high / medium"
       },
       "nodeBudget": "1 per segment, cap 24",
+      "maxWidth": 480,
+      "maxHeight": 100,
+      "gotchas": [
+        "Height is derived from the level count when you pass none.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "bundle / storage / budget composition",
         "two-level breakdowns"
@@ -10840,6 +11285,8 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 4",
+      "maxWidth": 400,
+      "maxHeight": 130,
       "bestFor": [
         "classifier reliability / trust",
         "probability-forecast auditing"
@@ -10954,6 +11401,13 @@
         "precision": "medium"
       },
       "nodeBudget": "k² + k + 2k labels",
+      "maxWidth": 220,
+      "maxHeight": 220,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "`counts` must be a square k×k matrix with k between 2 and 4; anything else is rejected.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "classifier evaluation dashboards",
         "any paired-classification agreement"
@@ -11044,6 +11498,8 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 5",
+      "maxWidth": 480,
+      "maxHeight": 130,
       "bestFor": [
         "typical-day traffic / load profiles",
         "on-call or energy capacity"
@@ -12550,6 +13006,12 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 4",
+      "maxWidth": 200,
+      "maxHeight": 140,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "volume-at-price / level-of-activity",
         "load by tier"
@@ -12650,6 +13112,11 @@
         "precision": "medium"
       },
       "nodeBudget": "≤ 5",
+      "maxWidth": 160,
+      "maxHeight": 130,
+      "gotchas": [
+        "Pass `xLabel` and `yLabel` so the summary can name the axes."
+      ],
       "bestFor": [
         "coupled-signal phase portraits",
         "CPU×latency, inflation×unemployment"
@@ -12888,6 +13355,12 @@
         "precision": "high"
       },
       "nodeBudget": "1 rect per span, cap 40",
+      "maxWidth": 480,
+      "maxHeight": 50,
+      "gotchas": [
+        "Height is derived from the fold count when you pass none.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "request traces / flame charts",
         "p95-exemplar latency breakdowns"
@@ -13003,6 +13476,8 @@
         "precision": "high"
       },
       "nodeBudget": "1 pointer + 1 tick path + ≤4 zone rects",
+      "maxWidth": 190,
+      "maxHeight": 240,
       "bestFor": [
         "a live changing reading (airspeed, throughput, temp)",
         "value + trend + safe/caution band at a glance"
@@ -13098,6 +13573,8 @@
         "precision": "high"
       },
       "nodeBudget": "1 disc + 1 sector + 1 barb + ≤3 numerals",
+      "maxWidth": 200,
+      "maxHeight": 200,
       "bestFor": [
         "a dense weather station model",
         "any multi-field reading that must fit one cell"
@@ -13186,6 +13663,10 @@
         "precision": "low — steer to a table when exact per-cell values matter"
       },
       "nodeBudget": "1 per cell",
+      "gotchas": [
+        "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+        "Caps at 12 cohorts × 12 ages; rows and columns past that are dropped."
+      ],
       "bestFor": [
         "monthly/weekly cohorts side by side",
         "spotting which vintage decays worst",
@@ -13315,6 +13796,8 @@
         "precision": "high"
       },
       "nodeBudget": "1 rect per run, cap 40",
+      "maxWidth": 390,
+      "maxHeight": 100,
       "bestFor": [
         "pass/fail run histories",
         "uptime & incident-free streaks",
@@ -13405,6 +13888,8 @@
         "precision": "medium — a difficulty read; the readout gives the exact grade"
       },
       "nodeBudget": "1 quad per segment + ridge (+ seat-gated summit tick)",
+      "maxWidth": 480,
+      "maxHeight": 160,
       "bestFor": [
         "route / climb profiles (cycling, running, hiking)",
         "where the hard pitches fall"
@@ -13491,6 +13976,13 @@
         "precision": "high"
       },
       "nodeBudget": "≤ 5 + 1 per lead change",
+      "maxWidth": 320,
+      "maxHeight": 70,
+      "gotchas": [
+        "Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: \"always\"`) is dropped rather than doubled.",
+        "Values are win probabilities and are clamped to 0–100.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "live win / election probability where the lead flips",
         "a modelled forecast whose crossings are the story",
@@ -13575,6 +14067,11 @@
         "precision": "high for the depth; the trend glyph is a low-precision direction cue"
       },
       "nodeBudget": "≤ 7",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "a support-queue backlog in a KPI card",
         "a work-in-progress stock vs its WIP limit",
@@ -13638,6 +14135,8 @@
         "precision": "medium — the filled gap is the read; hover for the exact lead"
       },
       "nodeBudget": "≤ 8 (2 band fills + 2 lines + crossing/endpoint dots + label)",
+      "maxWidth": 320,
+      "maxHeight": 80,
       "bestFor": [
         "lead-vs-reference in KPI cards",
         "actual-vs-plan where the flip matters"
@@ -13748,6 +14247,11 @@
         "precision": "high"
       },
       "nodeBudget": "1 per pair (≤ 40) + band + 2 lines",
+      "maxWidth": 230,
+      "maxHeight": 120,
+      "gotchas": [
+        "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      ],
       "bestFor": [
         "method-agreement checks in a cell",
         "instrument drift in a KPI card"
@@ -13886,6 +14390,12 @@
         "precision": "high — rank is the axis, so the population bands are exact by definition"
       },
       "nodeBudget": "≤ 6",
+      "maxWidth": 320,
+      "maxHeight": 80,
+      "gotchas": [
+        "Ranks are 0–100; out-of-range values are clamped.",
+        "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
+      ],
       "bestFor": [
         "one player's or product's rank drifting over time",
         "whether a standing has crossed into the top or bottom of the pack",

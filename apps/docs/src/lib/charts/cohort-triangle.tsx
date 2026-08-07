@@ -27,6 +27,10 @@ export const entry: ChartEntry = {
     precision: "low — steer to a table when exact per-cell values matter",
   },
   nodeBudget: "1 per cell",
+  gotchas: [
+    "Sized by `cell` and `gap`, not `width`/`height` — the box follows from the cell count.",
+    "Caps at 12 cohorts × 12 ages; rows and columns past that are dropped.",
+  ],
   bestFor: [
     "monthly/weekly cohorts side by side",
     "spotting which vintage decays worst",

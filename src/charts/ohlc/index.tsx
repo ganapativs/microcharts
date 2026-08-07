@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import { round2 } from "../../core/types.js";
@@ -61,6 +61,11 @@ export interface OhlcProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: OhlcStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
     format,
     locale,
     strings = EN_OHLC,
+    labelSize,
     title,
     summary,
     id,
@@ -90,8 +96,8 @@ export function Ohlc(props: OhlcProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
-  const fontSize = labelFont(height, 0.4);
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
+  const fontSize = labelFont(height, 0.4, labelSize);
   // The window, the label and the summary all read the same periods the marks
   // do: a price the chart refuses to draw must not appear in the gutter or the
   // accessible name.
@@ -125,7 +131,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

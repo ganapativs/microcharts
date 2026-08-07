@@ -24,13 +24,14 @@ export function biasLayout(
   height: number,
   label: string,
   r: number | undefined,
+  min?: number | undefined,
 ): { rad: number; outlierRad: number; fontSize: number; captionPad: number } {
   // `clamp` is NaN-transparent by design (see core/scale.ts), so an `r` of NaN
   // sailed straight through it and poisoned every cx/cy/r, the band rect, and
   // the `--mc-seat` variable — a chart that paints nothing and unseats itself
   // on the text line. Anything unusable falls back to the documented default.
   const rad = clamp(isFiniteValue(r) ? r : 1.5, 1, 3);
-  const fontSize = labelFont(height, 0.28);
+  const fontSize = labelFont(height, 0.28, min);
   const captionPad = label === "bias" && width >= 40 && height >= 3 * fontSize ? fontSize + 2 : 0;
   return { rad, outlierRad: round2(rad + 0.3), fontSize, captionPad };
 }

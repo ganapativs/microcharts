@@ -24,6 +24,7 @@ export const entry: ChartEntry = {
     precision: "low — for precise comparison, use MiniBar",
   },
   nodeBudget: "2 per bubble (n ≤ 8)",
+  gotchas: ["Width is derived from the item count; only `height` is yours to set."],
   bestFor: [
     "a few magnitudes with physical presence in a sentence",
     "a market-size or segment impression in a KPI card",

@@ -24,6 +24,12 @@ export const entry: ChartEntry = {
     precision: "medium — label='delta' or the interactive readout for exact steps",
   },
   nodeBudget: "≤ 15 (≤ 7 step rects + connectors + total bar)",
+  maxWidth: 280,
+  maxHeight: 80,
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["P&L bridges in table cells", "net-change decomposition in KPI cards"],
   avoidFor: ["unordered category comparison (MiniBar)", "more than ~8 steps"],
   props: [

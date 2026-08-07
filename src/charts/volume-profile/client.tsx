@@ -4,7 +4,7 @@
 // order). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter, makePercentFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, makeUnitFormatter } from "../../core/format.js";
 import {
   CHIP,
   named,
@@ -88,7 +88,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   // real formatter, and the magnitude travels with its share.
   const pctFmt = useMemo(() => makePercentFormatter(locale), [locale]);
   const massFmt = useMemo(
-    () => makeFormatter(undefined, locale, { notation: "compact" }),
+    () => makeUnitFormatter(undefined, locale, { notation: "compact" }),
     [locale],
   );
   // The POC label's gutter narrows every bar, so the client must reserve it on

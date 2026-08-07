@@ -41,6 +41,11 @@ export interface BenchmarkStripProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
     format,
     locale,
     strings = EN_QUANTILE,
+    labelSize,
     title,
     summary,
     id,
@@ -90,7 +96,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   } = props;
 
   // label size in viewBox units (~0.62·height, clamped 7–11) — see coverage-strip
-  const FONT = labelFont(height, 0.62);
+  const FONT = labelFont(height, 0.62, labelSize);
   const fmt = makeFormatter(format, locale);
   // `labelFont` floors at 7 viewBox units, so below a 7-unit box the readout
   // cannot be painted inside the strip at all. It DROPS rather than spilling
@@ -151,7 +157,7 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
   // cramped + low-contrast) — colored like the dot so it stays tied to the focal
   const midY = round2(height / 2);
   // pin the label size to viewBox units (see coverage-strip)
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

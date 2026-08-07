@@ -23,6 +23,10 @@ export const entry: ChartEntry = {
   dataShape: "{ label: string; value: 0 | 1 | 2 | 3 }[]",
   encoding: { channel: "ordinal growth-stage glyph (height monotonic)", precision: "high" },
   nodeBudget: "n + 1 (+ n labels)",
+  gotchas: [
+    "Width is derived from the item count; only `height` is yours to set.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "account or project maturity across a small set",
     "a health column in a portfolio table",

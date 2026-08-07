@@ -57,7 +57,13 @@ export function BubbleRow(props: InteractiveBubbleRowProps): React.ReactNode {
     fontSize,
     band: labelBand,
     charW,
-  } = bubbleLayout({ height: props.height, gap: props.gap, fontSize: props.fontSize, label });
+  } = bubbleLayout({
+    height: props.height,
+    gap: props.gap,
+    fontSize: props.fontSize,
+    labelSize: props.labelSize,
+    label,
+  });
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   const hostRef = useRef<HTMLSpanElement>(null);

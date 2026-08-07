@@ -18,6 +18,11 @@ export const entry: ChartEntry = {
     precision: "medium — Progress when the % must read precisely",
   },
   nodeBudget: "≤ 3",
+  maxWidth: 100,
+  maxHeight: 100,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+  ],
   bestFor: ["tab headers", "KPI card corners", "cooldowns (sweep)"],
   avoidFor: ["precise reads (Progress)", "gauges (never shipped)"],
   props: [

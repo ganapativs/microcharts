@@ -19,6 +19,9 @@ export const entry: ChartEntry = {
   dataShape: "{ x, y }[] (two synchronized signals as one trajectory)",
   encoding: { channel: "x×y trajectory; path order = time", precision: "medium" },
   nodeBudget: "≤ 5",
+  maxWidth: 160,
+  maxHeight: 130,
+  gotchas: ["Pass `xLabel` and `yLabel` so the summary can name the axes."],
   bestFor: ["coupled-signal phase portraits", "CPU×latency, inflation×unemployment"],
   avoidFor: ["exact values (DualSparkline)", "a single series (Sparkline)"],
   props: [

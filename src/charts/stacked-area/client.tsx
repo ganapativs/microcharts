@@ -6,7 +6,7 @@
 // composed (summary={false}, crosshair + pin as its children) so the SVG never
 // drifts.
 import { Fragment, useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import {
@@ -110,7 +110,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
     [width, height, series, domain, usedCurve, rest.label, fontSize],
   );
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
 

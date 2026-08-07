@@ -6,7 +6,13 @@
 import { normalizeShares } from "../../core/stack.js";
 import { clamp, maxOf } from "../../core/scale.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
-import { labelFitsBand, rowLabelChars, rowLabelFont, textGutterProse } from "../../core/labels.js";
+import {
+  labelFitsBand,
+  rowLabelChars,
+  rowLabelFont,
+  ROW_LABEL_FACTOR,
+  textGutterProse,
+} from "../../core/labels.js";
 
 /** Default score domain, shared by both entries (see DEFAULT_PERCENTILES). */
 export const UNIT_DOMAIN: readonly [number, number] = [0, 1];
@@ -125,10 +131,12 @@ export function rubricLabels(opts: {
   width: number;
   height: number;
   show: boolean;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): { fontSize: number; gutter: number; chars: number; y: number[] } {
   const { names, bands, width, height, show } = opts;
   const n = Math.max(1, bands.length);
-  const fontSize = rowLabelFont(height / n);
+  const fontSize = rowLabelFont(height / n, ROW_LABEL_FACTOR, opts.labelSize);
   // Keep every name inside the box even where a row is thinner than the type.
   const y = bands.map((b) =>
     round2(Math.max(fontSize * 0.5, Math.min(height - fontSize * 0.5, b.y + b.height / 2))),

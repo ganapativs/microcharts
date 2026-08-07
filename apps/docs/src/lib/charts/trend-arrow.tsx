@@ -31,6 +31,10 @@ export const entry: ChartEntry = {
     precision: "low — use Delta when the magnitude matters",
   },
   nodeBudget: "≤ 2 (glyph + optional value)",
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+    "One fixed intrinsic box: size it with CSS, not `width`/`height`.",
+  ],
   bestFor: ["table direction columns", "dense dashboards", "inline movement cues"],
   avoidFor: ["exact magnitudes (use Delta)", "series shape (use Sparkline)"],
   props: [

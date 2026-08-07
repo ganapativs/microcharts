@@ -20,6 +20,12 @@ export const entry: ChartEntry = {
   dataShape: "{ label, score, weight? }[]",
   encoding: { channel: "bar length = score, bar thickness = weight", precision: "high / medium" },
   nodeBudget: "≤ 2 per row, cap 8",
+  maxWidth: 320,
+  maxHeight: 40,
+  gotchas: [
+    "Non-positive weights are treated as an equal split, and scores outside `domain` are clamped.",
+    "Height is derived from the criterion count when you pass none.",
+  ],
   bestFor: ["model / code-review scorecards", "weighted vendor comparison"],
   avoidFor: ["one criterion (Bullet)", "parts of a whole (SegmentedBar)"],
   props: [

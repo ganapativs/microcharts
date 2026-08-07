@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { funnelGeometry } from "./geometry.js";
@@ -60,6 +60,11 @@ export interface FunnelProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function Funnel(props: FunnelProps): ReactNode {
     format,
     locale,
     strings = EN_COMPOSITION,
+    labelSize,
     title,
     summary,
     id,
@@ -105,7 +111,7 @@ export function Funnel(props: FunnelProps): ReactNode {
   });
   const { fontSize } = geo;
   const fmt = makeFormatter(format, locale);
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => funnelSummary(data, fmt, pctFmt, strings));
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
@@ -113,7 +119,7 @@ export function Funnel(props: FunnelProps): ReactNode {
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
   const rootStyle =
-    fontSize > 0 ? { ...style, "--mc-label-size": `${fontSize}px` } : (style as CSSProperties);
+    fontSize > 0 ? { ...style, "--mc-label-px": `${fontSize}px` } : (style as CSSProperties);
   const slatPath = geo.slats.map((s) => s.d).join("");
 
   return (

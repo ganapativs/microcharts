@@ -55,6 +55,11 @@ export interface PercentileTraceProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PercentileTraceStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -73,9 +78,9 @@ export const INT: Intl.NumberFormatOptions = { maximumFractionDigits: 0 };
  * total the static drew with; scaling by bare `width` walks the crosshair
  * progressively rightward and puts the last readings out of reach.
  */
-export const percentileGutter = (labelText: string, height: number): number =>
-  labelText && percentileLabelFits(height)
-    ? Math.ceil(labelText.length * labelFont(height) * 0.72) + 4
+export const percentileGutter = (labelText: string, height: number, min?: number): number =>
+  labelText && percentileLabelFits(height, min)
+    ? Math.ceil(labelText.length * labelFont(height, 0.55, min) * 0.72) + 4
     : 0;
 
 /**
@@ -87,8 +92,8 @@ export const percentileGutter = (labelText: string, height: number): number =>
  * gutter is: both entries must reach the same answer. Pure arithmetic — the
  * static path may never measure text.
  */
-export const percentileLabelFits = (height: number): boolean =>
-  labelFitsY(height / 2, labelFont(height), height);
+export const percentileLabelFits = (height: number, min?: number): boolean =>
+  labelFitsY(height / 2, labelFont(height, 0.55, min), height);
 
 export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const {
@@ -103,6 +108,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
     format = INT,
     locale,
     strings = EN_PERCENTILE_TRACE,
+    labelSize,
     title,
     summary,
     id,
@@ -112,12 +118,12 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   } = props;
 
   // Everything below reads the RESOLVED box, never the prop: `height={NaN}`
-  // set `--mc-label-size: NaNpx` and a NaN seat on a 1×1 frame, and geometry
+  // set `--mc-label-px: NaNpx` and a NaN seat on a 1×1 frame, and geometry
   // laid the trace out against the raw prop while `Chart` clamped the viewBox.
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   const pStr = (n: number) => strings.percentileValue(fmt(n));
   const cls = className ? `mc-percentile-trace ${className}` : "mc-percentile-trace";
@@ -152,9 +158,9 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
     devWarn("<PercentileTrace>: ranks are 0–100; out-of-range clamped.");
   }
 
-  const showLabel = label === "last" && percentileLabelFits(height);
+  const showLabel = label === "last" && percentileLabelFits(height, labelSize);
   const labelText = showLabel ? pStr(geo.last.value) : "";
-  const gutter = percentileGutter(labelText, height);
+  const gutter = percentileGutter(labelText, height, labelSize);
 
   const lineColor = color ?? "var(--mc-accent)";
   // Endpoint valence: rising standing is good by default; the line already
@@ -205,7 +211,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
       // population bands ride inside that frame and never move it.
       seat={{ mode: "floor", bottom: geo.y1 }}
       className={cls}
-      style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${FONT}px` } as CSSProperties}
     >
       {ann.under}
       {showBands

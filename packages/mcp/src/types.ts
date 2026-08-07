@@ -26,6 +26,16 @@ export interface ChartEntry {
   dataShape: string;
   encoding: { channel: string; precision: string };
   nodeBudget: string;
+  /**
+   * Authored maximum box, viewBox units — the largest `width`/`height` the chart
+   * is drawn at. Past it the geometry stops scaling and the extra box is
+   * whitespace; scale with CSS instead. Absent together on the charts sized by
+   * `cell`, by their content, or by CSS, and those say so in `gotchas`.
+   */
+  maxWidth?: number;
+  maxHeight?: number;
+  /** Caps, derived inputs, and sizing knobs no prop description carries. */
+  gotchas?: string[];
   bestFor: string[];
   avoidFor: string[];
   props: ChartProp[];

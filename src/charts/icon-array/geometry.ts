@@ -84,11 +84,13 @@ export function iconArrayLabelPlan(opts: {
   total: IconArrayN;
   width: number;
   height: number;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): IconArrayLabelPlan {
   const { label, total, width, height } = opts;
   // label a touch smaller than the strips so the countable grid stays the hero
   // (~0.5·height, clamped 7–10) — see coverage-strip
-  const font = labelFont(height, 0.5);
+  const font = labelFont(height, 0.5, opts.labelSize);
   const wantCh = label === "ratio" ? 2 * `${total}`.length + 5 : label === "percent" ? 5 : 0;
   if (wantCh === 0) return { font, gutterCh: 0, show: false };
   // The label lives in a gutter carved OUT of the width. On a narrow box that

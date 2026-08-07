@@ -21,6 +21,12 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value, ref }[]",
   encoding: { channel: "adjacent bar lengths, zero-anchored", precision: "high" },
   nodeBudget: "2 per pair (pairs ≤ 5)",
+  maxWidth: 240,
+  maxHeight: 80,
+  gotchas: [
+    "Past 5 pairs the grouped read blurs; the component dev-warns past the cap.",
+    "Every `ref` missing means MiniBar is the chart, and the component says so.",
+  ],
   bestFor: ["budget vs actual per region", "target vs result rows"],
   avoidFor: ["no reference series (MiniBar)", "> 5 pairs"],
   props: [

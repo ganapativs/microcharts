@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
+import { makePercentFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
 import { EN_CONFUSION, type ConfusionStrings } from "../../core/strings-confusion.js";
 import { round2 } from "../../core/types.js";
 import { confusionGridGeometry } from "./geometry.js";
@@ -33,6 +33,11 @@ export interface ConfusionGridProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ConfusionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -88,6 +93,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
     format,
     locale,
     strings = EN_CONFUSION,
+    labelSize,
     title,
     summary,
     id,
@@ -105,13 +111,13 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
   const kk = Math.max(2, Math.min(4, k));
 
   const size = props.size ?? 54 + (kk - 2) * 8;
-  const fontSize = labelFont(size, 0.16);
+  const fontSize = labelFont(size, 0.16, labelSize);
   const gutterCh = fontSize + 1;
   // Percent formatting goes through the shared cached formatter (never a
   // hand-rolled Math.round), so `format`/`locale` reach the one number this
   // chart renders. The gutter is measured off the produced string, so a
   // locale that widens it (e.g. a non-breaking space before "%") still fits.
-  const accFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const accFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accLabel = label === "accuracy" ? accFmt(confGeoAccuracy(counts, kk)) : undefined;
   const rightGutter = accLabel ? accLabel.length * fontSize * 0.62 + 2 : 0;
 
@@ -136,7 +142,7 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
       // gutter off the line. The block itself is symmetric with no floor.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-confusion ${className}` : "mc-confusion"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* flat siblings, plain attributes — the k² cell list + axis labels are
           this chart's SSR hot path (bench floor); no per-cell <g> wrappers */}

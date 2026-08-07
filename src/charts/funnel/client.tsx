@@ -3,7 +3,7 @@
 // stage-by-x-band lookup, ←/→ rove stages ("Checkout: 2,730 — 22% of visitors.").
 // click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -79,7 +79,7 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
 

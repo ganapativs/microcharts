@@ -8,6 +8,7 @@ import { round2, isFiniteValue } from "../../core/types.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import type { WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
 import { textGutter } from "../../core/labels.js";
+import { unsigned } from "../../core/format.js";
 
 /** Symmetric inset (viewBox units) — the plot never touches the frame edge. */
 export const PAD = 2;
@@ -43,8 +44,10 @@ export const wormCustomPct =
     const s = fmt(fraction * 100);
     return s.endsWith("%") ? s : `${s}%`;
   };
+// `unsigned` because the sign below is ours: a caller's signed formatter
+// (`signDisplay: "always"`) would otherwise print `++5` / `−+5`.
 const signed = (d: number, fmt: (n: number) => string): string =>
-  `${d > 0 ? "+" : d < 0 ? "−" : ""}${fmt(Math.abs(d))}`;
+  `${d > 0 ? "+" : d < 0 ? "−" : ""}${unsigned(fmt(Math.abs(d)))}`;
 
 export interface WinProbWormGeometry {
   /** The resolved y-domain. The annotations frame reads it so a caller's

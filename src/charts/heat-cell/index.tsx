@@ -38,6 +38,11 @@ export interface HeatCellProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -59,6 +64,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
     format,
     locale,
     strings = EN_SCALAR,
+    labelSize,
     title,
     summary,
     id,
@@ -88,7 +94,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

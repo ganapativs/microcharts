@@ -18,6 +18,13 @@ export const entry: ChartEntry = {
   dataShape: "number[] raw series + target",
   encoding: { channel: "two co-plotted rolling means vs a target line", precision: "high" },
   nodeBudget: "≤ 6",
+  maxWidth: 400,
+  maxHeight: 100,
+  gotchas: [
+    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "A fast window at or above the slow window is swapped.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["loudness / LUFS metering", "latency SLO or CPU-headroom compliance"],
   avoidFor: ["a single series (Sparkline)", "no target to compare against"],
   props: [

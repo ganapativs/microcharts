@@ -82,7 +82,7 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
     link: 'path[data-mc-w="full"]',
   });
 
-  const { topPad } = gradeLayout(height, label);
+  const { topPad } = gradeLayout(height, label, props.labelSize);
   const geo = useMemo(
     () => gradeProfileGeometry({ data, width, height, bins, topPad }),
     [data, width, height, bins, topPad],

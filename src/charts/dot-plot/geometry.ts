@@ -5,6 +5,7 @@
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
 import {
+  ROW_LABEL_FACTOR,
   ROW_LABEL_WIDTH_SHARE_WIDE,
   rowLabelChars,
   rowLabelFont,
@@ -38,13 +39,13 @@ export interface DotPlotGeometry {
 
 /** Row-pitch-aware type size — denser than `labelFont` so micro DotPlots keep
  *  category labels, taller plates still climb to the shared 11-unit ceiling. */
-export function dotPlotFontSize(height: number, rows: number): number {
+export function dotPlotFontSize(height: number, rows: number, min?: number | undefined): number {
   // One shared policy with every other row-label chart (core/labels): sized off
   // the row PITCH, and floored at the library's own 7 rather than a private 6 —
   // a 6-unit label read visibly smaller than the rest of the catalog, which is
   // the complaint this pass started from. Dense plates still CULL via
   // showCategories; shrinking the type is not an escape hatch.
-  return rowLabelFont(rows > 0 ? height / rows : height);
+  return rowLabelFont(rows > 0 ? height / rows : height, ROW_LABEL_FACTOR, min);
 }
 
 /** How many category characters the left gutter can afford at this width.

@@ -40,6 +40,11 @@ export interface RubricStripProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: RubricStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -83,6 +88,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     format,
     locale,
     strings = EN_RUBRIC,
+    labelSize,
     title,
     summary,
     id,
@@ -121,6 +127,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
     width,
     height,
     show: labels,
+    labelSize,
   });
   const geo = rubricStripGeometry({
     data: toInputs(data),
@@ -144,7 +151,7 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
       // bottom edge, so the block centres on the cap band.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-rubric ${className}` : "mc-rubric"}
-      style={{ ...style, "--mc-label-size": `${lab.fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${lab.fontSize}px` } as CSSProperties}
     >
       {/* flat siblings, ink roles: rows × (track + bar [+ label]) is this
           chart's SSR hot path (bench floor 25 charts/ms) — no per-row <g>.
