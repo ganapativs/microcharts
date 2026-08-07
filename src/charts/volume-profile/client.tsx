@@ -93,7 +93,7 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
   );
   // The POC label's gutter narrows every bar, so the client must reserve it on
   // the same terms the static does or its overlays anchor to unpainted bars.
-  const fontSize = labelFont(height, 0.11);
+  const fontSize = labelFont(height, 0.11, props.labelSize);
   const geo = useMemo(
     () =>
       profileLayout({

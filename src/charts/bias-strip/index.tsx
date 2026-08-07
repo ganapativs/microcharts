@@ -79,7 +79,13 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
     style,
     children,
   } = props;
-  const { rad, outlierRad, fontSize, captionPad } = biasLayout(width, height, label, props.r, labelSize);
+  const { rad, outlierRad, fontSize, captionPad } = biasLayout(
+    width,
+    height,
+    label,
+    props.r,
+    labelSize,
+  );
 
   if (data.length > 40) {
     devWarn(`<BiasStrip> ${data.length} pairs downsampled.`);

@@ -130,7 +130,8 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
   // basis (otherwise every hit lands right of the cursor and the last readings
   // are unreachable).
   const vbWidth = geo
-    ? queueDepthLabels(geo, { width, height, capacity, label, fmt, labelSize: props.labelSize }).totalWidth
+    ? queueDepthLabels(geo, { width, height, capacity, label, fmt, labelSize: props.labelSize })
+        .totalWidth
     : width;
 
   const { active, selected, bind } = useActivePicker({

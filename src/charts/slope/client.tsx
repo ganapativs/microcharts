@@ -63,8 +63,9 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
   // The overlay + hit-test must resolve against the SAME frame the composed
   // static renders — label gutters included (shared rule, never re-derived).
   const geo = useMemo(
-    () => slopeFitFrame({ width, height, data, domain, label, fmt, labelSize: props.labelSize }).geo,
-    [width, height, data, domain, label, fmt],
+    () =>
+      slopeFitFrame({ width, height, data, domain, label, fmt, labelSize: props.labelSize }).geo,
+    [width, height, data, domain, label, fmt, props.labelSize],
   );
 
   /** Rows ordered by `to` (descending) for ↑/↓ roving. */

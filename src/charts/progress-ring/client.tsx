@@ -104,7 +104,8 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   // the hole (both modes, and "—" for no data), so its length is the fit budget
   // geometry weighs.
   const printsLabel =
-    rest.label === "percent" && ringLabelSize(rest.size, rest.weight, readoutText.length) > 0;
+    rest.label === "percent" &&
+    ringLabelSize(rest.size, rest.weight, readoutText.length, rest.labelSize) > 0;
 
   // One arc, one selectable unit (index 0): the fraction it sweeps. One builder,
   // so `onActive` and `onSelect` can never report a different number or a

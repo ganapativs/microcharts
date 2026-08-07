@@ -97,7 +97,8 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
   // A host-computed size (`Number(field.value)` on an empty input → NaN) used to
   // reach the reserved band, and from there every coordinate in the chart.
   const fs = props.fontSize;
-  const fontSize = fs !== undefined && Number.isFinite(fs) && fs > 0 ? fs : labelFont(height, 0.55, labelSize);
+  const fontSize =
+    fs !== undefined && Number.isFinite(fs) && fs > 0 ? fs : labelFont(height, 0.55, labelSize);
 
   const resolvedNow = resolveNow(events, now);
   // The tally is a pure time filter — width-independent — so the numeral is

@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
-import { rowLabelFont } from "../../core/labels.js";
+import { rowLabelFont, ROW_LABEL_FACTOR } from "../../core/labels.js";
 import { dumbbellGeometry, dumbbellLabelChars } from "./geometry.js";
 import {
   Dumbbell as StaticDumbbell,
@@ -92,7 +92,11 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
 
   // Must be the SAME number the composed static computes, or the overlay rings
   // land off the labels — pitch-based, exactly as index.tsx does it.
-  const fontSize = rowLabelFont(data.length > 0 ? height / data.length : height);
+  const fontSize = rowLabelFont(
+    data.length > 0 ? height / data.length : height,
+    ROW_LABEL_FACTOR,
+    props.labelSize,
+  );
   // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub. It has
   // to be the SAME budget the static entry reserves (dumbbellLabelChars owns it):

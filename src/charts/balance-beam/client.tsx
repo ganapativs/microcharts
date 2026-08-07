@@ -142,7 +142,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   // viewBox is `height + labelBand` — the pointer map has to use the total.
   const labelBand =
     (props.label ?? "none") === "values"
-      ? Math.ceil((props.fontSize ?? labelFont(height, 0.4)) * 1.3)
+      ? Math.ceil((props.fontSize ?? labelFont(height, 0.4, props.labelSize)) * 1.3)
       : 0;
 
   const { active, selected, bind } = useActivePicker({

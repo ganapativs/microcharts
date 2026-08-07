@@ -135,7 +135,9 @@ export function Constellation(props: ConstellationProps): ReactNode {
   // Sized off the RESOLVED box, and only from a finite override: a non-finite
   // fontSize otherwise reached the DOM as `--mc-label-px: NaNpx` and silently
   // dropped the numeral (every placement test fails against NaN).
-  const fontSize = isFiniteValue(props.fontSize) ? props.fontSize : labelFont(geo.height, 0.55, labelSize);
+  const fontSize = isFiniteValue(props.fontSize)
+    ? props.fontSize
+    : labelFont(geo.height, 0.55, labelSize);
   const accName =
     summary === false
       ? false

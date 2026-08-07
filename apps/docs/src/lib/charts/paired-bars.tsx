@@ -25,7 +25,7 @@ export const entry: ChartEntry = {
   maxHeight: 80,
   gotchas: [
     "Past 5 pairs the grouped read blurs; the component dev-warns past the cap.",
-    "Every `ref` missing means MiniBar is the chart, and the component says so.",
+    "Every `ref` missing means MiniBar is the chart, and the component warns.",
   ],
   bestFor: ["budget vs actual per region", "target vs result rows"],
   avoidFor: ["no reference series (MiniBar)", "> 5 pairs"],

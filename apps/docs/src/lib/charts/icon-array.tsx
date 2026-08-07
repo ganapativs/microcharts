@@ -20,7 +20,7 @@ export const entry: ChartEntry = {
   maxWidth: 560,
   maxHeight: 120,
   gotchas: [
-    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
     "`total={100}` needs at least 40×40 units, below which the unit size falls under the crispness floor.",
   ],
   bestFor: ["risk in a sentence", "uptake / adoption rates", "lay-audience probabilities"],

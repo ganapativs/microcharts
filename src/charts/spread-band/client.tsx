@@ -17,7 +17,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
 import { EN_SPREAD_BAND } from "../../core/strings-spread-band.js";
-import { gutterFont, lastGap, spreadBandGeometry } from "./geometry.js";
+import { gutterFits, gutterFont, lastGap, spreadBandGeometry } from "./geometry.js";
 import {
   DEFAULT_SERIES_LABELS,
   SpreadBand as StaticSpreadBand,
@@ -64,10 +64,11 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
   useEntrance(hostRef, "wipe", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const fontSize = gutterFont(height);
+  const fontSize = gutterFont(height, props.labelSize);
 
   const endGap = lastGap(data);
-  const showLabel = label === "gap" && endGap !== null && endGap !== 0;
+  const showLabel =
+    label === "gap" && endGap !== null && endGap !== 0 && gutterFits(height, fontSize);
   const gutterCh = showLabel ? signedGap(endGap!, fmt).length : 0;
 
   const geo = useMemo(

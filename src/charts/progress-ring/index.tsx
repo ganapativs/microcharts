@@ -17,6 +17,7 @@ export interface ProgressRingProps extends Pick<
   | "positive"
   | "format"
   | "locale"
+  | "labelSize"
   | "title"
   | "summary"
   | "id"
@@ -47,6 +48,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     format,
     locale,
     strings = EN_SCALAR,
+    labelSize,
     title,
     summary,
     id,
@@ -75,6 +77,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     weight,
     sweep,
     labelChars: showLabel ? display.length : 0,
+    labelSize,
   });
 
   const auto = !Number.isFinite(model.fraction)

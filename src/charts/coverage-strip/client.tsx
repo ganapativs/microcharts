@@ -80,7 +80,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
 
   // the static entry's font formula itself, not a copy of it — the label gutter
   // widens totalWidth, and a drifting fontSize hangs the readout off the strip
-  const font = labelFont(height, 0.62);
+  const font = labelFont(height, 0.62, props.labelSize);
   // …and its drop rule: the static drops the percent (and its gutter) once the
   // box is shorter than one em, so reserving it here would widen totalWidth past
   // the composed static's and hang the readout off the end of the strip.

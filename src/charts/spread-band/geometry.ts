@@ -6,7 +6,7 @@
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { linePath } from "../../core/path.js";
 import { isFiniteValue, round2, type Value, type XY } from "../../core/types.js";
-import { textGutter } from "../../core/labels.js";
+import { labelFitsBand, textGutter } from "../../core/labels.js";
 
 /** One paired reading: `a` = the subject, `b` = the reference it is judged against. */
 export interface SpreadDatum {
@@ -24,9 +24,18 @@ export function lastGap(data: readonly SpreadDatum[]): number | null {
   return null;
 }
 
-/** Gutter label size (viewBox units) — dense-strip weight, floored legible. */
-export function gutterFont(height: number): number {
-  return clamp(Math.round(height * 0.4), 5, 8);
+/** Gutter label size (viewBox units) — dense-strip weight, floored legible.
+ *  `min` (the chart's `labelSize`) is applied last, so it beats the 8-unit cap
+ *  the way it beats `labelFont`'s 11. */
+export function gutterFont(height: number, min?: number | undefined): number {
+  return Math.max(min ?? 0, clamp(Math.round(height * 0.4), 5, 8));
+}
+
+/** Does the box still have a line of vertical room for the gutter figure? A
+ *  raised `labelSize` can outgrow a short band, and the figure DROPS with its
+ *  gutter rather than being clamped onto the lines it annotates. */
+export function gutterFits(height: number, fontSize: number): boolean {
+  return labelFitsBand(height, fontSize);
 }
 
 export interface SpreadBandGeometry {

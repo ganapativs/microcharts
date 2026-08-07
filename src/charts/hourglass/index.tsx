@@ -88,7 +88,12 @@ export function Hourglass(props: HourglassProps): ReactNode {
   // DOM verbatim — `font-size="NaN"`, and a NaN viewBox width through the gutter
   // it sizes, which collapsed the glass along with the numeral. Documented
   // default.
-  const fontSize = isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : 8;
+  // `labelSize` raises the derived default; an explicit `fontSize` still wins,
+  // being the more specific lever.
+  const fontSize =
+    isFiniteValue(props.fontSize) && props.fontSize > 0
+      ? props.fontSize
+      : Math.max(8, labelSize ?? 0);
 
   const e = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   const pct = hourglassPct(

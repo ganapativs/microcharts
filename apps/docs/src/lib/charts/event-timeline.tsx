@@ -32,7 +32,7 @@ export const entry: ChartEntry = {
   maxWidth: 320,
   maxHeight: 50,
   gotchas: [
-    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
     "One track by design. Items share a single row and there are no lanes — render one chart per service and fix `domain` across them for small multiples.",
     "Geometry caps the marks: the span bar stops at 6 viewBox units, the point diamond at 2.5, and the track inset at 2. Height past the authored maximum becomes whitespace.",
     "Items entirely outside `domain` are excluded, reversed spans are dropped, and a zero-duration span renders as a point event.",

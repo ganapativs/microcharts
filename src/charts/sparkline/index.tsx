@@ -107,13 +107,13 @@ export function Sparkline(props: SparklineProps): ReactNode {
   // the chart's box (containment rule). No DOM measurement.
   const last = lastFinite(data);
   const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
-  const metrics = lastLabelMetrics(labelText, width, height);
+  const metrics = lastLabelMetrics(labelText, width, height, labelSize);
 
   // "minmax" labels reserve top/bottom gutters BEFORE geometry and
   // sit above the max / below the min — the only spots the data can't occupy.
   // Documented affordance: below ~28px tall the gutters would crush the plot,
   // so the labels are omitted (the summary still reads the range).
-  const mmFont = minmaxFont(height, label);
+  const mmFont = minmaxFont(height, label, labelSize);
 
   const geo = sparkGeometry(data, {
     width,

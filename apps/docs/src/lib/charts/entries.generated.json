@@ -613,7 +613,7 @@
     "maxWidth": 200,
     "maxHeight": 40,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
     "bestFor": ["KPI cards", "table completion columns", "step counts (segments)"],
@@ -1112,7 +1112,7 @@
     "maxHeight": 80,
     "gotchas": [
       "Past 5 pairs the grouped read blurs; the component dev-warns past the cap.",
-      "Every `ref` missing means MiniBar is the chart, and the component says so."
+      "Every `ref` missing means MiniBar is the chart, and the component warns."
     ],
     "bestFor": ["budget vs actual per region", "target vs result rows"],
     "avoidFor": ["no reference series (MiniBar)", "> 5 pairs"],
@@ -1370,7 +1370,7 @@
     "maxWidth": 260,
     "maxHeight": 70,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included."
     ],
     "bestFor": ["latency clusters in a sentence", "distributions per row"],
     "avoidFor": ["pre-aggregated counts (SparkBar)", "raw marks (RugStrip)"],
@@ -1443,7 +1443,7 @@
     "nodeBudget": "≤ 4 (+ ≤ 3 outlier dots/side in tukey)",
     "maxWidth": 260,
     "maxHeight": 60,
-    "gotchas": ["Non-monotonic stats are refused rather than drawn as a plausible-looking lie."],
+    "gotchas": ["Non-monotonic stats are rejected rather than drawn as a plausible-looking lie."],
     "bestFor": ["latency percentile rows", "spread beside a stat"],
     "avoidFor": ["modality/shape (HistogramStrip)", "< 5 observations (renders dots)"],
     "props": [
@@ -1502,7 +1502,7 @@
     "maxWidth": 100,
     "maxHeight": 100,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included."
     ],
     "bestFor": ["tab headers", "KPI card corners", "cooldowns (sweep)"],
     "avoidFor": ["precise reads (Progress)", "gauges (never shipped)"],
@@ -1645,7 +1645,7 @@
     "maxWidth": 260,
     "maxHeight": 80,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "Past 6 stages the drops blur; the component dev-warns past the cap."
     ],
     "bestFor": ["per-campaign funnels in tables", "conversion in cards"],
@@ -1711,7 +1711,7 @@
     "maxWidth": 260,
     "maxHeight": 60,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "7 levels is the legibility bar; more are rejected.",
       "Negative counts are treated as 0."
     ],
@@ -1975,7 +1975,7 @@
     "maxWidth": 260,
     "maxHeight": 70,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "Three series is a hard cap — the thickness read degrades past it.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
@@ -2054,7 +2054,7 @@
     "maxWidth": 320,
     "maxHeight": 70,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
     "bestFor": ["watchlist table rows", "ticker KPI cards"],
@@ -2265,7 +2265,7 @@
     "maxWidth": 320,
     "maxHeight": 50,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "One track by design. Items share a single row and there are no lanes — render one chart per service and fix `domain` across them for small multiples.",
       "Geometry caps the marks: the span bar stops at 6 viewBox units, the point diamond at 2.5, and the track inset at 2. Height past the authored maximum becomes whitespace.",
       "Items entirely outside `domain` are excluded, reversed spans are dropped, and a zero-duration span renders as a point event.",
@@ -2619,7 +2619,7 @@
     "maxWidth": 560,
     "maxHeight": 120,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "`total={100}` needs at least 40×40 units, below which the unit size falls under the crispness floor."
     ],
     "bestFor": ["risk in a sentence", "uptake / adoption rates", "lay-audience probabilities"],
@@ -4836,7 +4836,7 @@
     },
     "nodeBudget": "2",
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "Over 60 cells stops being countable; use Progress (documented cap).",
       "Sized by `cell`, not `width`/`height` — the box follows from the cell count.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
@@ -5185,7 +5185,7 @@
     "maxWidth": 70,
     "maxHeight": 70,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
     "bestFor": [
@@ -6100,7 +6100,7 @@
     "maxWidth": 400,
     "maxHeight": 100,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "A fast window at or above the slow window is swapped.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
@@ -6352,7 +6352,7 @@
     "maxWidth": 220,
     "maxHeight": 220,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "`counts` must be a square k×k matrix with k between 2 and 4; anything else is rejected.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
@@ -6497,7 +6497,7 @@
     "maxWidth": 200,
     "maxHeight": 140,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
       "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it."
     ],
     "bestFor": ["volume-at-price / level-of-activity", "load by tier"],
@@ -7235,7 +7235,7 @@
     "maxWidth": 230,
     "maxHeight": 120,
     "gotchas": [
-      "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it."
+      "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included."
     ],
     "bestFor": ["method-agreement checks in a cell", "instrument drift in a KPI card"],
     "avoidFor": ["unpaired samples (MicroScatter)", "a single time series (Sparkline)"],

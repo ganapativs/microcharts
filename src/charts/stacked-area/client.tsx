@@ -90,7 +90,7 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
   }, [data, order]);
 
   const usedCurve: Curve = mode === "ridge" ? "smooth" : curve;
-  const fontSize = labelFont(height, 0.3);
+  const fontSize = labelFont(height, 0.3, props.labelSize);
   const geo = useMemo(
     () =>
       stackedAreaGeometry({

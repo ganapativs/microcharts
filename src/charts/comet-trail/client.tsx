@@ -72,8 +72,9 @@ export function CometTrail(props: InteractiveCometTrailProps): React.ReactNode {
   } = props;
   // Same NaN/0 guard as the static entry — the two must resolve the identical
   // font size or the composed frame and the overlays part company.
-  const asked = props.fontSize ?? labelFont(height);
-  const fontSize = Number.isFinite(asked) && asked > 0 ? asked : labelFont(height);
+  const asked = props.fontSize ?? labelFont(height, 0.55, props.labelSize);
+  const fontSize =
+    Number.isFinite(asked) && asked > 0 ? asked : labelFont(height, 0.55, props.labelSize);
 
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();

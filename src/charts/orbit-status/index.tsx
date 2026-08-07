@@ -106,7 +106,9 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
   // viewBox width through the gutter it sizes. Fall back to the size-derived
   // default.
   const fontSize =
-    isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : labelFont(geo.size, 0.55, labelSize);
+    isFiniteValue(props.fontSize) && props.fontSize > 0
+      ? props.fontSize
+      : labelFont(geo.size, 0.55, labelSize);
 
   const accName =
     summary === false

@@ -78,7 +78,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   const h = chartSide(height);
   // must match the static geometry (label font sizes the log-tag gutter) —
   // import the CHART's font, not `core/labels`' same-named helper
-  const font = ladderFont(h);
+  const font = ladderFont(h, props.labelSize);
   const geo = useMemo(
     () =>
       percentileLadderGeometry({

@@ -9,7 +9,7 @@ import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { heatCellGeometry, HEAT_CELL_LABEL_SIZE } from "./geometry.js";
+import { heatCellGeometry, heatCellFont } from "./geometry.js";
 import { HeatCell as StaticHeatCell, heatCellSummary, type HeatCellProps } from "./index.js";
 
 export interface InteractiveHeatCellProps extends HeatCellProps {
@@ -84,7 +84,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const numeralPainted =
     props.label === "value" &&
     geo.step !== null &&
-    geo.labelFits(fmt(value).length, HEAT_CELL_LABEL_SIZE);
+    geo.labelFits(fmt(value).length, heatCellFont(12, props.labelSize));
 
   // Cell value (readout number). One datum builder — callbacks match the chip.
   const datum = (): MicroDatum => ({

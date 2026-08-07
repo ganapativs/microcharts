@@ -60,15 +60,18 @@ export function labelMetrics(
   text: string,
   width: number,
   height: number,
+  min = 5,
 ): { fontSize: number; gutter: number } {
-  const ideal = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const ideal = Math.max(min, 6, Math.min(Math.round(height * 0.5), 11));
   const budget = Math.floor(width * 0.45);
   const needs = (size: number): number => textGutter(text.length, size, 6);
 
   let fontSize = ideal;
   if (needs(fontSize) > budget && text.length > 0) {
     const fitted = Math.floor((budget - 6) / (text.length * 0.62));
-    fontSize = Math.max(5, Math.min(ideal, fitted));
+    // The shrink stops at the size the caller asked for, never under it: the
+    // gutter is `needs(fontSize)` either way, so the figure keeps its room.
+    fontSize = Math.max(min, Math.min(ideal, fitted));
   }
   return { fontSize, gutter: needs(fontSize) };
 }

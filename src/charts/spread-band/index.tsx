@@ -12,6 +12,7 @@ import type { Polarity } from "../../core/types.js";
 import { EN_SPREAD_BAND, type SpreadBandStrings } from "../../core/strings-spread-band.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
+  gutterFits,
   gutterFont,
   lastGap,
   spreadBandGeometry,
@@ -106,11 +107,11 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = gutterFont(height);
+  const fontSize = gutterFont(height, labelSize);
 
   // endpoint gap → reserve the label gutter before geometry runs
   const gap = lastGap(data);
-  const showLabel = label === "gap" && gap !== null && gap !== 0;
+  const showLabel = label === "gap" && gap !== null && gap !== 0 && gutterFits(height, fontSize);
   const labelText = showLabel ? signedGap(gap!, fmt) : "";
 
   const geo = spreadBandGeometry({

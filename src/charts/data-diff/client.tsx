@@ -105,7 +105,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       fontSize: tagFont,
       footer,
     });
-  }, [width, height, data, order, domain, maxItems, labels, label]);
+  }, [width, height, data, order, domain, maxItems, labels, label, props.labelSize]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Navigable unit = one DISPLAYED row: index into `geo.rows`, i.e. the sorted +

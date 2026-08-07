@@ -98,7 +98,8 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         }
       }
     }
-    const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+    const metrics =
+      labelText !== undefined ? labelMetrics(labelText, width, height, props.labelSize) : undefined;
     return sparkBarGeometry(data, {
       width,
       height,
@@ -107,7 +108,7 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
       gap,
       gutterRight: metrics?.gutter ?? 0,
     });
-  }, [data, width, height, mode, domain, gap, label, fmt]);
+  }, [data, width, height, mode, domain, gap, label, props.labelSize, fmt]);
 
   // Bars only (gaps dropped) — the navigable stops. `index` in the datum is the
   // DATA index (what the consumer indexes into); we walk finite bars and never

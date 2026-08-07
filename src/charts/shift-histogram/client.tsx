@@ -113,9 +113,20 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
       mode,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height, 0.42),
+      fontSize: labelFont(height, 0.42, props.labelSize),
     });
-  }, [width, height, data.before, data.after, bins, mode, props.domain, props.label, fmt]);
+  }, [
+    width,
+    height,
+    data.before,
+    data.after,
+    bins,
+    mode,
+    props.domain,
+    props.label,
+    props.labelSize,
+    fmt,
+  ]);
 
   const accName =
     summary === false

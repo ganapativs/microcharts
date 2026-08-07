@@ -10,80 +10,80 @@
   "styles": "12 kB",
   "charts": {
     "sparkline": {
-      "static": "4.33 kB",
-      "interactive": "7 kB"
+      "static": "4.35 kB",
+      "interactive": "7.00 kB"
     },
     "sparkbar": {
-      "static": "3.43 kB",
-      "interactive": "6.09 kB"
+      "static": "3.46 kB",
+      "interactive": "6.19 kB"
     },
     "delta": {
-      "static": "1.18 kB",
-      "interactive": "2.24 kB"
+      "static": "1.29 kB",
+      "interactive": "2.35 kB"
     },
     "bullet": {
-      "static": "2.44 kB",
-      "interactive": "3.85 kB"
+      "static": "2.45 kB",
+      "interactive": "3.98 kB"
     },
     "activity-grid": {
-      "static": "2.54 kB",
-      "interactive": "5.53 kB"
+      "static": "2.53 kB",
+      "interactive": "5.60 kB"
     },
     "trend-arrow": {
-      "static": "2.03 kB",
-      "interactive": "3.10 kB"
+      "static": "2.11 kB",
+      "interactive": "3.19 kB"
     },
     "status-dot": {
       "static": "1.84 kB",
       "interactive": "2.86 kB"
     },
     "heat-cell": {
-      "static": "2.16 kB",
-      "interactive": "3.53 kB"
+      "static": "2.22 kB",
+      "interactive": "3.64 kB"
     },
     "progress": {
-      "static": "2.26 kB",
-      "interactive": "3.67 kB"
+      "static": "2.37 kB",
+      "interactive": "3.82 kB"
     },
     "rug-strip": {
       "static": "2.57 kB",
-      "interactive": "4.96 kB"
+      "interactive": "5.01 kB"
     },
     "mini-bar": {
-      "static": "3.22 kB",
-      "interactive": "5.85 kB"
+      "static": "3.23 kB",
+      "interactive": "5.86 kB"
     },
     "pictogram-row": {
       "static": "2.28 kB",
-      "interactive": "4.94 kB"
+      "interactive": "5.01 kB"
     },
     "seismogram": {
       "static": "2.77 kB",
-      "interactive": "5.34 kB"
+      "interactive": "5.44 kB"
     },
     "heat-strip": {
       "static": "2.70 kB",
-      "interactive": "5.10 kB"
+      "interactive": "5.15 kB"
     },
     "dot-plot": {
-      "static": "2.73 kB",
-      "interactive": "5.35 kB"
+      "static": "2.74 kB",
+      "interactive": "5.40 kB"
     },
     "dumbbell": {
-      "static": "3.39 kB",
-      "interactive": "6.06 kB"
+      "static": "3.41 kB",
+      "interactive": "6.14 kB"
     },
     "paired-bars": {
       "static": "3.03 kB",
-      "interactive": "5.62 kB"
+      "interactive": "5.63 kB"
     },
     "slope": {
-      "static": "4.15 kB",
-      "interactive": "6.85 kB"
+      "static": "4.18 kB",
+      "interactive": "6.92 kB"
     },
     "micro-scatter": {
-      "static": "2.16 kB",
-      "interactive": "4.93 kB"
+      "static": "2.15 kB",
+      "interactive": "5.00 kB"
     },
     "annotations": {
       "static": "1.68 kB"
@@ -98,52 +98,52 @@
       "static": "0.46 kB"
     },
     "segmented-bar": {
-      "static": "2.74 kB",
-      "interactive": "5.27 kB"
+      "static": "2.75 kB",
+      "interactive": "5.35 kB"
     },
     "histogram-strip": {
       "static": "2.41 kB",
-      "interactive": "4.80 kB"
+      "interactive": "4.95 kB"
     },
     "micro-box": {
-      "static": "2.94 kB",
-      "interactive": "5.36 kB"
+      "static": "2.93 kB",
+      "interactive": "5.43 kB"
     },
     "progress-ring": {
-      "static": "2.70 kB",
-      "interactive": "4.25 kB"
+      "static": "2.82 kB",
+      "interactive": "4.43 kB"
     },
     "micro-donut": {
-      "static": "3.05 kB",
-      "interactive": "5.64 kB"
+      "static": "3.06 kB",
+      "interactive": "5.66 kB"
     },
     "funnel": {
-      "static": "2.68 kB",
-      "interactive": "5.15 kB"
+      "static": "2.79 kB",
+      "interactive": "5.34 kB"
     },
     "likert-strip": {
-      "static": "3.26 kB",
-      "interactive": "5.67 kB"
+      "static": "3.34 kB",
+      "interactive": "5.85 kB"
     },
     "waterfall": {
-      "static": "3.18 kB",
-      "interactive": "5.65 kB"
+      "static": "3.21 kB",
+      "interactive": "5.74 kB"
     },
     "bump-strip": {
-      "static": "2.43 kB",
-      "interactive": "4.86 kB"
+      "static": "2.47 kB",
+      "interactive": "4.97 kB"
     },
     "dual-sparkline": {
       "static": "3.81 kB",
-      "interactive": "6.23 kB"
+      "interactive": "6.38 kB"
     },
     "stacked-area": {
-      "static": "3.45 kB",
-      "interactive": "6.30 kB"
+      "static": "3.54 kB",
+      "interactive": "6.52 kB"
     },
     "ohlc": {
-      "static": "2.88 kB",
-      "interactive": "5.40 kB"
+      "static": "2.99 kB",
+      "interactive": "5.59 kB"
     },
     "horizon": {
       "static": "2.94 kB",
@@ -151,299 +151,299 @@
     },
     "calendar-strip": {
       "static": "2.76 kB",
-      "interactive": "5.63 kB"
+      "interactive": "5.70 kB"
     },
     "event-timeline": {
-      "static": "3.10 kB",
-      "interactive": "5.97 kB"
+      "static": "3.24 kB",
+      "interactive": "6.05 kB"
     },
     "coverage-strip": {
       "static": "2.66 kB",
-      "interactive": "4.99 kB"
+      "interactive": "5.07 kB"
     },
     "benchmark-strip": {
-      "static": "3.14 kB",
-      "interactive": "5.51 kB"
+      "static": "3.16 kB",
+      "interactive": "5.64 kB"
     },
     "percentile-ladder": {
-      "static": "3.48 kB",
-      "interactive": "6.09 kB"
+      "static": "3.56 kB",
+      "interactive": "6.10 kB"
     },
     "graded-band": {
-      "static": "3.14 kB",
-      "interactive": "5.62 kB"
+      "static": "3.15 kB",
+      "interactive": "5.71 kB"
     },
     "icon-array": {
-      "static": "2.61 kB",
-      "interactive": "5.20 kB"
+      "static": "2.70 kB",
+      "interactive": "5.35 kB"
     },
     "rate-volume": {
-      "static": "2.99 kB",
-      "interactive": "5.59 kB"
+      "static": "3.00 kB",
+      "interactive": "5.71 kB"
     },
     "net-flow": {
       "static": "3.40 kB",
-      "interactive": "5.89 kB"
+      "interactive": "5.97 kB"
     },
     "retention-curve": {
-      "static": "3.52 kB",
-      "interactive": "6.09 kB"
+      "static": "3.53 kB",
+      "interactive": "6.23 kB"
     },
     "burn-chart": {
-      "static": "3.56 kB",
-      "interactive": "6.28 kB"
+      "static": "3.57 kB",
+      "interactive": "6.30 kB"
     },
     "error-budget": {
-      "static": "3.06 kB",
-      "interactive": "5.63 kB"
+      "static": "3.08 kB",
+      "interactive": "5.65 kB"
     },
     "control-strip": {
       "static": "3.44 kB",
-      "interactive": "6.03 kB"
+      "interactive": "6.04 kB"
     },
     "forecast-cone": {
-      "static": "3.67 kB",
-      "interactive": "6.15 kB"
+      "static": "3.68 kB",
+      "interactive": "6.27 kB"
     },
     "quantile-dots": {
-      "static": "2.94 kB",
-      "interactive": "5.61 kB"
+      "static": "2.96 kB",
+      "interactive": "5.74 kB"
     },
     "ab-strips": {
-      "static": "3.32 kB",
-      "interactive": "6.05 kB"
+      "static": "3.33 kB",
+      "interactive": "6.09 kB"
     },
     "shift-histogram": {
-      "static": "3.35 kB",
-      "interactive": "6.03 kB"
+      "static": "3.36 kB",
+      "interactive": "6.13 kB"
     },
     "pareto-strip": {
-      "static": "2.95 kB",
-      "interactive": "5.57 kB"
+      "static": "2.93 kB",
+      "interactive": "5.63 kB"
     },
     "data-diff": {
-      "static": "2.97 kB",
-      "interactive": "5.59 kB"
+      "static": "3.02 kB",
+      "interactive": "5.67 kB"
     },
     "quadrant-dot": {
       "static": "2.67 kB",
-      "interactive": "5.17 kB"
+      "interactive": "5.26 kB"
     },
     "cycle-plot": {
-      "static": "3.17 kB",
-      "interactive": "6.06 kB"
+      "static": "3.19 kB",
+      "interactive": "6.18 kB"
     },
     "change-point": {
-      "static": "3.74 kB",
-      "interactive": "6.54 kB"
+      "static": "3.75 kB",
+      "interactive": "6.66 kB"
     },
     "ensemble-ghosts": {
       "static": "3.37 kB",
-      "interactive": "6.56 kB"
+      "interactive": "6.66 kB"
     },
     "tally-marks": {
-      "static": "1.73 kB",
+      "static": "1.75 kB",
       "interactive": "3.24 kB"
     },
     "dice-pips": {
-      "static": "1.75 kB",
+      "static": "1.76 kB",
       "interactive": "3.21 kB"
     },
     "fill-word": {
-      "static": "1.91 kB",
-      "interactive": "3.40 kB"
+      "static": "1.89 kB",
+      "interactive": "3.42 kB"
     },
     "fat-digits": {
       "static": "1.94 kB",
-      "interactive": "3.25 kB"
+      "interactive": "3.24 kB"
     },
     "thermometer": {
-      "static": "2.61 kB",
-      "interactive": "4.17 kB"
+      "static": "2.63 kB",
+      "interactive": "4.19 kB"
     },
     "moon-phase": {
-      "static": "1.75 kB",
-      "interactive": "3.38 kB"
+      "static": "1.73 kB",
+      "interactive": "3.40 kB"
     },
     "hourglass": {
-      "static": "2.25 kB",
-      "interactive": "3.86 kB"
+      "static": "2.23 kB",
+      "interactive": "3.89 kB"
     },
     "balance-beam": {
-      "static": "2.56 kB",
-      "interactive": "5.09 kB"
+      "static": "2.57 kB",
+      "interactive": "5.21 kB"
     },
     "sprout-row": {
       "static": "2.27 kB",
-      "interactive": "4.80 kB"
+      "interactive": "4.91 kB"
     },
     "garden-grid": {
       "static": "2.11 kB",
-      "interactive": "4.72 kB"
+      "interactive": "4.79 kB"
     },
     "bubble-row": {
-      "static": "2.35 kB",
-      "interactive": "4.81 kB"
+      "static": "2.36 kB",
+      "interactive": "4.89 kB"
     },
     "music-staff": {
-      "static": "3.01 kB",
-      "interactive": "5.41 kB"
+      "static": "3.02 kB",
+      "interactive": "5.50 kB"
     },
     "tree-rings": {
-      "static": "2.39 kB",
-      "interactive": "4.98 kB"
+      "static": "2.41 kB",
+      "interactive": "5.01 kB"
     },
     "city-skyline": {
-      "static": "2.69 kB",
-      "interactive": "5.20 kB"
+      "static": "2.71 kB",
+      "interactive": "5.30 kB"
     },
     "honeycomb": {
-      "static": "2.32 kB",
-      "interactive": "5.04 kB"
+      "static": "2.43 kB",
+      "interactive": "5.25 kB"
     },
     "constellation": {
-      "static": "3.23 kB",
-      "interactive": "5.89 kB"
+      "static": "3.24 kB",
+      "interactive": "5.97 kB"
     },
     "polar-clock": {
-      "static": "3.39 kB",
-      "interactive": "5.88 kB"
+      "static": "3.41 kB",
+      "interactive": "6.00 kB"
     },
     "spiral-year": {
       "static": "3.04 kB",
-      "interactive": "5.57 kB"
+      "interactive": "5.67 kB"
     },
     "breathing-dot": {
-      "static": "2.04 kB",
-      "interactive": "3.69 kB"
+      "static": "2.13 kB",
+      "interactive": "3.82 kB"
     },
     "heartbeat-blip": {
       "static": "2.48 kB",
-      "interactive": "4.08 kB"
+      "interactive": "4.13 kB"
     },
     "comet-trail": {
       "static": "2.51 kB",
-      "interactive": "5.18 kB"
+      "interactive": "5.28 kB"
     },
     "orbit-status": {
-      "static": "2.48 kB",
-      "interactive": "4.49 kB"
+      "static": "2.53 kB",
+      "interactive": "4.56 kB"
     },
     "time-in-range": {
-      "static": "2.64 kB",
-      "interactive": "5.20 kB"
+      "static": "2.62 kB",
+      "interactive": "5.22 kB"
     },
     "hypnogram": {
-      "static": "3.00 kB",
-      "interactive": "5.63 kB"
+      "static": "3.02 kB",
+      "interactive": "5.73 kB"
     },
     "eta-bar": {
-      "static": "2.28 kB",
-      "interactive": "3.82 kB"
+      "static": "2.30 kB",
+      "interactive": "3.86 kB"
     },
     "waveform": {
-      "static": "2.73 kB",
-      "interactive": "5.30 kB"
+      "static": "2.70 kB",
+      "interactive": "5.38 kB"
     },
     "event-raster": {
-      "static": "2.86 kB",
-      "interactive": "5.97 kB"
+      "static": "2.88 kB",
+      "interactive": "6.09 kB"
     },
     "rubric-strip": {
-      "static": "2.94 kB",
-      "interactive": "5.50 kB"
+      "static": "2.96 kB",
+      "interactive": "5.57 kB"
     },
     "token-confidence": {
       "static": "1.13 kB",
-      "interactive": "2.41 kB"
+      "interactive": "2.34 kB"
     },
     "wind-barb": {
-      "static": "2.81 kB",
-      "interactive": "4.31 kB"
+      "static": "2.83 kB",
+      "interactive": "4.37 kB"
     },
     "star-spoke": {
-      "static": "2.49 kB",
-      "interactive": "5.05 kB"
+      "static": "2.50 kB",
+      "interactive": "5.11 kB"
     },
     "minimap-strip": {
-      "static": "2.99 kB",
-      "interactive": "4.44 kB"
+      "static": "2.98 kB",
+      "interactive": "4.45 kB"
     },
     "dual-window-meter": {
-      "static": "2.85 kB",
-      "interactive": "5.36 kB"
+      "static": "2.94 kB",
+      "interactive": "5.45 kB"
     },
     "depth-wedge": {
       "static": "2.54 kB",
-      "interactive": "5.05 kB"
+      "interactive": "5.06 kB"
     },
     "partition-strip": {
-      "static": "2.61 kB",
-      "interactive": "5.45 kB"
+      "static": "2.60 kB",
+      "interactive": "5.55 kB"
     },
     "calibration-strip": {
-      "static": "2.87 kB",
-      "interactive": "5.31 kB"
+      "static": "2.85 kB",
+      "interactive": "5.40 kB"
     },
     "confusion-grid": {
-      "static": "2.85 kB",
-      "interactive": "5.46 kB"
+      "static": "2.94 kB",
+      "interactive": "5.64 kB"
     },
     "folded-day-band": {
       "static": "2.67 kB",
-      "interactive": "5.03 kB"
+      "interactive": "5.13 kB"
     },
     "volume-profile": {
-      "static": "3.08 kB",
-      "interactive": "5.63 kB"
+      "static": "3.09 kB",
+      "interactive": "5.81 kB"
     },
     "phase-trace": {
-      "static": "2.61 kB",
-      "interactive": "5.02 kB"
+      "static": "2.65 kB",
+      "interactive": "5.11 kB"
     },
     "trace-fold": {
       "static": "2.58 kB",
-      "interactive": "5.39 kB"
+      "interactive": "5.47 kB"
     },
     "tape-gauge": {
-      "static": "3.49 kB",
-      "interactive": "5.03 kB"
-    },
-    "station-glyph": {
-      "static": "3.55 kB",
-      "interactive": "6.31 kB"
-    },
-    "cohort-triangle": {
-      "static": "2.76 kB",
-      "interactive": "5.43 kB"
-    },
-    "streak-spark": {
-      "static": "2.87 kB",
-      "interactive": "5.24 kB"
-    },
-    "grade-profile": {
-      "static": "2.68 kB",
+      "static": "3.52 kB",
       "interactive": "5.11 kB"
     },
+    "station-glyph": {
+      "static": "3.57 kB",
+      "interactive": "6.40 kB"
+    },
+    "cohort-triangle": {
+      "static": "2.77 kB",
+      "interactive": "5.52 kB"
+    },
+    "streak-spark": {
+      "static": "2.89 kB",
+      "interactive": "5.35 kB"
+    },
+    "grade-profile": {
+      "static": "2.69 kB",
+      "interactive": "5.22 kB"
+    },
     "win-prob-worm": {
-      "static": "3.75 kB",
-      "interactive": "6.31 kB"
+      "static": "3.86 kB",
+      "interactive": "6.37 kB"
     },
     "queue-depth": {
-      "static": "3.44 kB",
-      "interactive": "6.04 kB"
+      "static": "3.46 kB",
+      "interactive": "6.08 kB"
     },
     "spread-band": {
-      "static": "3.45 kB",
-      "interactive": "6.11 kB"
+      "static": "3.49 kB",
+      "interactive": "6.15 kB"
     },
     "bias-strip": {
-      "static": "2.82 kB",
-      "interactive": "5.40 kB"
+      "static": "2.89 kB",
+      "interactive": "5.58 kB"
     },
     "percentile-trace": {
-      "static": "3.11 kB",
-      "interactive": "5.77 kB"
+      "static": "3.15 kB",
+      "interactive": "5.80 kB"
     }
   },
   "$labelsize": "LABEL-SIZE PIN (2026-07-19): `styles.css` sets `font-size` on `.mc-root text`, and a CSS declaration outranks an SVG presentation attribute, so a chart's `fontSize={n}` was inert unless it also pinned `--mc-label-size`. 22 charts did not, and painted labels at 1.3-2.4x the size their gutters were computed for — measured spills up to 17.5 viewBox units past the viewBox, at default size, with the catalog's own sample data (src/test/label-containment.browser.test.tsx reproduces it). Pinning the var costs ~30 B gzip per affected subpath (+1.35 kB across the catalog). Twelve budgets are raised here to absorb it, each to ~60 B of headroom. Sparkline static 3.7 -> 3.8 kB touches the USER-APPROVED flagship exception above and needs the same sign-off. The alternative to paying these bytes is shipping charts whose labels paint into the page, so the bytes are not optional. STREAK-SPARK LABEL BAND (same pass): its geometry reserved no room above the runs, so the DEFAULT label=\"current\" rendered nothing below ~48 units against a default height of 20 — a documented prop that did nothing at word size. Reserving the band costs ~50 B static / ~20 B interactive; both budgets raised here.",
@@ -452,5 +452,6 @@
   "$readoutvalue": "READOUT VALUE-VISIBILITY PASS (2026-07-26): a readout may not drop a number the caller passed in. Chips and announcements now carry the magnitude behind every derived share (confusion-grid the cell tally, partition-strip/likert-strip/volume-profile the value behind the share, segmented-bar/micro-donut the rolled-up Other total), StackedArea names every band instead of the leading one, ActivityGrid names the day when `anchor` dates the grid, and a measured zero stopped rendering as \"no data\" (seismogram) while an empty bucket stopped rendering as zero (waveform). Where a richer chip would have ellipsized at the chart's own width, it became ROWS (`.mc-readout-rows`, one row per member, name column capped at 7em) rather than a longer line — readout-containment.browser.test.tsx still gates verbosity, and readout-value-visibility.browser.test.tsx now gates the other direction. Only 3 subpaths moved past their budget, all interactive: activity-grid 5.17→5.42 (UTC day math + date formatter), stacked-area 5.91→6.05 (row chip), partition-strip 4.85→5.17 (row chip + value formatter + the new format/locale props). Statics unchanged; measured + max(50 B, 2%) per $rebaseline.",
   "$rebaseline": "SIZE RE-BASELINE (2026-07-20, scripts/rebaseline-sizes.mjs): every budget reset to measured + max(50 B, 2%) headroom after the release hardening pass (fillFor sizing fix ~90 B/interactive entry, per-chart degradation label-drop gates ~42–119 B/static, null/NaN geometry guards). 149 budgets raised, 65 tightened — subpaths that shrank were pulled DOWN to lock the win in, which the old ~10 B-above-actual policy would have missed. The 2% band absorbs shared-kernel byte churn instead of firing all 106 interactive entries on a one-line helper edit.",
   "$systemic": "SYSTEMIC-AUDIT RE-BASELINE (2026-07-26): 44 budgets raised to measured + max(50 B, 2%) per $rebaseline. Only the entries that went over are touched — a full re-baseline would tighten ~170 others in the same commit and bury the deltas that need reading. Four causes, all of them things the library already claimed and nothing checked. (1) `onActive` on the 19 NON-PICKER scalars (+2 B pictogram-row to +91 B delta): the shared interaction contract and the quickstart both documented `onActive` as universal while those entries implemented `onSelect` alone, so the `readout={false}` + `datum.formatted` KPI pattern worked on 84 charts and not on 19. Cost is one datum builder shared by both callbacks plus an edge-gate ref, because pointer-enter and focus both mean 'active' and would otherwise fire twice. (2) The percent-formatter sweep (+3 B micro-donut static to +280 B fill-word interactive): every hardcoded `${n}%` now goes through one `makePercentFormatter`, and the five charts that had no `locale` to thread gained one. The biggest movers are the charts where the percent is the ONLY number and there was no formatter to share — fill-word, moon-phase, hourglass, time-in-range, pareto-strip pay for the Intl plumbing on a ~1.5-2.5 kB base, which is why a 200 B delta reads as 12-18% there and under 2% on a figure-scale chart. (3) `annotations` +39 B: the label layer sets `--mc-label-size` (its `fontSize` attribute was inert), seats labels on a clamped central baseline, and runs Marker's label through the truncator every other annotation already used. (4) `theme` +41 B: `defineTheme` derives `--mc-on-cat` from its own generated palette, so the measured 4.5:1 label contrast travels with a custom accent instead of being silently voided by one. The rest (calendar-strip, heartbeat-blip, orbit-status, sprout-row, waveform, win-prob-worm, bias-strip, change-point) is per-chart work plus the shared-kernel byte churn the 2% band exists to absorb. No NEW chart is admitted under these numbers: the 3 kB / +1 kB ceiling still applies to one.",
-  "$windbarb": "WIND-BARB INTERACTIVE ENTRY (2026-08-02, completeness pass): the chart shipped static-only; the interactive entry (live announce + pop entrance + whole-chart onActive/onSelect, the pure-scalar shape from $interaction) was added with its browser tests. The budget staged at 4.18 kB sat BELOW the built entry (4224 B), so `pnpm size` was red on this tree — the same failure mode eta-bar hit in $readout. Re-measured to 4.31 kB per the measured + max(50 B, 2%) rule."
+  "$windbarb": "WIND-BARB INTERACTIVE ENTRY (2026-08-02, completeness pass): the chart shipped static-only; the interactive entry (live announce + pop entrance + whole-chart onActive/onSelect, the pure-scalar shape from $interaction) was added with its browser tests. The budget staged at 4.18 kB sat BELOW the built entry (4224 B), so `pnpm size` was red on this tree — the same failure mode eta-bar hit in $readout. Re-measured to 4.31 kB per the measured + max(50 B, 2%) rule.",
+  "$fieldreport": "FIELD-REPORT RE-BASELINE (2026-08-07). Four changes landed together, all of them sweeps rather than point fixes, so this re-baselines every budget to measured + max(50 B, 2%) per $rebaseline. (1) makeFormatter split: `format` now MERGES with a chart's own defaults instead of replacing them (`format={{notation:\"compact\"}}` on a percent chart rendered 3% as 0.03), and the merging path moved to a separate `makeUnitFormatter` so the ~75 charts that format a bare number are not charged for a branch they cannot reach — measured 95 B gzip per subpath, which is the difference between ./sparkline/interactive sitting under the wall and over it. Cost lands only on the 27 charts with formatting defaults (funnel +55, honeycomb +52, delta +115). (2) labelSize: every chart that paints an in-SVG label takes a `labelSize` prop that raises labelFont's 7-unit floor through GEOMETRY, because that is where the gutter is reserved; charts now pin their computed size as `--mc-label-px` so the app-facing `--mc-label-size` stops being clobbered on exactly the charts that paint labels. (3) Sub-unit marks: a stylesheet rule relaxes `crispEdges` below 1 unit, where the hint snapped a 0.5-unit visibility floor to zero device pixels and a bin holding 4 events painted what a bin holding 0 painted. Net -6 B of JS across the catalog; the cost is 25 B on styles.css. (4) sparkbar containment: y and height were rounded independently, so each could round up 0.005 and the pair summed past the viewBox (found by the property test, red on main). SPARKLINE IS CLAMPED AT THE CEILING, NOT AT measured + 2%: interactive 7.00 kB (measured 6985, 15 B of room) and static 4.35 kB (measured 4255). The 7 kB wall is USER-SET and quoted in the README, the docs and the package description; no sign-off raises it. The `labelSize` prop was fitted inside that margin rather than paid for by raising the number. A per-chart dev warning for oversized width/height was DESIGNED AND DROPPED for the same reason: measured +86 B on ./sparkline/interactive (7079) and +100 B static (4355), past both ceilings. The authored maximums ship as catalog metadata instead, which costs nothing and is what an agent reads anyway."
 }

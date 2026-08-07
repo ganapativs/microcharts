@@ -72,7 +72,13 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   });
 
   const total = resolveTotal(rawTotal);
-  const { font: FONT, gutterCh } = iconArrayLabelPlan({ label, total, width, height, labelSize: props.labelSize });
+  const { font: FONT, gutterCh } = iconArrayLabelPlan({
+    label,
+    total,
+    width,
+    height,
+    labelSize: props.labelSize,
+  });
   const geo = useMemo(
     () => iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT }),
     [width, height, value, total, shape, gutterCh, FONT],

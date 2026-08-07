@@ -134,7 +134,14 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   // basis has to follow it, or every angle is measured in a squeezed x-space.
   const { active, selected, bind } = useActivePicker({
     count: data.length,
-    width: treeRingsWidth({ data, size: box, label, fontSize: props.fontSize, labelSize: props.labelSize, fmt }),
+    width: treeRingsWidth({
+      data,
+      size: box,
+      label,
+      fontSize: props.fontSize,
+      labelSize: props.labelSize,
+      fmt,
+    }),
     height: box,
     locate,
     datum,

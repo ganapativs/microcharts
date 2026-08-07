@@ -76,7 +76,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
   // and the focus outline are all in viewBox units, so a box that disagrees with
   // the painted one puts the outline somewhere the marks are not.
   const [width, height] = timelineBox(widthProp, heightProp);
-  const fontSize = labelFont(height, 0.45);
+  const fontSize = labelFont(height, 0.45, props.labelSize);
   const geo = useMemo(
     () =>
       eventTimelineGeometry({

@@ -63,7 +63,7 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
   // that drops takes its gutter with it, so a copy that kept reserving would
   // stretch `totalWidth` past the composed static's viewBox and slide the
   // pointer map off the marks.
-  const FONT = labelFont(height, 0.3);
+  const FONT = labelFont(height, 0.3, props.labelSize);
   const labelChars = abTagChars({ width, height, fontSize: FONT, labels: seriesLabels });
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // Same percent formatter the static builds — the gutter is measured off its

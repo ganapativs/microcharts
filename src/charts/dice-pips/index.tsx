@@ -77,7 +77,8 @@ export function DicePips(props: DicePipsProps): ReactNode {
   const geo = dicePipsGeometry({ value, size });
   // Everything below reads the RESOLVED box, never the prop (see resolveSize).
   const box = geo.size;
-  const fitted = geo.numeral === null ? 0 : numeralFont(geo.numeral.length, box, geo.face.width, labelSize);
+  const fitted =
+    geo.numeral === null ? 0 : numeralFont(geo.numeral.length, box, geo.face.width, labelSize);
   const showNumeral = fitted > 0;
   const fontSize = showNumeral ? fitted : labelFont(box, NUMERAL_FACTOR, labelSize);
   const accName = resolveSummary(summary, () => dicePipsSummary(value, strings));

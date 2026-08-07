@@ -9,7 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { valueStepMixPct, type CellShape } from "../../shared/cell.js";
-import { heatCellGeometry, HEAT_CELL_LABEL_SIZE } from "./geometry.js";
+import { heatCellGeometry, heatCellFont } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function heatCellSummary(
@@ -86,7 +86,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
     heatCellSummary(value, geo.step, geo.steps, fmt, strings),
   );
 
-  const fontSize = HEAT_CELL_LABEL_SIZE;
+  const fontSize = heatCellFont(SIZE, labelSize);
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;
   const showLabel = text !== undefined && geo.labelFits(text.length, fontSize);
 

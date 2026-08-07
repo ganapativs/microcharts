@@ -134,7 +134,14 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
     y0,
     y1,
     box,
-  } = stationLayout({ size, temp: tempT, dew: dewT, pressure: presT, station: stationT, labelSize });
+  } = stationLayout({
+    size,
+    temp: tempT,
+    dew: dewT,
+    pressure: presT,
+    station: stationT,
+    labelSize,
+  });
 
   const geo = stationGlyphGeometry({
     cloud: cloud ?? null,

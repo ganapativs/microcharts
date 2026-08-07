@@ -87,9 +87,9 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       target,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height),
+      fontSize: labelFont(height, 0.55, props.labelSize),
     });
-  }, [width, height, data, forecast, target, props.domain, props.label, fmt]);
+  }, [width, height, data, forecast, target, props.domain, props.label, props.labelSize, fmt]);
 
   const at = data.length + forecast.mid.length;
   const accName =

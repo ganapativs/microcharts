@@ -18,7 +18,7 @@ export const entry: ChartEntry = {
   maxWidth: 200,
   maxHeight: 40,
   gotchas: [
-    "`format` merges with this chart's own unit instead of replacing it, so changing notation or precision keeps the unit; an explicit `style` opts out of the unit and of the digit defaults calibrated for it.",
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
     "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
   ],
   bestFor: ["KPI cards", "table completion columns", "step counts (segments)"],

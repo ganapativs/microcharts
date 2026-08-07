@@ -89,7 +89,7 @@ export function SegmentedBar(props: InteractiveSegmentedBarProps): React.ReactNo
     return r;
   }, [data, maxSegments, order, strings]);
 
-  const fontSize = labelFont(height, 0.6);
+  const fontSize = labelFont(height, 0.6, props.labelSize);
   const geo = useMemo(
     () => segmentedBarGeometry({ width, height, values: rolled.map((d) => d.value), fontSize }),
     [width, height, rolled, fontSize],

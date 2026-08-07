@@ -124,7 +124,8 @@ async function inkIn(el: ReactElement, w: number, box: Box, nudge: number): Prom
   for (let y = c; y < d; y++) {
     for (let x = a; x < b; x++) {
       const i = (y * px.width + x) * 4;
-      const lum = (0.2126 * px.data[i]! + 0.7152 * px.data[i + 1]! + 0.0722 * px.data[i + 2]!) / 255;
+      const lum =
+        (0.2126 * px.data[i]! + 0.7152 * px.data[i + 1]! + 0.0722 * px.data[i + 2]!) / 255;
       ink += (1 - lum) * (px.data[i + 3]! / 255);
     }
   }

@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
-import { labelFitsY } from "../../core/labels.js";
+import { labelFitsY, LABEL_MIN } from "../../core/labels.js";
 import {
   DEFAULT_HEIGHT,
   DEFAULT_WIDTH,
@@ -156,13 +156,19 @@ export function tapeGaugeReadoutFont(opts: {
   width: number;
   height: number;
   vertical: boolean;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): number | null {
   const { valueText, gutter, band, labelY, width, height, vertical } = opts;
   if (!valueText) return null;
+  const min = opts.labelSize ?? LABEL_MIN;
   const avail = (vertical ? gutter : width) - 1.6;
-  const base = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
+  const base = Math.max(
+    min,
+    Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25))),
+  );
   const font = Math.max(5, Math.min(base, avail / est(valueText.length || 1, 1), band));
-  return font >= 7 && labelFitsY(labelY, font, height) ? font : null;
+  return font >= min && labelFitsY(labelY, font, height) ? font : null;
 }
 
 export function TapeGauge(props: TapeGaugeProps): ReactNode {
@@ -200,7 +206,9 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     rateTiers: tiersProp,
   });
   const fmt = makeFormatter(format, locale);
-  const tickFont = 7;
+  // The tick scale sets at the library floor; `labelSize` lifts it, and a tick
+  // that no longer clears its column or its neighbour drops (see `shownLabels`).
+  const tickFont = Math.max(LABEL_MIN, labelSize ?? 0);
   const vertical = orientation !== "horizontal";
   const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
   const accName =
@@ -226,6 +234,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       width,
       height,
       vertical,
+      labelSize,
     }) ?? 0;
   const showReadout = readoutFont > 0;
 

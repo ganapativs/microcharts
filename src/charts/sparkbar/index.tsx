@@ -113,7 +113,8 @@ export function SparkBar(props: SparkBarProps): ReactNode {
       }
     }
   }
-  const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+  const metrics =
+    labelText !== undefined ? labelMetrics(labelText, width, height, labelSize) : undefined;
   const geo = sparkBarGeometry(data, {
     width,
     height,

@@ -69,7 +69,7 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
   useEntrance(hostRef, "draw", animate);
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const fontSize = labelFont(height, 0.4);
+  const fontSize = labelFont(height, 0.4, props.labelSize);
   // Memoised: the interactive entry re-renders on every unit crossed during a
   // scrub, and this feeds `geo`. Must stay identical to the static entry's — the
   // gutter it reserves decides where the crosshair lands.

@@ -57,7 +57,8 @@ export function musicStaffFrame(opts: {
   const width = chartSide(opts.width, DEFAULT_WIDTH);
   const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const given = opts.fontSize;
-  const fontSize = isFiniteValue(given) && given > 0 ? given : labelFont(height, 0.55, opts.labelSize);
+  const fontSize =
+    isFiniteValue(given) && given > 0 ? given : labelFont(height, 0.55, opts.labelSize);
 
   let gutter = 0;
   const text = opts.labelText;

@@ -3,12 +3,16 @@
 // Why this file exists (and why the node-project containment tests could not
 // catch what it catches):
 //
-//   1. `styles.css` sets `:where(.mc-root text){ font-size: calc(var(--mc-label-size)
-//      * var(--mc-density)) }`. A CSS declaration ALWAYS beats an SVG presentation
-//      attribute — `:where()` zero specificity still outranks one — so a chart's
-//      `fontSize={n}` attribute is inert unless that chart also pins
-//      `--mc-label-size`. A chart that reserves a gutter from `n` while the browser
-//      paints at `0.75em` spills its labels outside the viewBox.
+//   1. `styles.css` sets `:where(.mc-root text){ font-size: calc(var(--mc-label-px,
+//      var(--mc-label-size)) * var(--mc-density)) }`. A CSS declaration ALWAYS beats
+//      an SVG presentation attribute — `:where()` zero specificity still outranks
+//      one — so a chart's `fontSize={n}` attribute is inert unless that chart also
+//      pins `--mc-label-px`. A chart that reserves a gutter from `n` while the
+//      browser paints at `0.75em` spills its labels outside the viewBox.
+//      (`--mc-label-px` is the chart's private channel; `--mc-label-size` is the
+//      app-facing token it falls back to. They used to be one name, which is why
+//      an app setting the token was silently overridden on every labelled chart —
+//      the `labelSize` prop is the supported lever now. See core/labels.ts.)
 //   2. jsdom returns 0 from `getComputedTextLength`/`getBoundingClientRect` on SVG
 //      text, and the node project never loads the stylesheet, so neither the size
 //      override nor the resulting overflow is observable there.
@@ -49,15 +53,15 @@ import { TapeGauge } from "../charts/tape-gauge/index.js";
 import { TrendArrow } from "../charts/trend-arrow/index.js";
 import { Waterfall } from "../charts/waterfall/index.js";
 
-// Controls: charts that already pin `--mc-label-size`. They must pass too —
+// Controls: charts that already pin their label size. They must pass too —
 // otherwise a green suite would prove only that the assertion is toothless.
 import { IconArray } from "../charts/icon-array/index.js";
 import { CoverageStrip } from "../charts/coverage-strip/index.js";
 import { Thermometer } from "../charts/thermometer/index.js";
 
 // Annotation hosts. Their annotation labels are laid out by `annotationFontSize`
-// in shared/annotations-host.tsx and were painted at whatever the HOST's
-// `--mc-label-size` resolved to — a different number per host, conditional on an
+// in shared/annotations-host.tsx and were painted at whatever the HOST's own
+// pinned label size resolved to — a different number per host, conditional on an
 // unrelated prop on six of them, and on the three that render no text of their
 // own not a viewBox-relative number at all.
 import { Marker, TargetZone, Threshold } from "../shared/annotations.js";
@@ -274,7 +278,7 @@ const CASES: Record<string, () => ReactElement> = {
     />
   ),
 
-  // --- controls: already pin --mc-label-size, must stay green ---
+  // --- controls: already pin their label size, must stay green ---
   "icon-array (control)": () => <IconArray value={3} total={20} label="percent" title="Icons" />,
   "coverage-strip (control)": () => (
     <CoverageStrip data={[1, 0, 1, 1, 0, 1]} label="percent" title="Coverage" />
@@ -440,7 +444,7 @@ describe("label containment (real browser + real stylesheet)", () => {
   // ANNOTATION labels, on both axes. `annotationFontSize(height)` drives the
   // truncation budget in `fit()`, the `edgeFlip` anchor, and every top clamp in
   // shared/annotations.tsx — but the `<text fontSize>` attribute it wrote was
-  // inert, so the painted size was the host's `--mc-label-size`. The three hosts
+  // inert, so the painted size was the host's own pin. The three hosts
   // below that render no text of their own never pinned it at all, which left the
   // `0.75em` default resolving against the SURROUNDING PROSE: the same annotation
   // painted at a different size in a heading than in a table cell, and nothing in

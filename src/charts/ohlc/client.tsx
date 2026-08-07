@@ -75,7 +75,7 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
     () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 }),
     [format, locale],
   );
-  const fontSize = labelFont(height, 0.4);
+  const fontSize = labelFont(height, 0.4, props.labelSize);
   // Both entries derive the window the same way, or the interactive geometry
   // (frame x, hit test) drifts off the candles the static child painted.
   const rendered = useMemo(() => ohlcWindow(data, maxPeriods), [data, maxPeriods]);

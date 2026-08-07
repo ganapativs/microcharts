@@ -74,8 +74,9 @@ export function Funnel(props: InteractiveFunnelProps): React.ReactNode {
         mode,
         connectors,
         label,
+        labelSize: props.labelSize,
       }),
-    [width, height, data, mode, connectors, label],
+    [width, height, data, mode, connectors, label, props.labelSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(

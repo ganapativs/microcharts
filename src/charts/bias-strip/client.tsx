@@ -54,7 +54,13 @@ export function BiasStrip(props: InteractiveBiasStripProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
-  const { rad, outlierRad, captionPad } = biasLayout(width, height, props.label ?? "bias", props.r, props.labelSize);
+  const { rad, outlierRad, captionPad } = biasLayout(
+    width,
+    height,
+    props.label ?? "bias",
+    props.r,
+    props.labelSize,
+  );
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Dots settle in left→right along the mean axis (the same axis ←/→ nav

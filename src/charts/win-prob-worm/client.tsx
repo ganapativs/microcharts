@@ -81,7 +81,7 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
     () => (format === undefined ? makePercentFormatter(locale, 3) : wormCustomPct(fmt)),
     [format, locale, fmt],
   );
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, props.labelSize);
 
   // Geometry must match the static entry EXACTLY (same shared resolve), so the
   // overlay + pointer math never drift.

@@ -82,6 +82,8 @@ export function trendArrowGeometry(opts: {
   height: number;
   direction: TrendDirection;
   glyph: TrendGlyph;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): TrendArrowGeometry {
   const { width, height, direction, glyph } = opts;
   // Glyph fills the largest centered square; never stretched (orientation is
@@ -95,7 +97,7 @@ export function trendArrowGeometry(opts: {
       ? toPath(FLAT, scale, ox, oy, false)
       : toPath(upShape(glyph), scale, ox, oy, direction === "down");
 
-  const fontSize = Math.max(6, Math.min(round2(height * 0.5), 11));
+  const fontSize = Math.max(opts.labelSize ?? 6, Math.min(round2(height * 0.5), 11));
   // Baseline sits so digits center optically on the glyph; clamp inside the box.
   const labelY = round2(height / 2);
   const labelX = round2(BOX * scale + ox + 2);

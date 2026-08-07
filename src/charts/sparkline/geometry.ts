@@ -40,40 +40,6 @@ export interface SparkGeometry {
   domain: readonly [number, number];
 }
 
-/**
- * Deterministic label sizing — text is unmeasurable server-side, so it is never
- * measured. Font size is in viewBox units (an SVG attribute, so it scales with
- * the chart instead of drifting against em-based CSS); 0.62em-per-char is a safe
- * over-estimate for tabular digits + separators.
- *
- * The label budget is ~45% of the width: past that the endpoint figure has eaten
- * the series it is annotating. A long value (`1,234,567` on a narrow spark) can
- * ask for more than that, and it shrinks rather than paint into the margin —
- * down to a 5-unit floor, below which the budget yields instead.
- *
- * The gutter is then always what the chosen size actually needs; clamping it to
- * the budget while the text still rendered at full length overhung the viewBox
- * by up to 8 units and broke containment.
- */
-function labelMetrics(
-  text: string,
-  width: number,
-  height: number,
-): { fontSize: number; gutter: number } {
-  const ideal = Math.max(6, Math.min(Math.round(height * 0.5), 11));
-  const budget = Math.floor(width * 0.45);
-  const needs = (size: number): number => Math.ceil(text.length * size * 0.62) + 6;
-
-  let fontSize = ideal;
-  if (needs(fontSize) > budget && text.length > 0) {
-    // Largest size whose gutter fits the budget, floored so the figure stays
-    // readable and capped at `ideal` so a roomy chart never grows its label.
-    const fitted = Math.floor((budget - 6) / (text.length * 0.62));
-    fontSize = Math.max(5, Math.min(ideal, fitted));
-  }
-  return { fontSize, gutter: needs(fontSize) };
-}
-
 export interface SparkGeometryOptions {
   width: number;
   height: number;
@@ -98,8 +64,20 @@ export interface SparkGeometryOptions {
 /**
  * Metrics for the `label="last"` endpoint figure, or `undefined` when it is not
  * painted — either there is no label, or the box is too short to seat a line of
- * it (`labelMetrics` fits the label's WIDTH budget and answers nothing about
- * height). When it drops, so does its gutter, and the line reclaims the width.
+ * it. When it drops, so does its gutter, and the line reclaims the width.
+ *
+ * Deterministic sizing — text is unmeasurable server-side, so it is never
+ * measured. Font size is in viewBox units (an SVG attribute, so it scales with
+ * the chart instead of drifting against em-based CSS); 0.62em-per-char is a safe
+ * over-estimate for tabular digits + separators.
+ *
+ * The label budget is ~45% of the width: past that the endpoint figure has eaten
+ * the series it is annotating. A long value (`1,234,567` on a narrow spark) can
+ * ask for more than that, and it shrinks rather than paint into the margin —
+ * down to `min`, the chart's `labelSize`, below which the budget yields instead.
+ * The gutter is then always what the chosen size actually needs; clamping it to
+ * the budget while the text still rendered at full length overhung the viewBox
+ * by up to 8 units and broke containment.
  *
  * Shared by both entries: the interactive entry used to reserve this gutter
  * whenever a label existed, skipping the height check the static applies, so on
@@ -110,9 +88,23 @@ export function lastLabelMetrics(
   text: string | undefined,
   width: number,
   height: number,
+  min = 5,
 ): { fontSize: number; gutter: number } | undefined {
-  const fitted = text === undefined ? undefined : labelMetrics(text, width, height);
-  return fitted && labelFitsY(height / 2, fitted.fontSize, height) ? fitted : undefined;
+  if (text === undefined) return undefined;
+  const ideal = Math.max(min, 6, Math.min(Math.round(height * 0.5), 11));
+  const budget = Math.floor(width * 0.45);
+  const needs = (size: number): number => Math.ceil(text.length * size * 0.62) + 6;
+
+  let fontSize = ideal;
+  if (needs(fontSize) > budget && text.length > 0) {
+    // Largest size whose gutter fits the budget, floored at `min` so the figure
+    // never sets under the size an app asked for, and capped at `ideal` so a
+    // roomy chart never grows its label.
+    fontSize = Math.max(min, Math.min(ideal, Math.floor((budget - 6) / (text.length * 0.62))));
+  }
+  return labelFitsY(height / 2, fontSize, height)
+    ? { fontSize, gutter: needs(fontSize) }
+    : undefined;
 }
 
 /**
@@ -124,8 +116,8 @@ export function lastLabelMetrics(
  * the interactive entry must reserve byte-identical space — they each used to
  * inline this arithmetic, which is two copies of one contract.
  */
-export function minmaxFont(height: number, label: string | undefined): number {
-  const size = Math.max(5, Math.min(Math.round(height * 0.22), 9));
+export function minmaxFont(height: number, label: string | undefined, min = 5): number {
+  const size = Math.max(min, Math.min(Math.round(height * 0.22), 9));
   return label === "minmax" && height >= (size + 1) * 2 + 12 ? size : 0;
 }
 

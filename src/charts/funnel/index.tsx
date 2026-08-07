@@ -108,6 +108,7 @@ export function Funnel(props: FunnelProps): ReactNode {
     mode,
     connectors,
     label,
+    labelSize,
   });
   const { fontSize } = geo;
   const fmt = makeFormatter(format, locale);

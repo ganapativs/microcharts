@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, unsigned, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import { labelFitsBand } from "../../core/labels.js";
 import { trendArrowGeometry, type TrendDirection, type TrendGlyph } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -97,11 +98,21 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   } = props;
 
   const model = trendArrowModel(props);
-  const geo = trendArrowGeometry({ width: SIZE, height: SIZE, direction: model.direction, glyph });
+  const geo = trendArrowGeometry({
+    width: SIZE,
+    height: SIZE,
+    direction: model.direction,
+    glyph,
+    labelSize,
+  });
 
   // Right gutter reserved from the rendered text's char count
   // (0.62em/char over-estimate; never measured).
-  const width = showValue
+  // A numeral taller than the 16-unit glyph box straddles both edges of a
+  // viewBox `.mc-root` does not clip, so a raised `labelSize` the box cannot
+  // seat DROPS the number and hands its gutter back (core/labels degradation).
+  const showNumeral = showValue && labelFitsBand(SIZE, geo.fontSize);
+  const width = showNumeral
     ? Math.ceil(geo.labelX + model.display.length * geo.fontSize * 0.62 + 1)
     : SIZE;
 
@@ -137,7 +148,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
           The role picks up the `fill: CanvasText` mapping — and elsewhere quiets
           the number to `--mc-neutral`, which is what a direct value label is
           across the catalog. */}
-      {showValue ? (
+      {showNumeral ? (
         <text
           x={geo.labelX}
           y={geo.labelY}

@@ -81,8 +81,8 @@ to the shape you already have.
 ### `get_microchart`
 
 Everything needed to wire one chart: import paths, its own props plus the
-[shared grammar](/docs/quickstart#the-shared-grammar), best/avoid guidance, a copy-runnable example, and `sample` — that
-same example as JSON props.
+[shared grammar](/docs/quickstart#the-shared-grammar), best/avoid guidance, the authored box, its gotchas, a
+copy-runnable example, and `sample` — that same example as JSON props.
 
 ```json title="call"
 { "slug": "bullet" }
@@ -95,6 +95,9 @@ same example as JSON props.
   "interactiveImport": "@microcharts/react/bullet/interactive",
   "dataShape": "value + target + bands",
   "encoding": { "channel": "position (measure length vs a target tick)", "precision": "high" },
+  "maxWidth": 320,
+  "maxHeight": 70,
+  "gotchas": ["Its only interaction callback is `onSelect`."],
   "bestFor": ["progress to goal", "SLA / budget vs target", "KPI with thresholds"],
   "example": { "code": "<Bullet value={72} target={80} bands={[50, 90]} title=\"Quota\" />" },
   "sample": { "value": 72, "target": 80, "bands": [50, 90], "title": "Quota" }
@@ -104,6 +107,11 @@ same example as JSON props.
 The two example forms serve two readers. `example.code` is JSX, for a human to paste. `sample` is JSON, for the model to
 hand straight to `render_microchart`. Every chart takes its own shape, and guessing between `number[]`,
 `{ label, value }[]`, and `{ open, high, low, close }[]` is where a model goes wrong.
+
+`maxWidth` and `maxHeight` are the authored box in viewBox units. Past it a chart's geometry stops scaling, so a
+`width` of 823 on a chart authored to 320 paints a word-sized mark in a room-sized frame; scale with CSS instead.
+`gotchas` carries what a prop description cannot: documented caps, inputs the component derives from a raw sample, and
+how `format` meets a chart that prints its own sign or unit.
 
 ### `render_microchart`
 

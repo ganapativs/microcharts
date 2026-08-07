@@ -413,7 +413,13 @@
        Compact density (< 1) is always safe — it shrinks the text inside a gutter
        already reserved for the larger size. Stroke and gap keep scaling
        unclamped below; neither is bounded by a reserved text box. */
-    font-size: calc(var(--mc-label-size) * min(1.25, var(--mc-density)));
+    /* `--mc-label-px` is the CHART's own computed size, pinned on its host from
+       geometry — the number the gutter was reserved for, so it is what has to
+       paint. `--mc-label-size` is the APP's token and stands in only for a chart
+       that pins nothing. They used to be one name, which meant an app setting
+       the token silently overrode the geometry on exactly the charts that paint
+       labels, and a chart's own pin overrode the app everywhere else. */
+    font-size: calc(var(--mc-label-px, var(--mc-label-size)) * min(1.25, var(--mc-density)));
     fill: var(--mc-stroke);
   }
   /* Labels seated ON a solid mark (HeatCell upper steps, TimeInRange zones,

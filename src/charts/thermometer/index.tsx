@@ -96,7 +96,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     bulb = true,
     label = "none",
     color,
-    fontSize = 8,
+    fontSize: fontSizeProp,
     format,
     locale,
     strings = EN_THERMOMETER,
@@ -108,6 +108,11 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `labelSize` raises the derived default; an explicit `fontSize` still wins,
+  // being the more specific lever. The gutter is sized from the result, so a
+  // raised floor widens the numeral's room instead of spilling into the page.
+  const fontSize = fontSizeProp ?? Math.max(8, labelSize ?? 0);
 
   const domain = resolveThermometerDomain(props.domain);
   const vertical = orientation === "vertical";

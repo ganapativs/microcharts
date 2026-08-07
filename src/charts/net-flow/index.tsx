@@ -159,9 +159,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
   // (in always above, out always below) — the two channels are independent
   const inRole = positive === "down" ? "negative" : "positive";
   const outRole = positive === "down" ? "positive" : "negative";
-  const rootStyle = lab
-    ? ({ ...style, "--mc-label-px": `${lab.font}px` } as CSSProperties)
-    : style;
+  const rootStyle = lab ? ({ ...style, "--mc-label-px": `${lab.font}px` } as CSSProperties) : style;
   const bars = geo.mode === "bars";
 
   const ann = children

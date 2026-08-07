@@ -74,7 +74,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
     if (bare === null) return null;
     // Mirror the static's median right-gutter reservation (index.tsx) so
     // totalWidth/labelX/labelY match byte-for-byte when label="median".
-    const FONT = labelFont(height, 0.62);
+    const FONT = labelFont(height, 0.62, props.labelSize);
     const showLabel = label === "median" && labelFitsY(height / 2, FONT, height);
     if (!showLabel) return bare;
     const medText = fmt(bare.median.value);
@@ -88,7 +88,7 @@ export function GradedBand(props: InteractiveGradedBandProps): React.ReactNode {
       gutterCh: medText.length,
       fontSize: FONT,
     })!;
-  }, [width, height, data, levels, value, props.domain, label, fmt]);
+  }, [width, height, data, levels, value, props.domain, label, props.labelSize, fmt]);
 
   // ascending by level → ←/→ steps from the most-certain (innermost) outward
   const stops = useMemo(() => (geo ? [...geo.bands].sort((a, b) => a.p - b.p) : []), [geo]);

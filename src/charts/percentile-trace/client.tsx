@@ -141,7 +141,8 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
   // The static reserves a right gutter for the `label="last"` readout and
   // widens its viewBox by it, so THIS is the pointer basis — not bare `width`.
   const vbWidth =
-    width + (geo && label === "last" ? percentileGutter(pStr(geo.last.value), height, props.labelSize) : 0);
+    width +
+    (geo && label === "last" ? percentileGutter(pStr(geo.last.value), height, props.labelSize) : 0);
 
   const { active, selected, bind } = useActivePicker({
     count: stops.length,

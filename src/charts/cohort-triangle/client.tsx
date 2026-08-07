@@ -68,8 +68,9 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
   useEntrance(hostRef, "reveal", animate, { selector: 'rect[data-mc-ink="cell"]', order: "x" });
 
   const geo = useMemo(
-    () => cohortTriangleGeometry(data, { cell, gap, labels, highlight, labelSize: props.labelSize }),
-    [data, cell, gap, labels, highlight],
+    () =>
+      cohortTriangleGeometry(data, { cell, gap, labels, highlight, labelSize: props.labelSize }),
+    [data, cell, gap, labels, highlight, props.labelSize],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 

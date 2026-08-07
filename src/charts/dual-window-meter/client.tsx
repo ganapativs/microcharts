@@ -73,7 +73,7 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
   );
   // Same font metric as the static — it sizes the label gutter, and therefore
   // every x the crosshair and readout are placed at.
-  const fontSize = labelFont(height, 0.32);
+  const fontSize = labelFont(height, 0.32, props.labelSize);
   const gutter =
     label === "last"
       ? Math.min(
