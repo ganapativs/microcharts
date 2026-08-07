@@ -3,6 +3,7 @@ import { source } from "@/lib/source";
 import { docLastModified, fileLastModified } from "@/lib/doc-dates";
 import { abs } from "@/lib/site";
 import { SHOWCASE } from "@/lib/showcase";
+import { COLLECTIONS } from "@/lib/collections";
 
 const HOME = "apps/docs/src/app/(home)";
 const LANDING = "apps/docs/src/app/(landing)";
@@ -27,30 +28,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       src: `${HOME}/charts/page.tsx`,
     },
-    {
-      path: "/charts/core",
+    // Derived from COLLECTIONS, the same source `generateStaticParams` uses, so
+    // a new shelf cannot ship a page the sitemap doesn't list.
+    ...COLLECTIONS.map((c) => ({
+      path: `/charts/${c.key}`,
       priority: 0.85,
       changeFrequency: "weekly" as const,
-      src: `${HOME}/charts/collections.ts`,
-    },
-    {
-      path: "/charts/decision",
-      priority: 0.85,
-      changeFrequency: "weekly" as const,
-      src: `${HOME}/charts/collections.ts`,
-    },
-    {
-      path: "/charts/expressive",
-      priority: 0.85,
-      changeFrequency: "weekly" as const,
-      src: `${HOME}/charts/collections.ts`,
-    },
-    {
-      path: "/charts/frontier",
-      priority: 0.85,
-      changeFrequency: "weekly" as const,
-      src: `${HOME}/charts/collections.ts`,
-    },
+      src: "apps/docs/src/lib/collections.ts",
+    })),
     {
       path: "/docs",
       priority: 0.9,

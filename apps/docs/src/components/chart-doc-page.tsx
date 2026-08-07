@@ -23,7 +23,10 @@ import type { ChartEntry } from "@/lib/charts/types";
 import { chartSeoDescription, chartSeoTitle } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { chartSourcePath, chartSourceUrl } from "@/lib/charts/source";
+import { getCollection } from "@/lib/collections";
 import { Code } from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 
 /**
  * The honest-encoding facts, in the page header. Every chart type documents one
@@ -33,12 +36,31 @@ import { Code } from "lucide-react";
  * and the relatedness scoring). Same treatment as the `LiveDemo` size meta —
  * `mono-label` keys, muted values, dot-free because the precision rating is
  * often a sentence with its own steer.
+ *
+ * The shelf comes last, as a link: the registry has always known which
+ * collection a chart sits on, and the hub pages that browse those shelves were
+ * reachable only from /charts. This is the way back up from any of the 106
+ * chart pages, and the way a reader finds the siblings that answer the same
+ * class of question.
  */
 function EncodingFacts({ entry }: { entry: ChartEntry }) {
-  const facts = [
+  const shelf = getCollection(entry.collection);
+  const facts: { key: string; value: ReactNode }[] = [
     { key: "encodes", value: entry.encoding.channel },
     { key: "precision", value: entry.encoding.precision },
     { key: "nodes", value: entry.nodeBudget },
+    ...(shelf
+      ? [
+          {
+            key: "collection",
+            value: (
+              <Link prefetch={false} href={`/charts/${shelf.key}`} className="ulink">
+                {shelf.label}
+              </Link>
+            ),
+          },
+        ]
+      : []),
   ];
   return (
     <dl className="m-0 flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[0.82rem] leading-snug text-fd-muted-foreground">

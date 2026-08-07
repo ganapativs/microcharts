@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COLLECTIONS, COLLECTION_KEYS, getCollection, isChartCollection } from "./collections";
+import { COLLECTIONS, COLLECTION_KEYS, getCollection, isChartCollection } from "@/lib/collections";
 import { CATALOG } from "@/lib/docs-facts";
 
 describe("chart collections", () => {

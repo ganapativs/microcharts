@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { COLLECTIONS } from "./collections";
 
 // Runs against the static export in out/. Skips (as passing) until a build
 // exists so `vitest` is green in a fresh checkout; CI runs it after `next build`.
@@ -44,5 +45,16 @@ describe.skipIf(!hasBuild)("built docs metadata", () => {
     expect(xml).not.toMatch(/<loc>[^<]+\/charts\/<\/loc>/);
     expect(xml).toMatch(/<loc>https?:\/\/[^/]+\/docs<\/loc>/);
     expect(xml).toMatch(/<loc>https?:\/\/[^/]+\/docs\/charts\/sparkline<\/loc>/);
+  });
+
+  // The hubs are built from COLLECTIONS by `generateStaticParams`; the sitemap
+  // is built from the same list. This asserts the two agree against the real
+  // export, so adding a shelf can't ship a page no crawler is pointed at.
+  it("lists every built collection hub", () => {
+    const xml = readFileSync(outDir + "sitemap.xml", "utf8");
+    for (const c of COLLECTIONS) {
+      expect(existsSync(`${outDir}charts/${c.key}.html`)).toBe(true);
+      expect(xml).toContain(`/charts/${c.key}</loc>`);
+    }
   });
 });

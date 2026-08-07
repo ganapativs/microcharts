@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { STABLE_CHARTS } from "@/lib/charts/registry";
-import { COLLECTIONS } from "./collections";
+import { COLLECTIONS } from "@/lib/collections";
 import { GalleryDock } from "./gallery-dock";
 
 function catalogCounts() {
