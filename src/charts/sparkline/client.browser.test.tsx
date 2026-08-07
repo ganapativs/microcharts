@@ -78,4 +78,26 @@ describe("interactive <Sparkline>", () => {
     const fig = screen.getByRole("img").element() as HTMLElement;
     expect(fig.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
+
+  it("a pin that outlives its series announces nothing, not NaN", async () => {
+    // A live series can shrink under a pinned index. The readout used to index
+    // straight into `data`, so the announcement read "Point 0 of 3: NaN" and the
+    // crosshair pointed at an undefined coordinate.
+    const screen = await render(<Sparkline data={D} selectedIndex={8} title="Revenue" />);
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    const live = fig.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("Point 9 of 10: 13.");
+
+    await screen.rerender(<Sparkline data={[4, 6, 5]} selectedIndex={8} title="Revenue" />);
+    await expect.poll(() => live.textContent).toBe("");
+  });
+
+  it("a selection pointed at a gap shows nothing, not NaN", async () => {
+    const screen = await render(
+      <Sparkline data={[4, Number.NaN, 5]} selectedIndex={1} title="Revenue" />,
+    );
+    const fig = screen.getByRole("img").element() as HTMLElement;
+    expect(fig.querySelector('[aria-live="polite"]')!.textContent).toBe("");
+    expect(fig.querySelector(".mc-spark-readout")).toBeNull();
+  });
 });

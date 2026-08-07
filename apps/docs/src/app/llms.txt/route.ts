@@ -60,8 +60,8 @@ export function GET() {
 Use \`${SITE.pkg}\` for React. Import individual charts from subpaths, for example
 \`${SITE.pkg}/sparkline\`. Static entries are hook-free and React Server Component safe.
 Interactive entries live under \`/interactive\` and share one interaction contract: hover or
-arrow keys make a unit active, click/tap/Enter/Space selects and pins it, Escape clears,
-Home/End jump to the ends. Read it with \`onActive(datum)\` and \`onSelect(datum)\`, payload
+arrow keys make a unit active, click/tap/Enter/Space selects and pins it, Escape or a press
+outside the chart clears, Home/End jump to the ends. Read it with \`onActive(datum)\` and \`onSelect(datum)\`, payload
 \`{ index, value, label?, formatted? }\` where \`value\` is the raw number and \`formatted\` is the
 chart's ready-to-display string; control the pin with \`selectedIndex\` / \`defaultSelectedIndex\`.
 Set \`readout={false}\` to hide the in-chart value chip and render \`datum.formatted\` yourself.

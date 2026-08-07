@@ -1,7 +1,7 @@
 // Shared helpers for the `…/interactive` client entries. This module is consumed
 // by client files (which carry the 'use client' directive); like shared/motion.ts
 // it doesn't declare it itself.
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, MouseEvent, PointerEvent } from "react";
 
 /** Static SVG fills the wrapper box — pointer→viewBox math and overlays stay aligned. */
@@ -57,8 +57,13 @@ const WRAP: CSSProperties = {
 
 type WrapAttrs = { className: string; style: CSSProperties; "data-mc-host": "" };
 
-/** Default wrap() result per base class — stable identity across renders. */
-const WRAP_CACHE = new Map<string, WrapAttrs>();
+/**
+ * Default wrap() result per base class — stable identity across renders. A bare
+ * object rather than a Map: the keys are this package's own class-name literals,
+ * so there is no untrusted key to reach a prototype slot, and `??=` on a plain
+ * object is the cheapest cache in the shared kernel's ~100 bundles.
+ */
+const WRAP_CACHE: Record<string, WrapAttrs> = {};
 
 /** Wrapper className/style + `data-mc-host` (table strut hook; `-live`/`-interactive` suffixes differ). */
 export function wrap(
@@ -67,12 +72,7 @@ export function wrap(
   style: CSSProperties | undefined,
 ): WrapAttrs {
   if (!className && !style) {
-    let hit = WRAP_CACHE.get(base);
-    if (!hit) {
-      hit = { className: base, style: WRAP, "data-mc-host": "" };
-      WRAP_CACHE.set(base, hit);
-    }
-    return hit;
+    return (WRAP_CACHE[base] ??= { className: base, style: WRAP, "data-mc-host": "" });
   }
   return {
     className: className ? `${base} ${className}` : base,
@@ -195,9 +195,11 @@ interface PickerOptions extends PickerProps {
   /**
    * index → payload. `value` = primary encoded number (often derived: share,
    * duration, gap…); `null` if empty. Second channel goes in `label` — never
-   * invent another numeric field.
+   * invent another numeric field. Required: all ~85 picker charts name their
+   * units, and the "index only" fallback the kernel used to carry for the ones
+   * that didn't was dead weight in every one of their bundles.
    */
-  datum?: (index: number) => MicroDatum;
+  datum: (index: number) => MicroDatum;
   /**
    * Custom keyboard step — required for sparse indices (`navOrder`) and 2-D
    * (intercept all four arrows; don't fall through to `nav1d`). `current` is -1
@@ -250,9 +252,9 @@ export function nav1d(cur: number, count: number, key: string): number | null {
 export function navOrder(order: readonly number[], cur: number, key: string): number | null {
   const n = order.length;
   if (n === 0) return null;
-  const pos = order.indexOf(cur); // -1 when nothing active or cur is off-list
-  const next = nav1d(pos, n, key);
-  return next === null ? null : (order[next] ?? null);
+  // `indexOf` is -1 when nothing is active or `cur` is off-list; a null step
+  // (a key we don't rove on) indexes -1, which is the same miss as a gap.
+  return order[nav1d(order.indexOf(cur), n, key) ?? -1] ?? null;
 }
 
 /**
@@ -273,24 +275,64 @@ export function useActivePicker(opts: PickerOptions): Picker {
   // Did the KEYBOARD put the current unit up, rather than the pointer? See
   // `onPointerLeave` — a boundary event must not wipe a roved unit.
   const byKey = useRef(false);
-  const down = useRef<[number, number] | null>(null);
+  // The last native event this chart handled. Two jobs, one slot: the tap/drag
+  // test in `onClick` reads its coordinates, and the light-dismiss listener
+  // compares identity against it.
+  const down = useRef<Event | null>(null);
   // Cache the painted SVG across a scrub — skip querySelector on every move.
   // Still measure getBoundingClientRect each move (scroll/resize while hovering
   // would stale a cached rect).
   const svgRef = useRef<Element | null>(null);
 
-  const dat = (i: number): MicroDatum => (datum ? datum(i) : { index: i, value: null });
   const act = (i: number | null): void => {
     if (activeRef.current === i) return; // renders track unit changes, not moves
     activeRef.current = i;
     setActive(i);
-    onActive?.(i === null ? null : dat(i));
+    onActive?.(i === null ? null : datum(i));
   };
   const select = (i: number | null): void => {
     const next = i === null || selected === i ? null : i; // re-tap clears
     if (!controlled) setSel(next);
-    onSelect?.(next === null ? null : dat(next));
+    onSelect?.(next === null ? null : datum(next));
   };
+
+  // LIGHT DISMISS. A pin outlives the pointer by design, which used to mean it
+  // outlived the reader's interest in it too: re-tapping the same unit and
+  // Escape were the only ways out, and Escape only reached a chart that still
+  // had focus. Clicking away — the thing everyone tries first — left the mark
+  // ringed and every other mark dimmed by `:has([data-mc-active])`, with no way
+  // back short of tabbing to the chart. So a pointerdown that is not this
+  // chart's own drops the selection, and Escape does it from anywhere.
+  //
+  // The listeners exist ONLY while something is pinned: an idle chart adds none,
+  // and a page of 500 charts adds as many as it has pins. They bind on `window`
+  // (the bare globals are `window.addEventListener`/`removeEventListener`, and
+  // dropping the `document.` qualifier is 36 B across ~90 bundles) so they run
+  // after React's root listener, which sits on the app container or a portal
+  // container — both inside the document.
+  //
+  // Identity, not containment, decides "not ours": `bind`'s own handler stamps
+  // the native event as it passes, so an event raised inside this chart is
+  // already stamped by the time it arrives here, and a chart with no host ref
+  // needs none. Comparing the event itself cannot go stale either — a handler
+  // that never runs leaves no flag behind for the next event to trip over.
+  //
+  // `e.key ?? "Escape"` reads as "a pointerdown, or the one key that dismisses":
+  // pointer events carry no `key`, so the nullish default admits them and every
+  // other keystroke falls out. Cheaper than testing `e.type` and no less exact,
+  // since these two listeners are the only ones that reach this function.
+  useEffect(() => {
+    if (selected === null) return;
+    const off = (e: Event & { key?: string }): void => {
+      if (e !== down.current && (e.key ?? "Escape") === "Escape") select(null);
+    };
+    addEventListener("pointerdown", off);
+    addEventListener("keydown", off);
+    return () => {
+      removeEventListener("pointerdown", off);
+      removeEventListener("keydown", off);
+    };
+  });
 
   // Hit-test the painted SVG — `.mc-inline` seat translates the mark, not the wrapper box.
   const at = (e: MouseEvent<HTMLElement>): number | null => {
@@ -310,7 +352,7 @@ export function useActivePicker(opts: PickerOptions): Picker {
 
   const bind: Picker["bind"] = {
     onPointerDown: (e) => {
-      down.current = [e.clientX, e.clientY];
+      down.current = e.nativeEvent; // also the stamp the dismiss listener skips
       // Touch/pen: capture so a drag that leaves the mark still scrubs, and
       // light the unit under the finger immediately (no hover prelude).
       if (e.pointerType !== "mouse") {
@@ -361,24 +403,28 @@ export function useActivePicker(opts: PickerOptions): Picker {
       if (!byKey.current) act(null);
     },
     onClick: (e) => {
-      const d = down.current;
+      const d = down.current as { clientX: number; clientY: number } | null;
       down.current = null;
       // A drag (down→up far apart) is a scrub, not a tap — don't select.
-      if (d && Math.abs(e.clientX - d[0]) + Math.abs(e.clientY - d[1]) > 6) return;
+      if (d && Math.abs(e.clientX - d.clientX) + Math.abs(e.clientY - d.clientY) > 6) return;
       select(at(e));
     },
     onKeyDown: (e) => {
-      if (count === 0) return;
+      down.current = e.nativeEvent; // stamp, so the dismiss listener doesn't double-clear
       const cur = activeRef.current ?? -1;
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        return select(cur < 0 ? selected : cur);
-      }
+      // Escape is handled BEFORE the empty guard: a chart whose data went away
+      // under a pin still has a pin to clear, and refusing the key there was the
+      // one state the keyboard could not get out of.
       if (e.key === "Escape") {
         byKey.current = false;
         act(null);
         if (selected !== null) select(null);
         return;
+      }
+      if (count === 0) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        return select(cur < 0 ? selected : cur);
       }
       const next = step ? step(cur, e.key, e) : nav1d(cur, count, e.key);
       if (next === null) return;

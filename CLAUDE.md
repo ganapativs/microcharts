@@ -154,6 +154,12 @@ all four back to a system outline. The dim rule skips `[opacity]` — a mark tha
 3. Wrapper `<span tabIndex={0} role="img">` owns naming + roving keyboard; announcements go through a polite live region
    using `SummaryStrings` (the i18n contract — no hardcoded English outside `EN`). Shared summary text lives in one
    exported function used by both entries.
+4. **Every state a reader can enter, they can leave.** A selection is a pin — it survives blur on purpose — so the
+   kernel light-dismisses it: while something is pinned (and only then) it binds `pointerdown` + `keydown` on the
+   window, and a press outside this chart, or Escape from anywhere, clears it through the same `onSelect(null)` as a
+   re-tap. "Not ours" is decided by event identity (`bind`'s own handler stamps the native event as it passes), never by
+   containment, so no entry needs a host ref for it. A controlled chart reports the dismissal and leaves `selectedIndex`
+   to its host. Escape is handled before the empty guard in `onKeyDown`, because a pin can outlive the data under it.
 
 **Accessible naming:** default = a deterministic composed `aria-label` (plus an id-less `<title>`); an explicit `id`
 prop opts into `<title>/<desc>` + `aria-labelledby`. Never generate ids in static components (module counters desync

@@ -85,9 +85,14 @@ work, so a grid navigates the same way a line does. **Home** and **End** jump to
 
 **Active vs selected.** Hovering or roving makes a unit _active_: a transient read that clears when the pointer leaves
 or focus blurs. **Enter**, **Space**, a click, or a tap _selects_ it and **pins** the readout, so it survives blur and
-pointer-leave. A keyboard user can move focus elsewhere and the pinned value stays on screen. Selecting the same unit
-again clears it, and **Escape** clears the selection from anywhere. The two states are drawn differently, so "where I
-am" and "what I kept" never look the same.
+pointer-leave. A keyboard user can move focus elsewhere and the pinned value stays on screen. The two states are drawn
+differently, so "where I am" and "what I kept" never look the same.
+
+**Getting out of a selection.** Three ways, and none of them is a shortcut you have to be told about. Select the same
+unit again. Press **Escape** — from the chart, or from anywhere else on the page while the pin is up. Or click, tap, or
+press anywhere outside the chart: a pointer press that is not the chart's own drops the pin and fires `onSelect(null)`.
+Blur is deliberately not one of them, so tabbing to a detail panel keeps the value you pinned. On a controlled chart
+(`selectedIndex`), all three report `onSelect(null)` and leave the pin where your state put it.
 
 **Touch.** A tap pins a unit the way a click does; dragging across the chart scrubs the active unit continuously. A drag
 always resolves as a scrub, so scrolling past a chart can't pin a value by accident.

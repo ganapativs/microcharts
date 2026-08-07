@@ -32,8 +32,8 @@ export const INTERACTION_NOTES: Record<Exclude<InteractionKind, "none">, string>
   picker: [
     `The interactive entry follows the shared [interaction contract](${CONTRACT_HREF}):`,
     "arrow keys rove between units on both axes, `Home` and `End` jump to the ends, and a click, tap, `Enter` or",
-    "`Space` selects a unit — pinning its readout so it survives blur, until you select it again or press `Escape`.",
-    "On touch, a tap pins and a drag scrubs.",
+    "`Space` selects a unit — pinning its readout so it survives blur, until you select it again, press `Escape`, or",
+    "press outside the chart. On touch, a tap pins and a drag scrubs.",
   ].join("\n"),
   single: [
     "This chart is a single unit, so there is nothing to rove between: a click, tap, `Enter` or `Space` selects it",

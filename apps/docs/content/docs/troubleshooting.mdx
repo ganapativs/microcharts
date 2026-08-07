@@ -97,6 +97,21 @@ none of them bugs: the reader has `prefers-reduced-motion: reduce`, the chart is
 an entrance would animate content the reader can already see. The entrance runs once per mount by design; remount with a
 changed `key` to replay it. The full contract is on [Motion](/docs/motion).
 
+## A selected unit stays lit after I click away
+
+It shouldn't, from 0.16. A pin is dropped by a pointer press anywhere outside the chart, by **Escape** from anywhere on
+the page, and by selecting the same unit again; each fires `onSelect(null)`. Blur is not one of them, so moving focus to
+a panel that reads the pinned value keeps it.
+
+If a pin is still stuck, the chart is controlled: `selectedIndex` makes your state the only thing that can move the
+selection, and the chart just reports the dismissal. Clear it in your handler, or switch to `defaultSelectedIndex` to
+seed the selection once and let the chart own it after that.
+
+```tsx
+const [picked, setPicked] = useState<number | null>(null);
+<SparkBar data={data} selectedIndex={picked} onSelect={(d) => setPicked(d?.index ?? null)} />;
+```
+
 ## The chart won't stretch to fill its container
 
 Give it a width and make sure the _parent_ is block-level (a flex or grid item, or a `div`). A chart can't grow past an
