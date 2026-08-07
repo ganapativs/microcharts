@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { docsMeta } from "@/lib/metadata";
-import { COLLECTIONS, isChartCollection } from "../collections";
+import { COLLECTIONS, isChartCollection } from "@/lib/collections";
 import { GalleryView } from "../gallery-view";
 
 type Props = { params: Promise<{ collection: string }> };

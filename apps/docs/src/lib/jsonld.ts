@@ -131,14 +131,26 @@ export function softwareApplicationJsonLd() {
   };
 }
 
+/** The catalog, or one collection shelf of it, as an ItemList.
+ *
+ *  `hub` is required for the five URLs that render a filtered catalog: without
+ *  it every shelf claimed the same `name` and described its subset as "All N
+ *  chart types in the package" — one duplicated list name across five indexable
+ *  URLs, and a count that contradicts the 106 the rest of the site states. */
 export function chartCatalogJsonLd(
   charts: readonly { name: string; slug: string; tagline: string }[],
+  hub?: { key: string; title: string; description: string },
 ) {
+  const url = abs(hub ? `/charts/${hub.key}` : "/charts");
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: `${SITE.name} chart catalog`,
-    description: `All ${charts.length} word-sized React chart types in ${SITE.pkg}.`,
+    "@id": `${url}#catalog`,
+    url,
+    name: hub ? hub.title : `${SITE.name} chart catalog`,
+    description: hub
+      ? hub.description
+      : `All ${charts.length} word-sized React chart types in ${SITE.pkg}.`,
     numberOfItems: charts.length,
     itemListElement: charts.map((c, i) => ({
       "@type": "ListItem",

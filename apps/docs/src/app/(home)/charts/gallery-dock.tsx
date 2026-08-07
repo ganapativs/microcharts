@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import type { ChartCollection } from "@/lib/charts/types";
-import { isChartCollection } from "./collections";
+import { isChartCollection } from "@/lib/collections";
 import { GalleryDockBar } from "./gallery-dock-bar";
 
 function activeFromPath(path: string): ChartCollection | "all" {

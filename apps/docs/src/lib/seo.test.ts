@@ -11,6 +11,7 @@ import {
 import { chartSeoTitle, chartsIndexDescription, SEO_KEYWORDS } from "./seo";
 import { docsMeta } from "./metadata";
 import { SITE } from "./site";
+import { COLLECTIONS } from "./collections";
 
 describe("seo helpers", () => {
   it("builds keyword-rich chart titles", () => {
@@ -86,7 +87,25 @@ describe("json-ld", () => {
   it("builds a catalog ItemList with absolute chart URLs", () => {
     const ld = chartCatalogJsonLd([{ name: "Sparkline", slug: "sparkline", tagline: "trend" }]);
     expect(ld.numberOfItems).toBe(1);
+    expect(ld.url).toBe(`${SITE.url}/charts`);
     expect(ld.itemListElement[0]?.url).toBe(`${SITE.url}/docs/charts/sparkline`);
+  });
+
+  it("names each collection shelf as its own list, not the whole catalog", () => {
+    const one = [{ name: "Sparkline", slug: "sparkline", tagline: "trend" }];
+    const full = chartCatalogJsonLd(one);
+    const names = new Set<string>([full.name]);
+    for (const hub of COLLECTIONS) {
+      const ld = chartCatalogJsonLd(one, hub);
+      expect(ld.url).toBe(`${SITE.url}/charts/${hub.key}`);
+      expect(ld["@id"]).toBe(`${SITE.url}/charts/${hub.key}#catalog`);
+      expect(ld.name).toBe(hub.title);
+      // A shelf must never describe its subset as the whole package.
+      expect(ld.description).not.toMatch(/^All \d+ word-sized/);
+      names.add(ld.name);
+    }
+    // Five indexable catalog URLs, five distinct list names.
+    expect(names.size).toBe(COLLECTIONS.length + 1);
   });
 
   it("ships FAQPage schema matching the intro FAQ set", () => {

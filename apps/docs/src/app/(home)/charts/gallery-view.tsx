@@ -2,12 +2,18 @@ import { Fragment } from "react";
 import Link from "next/link";
 import { getModule, STABLE_CHARTS } from "@/lib/charts/registry";
 import type { ChartCollection, ChartEntry } from "@/lib/charts/types";
-import { chartCatalogJsonLd, jsonLdScript } from "@/lib/jsonld";
+import { breadcrumbJsonLd, chartCatalogJsonLd, jsonLdScript } from "@/lib/jsonld";
+import { abs } from "@/lib/site";
 import { GalleryStage } from "./gallery-stage";
 import { GalleryCard } from "./gallery-card";
 import { ChartQuestions } from "./chart-questions";
 import { WildStrip } from "./wild-strip";
-import { COLLECTIONS, COLLECTION_ORDER, getCollection, type CollectionDef } from "./collections";
+import {
+  COLLECTIONS,
+  COLLECTION_ORDER,
+  getCollection,
+  type CollectionDef,
+} from "@/lib/collections";
 
 function keywords(c: ChartEntry): string {
   // Includes `bestFor` — the decisions each chart answers ("rank shuffles",
@@ -51,9 +57,23 @@ export function GalleryView({
         {jsonLdScript(
           chartCatalogJsonLd(
             charts.map((c) => ({ name: c.name, slug: c.slug, tagline: c.tagline })),
+            hub ?? undefined,
           ),
         )}
       </script>
+      {/* The hubs are the only catalog URLs with a parent, and they already draw
+          the crumb visually ("The catalog / Core"). Marking it up gives the four
+          shelves the SERP breadcrumb every /docs page has had. */}
+      {hub && (
+        <script type="application/ld+json">
+          {jsonLdScript(
+            breadcrumbJsonLd([
+              { name: "Charts", url: abs("/charts") },
+              { name: hub.label, url: abs(`/charts/${hub.key}`) },
+            ]),
+          )}
+        </script>
+      )}
 
       <section className="act-open">
         <div className="shell">
