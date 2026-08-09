@@ -1,5 +1,21 @@
 # @microcharts/mcp
 
+## 0.1.14
+
+### Patch Changes
+
+- [#116](https://github.com/ganapativs/microcharts/pull/116)
+  [`b80156e`](https://github.com/ganapativs/microcharts/commit/b80156e6278a384694fdeebd18e972923d775a3f) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-publish the embedded catalog. Every chart entry gains
+  `maxWidth`/`maxHeight` — the box the chart is authored for, which nothing previously stated — and a `gotchas` array
+  carrying the facts that do not fit a prop description: the caps that lived only as dev warnings in the library source,
+  which charts print their own sign, which take a raw sample rather than precomputed quantiles, and how `format` merges
+  with a chart's own defaults. `get_microchart` returns both.
+- Updated dependencies
+  [[`b80156e`](https://github.com/ganapativs/microcharts/commit/b80156e6278a384694fdeebd18e972923d775a3f),
+  [`b80156e`](https://github.com/ganapativs/microcharts/commit/b80156e6278a384694fdeebd18e972923d775a3f)]:
+  - @microcharts/react@0.17.0
+
 ## 0.1.13
 
 ### Patch Changes
