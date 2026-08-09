@@ -17,12 +17,12 @@ is the mark and it is sized from the box.
 **Sub-unit marks paint again.** Several charts floor a magnitude-encoding rect at 0.5 viewBox units so a small-but-real
 value stays visible, and every one of those rects also carried `shapeRendering: crispEdges`. The hint snaps each edge to
 the device pixel grid, and a word-sized chart renders at about one unit per pixel, so the floor and the hint cancelled:
-measured in Chromium at 1u = 1px, a 30×0.5 rect painted **0.00 ink** with the hint and 7.09 without it. `<SparkBar
-data={[1000, 4, 0]} />` drew the 4 and the 0 pixel-identically. Worse, below one unit survival depended on where the
-edges fell on the grid — the same bar measured 0.00, 0.00, 16.78 and 17.66 across four sub-pixel offsets, so it painted
-nothing at half of them and twice its honest weight at the others. Sub-unit marks now get their anti-aliasing back. A
-true zero still paints nothing, which is the other half of the contract. HistogramStrip gained the visibility floor it
-never had.
+measured in Chromium at 1u = 1px, a 30×0.5 rect painted **0.00 ink** with the hint and 7.09 without it.
+`<SparkBar data={[1000, 4, 0]} />` drew the 4 and the 0 pixel-identically. Worse, below one unit survival depended on
+where the edges fell on the grid — the same bar measured 0.00, 0.00, 16.78 and 17.66 across four sub-pixel offsets, so
+it painted nothing at half of them and twice its honest weight at the others. Sub-unit marks now get their anti-aliasing
+back. A true zero still paints nothing, which is the other half of the contract. HistogramStrip gained the visibility
+floor it never had.
 
 **SparkBar could paint outside its own viewBox.** `y` and `height` were rounded independently, so each could round up by
 0.005 and a bar the clamp had seated flush on the frame came back as `y + height = 20.01` in a 20-unit box — and

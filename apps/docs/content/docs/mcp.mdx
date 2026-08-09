@@ -108,10 +108,10 @@ The two example forms serve two readers. `example.code` is JSX, for a human to p
 hand straight to `render_microchart`. Every chart takes its own shape, and guessing between `number[]`,
 `{ label, value }[]`, and `{ open, high, low, close }[]` is where a model goes wrong.
 
-`maxWidth` and `maxHeight` are the authored box in viewBox units. Past it a chart's geometry stops scaling, so a
-`width` of 823 on a chart authored to 320 paints a word-sized mark in a room-sized frame; scale with CSS instead.
-`gotchas` carries what a prop description cannot: documented caps, inputs the component derives from a raw sample, and
-how `format` meets a chart that prints its own sign or unit.
+`maxWidth` and `maxHeight` are the authored box in viewBox units. Past it a chart's geometry stops scaling, so a `width`
+of 823 on a chart authored to 320 paints a word-sized mark in a room-sized frame; scale with CSS instead. `gotchas`
+carries what a prop description cannot: documented caps, inputs the component derives from a raw sample, and how
+`format` meets a chart that prints its own sign or unit.
 
 ### `render_microchart`
 

@@ -7,8 +7,8 @@ A `format` prop can change how a number reads. It can no longer change what it m
 **Chart formatting defaults merge instead of being replaced.** `makeFormatter` resolved its options as
 `format ?? defaults`, so a chart's defaults were consulted only when you passed nothing at all. Those defaults carry the
 chart's UNIT — `{ style: "percent" }` on the share labels of Funnel, Progress, ProgressRing, StackedArea, OHLC,
-LikertStrip, IconArray, ConfusionGrid, EventTimeline, BreathingDot, BiasStrip, Honeycomb, DualWindowMeter,
-VolumeProfile and HistogramStrip — so `format={{ notation: "compact" }}`, written to shorten six-figure counts, deleted
+LikertStrip, IconArray, ConfusionGrid, EventTimeline, BreathingDot, BiasStrip, Honeycomb, DualWindowMeter, VolumeProfile
+and HistogramStrip — so `format={{ notation: "compact" }}`, written to shorten six-figure counts, deleted
 `style: "percent"` in the same breath and rendered three percent as `0.03`. A plausible wrong number, in the label a
 reader is most likely to quote, with nothing to warn you. Options now merge per key, so the unit survives a change to
 notation or precision, and an explicit `{ style: "decimal" }` still opts out of it. Changing the unit drops the chart's
@@ -31,10 +31,10 @@ routing all ~75 of them through the merging path would charge each one 95 B gzip
 enough to push `./sparkline/interactive` through the 7 kB wall.
 
 **Charts that print their own sign no longer print two.** Delta formats a magnitude and prepends the direction itself,
-so `format={{ signDisplay: "always" }}` — a legal thing to write — rendered `++0.7 pp`, and a negative rendered
-`−+3%`. The same shape was in ten more places: Waterfall (five), DataDiff (two), Bullet, TrendArrow and WinProbWorm.
-Each now strips a sign the formatter already emitted. TrendArrow's case was the quietest: it prints no sign of its own,
-so a signed formatter put `+5` beside a down arrow.
+so `format={{ signDisplay: "always" }}` — a legal thing to write — rendered `++0.7 pp`, and a negative rendered `−+3%`.
+The same shape was in ten more places: Waterfall (five), DataDiff (two), Bullet, TrendArrow and WinProbWorm. Each now
+strips a sign the formatter already emitted. TrendArrow's case was the quietest: it prints no sign of its own, so a
+signed formatter put `+5` beside a down arrow.
 
 A source-level gate now fails any chart that concatenates a sign onto a formatted absolute value without passing it
 through `unsigned` or `withPlus`, so this class cannot come back.

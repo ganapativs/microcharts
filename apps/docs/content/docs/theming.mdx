@@ -67,12 +67,12 @@ value wins.
 
 Overriding a **rule** works differently, because layer order beats specificity and the last layer declared wins. If your
 app declares its own layers (Tailwind's `@layer theme, base, components, utilities`, or a framework that sets that up
-for you) and `styles.css` is imported after them, the four microcharts layers are declared last and outrank your
-utility classes. A class you add to a chart still lands on the element and still matches a real rule of yours. It loses
-the cascade and paints nothing, with no warning anywhere.
+for you) and `styles.css` is imported after them, the four microcharts layers are declared last and outrank your utility
+classes. A class you add to a chart still lands on the element and still matches a real rule of yours. It loses the
+cascade and paints nothing, with no warning anywhere.
 
-Declare the order yourself to fix it. Put the microcharts layers first, above every import in your entry stylesheet,
-and your own layers then win by being later:
+Declare the order yourself to fix it. Put the microcharts layers first, above every import in your entry stylesheet, and
+your own layers then win by being later:
 
 ```css
 /* app entry CSS, before the imports */
@@ -81,8 +81,8 @@ and your own layers then win by being later:
 ```
 
 `!important` also crosses the boundary, because importance inverts layer order: an important declaration in an earlier
-layer beats an important one in a later layer, and both beat every normal declaration. Reach for it to unblock a
-single rule, and reach for the layer statement above to stop hitting this at all.
+layer beats an important one in a later layer, and both beat every normal declaration. Reach for it to unblock a single
+rule, and reach for the layer statement above to stop hitting this at all.
 
 Unlayered CSS never meets any of this. Plain rules beat every layered rule regardless of order, so an app with no
 `@layer` of its own already wins.
@@ -459,10 +459,10 @@ focused, and pinned states alike.
 
 The fourth token, `--mc-surface-shadow`, stays a black mix in every theme, and that is deliberate. The chip renders in
 the top layer over ground the library cannot know, so its drop shadow reads as occlusion rather than as part of the
-palette, and occlusion is dark on a dark surface too. An earlier version mixed `CanvasText` the way the edge does,
-which inverts with the theme and painted a white halo around the chip on dark. On dark the shadow now goes quiet and
-the 1px `--mc-surface-edge` ring carries the separation. Override it if your surface needs a different depth; don't
-give it a theme twin.
+palette, and occlusion is dark on a dark surface too. An earlier version mixed `CanvasText` the way the edge does, which
+inverts with the theme and painted a white halo around the chip on dark. On dark the shadow now goes quiet and the 1px
+`--mc-surface-edge` ring carries the separation. Override it if your surface needs a different depth; don't give it a
+theme twin.
 
 ## The active state
 
@@ -509,9 +509,9 @@ The library reads the theme two ways. `prefers-color-scheme` is the default, and
 ### Tell the charts which theme your app picked
 
 If your app switches theme with a **class**, the charts do not see it. `.dark` on `<html>` is what next-themes,
-fumadocs, and most Tailwind setups write, and it means nothing to a stylesheet that is reading `prefers-color-scheme`.
-A reader on a light OS who picks dark mode gets your dark chrome with light-tuned charts on it, and a reader on a dark
-OS who picks light gets the reverse. Both are legible enough to ship by accident and wrong enough to notice.
+fumadocs, and most Tailwind setups write, and it means nothing to a stylesheet that is reading `prefers-color-scheme`. A
+reader on a light OS who picks dark mode gets your dark chrome with light-tuned charts on it, and a reader on a dark OS
+who picks light gets the reverse. Both are legible enough to ship by accident and wrong enough to notice.
 
 Set `data-mc-theme` wherever you set the class, and the two agree:
 

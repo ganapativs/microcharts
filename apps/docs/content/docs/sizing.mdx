@@ -64,13 +64,13 @@ screen.
 ## How big a chart usefully gets
 
 Each chart's geometry is authored for a box in the word-sized range, and past that box it stops scaling. Internal caps
-hold the marks at their authored size and the extra room becomes whitespace. `<EventTimeline width={823} height={658} />`
-draws a 6-unit bar in 658 units of nothing, because the span bar caps at 6 viewBox units, the point diamond at 2.5, and
-the track inset at 2.
+hold the marks at their authored size and the extra room becomes whitespace.
+`<EventTimeline width={823} height={658} />` draws a 6-unit bar in 658 units of nothing, because the span bar caps at 6
+viewBox units, the point diamond at 2.5, and the track inset at 2.
 
 Every chart publishes its own ceiling as `maxWidth` and `maxHeight` in [`/catalog.json`](/catalog.json), the machine
-catalog an agent reads to pick a chart. Sparkline is authored to 340 × 100, EventTimeline to 320 × 50, Progress to
-200 × 40.
+catalog an agent reads to pick a chart. Sparkline is authored to 340 × 100, EventTimeline to 320 × 50, Progress to 200
+× 40.
 
 To render larger, keep the props inside that box and scale with CSS. The viewBox handles the rest and the marks keep
 their proportions:
@@ -155,15 +155,14 @@ It answers the four questions a hand-written version has to answer:
 - **A measured 0 never reaches `width`.** A collapsed disclosure, an inactive tab, and a `display: none` ancestor all
   measure 0, and a chart 0 units wide draws nothing, so the last real width holds until the box comes back.
 - **Widths round to whole pixels**, matching the integer viewBox coordinates the charts draw in.
-- **Commits land once per animation frame**, so dragging a window edge doesn't write state inside the layout pass it
-  was measured in.
+- **Commits land once per animation frame**, so dragging a window edge doesn't write state inside the layout pass it was
+  measured in.
 
-Attach `ref` to one element and keep it for the life of the component. The observer binds on mount, so swapping the
-node out leaves it watching the old one.
+Attach `ref` to one element and keep it for the life of the component. The observer binds on mount, so swapping the node
+out leaves it watching the old one.
 
-`useFluidWidth` answers "my chart lives in a flexible box"; the
-[authored maximum](#how-big-a-chart-usefully-gets) answers "how big is worth asking for". Clamp the measured number
-when the container can outgrow the chart:
+`useFluidWidth` answers "my chart lives in a flexible box"; the [authored maximum](#how-big-a-chart-usefully-gets)
+answers "how big is worth asking for". Clamp the measured number when the container can outgrow the chart:
 
 ```tsx
 <Sparkline data={data} width={Math.min(width, 340)} />

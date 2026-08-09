@@ -64,8 +64,8 @@ section into `CLAUDE.md` on Windows.
   MinimapStrip uses `onWindowChange` in chart `props`). For entrance motion: pass `animate` and import
   `@microcharts/react/motion` once on the client.
 - These charts are word-sized. `width`/`height` are viewBox units with an authored maximum per chart (`maxWidth` /
-  `maxHeight` in `/catalog.json`); stay inside it and scale with CSS beyond it, because past that box the geometry
-  stops scaling and the extra room is whitespace.
+  `maxHeight` in `/catalog.json`); stay inside it and scale with CSS beyond it, because past that box the geometry stops
+  scaling and the extra room is whitespace.
 - `null`, `NaN`, or non-finite values in `data` are gaps, never zeros.
 - Accessibility is automatic (`role="img"` + a generated summary). Inline in a sentence: wrap in
   `<span className="mc-inline">` and pass `summary={false}`.

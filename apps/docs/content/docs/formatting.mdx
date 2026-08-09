@@ -52,12 +52,12 @@ chart-style defaults, merge them yourself instead — `makeFormatter({ ...defaul
 ## Your format merges with the chart's own defaults
 
 Fifteen charts format with defaults of their own. Eleven label a share as a percent — Funnel, Progress, ProgressRing,
-StackedArea, OHLC, LikertStrip, IconArray, ConfusionGrid, EventTimeline, BreathingDot, and Honeycomb. The other four
-set a different default: BiasStrip shows the sign on every non-zero bias, VolumeProfile uses compact notation, and
+StackedArea, OHLC, LikertStrip, IconArray, ConfusionGrid, EventTimeline, BreathingDot, and Honeycomb. The other four set
+a different default: BiasStrip shows the sign on every non-zero bias, VolumeProfile uses compact notation, and
 DualWindowMeter and HistogramStrip pin their decimal places.
 
-Your `format` merges with those defaults key by key rather than replacing them, so `format={{ notation: "compact" }}`
-on a percent chart still writes a percent.
+Your `format` merges with those defaults key by key rather than replacing them, so `format={{ notation: "compact" }}` on
+a percent chart still writes a percent.
 
 Passing an explicit `style` replaces the whole set, digit defaults included. Those digits are calibrated for the unit:
 `maximumFractionDigits: 0` reads as `3%`, and kept under `style: "decimal"` it rounds 0.03 to `0`. Changing the unit
