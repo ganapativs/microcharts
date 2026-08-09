@@ -55,7 +55,7 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
 
-  const fontSize = labelFont(height, 0.4);
+  const fontSize = labelFont(height, 0.4, props.labelSize);
   // Widest rank label, in chars. A full scan of the series, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
   const maxLabelChars = useMemo(() => {

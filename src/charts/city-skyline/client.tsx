@@ -67,7 +67,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
     defaultSelectedIndex,
     ...rest
   } = props;
-  const fontSize = props.fontSize ?? labelFont(height, 0.3);
+  const fontSize = props.fontSize ?? labelFont(height, 0.3, props.labelSize);
   const hostRef = useRef<HTMLSpanElement>(null);
   // ordered by x, spread over a 500ms window — the skyline builds left→right
   // instead of every building rising in lockstep.

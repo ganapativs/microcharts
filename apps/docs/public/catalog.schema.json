@@ -206,6 +206,25 @@
           "minLength": 1,
           "description": "SVG nodes a typical render emits, e.g. `≤ 6` or `1 per cell`."
         },
+        "maxWidth": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authored maximum `width` prop, in viewBox units. Past it the geometry stops scaling: internal caps hold marks at their authored size and the extra box becomes whitespace. To render larger, keep the props inside this box and scale with CSS — the viewBox does the rest. Paired with maxHeight; both are absent on charts whose box comes from `cell`, from the data, or from CSS, and those say so in `gotchas`."
+        },
+        "maxHeight": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Authored maximum `height` prop, in viewBox units. See maxWidth."
+        },
+        "gotchas": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Behavior a prop description cannot carry and a caller has no other way to learn: documented caps, inputs the component derives, how `format` interacts with the chart's own sign or unit, and sizing knobs that are not `width`/`height`. Absent means none is recorded, not that none exists.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "bestFor": {
           "type": "array",
           "description": "Situations this chart is the right pick for.",

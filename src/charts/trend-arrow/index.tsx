@@ -5,8 +5,9 @@
 // `showValue` and the summary — the glyph never scales with it.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeFormatter, unsigned, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
+import { labelFitsBand } from "../../core/labels.js";
 import { trendArrowGeometry, type TrendDirection, type TrendGlyph } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
@@ -35,7 +36,10 @@ export function trendArrowModel(props: TrendArrowProps): TrendArrowModel {
         : "down";
 
   const fmt = makeFormatter(format, locale);
-  const display = finite ? fmt(Math.abs(value)) : "—";
+  // The GLYPH carries direction, so the number is a magnitude. `unsigned` keeps
+  // a caller's `signDisplay: "always"` from printing `+5` beside a down arrow —
+  // a sign that contradicts the mark it sits next to.
+  const display = finite ? unsigned(fmt(Math.abs(value))) : "—";
   const goodDir = positive === "down" ? "down" : "up";
 
   return {
@@ -65,6 +69,11 @@ export interface TrendArrowProps {
   locale?: string | string[] | undefined;
   /** Swappable summary templates (defaults to EN). */
   strings?: ScalarStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -79,6 +88,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   const {
     glyph = "arrow",
     showValue = false,
+    labelSize,
     title,
     summary,
     id,
@@ -88,11 +98,21 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   } = props;
 
   const model = trendArrowModel(props);
-  const geo = trendArrowGeometry({ width: SIZE, height: SIZE, direction: model.direction, glyph });
+  const geo = trendArrowGeometry({
+    width: SIZE,
+    height: SIZE,
+    direction: model.direction,
+    glyph,
+    labelSize,
+  });
 
   // Right gutter reserved from the rendered text's char count
   // (0.62em/char over-estimate; never measured).
-  const width = showValue
+  // A numeral taller than the 16-unit glyph box straddles both edges of a
+  // viewBox `.mc-root` does not clip, so a raised `labelSize` the box cannot
+  // seat DROPS the number and hands its gutter back (core/labels degradation).
+  const showNumeral = showValue && labelFitsBand(SIZE, geo.fontSize);
+  const width = showNumeral
     ? Math.ceil(geo.labelX + model.display.length * geo.fontSize * 0.62 + 1)
     : SIZE;
 
@@ -104,7 +124,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${geo.fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${geo.fontSize}px` } as CSSProperties;
 
   return (
     <Chart
@@ -128,7 +148,7 @@ export function TrendArrow(props: TrendArrowProps): ReactNode {
           The role picks up the `fill: CanvasText` mapping — and elsewhere quiets
           the number to `--mc-neutral`, which is what a direct value label is
           across the catalog. */}
-      {showValue ? (
+      {showNumeral ? (
         <text
           x={geo.labelX}
           y={geo.labelY}

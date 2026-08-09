@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
     precision: "medium — interval read",
   },
   nodeBudget: "≤ 6",
+  maxWidth: 320,
+  maxHeight: 50,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a forecast with its uncertainty",
     "estimate-vs-actual in a KPI card",

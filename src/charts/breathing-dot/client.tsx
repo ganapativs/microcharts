@@ -8,7 +8,7 @@
 // changes only, never per tick, and hover/focus reveals the level itself
 // which the glyph alone never shows.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
@@ -124,7 +124,7 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
   // percent is a real `Intl` percent (see index.tsx) — `${n}%` was an en-US
   // percent that ignored `locale`.
   const pct = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
   const readoutText = geo.unknown ? "—" : `${pct(geo.level)} · ${strings.loadBands[geo.band]}`;

@@ -87,7 +87,7 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
     // only the `label` prop kept reserving that gutter here, so `totalWidth`
     // ran ~20 units wider than the SVG the pointer was actually over and every
     // hit landed a period or two early.
-    const font = labelFont(height);
+    const font = labelFont(height, 0.55, props.labelSize);
     const showLabel =
       (props.label ?? "last") === "last" && base != null && labelFitsY(height / 2, font, height);
     const gutterCh = showLabel ? fmt(base!.last.value).length : 0;
@@ -102,7 +102,18 @@ export function RetentionCurve(props: InteractiveRetentionCurveProps): React.Rea
       gutterCh,
       fontSize: font,
     });
-  }, [width, height, data, benchmark, plateau, curve, props.domain, props.label, fmt]);
+  }, [
+    width,
+    height,
+    data,
+    benchmark,
+    plateau,
+    curve,
+    props.domain,
+    props.label,
+    props.labelSize,
+    fmt,
+  ]);
 
   const accName =
     summary === false

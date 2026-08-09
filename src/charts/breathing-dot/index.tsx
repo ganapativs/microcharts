@@ -8,7 +8,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
-import { makeFormatter, type Format } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
 import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import { breathingDotGeometry, loadBand, resolveThresholds } from "./geometry.js";
@@ -26,6 +26,11 @@ export interface BreathingDotProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BreathingDotStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -58,7 +63,7 @@ export function breathingDotSummary(
   // Same resolver + same band function the geometry uses, so the word spoken
   // and the color painted can never come off different edges.
   const band = loadBand(v, resolveThresholds(opts.thresholds));
-  return strings.breathingDot(makeFormatter(format, locale, PCT)(v), strings.loadBands[band]);
+  return strings.breathingDot(makeUnitFormatter(format, locale, PCT)(v), strings.loadBands[band]);
 }
 
 export function BreathingDot(props: BreathingDotProps): ReactNode {
@@ -70,6 +75,7 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
     format,
     locale,
     strings = EN_BREATHING_DOT,
+    labelSize,
     title,
     summary,
     id,
@@ -82,14 +88,16 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
   // one reached the DOM verbatim: `font-size="NaN"`, plus a NaN viewBox width
   // through the gutter it sizes. Fall back to the `size`-derived default.
   const fontSize =
-    isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : labelFont(geo.size);
+    isFiniteValue(props.fontSize) && props.fontSize > 0
+      ? props.fontSize
+      : labelFont(geo.size, 0.55, labelSize);
 
   const accName =
     summary === false
       ? false
       : (summary ?? breathingDotSummary(value, { thresholds, strings, format, locale }));
   const pctText =
-    label === "value" && !geo.unknown ? makeFormatter(format, locale, PCT)(geo.level) : null;
+    label === "value" && !geo.unknown ? makeUnitFormatter(format, locale, PCT)(geo.level) : null;
   const labelY = geo.size / 2 + fontSize * 0.34;
   // `labelFont` floors at 7, so under a box of ~8 units the numeral's em-box no
   // longer fits the glyph box vertically — and `.mc-root` is `overflow: visible`,
@@ -120,7 +128,7 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       // the ring it happens to be drawn at, so the dot holds still as load moves.
       seat={{ mode: "center", top: PAD, bottom: geo.size - PAD }}
       className={className ? `mc-breathing ${className}` : "mc-breathing"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* Level ring (distance from core); hair stroke role. */}
       {!geo.unknown ? (

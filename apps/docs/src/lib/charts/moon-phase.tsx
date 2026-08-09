@@ -19,6 +19,8 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number }",
   encoding: { channel: "illuminated area fraction of the disc", precision: "medium" },
   nodeBudget: "3",
+  maxWidth: 70,
+  maxHeight: 70,
   bestFor: [
     "sprint or quota progress in a sentence",
     "a billing-period or release-cycle marker",

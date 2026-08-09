@@ -15,6 +15,7 @@ export const entry: ChartEntry = {
   dataShape: "{ word: string; value: number }",
   encoding: { channel: "inked fraction of the word's own glyph extent", precision: "medium" },
   nodeBudget: "2 (+1 numeral)",
+  gotchas: ["One fixed intrinsic box: size it with CSS, not `width`/`height`."],
   bestFor: [
     "a labelled progress read in a sentence or cell",
     "a sync / upload status where the label names the task",

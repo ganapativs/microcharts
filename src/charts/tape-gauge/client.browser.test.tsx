@@ -70,7 +70,7 @@ describe("interactive <TapeGauge>", () => {
   });
 
   // The readout is the hero number: it must PAINT bigger than the tick labels.
-  // The root pins --mc-label-size to the tick size, so without an inline
+  // The root pins --mc-label-px to the tick size, so without an inline
   // font-size the SVG attribute is inert and both render at 7.
   it("paints the reading larger than the scale ticks", async () => {
     const screen = await render(<TapeGauge value={142} span={25} height={80} title="Airspeed" />);

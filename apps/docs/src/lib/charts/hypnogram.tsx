@@ -28,6 +28,12 @@ export const entry: ChartEntry = {
   dataShape: "{ t, state }[] (state holds until the next entry)",
   encoding: { channel: "row position (y = state, x = time), no interpolation", precision: "high" },
   nodeBudget: "≤ 3 paths",
+  maxWidth: 560,
+  maxHeight: 70,
+  gotchas: [
+    "States outside `states` are appended rather than dropped, so an unlisted state still renders.",
+    "Height is derived from the state count when you pass none.",
+  ],
   bestFor: ["sleep stages", "deploy / machine / incident state over time"],
   avoidFor: ["continuous signals (Sparkline)", "a single current state (StatusDot)"],
   props: [

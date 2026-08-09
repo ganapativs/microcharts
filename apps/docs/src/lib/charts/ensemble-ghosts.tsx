@@ -20,6 +20,11 @@ export const entry: ChartEntry = {
   dataShape: "number[][] (2–50 members)",
   encoding: { channel: "path-bundle spread + one emphasized representative", precision: "low" },
   nodeBudget: "≤ 14 at cap",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a KPI card — the futures, not the average",
     "Monte-Carlo / simulation output where paths disagree in shape",

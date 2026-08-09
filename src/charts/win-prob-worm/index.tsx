@@ -35,6 +35,11 @@ export interface WinProbWormProps {
   height?: number | undefined;
   color?: string | undefined;
   strings?: WinProbWormStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -56,6 +61,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
     height = 16,
     color,
     strings = EN_WIN_PROB_WORM,
+    labelSize,
     title,
     summary,
     id,
@@ -64,7 +70,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   // Probabilities go through `Intl`'s own percent style so the sign follows
   // `locale`. Three fraction digits keeps the pre-`Intl` output byte-identical
@@ -114,7 +120,7 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
   }
 
   const accent = color ?? "var(--mc-accent)";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   const swing = swingMark(geo!, markSwing, FONT, fmt);
   const end = geo!.end!;
 

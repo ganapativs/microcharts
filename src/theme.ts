@@ -39,7 +39,11 @@ export interface ThemeSpec {
   font?: string;
   /** Face for tabular figures + labels (defaults to `font`). */
   fontNumeric?: string;
-  /** Label size (a CSS length, e.g. `"0.8em"`). */
+  /** Label size (a CSS length, e.g. `"0.8em"`) — `--mc-label-size`. It reaches
+   *  the readout chip and any chart text the library did not size itself. A
+   *  chart that reserves a gutter for its label computes that size in geometry
+   *  and pins it, so raise the floor there with the chart's `labelSize` PROP (a
+   *  number, in viewBox units); this token cannot move a gutter. */
   labelSize?: string;
   /** Label weight. */
   labelWeight?: number | string;

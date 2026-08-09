@@ -28,6 +28,11 @@ export const entry: ChartEntry = {
   dataShape: "number[] (amplitude samples, may be long)",
   encoding: { channel: "mirrored bar height = per-bucket max amplitude", precision: "medium" },
   nodeBudget: "≤ 3",
+  maxWidth: 480,
+  maxHeight: 100,
+  gotchas: [
+    "Buckets are `min(⌊width / 2⌋, samples)` and cap at 64, so a wider box buys resolution and a narrower one costs it.",
+  ],
   bestFor: ["voice-memo / audio scrubbers", "high-frequency log volume"],
   avoidFor: ["exact values (Sparkline)", "categorical state (Hypnogram)"],
   props: [

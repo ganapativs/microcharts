@@ -4,7 +4,7 @@
 // ("Period 18 of 20: open 145.10, high 149.30, low 144.00, close 148.20.").
 // click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import { EN_OHLC, type OhlcStrings } from "../../core/strings-ohlc.js";
 import {
@@ -72,10 +72,10 @@ export function Ohlc(props: InteractiveOhlcProps): React.ReactNode {
 
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 }),
     [format, locale],
   );
-  const fontSize = labelFont(height, 0.4);
+  const fontSize = labelFont(height, 0.4, props.labelSize);
   // Both entries derive the window the same way, or the interactive geometry
   // (frame x, hit test) drifts off the candles the static child painted.
   const rendered = useMemo(() => ohlcWindow(data, maxPeriods), [data, maxPeriods]);

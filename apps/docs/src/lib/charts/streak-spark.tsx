@@ -20,6 +20,8 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "1 rect per run, cap 40",
+  maxWidth: 390,
+  maxHeight: 100,
   bestFor: [
     "pass/fail run histories",
     "uptime & incident-free streaks",

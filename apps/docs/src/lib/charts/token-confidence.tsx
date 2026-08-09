@@ -39,6 +39,10 @@ export const entry: ChartEntry = {
     precision: "low by design",
   },
   nodeBudget: "1 span per token (HTML, not SVG)",
+  gotchas: [
+    "Renders inline HTML rather than an `<svg>`: it takes no `width`/`height` and inherits the surrounding font size.",
+    "Moves real focus through its token spans instead of using the shared picker, so it takes neither `onActive` nor `selectedIndex`.",
+  ],
   bestFor: ["LLM answers in chat / transcripts", "flagging text to review"],
   avoidFor: ["numeric confidence auditing (CalibrationStrip)", "a single score (Delta)"],
   // HTML host (the documented SVG exception — the text IS the chart), so there

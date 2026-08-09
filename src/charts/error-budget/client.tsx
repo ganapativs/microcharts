@@ -80,9 +80,9 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
       window,
       rates,
       gutterCh,
-      fontSize: labelFont(height),
+      fontSize: labelFont(height, 0.55, props.labelSize),
     });
-  }, [width, height, data, window, rates, props.label, fmt]);
+  }, [width, height, data, window, rates, props.label, props.labelSize, fmt]);
 
   const total = window ?? data.length;
   const count = geo?.points.length ?? 0;

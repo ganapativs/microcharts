@@ -12,6 +12,7 @@ import type { Polarity } from "../../core/types.js";
 import { EN_SPREAD_BAND, type SpreadBandStrings } from "../../core/strings-spread-band.js";
 import { resolveSummary } from "../../core/summary.js";
 import {
+  gutterFits,
   gutterFont,
   lastGap,
   spreadBandGeometry,
@@ -70,6 +71,11 @@ export interface SpreadBandProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: SpreadBandStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -91,6 +97,7 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
     format,
     locale,
     strings = EN_SPREAD_BAND,
+    labelSize,
     title,
     summary,
     id,
@@ -100,11 +107,11 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = gutterFont(height);
+  const fontSize = gutterFont(height, labelSize);
 
   // endpoint gap → reserve the label gutter before geometry runs
   const gap = lastGap(data);
-  const showLabel = label === "gap" && gap !== null && gap !== 0;
+  const showLabel = label === "gap" && gap !== null && gap !== 0 && gutterFits(height, fontSize);
   const labelText = showLabel ? signedGap(gap!, fmt) : "";
 
   const geo = spreadBandGeometry({
@@ -145,7 +152,7 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

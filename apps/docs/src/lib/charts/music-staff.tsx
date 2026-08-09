@@ -15,6 +15,8 @@ export const entry: ChartEntry = {
   dataShape: "(number | null)[]",
   encoding: { channel: "pitch (vertical position on a 5-line staff)", precision: "medium" },
   nodeBudget: "n + 2 (n ≤ 16)",
+  maxWidth: 240,
+  maxHeight: 120,
   bestFor: [
     "a weekly-rhythm read in a sentence",
     "the shape of a sprint or short series in a cell",

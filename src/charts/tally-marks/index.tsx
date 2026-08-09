@@ -22,6 +22,11 @@ export interface TallyMarksProps {
   pen?: TallyPen | undefined;
   height?: number | undefined;
   strings?: TallyStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -30,7 +35,10 @@ export interface TallyMarksProps {
   children?: ReactNode | undefined;
 }
 
-const FONT = 9; // overflow numeral, viewBox units
+// Overflow numeral, viewBox units. Fixed rather than derived — the strip's
+// height is the pen band, not a type ramp — and `labelSize` raises it.
+const FONT = 9;
+const numeralFont = (min: number | undefined): number => Math.max(FONT, min ?? 0);
 const PAD = 2;
 
 export function tallySummary(value: number, strings: TallyStrings = EN_TALLY): string {
@@ -48,6 +56,7 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
     pen = "ruled",
     height = 16,
     strings = EN_TALLY,
+    labelSize,
     title,
     summary,
     id,
@@ -56,7 +65,8 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
     children,
   } = props;
 
-  const geo = tallyGeometry({ value, total, height, pad: PAD, pen, overflow, fontSize: FONT });
+  const fontSize = numeralFont(labelSize);
+  const geo = tallyGeometry({ value, total, height, pad: PAD, pen, overflow, fontSize });
   const accName = resolveSummary(summary, () => tallySummary(value, strings));
 
   return (
@@ -71,14 +81,14 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
       // the cap band, letting the marks set like the glyphs they imitate.
       seat={{ mode: "center", top: PAD, bottom: height - PAD }}
       className={className ? `mc-tally ${className}` : "mc-tally"}
-      style={{ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.d ? <path d={geo.d} data-mc-ink="data" vectorEffect="non-scaling-stroke" /> : null}
       {geo.numeralX !== null ? (
         <text
           x={geo.numeralX}
           y={height / 2}
-          fontSize={FONT}
+          fontSize={fontSize}
           dominantBaseline="central"
           textAnchor="start"
           data-mc-ink="label"

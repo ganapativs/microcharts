@@ -68,7 +68,7 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
   // Mirror the static entry's label ring EXACTLY — a divergent `pad` shifts
   // every spoke, and the focus mark would sit off the drawn spoke.
   const showLabels = labels && size >= 44;
-  const pad = showLabels ? Math.max(labelFont(size, 0.1) * 2, size * 0.22) : 2;
+  const pad = showLabels ? Math.max(labelFont(size, 0.1, props.labelSize) * 2, size * 0.22) : 2;
   const geo = useMemo(
     () =>
       starSpokeGeometry({

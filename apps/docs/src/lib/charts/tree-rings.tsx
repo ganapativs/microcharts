@@ -15,6 +15,11 @@ export const entry: ChartEntry = {
   dataShape: "number[] (oldest first)",
   encoding: { channel: "radial ring thickness ∝ per-period value", precision: "medium" },
   nodeBudget: "≤ 4 (merged ring path + highlighted ring + centre dot + label)",
+  maxWidth: 100,
+  maxHeight: 100,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "account or company age at a glance",
     "a cohort-age marker in a table cell",

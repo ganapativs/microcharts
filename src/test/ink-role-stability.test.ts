@@ -140,7 +140,7 @@ describe("a role's opacity is never inherited by accident", () => {
    * caller's `color` changes its hue without making it opaque enough to compete
    * with the line it sits beneath.
    */
-  const INTENTIONALLY_TRANSLUCENT = new Set(["sparkline/index.tsx:189"]);
+  const INTENTIONALLY_TRANSLUCENT = new Set(["sparkline/index.tsx:195"]);
 
   it("a mark that overrides a colour also owns the opacity that came with it", () => {
     const offenders: string[] = [];

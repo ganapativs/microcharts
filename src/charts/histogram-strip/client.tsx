@@ -3,7 +3,7 @@
 // listener + bin-by-x-band lookup, ←/→ rove bins ("40 to 50: 34 values.").
 // click / Enter / Space pins one (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import {
   CHIP,
@@ -72,7 +72,7 @@ export function HistogramStrip(props: InteractiveHistogramStripProps): React.Rea
   // Counts are cardinal integers, not axis values — format them with the locale
   // (thousands grouping) but never the value `format` (units/decimals).
   const countFmt = useMemo(
-    () => makeFormatter(undefined, locale, { maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(undefined, locale, { maximumFractionDigits: 0 }),
     [locale],
   );
 

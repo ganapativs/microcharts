@@ -20,6 +20,9 @@ export const entry: ChartEntry = {
   dataShape: "{ label, events: number[] }[] (one lane per source)",
   encoding: { channel: "position (x = time, y = lane)", precision: "high / medium" },
   nodeBudget: "1 path per lane, cap 12",
+  maxWidth: 480,
+  maxHeight: 60,
+  gotchas: ["Lanes cap at 12; extra lanes are dropped."],
   bestFor: ["service events across sources", "agent steps / cron / sensor triggers"],
   avoidFor: ["a single lane (RugStrip)", "continuous rates (Sparkline)"],
   props: [

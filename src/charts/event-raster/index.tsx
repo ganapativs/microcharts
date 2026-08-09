@@ -33,6 +33,11 @@ export interface EventRasterProps {
   width?: number | undefined;
   height?: number | undefined;
   strings?: EventRasterStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -86,6 +91,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
     width = 120,
     height: heightProp,
     strings = EN_EVENT_RASTER,
+    labelSize,
     title,
     summary,
     id,
@@ -114,6 +120,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       data.slice(0, LANE_CAP).map((d) => d.label.length),
       1,
     ),
+    labelSize,
   });
 
   const domain = resolveRasterDomain(domainProp, data);
@@ -135,7 +142,7 @@ export function EventRaster(props: EventRasterProps): ReactNode {
       // the full height, and `labels` only takes a LEFT gutter from it.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-raster ${className}` : "mc-raster"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.lanes.map((lane, i) =>
         i % 2 === 1 ? (

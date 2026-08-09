@@ -22,6 +22,12 @@ export const entry: ChartEntry = {
     precision: "high for the count, medium for shape",
   },
   nodeBudget: "1 per dot + 3",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "`data` is a raw sample or a set of posterior draws; the component bins it into dots.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     'a "will we miss the SLA?" read in a sentence',
     "odds you can count in a KPI card",

@@ -49,6 +49,11 @@ export interface ErrorBudgetProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ErrorBudgetStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -74,6 +79,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
     format = PCT,
     locale,
     strings = EN_ERROR_BUDGET,
+    labelSize,
     title,
     summary,
     id,
@@ -82,7 +88,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-error-budget ${className}` : "mc-error-budget";
   // matches the geometry's default inset; also the annotation scale below
@@ -144,7 +150,7 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
   const steadyAtNow = 1 - geo.nowElapsed;
   const danger = geo.remaining.value < steadyAtNow - 0.001 || geo.exhausted !== null;
   const endColor = danger ? "var(--mc-negative)" : lineColor;
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   // annotations host contract: Marker x = step position on the elapsed axis,
   // Threshold/TargetZone y = budget-remaining fractions (1 top → 0 bottom).

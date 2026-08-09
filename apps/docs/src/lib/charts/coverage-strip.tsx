@@ -35,6 +35,12 @@ export const entry: ChartEntry = {
     precision: "high — binary presence per slot",
   },
   nodeBudget: "1 per cell (≤ 120 documented)",
+  maxWidth: 320,
+  maxHeight: 40,
+  gotchas: [
+    "Slots cap at 120; a longer series is truncated.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["data-quality cells beside a metric", "sensor uptime rows", "trailing-gap detection"],
   avoidFor: ["magnitude over time (HeatStrip)", "exact values (Sparkline)"],
   props: [

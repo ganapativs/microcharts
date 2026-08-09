@@ -21,6 +21,13 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value }[] (3–8 metrics)",
   encoding: { channel: "spoke length from center = value", precision: "medium" },
   nodeBudget: "≤ 4",
+  maxWidth: 320,
+  maxHeight: 320,
+  gotchas: [
+    "Fewer than 3 metrics reads better as PairedBars or MiniBar.",
+    "Values outside `domain` are clamped.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["entity profiles in small multiples", "skill / capability comparison"],
   avoidFor: ["fewer than 3 metrics (PairedBars)", "precise values (MiniBar)"],
   props: [

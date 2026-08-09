@@ -109,9 +109,9 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       threshold,
       maxItems,
       gutterCh,
-      fontSize: labelFont(height),
+      fontSize: labelFont(height, 0.55, props.labelSize),
     });
-  }, [width, height, data, threshold, maxItems, props.label, pct, strings]);
+  }, [width, height, data, threshold, maxItems, props.label, props.labelSize, pct, strings]);
 
   // Only bars that PAINT are navigable — a zero-magnitude category (or an
   // all-zero dataset, which draws nothing at all) must not answer the pointer

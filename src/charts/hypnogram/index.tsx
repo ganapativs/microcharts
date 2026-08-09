@@ -39,6 +39,11 @@ export interface HypnogramProps {
   width?: number | undefined;
   height?: number | undefined;
   strings?: HypnogramStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -121,6 +126,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
     width = 140,
     height: heightProp,
     strings = EN_HYPNOGRAM,
+    labelSize,
     title,
     summary,
     id,
@@ -156,6 +162,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       rowStates.map((s) => s.length),
       1,
     ),
+    labelSize,
   });
 
   const domain = resolveDomain(data, domainProp);
@@ -189,7 +196,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
       // vertical box holds whether or not the state names are drawn.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hypno ${className}` : "mc-hypno"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* One path for the whole scaffold. Every row rule carries identical
           paint, so N <g>+<line> pairs were 2N nodes saying one thing; a

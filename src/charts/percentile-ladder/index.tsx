@@ -52,6 +52,11 @@ export interface PercentileLadderProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QuantileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -62,13 +67,15 @@ export interface PercentileLadderProps {
 
 const LABEL_MIN_WIDTH = 56;
 // label size in viewBox units — a touch smaller than the strips (three labels
-// must share the track), ~0.5·height clamped 6–9
+// must share the track), ~0.5·height clamped 6–9, and `min` (the chart's
+// `labelSize`) applied last so it beats the 9-unit cap the way it beats
+// `labelFont`'s 11.
 // Exported, and NOT named `labelFont`: this chart deliberately diverges from
 // the shared `core/labels` helper, and the interactive entry importing that one
 // by the same name silently sized the log-tag gutter differently — every tick x
 // then shifted between the two entries. One name, one source.
-export const ladderFont = (height: number): number =>
-  Math.min(9, Math.max(6, Math.round(height * 0.5)));
+export const ladderFont = (height: number, min?: number | undefined): number =>
+  Math.max(min ?? 0, Math.min(9, Math.max(6, Math.round(height * 0.5))));
 
 /** Seats the tick labels, SPREAD FIRST: at most four rungs share the row, so
  *  nudging the labels apart to a minimum pitch keeps all of them rather than
@@ -148,6 +155,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
     format,
     locale,
     strings = EN_QUANTILE,
+    labelSize,
     title,
     summary,
     id,
@@ -162,7 +170,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const w = chartSide(width);
   const h = chartSide(height);
 
-  const FONT = ladderFont(h);
+  const FONT = ladderFont(h, labelSize);
   const labelY = round2(h - FONT * 0.22 - 0.2);
   const showLabels = label !== "none" && w >= LABEL_MIN_WIDTH && labelFitsY(labelY, FONT, h, false);
   const trackY = round2(h * 0.35);
@@ -225,7 +233,7 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
   const texts = rendered.map((t) => labelText(t.p, t.value));
   const labelX = showLabels ? ladderLabelLayout(geo, texts, w, FONT) : null;
   // pin the label size to viewBox units (see coverage-strip / )
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

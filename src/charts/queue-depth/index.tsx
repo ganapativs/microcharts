@@ -51,9 +51,10 @@ export function queueDepthLabels(
     capacity: number | undefined;
     label: "last" | "none";
     fmt: (n: number) => string;
+    labelSize?: number | undefined;
   },
 ): { endText: string; capText: string; totalWidth: number } {
-  const font = labelFont(opts.height);
+  const font = labelFont(opts.height, 0.55, opts.labelSize);
   // Degradation: `labelFont` floors at 7 viewBox units, so under a 7-unit-tall
   // box neither readout can be seated inside the plot. Both DROP rather than
   // spilling past the viewBox, and the gutter below is derived from their text
@@ -102,6 +103,11 @@ export interface QueueDepthProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: QueueDepthStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -122,6 +128,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
     format,
     locale,
     strings = EN_QUEUE_DEPTH,
+    labelSize,
     title,
     summary,
     id,
@@ -130,7 +137,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-queue-depth ${className}` : "mc-queue-depth";
 
@@ -160,6 +167,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
     capacity,
     label,
     fmt,
+    labelSize,
   });
   const showEnd = endText !== "";
   const showCap = capText !== "";
@@ -180,7 +188,7 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
   });
 
   const lineColor = color ?? "var(--mc-accent)";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   // Breach valence: red is the story, so the endpoint dot AND its label flip to
   // it — the trend glyph already double-encodes direction, so color never
   // stands alone. An ink ROLE, not an inline fill: `.mc-root` sets

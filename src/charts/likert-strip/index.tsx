@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -50,6 +50,11 @@ export interface LikertStripProps {
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -68,6 +73,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     format,
     locale,
     strings = EN_COMPOSITION,
+    labelSize,
     title,
     summary,
     id,
@@ -84,8 +90,8 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   }
 
   const [w, h] = likertBox(width, height);
-  const fontSize = likertFont(h);
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const fontSize = likertFont(h, labelSize);
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const hasNeutralLevel = data.length % 2 === 1;
 
   // End labels reserve deterministic gutters, measured off the widest string this
@@ -144,7 +150,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   // and the other two label modes never spend a net score.
   const netFmt =
     wantLabels && label === "net"
-      ? makeFormatter(undefined, locale, { maximumFractionDigits: 0 })
+      ? makeUnitFormatter(undefined, locale, { maximumFractionDigits: 0 })
       : null;
   const netText = netFmt ? `${net >= 0 ? "+" : "−"}${netFmt(Math.abs(net))}` : null;
 
@@ -152,7 +158,7 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

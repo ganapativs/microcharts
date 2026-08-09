@@ -413,7 +413,13 @@
        Compact density (< 1) is always safe — it shrinks the text inside a gutter
        already reserved for the larger size. Stroke and gap keep scaling
        unclamped below; neither is bounded by a reserved text box. */
-    font-size: calc(var(--mc-label-size) * min(1.25, var(--mc-density)));
+    /* `--mc-label-px` is the CHART's own computed size, pinned on its host from
+       geometry — the number the gutter was reserved for, so it is what has to
+       paint. `--mc-label-size` is the APP's token and stands in only for a chart
+       that pins nothing. They used to be one name, which meant an app setting
+       the token silently overrode the geometry on exactly the charts that paint
+       labels, and a chart's own pin overrode the app everywhere else. */
+    font-size: calc(var(--mc-label-px, var(--mc-label-size)) * min(1.25, var(--mc-density)));
     fill: var(--mc-stroke);
   }
   /* Labels seated ON a solid mark (HeatCell upper steps, TimeInRange zones,
@@ -948,6 +954,33 @@
   :where(.mc-trace, .mc-partition) :where(rect) {
     shape-rendering: crispEdges;
     rx: 0.5;
+  }
+
+  /* A mark thinner than one viewBox unit gets its anti-aliasing back.
+     `crispEdges` snaps every edge to the device pixel grid, so a rect whose
+     extent rounds to zero device pixels paints NOTHING — and word-sized charts
+     render at ~1 unit = 1 px, where "sub-unit" and "sub-pixel" are the same
+     thing. Measured in Chromium at 1u = 1px, a 30x0.5 rect flush to the box
+     bottom: `crispEdges` 0 ink, `auto` 7.1 ink, against 0 for a true zero.
+     Several charts floor a magnitude at 0.5 units precisely so a tiny-but-real
+     value stays visible (sparkbar/geometry.ts:201, funnel, event-timeline,
+     streak-spark, net-flow, rate-volume) — the floor and the hint cancelled
+     out, and a bin holding 4 events painted exactly what a bin holding 0
+     painted. That is a lie factor above 1, so it is a bug, not a nicety.
+
+     Sub-unit is the only safe trigger: below 1 unit whether a mark survives the
+     snap depends on where its edges land on the grid, which nothing server-side
+     can know. At and above 1 unit the mark always paints, so it keeps the crisp
+     hint. A true zero is untouched — `height="0"` does not start with "0." —
+     and it must stay untouched: zero and no-data part company deliberately
+     (a null emits no rect at all).
+
+     This is the last word on `shape-rendering` in the layer, so it also relaxes
+     the TraceFold/PartitionStrip rule above for a sub-unit segment. Ordering,
+     not specificity — both selectors are `:where()`, so keep this one last.
+     Guarded by src/test/sub-pixel-ink.browser.test.tsx. */
+  :where(.mc-root rect[width^="0."], .mc-root rect[height^="0."]) {
+    shape-rendering: auto;
   }
   /* anchor/baseline stay SVG attributes on the marks — the craft gate computes
      text extents from raw attributes; only paint moves here.

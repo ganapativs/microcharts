@@ -66,6 +66,11 @@ export interface ChangePointProps {
   height?: number | undefined;
   color?: string | undefined;
   strings?: ChangePointStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -88,6 +93,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
     height = 16,
     color,
     strings = EN_CHANGE_POINT,
+    labelSize,
     title,
     summary,
     id,
@@ -96,7 +102,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height, 0.55);
+  const FONT = labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
   // The shift is a relative change, not a measurement — it takes `locale` but
   // never the value `format` (which carries the series' units).
@@ -135,7 +141,7 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
 
   const accName = resolveSummary(summary, () => changePointSummary(geo, fmt, strings, pctFmt));
   const accent = color ?? "var(--mc-accent)";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   const totalWidth = width + gutter;
   const lastBreak = geo.breaks[geo.breaks.length - 1];
 

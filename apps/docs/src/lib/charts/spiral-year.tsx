@@ -20,6 +20,8 @@ export const entry: ChartEntry = {
   dataShape: "(number | null)[]",
   encoding: { channel: "5-step opacity of marks along a calendar spiral", precision: "low" },
   nodeBudget: "≤ 6 (merged month-tick path + ≤ 5 step paths)",
+  maxWidth: 130,
+  maxHeight: 130,
   bestFor: [
     "the seasonal shape of a year at a glance",
     "spotting a busy season or a quiet stretch",

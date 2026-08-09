@@ -34,6 +34,11 @@ export const entry: ChartEntry = {
     precision: "medium — the widening itself is the message",
   },
   nodeBudget: "≤ 8",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     'a "will we hit Q4?" forecast in a KPI card',
     "a projection with honest uncertainty in a sentence",

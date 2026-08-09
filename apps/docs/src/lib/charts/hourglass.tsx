@@ -19,6 +19,9 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number }",
   encoding: { channel: "sand area split top (remaining) / bottom (elapsed)", precision: "medium" },
   nodeBudget: "4",
+  maxWidth: 70,
+  maxHeight: 100,
+  gotchas: ["Width tracks height when you pass none, so the instrument keeps its proportion."],
   bestFor: [
     "a deadline or session-expiry read in a sentence",
     "a TTL cell where remaining is the story",

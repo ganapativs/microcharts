@@ -26,6 +26,9 @@ export const entry: ChartEntry = {
   dataShape: "{ label, from, to }[]",
   encoding: { channel: "line slope between two aligned columns", precision: "medium-high" },
   nodeBudget: "≤ 3 per category (≤ 7)",
+  maxWidth: 200,
+  maxHeight: 160,
+  gotchas: ["Past 7 categories the crossings tangle (documented cap)."],
   bestFor: ["before/after experiments", "rank shuffles", "two-moment comparisons"],
   avoidFor: ["the path between (Sparkline)", "> 7 categories"],
   props: [

@@ -40,6 +40,11 @@ export interface ConstellationProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ConstellationStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -108,6 +113,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
     format,
     locale,
     strings = EN_CONSTELLATION,
+    labelSize,
     title,
     summary,
     id,
@@ -127,9 +133,11 @@ export function Constellation(props: ConstellationProps): ReactNode {
     pad: PAD,
   });
   // Sized off the RESOLVED box, and only from a finite override: a non-finite
-  // fontSize otherwise reached the DOM as `--mc-label-size: NaNpx` and silently
+  // fontSize otherwise reached the DOM as `--mc-label-px: NaNpx` and silently
   // dropped the numeral (every placement test fails against NaN).
-  const fontSize = isFiniteValue(props.fontSize) ? props.fontSize : labelFont(geo.height);
+  const fontSize = isFiniteValue(props.fontSize)
+    ? props.fontSize
+    : labelFont(geo.height, 0.55, labelSize);
   const accName =
     summary === false
       ? false
@@ -189,7 +197,7 @@ export function Constellation(props: ConstellationProps): ReactNode {
       // padded box, not the stars' extent, which moves with every event.
       seat={{ mode: "center", top: PAD, bottom: geo.height - PAD }}
       className={className ? `mc-constellation ${className}` : "mc-constellation"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.connectorPath ? (
         <path d={geo.connectorPath} data-mc-ink="ghost" data-mc-w="tick" />

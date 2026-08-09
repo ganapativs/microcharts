@@ -7,7 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
-import { labelFitsY } from "../../core/labels.js";
+import { labelFitsY, LABEL_MIN } from "../../core/labels.js";
 import {
   DEFAULT_HEIGHT,
   DEFAULT_WIDTH,
@@ -37,6 +37,11 @@ export interface TapeGaugeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TapeGaugeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -151,13 +156,19 @@ export function tapeGaugeReadoutFont(opts: {
   width: number;
   height: number;
   vertical: boolean;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): number | null {
   const { valueText, gutter, band, labelY, width, height, vertical } = opts;
   if (!valueText) return null;
+  const min = opts.labelSize ?? LABEL_MIN;
   const avail = (vertical ? gutter : width) - 1.6;
-  const base = Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25)));
+  const base = Math.max(
+    min,
+    Math.min(13, Math.max(10, Math.round(Math.min(width, height) * 0.25))),
+  );
   const font = Math.max(5, Math.min(base, avail / est(valueText.length || 1, 1), band));
-  return font >= 7 && labelFitsY(labelY, font, height) ? font : null;
+  return font >= min && labelFitsY(labelY, font, height) ? font : null;
 }
 
 export function TapeGauge(props: TapeGaugeProps): ReactNode {
@@ -174,6 +185,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     format,
     locale,
     strings = EN_TAPE_GAUGE,
+    labelSize,
     title,
     summary,
     id,
@@ -194,7 +206,9 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     rateTiers: tiersProp,
   });
   const fmt = makeFormatter(format, locale);
-  const tickFont = 7;
+  // The tick scale sets at the library floor; `labelSize` lifts it, and a tick
+  // that no longer clears its column or its neighbour drops (see `shownLabels`).
+  const tickFont = Math.max(LABEL_MIN, labelSize ?? 0);
   const vertical = orientation !== "horizontal";
   const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
   const accName =
@@ -220,6 +234,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       width,
       height,
       vertical,
+      labelSize,
     }) ?? 0;
   const showReadout = readoutFont > 0;
 
@@ -288,7 +303,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       // pointer line in either orientation, which is the one place the eye reads.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-tape ${className}` : "mc-tape"}
-      style={{ ...style, "--mc-label-size": `${tickFont}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${tickFont}px` } as CSSProperties}
     >
       {finite ? (
         <>
@@ -335,7 +350,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               dominantBaseline="central"
               textAnchor="middle"
               fontSize={readoutFont}
-              // The root pins `--mc-label-size` to the TICK size (7), and
+              // The root pins `--mc-label-px` to the TICK size (7), and
               // `:where(.mc-root text)` outranks the presentation attribute — so
               // the hero number was painted at tick size while its clearance was
               // reserved for 7–13. An inline font-size is the one thing that

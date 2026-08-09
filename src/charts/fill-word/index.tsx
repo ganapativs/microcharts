@@ -90,7 +90,7 @@ export function FillWord(props: FillWordProps): ReactNode {
 
   // The box, the painted font-size and the seat all come off ONE resolved
   // number — see resolveFontSize. Resolving it here rather than only inside
-  // geometry is what keeps the `font-size` attribute and `--mc-label-size` on
+  // geometry is what keeps the `font-size` attribute and `--mc-label-px` on
   // the same scale the viewBox was cut for.
   const fontSize = resolveFontSize(props.fontSize);
   // The numeral is resolved BEFORE geometry so the gutter is reserved from the
@@ -136,7 +136,7 @@ export function FillWord(props: FillWordProps): ReactNode {
       // a line high, which reads as a typo rather than a chart.
       seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fillword ${className}` : "mc-fillword"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {word.length > 0 ? (
         <>

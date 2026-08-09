@@ -22,6 +22,13 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "≤ 5 + 1 per lead change",
+  maxWidth: 320,
+  maxHeight: 70,
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+    "Values are win probabilities and are clamped to 0–100.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "live win / election probability where the lead flips",
     "a modelled forecast whose crossings are the story",

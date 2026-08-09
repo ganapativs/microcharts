@@ -81,7 +81,7 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
   // Mirror the static's delta gutter: geometry is laid out in `width`, but the
   // rendered viewBox is `width + gutter`. Mapping the pointer over `width`
   // alone drifts the crosshair right of the cursor and mis-places the readout.
-  const FONT = labelFont(height, 0.55);
+  const FONT = labelFont(height, 0.55, props.labelSize);
   const lastBreak = geo ? geo.breaks[geo.breaks.length - 1] : undefined;
   const gutter =
     (props.label ?? "none") === "delta" && lastBreak

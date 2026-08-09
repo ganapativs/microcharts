@@ -3,7 +3,7 @@
 // listener + column-by-x band lookup, ←/→ rove steps ("Refunds: −140, running
 // 1,410."). End focuses the total, click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter, withPlus } from "../../core/format.js";
+import { makeFormatter, unsigned, withPlus } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -106,7 +106,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         label: d.label,
         formatted: `${d.label}: ${
           isFiniteValue(d.value)
-            ? `${d.value < 0 ? "−" : "+"}${fmt(Math.abs(d.value))}`
+            ? `${d.value < 0 ? "−" : "+"}${unsigned(fmt(Math.abs(d.value)))}`
             : strings.noData
         } → ${fmt(geo.levels[i] ?? open)}`,
       };
@@ -168,7 +168,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
       ? strings.waterfallStep(
           step.label,
           isFiniteValue(step.value)
-            ? `${step.value < 0 ? "−" : "+"}${fmt(Math.abs(step.value))}`
+            ? `${step.value < 0 ? "−" : "+"}${unsigned(fmt(Math.abs(step.value)))}`
             : strings.noData,
           fmt(geo.levels[shown!] ?? open),
         )
@@ -208,7 +208,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
               ? `${step.label}: ${
                   isFiniteValue(step.value)
                     ? step.value < 0
-                      ? `−${fmt(Math.abs(step.value))}`
+                      ? `−${unsigned(fmt(Math.abs(step.value)))}`
                       : withPlus(step.value, (v) => fmt(Math.abs(v)))
                     : strings.noData
                 } → ${fmt(geo.levels[shown] ?? open)}`

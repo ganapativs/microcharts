@@ -55,6 +55,11 @@ export interface SparkBarProps {
   /** Swappable summary strings (defaults to EN) — the accessible name is
    *  generated, so this is how a non-English host localizes it. */
   strings?: SeriesStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   format?: DescribeOptions["format"] | undefined;
@@ -76,6 +81,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
     label = "none",
     positive = "up",
     color,
+    labelSize,
     title,
     summary,
     strings,
@@ -88,7 +94,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   } = props;
 
   // Everything below reads the RESOLVED box, never the prop: `height={NaN}` set
-  // `--mc-label-size: NaNpx` and a NaN seat on a frame `Chart` had clamped to 1.
+  // `--mc-label-px: NaNpx` and a NaN seat on a frame `Chart` had clamped to 1.
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
 
@@ -107,7 +113,8 @@ export function SparkBar(props: SparkBarProps): ReactNode {
       }
     }
   }
-  const metrics = labelText !== undefined ? labelMetrics(labelText, width, height) : undefined;
+  const metrics =
+    labelText !== undefined ? labelMetrics(labelText, width, height, labelSize) : undefined;
   const geo = sparkBarGeometry(data, {
     width,
     height,
@@ -133,7 +140,7 @@ export function SparkBar(props: SparkBarProps): ReactNode {
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
   const rootStyle = metrics
-    ? { ...style, "--mc-label-size": `${metrics.fontSize}px` }
+    ? { ...style, "--mc-label-px": `${metrics.fontSize}px` }
     : (style as CSSProperties);
 
   return (

@@ -28,6 +28,8 @@ export const entry: ChartEntry = {
   dataShape: "{ p, outcome }[] raw, or { predicted, observed, count }[] pre-binned",
   encoding: { channel: "observed frequency vs the identity diagonal per bin", precision: "medium" },
   nodeBudget: "≤ 4",
+  maxWidth: 400,
+  maxHeight: 130,
   bestFor: ["classifier reliability / trust", "probability-forecast auditing"],
   avoidFor: ["a single accuracy number (Delta)", "where errors go (ConfusionGrid)"],
   props: [

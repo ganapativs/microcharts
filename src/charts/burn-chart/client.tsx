@@ -96,9 +96,20 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       projection,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height),
+      fontSize: labelFont(height, 0.55, props.labelSize),
     });
-  }, [width, height, data.plan, data.actual, mode, projection, props.domain, props.label, unit]);
+  }, [
+    width,
+    height,
+    data.plan,
+    data.actual,
+    mode,
+    projection,
+    props.domain,
+    props.label,
+    props.labelSize,
+    unit,
+  ]);
 
   const accName =
     summary === false

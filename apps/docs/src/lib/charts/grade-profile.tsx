@@ -27,6 +27,8 @@ export const entry: ChartEntry = {
     precision: "medium — a difficulty read; the readout gives the exact grade",
   },
   nodeBudget: "1 quad per segment + ridge (+ seat-gated summit tick)",
+  maxWidth: 480,
+  maxHeight: 160,
   bestFor: ["route / climb profiles (cycling, running, hiking)", "where the hard pitches fall"],
   avoidFor: ["a single elevation series (Sparkline)", "non-monotone tracks (needs distance order)"],
   props: [

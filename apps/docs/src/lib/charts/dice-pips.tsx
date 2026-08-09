@@ -20,6 +20,11 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number }",
   encoding: { channel: "canonical pip pattern 1–6 (subitized)", precision: "high" },
   nodeBudget: "≤ 7 (face + 6 pips)",
+  maxWidth: 70,
+  maxHeight: 70,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "severity or rating 0–6 in a cell",
     "an at-a-glance small count in a sentence",

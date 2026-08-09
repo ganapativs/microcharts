@@ -11,6 +11,9 @@ export default defineConfig({
     "src/index.ts",
     "src/annotations.ts",
     "src/theme.ts",
+    // Container measurement for consumers (`useFluidWidth`). Its own entry, and
+    // nothing in the library imports it — a static chart may not observe.
+    "src/fluid.ts",
     // Entrance-motion engine: dynamically imported by motion-gate when a
     // consumer passes `animate` — its own chunk so charts that never animate
     // never load it.

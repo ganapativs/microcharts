@@ -19,6 +19,11 @@ export const entry: ChartEntry = {
   dataShape: "[{ label, value }, { label, value }]",
   encoding: { channel: "beam tilt direction + saturating angle", precision: "medium" },
   nodeBudget: "≤ 6",
+  maxWidth: 200,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a buy vs sell or in vs out read in a sentence",
     "a pro vs con weight in a KPI card",

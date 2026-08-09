@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
-import { makeFormatter, withPlus, type Format } from "../../core/format.js";
+import { makeFormatter, unsigned, withPlus, type Format } from "../../core/format.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { waterfallGeometry, placeWaterfallLabels } from "./geometry.js";
@@ -33,7 +33,7 @@ export function waterfallSummary(
     fmt(end),
     deltas.length,
     withPlus(gains, fmt),
-    `−${fmt(Math.abs(losses))}`,
+    `−${unsigned(fmt(Math.abs(losses)))}`,
   );
 }
 
@@ -54,6 +54,11 @@ export interface WaterfallProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: FlowStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -74,6 +79,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
     format,
     locale,
     strings = EN_FLOW,
+    labelSize,
     title,
     summary,
     id,
@@ -103,8 +109,8 @@ export function Waterfall(props: WaterfallProps): ReactNode {
   // Direct value labels sit in a reserved band BELOW the plot (like the endpoint
   // gutter idiom): the viewBox grows downward, so the plot — and every
   // interactive overlay drawn over it — keeps its y∈[0,height] coordinates.
-  const FONT = labelFont(height, 0.5);
-  const labelText = (v: number): string => `${v < 0 ? "−" : "+"}${fmt(Math.abs(v))}`;
+  const FONT = labelFont(height, 0.5, labelSize);
+  const labelText = (v: number): string => `${v < 0 ? "−" : "+"}${unsigned(fmt(Math.abs(v)))}`;
   const labels =
     label === "delta"
       ? placeWaterfallLabels(
@@ -143,7 +149,7 @@ export function Waterfall(props: WaterfallProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

@@ -29,9 +29,9 @@ function side(n: number, fallback: number): number {
  * and only the spilled labels were left. Both entries read this through
  * `FunnelGeometry.fontSize`, so their stages agree.
  */
-function labelSize(height: number, label: FunnelLabel): number {
+function labelFontFor(height: number, label: FunnelLabel, min: number | undefined): number {
   if (label === "none") return 0;
-  const f = labelFont(height, 0.35);
+  const f = labelFont(height, 0.35, min);
   return labelFitsY(f * 0.9, f, height, false) ? f : 0;
 }
 
@@ -66,11 +66,13 @@ export function funnelGeometry(opts: {
   gap?: number | undefined;
   connectors: boolean;
   label: FunnelLabel;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): FunnelGeometry {
   const { values, mode, connectors } = opts;
   const width = side(opts.width, W);
   const height = side(opts.height, H);
-  const fontSize = labelSize(height, opts.label);
+  const fontSize = labelFontFor(height, opts.label, opts.labelSize);
   const finite = values.map((v) => (isFiniteValue(v) && v >= 0 ? v : 0));
   const n = finite.length;
   const box = { width, height, fontSize };

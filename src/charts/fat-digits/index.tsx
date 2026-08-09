@@ -35,7 +35,7 @@ const FONT = 14;
 /** The numeral's size, in viewBox units. A non-finite or non-positive
  *  `fontSize` reached the box as `NaN`/`Infinity`: `Chart` clamped the viewBox
  *  to 1×1 (so nothing was visible) while the accessible name still read the
- *  value perfectly, and `NaNpx` landed in `--mc-label-size` and `--mc-seat`.
+ *  value perfectly, and `NaNpx` landed in `--mc-label-px` and `--mc-seat`.
  *  Resolved once, before geometry, so the painted size and the reserved gutter
  *  are the same number. */
 function resolveFontSize(fontSize: number | undefined): number {
@@ -103,7 +103,7 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
       // construction, so the frame is the plot box.
       seat={{ mode: "center", top: 0, bottom: geo.height }}
       className={className ? `mc-fat ${className}` : "mc-fat"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {formatted ? (
         <text x={geo.x} y={geo.y} fontSize={fontSize} dominantBaseline="central" textAnchor="start">

@@ -61,6 +61,27 @@ screen.
   level.
 </Callout>
 
+## How big a chart usefully gets
+
+Each chart's geometry is authored for a box in the word-sized range, and past that box it stops scaling. Internal caps
+hold the marks at their authored size and the extra room becomes whitespace.
+`<EventTimeline width={823} height={658} />` draws a 6-unit bar in 658 units of nothing, because the span bar caps at 6
+viewBox units, the point diamond at 2.5, and the track inset at 2.
+
+Every chart publishes its own ceiling as `maxWidth` and `maxHeight` in [`/catalog.json`](/catalog.json), the machine
+catalog an agent reads to pick a chart. Sparkline is authored to 340 × 100, EventTimeline to 320 × 50, Progress to 200
+× 40.
+
+To render larger, keep the props inside that box and scale with CSS. The viewBox handles the rest and the marks keep
+their proportions:
+
+```tsx
+<Sparkline data={data} width={320} height={80} style={{ width: "100%", height: "auto" }} />
+```
+
+Charts sized by `cell`, by their own content, or by CSS alone publish no maximum. Each one says which knob sizes it in
+its catalog `gotchas` list.
+
 ## Fill the container
 
 Set a width in CSS. The height follows on its own, because the `viewBox` keeps the aspect ratio and `.mc-root` ships
@@ -96,6 +117,56 @@ rather than magnifying it.
 To give a whole row of charts one identical box rather than sizing each by hand, put `width`/`height` on `SparkGroup`:
 it enforces them on every series child that didn't set its own, and shares one scale at the same time. See
 [Formatting & scale](/docs/formatting#scale-the-domain-decision).
+
+## Measure the container with useFluidWidth
+
+CSS stretches a drawing the geometry already laid out. When you want the geometry to lay out again at the new size,
+measure the box and pass the number:
+
+```tsx
+"use client";
+
+import { useFluidWidth } from "@microcharts/react/fluid";
+import { Sparkline } from "@microcharts/react/sparkline";
+
+export function Card({ data }: { data: number[] }) {
+  const { ref, width } = useFluidWidth(240);
+  return (
+    <div ref={ref}>
+      <Sparkline data={data} width={width} />
+    </div>
+  );
+}
+```
+
+`width` is a number on every chart, with no string form anywhere in the catalog, and that is why measuring is the
+answer. A CSS `width: 100%` over a rendered viewBox scales the drawing rather than re-laying it out, so the spacing
+between ticks stops meaning what it meant at the authored size.
+
+The hook is opt-in, and nothing in the library imports it. Static entries are hook-free, listener-free, and
+observer-free by architecture: they render on the server, where there is nothing to measure, so a chart can never do
+this for you. The subpath measures 403 B gzip and adds nothing to any chart subpath.
+
+It answers the four questions a hand-written version has to answer:
+
+- **`initial`** is what renders on the server, on the first client paint, and where `ResizeObserver` doesn't exist. It
+  defaults to 80, the width most charts fall back to on their own. Pass the width you expect so the layout is reserved
+  and the measurement causes no reflow.
+- **A measured 0 never reaches `width`.** A collapsed disclosure, an inactive tab, and a `display: none` ancestor all
+  measure 0, and a chart 0 units wide draws nothing, so the last real width holds until the box comes back.
+- **Widths round to whole pixels**, matching the integer viewBox coordinates the charts draw in.
+- **Commits land once per animation frame**, so dragging a window edge doesn't write state inside the layout pass it was
+  measured in.
+
+Attach `ref` to one element and keep it for the life of the component. The observer binds on mount, so swapping the node
+out leaves it watching the old one.
+
+`useFluidWidth` answers "my chart lives in a flexible box"; the [authored maximum](#how-big-a-chart-usefully-gets)
+answers "how big is worth asking for". Clamp the measured number when the container can outgrow the chart:
+
+```tsx
+<Sparkline data={data} width={Math.min(width, 340)} />
+```
 
 <Callout type="info">
   `.mc-root` is `display: inline-block` by default, so a chart flows next to text. Filling a block-level container works

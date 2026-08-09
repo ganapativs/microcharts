@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
   dataShape: "{ a, b }[] (paired measurements)",
   encoding: { channel: "vertical position of the paired difference", precision: "high" },
   nodeBudget: "1 per pair (≤ 40) + band + 2 lines",
+  maxWidth: 230,
+  maxHeight: 120,
+  gotchas: [
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
+  ],
   bestFor: ["method-agreement checks in a cell", "instrument drift in a KPI card"],
   avoidFor: ["unpaired samples (MicroScatter)", "a single time series (Sparkline)"],
   props: [

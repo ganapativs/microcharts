@@ -68,7 +68,10 @@ export function buildCatalog() {
       "Full API for a chart = sharedProps (grammar, layout, i18n) + charts[n].props (chart-specific). " +
       "Interactive shared callbacks/flags apply ONLY when listed in charts[n].sharedInteractive " +
       "(empty/missing ⇒ no shared interactive props). Chart-specific interactive props stay in charts[n].props " +
-      "with interactive:true (e.g. onWindowChange). Prefer docs URL + this file over memorized APIs.",
+      "with interactive:true (e.g. onWindowChange). These are word-sized charts: keep width/height inside " +
+      "charts[n].maxWidth/maxHeight (viewBox units) and scale with CSS beyond that. Read charts[n].gotchas " +
+      "before writing props — it carries the caps and defaults no prop description states. " +
+      "Prefer docs URL + this file over memorized APIs.",
     mcp: {
       package: "@microcharts/mcp",
       command: "npx -y @microcharts/mcp",
@@ -99,6 +102,12 @@ export function buildCatalog() {
         primaryEncoding: c.encoding.channel,
         precision: c.encoding.precision,
         nodeBudget: c.nodeBudget,
+        // Both or neither: a lone side reads as "this axis is capped and the
+        // other is free", which is not what any chart does.
+        ...(c.maxWidth !== undefined && c.maxHeight !== undefined
+          ? { maxWidth: c.maxWidth, maxHeight: c.maxHeight }
+          : {}),
+        ...(c.gotchas?.length ? { gotchas: c.gotchas } : {}),
         bestFor: c.bestFor,
         avoidFor: c.avoidFor,
         props: c.props.map(toCatalogProp),

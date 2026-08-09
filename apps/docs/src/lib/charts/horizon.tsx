@@ -20,6 +20,8 @@ export const entry: ChartEntry = {
     precision: "low — a density read; Sparkline when exact shape matters",
   },
   nodeBudget: "≤ 6 (≤ 3 fold paths per direction)",
+  maxWidth: 320,
+  maxHeight: 60,
   bestFor: ["dense monitoring rows (dozens stacked)", "wide-range series in tight cells"],
   avoidFor: ["first-glance audiences (folding needs a key)", "few rows with room (Sparkline)"],
   props: [

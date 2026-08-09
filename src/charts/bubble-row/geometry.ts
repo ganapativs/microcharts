@@ -57,13 +57,15 @@ export function bubbleLayout(opts: {
   height?: number | undefined;
   gap?: number | undefined;
   fontSize?: number | undefined;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
   label: "value" | "both" | "none";
 }): BubbleLayout {
   const height = dim(opts.height, 30, 0);
   const gap = dim(opts.gap, 2, 0);
   // Numerals scale with height (floor 7) so they read at the library norm — a
   // fixed size looked ~40 % smaller than every other chart's labels.
-  const fontSize = dim(opts.fontSize, labelFont(height, 0.34), 0);
+  const fontSize = dim(opts.fontSize, labelFont(height, 0.34, opts.labelSize), 0);
   const labelY = round2(height - PAD - fontSize * 0.32);
   // Alphabetic baseline, so `mid: false`. A numeral the box can no longer seat
   // is DROPPED, never shrunk or painted past the edge — the library's

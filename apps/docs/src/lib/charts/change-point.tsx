@@ -24,6 +24,12 @@ export const entry: ChartEntry = {
   dataShape: "number[]",
   encoding: { channel: "break marker position + regime shading", precision: "high" },
   nodeBudget: "≤ 6 + 3 per break",
+  maxWidth: 320,
+  maxHeight: 70,
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "context for an anomaly — a spike means nothing without the regime it broke",
     "error rate / latency / cost that stepped to a new level",

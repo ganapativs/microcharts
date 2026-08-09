@@ -31,6 +31,11 @@ export interface ThermometerProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ThermometerStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -91,10 +96,11 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     bulb = true,
     label = "none",
     color,
-    fontSize = 8,
+    fontSize: fontSizeProp,
     format,
     locale,
     strings = EN_THERMOMETER,
+    labelSize,
     title,
     summary,
     id,
@@ -102,6 +108,11 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     style,
     children,
   } = props;
+
+  // `labelSize` raises the derived default; an explicit `fontSize` still wins,
+  // being the more specific lever. The gutter is sized from the result, so a
+  // raised floor widens the numeral's room instead of spilling into the page.
+  const fontSize = fontSizeProp ?? Math.max(8, labelSize ?? 0);
 
   const domain = resolveThermometerDomain(props.domain);
   const vertical = orientation === "vertical";
@@ -188,7 +199,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
         vertical ? { mode: "floor", bottom: boxH - PAD } : { mode: "center", top: 0, bottom: boxH }
       }
       className={className ? `mc-thermo ${className}` : "mc-thermo"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* Bulb always full; fill inline, width from role. */}
       {geo.bulb ? (

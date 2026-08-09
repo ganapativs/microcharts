@@ -61,7 +61,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
   } = props;
   // The static's own resolution, not a second copy of it: the hit box, the ring
   // and the painted glyphs all have to be sized against one box.
-  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize);
+  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize, props.labelSize);
   const hostRef = useRef<HTMLSpanElement>(null);
   // "rise" from the soil: each stage glyph (data-mc-ink="point") grows upward
   // from its baseline, left→right — the row literally sprouts. "trail" scaled

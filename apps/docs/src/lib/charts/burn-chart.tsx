@@ -21,6 +21,11 @@ export const entry: ChartEntry = {
     precision: "high for history, low-deliberate for the dotted projection",
   },
   nodeBudget: "≤ 7",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "a sprint burndown in a tab header",
     "will-we-finish in a KPI card",

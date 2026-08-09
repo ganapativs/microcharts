@@ -36,6 +36,11 @@ export interface BumpStripProps {
   height?: number | undefined;
   color?: string | undefined;
   strings?: FlowStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -54,6 +59,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     height = 16,
     color,
     strings = EN_FLOW,
+    labelSize,
     title,
     summary,
     id,
@@ -75,7 +81,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     devWarn(`<BumpStrip> rank beyond maxRank=${fixedMax} clamped to the bottom band.`);
   }
 
-  const fontSize = labelFont(height, 0.4);
+  const fontSize = labelFont(height, 0.4, labelSize);
   // clamped label center — the glyph box (central baseline) never leaves the frame
   const labelY = (y: number): number =>
     Math.min(Math.max(y, fontSize * 0.5), height - fontSize * 0.5);
@@ -98,7 +104,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

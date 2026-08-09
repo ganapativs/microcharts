@@ -21,6 +21,12 @@ export const entry: ChartEntry = {
     precision: "high — rank is the axis, so the population bands are exact by definition",
   },
   nodeBudget: "≤ 6",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "Ranks are 0–100; out-of-range values are clamped.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "one player's or product's rank drifting over time",
     "whether a standing has crossed into the top or bottom of the pack",

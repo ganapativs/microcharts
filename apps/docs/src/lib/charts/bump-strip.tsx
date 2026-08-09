@@ -26,6 +26,13 @@ export const entry: ChartEntry = {
     precision: "medium — end labels give the exact ranks; steps are ordinal",
   },
   nodeBudget: "≤ 10 (1 path + change dots + 2 end labels)",
+  maxWidth: 260,
+  maxHeight: 70,
+  gotchas: [
+    "Ranks are 1-based ordinals: non-integers round, and values below 1 are dropped.",
+    "A rank past `maxRank` is clamped to the bottom band.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["leaderboard rows", "category-rank trends in KPI cards"],
   avoidFor: ["continuous values (Sparkline)", "more than ~15 rank levels"],
   props: [

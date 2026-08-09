@@ -57,8 +57,13 @@ export function dataDiffCap(maxItems: number | undefined): number {
  * cost a label, so step down to the floor before giving up. Bounded by
  * `labelFont`'s cap of 11, so the loop runs at most seven times.
  */
-export function dataDiffTagFont(pitchFont: number, chars: number, width: number): number {
-  for (let f = Math.floor(pitchFont); f >= TAG_FONT_MIN; f--)
+export function dataDiffTagFont(
+  pitchFont: number,
+  chars: number,
+  width: number,
+  min = TAG_FONT_MIN,
+): number {
+  for (let f = Math.floor(pitchFont); f >= min; f--)
     if (dataDiffGutter(chars, f, width) > 0) return f;
   return 0;
 }
@@ -76,9 +81,11 @@ export function dataDiffLayout(opts: {
   maxItems?: number | undefined;
   width: number;
   height: number;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): { font: number; footer: number; tagFont: number; keyChars: number } {
   const { width, height } = opts;
-  const font = labelFont(height, 0.4);
+  const font = labelFont(height, 0.4, opts.labelSize);
   // rows split the plot height — the totals band only earns its own band when
   // there is vertical room to spend on it.
   const footer = opts.label === "totals" && height >= 34 ? font + 3 : 0;
@@ -90,8 +97,15 @@ export function dataDiffLayout(opts: {
     opts.data.map((d) => d.key.length),
     0,
   );
+  // A raised floor lifts the bottom of the tag's shrink range too: the tags
+  // drop rather than setting under the size an app asked for.
   const tagFont = opts.labels
-    ? dataDiffTagFont(Math.min(font, Math.floor(rowH * 0.5)), keyChars, width)
+    ? dataDiffTagFont(
+        Math.min(font, Math.floor(rowH * 0.5)),
+        keyChars,
+        width,
+        opts.labelSize ?? TAG_FONT_MIN,
+      )
     : 0;
   return { font, footer, tagFont, keyChars };
 }

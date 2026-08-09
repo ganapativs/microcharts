@@ -37,8 +37,8 @@ export function likertBox(width: number, height: number): readonly [number, numb
 }
 
 /** Label font size (viewBox units) — `labelFont` floor 7, scaled to strip height. */
-export function likertFont(height: number): number {
-  return labelFont(height, 0.5);
+export function likertFont(height: number, min?: number | undefined): number {
+  return labelFont(height, 0.5, min);
 }
 
 /** Bar thickness: the strip inset a unit top and bottom, never thinner than 3. */

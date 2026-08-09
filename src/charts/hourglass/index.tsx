@@ -25,6 +25,11 @@ export interface HourglassProps {
   fontSize?: number | undefined;
   locale?: string | string[] | undefined;
   strings?: HourglassStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -68,6 +73,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
     color,
     locale,
     strings = EN_HOURGLASS,
+    labelSize,
     title,
     summary,
     id,
@@ -82,7 +88,12 @@ export function Hourglass(props: HourglassProps): ReactNode {
   // DOM verbatim — `font-size="NaN"`, and a NaN viewBox width through the gutter
   // it sizes, which collapsed the glass along with the numeral. Documented
   // default.
-  const fontSize = isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : 8;
+  // `labelSize` raises the derived default; an explicit `fontSize` still wins,
+  // being the more specific lever.
+  const fontSize =
+    isFiniteValue(props.fontSize) && props.fontSize > 0
+      ? props.fontSize
+      : Math.max(8, labelSize ?? 0);
 
   const e = Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
   const pct = hourglassPct(
@@ -115,7 +126,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
       // other glyphs. The box is the cap plates, the one part `value` can't move.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-hourglass ${className}` : "mc-hourglass"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <path d={geo.frame} data-mc-ink="fill" />
       {/* Top sand (remaining). .mc-hourglass-sand scopes interactive fade. */}

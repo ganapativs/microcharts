@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
     precision: "medium — interval read; the delta label restores a number",
   },
   nodeBudget: "≤ 10",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "an A/B experiment result in a KPI card",
     "control vs test in an experiments table",

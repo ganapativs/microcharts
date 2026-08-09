@@ -60,15 +60,18 @@ export function labelMetrics(
   text: string,
   width: number,
   height: number,
+  min = 5,
 ): { fontSize: number; gutter: number } {
-  const ideal = Math.max(6, Math.min(Math.round(height * 0.5), 11));
+  const ideal = Math.max(min, 6, Math.min(Math.round(height * 0.5), 11));
   const budget = Math.floor(width * 0.45);
   const needs = (size: number): number => textGutter(text.length, size, 6);
 
   let fontSize = ideal;
   if (needs(fontSize) > budget && text.length > 0) {
     const fitted = Math.floor((budget - 6) / (text.length * 0.62));
-    fontSize = Math.max(5, Math.min(ideal, fitted));
+    // The shrink stops at the size the caller asked for, never under it: the
+    // gutter is `needs(fontSize)` either way, so the figure keeps its room.
+    fontSize = Math.max(min, Math.min(ideal, fitted));
   }
   return { fontSize, gutter: needs(fontSize) };
 }
@@ -204,11 +207,21 @@ export function sparkBarGeometry(
     let y = Math.min(top, baselineY);
     if (y + h > y1) y = y1 - h;
     if (y < y0) y = y0;
+    // Round the two EDGES, then derive the extent from the rounded pair — the
+    // clamp-the-ends discipline above, applied to rounding. Rounding `y` and
+    // `h` independently let EACH move up by 0.005, so a bar the clamp had
+    // seated flush on `y1` came back as `y + height = 20.01` in a 20-unit
+    // frame and painted a hundredth of a unit into the page, which does not
+    // clip. Off the rounded edges, `y + height === bottom <= y1` holds by
+    // construction. A true zero keeps `bottom === y`, so it still emits
+    // `height: 0` and paints nothing.
+    const yTop = round2(y);
+    const yBot = round2(Math.min(y + h, y1));
     bars.push({
       x: round2(x0 + i * slot + inset),
-      y: round2(y),
+      y: yTop,
       width: barW,
-      height: round2(h),
+      height: round2(yBot - yTop),
       value: v,
       index: i,
       sign: v > 0 ? 1 : v < 0 ? -1 : 0,

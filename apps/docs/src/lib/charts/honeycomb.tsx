@@ -14,6 +14,12 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number; total: number }",
   encoding: { channel: "filled-cell count in a hex grid (unit counting)", precision: "high" },
   nodeBudget: "2",
+  gotchas: [
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
+    "Over 60 cells stops being countable; use Progress (documented cap).",
+    "Sized by `cell`, not `width`/`height` — the box follows from the cell count.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "seats or licenses taken of a capacity",
     "an occupancy read in a KPI card",

@@ -25,6 +25,9 @@ export const entry: ChartEntry = {
   dataShape: "{ content, window, marks?, known? }",
   encoding: { channel: "position (window + marks along the extent)", precision: "high / low" },
   nodeBudget: "≤ 5",
+  maxWidth: 480,
+  maxHeight: 70,
+  gotchas: ["Takes `onWindowChange([lo, hi])` instead of the shared picker callbacks."],
   bestFor: ["document / log position", "long-timeline navigation"],
   avoidFor: ["a single value (Progress)", "exact content values (Sparkline)"],
   props: [

@@ -30,6 +30,11 @@ export const entry: ChartEntry = {
   dataShape: "{ demand: { level, amount }[], supply: { level, amount }[] }",
   encoding: { channel: "area (cumulative step-wedges)", precision: "medium" },
   nodeBudget: "≤ 4",
+  maxWidth: 400,
+  maxHeight: 100,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["order-book depth / liquidity", "supply vs demand posture"],
   avoidFor: ["a time series (Sparkline)", "a single ratio (Delta)"],
   props: [

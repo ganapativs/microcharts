@@ -44,6 +44,11 @@ export const entry: ChartEntry = {
   dataShape: "{ label, value }[] (parts of a whole)",
   encoding: { channel: "segment length in a fixed bar", precision: "medium-high" },
   nodeBudget: "≤ 6 + labels",
+  maxWidth: 260,
+  maxHeight: 40,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["traffic mix per row", "composition in cards"],
   avoidFor: ["comparing across rows precisely (MiniBar)", "negative parts (Waterfall)"],
   props: [

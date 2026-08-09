@@ -38,7 +38,7 @@ export interface MusicStaffFrame {
  *   out to x −61 inside a viewBox of 1. Same helper as `Chart`, so the frame
  *   and the marks stay in step.
  * - `fontSize`: a non-finite one poisoned the gutter, the label's x, and
- *   `--mc-label-size` ("NaNpx").
+ *   `--mc-label-px` ("NaNpx").
  * - the gutter itself: reserved from the figure's length with no ceiling, so
  *   `label="last"` on `[1, -999999999]` at the default 60×28 asked for 84 units
  *   of a 60-unit box. The staff's right edge landed at x −26 — outside a
@@ -49,13 +49,16 @@ export function musicStaffFrame(opts: {
   width: number;
   height: number;
   fontSize?: number | undefined;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
   /** The formatted trailing figure, or undefined when there is no label. */
   labelText?: string | undefined;
 }): MusicStaffFrame {
   const width = chartSide(opts.width, DEFAULT_WIDTH);
   const height = chartSide(opts.height, DEFAULT_HEIGHT);
   const given = opts.fontSize;
-  const fontSize = isFiniteValue(given) && given > 0 ? given : labelFont(height);
+  const fontSize =
+    isFiniteValue(given) && given > 0 ? given : labelFont(height, 0.55, opts.labelSize);
 
   let gutter = 0;
   const text = opts.labelText;

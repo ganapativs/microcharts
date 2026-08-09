@@ -76,8 +76,8 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const geo = useMemo(() => {
     const last = lastFinite(data);
     const labelText = label === "last" && last !== undefined ? fmt(last) : undefined;
-    const gutterRight = lastLabelMetrics(labelText, width, height)?.gutter ?? 0;
-    const mmFont = minmaxFont(height, label);
+    const gutterRight = lastLabelMetrics(labelText, width, height, props.labelSize)?.gutter ?? 0;
+    const mmFont = minmaxFont(height, label, props.labelSize);
     const gutterY = mmFont && mmFont + 1;
     return sparkGeometry(data, {
       width,
@@ -90,7 +90,7 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
       gutterBottom: gutterY,
       maxPoints: props.maxPoints,
     });
-  }, [data, width, height, domain, fill, band, label, fmt, props.maxPoints]);
+  }, [data, width, height, domain, fill, band, label, fmt, props.maxPoints, props.labelSize]);
 
   // Indices with a finite value — the only navigable stops. Callbacks report the
   // DATA index (what the consumer indexes into), so we walk finite indices and

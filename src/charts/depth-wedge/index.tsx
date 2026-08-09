@@ -27,6 +27,11 @@ export interface DepthWedgeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: DepthWedgeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -63,6 +68,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
     format,
     locale,
     strings = EN_DEPTH_WEDGE,
+    labelSize,
     title,
     summary,
     id,
@@ -72,7 +78,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
   } = props;
 
   const fmt = makeFormatter(format, locale);
-  const fontSize = labelFont(height, 0.18);
+  const fontSize = labelFont(height, 0.18, labelSize);
   const geo = depthWedgeGeometry({
     demand: data.demand,
     supply: data.supply,
@@ -109,7 +115,7 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
       // spread readout occupies a top gutter, which a floor seat never reads.
       seat={{ mode: "floor", bottom: geo.yBase }}
       className={className ? `mc-depth ${className}` : "mc-depth"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* The two wedges meet at the gap (midX): demand's inner edge is on the
           right, supply's on the left. Pinning each sweep to its inner edge keeps

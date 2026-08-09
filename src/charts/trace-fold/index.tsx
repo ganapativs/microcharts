@@ -23,6 +23,11 @@ export interface TraceFoldProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TraceFoldStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -57,6 +62,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
     format,
     locale,
     strings = EN_TRACE_FOLD,
+    labelSize,
     title,
     summary,
     id,
@@ -77,7 +83,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
   const height = chartSide(heightProp ?? fallbackH, fallbackH);
   const rowGap = 1.2;
   const fmt = makeFormatter(format, locale);
-  const fontSize = labelFont(height / depthCount, 0.6);
+  const fontSize = labelFont(height / depthCount, 0.6, labelSize);
 
   const geo = traceFoldGeometry({ data, width, height, rowGap });
   const accName = resolveSummary(summary, () => traceFoldSummary(geo, strings, fmt));
@@ -95,7 +101,7 @@ export function TraceFold(props: TraceFoldProps): ReactNode {
       // frame the same midpoint the geometry would hand back.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-trace ${className}` : "mc-trace"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.rects.flatMap((r, i) => {
         // width 0 = the geometry could not place this span on the wall clock.

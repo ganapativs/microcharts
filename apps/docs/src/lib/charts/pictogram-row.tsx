@@ -14,6 +14,9 @@ export const entry: ChartEntry = {
   dataShape: "value of total (units)",
   encoding: { channel: "filled-unit count", precision: "high — it is the number" },
   nodeBudget: "1 per unit (total ≤ 20 documented)",
+  maxWidth: 240,
+  maxHeight: 50,
+  gotchas: ["Past 20 units counting fails; use Progress (documented cap)."],
   bestFor: ["seats and slots in a sentence", "ratings", "capacity rows"],
   avoidFor: ["> 20 units (Progress)", "continuous ratios (Progress)"],
   props: [

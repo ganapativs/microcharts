@@ -4,7 +4,7 @@
 // edge/point). ←/→ cycle items chronologically, click / Enter / Space selects
 // (onSelect); announces "Deploy freeze: Jun 3, 09:00 to 13:30 — 4h 30m."
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter, makeDateFormatter, type DateFormat } from "../../core/format.js";
+import { makeDateFormatter, makeUnitFormatter, type DateFormat } from "../../core/format.js";
 import { labelFont } from "../../core/labels.js";
 import {
   CHIP,
@@ -76,7 +76,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
   // and the focus outline are all in viewBox units, so a box that disagrees with
   // the painted one puts the outline somewhere the marks are not.
   const [width, height] = timelineBox(widthProp, heightProp);
-  const fontSize = labelFont(height, 0.45);
+  const fontSize = labelFont(height, 0.45, props.labelSize);
   const geo = useMemo(
     () =>
       eventTimelineGeometry({
@@ -163,7 +163,7 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
   });
 
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
   const accName =

@@ -5,7 +5,7 @@
 // row's added / removed / net.focus
 // ring + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter, withPlus } from "../../core/format.js";
+import { makeFormatter, unsigned, withPlus } from "../../core/format.js";
 import {
   CHIP,
   named,
@@ -31,8 +31,15 @@ export interface InteractiveDataDiffProps extends DataDiffProps, PickerProps {
   animate?: boolean;
 }
 
+// The negative branch prints its own `−`, so the formatter's own sign has to go
+// or a `signDisplay: "always"` caller reads `−+5`. `withPlus` already guards the
+// positive branch from the mirror of the same defect.
 const signed = (n: number, fmt: (v: number) => string): string =>
-  n < 0 ? `−${fmt(Math.abs(n))}` : n === 0 ? fmt(0) : withPlus(n, (v) => fmt(Math.abs(v)));
+  n < 0
+    ? `−${unsigned(fmt(Math.abs(n)))}`
+    : n === 0
+      ? fmt(0)
+      : withPlus(n, (v) => fmt(Math.abs(v)));
 
 export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
   const {
@@ -85,6 +92,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       maxItems,
       width,
       height,
+      labelSize: props.labelSize,
     });
     return dataDiffGeometry({
       width,
@@ -97,7 +105,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
       fontSize: tagFont,
       footer,
     });
-  }, [width, height, data, order, domain, maxItems, labels, label]);
+  }, [width, height, data, order, domain, maxItems, labels, label, props.labelSize]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
   // Navigable unit = one DISPLAYED row: index into `geo.rows`, i.e. the sorted +

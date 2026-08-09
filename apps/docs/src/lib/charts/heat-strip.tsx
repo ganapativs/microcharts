@@ -27,6 +27,8 @@ export const entry: ChartEntry = {
     precision: "low — Sparkline when shape matters",
   },
   nodeBudget: "1 per cell (≤ 60 documented)",
+  maxWidth: 260,
+  maxHeight: 40,
   bestFor: ["per-tenant load rows", "intensity ribbons in tables", "dense time context"],
   avoidFor: ["exact shape (Sparkline)", "calendar rhythm (ActivityGrid)"],
   props: [

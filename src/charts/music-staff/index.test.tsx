@@ -76,7 +76,7 @@ describe("<MusicStaff>", () => {
 
   it("a non-finite box or fontSize never reaches a coordinate", () => {
     // `Chart` clamps the FRAME; a chart that read the raw prop still drew its
-    // marks against it (`cy="NaN"`, `--mc-label-size: NaNpx`).
+    // marks against it (`cy="NaN"`, `--mc-label-px: NaNpx`).
     for (const bad of [NaN, Infinity, 0, -50]) {
       for (const html of [
         draw(<MusicStaff data={MELODY} width={bad} label="last" />).container.innerHTML,

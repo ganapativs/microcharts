@@ -36,6 +36,12 @@ export const entry: ChartEntry = {
     precision: "high / medium",
   },
   nodeBudget: "1 per segment, cap 24",
+  maxWidth: 480,
+  maxHeight: 100,
+  gotchas: [
+    "Height is derived from the level count when you pass none.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["bundle / storage / budget composition", "two-level breakdowns"],
   avoidFor: ["deep hierarchies (unreadable)", "flat parts (SegmentedBar)"],
   props: [

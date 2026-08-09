@@ -17,6 +17,11 @@ export const entry: ChartEntry = {
   dataShape: "(number | null)[]",
   encoding: { channel: "radial bar length at a fixed cycle angle", precision: "medium" },
   nodeBudget: "4",
+  maxWidth: 120,
+  maxHeight: 120,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "the shape of a 24-hour or 7-day cycle",
     "when a metric is busy across the cycle",

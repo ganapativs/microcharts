@@ -46,6 +46,11 @@ export interface CoverageStripProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CoverageStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -68,6 +73,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
     color,
     locale,
     strings = EN_COVERAGE,
+    labelSize,
     title,
     summary,
     id,
@@ -90,7 +96,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
 
   // label size in viewBox units — ~0.62·height, clamped 7–11 to match the rest
   // of the catalog at any chart size
-  const FONT = labelFont(height, 0.62);
+  const FONT = labelFont(height, 0.62, labelSize);
 
   const pctFmt = makeFormatter({ style: "percent", maximumFractionDigits: 0 }, locale);
   // Degrade, don't overlap: the percent is centred on the strip's midline, so a
@@ -115,7 +121,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
   const accName = resolveSummary(summary, () => coverageSummary(geo, pctFmt, strings));
   // pin the label size to viewBox units (the shared 0.75em default is ambient —
   // it would render labels ~2× and break the reserved gutter).
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   // a custom `color` must be inline STYLE: the "cell" role rule would override
   // a fill attribute. ONE shared object — never allocated per cell (SSR path).
   const customFill = color ? { fill: color } : undefined;

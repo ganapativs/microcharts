@@ -58,7 +58,7 @@ describe("<FillWord>", () => {
 
   it("pins the label size inline (attribute alone is overridden by the base text rule)", () => {
     const { container } = draw(<FillWord word="sync" value={0.5} />);
-    expect(container.querySelector("svg")!.getAttribute("style")).toContain("--mc-label-size");
+    expect(container.querySelector("svg")!.getAttribute("style")).toContain("--mc-label-px");
   });
 
   // A host computes fontSize (`base * scale`, `Number("")` from a cleared
@@ -76,7 +76,7 @@ describe("<FillWord>", () => {
         .container.querySelector("svg")!
         .getAttribute("viewBox"),
     );
-    expect(svg.getAttribute("style")).toContain("--mc-label-size: 12px");
+    expect(svg.getAttribute("style")).toContain("--mc-label-px: 12px");
   });
 
   // `.mc-root` sets forced-color-adjust: none, so an inline fade would reach High

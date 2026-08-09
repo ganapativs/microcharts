@@ -28,6 +28,11 @@ export interface CometTrailProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CometTrailStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -67,6 +72,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
     format,
     locale,
     strings = EN_COMET_TRAIL,
+    labelSize,
     title,
     summary,
     id,
@@ -77,8 +83,8 @@ export function CometTrail(props: CometTrailProps): ReactNode {
   // A host-computed `fontSize` can arrive NaN (`Number("")`) or 0. Left alone it
   // reached the reserved gutter and, through it, every dot coordinate — a chart
   // of `cx="NaN"` under a perfectly normal-looking accessible name.
-  const asked = props.fontSize ?? labelFont(height);
-  const fontSize = Number.isFinite(asked) && asked > 0 ? asked : labelFont(height);
+  const asked = props.fontSize ?? labelFont(height, 0.55, labelSize);
+  const fontSize = Number.isFinite(asked) && asked > 0 ? asked : labelFont(height, 0.55, labelSize);
   const fmt = makeFormatter(format, locale);
 
   // The gutter is reserved BEFORE geometry and sized from the text that will
@@ -114,7 +120,7 @@ export function CometTrail(props: CometTrailProps): ReactNode {
       // glyph. The seat tracks `vPad`, which `label="last"` widens.
       seat={{ mode: "center", top: geo.y0, bottom: geo.y1 }}
       className={className ? `mc-comet ${className}` : "mc-comet"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.trail.map((t) => (
         <circle

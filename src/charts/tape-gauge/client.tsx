@@ -132,6 +132,7 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
       width,
       height,
       vertical: orientation !== "horizontal",
+      labelSize: props.labelSize,
     }) !== null;
 
   // Tape reading under the pointer. One datum builder — callbacks match the chip.

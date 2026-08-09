@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { progressModel, type ProgressProps } from "../progress/index.js";
 import { ringGeometry, ringSize } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
@@ -17,6 +17,7 @@ export interface ProgressRingProps extends Pick<
   | "positive"
   | "format"
   | "locale"
+  | "labelSize"
   | "title"
   | "summary"
   | "id"
@@ -47,6 +48,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     format,
     locale,
     strings = EN_SCALAR,
+    labelSize,
     title,
     summary,
     id,
@@ -60,7 +62,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
   const size = ringSize(props.size);
   // reuse Progress's resolved model (fraction/clamp/label semantics)
   const model = progressModel({ value, max, positive, format, locale, strings, label: "percent" });
-  const pctFmt = makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   // In `sweep` mode the arc paints what is LEFT and the name speaks what is
   // left, but the centre figure kept printing what was DONE — one glyph carried
   // two numbers ("68%" over a 32% wedge, announced "32% remaining"). One string
@@ -75,6 +77,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
     weight,
     sweep,
     labelChars: showLabel ? display.length : 0,
+    labelSize,
   });
 
   const auto = !Number.isFinite(model.fraction)
@@ -88,7 +91,7 @@ export function ProgressRing(props: ProgressRingProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${geo.fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${geo.fontSize}px` } as CSSProperties;
 
   return (
     <Chart

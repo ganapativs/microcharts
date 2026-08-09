@@ -40,7 +40,7 @@ describe("<TallyMarks>", () => {
     const { container } = draw(<TallyMarks value={-4} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("0 counted.");
     const svg = container.querySelector("svg")!;
-    expect(svg.getAttribute("style")).toContain("--mc-label-size");
+    expect(svg.getAttribute("style")).toContain("--mc-label-px");
   });
 
   it("summary={false} hides it from assistive tech (decorative opt-out)", () => {

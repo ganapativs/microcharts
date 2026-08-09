@@ -3,7 +3,7 @@
 // listener + segment-by-x-band lookup, ←/→ step levels in DATA order
 // ("Agree: 34%, level 4 of 5."). click / Enter / Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, makeUnitFormatter } from "../../core/format.js";
 import {
   CHIP,
   named,
@@ -69,9 +69,9 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   // The box `<Chart>` will paint, resolved before anything measures against it —
   // the hit test and the overlay have to agree with the static entry's clamp.
   const [w, h] = likertBox(width, height);
-  const fontSize = likertFont(h);
+  const fontSize = likertFont(h, props.labelSize);
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
   // Same reservation as the static entry, from the same resolver — a gutter that

@@ -58,6 +58,11 @@ export interface SegmentedBarProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -82,6 +87,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     format,
     locale,
     strings = EN_COMPOSITION,
+    labelSize,
     title,
     summary,
     id,
@@ -109,7 +115,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
       a.label === strings.otherLabel ? 1 : b.label === strings.otherLabel ? -1 : b.value - a.value,
     );
   }
-  const fontSize = label === "none" ? 0 : labelFont(height, 0.6);
+  const fontSize = label === "none" ? 0 : labelFont(height, 0.6, labelSize);
   const geo = segmentedBarGeometry({
     width,
     height,
@@ -131,7 +137,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
   const rootStyle =
-    fontSize > 0 ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties) : style;
+    fontSize > 0 ? ({ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties) : style;
 
   return (
     <Chart

@@ -1147,6 +1147,11 @@
       "import": "./dist/shared/motion-engine.js",
       "default": "./dist/shared/motion-engine.js"
     },
+    "./fluid": {
+      "types": "./dist/fluid.d.ts",
+      "import": "./dist/fluid.js",
+      "default": "./dist/fluid.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./styles/core.css": "./dist/styles/core.css",
     "./styles/*.css": "./dist/styles/*.css"

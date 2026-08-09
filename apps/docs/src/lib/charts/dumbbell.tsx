@@ -25,6 +25,13 @@ export const entry: ChartEntry = {
   dataShape: "{ label?, from, to }[]",
   encoding: { channel: "two dot positions + connecting span", precision: "high" },
   nodeBudget: "≤ 3 per row (rows ≤ 5)",
+  maxWidth: 240,
+  maxHeight: 100,
+  gotchas: [
+    "Past 5 rows the comparison blurs; the component dev-warns past the cap.",
+    "Height is derived from the row count when you pass none.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["salary bands", "before/after per row", "ranges in tables"],
   avoidFor: ["many rows (Slope for crossings)", "the path between (Sparkline)"],
   props: [

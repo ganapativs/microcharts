@@ -37,6 +37,10 @@ export const entry: ChartEntry = {
   dataShape: '"ok" | "warn" | "error" | "off" | "busy" (extensible)',
   encoding: { channel: "paired glyph shape + semantic color", precision: "n/a — categorical" },
   nodeBudget: "≤ 2 (mark + optional pulse halo)",
+  gotchas: [
+    "One fixed intrinsic box: size it with CSS, not `width`/`height`.",
+    'An unrecognized `status` renders the "off" glyph.',
+  ],
   bestFor: ["service lists", "inline state in a sentence", "monitoring rows"],
   avoidFor: ["quantities", "trends", "more than ~6 state kinds"],
   props: [

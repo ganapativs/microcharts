@@ -8,7 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
 import { round2 } from "../../core/types.js";
-import { labelFitsY, rowLabelFont } from "../../core/labels.js";
+import { labelFitsY, rowLabelFont, ROW_LABEL_FACTOR } from "../../core/labels.js";
 import { EN_PAIRED, type PairedStrings } from "../../core/strings-paired.js";
 import { dumbbellGeometry, dumbbellLabelChars } from "./geometry.js";
 import { truncateLabel } from "../dot-plot/geometry.js";
@@ -83,6 +83,11 @@ export interface DumbbellProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: PairedStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -103,6 +108,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
     format,
     locale,
     strings = EN_PAIRED,
+    labelSize,
     title,
     summary,
     id,
@@ -120,7 +126,11 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
   // so `labelFont(height, …)` grew the type while the room per row shrank — it
   // pinned at the 11-unit ceiling from three rows on while DotPlot, doing the
   // same job beside it, sat at 7.
-  const fontSize = rowLabelFont(data.length > 0 ? height / data.length : height);
+  const fontSize = rowLabelFont(
+    data.length > 0 ? height / data.length : height,
+    ROW_LABEL_FACTOR,
+    labelSize,
+  );
   const rowPitch = data.length > 0 ? height / data.length : 0;
   // Both entries share this budget (see dumbbellLabelChars) — the client
   // re-derives it to place its overlay rings, and a second spelling drifts.
@@ -151,7 +161,7 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   // Value runs on x; Threshold/TargetZone are y-valued so annotations can't map
   // honestly here — pass children through (same contract as horizontal MiniBar).

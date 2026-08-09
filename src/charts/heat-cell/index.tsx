@@ -9,7 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { valueStepMixPct, type CellShape } from "../../shared/cell.js";
-import { heatCellGeometry, HEAT_CELL_LABEL_SIZE } from "./geometry.js";
+import { heatCellGeometry, heatCellFont } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 
 export function heatCellSummary(
@@ -38,6 +38,11 @@ export interface HeatCellProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ScalarStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -59,6 +64,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
     format,
     locale,
     strings = EN_SCALAR,
+    labelSize,
     title,
     summary,
     id,
@@ -80,7 +86,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
     heatCellSummary(value, geo.step, geo.steps, fmt, strings),
   );
 
-  const fontSize = HEAT_CELL_LABEL_SIZE;
+  const fontSize = heatCellFont(SIZE, labelSize);
   const text = geo.step !== null && label === "value" ? fmt(value) : undefined;
   const showLabel = text !== undefined && geo.labelFits(text.length, fontSize);
 
@@ -88,7 +94,7 @@ export function HeatCell(props: HeatCellProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

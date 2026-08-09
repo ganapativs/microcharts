@@ -62,7 +62,7 @@ export function DotPlot(props: InteractiveDotPlotProps): React.ReactNode {
   // (No-op when stem is off — its default — since no stem lines exist.)
   useEntrance(hostRef, "settle", animate, { link: 'line[data-mc-ink="muted"]' });
 
-  const fontSize = dotPlotFontSize(height, data.length);
+  const fontSize = dotPlotFontSize(height, data.length, props.labelSize);
   // Label-gutter width, in chars — a full scan of the rows, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
   const maxLabelChars = useMemo(() => {

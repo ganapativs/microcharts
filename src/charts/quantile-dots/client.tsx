@@ -99,7 +99,7 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
   // cursor is down would resize the box mid-scrub.
   const hasThreshold = threshold !== undefined && Number.isFinite(threshold);
   const labelMode = hasThreshold ? (props.label ?? "count") : "none";
-  const font = labelFont(height);
+  const font = labelFont(height, 0.55, props.labelSize);
   const gutterCh =
     labelMode === "count" && plot !== null && labelFitsY(height / 2, font, height)
       ? strings.quantileDotsOdds(dotCount, dotCount).length

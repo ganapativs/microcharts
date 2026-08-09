@@ -24,6 +24,13 @@ export const entry: ChartEntry = {
     precision: "medium — MiniBar for exact per-level values",
   },
   nodeBudget: "≤ 10 (≤ 7 segments + hairline + 2 labels)",
+  maxWidth: 260,
+  maxHeight: 60,
+  gotchas: [
+    "`format` merges with this chart's own formatting defaults instead of replacing them, so changing notation or precision keeps the unit. An explicit `style` replaces the whole set, digit defaults included.",
+    "7 levels is the legibility bar; more are rejected.",
+    "Negative counts are treated as 0.",
+  ],
   bestFor: ["survey question rows (SparkGroup shared scale)", "sentiment in cards"],
   avoidFor: ["> 7 levels", "unvalenced composition (SegmentedBar)"],
   props: [

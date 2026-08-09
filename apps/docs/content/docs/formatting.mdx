@@ -46,8 +46,27 @@ const fmt = makeFormatter({ style: "currency", currency: "USD" }, "en-US");
 fmt(42); // "$42.00"
 ```
 
-The arguments are positional: `makeFormatter(format, locale, defaults?)`. The third is the fallback used when `format`
-is omitted, which is how a chart supplies its own default (see `Delta` below).
+The arguments are positional, and there are two: `makeFormatter(format, locale)`. If you passed a third argument for
+chart-style defaults, merge them yourself instead — `makeFormatter({ ...defaults, ...format }, locale)`.
+
+## Your format merges with the chart's own defaults
+
+Fifteen charts format with defaults of their own. Eleven label a share as a percent — Funnel, Progress, ProgressRing,
+StackedArea, OHLC, LikertStrip, IconArray, ConfusionGrid, EventTimeline, BreathingDot, and Honeycomb. The other four set
+a different default: BiasStrip shows the sign on every non-zero bias, VolumeProfile uses compact notation, and
+DualWindowMeter and HistogramStrip pin their decimal places.
+
+Your `format` merges with those defaults key by key rather than replacing them, so `format={{ notation: "compact" }}` on
+a percent chart still writes a percent.
+
+Passing an explicit `style` replaces the whole set, digit defaults included. Those digits are calibrated for the unit:
+`maximumFractionDigits: 0` reads as `3%`, and kept under `style: "decimal"` it rounds 0.03 to `0`. Changing the unit
+voids the whole default rather than half of it.
+
+```tsx
+<Progress value={0.03} format={{ notation: "compact" }} /> // 3%
+<Progress value={0.03} format={{ style: "decimal" }} /> // 0.03
+```
 
 ## Percent, compact, decimals
 
@@ -66,6 +85,13 @@ to a locale-aware percent, so a raw ratio reads as a change with no config:
     <Delta value={4200} format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }} summary={false} />
   </div>
 </LiveDemo>
+
+## Charts that print their own sign
+
+Delta, Waterfall, DataDiff, Bullet, TrendArrow, WinProbWorm, and ChangePoint carry the direction in a glyph, a word, or
+a color, and format the absolute magnitude beside it. A sign in your `format` is stripped there rather than doubled, so
+`format={{ signDisplay: "always" }}` on a Delta reads `+0.7 pp`, not `++0.7 pp`. The direction is still in the mark and
+still in the summary.
 
 ## A custom function
 

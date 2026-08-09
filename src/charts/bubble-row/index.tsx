@@ -33,6 +33,11 @@ export interface BubbleRowProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: BubbleStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -71,6 +76,7 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     format,
     locale,
     strings = EN_BUBBLE,
+    labelSize,
     title,
     summary,
     id,
@@ -88,7 +94,13 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
     band: labelBand,
     labelY,
     charW,
-  } = bubbleLayout({ height: props.height, gap: props.gap, fontSize: props.fontSize, label });
+  } = bubbleLayout({
+    height: props.height,
+    gap: props.gap,
+    fontSize: props.fontSize,
+    labelSize,
+    label,
+  });
   const fmt = makeFormatter(format, locale);
   const fill = color ?? "var(--mc-accent)";
 
@@ -155,7 +167,7 @@ export function BubbleRow(props: BubbleRowProps): ReactNode {
             : { mode: "center", top: geo.y0, bottom: geo.y1 }
       }
       className={className ? `mc-bubble ${className}` : "mc-bubble"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {geo.bubbles.map((b) => (
         <circle

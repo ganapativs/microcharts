@@ -90,6 +90,7 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
     width: widthProp,
     height: heightProp,
     fontSize: props.fontSize,
+    labelSize: props.labelSize,
     labelText,
   });
   const geo = useMemo(

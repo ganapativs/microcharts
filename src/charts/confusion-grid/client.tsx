@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { EN_CONFUSION } from "../../core/strings-confusion.js";
 import { confusionGridGeometry } from "./geometry.js";
 import {
@@ -67,7 +67,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   // so any divergence here would park the ring off the cells it rings.
   const k = Math.max(2, Math.min(4, labels.length));
   const size = props.size ?? 54 + (k - 2) * 8;
-  const fontSize = labelFont(size, 0.16);
+  const fontSize = labelFont(size, 0.16, props.labelSize);
   const gutterCh = fontSize + 1;
   // The accuracy readout takes a right gutter out of the PLOT (the viewBox
   // stays `size`), so the grid is laid out in `size - rightGutter`.
@@ -75,9 +75,10 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   // locale that widens the percent (fr-FR "50 %") keeps ring and cells aligned.
   const accLabel =
     (props.label ?? "none") === "accuracy"
-      ? makeFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 })(
-          confGeoAccuracy(counts, k),
-        )
+      ? makeUnitFormatter(props.format, props.locale, {
+          style: "percent",
+          maximumFractionDigits: 0,
+        })(confGeoAccuracy(counts, k))
       : undefined;
   const rightGutter = accLabel ? accLabel.length * fontSize * 0.62 + 2 : 0;
   const geo = useMemo(
@@ -88,13 +89,14 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   // Same locale-aware percent formatter the static entry renders the accuracy
   // label with — so the chip and announcement don't drift from "50 %" (fr-FR).
   const pctFmt = useMemo(
-    () => makeFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 }),
+    () =>
+      makeUnitFormatter(props.format, props.locale, { style: "percent", maximumFractionDigits: 0 }),
     [props.format, props.locale],
   );
   // Cell tallies are cardinal integers, not axis values — group them with the
   // locale but never with the value `format`, which is the percent format here.
   const countFmt = useMemo(
-    () => makeFormatter(undefined, props.locale, { maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(undefined, props.locale, { maximumFractionDigits: 0 }),
     [props.locale],
   );
 

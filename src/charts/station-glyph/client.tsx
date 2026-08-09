@@ -97,6 +97,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
       dew: dewT,
       pressure: presT,
       station: station || null,
+      labelSize: props.labelSize,
     });
     const { font, cx, cy, r, yOff, gap, box } = lay;
     // per-char over-estimate — the static path never measures text either, and
@@ -175,7 +176,7 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         ],
       });
     return { fields: out, L: lay };
-  }, [station, wind, step, cloud, temp, dewpoint, pressure, size, strings, fmt]);
+  }, [station, wind, step, cloud, temp, dewpoint, pressure, size, strings, fmt, props.labelSize]);
 
   // Nearest drawn field by squared distance to its box center — the glyph's
   // marks are scattered around the disc, so there is no 1-D ordering to scan.

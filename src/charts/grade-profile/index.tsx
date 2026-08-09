@@ -27,6 +27,11 @@ export interface GradeProfileProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: GradeProfileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
     format,
     locale,
     strings = EN_GRADE_PROFILE,
+    labelSize,
     title,
     summary,
     id,
@@ -89,7 +95,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
     children,
   } = props;
 
-  const { fontSize, topPad } = gradeLayout(height, label);
+  const { fontSize, topPad } = gradeLayout(height, label, labelSize);
   const geo = gradeProfileGeometry({ data, width, height, bins, topPad });
   const fmt = makeFormatter(format, locale);
   const pct = gradePercent(locale);
@@ -107,7 +113,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation
   // attribute, so `fontSize={...}` alone is inert and the reserved gutters would
   // be sized for a font the browser never paints (see label-containment tests).
-  const rootStyle = { ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties;
 
   return (
     <Chart

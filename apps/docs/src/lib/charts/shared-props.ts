@@ -66,6 +66,13 @@ const GRAMMAR_PROPS: ChartProp[] = [
     required: false,
     description: 'Which individual points to emphasize (e.g. `"minmax"` on a line).',
   },
+  {
+    name: "labelSize",
+    type: "number",
+    required: false,
+    description:
+      "Raise the minimum label size, in viewBox units. Labels size themselves from the mark and floor at 7; set this where 7 reads too small. A label the box cannot seat at the raised floor drops rather than shrinking back under it, so a bigger number can mean fewer labels, never smaller ones.",
+  },
 ];
 
 const LAYOUT_PROPS: ChartProp[] = [

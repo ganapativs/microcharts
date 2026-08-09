@@ -63,6 +63,11 @@ export interface ForecastConeProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ForecastStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -87,6 +92,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     format,
     locale,
     strings = EN_FORECAST,
+    labelSize,
     title,
     summary,
     id,
@@ -120,7 +126,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     );
   }
 
-  const FONT = label === "landing" ? labelFont(height) : 0;
+  const FONT = label === "landing" ? labelFont(height, 0.55, labelSize) : 0;
   const showLabel = FONT > 0 && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(geo.landing.value) : "";
   const totalWidth = showLabel ? width + Math.ceil(labelText.length * FONT * 0.72) + 4 : width;
@@ -141,7 +147,7 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
       : (summary ?? forecastSummary(geo, fmt, { unit, at, target }, strings));
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
-    ? ({ ...style, "--mc-label-size": `${FONT}px` } as CSSProperties)
+    ? ({ ...style, "--mc-label-px": `${FONT}px` } as CSSProperties)
     : style;
 
   // annotations host contract: Marker x = period INDEX across history+forecast

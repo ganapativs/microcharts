@@ -15,6 +15,9 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number; target?: number }",
   encoding: { channel: "column extent on a ticked calibrated scale", precision: "high" },
   nodeBudget: "≤ 6",
+  maxWidth: 200,
+  maxHeight: 200,
+  gotchas: ["The default box follows `orientation`: 48×16 horizontal, 16×48 vertical."],
   bestFor: [
     "a fundraising or goal progress read",
     "a capacity or utilization gauge in a cell",

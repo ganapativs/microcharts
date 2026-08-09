@@ -39,9 +39,10 @@ export function netFlowLabel(
   height: number,
   label: "last" | "none",
   fmt: (n: number) => string,
+  min?: number | undefined,
 ): { font: number; text: string } | null {
   if (label !== "last" || geo.degenerate || geo.last === null) return null;
-  const font = labelFont(height);
+  const font = labelFont(height, 0.55, min);
   // Degradation contract: a label the box can no longer seat is DROPPED, and
   // its reserved gutter goes with it.
   if (!labelFitsY(height / 2, font, height)) return null;
@@ -81,6 +82,11 @@ export interface NetFlowProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: NetFlowStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -108,6 +114,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
     format,
     locale,
     strings = EN_NET_FLOW,
+    labelSize,
     title,
     summary,
     id,
@@ -144,7 +151,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
   }
 
   const fmt = makeFormatter(format, locale);
-  const lab = netFlowLabel(geo, height, label, fmt);
+  const lab = netFlowLabel(geo, height, label, fmt, labelSize);
   const totalWidth = lab ? width + Math.ceil(lab.text.length * lab.font * 0.72) + 4 : width;
 
   const accName = resolveSummary(summary, () => netFlowSummary(geo, fmt, strings));
@@ -152,9 +159,7 @@ export function NetFlow(props: NetFlowProps): ReactNode {
   // (in always above, out always below) — the two channels are independent
   const inRole = positive === "down" ? "negative" : "positive";
   const outRole = positive === "down" ? "positive" : "negative";
-  const rootStyle = lab
-    ? ({ ...style, "--mc-label-size": `${lab.font}px` } as CSSProperties)
-    : style;
+  const rootStyle = lab ? ({ ...style, "--mc-label-px": `${lab.font}px` } as CSSProperties) : style;
   const bars = geo.mode === "bars";
 
   const ann = children

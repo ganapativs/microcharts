@@ -56,13 +56,13 @@ export interface RingGeometry {
 
 /** Font for a centered percent: ≥1 unit air from the inner ring, sized for
  *  up to 3-digit values (`100%`/`999%` = 4 glyphs). 0 when it won't fit. */
-export function ringLabelFont(rInner: number, chars: number): number {
+export function ringLabelFont(rInner: number, chars: number, min = 5): number {
   if (chars <= 0) return 0;
   const hole = 2 * (rInner - 1);
   if (hole < 5) return 0;
   const n = Math.max(chars, 4);
-  const fs = Math.floor(Math.min(hole / (n * 0.62), hole, Math.max(5, Math.round(rInner * 0.9))));
-  return fs >= 5 && (n * fs * 0.62) / 2 <= rInner - 1 && fs / 2 <= rInner - 1 ? fs : 0;
+  const fs = Math.floor(Math.min(hole / (n * 0.62), hole, Math.max(min, Math.round(rInner * 0.9))));
+  return fs >= min && (n * fs * 0.62) / 2 <= rInner - 1 && fs / 2 <= rInner - 1 ? fs : 0;
 }
 
 /** Does a ring of this box and weight print `chars` glyphs in its hole? 0 = no.
@@ -72,8 +72,9 @@ export function ringLabelSize(
   size: number | undefined,
   weight: number | undefined,
   chars: number,
+  min?: number | undefined,
 ): number {
-  return ringLabelFont(ringRadii(size, weight).rInner, chars);
+  return ringLabelFont(ringRadii(size, weight).rInner, chars, min);
 }
 
 export function ringGeometry(opts: {
@@ -82,6 +83,8 @@ export function ringGeometry(opts: {
   weight?: number | undefined;
   sweep: boolean;
   labelChars?: number;
+  /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
+  labelSize?: number | undefined;
 }): RingGeometry {
   const { sweep } = opts;
   const { c, rOuter, rInner, weight } = ringRadii(opts.size, opts.weight);
@@ -96,7 +99,10 @@ export function ringGeometry(opts: {
     weight: round2(weight),
     labelX: round2(c),
     labelY: round2(c),
-    fontSize: chars > 0 ? ringLabelFont(rInner, chars) : Math.max(5, Math.round(rInner * 0.9)),
+    fontSize:
+      chars > 0
+        ? ringLabelFont(rInner, chars, opts.labelSize)
+        : Math.max(5, Math.round(rInner * 0.9)),
     y0: round2(c - rOuter),
     y1: round2(c + rOuter),
   };

@@ -90,9 +90,20 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
       domain: props.domain,
       volumeDomain: props.volumeDomain,
       gutterCh,
-      fontSize: labelFont(height, 0.62),
+      fontSize: labelFont(height, 0.62, props.labelSize),
     });
-  }, [width, height, data, minVolume, curve, props.domain, props.volumeDomain, props.label, fmt]);
+  }, [
+    width,
+    height,
+    data,
+    minVolume,
+    curve,
+    props.domain,
+    props.volumeDomain,
+    props.label,
+    props.labelSize,
+    fmt,
+  ]);
   const fmtVol = useMemo(() => makeFormatter(volumeFormat, locale), [volumeFormat, locale]);
 
   const total = data.length;

@@ -15,6 +15,11 @@ export const entry: ChartEntry = {
   dataShape: "{ severeBelow?, below, in, above, severeAbove? } (counts or fractions)",
   encoding: { channel: "stacked share length in fixed semantic order", precision: "high" },
   nodeBudget: "≤ 5 rects + ≤ 3 labels",
+  maxWidth: 320,
+  maxHeight: 120,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["SLO / uptime corridors", "glucose-style time-in-range KPI"],
   avoidFor: ["ranking parts (SegmentedBar)", "a single ratio (Progress)"],
   props: [

@@ -65,7 +65,7 @@ export function BenchmarkStrip(props: InteractiveBenchmarkStripProps): React.Rea
   });
 
   // must match the static's viewBox (the label gutter widens totalWidth)
-  const font = labelFont(height, 0.62);
+  const font = labelFont(height, 0.62, props.labelSize);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = useMemo(
     () =>

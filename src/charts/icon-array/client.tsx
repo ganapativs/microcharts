@@ -6,7 +6,7 @@
 // reading (`readout={false}` suppresses only the chip).
 // re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import {
   CHIP,
   named,
@@ -72,13 +72,19 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   });
 
   const total = resolveTotal(rawTotal);
-  const { font: FONT, gutterCh } = iconArrayLabelPlan({ label, total, width, height });
+  const { font: FONT, gutterCh } = iconArrayLabelPlan({
+    label,
+    total,
+    width,
+    height,
+    labelSize: props.labelSize,
+  });
   const geo = useMemo(
     () => iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT }),
     [width, height, value, total, shape, gutterCh, FONT],
   );
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
 

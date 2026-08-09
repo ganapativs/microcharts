@@ -3,7 +3,7 @@
 // threshold crossings only (documented anti-spam rule). No pointer lookup
 // (single mark) — hover/focus is a reveal of the percent, not a lookup.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeUnitFormatter } from "../../core/format.js";
 import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -62,7 +62,7 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   const fraction =
     Number.isFinite(value) && Number.isFinite(max) && max > 0 ? value / max : Number.NaN;
   const pctFmt = useMemo(
-    () => makeFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
     [format, locale],
   );
 
@@ -104,7 +104,8 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
   // the hole (both modes, and "—" for no data), so its length is the fit budget
   // geometry weighs.
   const printsLabel =
-    rest.label === "percent" && ringLabelSize(rest.size, rest.weight, readoutText.length) > 0;
+    rest.label === "percent" &&
+    ringLabelSize(rest.size, rest.weight, readoutText.length, rest.labelSize) > 0;
 
   // One arc, one selectable unit (index 0): the fraction it sweeps. One builder,
   // so `onActive` and `onSelect` can never report a different number or a

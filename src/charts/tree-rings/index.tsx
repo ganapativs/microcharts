@@ -38,6 +38,11 @@ export interface TreeRingsProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: TreeStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -50,10 +55,10 @@ export interface TreeRingsProps {
  * Label size, resolved once. A non-finite `fontSize` reached the gutter
  * arithmetic as NaN, so `Chart` clamped the viewBox to 1 unit wide while the
  * disc still painted out to `size` — the entire chart outside its own box —
- * and shipped `--mc-label-size: NaNpx` with it.
+ * and shipped `--mc-label-px: NaNpx` with it.
  */
-function treeRingsFont(box: number, fontSize: number | undefined): number {
-  return isFiniteValue(fontSize) && fontSize > 0 ? fontSize : labelFont(box);
+function treeRingsFont(box: number, fontSize: number | undefined, min?: number): number {
+  return isFiniteValue(fontSize) && fontSize > 0 ? fontSize : labelFont(box, 0.55, min);
 }
 
 /**
@@ -67,12 +72,13 @@ export function treeRingsWidth(opts: {
   size: number;
   label: "none" | "last";
   fontSize?: number | undefined;
+  labelSize?: number | undefined;
   fmt: (n: number) => string;
 }): number {
   const box = treeRingsSize(opts.size);
   const last = opts.data[opts.data.length - 1];
   if (opts.label !== "last" || !isFiniteValue(last)) return box;
-  const font = treeRingsFont(box, opts.fontSize);
+  const font = treeRingsFont(box, opts.fontSize, opts.labelSize);
   return box + Math.ceil(`${opts.fmt(last)}`.length * 0.62 * font + 5);
 }
 
@@ -124,6 +130,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     format,
     locale,
     strings = EN_TREE,
+    labelSize,
     title,
     summary,
     id,
@@ -132,7 +139,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
     children,
   } = props;
   const box = treeRingsSize(size);
-  const fontSize = treeRingsFont(box, props.fontSize);
+  const fontSize = treeRingsFont(box, props.fontSize, labelSize);
 
   const geo = treeRingsGeometry({ values: data, size: box, pad: TREE_PAD, total });
   const accIdx = highlight === "last" ? data.length - 1 : highlight === "none" ? -1 : highlight;
@@ -182,7 +189,7 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
         bottom: geo.center.cy + geo.maxR,
       }}
       className={className ? `mc-tree ${className}` : "mc-tree"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {filled
         ? [

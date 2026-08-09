@@ -3,11 +3,15 @@
 // opacity is a false-precision channel at 12 px. All metrics 2-dp.
 import { clamp } from "../../core/scale.js";
 import { round2 } from "../../core/types.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { cellMetrics, stepIndex, type CellShape } from "../../shared/cell.js";
 
-/** In-cell numeral size in viewBox units. Lives here because BOTH entries need
- *  the same answer to "does the number fit?" — see `labelFits`. */
-export const HEAT_CELL_LABEL_SIZE = 7;
+/** In-cell numeral size in viewBox units. A 12-unit cell puts `labelFont` on its
+ *  own floor of 7, and `min` — the chart's `labelSize` — raises it from there.
+ *  Lives here because BOTH entries need the same answer to "does the number
+ *  fit?" — see `labelFits`. */
+export const heatCellFont = (size: number, min?: number | undefined): number =>
+  labelFont(size, 0.55, min);
 
 export interface HeatCellGeometry {
   x: number;
@@ -70,6 +74,11 @@ export function heatCellGeometry(opts: {
     steps,
     t,
     crisp: m.crisp,
-    labelFits: (chars, fontSize) => chars * fontSize * 0.62 <= width - 1,
+    // Both axes: a raised `labelSize` can outgrow the 12-unit cell vertically
+    // long before it runs out of width, and `.mc-root` is `overflow: visible`,
+    // so the numeral would paint over the rows above and below. `labelFitsBand`
+    // is the library's degradation primitive — over the band, the label drops.
+    labelFits: (chars, fontSize) =>
+      chars * fontSize * 0.62 <= width - 1 && labelFitsBand(height, fontSize),
   };
 }

@@ -29,6 +29,12 @@ export const entry: ChartEntry = {
     precision: "high",
   },
   nodeBudget: "1 rect per span, cap 40",
+  maxWidth: 480,
+  maxHeight: 50,
+  gotchas: [
+    "Height is derived from the fold count when you pass none.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["request traces / flame charts", "p95-exemplar latency breakdowns"],
   avoidFor: ["a single duration (Bullet)", "a time series (Sparkline)"],
   props: [

@@ -59,6 +59,11 @@ export interface ShiftHistogramProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: ShiftStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -81,6 +86,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     format,
     locale,
     strings = EN_SHIFT,
+    labelSize,
     title,
     summary,
     id,
@@ -89,7 +95,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     children,
   } = props;
 
-  const FONT = labelFont(height, 0.42);
+  const FONT = labelFont(height, 0.42, labelSize);
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-shift-histogram ${className}` : "mc-shift-histogram";
 
@@ -138,7 +144,7 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
   const accName = resolveSummary(summary, () => shiftSummary(geo, fmt, seriesLabels, strings));
   const afterFill = color ?? "var(--mc-accent)";
   const overlay = mode === "overlay";
-  const rootStyle = { ...style, "--mc-label-size": `${FONT}px` } as CSSProperties;
+  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (
     <Chart

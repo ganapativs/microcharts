@@ -25,6 +25,10 @@ export const entry: ChartEntry = {
     precision: "high height / low lit",
   },
   nodeBudget: "2 per building + 1 (n ≤ 8)",
+  gotchas: [
+    "Width is derived from the bar count and `gap`; there is no `width` prop.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "team or region size plus an activation read",
     "an org KPI where two variables are the story",

@@ -5,15 +5,36 @@
 // fit (caller falls back to its drop-out rule).
 import { round2 } from "./types.js";
 
+/** @knipignore — published label vocabulary, the counterpart to
+ *  `ROW_LABEL_FACTOR` below; charts take it through `labelFont`'s default
+ *  rather than by name.
+ *  The floor `labelFont` holds when a caller sets none: text never reads
+ *  smaller than the rest of the library. */
+export const LABEL_MIN = 7;
+
 /**
  * Canonical in-chart label size (viewBox units): scales with the chart's height
  * and holds a **floor of 7** so text never reads smaller than the rest of the
  * library. `factor` tunes weight per chart (default 0.55 — the common case;
  * label-forward charts use ~0.62, dense strips ~0.4). Capped at 11. This is the
  * one source of truth for label sizing — never hardcode a fixed fontSize.
+ *
+ * `min` raises that floor from the chart's `labelSize` prop. 7 viewBox units is
+ * below the legibility floor of most design systems, and an app had no way to
+ * lift it: the token that looks like the lever, `--mc-label-size`, is written by
+ * the chart itself onto its own host, so an app setting it is overridden on
+ * every chart that paints a label. Raising the floor has to travel through
+ * GEOMETRY rather than CSS, because the same number reserves the label's gutter
+ * — a bigger font with a gutter computed for a smaller one paints into the page
+ * (`.mc-root` is `overflow: visible`). Charts clamp with `labelFitsBand` /
+ * `labelFitsY` as before, so a floor the box cannot seat DROPS the label rather
+ * than shrinking it back below the floor.
+ *
+ * `min` is applied last so it also wins over the 11-unit cap: an app asking for
+ * 12 means 12. At the default the two orderings are identical.
  */
-export function labelFont(height: number, factor = 0.55): number {
-  return Math.min(11, Math.max(7, Math.round(height * factor)));
+export function labelFont(height: number, factor = 0.55, min = LABEL_MIN): number {
+  return Math.max(min, Math.min(11, Math.round(height * factor)));
 }
 
 /**
@@ -31,10 +52,12 @@ export function labelFont(height: number, factor = 0.55): number {
  * doing the same job, side by side in the catalog.
  *
  * Floor and ceiling are `labelFont`'s, so a row label never reads smaller or
- * larger than the rest of the library.
+ * larger than the rest of the library. `min` is the chart's `labelSize` prop,
+ * passed straight through — a raised floor means the same thing on a row label
+ * as on any other.
  */
-export function rowLabelFont(pitch: number, factor = ROW_LABEL_FACTOR): number {
-  return labelFont(pitch, factor);
+export function rowLabelFont(pitch: number, factor = ROW_LABEL_FACTOR, min = LABEL_MIN): number {
+  return labelFont(pitch, factor, min);
 }
 
 /** DEFAULT share of the chart's width a row-label gutter may claim, for charts

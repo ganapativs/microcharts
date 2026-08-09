@@ -38,6 +38,8 @@ export const entry: ChartEntry = {
   dataShape: "{ x: number; y: number } + field?: { x; y }[]",
   encoding: { channel: "2-D position vs a quadrant split", precision: "medium" },
   nodeBudget: "≤ 5 + 1 per ghost (cap 30)",
+  maxWidth: 120,
+  maxHeight: 120,
   bestFor: [
     "a table cell per initiative — the classic prioritization 2×2",
     "an effort vs impact read in a KPI card",

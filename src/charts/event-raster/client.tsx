@@ -109,6 +109,7 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
     height,
     lanes: n,
     maxChars: labelCh,
+    labelSize: props.labelSize,
   });
   const plotX0 = gutter;
   const plotW = Math.max(1, width - gutter - 1);

@@ -38,6 +38,12 @@ export const entry: ChartEntry = {
     precision: "high — point estimates per percentile",
   },
   nodeBudget: "≤ 8",
+  maxWidth: 320,
+  maxHeight: 50,
+  gotchas: [
+    "`data` is a raw sample; the component derives the quantiles.",
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: ["latency SLOs in a sentence", "tail per endpoint in tables", "payment-size spread"],
   avoidFor: ["odds of an outcome (QuantileDots)", "full shape (MicroBox)"],
   props: [

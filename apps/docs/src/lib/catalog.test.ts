@@ -40,8 +40,8 @@ describe("catalog ↔ package exports", () => {
       ),
     );
     // every chart subpath in exports is catalogued; non-chart shared layers
-    // (annotations, the motion engine, stylesheet entries) are documented as
-    // guides, not catalog rows
+    // (annotations, the motion engine, the theme builder, the fluid-width hook,
+    // stylesheet entries) are documented as guides, not catalog rows
     const chartSubpaths = Object.keys(pkg.exports).filter(
       (k) =>
         k !== "." &&
@@ -49,6 +49,7 @@ describe("catalog ↔ package exports", () => {
         k !== "./annotations" &&
         k !== "./motion" &&
         k !== "./theme" &&
+        k !== "./fluid" &&
         !k.startsWith("./styles"),
     );
     for (const sub of chartSubpaths) {

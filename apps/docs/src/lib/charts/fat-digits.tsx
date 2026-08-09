@@ -18,6 +18,7 @@ export const entry: ChartEntry = {
   dataShape: "{ value: number }",
   encoding: { channel: "the numeral + redundant font-weight tier", precision: "high" },
   nodeBudget: "1 (value) / ≤ len (digit)",
+  gotchas: ["One fixed intrinsic box: size it with CSS, not `width`/`height`."],
   bestFor: [
     "a dense numeric table column you scan for the big ones",
     "a KPI number that should carry its own magnitude",

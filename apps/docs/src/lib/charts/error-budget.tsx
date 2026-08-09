@@ -23,6 +23,11 @@ export const entry: ChartEntry = {
     precision: "high — position against the pace that exactly spends the window",
   },
   nodeBudget: "≤ 8",
+  maxWidth: 320,
+  maxHeight: 80,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "an SLO error budget in a KPI card",
     "a service list where each row is a budget",

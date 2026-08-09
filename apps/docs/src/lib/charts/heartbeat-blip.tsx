@@ -22,6 +22,11 @@ export const entry: ChartEntry = {
   dataShape: "number[]",
   encoding: { channel: "a spike per event across the recent window", precision: "medium" },
   nodeBudget: "3",
+  maxWidth: 240,
+  maxHeight: 70,
+  gotchas: [
+    "In-SVG label size derives from the mark's height and floors at 7 viewBox units (raise it with `labelSize`); a box too small to seat the label drops the label rather than shrinking it.",
+  ],
   bestFor: [
     "at-a-glance liveness of a service or stream",
     "request or event rate in a header",

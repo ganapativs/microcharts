@@ -35,6 +35,11 @@ export interface OrbitStatusProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: OrbitStatusStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -76,6 +81,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
     format,
     locale,
     strings = EN_ORBIT_STATUS,
+    labelSize,
     title,
     summary,
     id,
@@ -100,7 +106,9 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
   // viewBox width through the gutter it sizes. Fall back to the size-derived
   // default.
   const fontSize =
-    isFiniteValue(props.fontSize) && props.fontSize > 0 ? props.fontSize : labelFont(geo.size);
+    isFiniteValue(props.fontSize) && props.fontSize > 0
+      ? props.fontSize
+      : labelFont(geo.size, 0.55, labelSize);
 
   const accName =
     summary === false
@@ -132,7 +140,7 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       // The label only widens the viewBox; the dial's band is unmoved.
       seat={{ mode: "center", top: 0, bottom: geo.size }}
       className={className ? `mc-orbit ${className}` : "mc-orbit"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <circle
         cx={geo.orbit.cx}

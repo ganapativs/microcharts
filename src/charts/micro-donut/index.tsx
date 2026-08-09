@@ -32,6 +32,11 @@ export interface MicroDonutProps {
   format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -52,6 +57,7 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     format,
     locale,
     strings = EN_COMPOSITION,
+    labelSize,
     title,
     summary,
     id,
@@ -76,7 +82,7 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
     weight,
   });
   const total = rolled.reduce((s, d) => s + (isFiniteValue(d.value) ? d.value : 0), 0);
-  const fontSize = label === "total" ? labelFont(size, 0.28) : 0;
+  const fontSize = label === "total" ? labelFont(size, 0.28, labelSize) : 0;
   const totalText =
     label === "total" && Number.isFinite(total) ? makeFormatter(format, locale)(total) : undefined;
   const showLabel = !decorative && totalText !== undefined && labelFitsY(size / 2, fontSize, size);
@@ -89,7 +95,7 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
       ? false
       : (summary ?? sharesSummary(rolled, strings, makePercentFormatter(locale)));
   const rootStyle = showLabel
-    ? ({ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties)
+    ? ({ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties)
     : style;
 
   return (

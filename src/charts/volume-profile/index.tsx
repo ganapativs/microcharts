@@ -33,6 +33,11 @@ export interface VolumeProfileProps {
   format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
   locale?: string | string[] | undefined;
   strings?: VolumeProfileStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -68,6 +73,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
     format,
     locale,
     strings = EN_VOLUME_PROFILE,
+    labelSize,
     title,
     summary,
     id,
@@ -85,7 +91,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const pctFmt = makePercentFormatter(locale);
-  const fontSize = labelFont(height, 0.11);
+  const fontSize = labelFont(height, 0.11, labelSize);
   // bins once (the O(data.length) pass); only the O(bins) layout repeats for the
   // gutter — re-running the bin + value-area walk was the bench-floor regression
   const { pocText, ...geo } = profileLayout({
@@ -121,7 +127,7 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
       // exactly where the viewBox does — the frame stands in for it.
       seat={{ mode: "center", top: 0, bottom: height }}
       className={className ? `mc-volprofile ${className}` : "mc-volprofile"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {/* value area band — a true background band (real data extent, kept for
           the craft/overlap + forced-colors exemption); fill via inline STYLE,
@@ -137,11 +143,21 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
           style={{ fill: "var(--mc-accent)", fillOpacity: 0.1 }}
         />
       ) : null}
+      {/* No `shapeRendering="crispEdges"` here, unlike the POC rect below. The
+          hint snaps every edge to the device grid, and BOTH of a row's extents
+          go sub-unit at word size: `width` is the mass (a thin row is a real
+          reading, not a rounding artefact) and `height` floors at 0.6 units
+          once the levels outnumber the box (geometry.ts:188). Snapped, a thin
+          row painted nothing and a 0.6-unit row painted or vanished depending
+          on where it fell against the grid — so a dense profile lost alternate
+          levels and read as half its resolution. The stylesheet relaxes the
+          hint per-rect for exactly this (`rect[width^="0."]`), but these rows
+          are ONE path — a batch the selector cannot reach a sub-shape inside,
+          and a hint that applies to the whole path or none of it. */}
       {normal.length > 0 ? (
         <path
           d={normal.map((b) => `M${b.x} ${b.y}h${b.width}v${b.height}h${-b.width}z`).join("")}
           data-mc-ink="bar"
-          shapeRendering="crispEdges"
         />
       ) : null}
       {pocBar ? (

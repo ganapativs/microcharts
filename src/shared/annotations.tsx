@@ -65,13 +65,20 @@ function pin(v: number, max: number): { v: number; off: boolean } {
  * are computed against — but an SVG `font-size` ATTRIBUTE on `<text>` is inert
  * here: `:where(.mc-root text)` in styles.css sets `font-size` as a CSS
  * declaration, and a declaration outranks a presentation attribute. So the
- * painted size was the HOST's `--mc-label-size` — a different number on every
+ * painted size was the HOST's own pinned size — a different number on every
  * host, conditional on an unrelated prop on six of them, and on the three hosts
  * that render no text of their own (PairedBars, ControlStrip, CyclePlot) not a
  * viewBox-relative number at all: the `0.75em` default resolves against the
  * surrounding prose, so the same annotation painted at a different size in a
  * table cell than in a heading. Labels were laid out at one size and painted at
  * another, which makes both the truncation budget and the top clamp wrong.
+ *
+ * The property is `--mc-label-px`, the same private channel a host pins on
+ * itself, set here on the annotation group instead — the nearer ancestor wins,
+ * so an annotation keeps its own size inside a host that pins one. A host's
+ * `labelSize` prop deliberately does not reach here: it raises the floor on the
+ * text the CHART lays out, and this layer runs its own truncation and clamps
+ * against `annotationFontSize`.
  *
  * Setting the variable rather than an inline `fontSize` keeps annotation text
  * inside the one cascade that owns in-chart type, so `--mc-density` scaling and
@@ -82,7 +89,7 @@ function pin(v: number, max: number): { v: number; off: boolean } {
  * to a hardcoded 10.
  */
 function labelSize(fontSize: number): CSSProperties {
-  return { "--mc-label-size": `${fontSize}px` } as CSSProperties;
+  return { "--mc-label-px": `${fontSize}px` } as CSSProperties;
 }
 
 /** Label anchor with deterministic edge flip (estChars × 0.31em each side). */

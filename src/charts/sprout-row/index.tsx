@@ -28,6 +28,11 @@ export interface SproutRowProps {
   step?: number | undefined;
   fontSize?: number | undefined;
   strings?: SproutStrings | undefined;
+  /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
+   *  the mark and floors them at 7; this raises that floor and moves the
+   *  reserved gutter with it. A label the box cannot seat at the raised floor
+   *  drops rather than shrinking back under it. */
+  labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
   id?: string | undefined;
@@ -56,9 +61,10 @@ export function sproutBox(
   labels: boolean,
   height?: number | undefined,
   fontSize?: number | undefined,
+  min?: number | undefined,
 ): { height: number; fontSize: number } {
   const h = chartSide(height ?? defaultHeight(labels), defaultHeight(labels));
-  const auto = labelFont(h, 0.3);
+  const auto = labelFont(h, 0.3, min);
   return { height: h, fontSize: chartSide(fontSize ?? auto, auto) };
 }
 
@@ -138,6 +144,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     label = "none",
     color,
     strings = EN_SPROUT,
+    labelSize,
     title,
     summary,
     id,
@@ -145,7 +152,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     style,
     children,
   } = props;
-  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize);
+  const { height, fontSize } = sproutBox(labels, props.height, props.fontSize, labelSize);
   // A name costs a band below the soil; keep it only while the glyph still has
   // room to grow above that band. Under it the row would be all text and no
   // sprout, with the names spilling out of the box — so they drop, and the band
@@ -180,7 +187,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
       // seating the whole box would sink the plants by that band's height.
       seat={{ mode: "floor", bottom: geo.soil.y1 }}
       className={className ? `mc-sprout ${className}` : "mc-sprout"}
-      style={{ ...style, "--mc-label-size": `${fontSize}px` } as CSSProperties}
+      style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       <line
         x1={geo.soil.x1}

@@ -224,7 +224,8 @@ export function gradeProfileGeometry(opts: {
 export function gradeLayout(
   height: number,
   label: "max" | "none",
+  min?: number | undefined,
 ): { fontSize: number; topPad: number } {
-  const fontSize = labelFont(height, 0.4); // dense strip weight (core/labels.ts)
+  const fontSize = labelFont(height, 0.4, min); // dense strip weight (core/labels.ts)
   return { fontSize, topPad: label === "none" ? 1 : round2(fontSize + 1.5) };
 }

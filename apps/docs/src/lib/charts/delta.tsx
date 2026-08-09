@@ -16,6 +16,10 @@ export const entry: ChartEntry = {
   dataShape: "number (+ optional from)",
   encoding: { channel: "text + direction glyph (▲/▼)", precision: "high — it is the number" },
   nodeBudget: "2 (glyph + value, HTML)",
+  gotchas: [
+    'Prints the direction itself and formats the absolute magnitude, so a sign in `format` (`signDisplay: "always"`) is dropped rather than doubled.',
+    "Renders inline HTML rather than an `<svg>`: it takes no `width`/`height`, inherits the surrounding font size, and owns its own baseline, so it needs no `mc-inline` wrapper.",
+  ],
   bestFor: ["KPI change", "period-over-period %", "inline metric movement"],
   avoidFor: ["showing a series", "magnitude across many items"],
   props: [

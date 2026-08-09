@@ -139,7 +139,9 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   // mark. This used to be a hand-copied expression; the shared helper is what
   // keeps the two in step.
   const labelFontSize =
-    isFiniteValue(rest.fontSize) && rest.fontSize > 0 ? rest.fontSize : labelFont(geo.size);
+    isFiniteValue(rest.fontSize) && rest.fontSize > 0
+      ? rest.fontSize
+      : labelFont(geo.size, 0.55, rest.labelSize);
   const labelText =
     rest.label === "latency" &&
     !geo.unknown &&

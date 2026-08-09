@@ -47,6 +47,26 @@ export interface ChartEntry {
   dataShape: string;
   encoding: { channel: string; precision: string };
   nodeBudget: string;
+  /**
+   * Authored maximum box, viewBox units — the largest `width`/`height` the
+   * chart is drawn and reviewed at. Derived as 4× the intrinsic default box,
+   * floored at the largest size the library's own examples use, so it is
+   * reproducible rather than a judgment call (`authored-box.test.ts` gates the
+   * floor). Past it the geometry stops scaling: caps hold marks at their
+   * authored size and the rest of the box becomes whitespace, which is how an
+   * `<EventTimeline>` at 823×658 drew a 6-unit bar in 658 units of nothing.
+   * Omitted on the charts whose box is set by `cell`, by content, or by CSS —
+   * each of those says so in `gotchas`.
+   */
+  maxWidth?: number;
+  maxHeight?: number;
+  /**
+   * Facts that do not fit a prop description and that a reader has no other way
+   * to learn: documented caps, derived inputs, sign and unit handling, sizing
+   * knobs that are not `width`/`height`. Shipped in `catalog.json`, where an
+   * agent picking a chart will meet them.
+   */
+  gotchas?: string[];
   bestFor: string[];
   avoidFor: string[];
   props: ChartProp[];
