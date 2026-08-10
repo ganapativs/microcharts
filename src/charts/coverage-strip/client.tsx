@@ -15,7 +15,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COVERAGE, type CoverageStrings } from "../../core/strings-coverage.js";
 import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { coverageGeometry } from "./geometry.js";
@@ -65,9 +65,6 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // no LiveRegion here to host it: seat the wrapper so the readout chip
-  // and the hit box travel with the mark when inline (see seat-hoist).
-  useSeatHoist(hostRef);
   // Time runs along x: each slot lights up in turn, oldest→newest. An explicit
   // `order:"x"` + `window` spreads the cascade across the whole strip (it does
   // NOT collapse under the default stagger cap), so the reveal reads as time
@@ -212,19 +209,7 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
           {cell.present && cell.value !== null ? fmt(cell.value) : "—"}
         </span>
       ) : null}
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
     </span>
   );
 }

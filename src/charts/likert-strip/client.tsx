@@ -13,7 +13,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { likertBox, likertFont, likertLabels, likertStripGeometry } from "./geometry.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -54,9 +54,6 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // no LiveRegion here to host it: seat the wrapper so the readout chip
-  // and the hit box travel with the mark when inline (see seat-hoist).
-  useSeatHoist(hostRef);
   // "sweep" with per-mark signed origin — the diverging composition grows OUT
   // from the center line: negative ink grows leftward (origin right), positive
   // rightward (origin left), echoing the encoding instead of a flat fade.
@@ -201,19 +198,7 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         {active !== null ? outline(active, false) : null}
         {rest.children}
       </StaticLikertStrip>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {announced}
-      </span>
+      <LiveRegion>{announced}</LiveRegion>
       {readout && seg && segDatum ? (
         <span className="mc-spark-readout" {...CHIP}>
           {`${segDatum.label} ${pctFmt(seg.share)} (${segCount})`}
