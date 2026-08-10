@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -143,10 +144,9 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
 
   const geo = treeRingsGeometry({ values: data, size: box, pad: TREE_PAD, total });
   const accIdx = highlight === "last" ? data.length - 1 : highlight === "none" ? -1 : highlight;
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? treeRingsSummary(data, { unit, periodWord, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    treeRingsSummary(data, { unit, periodWord, strings, format, locale }),
+  );
   const paint = color ?? "var(--mc-accent)";
   const fmt = makeFormatter(format, locale);
   const last = data[data.length - 1];

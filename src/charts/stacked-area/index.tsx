@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { EN_STACK, type StackStrings } from "../../core/strings-stack.js";
@@ -143,10 +144,9 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
     gutterCh: labelled ? 4 : 0,
     fontSize,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? stackedAreaSummary(series, geo.sharesAt.at(-1) ?? [], geo.n, pctFmt, strings));
+  const accName = resolveSummary(summary, () =>
+    stackedAreaSummary(series, geo.sharesAt.at(-1) ?? [], geo.n, pctFmt, strings),
+  );
 
   // an empty `colors` array is "no override", not `colors[NaN]`: the areas fell
   // back to the cat palette while the top hairlines lost their stroke outright,

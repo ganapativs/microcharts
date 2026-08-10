@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_GARDEN, type GardenStrings } from "../../core/strings-garden.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { devWarn } from "../../core/dev.js";
 import { isFiniteValue, type EmptyCellStyle, type Value } from "../../core/types.js";
 import { gardenGridGeometry } from "./geometry.js";
@@ -80,10 +81,9 @@ export function GardenGrid(props: GardenGridProps): ReactNode {
     devWarn("<GardenGrid> over 400 cells — downsample upstream for legibility.");
 
   const geo = gardenGridGeometry({ values: data, rows, cell, gap, steps, domain, pad: PAD });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? gardenGridSummary(data, { unit, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    gardenGridSummary(data, { unit, strings, format, locale }),
+  );
   const paint = color;
 
   return (

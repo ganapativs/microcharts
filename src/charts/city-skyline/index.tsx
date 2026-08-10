@@ -9,6 +9,7 @@ import { resolveAnnotations, annotationFontSize } from "../../shared/annotations
 import { scaleLinear } from "../../core/scale.js";
 import { EN_SKYLINE, type SkylineStrings } from "../../core/strings-skyline.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import { PAD, citySkylineGeometry, skylineBands } from "./geometry.js";
@@ -108,10 +109,9 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
     domain,
     pad: PAD,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? citySkylineSummary(data, { unit, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    citySkylineSummary(data, { unit, strings, format, locale }),
+  );
   const fmt = makeFormatter(format, locale);
 
   // annotations host: Marker x = building index (bar center),

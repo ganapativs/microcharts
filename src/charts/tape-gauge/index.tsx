@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_TAPE_GAUGE, type TapeGaugeStrings } from "../../core/strings-tape-gauge.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import { labelFitsY, LABEL_MIN } from "../../core/labels.js";
@@ -211,10 +212,9 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
   const tickFont = Math.max(LABEL_MIN, labelSize ?? 0);
   const vertical = orientation !== "horizontal";
   const geo = tapeGaugeGeometry({ value, span, zones, tick: null, width, height, orientation });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? tapeGaugeSummary(value, rate, tiers, geo.containingZone, strings, fmt));
+  const accName = resolveSummary(summary, () =>
+    tapeGaugeSummary(value, rate, tiers, geo.containingZone, strings, fmt),
+  );
 
   const finite = Number.isFinite(value);
   const tier = finite ? chevronTier(rate ?? 0, tiers) : 0;

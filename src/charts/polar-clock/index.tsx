@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_POLAR_CLOCK, type PolarClockStrings } from "../../core/strings-polar-clock.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
 import { POLAR_PAD, polarClockGeometry } from "./geometry.js";
@@ -145,10 +146,9 @@ export function PolarClock(props: PolarClockProps): ReactNode {
   } = props;
 
   const geo = polarClockGeometry({ values: data, size, inner, origin, pad: POLAR_PAD, mode, now });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? polarClockSummary(data, { segmentFormat, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    polarClockSummary(data, { segmentFormat, strings, format, locale }),
+  );
   const fmt = makeFormatter(format, locale);
 
   const {

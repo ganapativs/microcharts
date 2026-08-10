@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
 import { thermometerGeometry, type Orientation } from "./geometry.js";
@@ -153,10 +154,9 @@ export function Thermometer(props: ThermometerProps): ReactNode {
     bulb,
     pad: PAD,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? thermometerSummary(value, { domain, target, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    thermometerSummary(value, { domain, target, strings, format, locale }),
+  );
   const paint = color ?? "var(--mc-accent)";
 
   // The numeral tracks the fill edge, so it travels with the value — and at the

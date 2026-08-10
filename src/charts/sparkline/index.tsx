@@ -5,18 +5,13 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { linePath, smoothPath, stepPath, areaPath, type Curve } from "../../core/path.js";
-import {
-  describeSeries,
-  type DescribeOptions,
-  type SeriesStrings,
-  resolveSummary,
-} from "../../core/summary.js";
+import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import { chartSide, type Value } from "../../core/types.js";
 import { lastLabelMetrics, minmaxFont, sparkGeometry } from "./geometry.js";
 import { lastFinite } from "../../core/stats.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { scaleLinear } from "../../core/scale.js";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 
 const CURVE: Record<Curve, (p: readonly (readonly [number, number] | null)[]) => string> = {
   linear: linePath,
@@ -56,7 +51,7 @@ export interface SparklineProps {
   title?: string | undefined;
   summary?: string | false | undefined;
   /** Number formatting for the label + summary (`Intl` options or a fn). */
-  format?: DescribeOptions["format"] | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   /** Line-drawing point cap: series longer than this (default 200) decimate to
    *  an index-preserving min/max envelope — spikes and gaps survive, summaries

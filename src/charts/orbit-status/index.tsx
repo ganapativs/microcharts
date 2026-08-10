@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFitsY, labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import { orbitLabelBand, orbitStatusGeometry } from "./geometry.js";
@@ -110,10 +111,9 @@ export function OrbitStatus(props: OrbitStatusProps): ReactNode {
       ? props.fontSize
       : labelFont(geo.size, 0.55, labelSize);
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    orbitStatusSummary(latency, rate, { threshold, strings, format, locale }),
+  );
   const fmt = makeFormatter(format, locale);
   const labelY = geo.size / 2 + fontSize * 0.34;
   // `labelFont` floors at 7, so under a box of ~8 units the numeral's em-box no

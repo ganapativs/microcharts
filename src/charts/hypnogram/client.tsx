@@ -3,7 +3,7 @@
 // listener + run-by-x lookup, ←/→ rove runs, Home/End jump, click / Enter /
 // Space selects (onSelect).
 import { useCallback, useMemo, useRef } from "react";
-import { makeFormatter } from "../../core/format.js";
+import { makeFormatter, type Format } from "../../core/format.js";
 import {
   CHIP,
   named,
@@ -56,7 +56,7 @@ export function Hypnogram(props: InteractiveHypnogramProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props as InteractiveHypnogramProps & {
-    format?: Intl.NumberFormatOptions | ((n: number) => string);
+    format?: Format;
     locale?: string | string[];
   };
 

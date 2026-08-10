@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { fatDigitsGeometry, fatTier, resolveTiers, type FatTiers } from "./geometry.js";
 
@@ -83,10 +84,9 @@ export function FatDigits(props: FatDigitsProps): ReactNode {
 
   const formatted = isFiniteValue(value) ? makeFormatter(format, locale)(value) : "";
   const geo = fatDigitsGeometry({ formatted, value, domain, tiers, encode, fontSize, pad: PAD });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale }),
+  );
 
   return (
     <Chart

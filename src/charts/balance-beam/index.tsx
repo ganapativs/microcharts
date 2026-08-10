@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
 import {
@@ -140,10 +141,9 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     domain,
     pad: PAD,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? balanceBeamSummary(data, { mode, domain, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    balanceBeamSummary(data, { mode, domain, strings, format, locale }),
+  );
   // keep a centered value numeral inside the box (the beam ends ride the edges)
   const labelX = (cx: number, text: string) => {
     const half = (text.length * 0.62 * fontSize) / 2;

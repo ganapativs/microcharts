@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import type { FiveNumber } from "../../core/quantile.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
@@ -86,11 +87,9 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
   // fewer than 5 raw observations → honest dots, never a fake box
   const tooFew = resolved !== null && stats === undefined && rawCount < 5;
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        (resolved === null ? strings.noData : microBoxSummary(resolved.five, fmt, strings)));
+  const accName = resolveSummary(summary, () =>
+    resolved === null ? strings.noData : microBoxSummary(resolved.five, fmt, strings),
+  );
 
   const cls = className ? `mc-box ${className}` : "mc-box";
 

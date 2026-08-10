@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 
 import { devWarn } from "../../core/dev.js";
 import { makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { EN_TIMELINE, type TimelineStrings } from "../../core/strings-timeline.js";
 import { round2 } from "../../core/types.js";
@@ -173,11 +174,9 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
   if (dropped > 0) devWarn(`<EventTimeline> ${dropped} item(s) outside the domain excluded.`);
 
   const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        eventTimelineSummary(geo.spans.length, geo.points.length, geo.coverage, pctFmt, strings));
+  const accName = resolveSummary(summary, () =>
+    eventTimelineSummary(geo.spans.length, geo.points.length, geo.coverage, pctFmt, strings),
+  );
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation

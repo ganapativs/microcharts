@@ -5,7 +5,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { makeUnitFormatter } from "../../core/format.js";
+import { makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -47,7 +48,7 @@ export interface LikertStripProps {
   label?: "ends" | "net" | "none" | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: CompositionStrings | undefined;
   /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
@@ -113,13 +114,11 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
     gutterR: gutter,
   });
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        (geo === null
-          ? strings.noResponses
-          : likertSummary(geo.shares, hasNeutralLevel, pctFmt, strings)));
+  const accName = resolveSummary(summary, () =>
+    geo === null
+      ? strings.noResponses
+      : likertSummary(geo.shares, hasNeutralLevel, pctFmt, strings),
+  );
 
   const midY = h / 2;
   // direct labels hug the BAR ends, not the frame — with `neutral="omit"` on a

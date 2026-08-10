@@ -130,10 +130,9 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings));
+  const accName = resolveSummary(summary, () =>
+    quadrantSummary(geo, { xLabel, yLabel, quadrants }, fmt, strings),
+  );
   const accent = color ?? "var(--mc-accent)";
   const { focal: focalR, ghost: ghostR, halo: haloR } = quadrantDotRadii(width, height);
 

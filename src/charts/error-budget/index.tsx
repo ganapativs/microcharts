@@ -134,17 +134,15 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        errorBudgetSummary(
-          geo,
-          fmt,
-          RATE_FMT,
-          { unit, elapsed: data.length, total: window ?? data.length },
-          strings,
-        ));
+  const accName = resolveSummary(summary, () =>
+    errorBudgetSummary(
+      geo,
+      fmt,
+      RATE_FMT,
+      { unit, elapsed: data.length, total: window ?? data.length },
+      strings,
+    ),
+  );
   const lineColor = color ?? "var(--mc-accent)";
   // burning faster than steady = remaining below the diagonal at "now" → danger
   const steadyAtNow = 1 - geo.nowElapsed;

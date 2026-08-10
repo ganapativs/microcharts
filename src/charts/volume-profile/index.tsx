@@ -4,7 +4,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { labelFont } from "../../core/labels.js";
-import { makeFormatter, makePercentFormatter } from "../../core/format.js";
+import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_VOLUME_PROFILE, type VolumeProfileStrings } from "../../core/strings-volume-profile.js";
 import { chartSide, round2 } from "../../core/types.js";
 import {
@@ -30,7 +31,7 @@ export interface VolumeProfileProps {
   bins?: number | undefined;
   width?: number | undefined;
   height?: number | undefined;
-  format?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   strings?: VolumeProfileStrings | undefined;
   /** Minimum in-chart label size, in viewBox units. Geometry sizes labels from
@@ -105,10 +106,9 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
     fontSize,
     fmt,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? volumeProfileSummary(geo, valueArea, strings, fmt, pctFmt));
+  const accName = resolveSummary(summary, () =>
+    volumeProfileSummary(geo, valueArea, strings, fmt, pctFmt),
+  );
 
   const normal = geo.bars.filter((b) => !b.poc);
   const pocBar = geo.bars.find((b) => b.poc);

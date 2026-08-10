@@ -5,13 +5,8 @@
 // by position AND color. Endpoint bar gets accent emphasis.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { makeFormatter } from "../../core/format.js";
-import {
-  describeSeries,
-  type DescribeOptions,
-  type SeriesStrings,
-  resolveSummary,
-} from "../../core/summary.js";
+import { makeFormatter, type Format } from "../../core/format.js";
+import { describeSeries, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 import {
   DEFAULT_HEIGHT,
@@ -62,7 +57,7 @@ export interface SparkBarProps {
   labelSize?: number | undefined;
   title?: string | undefined;
   summary?: string | false | undefined;
-  format?: DescribeOptions["format"] | undefined;
+  format?: Format | undefined;
   locale?: string | string[] | undefined;
   id?: string | undefined;
   className?: string | undefined;

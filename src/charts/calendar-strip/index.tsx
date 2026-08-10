@@ -9,6 +9,7 @@ import { devWarn } from "../../core/dev.js";
 import { parseUTCDay } from "../../core/calendar.js";
 import { isoDate } from "../../core/calendar-grid.js";
 import { EN_CALENDAR, type CalendarStrings } from "../../core/strings-calendar.js";
+import { resolveSummary } from "../../core/summary.js";
 import { cellMetrics, stepOpacity, type CellShape } from "../../shared/cell.js";
 import { calendarStripGeometry } from "./geometry.js";
 
@@ -129,13 +130,13 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
     return null;
   }
   const mark = cellMetrics(geo.cell, shape);
-  const accName =
-    summary === false
-      ? false
-      : // geo.rows, never the raw `weeks`: the summary names the window the grid
-        // actually paints, so a floored, clamped or capped prop can't announce a
-        // calendar that isn't there.
-        (summary ?? calendarStripSummary(geo.activeDays, geo.totalDays, geo.rows, strings));
+  const accName = resolveSummary(
+    summary,
+    // geo.rows, never the raw `weeks`: the summary names the window the grid
+    // actually paints, so a floored, clamped or capped prop can't announce a
+    // calendar that isn't there.
+    () => calendarStripSummary(geo.activeDays, geo.totalDays, geo.rows, strings),
+  );
 
   return (
     <Chart

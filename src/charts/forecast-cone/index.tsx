@@ -141,10 +141,9 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? forecastSummary(geo, fmt, { unit, at, target }, strings));
+  const accName = resolveSummary(summary, () =>
+    forecastSummary(geo, fmt, { unit, at, target }, strings),
+  );
   const accent = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
     ? ({ ...style, "--mc-label-px": `${FONT}px` } as CSSProperties)

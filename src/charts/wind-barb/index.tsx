@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
@@ -99,10 +100,9 @@ export function WindBarb(props: WindBarbProps): ReactNode {
   const totalW = size + gutter;
 
   const geo = windBarbGeometry({ direction: dir, magnitude: mag, step, width: size, height: size });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? windBarbSummary(direction, magnitude, step, strings, fmt));
+  const accName = resolveSummary(summary, () =>
+    windBarbSummary(direction, magnitude, step, strings, fmt),
+  );
 
   const arrowHead = (() => {
     if (mode !== "arrow" || geo.calm) return null;

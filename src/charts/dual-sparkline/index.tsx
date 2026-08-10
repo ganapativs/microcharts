@@ -10,7 +10,7 @@ import { labelFont } from "../../core/labels.js";
 import type { Curve } from "../../core/path.js";
 import { lastFinite, seriesStats } from "../../core/stats.js";
 import { EN_VS, type VsStrings } from "../../core/strings-vs.js";
-import { EN_SERIES, type SeriesStrings } from "../../core/summary.js";
+import { EN_SERIES, type SeriesStrings, resolveSummary } from "../../core/summary.js";
 import type { Value } from "../../core/types.js";
 import { dualSparklineGeometry } from "./geometry.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
@@ -129,10 +129,9 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
     gutterCh: lastText !== undefined ? fmt(lastText).length : 0,
     fontSize,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? dualSummary(data, compare, fmt, strings, seriesStrings));
+  const accName = resolveSummary(summary, () =>
+    dualSummary(data, compare, fmt, strings, seriesStrings),
+  );
 
   // annotations host contract: Marker x = data INDEX (over the shared x-range),
   // Threshold/TargetZone y = data values on the shared value scale.
