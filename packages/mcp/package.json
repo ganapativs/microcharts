@@ -58,11 +58,11 @@
     "zod": "^3.25.76 || ^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^26.1.2",
-    "ai": "^7.0.48",
-    "esbuild": "^0.28.1",
+    "@types/node": "^26.2.0",
+    "ai": "^7.0.58",
+    "esbuild": "^0.28.2",
     "tsdown": "^0.22.14",
-    "tsx": "^4.23.5",
+    "tsx": "^4.23.12",
     "vitest": "^4.1.10"
   },
   "peerDependencies": {
