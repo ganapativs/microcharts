@@ -320,6 +320,30 @@ describe("the interaction overlay is a channel, not a hardcode", () => {
     }
   });
 
+  it("every client entry is on the channel, on the scalar hook, or excused by name", () => {
+    // The overlay test above triggers on `data-mc-w`, so a chart that draws no
+    // overlay at all used to escape every active-state gate by never matching
+    // it. This closes the partition: an interactive entry either carries a
+    // `data-mc-active` overlay, activates whole-chart through `useScalarActive`
+    // (one unit — there is no per-unit mark for a ring to name), or is excused
+    // here with the reason a reviewer signed off on.
+    const EXCUSED = new Set([
+      "polar-clock", // filled accent wedge repaints the arc (see EXEMPT above)
+      "minimap-strip", // role="slider" window picker — its own interaction shape
+      "token-confidence", // inline HTML tokens; underline tiers, not overlays
+    ]);
+    const offenders = chartSources()
+      .filter((f) => f.path.endsWith("client.tsx"))
+      .filter((f) => !f.text.includes("data-mc-active") && !f.text.includes("useScalarActive"))
+      .map((f) => f.path.split("/")[2]!)
+      .filter((slug) => !EXCUSED.has(slug));
+    expect(offenders).toEqual([]);
+    for (const name of EXCUSED) {
+      const client = chartSources().find((f) => f.path === `src/charts/${name}/client.tsx`);
+      expect(client, `${name} is excused but no longer exists`).toBeDefined();
+    }
+  });
+
   it("styles.css resolves all four tokens with their documented defaults", () => {
     const charts = css.slice(css.indexOf("@layer microcharts.charts"));
     expect(charts).toContain("stroke: var(--mc-active-stroke, var(--mc-accent))");

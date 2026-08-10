@@ -257,6 +257,63 @@ export function navOrder(order: readonly number[], cur: number, key: string): nu
   return order[nav1d(order.indexOf(cur), n, key) ?? -1] ?? null;
 }
 
+/** Handlers the scalar (single-unit) entries spread on their wrapper. */
+export interface ScalarBind {
+  onPointerEnter: () => void;
+  onPointerLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+  onClick: () => void;
+  onKeyDown: (e: KeyboardEvent) => void;
+}
+
+/**
+ * Whole-chart activation for the single-unit (scalar) entries: one glyph, one
+ * reading. Hover and focus are ONE edge-gated `onActive` pair — pointer-enter
+ * then focus never report the same unit twice — and click/Enter/Space report
+ * the same datum through `onSelect`. Scalars have no pin: `onSelect` is a
+ * report, not a toggle, so there is no selection to light-dismiss. Escape
+ * still clears the reveal (chip + `onActive(null)`) without moving focus —
+ * before it, a keyboard reader could raise the chip and had no way to lower
+ * it short of leaving the chart, the exact hole the picker's Escape closes.
+ *
+ * `active` is the reveal state the chip renders on. Every scalar entry used to
+ * carry this block verbatim (the edge ref, the six listeners, the Enter/Space
+ * guard); one hook keeps the family identical by construction.
+ */
+export function useScalarActive(
+  datum: () => MicroDatum,
+  onActive?: ((datum: MicroDatum | null) => void) | undefined,
+  onSelect?: ((datum: MicroDatum | null) => void) | undefined,
+): { active: boolean; bind: ScalarBind } {
+  const [active, setActive] = useState(false);
+  const shown = useRef(false);
+  const act = (on: boolean): void => {
+    setActive(on);
+    if (shown.current === on) return;
+    shown.current = on;
+    onActive?.(on ? datum() : null);
+  };
+  const on = (): void => act(true);
+  const off = (): void => act(false);
+  return {
+    active,
+    bind: {
+      onPointerEnter: on,
+      onPointerLeave: off,
+      onFocus: on,
+      onBlur: off,
+      onClick: () => onSelect?.(datum()),
+      onKeyDown: (e) => {
+        if (e.key === "Escape") return off();
+        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
+        e.preventDefault();
+        onSelect(datum());
+      },
+    },
+  };
+}
+
 /**
  * Shared picker kernel: pointer scrub, tap-to-pin, roving keyboard, selection.
  * Touch: drag scrubs; pointerup clears hover; short tap pins via onSelect.

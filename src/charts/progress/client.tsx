@@ -5,7 +5,14 @@
 // mark) — hover/focus is a reveal of the reading, for the `label="none"` bar
 // that prints nothing.
 import { useEffect, useRef, useState } from "react";
-import { CHIP, named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
+import {
+  CHIP,
+  named,
+  fillFor,
+  useScalarActive,
+  wrap,
+  type MicroDatum,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
@@ -61,7 +68,6 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
   useEntrance(hostRef, "sweep", animate);
 
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
   const prev = useRef(wholePct);
   useEffect(() => {
     if (prev.current === wholePct) return; // sub-percent movement stays quiet
@@ -91,34 +97,10 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
     value: Number.isFinite(model.fraction) ? model.fraction : null,
     formatted: model.display ?? chipText,
   });
-  const pick = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-progress-live", className, style)}
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
-    >
+    <span ref={hostRef} {...wrap("mc-progress-live", className, style)} {...named(label)} {...bind}>
       <StaticProgress {...rest} style={fillFor(style)} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
       {readout && hover && chipText ? (

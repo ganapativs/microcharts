@@ -9,7 +9,7 @@
 // which the glyph alone never shows.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeUnitFormatter } from "../../core/format.js";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
@@ -66,7 +66,6 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
   const geo = breathingDotGeometry({ value, size, thresholds, pad: 1 });
   const reduced = usePrefersReducedMotion();
   const [wrapRef, inView] = useInViewport<HTMLSpanElement>();
-  const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
   const prevBand = useRef<number | null>(null);
   const mounted = useRef(false);
@@ -136,34 +135,14 @@ export function BreathingDot(props: InteractiveBreathingDotProps): React.ReactNo
     label: geo.unknown ? undefined : strings.loadBands[geo.band],
     formatted: readoutText,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone
-  // can't gate it — pointer-enter then focus both set it `true`, which would
-  // announce the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={wrapRef}
       {...wrap("mc-breathing-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticBreathingDot
         {...rest}

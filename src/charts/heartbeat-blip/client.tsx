@@ -6,7 +6,7 @@
 // unforgivable lie here). Gated on reduced-motion (→ the static frame, re-rendered
 // on data change) and on-screen (paused off-viewport).
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { heartbeatCount, resolveNow } from "./geometry.js";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
@@ -61,7 +61,6 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   // and resets to the latest whenever the data changes (new events anchor at now).
   const [liveNow, setLiveNow] = useState(baseNow);
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
   const prevLen = useRef(events.length);
   const mounted = useRef(false);
 
@@ -126,36 +125,16 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
     label: strings.heartbeatWindow(win),
     formatted: readoutText,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here. (The count
-  // keeps drifting with the clock; that is a value change, not a unit change, so
-  // it never re-fires.)
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  // The count keeps drifting with the clock; that is a value change, not a
+  // unit change, so the edge-gated `onActive` never re-fires while hovered.
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={wrapRef}
       {...wrap("mc-heartbeat-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticHeartbeatBlip
         {...rest}

@@ -8,7 +8,13 @@ import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { EN_HOURGLASS, type HourglassStrings } from "../../core/strings-hourglass.js";
 import { LiveRegion } from "../../shared/live-region.js";
-import { CHIP, named, fillFor, wrap as wrapAttrs } from "../../shared/interactive.js";
+import {
+  CHIP,
+  named,
+  fillFor,
+  useScalarActive,
+  wrap as wrapAttrs,
+} from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import {
   Hourglass as StaticHourglass,
@@ -71,7 +77,6 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
   useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
   // The elapsed percent the sand encodes — the same number `label="elapsed"`
   // prints, so hovering and labelling never disagree.
   const elapsedPct = Number.isFinite(value)
@@ -112,34 +117,14 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
     value: Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null,
     formatted: readoutText,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-hourglass-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticHourglass
         {...rest}

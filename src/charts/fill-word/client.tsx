@@ -5,7 +5,7 @@
 // Wrapper focus only (one value) — but hover/focus reveals the percent, which
 // the fill edge alone only approximates.
 import { useEffect, useRef, useState } from "react";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -80,7 +80,6 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
   const last = useRef(-Infinity);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
   // The same numeral `label="value"` prints — one source, so hover and label
   // can never disagree about the reading.
   const readoutText = shownPctText(value, mode, locale);
@@ -117,35 +116,10 @@ export function FillWord(props: InteractiveFillWordProps): React.ReactNode {
     label: word,
     formatted: readoutText,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-fillword-live", className, style)}
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
-    >
+    <span ref={hostRef} {...wrap("mc-fillword-live", className, style)} {...named(label)} {...bind}>
       <StaticFillWord
         {...rest}
         style={fillFor(style)}

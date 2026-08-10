@@ -5,7 +5,7 @@
 // hover OR focus reveals the forecast chip, the reveal-on-hover scalar pattern.
 import { useEffect, useRef, useState } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -106,7 +106,6 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
           : (etaOnly ?? etaPct);
 
   const [announced, setAnnounced] = useState("");
-  const [open, setOpen] = useState(false);
   // -Infinity, not 0: `performance.now()` is milliseconds since THIS document's
   // time origin, so anchoring at 0 claims "already announced at page load" and
   // silently swallows the leading edge for the whole first `announceEvery`
@@ -130,38 +129,10 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
     value: Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : null,
     formatted: chip,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `open` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setOpen(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: open, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-eta-live", className, style)}
-      {...named(label)}
-      // Pointer AND focus, like every other reveal-on-hover scalar (Bullet,
-      // Thermometer, HeatCell, MoonPhase, OrbitStatus): keyboard-only would
-      // hide the forecast from a mouse reader entirely.
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
-    >
+    <span ref={hostRef} {...wrap("mc-eta-live", className, style)} {...named(label)} {...bind}>
       <StaticEtaBar
         {...rest}
         progress={progress}

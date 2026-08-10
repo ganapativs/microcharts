@@ -3,12 +3,15 @@
 // a polite region ("Deploys: warning."). No pointer math — a single 8-px state
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip).
-import { useEffect, useRef, useState } from "react";
-import { named, type MicroDatum } from "../../shared/interactive.js";
+import { memo, useEffect, useRef, useState } from "react";
+import { named, useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { resolveStatus, StatusDot as StaticStatusDot, type StatusDotProps } from "./index.js";
+
+// Memoized: hover only flips wrapper state, so the static SVG must not re-render.
+const Static = memo(StaticStatusDot);
 
 export interface InteractiveStatusDotProps extends StatusDotProps {
   /** Announce when the status changes (default true). */
@@ -69,35 +72,11 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   // so `value` is null and the state's name rides in `label`. One builder, so
   // `onActive` and `onSelect` can never report a different state.
   const datum = (): MicroDatum => ({ index: 0, value: null, label: state.label });
-  const pick = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice. No state — the
-  // dot paints no chip, so a hover must not cost a render.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      className="mc-status-live"
-      data-mc-host=""
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
-    >
-      <StaticStatusDot {...rest} strings={strings} summary={false} />
+    <span ref={hostRef} className="mc-status-live" data-mc-host="" {...named(label)} {...bind}>
+      <Static {...rest} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );

@@ -3,12 +3,21 @@
 // polite region on change; the weight eases via CSS on variable fonts (snaps
 // otherwise). with no layout shift (tabular-nums). Wrapper focus only —
 // numeral is one value.
-import { useEffect, useRef, useState } from "react";
-import { named, fillFor, wrap, type MicroDatum } from "../../shared/interactive.js";
+import { memo, useEffect, useRef, useState } from "react";
+import {
+  named,
+  fillFor,
+  useScalarActive,
+  wrap,
+  type MicroDatum,
+} from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
 import { FatDigits as StaticFatDigits, fatDigitsSummary, type FatDigitsProps } from "./index.js";
+
+// Memoized: hover only flips wrapper state, so the static SVG must not re-render.
+const Static = memo(StaticFatDigits);
 
 export interface InteractiveFatDigitsProps extends FatDigitsProps {
   /** Announce changes through a polite region (default true). */
@@ -72,34 +81,11 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
   // One numeral, one selectable unit (index 0): the value it prints. One
   // builder, so `onActive` and `onSelect` can never report different numbers.
   const datum = (): MicroDatum => ({ index: 0, value: Number.isFinite(value) ? value : null });
-  const pick = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice. No state — the
-  // numeral paints no chip, so a hover must not cost a render.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-fat-live", className, style)}
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
-    >
-      <StaticFatDigits
+    <span ref={hostRef} {...wrap("mc-fat-live", className, style)} {...named(label)} {...bind}>
+      <Static
         {...rest}
         style={fillFor(style)}
         value={value}

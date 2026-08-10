@@ -8,6 +8,7 @@ import {
   CHIP,
   named,
   fillFor,
+  useScalarActive,
   wrap as wrapAttrs,
   type MicroDatum,
 } from "../../shared/interactive.js";
@@ -71,7 +72,6 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
   // announced", so the first change emits at once and only repeats throttle.
   const last = useRef(-Infinity);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const [hover, setHover] = useState(false);
   const [announced, setAnnounced] = useState("");
 
   useEffect(() => {
@@ -134,34 +134,10 @@ export function MoonPhase(props: InteractiveMoonPhaseProps): React.ReactNode {
     value: Number.isFinite(frac) ? frac : null,
     formatted: pct,
   });
-  const pick = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={wrap}
-      {...wrapAttrs("mc-moon-live", className, style)}
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
-    >
+    <span ref={wrap} {...wrapAttrs("mc-moon-live", className, style)} {...named(label)} {...bind}>
       <StaticMoonPhase
         {...rest}
         style={fillFor(style)}
