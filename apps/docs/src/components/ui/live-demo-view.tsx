@@ -5,18 +5,40 @@ import { CodeWithData } from "@/components/ui/code-with-data";
 import { useChartSlug } from "@/components/charts/chart-slug-context";
 import { swapChartTree } from "@/lib/charts/swap-chart-tree";
 import { useChartModule } from "@/lib/charts/use-chart-module";
+import { FluidFrame } from "@/components/ui/fluid-frame";
 import type { SampleData } from "@/lib/charts/types";
 
 type Tab = "preview" | "code";
 
 /** Prefer interactive twin when children were built on the client with the
- *  static `Chart` identity (Sizing recipes). MDX variants already mount the
- *  interactive tag — swap is a no-op there (`type` is ChartLive). */
+ *  static `Chart` identity (Sizing recipes rendered client-side). MDX variants
+ *  already mount the interactive tag — swap is a no-op there. */
 function LivePreview({ children }: { children: ReactNode }) {
   const slug = useChartSlug();
   const mod = useChartModule(slug);
   if (!mod?.Chart || !mod.ChartLive) return children;
   return <>{swapChartTree(children, mod.Chart, mod.ChartLive)}</>;
+}
+
+/**
+ * Sizing recipes arrive as SERVER-rendered static pixels (`children`), which a
+ * client-side identity swap cannot rewrite — RSC children are opaque. When the
+ * lazy module lands, re-render the SAME recipe from it with the interactive
+ * identity; the recipe node is identical geometry, so the panel never moves and
+ * the marks gain hover in place.
+ */
+function RecipePreview({
+  recipeOf,
+  children,
+}: {
+  recipeOf: { slug: string; i: number };
+  children: ReactNode;
+}) {
+  const mod = useChartModule(recipeOf.slug);
+  const recipe = mod?.recipes?.[recipeOf.i];
+  if (!recipe || !mod.Chart || !mod.ChartLive) return children;
+  const node = swapChartTree(recipe.node, mod.Chart, mod.ChartLive) as ReactNode;
+  return recipe.fluid ? <FluidFrame>{node}</FluidFrame> : <>{node}</>;
 }
 
 /** Client view for {@link LiveDemo}. All catalog lookups (size meta, sample
@@ -30,6 +52,7 @@ export function LiveDemoView({
   metaText,
   sampleData,
   grid = false,
+  recipeOf,
 }: {
   children: ReactNode;
   code?: string;
@@ -38,6 +61,8 @@ export function LiveDemoView({
   metaText?: string;
   sampleData?: SampleData[];
   grid?: boolean;
+  /** Server-rendered sizing recipe — swap to the live twin from this module. */
+  recipeOf?: { slug: string; i: number };
 }) {
   const [tab, setTab] = useState<Tab>("preview");
   const hasCode = code !== undefined;
@@ -77,7 +102,11 @@ export function LiveDemoView({
             grid && "grid-paper",
           )}
         >
-          <LivePreview>{children}</LivePreview>
+          {recipeOf ? (
+            <RecipePreview recipeOf={recipeOf}>{children}</RecipePreview>
+          ) : (
+            <LivePreview>{children}</LivePreview>
+          )}
         </div>
       ) : (
         <CodeWithData code={code} sampleData={sampleData} lang={lang} />

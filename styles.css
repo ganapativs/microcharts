@@ -391,10 +391,14 @@
     --mc-sw: calc(var(--mc-stroke-width) * var(--mc-density));
   }
   /* Chart-only table cells: kill the font strut so a lone SVG seats the row
-     height instead of a 1em line-box around an inline mark. */
+     height instead of a 1em line-box around an inline mark. The two HTML-text
+     charts (Delta, TokenConfidence) are excluded: their marks ARE text, so the
+     strut is load-bearing — and only their LIVE wrappers match these selectors,
+     which made a hydrating cell 2px shorter than its server render (the
+     "one component, two layouts" bug, in the row-height axis). */
   :where(td:has(> .mc-root:only-child)),
-  :where(td:has(> [data-mc-host]:only-child)),
-  :where(td:has(> [class$="-live"]:only-child)),
+  :where(td:has(> [data-mc-host]:only-child:not(.mc-delta-live, .mc-token-confidence))),
+  :where(td:has(> [class$="-live"]:only-child:not(.mc-delta-live, .mc-tc-live))),
   :where(td:has(> [class$="-interactive"]:only-child)) {
     line-height: 0;
   }

@@ -190,7 +190,7 @@ export const contexts: ChartContexts = {
                 <EventTimeline data={rows} domain={WINDOW} summary={false} width={90} height={14} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
-                {incidents} incident{incidents === 1 ? "" : "s"}
+                {`${incidents} incident${incidents === 1 ? "" : "s"}`}
               </td>
             </tr>
           ))}

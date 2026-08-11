@@ -53,10 +53,26 @@ function liveContexts(mod: ChartModule): ChartContexts {
   };
 }
 
-/** Chart in four placements: sentence, cell, KPI, tab — for one resolved module. */
-export function FourContextsView({ mod }: { mod: ChartModule }) {
+/** Server-rendered stand-ins for the tiles while the module is in flight. */
+export interface ContextsFallback {
+  slots: Record<string, ReactNode>;
+  codes: Record<string, string>;
+  note?: string | undefined;
+}
+
+/** Chart in four placements: sentence, cell, KPI, tab — for one resolved
+ *  module, or for the server-rendered static tiles while it loads. Both states
+ *  render the same grid and the same tile boxes, so the module landing swaps
+ *  pixels inside them and never moves the layout. */
+export function FourContextsView({
+  mod,
+  fallback,
+}: {
+  mod: ChartModule | undefined;
+  fallback?: ContextsFallback;
+}) {
   const [tab, setTab] = useState<"preview" | "code">("preview");
-  const ctx = liveContexts(mod);
+  const ctx = mod ? liveContexts(mod) : undefined;
 
   return (
     <div className="not-prose my-6">
@@ -80,7 +96,9 @@ export function FourContextsView({ mod }: { mod: ChartModule }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {HOMES.map(({ key, label }) => {
-          const home = ctx[key];
+          const home = ctx?.[key];
+          const content = home ? (home.render() as ReactNode) : fallback?.slots[key];
+          const code = home?.code ?? fallback?.codes[key] ?? "";
           return (
             <div key={key} className="panel flex flex-col overflow-hidden">
               <div className="border-b border-hairline px-4 py-2">
@@ -88,19 +106,21 @@ export function FourContextsView({ mod }: { mod: ChartModule }) {
               </div>
               {tab === "code" ? (
                 <div className="code-inset code-fill h-36 overflow-hidden">
-                  <DynamicCodeBlock lang="tsx" code={home.code} />
+                  <DynamicCodeBlock lang="tsx" code={code} />
                 </div>
               ) : (
                 <div className="flex min-h-36 flex-1 flex-col justify-center gap-2 p-4">
-                  {home.render() as ReactNode}
+                  {content}
                 </div>
               )}
             </div>
           );
         })}
       </div>
-      {ctx.note ? (
-        <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">{ctx.note}</p>
+      {(ctx ? ctx.note : fallback?.note) ? (
+        <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">
+          {ctx ? ctx.note : fallback?.note}
+        </p>
       ) : null}
       <p className="mt-2 text-[0.7rem] leading-snug text-fd-muted-foreground/80">
         Preview uses the public chart API only. When an interactive twin exists, it swaps in with

@@ -162,8 +162,7 @@ export const contexts: ChartContexts = {
                 <Slope data={[r]} summary={false} width={40} height={18} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
-                {r.to - r.from >= 0 ? "+" : ""}
-                {r.to - r.from}pt
+                {`${r.to - r.from >= 0 ? "+" : ""}${r.to - r.from}pt`}
               </td>
             </tr>
           ))}
