@@ -2,5 +2,5 @@
 "@microcharts/mcp": patch
 ---
 
-Re-embeds the chart catalog and stylesheet after the scalar-kernel pass, so the served assets carry the current measured
-sizes and the updated interaction notes.
+Version-alignment bump for the scalar-kernel release of `@microcharts/react` — the embedded catalog and assets are
+regenerated at build time and carry no content change of their own.

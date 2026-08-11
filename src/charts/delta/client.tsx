@@ -3,11 +3,15 @@
 // `live` mode: when the value changes it re-announces the new figure through a
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
+
+// Memoized like the other chip-less scalars: hover only flips wrapper state,
+// so the static markup must not re-render on the edge.
+const Static = memo(StaticDelta);
 
 // Fresh-client-mount detector, mirroring the motion gate's hydration latch: the
 // value change edge is `true` on the very first render only while hydrating
@@ -92,7 +96,7 @@ export function Delta({
       tabIndex={pick || report ? 0 : undefined}
       {...bind}
     >
-      <StaticDelta {...props} />
+      <Static {...props} />
       <LiveRegion>{live && props.summary !== false ? summary : ""}</LiveRegion>
     </span>
   );

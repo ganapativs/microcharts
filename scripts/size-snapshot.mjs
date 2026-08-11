@@ -89,7 +89,24 @@ const KERNELS = {
   "kernel:interactive": [...STATIC_KERNEL, "live-region", "motion-gate"],
 };
 
+// Names that were folded INTO a declared chunk above. If any reappears as its
+// own file the fold has un-merged and the declared list understates the kernel
+// — the exact silently-skipped chunk resolveChunk() promises is a hard error,
+// which listing-only validation cannot see.
+const FOLDED = ["interactive", "seat-hoist", "stats"];
+
 const distFiles = readdirSync(resolve(root, "dist"));
+
+for (const base of FOLDED) {
+  const re = new RegExp(`^${base}-[A-Za-z0-9_-]{8}\\.js$`);
+  const hit = distFiles.find((f) => re.test(f));
+  if (hit) {
+    console.error(
+      `size-snapshot: "${hit}" re-emerged as its own chunk — it was folded into a declared kernel chunk, so the KERNELS list now understates the kernel. Move "${base}" back into KERNELS (and out of FOLDED).`,
+    );
+    process.exit(1);
+  }
+}
 
 /** Chunk basename → its one hashed file in `dist/`. Exits on 0 or >1 matches. */
 function resolveChunk(base) {

@@ -38,7 +38,7 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    target, "Delta-class" ≤ 1.5 kB), interactive ≤ static + 3.25 kB, ≤ ~6 SVG nodes typical, 0 client JS for static
    charts in RSC. **(4) Catalog ceiling:** static 4.35 kB / interactive **7 kB**. The interactive wall is hard — no
    subpath crosses it, and no sign-off raises it, because "~2–7 kB interactive" is quoted in the README, the docs and
-   the package description. `sparkline` defines the top of both scales (4255 / 6973 measured) and its interactive budget
+   the package description. `sparkline` defines the top of both scales (4256 / 6973 measured) and its interactive budget
    is pinned **at** the wall: 7000 B, 27 B of headroom. Growing that entry fails the gate on purpose — buy room by
    shrinking it, never by raising the number.
 

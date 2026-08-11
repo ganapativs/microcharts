@@ -12,10 +12,14 @@ const check = (cond, msg) => {
 };
 
 // 1. Every SVG chart on the page is server-rendered into static HTML.
-// page.tsx renders 24 <Chart>-rooted charts (22 distinct SVG types, plus the
-// annotated Sparkline and a 2-chart SparkGroup) and 2 inline-HTML charts.
+// page.tsx renders exactly 25 <Chart>-rooted svgs: 22 distinct chart types,
+// the annotated second Sparkline, and the 2-chart SparkGroup. Exact, not a
+// floor — a floor lets one chart vanish from the export without failing.
 const svgCharts = (html.match(/class="mc-root/g) ?? []).length;
-check(svgCharts >= 24, `all SVG charts server-rendered (${svgCharts} mc-root found, need ≥ 24)`);
+check(
+  svgCharts === 25,
+  `all SVG charts server-rendered (${svgCharts} mc-root found, need exactly 25)`,
+);
 check(html.includes('class="mc-delta'), "Delta (inline HTML) present");
 check(html.includes('class="mc-token-confidence'), "TokenConfidence (inline HTML) present");
 check(html.includes('data-mc-ink="data"'), "data ink present in static HTML");
