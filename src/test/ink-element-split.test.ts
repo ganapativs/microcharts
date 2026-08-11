@@ -30,8 +30,17 @@ describe("ink element-split cascade (styles.css)", () => {
 
   it("chart-only table cells kill the font strut (line-height: 0)", () => {
     expect(css).toMatch(/td:has\(>\s*\.mc-root:only-child\)/);
-    expect(css).toMatch(/td:has\(>\s*\[data-mc-host\]:only-child\)/);
-    expect(css).toMatch(/td:has\(>\s*\[class\$="-live"\]:only-child\)/);
+    expect(css).toMatch(/td:has\(>\s*\[data-mc-host\]:only-child:not\(/);
+    expect(css).toMatch(/td:has\(>\s*\[class\$="-live"\]:only-child:not\(/);
     expect(css).toMatch(/td:has\(>\s*\[class\$="-interactive"\]:only-child\)/);
+  });
+
+  it("the HTML-text charts keep their strut in both entries", () => {
+    // The strut removal is for lone SVG marks. Delta and TokenConfidence ARE
+    // text, and only their LIVE wrappers match the selectors above — without
+    // these exclusions a hydrating cell rendered 2px shorter than its server
+    // HTML (static ↔ interactive row-height parity).
+    expect(css).toMatch(/:only-child:not\(\.mc-delta-live,\s*\.mc-token-confidence\)/);
+    expect(css).toMatch(/:only-child:not\(\.mc-delta-live,\s*\.mc-tc-live\)/);
   });
 });

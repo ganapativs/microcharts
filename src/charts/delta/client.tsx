@@ -3,11 +3,15 @@
 // `live` mode: when the value changes it re-announces the new figure through a
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { MicroDatum } from "../../shared/interactive.js";
+import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
+
+// Memoized like the other chip-less scalars: hover only flips wrapper state,
+// so the static markup must not re-render on the edge.
+const Static = memo(StaticDelta);
 
 // Fresh-client-mount detector, mirroring the motion gate's hydration latch: the
 // value change edge is `true` on the very first render only while hydrating
@@ -75,16 +79,9 @@ export function Delta({
   // nothing to name, so nothing to focus, activate or report.
   const inert = props.summary === false && !props.title;
   const datum = (): MicroDatum => ({ index: 0, value: shown, formatted: display });
-  const pick = onSelect && !inert ? (): void => onSelect(datum()) : undefined;
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice.
+  const pick = onSelect && !inert ? onSelect : undefined;
   const report = onActive && !inert ? onActive : undefined;
-  const shownActive = useRef(false);
-  const activate = (on: boolean): void => {
-    if (!report || shownActive.current === on) return;
-    shownActive.current = on;
-    report(on ? datum() : null);
-  };
+  const { bind } = useScalarActive(datum, report, pick);
 
   return (
     <span
@@ -97,22 +94,9 @@ export function Delta({
       data-pulse={pulse ? "1" : undefined}
       data-enter={enter ? "1" : undefined}
       tabIndex={pick || report ? 0 : undefined}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={
-        pick
-          ? (e): void => {
-              if (e.key !== "Enter" && e.key !== " ") return;
-              e.preventDefault();
-              pick();
-            }
-          : undefined
-      }
+      {...bind}
     >
-      <StaticDelta {...props} />
+      <Static {...props} />
       <LiveRegion>{live && props.summary !== false ? summary : ""}</LiveRegion>
     </span>
   );

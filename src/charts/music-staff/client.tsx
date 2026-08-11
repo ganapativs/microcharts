@@ -14,7 +14,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { useSeatHoist } from "../../shared/seat-hoist.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
 import { lastFinite } from "../../core/stats.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -70,9 +70,6 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
   } = props;
 
   const hostRef = useRef<HTMLSpanElement>(null);
-  // no LiveRegion here to host it: seat the wrapper so the readout chip
-  // and the hit box travel with the mark when inline (see seat-hoist).
-  useSeatHoist(hostRef);
   // "trail" ordered by x — notes land left→right along the staff, echoing a
   // melody played in time order rather than a generic staggered settle. The
   // melodic contour connects those notes in time, so it must arrive AFTER them,
@@ -176,19 +173,9 @@ export function MusicStaff(props: InteractiveMusicStaffProps): React.ReactNode {
         {active !== null && shownNote ? ring(shownNote, false) : null}
         {rest.children}
       </StaticMusicStaff>
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <LiveRegion>
         {shownNote ? strings.point(shownPos, stops.length, fmt(shownNote.value)) : ""}
-      </span>
+      </LiveRegion>
       {readout && shownNote ? (
         <span className="mc-spark-readout" {...CHIP}>
           {fmt(shownNote.value)}

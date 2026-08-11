@@ -3,12 +3,15 @@
 // point at. `live` mode announces direction changes through a polite region and
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard:
 // wrapper is focusable, nothing more.
-import { useEffect, useRef, useState } from "react";
-import { named, type MicroDatum } from "../../shared/interactive.js";
+import { memo, useEffect, useRef, useState } from "react";
+import { named, useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { TrendArrow as StaticTrendArrow, trendArrowModel, type TrendArrowProps } from "./index.js";
+
+// Memoized: hover only flips wrapper state, so the static SVG must not re-render.
+const Static = memo(StaticTrendArrow);
 
 export interface InteractiveTrendArrowProps extends TrendArrowProps {
   /** Announce + pulse when the direction changes (default true). */
@@ -72,16 +75,7 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
     value: Number.isFinite(rest.value) ? rest.value : null,
     label: model.direction,
   });
-  const pick = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice. No state — the
-  // glyph paints no chip, so a hover must not cost a render.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
@@ -90,18 +84,9 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
       data-mc-host=""
       data-pulse={pulse ? "1" : undefined}
       {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
+      {...bind}
     >
-      <StaticTrendArrow {...rest} strings={strings} summary={false} />
+      <Static {...rest} strings={strings} summary={false} />
       <LiveRegion>{live && summary !== false ? model.summary : ""}</LiveRegion>
     </span>
   );

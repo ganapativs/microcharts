@@ -14,6 +14,7 @@ import {
   CHIP,
   named,
   fillFor,
+  useScalarActive,
   wrap as wrapAttrs,
   type MicroDatum,
 } from "../../shared/interactive.js";
@@ -73,7 +74,6 @@ export function WindBarb(props: InteractiveWindBarbProps): React.ReactNode {
   useEntrance(wrap, "pop", animate);
   const prev = useRef(text);
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
 
   useEffect(() => {
     if (prev.current === text) return;
@@ -112,33 +112,14 @@ export function WindBarb(props: InteractiveWindBarbProps): React.ReactNode {
         : undefined,
     formatted: chipText,
   });
-  const pick = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice. The hover
-  // state still paints the chip, but the edge callback stays single-shot.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={wrap}
       {...wrapAttrs("mc-windbarb-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
+      {...bind}
     >
       <StaticWindBarb
         {...rest}

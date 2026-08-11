@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HEARTBEAT, type HeartbeatStrings } from "../../core/strings-heartbeat.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
 import { DEFAULT_WINDOW, heartbeatCount, heartbeatGeometry, resolveNow } from "./geometry.js";
 
@@ -132,10 +133,9 @@ export function HeartbeatBlip(props: HeartbeatBlipProps): ReactNode {
     height,
     pad: PAD,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? heartbeatSummary(events, { window: win, now, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    heartbeatSummary(events, { window: win, now, strings, format, locale }),
+  );
   // The empty-state word is translatable, so it can outgrow the plot it centres in.
   const showEmpty =
     geo.spikesPath === "" &&

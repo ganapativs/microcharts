@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont, textGutter } from "../../core/labels.js";
 import { EN_ETA_BAR, type EtaBarStrings } from "../../core/strings-eta-bar.js";
 import { round2 } from "../../core/types.js";
@@ -102,11 +103,9 @@ export function EtaBar(props: EtaBarProps): ReactNode {
   const barWidth = width - gutter;
   const geo = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width: barWidth, height });
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt, locale }, strings));
+  const accName = resolveSummary(summary, () =>
+    etaBarSummary({ progress, elapsed, rate: rate ?? null, etaFormat, fmt, locale }, strings),
+  );
 
   const dividerX = geo.done.x + geo.done.width;
 

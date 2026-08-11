@@ -6,6 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { round2 } from "../../core/types.js";
 import { EN_CALIBRATION, type CalibrationStrings } from "../../core/strings-calibration.js";
 import {
@@ -82,10 +83,9 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
   const ms = resolveMinSupport(data, minSupport);
   const supportHeight = Math.max(4, Math.round(height * 0.18));
   const geo = calibrationGeometry({ data, bins, minSupport: ms, width, height, supportHeight });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? calibrationSummary(geo.points, geo.maxGap, strings, fmt));
+  const accName = resolveSummary(summary, () =>
+    calibrationSummary(geo.points, geo.maxGap, strings, fmt),
+  );
   const diagY = (p: number) => geo.diagonal.y1 + (geo.diagonal.y2 - geo.diagonal.y1) * p;
 
   return (

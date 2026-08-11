@@ -2,13 +2,22 @@
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value.
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
-import { named, fillFor, wrap as wrapAttrs, type MicroDatum } from "../../shared/interactive.js";
+import {
+  named,
+  fillFor,
+  useScalarActive,
+  wrap as wrapAttrs,
+  type MicroDatum,
+} from "../../shared/interactive.js";
 import { DicePips as StaticDicePips, dicePipsSummary, type DicePipsProps } from "./index.js";
+
+// Memoized: hover only flips wrapper state, so the static SVG must not re-render.
+const Static = memo(StaticDicePips);
 
 export interface InteractiveDicePipsProps extends DicePipsProps {
   /** Announce face changes through a polite region (default true). */
@@ -97,40 +106,11 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
     index: 0,
     value: Number.isFinite(value) ? Math.round(value) : null,
   });
-  const pick = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only: pointer-enter then focus both
-  // mean "active", and the same unit must not be announced twice. No state — the
-  // face paints no chip, so a hover must not cost a render.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={wrap}
-      {...wrapAttrs("mc-dice-live", className, style)}
-      {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={pick}
-      onKeyDown={(e) => {
-        if (!onSelect || (e.key !== "Enter" && e.key !== " ")) return;
-        e.preventDefault();
-        pick();
-      }}
-    >
-      <StaticDicePips
-        {...rest}
-        style={fillFor(style)}
-        value={value}
-        strings={strings}
-        summary={false}
-      />
+    <span ref={wrap} {...wrapAttrs("mc-dice-live", className, style)} {...named(label)} {...bind}>
+      <Static {...rest} style={fillFor(style)} value={value} strings={strings} summary={false} />
       <LiveRegion>{live && props.summary !== false ? announced : ""}</LiveRegion>
     </span>
   );

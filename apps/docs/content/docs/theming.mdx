@@ -80,9 +80,19 @@ your own layers then win by being later:
   utilities;
 ```
 
-`!important` also crosses the boundary, because importance inverts layer order: an important declaration in an earlier
-layer beats an important one in a later layer, and both beat every normal declaration. Reach for it to unblock a single
-rule, and reach for the layer statement above to stop hitting this at all.
+Importing `styles.css` before your framework's CSS reaches the same order with no layer statement, because imports
+declare layers as they are parsed.
+
+Either way, the order cuts both ways: once your layers outrank the library's, your **reset** outranks it too. Tailwind's
+Preflight sets `svg { display: block }` in its `base` layer, which now beats the library's `display: inline-block` on
+`.mc-root` — a chart in running text drops onto its own line until you put `inline-block` back at the call site. With
+the reversed order you keep inline placement for free and lose your utilities instead. Pick per app: order your layers
+and re-assert `inline-block` where a chart sits in prose, or keep the library last and reach for a token or `!important`
+on the rule you need.
+
+`!important` crosses the boundary, because importance inverts layer order: an important declaration in an earlier layer
+beats an important one in a later layer, and both beat every normal declaration. Reach for it to unblock a single rule,
+and reach for the layer statement above to stop hitting this at all.
 
 Unlayered CSS never meets any of this. Plain rules beat every layered rule regardless of order, so an app with no
 `@layer` of its own already wins.

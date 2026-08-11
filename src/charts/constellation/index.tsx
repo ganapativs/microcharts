@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_CONSTELLATION, type ConstellationStrings } from "../../core/strings-constellation.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont } from "../../core/labels.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { constellationGeometry, DEFAULT_HEIGHT, DEFAULT_R, DEFAULT_WIDTH } from "./geometry.js";
@@ -138,10 +139,9 @@ export function Constellation(props: ConstellationProps): ReactNode {
   const fontSize = isFiniteValue(props.fontSize)
     ? props.fontSize
     : labelFont(geo.height, 0.55, labelSize);
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? constellationSummary(data, { xFormat, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    constellationSummary(data, { xFormat, strings, format, locale }),
+  );
   const fmt = makeFormatter(format, locale);
 
   const largest = geo.stars.find((s) => s.index === geo.largestIndex);

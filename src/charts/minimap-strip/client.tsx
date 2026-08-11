@@ -7,6 +7,7 @@ import { useCallback, useMemo, useRef, useState, type PointerEvent } from "react
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
 import { CHIP, fillFor, wrap } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { LiveRegion } from "../../shared/live-region.js";
 import { EN_MINIMAP } from "../../core/strings-minimap.js";
 import {
   DEFAULT_HEIGHT,
@@ -164,19 +165,7 @@ export function MinimapStrip(props: InteractiveMinimapProps): React.ReactNode {
         summary={false}
         style={fillFor(style)}
       />
-      <span
-        aria-live="polite"
-        style={{
-          position: "absolute",
-          width: 1,
-          height: 1,
-          overflow: "hidden",
-          clip: "rect(0 0 0 0)",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))}
-      </span>
+      <LiveRegion>{strings.minimapView(fmt(win[0]), fmt(win[1]), fmt(span))}</LiveRegion>
       {/* The window edges are the whole point of the control, and until now
           only `aria-valuetext` carried them — a sighted reader dragging saw a
           rectangle and no numbers. The chip rides over the window's centre. */}

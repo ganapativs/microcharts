@@ -75,20 +75,38 @@ for (const row of report) {
  * universal; a name that resolves to anything other than exactly one file is a
  * hard error, because a silently-skipped chunk would understate the kernel.
  */
-const STATIC_KERNEL = ["types", "format", "Chart", "scale", "labels", "stats", "summary"];
+// "stats" is gone from this list on purpose: once every static entry imported
+// resolveSummary, stats.ts and summary.ts shared an importer set and rollup
+// merged them into the one summary chunk. Its bytes are still counted — inside
+// "summary" — so the kernel reading stays continuous.
+const STATIC_KERNEL = ["types", "format", "Chart", "scale", "labels", "summary"];
 const KERNELS = {
   "kernel:static": STATIC_KERNEL,
-  // The picker/announce/seat layer every interactive entry adds on top.
-  "kernel:interactive": [
-    ...STATIC_KERNEL,
-    "interactive",
-    "motion-gate",
-    "live-region",
-    "seat-hoist",
-  ],
+  // The picker/announce/seat layer every interactive entry adds on top. One
+  // chunk since the LiveRegion unification: interactive.ts, live-region.tsx and
+  // seat-hoist.ts share an importer set now, so rollup emits them as the single
+  // "live-region" chunk.
+  "kernel:interactive": [...STATIC_KERNEL, "live-region", "motion-gate"],
 };
 
+// Names that were folded INTO a declared chunk above. If any reappears as its
+// own file the fold has un-merged and the declared list understates the kernel
+// — the exact silently-skipped chunk resolveChunk() promises is a hard error,
+// which listing-only validation cannot see.
+const FOLDED = ["interactive", "seat-hoist", "stats"];
+
 const distFiles = readdirSync(resolve(root, "dist"));
+
+for (const base of FOLDED) {
+  const re = new RegExp(`^${base}-[A-Za-z0-9_-]{8}\\.js$`);
+  const hit = distFiles.find((f) => re.test(f));
+  if (hit) {
+    console.error(
+      `size-snapshot: "${hit}" re-emerged as its own chunk — it was folded into a declared kernel chunk, so the KERNELS list now understates the kernel. Move "${base}" back into KERNELS (and out of FOLDED).`,
+    );
+    process.exit(1);
+  }
+}
 
 /** Chunk basename → its one hashed file in `dist/`. Exits on 0 or >1 matches. */
 function resolveChunk(base) {

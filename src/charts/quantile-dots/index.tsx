@@ -145,10 +145,9 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? quantileDotsSummary(geo, fmt, { threshold, side }, strings));
+  const accName = resolveSummary(summary, () =>
+    quantileDotsSummary(geo, fmt, { threshold, side }, strings),
+  );
   const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
   return (

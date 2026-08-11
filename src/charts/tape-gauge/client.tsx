@@ -7,7 +7,7 @@
 // ; the scale window stays centered on value.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -106,7 +106,6 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   const name = [title, full].filter(Boolean).join(". ") || undefined;
 
   const [announced, setAnnounced] = useState("");
-  const [hover, setHover] = useState(false);
   const last = useRef(-Infinity);
   useEffect(() => {
     if (!full) return;
@@ -141,35 +140,10 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
     value: Number.isFinite(value) ? value : null,
     formatted: valueText || undefined,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `hover` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setHover(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: hover, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
-    <span
-      ref={hostRef}
-      {...wrap("mc-tape-live", className, style)}
-      {...named(name)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
-    >
+    <span ref={hostRef} {...wrap("mc-tape-live", className, style)} {...named(name)} {...bind}>
       <StaticTapeGauge
         {...rest}
         value={value}

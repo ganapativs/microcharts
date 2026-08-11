@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPIRAL_YEAR, type SpiralYearStrings } from "../../core/strings-spiral-year.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { dayOfYear } from "../../core/calendar-grid.js";
 import type { Value } from "../../core/types.js";
 import { SPIRAL_PAD, spiralYearGeometry } from "./geometry.js";
@@ -118,10 +119,9 @@ export function SpiralYear(props: SpiralYearProps): ReactNode {
     pad: SPIRAL_PAD,
     mark,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? spiralYearSummary(data, { cadence: cadenceProp, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    spiralYearSummary(data, { cadence: cadenceProp, strings, format, locale }),
+  );
   const ramp = steps === 3 ? OPACITY_3 : OPACITY;
   const isArc = mark === "arc";
 

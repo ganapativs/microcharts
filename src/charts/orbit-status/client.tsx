@@ -14,7 +14,7 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
 import { labelFitsY, labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -91,8 +91,6 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const [announced, setAnnounced] = useState("");
-  // Hover/focus reveals the exact latency numeral — a readout, not a selection.
-  const [open, setOpen] = useState(false);
   const prevAlerted = useRef<boolean | null>(null);
   const mounted = useRef(false);
 
@@ -118,17 +116,8 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     label: title,
     formatted: geo.unknown ? "—" : strings.orbitLatency(fmt(Math.max(0, latency))),
   });
-  const select = (): void => onSelect?.(datum());
-  // `onActive` fires on the enter/leave EDGE only. `open` alone can't gate it —
-  // pointer-enter then focus both set it `true`, which would announce the same
-  // unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setOpen(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  // Hover/focus reveals the exact latency numeral — a readout, not a selection.
+  const { active: open, bind } = useScalarActive(datum, onActive, onSelect);
 
   // The Chart viewBox gains a right-hand gutter when the ms numeral is shown;
   // the orbit still sits in the left square, so anything positioned as a
@@ -182,17 +171,7 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
       ref={wrapRef}
       {...wrap("mc-orbit-live", className, style)}
       {...named(ariaLabel)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticOrbitStatus
         {...rest}

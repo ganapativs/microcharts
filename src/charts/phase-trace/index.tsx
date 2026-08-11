@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_PHASE_TRACE, type PhaseTraceStrings } from "../../core/strings-phase-trace.js";
 import { chartSide, isFiniteValue } from "../../core/types.js";
 import {
@@ -98,10 +99,9 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
   const h = chartSide(height, DEFAULT_HEIGHT);
   const fmt = makeFormatter(format, locale);
   const geo = phaseTraceGeometry({ data, xDomain, yDomain: domain, tail, width: w, height: h });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? phaseTraceSummary(data, xLabel, yLabel, geo.heading, strings, fmt));
+  const accName = resolveSummary(summary, () =>
+    phaseTraceSummary(data, xLabel, yLabel, geo.heading, strings, fmt),
+  );
 
   return (
     <Chart

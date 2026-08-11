@@ -153,19 +153,17 @@ export function BurnChart(props: BurnChartProps): ReactNode {
     );
   }
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        burnSummary(
-          geo,
-          fmt,
-          // Counts come from the geometry, not the props: the geometry drops
-          // non-finite entries before scaling, so the raw lengths describe a
-          // longer series than the one on screen.
-          { unit, work: workWord, mode, elapsed: geo.elapsed, total: geo.total },
-          strings,
-        ));
+  const accName = resolveSummary(summary, () =>
+    burnSummary(
+      geo,
+      fmt,
+      // Counts come from the geometry, not the props: the geometry drops
+      // non-finite entries before scaling, so the raw lengths describe a
+      // longer series than the one on screen.
+      { unit, work: workWord, mode, elapsed: geo.elapsed, total: geo.total },
+      strings,
+    ),
+  );
   const lineColor = color ?? "var(--mc-accent)";
   const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
   // gap valence: late (positive delta) is bad, early is good — double-encoded

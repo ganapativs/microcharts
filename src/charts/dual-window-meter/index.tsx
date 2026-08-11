@@ -7,6 +7,7 @@ import { Chart } from "../../shared/Chart.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_DUAL_WINDOW, type DualWindowStrings } from "../../core/strings-dual-window.js";
 import { clamp } from "../../core/scale.js";
 import { isFiniteValue, round2, type Value } from "../../core/types.js";
@@ -141,10 +142,9 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
     gutter,
     means,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? dualWindowSummary(geo.fastLast, geo.slowLast, target, strings, fmt));
+  const accName = resolveSummary(summary, () =>
+    dualWindowSummary(geo.fastLast, geo.slowLast, target, strings, fmt),
+  );
 
   // both readings need ~2.4× the font of vertical room; below that, show only the
   // sustained (slow) reading rather than crush two numbers together

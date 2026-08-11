@@ -2,9 +2,9 @@
 // Interactive <HeatCell>. One target — no pointer lookup needed;
 // focus/hover reveals the formatted value + calibrated level with ActivityGrid
 // announcement parity ("42 — level 3 of 5.").
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
@@ -60,7 +60,6 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
 
-  const [active, setActive] = useState(false);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   const geo = heatCellGeometry({ width: 12, height: 12, value, domain, steps, shape });
   // `geo.steps`, not the prop: the static bins and paints against the resolved
@@ -92,34 +91,14 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
     value: Number.isFinite(value) ? value : null,
     formatted: chip,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `active` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setActive(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-heat-cell-live", className, style)}
       {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticHeatCell
         {...rest}

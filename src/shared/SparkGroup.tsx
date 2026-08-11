@@ -56,8 +56,13 @@ export function SparkGroup(props: SparkGroupProps): ReactNode {
   });
 
   return (
-    <div className={className ? `mc-group ${className}` : "mc-group"} style={style}>
+    // A span, not a div: `.mc-group` is `inline-flex` either way, but a div is
+    // flow content and HTML forbids it inside `<p>` — the parser re-parents it
+    // out of the paragraph and hydration of a server-rendered group fails with
+    // a full client re-render. Word-sized charts live in prose; their group
+    // wrapper has to be phrasing content too.
+    <span className={className ? `mc-group ${className}` : "mc-group"} style={style}>
       {cloned}
-    </div>
+    </span>
   );
 }

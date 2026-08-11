@@ -9,6 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { resolveAnnotations, annotationFontSize } from "../../shared/annotations-host.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import {
@@ -129,10 +130,9 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
   const cls = className ? `mc-percentile-trace ${className}` : "mc-percentile-trace";
 
   const geo = percentileGeometry({ width, height, data, domain });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? (geo ? percentileSummary(geo, pStr, fmt, strings) : strings.noData));
+  const accName = resolveSummary(summary, () =>
+    geo ? percentileSummary(geo, pStr, fmt, strings) : strings.noData,
+  );
 
   // no finite readings → the empty Chart still carries the accessible name
   if (geo === null) {

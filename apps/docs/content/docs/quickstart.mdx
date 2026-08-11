@@ -148,6 +148,10 @@ Full detail — why it inherits, and per-scope fonting — in [Theming](/docs/th
 
 </Callout>
 
+If your app declares its own cascade layers (Tailwind v4 does), the import order of this stylesheet decides whether your
+utility classes or the library's rules win on a chart. The mechanism and both fixes are in
+[Theming → Where the library's rules sit in the cascade](/docs/theming#where-the-librarys-rules-sit-in-the-cascade).
+
 ## Your first chart
 
 Every series chart renders from `data` alone; single-value charts take `value`. Either way it works in a React Server

@@ -147,8 +147,7 @@ export const contexts: ChartContexts = {
                 <Dumbbell data={[b]} summary={false} width={70} height={14} />
               </td>
               <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">
-                {b.to - b.from >= 0 ? "+" : ""}
-                {b.to - b.from}k
+                {`${b.to - b.from >= 0 ? "+" : ""}${b.to - b.from}k`}
               </td>
             </tr>
           ))}

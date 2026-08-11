@@ -3,8 +3,8 @@
 // visual, wrapped focusable, with a readout of the exact value vs target revealed
 // on hover or focus. The wrapper owns the accessible name (role=img); the inner
 // static chart is decorative so the reading isn't announced twice.
-import { useRef, useState } from "react";
-import { CHIP, named, fillFor, wrap } from "../../shared/interactive.js";
+import { useRef } from "react";
+import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { makeFormatter, unsigned } from "../../core/format.js";
 import { EN_BULLET } from "../../core/strings-bullet.js";
@@ -54,7 +54,6 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     style,
     ...rest
   } = props;
-  const [open, setOpen] = useState(false);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "sweep", animate, { selector: MEASURE_SELECTOR });
 
@@ -90,34 +89,14 @@ export function Bullet(props: InteractiveBulletProps): React.ReactNode {
     value: Number.isFinite(value) ? value : null,
     formatted: readoutText,
   });
-  const select = (): void => onSelect?.(datum());
-  // ONE unit: `onActive` fires on the enter/leave EDGE only. `open` alone can't
-  // gate it — pointer-enter then focus both set it `true`, which would announce
-  // the same unit twice — so the last emitted state is tracked here.
-  const shown = useRef(false);
-  const activate = (on: boolean): void => {
-    setOpen(on);
-    if (shown.current === on) return;
-    shown.current = on;
-    onActive?.(on ? datum() : null);
-  };
+  const { active: open, bind } = useScalarActive(datum, onActive, onSelect);
 
   return (
     <span
       ref={hostRef}
       {...wrap("mc-bullet-interactive", className, style)}
       {...named(label)}
-      onPointerEnter={() => activate(true)}
-      onPointerLeave={() => activate(false)}
-      onFocus={() => activate(true)}
-      onBlur={() => activate(false)}
-      onClick={select}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          select();
-        }
-      }}
+      {...bind}
     >
       <StaticBullet
         {...rest}

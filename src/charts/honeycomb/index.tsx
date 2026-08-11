@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
 import { makeFormatter, makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFont, labelFitsY } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import type { EmptyCellStyle } from "../../core/types.js";
@@ -110,10 +111,9 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
           : undefined;
   }
   const showLabel = labelText !== undefined && labelFitsY(geo.height / 2, fontSize, geo.height);
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? honeycombSummary(filled, { total: cap, unit, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    honeycombSummary(filled, { total: cap, unit, strings, format, locale }),
+  );
   const fill = color ?? "var(--mc-accent)";
   const rootStyle = showLabel
     ? ({ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties)

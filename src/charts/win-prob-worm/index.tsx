@@ -12,6 +12,7 @@ import { round2, isFiniteValue } from "../../core/types.js";
 import { clamp, scaleLinear } from "../../core/scale.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_WIN_PROB_WORM, type WinProbWormStrings } from "../../core/strings-win-prob-worm.js";
 import { PAD, resolveWormGeo, swingMark, winProbWormSummary, wormCustomPct } from "./geometry.js";
@@ -96,11 +97,9 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
     pctFmt,
   });
   const empty = geo === null || geo.end === null;
-  const accName =
-    summary === false
-      ? false
-      : (summary ??
-        (empty ? strings.noData : winProbWormSummary(geo!, fmt, strings, sides, pctFmt)));
+  const accName = resolveSummary(summary, () =>
+    empty ? strings.noData : winProbWormSummary(geo!, fmt, strings, sides, pctFmt),
+  );
 
   if (empty) {
     return (

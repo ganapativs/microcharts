@@ -9,6 +9,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_BREATHING_DOT, type BreathingDotStrings } from "../../core/strings-breathing-dot.js";
 import { makeUnitFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import { breathingDotGeometry, loadBand, resolveThresholds } from "./geometry.js";
@@ -92,10 +93,9 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
       ? props.fontSize
       : labelFont(geo.size, 0.55, labelSize);
 
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? breathingDotSummary(value, { thresholds, strings, format, locale }));
+  const accName = resolveSummary(summary, () =>
+    breathingDotSummary(value, { thresholds, strings, format, locale }),
+  );
   const pctText =
     label === "value" && !geo.unknown ? makeUnitFormatter(format, locale, PCT)(geo.level) : null;
   const labelY = geo.size / 2 + fontSize * 0.34;

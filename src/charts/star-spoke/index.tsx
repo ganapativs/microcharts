@@ -8,6 +8,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { labelFont } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
 import { EN_STAR_SPOKE, type StarSpokeStrings } from "../../core/strings-star-spoke.js";
 import { UNIT_DOMAIN, resolveDomain, starBox, starSpokeGeometry } from "./geometry.js";
@@ -133,10 +134,9 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
     : null;
   // fmt (an Intl.NumberFormat lookup) is only needed for the auto summary — skip
   // it entirely when summary is explicitly off (SSR hot path: bench).
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? starSpokeSummary(data, strings, makeFormatter(format, locale)));
+  const accName = resolveSummary(summary, () =>
+    starSpokeSummary(data, strings, makeFormatter(format, locale)),
+  );
 
   return (
     <Chart

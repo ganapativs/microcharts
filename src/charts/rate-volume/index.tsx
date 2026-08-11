@@ -48,7 +48,7 @@ export interface RateVolumeProps {
   /** Below this volume the rate mark renders hollow — "insufficient denominator". */
   minVolume?: number | undefined;
   /** Volume has different units than rate; cached separately. */
-  volumeFormat?: Intl.NumberFormatOptions | ((n: number) => string) | undefined;
+  volumeFormat?: Format | undefined;
   /** Noun for the volume unit in the summary (default "events"). */
   unit?: string | undefined;
   curve?: RateCurve | undefined;

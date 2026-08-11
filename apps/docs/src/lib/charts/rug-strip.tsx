@@ -176,7 +176,7 @@ export const contexts: ChartContexts = {
                   height={18}
                 />
               </td>
-              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">${b.offer}k</td>
+              <td className="py-1.5 pl-3 text-right text-fd-muted-foreground">{`$${b.offer}k`}</td>
             </tr>
           ))}
         </tbody>

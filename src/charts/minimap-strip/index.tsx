@@ -5,6 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
+import { resolveSummary } from "../../core/summary.js";
 import { EN_MINIMAP, type MinimapStrings } from "../../core/strings-minimap.js";
 import {
   DEFAULT_HEIGHT,
@@ -103,10 +104,9 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
     width,
     height,
   });
-  const accName =
-    summary === false
-      ? false
-      : (summary ?? minimapSummary(data, domain, geo.unknownShare, strings, fmt, pctFmt));
+  const accName = resolveSummary(summary, () =>
+    minimapSummary(data, domain, geo.unknownShare, strings, fmt, pctFmt),
+  );
   const { contentTop, contentBottom } = geo;
 
   return (

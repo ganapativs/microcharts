@@ -42,7 +42,8 @@ import {
 import { shuffleBase, shuffleSeries } from "@/lib/charts/jitter";
 import { interactionKind } from "@/lib/charts/interaction-note";
 import { CodeWithData } from "@/components/ui/code-with-data";
-import type { ChartModule, Knob, KnobValue, SampleData } from "@/lib/charts/types";
+import type { ChartModule, Knob, KnobValue, PlaygroundSpec, SampleData } from "@/lib/charts/types";
+import type { PlaygroundSkeleton } from "./playground-skeleton";
 
 const READOUT_DESTINATIONS = ["chart", "panel", "both"] as const;
 
@@ -606,15 +607,49 @@ function KnobControl({
   }
 }
 
-export function Playground({ chart }: { chart: string }) {
+/**
+ * The island renders its COMPLETE chrome from the server-extracted skeleton on
+ * the very first paint — knob rail, drawers, mode switch, hint, code block, and
+ * the fixed-height stage — so the lazy module landing changes pixels inside
+ * the stage and nothing else. The old shape (a guessed `min-h` placeholder
+ * swapped for the real panel) shifted every chart page by 200–400px on load.
+ */
+export function PlaygroundIsland({
+  chart,
+  skeleton,
+}: {
+  chart: string;
+  skeleton: PlaygroundSkeleton;
+}) {
   const mod = useChartModule(chart);
-  if (!mod) return <div className="not-prose my-6 min-h-[26rem]" aria-hidden />;
-  return <PlaygroundView key={chart} mod={mod} />;
+  return <PlaygroundView key={chart} mod={mod} skeleton={skeleton} />;
 }
 
-function PlaygroundView({ mod }: { mod: ChartModule }) {
-  const spec = mod.playground;
-  const entry = mod.entry;
+/** The serializable spec stand-in used until the live module lands: the same
+ *  knobs and flags, an empty stage. Code functions are never called pre-module
+ *  — the code block shows `skeleton.initialCode` directly. */
+function shimSpec(s: PlaygroundSkeleton): PlaygroundSpec {
+  return {
+    knobs: s.knobs,
+    ...(s.data ? { data: s.data } : {}),
+    ...(s.hasShuffle ? { shuffle: () => s.data ?? [] } : {}),
+    render: () => null,
+    code: () => "",
+    ...(s.hasInteractive ? { renderInteractive: () => null } : {}),
+    ...(s.interactiveHint !== undefined ? { interactiveHint: s.interactiveHint } : {}),
+    ...(s.animates !== undefined ? { animates: s.animates } : {}),
+  };
+}
+
+function PlaygroundView({
+  mod,
+  skeleton,
+}: {
+  mod: ChartModule | undefined;
+  skeleton: PlaygroundSkeleton;
+}) {
+  const spec = mod?.playground ?? shimSpec(skeleton);
+  const entry = mod?.entry ?? skeleton.entry;
   const [state, setState] = useState<Record<string, KnobValue>>(() =>
     Object.fromEntries((spec?.knobs ?? []).map((k) => [k.key, k.init])),
   );
@@ -796,12 +831,16 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
   // own series above. Everything else — an OHLC bar, a labelled row, a station
   // observation — shuffles at the PROP level instead, so the button reaches the
   // whole catalog rather than the third of it that happens to plot a number[].
-  const propShuffle = !seriesShuffle && measurementProps(rawPreview).length > 0;
+  // Pre-module the answer comes from the skeleton (evaluated on the same
+  // first-paint render server-side), so the button never pops in on load.
+  const propShuffle =
+    !seriesShuffle && (mod ? measurementProps(rawPreview).length > 0 : skeleton.hasPropShuffle);
   const canShuffle = seriesShuffle || propShuffle;
   const preview = propShuffle ? shuffleChartProps(injectedPreview, shuffles) : injectedPreview;
 
   const onShuffle = canShuffle
     ? () => {
+        if (!mod) return; // chrome is up before the module — press again in a beat
         if (spec.shuffle) setData(spec.shuffle(seed));
         else if (threadsData) setData(shuffleSeries(spec.data ?? [], seed) as number[]);
         // Shuffle the series the chart is DRAWING, not `entry.demo`. The two
@@ -847,16 +886,21 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
           ? withCallback(chartJsx, true, true)
           : withReadoutOff(chartJsx)
         : chartJsx;
-  const code = [
-    `import { ${entry.name} } from "${importPath}";`,
-    ...(theme !== DEFAULT_THEME ? ['import { MicroProvider } from "@microcharts/react";'] : []),
-    ...(external || isMinimap || (scalar && interactive && showReadoutToggle && !chipOn)
-      ? ['import { useState } from "react";']
-      : []),
-    ...(ui.animate ? ['import "@microcharts/react/motion";'] : []),
-    "",
-    wrapTheme(jsx, theme),
-  ].join("\n");
+  // Pre-module the block shows the drift-tested first-paint snippet from the
+  // skeleton — the same string this composition produces once the module
+  // lands, so nothing below the stage ever reflows.
+  const code = mod
+    ? [
+        `import { ${entry.name} } from "${importPath}";`,
+        ...(theme !== DEFAULT_THEME ? ['import { MicroProvider } from "@microcharts/react";'] : []),
+        ...(external || isMinimap || (scalar && interactive && showReadoutToggle && !chipOn)
+          ? ['import { useState } from "react";']
+          : []),
+        ...(ui.animate ? ['import "@microcharts/react/motion";'] : []),
+        "",
+        wrapTheme(jsx, theme),
+      ].join("\n")
+    : skeleton.initialCode;
 
   return (
     <Shell
@@ -874,7 +918,7 @@ function PlaygroundView({ mod }: { mod: ChartModule }) {
       }
       onReplay={ui.animate ? () => setTake((t) => t + 1) : undefined}
       onShuffle={onShuffle}
-      sampleData={mod?.entry.sampleData}
+      sampleData={entry.sampleData}
       preview={preview}
       aside={
         interactive && showCallbacks ? (
