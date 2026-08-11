@@ -1,6 +1,6 @@
 {
   "name": "@microcharts/react",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Word-sized charts for React, made for LLMs and humans. 106 chart types, zero runtime dependencies, ~2–7 kB interactive · ~1–4 kB static, accessible by default, and server-component safe.",
   "keywords": [
     "a11y",

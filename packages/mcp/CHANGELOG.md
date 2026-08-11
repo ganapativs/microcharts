@@ -1,5 +1,19 @@
 # @microcharts/mcp
 
+## 0.1.15
+
+### Patch Changes
+
+- [#123](https://github.com/ganapativs/microcharts/pull/123)
+  [`f3a0b4a`](https://github.com/ganapativs/microcharts/commit/f3a0b4a3526004fd90c5e783928392609c3bba3a) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Version-alignment bump for the scalar-kernel release of
+  `@microcharts/react` — the embedded catalog and assets are regenerated at build time and carry no content change of
+  their own.
+- Updated dependencies
+  [[`f3a0b4a`](https://github.com/ganapativs/microcharts/commit/f3a0b4a3526004fd90c5e783928392609c3bba3a),
+  [`f3a0b4a`](https://github.com/ganapativs/microcharts/commit/f3a0b4a3526004fd90c5e783928392609c3bba3a)]:
+  - @microcharts/react@0.18.0
+
 ## 0.1.14
 
 ### Patch Changes
