@@ -8,7 +8,7 @@
     "preview": "vite preview --port 4007 --strictPort"
   },
   "dependencies": {
-    "@microcharts/react": "^0.17.0",
+    "@microcharts/react": "^0.18.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
