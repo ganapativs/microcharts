@@ -75,17 +75,18 @@ for (const row of report) {
  * universal; a name that resolves to anything other than exactly one file is a
  * hard error, because a silently-skipped chunk would understate the kernel.
  */
-const STATIC_KERNEL = ["types", "format", "Chart", "scale", "labels", "stats", "summary"];
+// "stats" is gone from this list on purpose: once every static entry imported
+// resolveSummary, stats.ts and summary.ts shared an importer set and rollup
+// merged them into the one summary chunk. Its bytes are still counted — inside
+// "summary" — so the kernel reading stays continuous.
+const STATIC_KERNEL = ["types", "format", "Chart", "scale", "labels", "summary"];
 const KERNELS = {
   "kernel:static": STATIC_KERNEL,
-  // The picker/announce/seat layer every interactive entry adds on top.
-  "kernel:interactive": [
-    ...STATIC_KERNEL,
-    "interactive",
-    "motion-gate",
-    "live-region",
-    "seat-hoist",
-  ],
+  // The picker/announce/seat layer every interactive entry adds on top. One
+  // chunk since the LiveRegion unification: interactive.ts, live-region.tsx and
+  // seat-hoist.ts share an importer set now, so rollup emits them as the single
+  // "live-region" chunk.
+  "kernel:interactive": [...STATIC_KERNEL, "live-region", "motion-gate"],
 };
 
 const distFiles = readdirSync(resolve(root, "dist"));

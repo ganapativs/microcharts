@@ -31,15 +31,15 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
 2. **Budgets are CI gates**, applied in this order. **(1) Per-subpath budget:** every subpath carries its own limit in
    `scripts/size-budgets.json`, set to measured + max(50 B, 2%); `styles.css` ≤ 12 kB. `.size-limit.json` is generated
    (`scripts/gen-size-limits.mjs` from that file), never hand-edited. **(2) Regression diff:** every PR is diffed
-   against its base branch — `scripts/size-snapshot.json` records the measured gzip bytes of all 216 subpaths, CI
+   against its base branch — `scripts/size-snapshot.json` records the measured gzip bytes of all 218 subpaths, CI
    re-measures against a fresh build (`size-snapshot.mjs --check`), and the `size-diff` job replies with a per-subpath
    table. Growth over **1% on any subpath fails**; regenerate with `pnpm build && pnpm size:snapshot`, and label the PR
    `size-increase-approved` when an increase is deliberate. **(3) Admission bar for a NEW chart:** static ≤ 3 kB (≤ 2 kB
    target, "Delta-class" ≤ 1.5 kB), interactive ≤ static + 3.25 kB, ≤ ~6 SVG nodes typical, 0 client JS for static
    charts in RSC. **(4) Catalog ceiling:** static 4.35 kB / interactive **7 kB**. The interactive wall is hard — no
    subpath crosses it, and no sign-off raises it, because "~2–7 kB interactive" is quoted in the README, the docs and
-   the package description. `sparkline` defines the top of both scales (4245 / 6995 measured) and its interactive budget
-   is pinned **at** the wall: 7000 B, 5 B of headroom. Growing that entry fails the gate on purpose — buy room by
+   the package description. `sparkline` defines the top of both scales (4255 / 6973 measured) and its interactive budget
+   is pinned **at** the wall: 7000 B, 27 B of headroom. Growing that entry fails the gate on purpose — buy room by
    shrinking it, never by raising the number.
 
    The old `interactive ≤ static + 1 kB` rule is **retired**, and `static ≤ 3 kB` is an admission bar rather than a
@@ -51,7 +51,7 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
 
    The **shared kernel is tracked, not gated**: nothing in `dist/` is the kernel (it is a set of hash-named chunks, and
    no chart imports all of them), so `size-snapshot.json` carries a declared `kernels` reading — `kernel:static` ~2.4
-   kB, `kernel:interactive` ~4.2 kB, measured as `KERNELS` in `size-snapshot.mjs` — and `size-diff` prints it beside the
+   kB, `kernel:interactive` ~4.4 kB, measured as `KERNELS` in `size-snapshot.mjs` — and `size-diff` prints it beside the
    table so a uniform shift across ~200 rows has a stated cause. Kernel growth is caught by the 1% per-subpath gate,
    which fires far earlier than any kernel ceiling would.
 
