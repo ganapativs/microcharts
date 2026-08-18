@@ -717,6 +717,55 @@
   :where(.mc-root [data-mc-w="hair"]) {
     stroke-width: calc(var(--mc-sw) / 3);
   }
+
+  /* Ink holds its weight at any render scale.
+
+     Keyed on where the stroke-width COMES FROM, not on the mark. A stroke sized
+     from `--mc-sw` — every `data-mc-w` step, and the ink roles above that carry
+     a token width — is INK: it encodes nothing by being thicker, so it must not
+     thicken when the box scales. A stroke sized from viewBox GEOMETRY is a mark
+     in its own right (a donut's band, a ring halo's span), and pinning that to
+     screen pixels breaks the channel it carries.
+
+     That split is not new: `tree-rings/client.tsx` already states it in prose
+     for one halo ("this width is viewBox geometry … the width roles the sibling
+     dials use are not geometry"). This is the same rule applied catalog-wide
+     instead of chart by chart, which is what makes it hold for a chart nobody
+     has written yet. Charts spelled the attribute per mark before, and 39 of
+     them missed at least one — 14 pinned some marks and not others, so a single
+     chart could hold a hairline on its line and thicken its own baseline.
+
+     Pinning here rather than in JSX also pays for itself: the attribute costs
+     bytes in every subpath that spells it, and subpaths are measured
+     standalone. Same reasoning as the `[data-mc-ui]` rule further down.
+
+     Roles are listed unscoped by shape on purpose. `vector-effect` is inert on a
+     mark that paints no stroke, so a filled `rect[data-mc-ink="positive"]` is
+     free to match — and listing them flat keeps this rule clear of the
+     element-split shapes `ink-element-split.test.ts` guards, where scoping a
+     PAINT rule that way would wipe DepthWedge's and NetFlow's fills. */
+  :where(
+    .mc-root [data-mc-w],
+    .mc-root [data-mc-ink="data"],
+    .mc-root [data-mc-ink="muted"],
+    .mc-root [data-mc-ink="unit-off"],
+    .mc-root [data-mc-ink="gap"],
+    .mc-root [data-mc-ink="accent"],
+    .mc-root [data-mc-ink="positive"],
+    .mc-root [data-mc-ink="negative"],
+    .mc-root [data-mc-ink="ghost"],
+    .mc-root [data-mc-ink="flag"]
+  ) {
+    vector-effect: non-scaling-stroke;
+  }
+  /* The three marks whose stroke-width IS the encoding. Each sets its width
+     inline from geometry, so the rule above would freeze a band that has to
+     grow with its box: a MicroDonut wedge and a ProgressRing arc ARE their
+     stroke, and the TreeRings halo spans exactly one ring by width. Ordering,
+     not specificity — both selectors are `:where()`, so this stays last. */
+  :where(.mc-donut-wedge, .mc-ring path[data-mc-ink="accent"], .mc-ring-halo) {
+    vector-effect: none;
+  }
   /* interaction overlay — the mark that names the unit under the pointer or the
      keyboard cursor. `data-mc-active` is a marker, not a state: hover vs pin is
      already carried by `data-mc-w`, which ~20 charts tune deliberately in both
