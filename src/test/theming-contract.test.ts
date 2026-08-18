@@ -401,21 +401,71 @@ describe("animated marks stay inside the viewBox", () => {
 });
 
 describe("primary stroked marks are scale-invariant", () => {
-  it('every stroked [data-mc-ink="data"] mark carries non-scaling-stroke', () => {
-    // The responsiveness model is `viewBox` + `preserveAspectRatio` +
-    // `vector-effect: non-scaling-stroke` — there is no `ResizeObserver` and no
-    // CSS default for the vector-effect, so a mark that omits the attribute
-    // THICKENS with its container. Every interactive entry spreads `FILL`
-    // (`width: 100%`), so those charts thicken with the host, and the same chart
-    // reads at two different weights in a table cell and in a figure.
+  // The responsiveness model is `viewBox` + `preserveAspectRatio` +
+  // `vector-effect: non-scaling-stroke`, and there is no `ResizeObserver`. Every
+  // interactive entry spreads `FILL` (`width: 100%`), so an unpinned stroke
+  // THICKENS with its host and the same chart reads at two weights in a table
+  // cell and in a figure.
+  //
+  // This used to require the ATTRIBUTE on every `data-mc-ink="data"` mark, which
+  // asked 106 charts to remember it — 39 missed at least one, and 14 pinned some
+  // marks and not others, so a single chart held a hairline on its line while its
+  // own baseline thickened. The pin now lives in `styles.css`, keyed on where the
+  // stroke-width comes from, so these assert the RULE rather than 222 copies of
+  // an attribute.
+  it("styles.css pins every token-width ink role", () => {
+    const rule = css.slice(css.indexOf("Ink holds its weight at any render scale"));
+    const decl = rule.slice(
+      0,
+      rule.indexOf("}", rule.indexOf("vector-effect: non-scaling-stroke")),
+    );
+    for (const sel of [
+      "[data-mc-w]",
+      '[data-mc-ink="data"]',
+      '[data-mc-ink="muted"]',
+      '[data-mc-ink="unit-off"]',
+      '[data-mc-ink="gap"]',
+      '[data-mc-ink="accent"]',
+      '[data-mc-ink="positive"]',
+      '[data-mc-ink="negative"]',
+      '[data-mc-ink="ghost"]',
+      '[data-mc-ink="flag"]',
+    ]) {
+      expect(decl, `the pin rule no longer covers ${sel}`).toContain(sel);
+    }
+    expect(decl).toContain("vector-effect: non-scaling-stroke");
+  });
+
+  it("exactly three marks are exempt, because their stroke-width IS the encoding", () => {
+    // Widening this list means a mark grows with its box on purpose. That is a
+    // design decision (the donut's band, the ring halo's span), not a default.
+    const at = css.indexOf("vector-effect: none");
+    expect(at, "the geometry-width exemption rule is gone").toBeGreaterThan(-1);
+    const sel = css.slice(css.lastIndexOf(":where(", at), at);
+    expect(sel).toContain("mc-donut-wedge");
+    expect(sel).toContain("mc-ring-halo");
+    expect(sel).toContain('.mc-ring path[data-mc-ink="accent"]');
+    expect(css.split("vector-effect: none").length - 1).toBe(1);
+  });
+
+  it("no chart re-spells the attribute on a mark the rule already covers", () => {
+    // Drift guard, and a byte guard: every subpath is measured standalone, so a
+    // re-spelled attribute is paid for once per chart that spells it.
+    const COVERED = ["data", "muted", "unit-off", "gap"];
+    const OPEN_ONLY = ["accent", "positive", "negative", "ghost", "flag"];
     const offenders: string[] = [];
     for (const { path, text } of chartSources()) {
       if (!path.endsWith(".tsx")) continue;
-      for (const el of jsxElements(text, /<(path|line|polyline|polygon)\b/g)) {
-        if (!el.source.includes('data-mc-ink="data"')) continue;
-        if (!el.source.includes("non-scaling-stroke")) {
-          offenders.push(`${path}:${el.line} <${el.tag}>`);
-        }
+      for (const el of jsxElements(text, /<(path|line|polyline|polygon|circle|rect|ellipse)\b/g)) {
+        if (!el.source.includes('vectorEffect="non-scaling-stroke"')) continue;
+        if (/data-mc-ink=\{/.test(el.source)) continue; // role decided at runtime
+        const ink = /data-mc-ink="([a-z-]+)"/.exec(el.source)?.[1];
+        const open = ["path", "line", "polyline"].includes(el.tag);
+        const covered =
+          /data-mc-w[=\s]/.test(el.source) ||
+          (ink !== undefined && COVERED.includes(ink)) ||
+          (ink !== undefined && OPEN_ONLY.includes(ink) && open);
+        if (covered) offenders.push(`${path}:${el.line} <${el.tag}>`);
       }
     }
     expect(offenders).toEqual([]);

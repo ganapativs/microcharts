@@ -1192,7 +1192,8 @@
     "changeset": "changeset",
     "version": "changeset version && node scripts/sync-server-json.mjs",
     "release": "pnpm build && changeset publish",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "ink-scale": "node tests/craft/ink-scale.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
