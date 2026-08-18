@@ -188,7 +188,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
             height={b.height}
             data-mc-ink={tinted ? "bar" : b.vital ? "accent" : "neutral"}
             fillOpacity={b.vital ? 1 : 0.5}
-            shapeRendering="crispEdges"
             style={tinted ? { fill: color } : undefined}
           />
         );

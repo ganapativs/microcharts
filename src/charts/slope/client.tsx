@@ -152,6 +152,12 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         x2={l.x1}
         y2={l.y1}
         data-mc-active=""
+        // `data-mc-w` is a STATE MARKER here, not a width — the same overload
+        // tree-rings/client.tsx documents for its halo. The inline width below
+        // outranks the role's stroke-width rule, so the overlay paints 3/2 in
+        // both states while `tick` marks the pinned one for the interaction
+        // tests and for consumer CSS. Collapsing the two would either drop the
+        // marker or repaint the overlay, so the literal stays and says why.
         data-mc-w={pinned ? "tick" : "support"}
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
       />

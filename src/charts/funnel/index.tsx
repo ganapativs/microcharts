@@ -163,7 +163,6 @@ export function Funnel(props: FunnelProps): ReactNode {
                 y={st.y}
                 width={st.w}
                 height={st.h}
-                shapeRendering="crispEdges"
                 data-mc-ink={isHl ? "accent" : "bar"}
                 style={!isHl && color ? { fill: color } : undefined}
               />

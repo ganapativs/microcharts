@@ -181,8 +181,7 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         height={r.height + 2}
         fill="none"
         data-mc-active=""
-        strokeWidth={0.8}
-        data-mc-w={pinned ? "tick" : undefined}
+        data-mc-w={pinned ? "tick" : "support"}
       />
     );
   };

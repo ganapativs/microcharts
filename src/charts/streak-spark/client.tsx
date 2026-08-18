@@ -155,7 +155,6 @@ export function StreakSpark(props: InteractiveStreakSparkProps): React.ReactNode
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        shapeRendering="crispEdges"
       />
     );
   };

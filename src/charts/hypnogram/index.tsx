@@ -272,7 +272,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ strokeWidth: "calc(var(--mc-sw) * 1.35)" }}
+            data-mc-w="heavy"
           />
           {emphasis && emphRuns.length > 0 ? (
             <path
@@ -280,7 +280,7 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               fill="none"
               stroke="var(--mc-accent)"
               strokeLinecap="round"
-              style={{ strokeWidth: "calc(var(--mc-sw) * 1.4)" }}
+              data-mc-w="heavy"
             />
           ) : null}
         </>

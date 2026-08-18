@@ -717,6 +717,18 @@
   :where(.mc-root [data-mc-w="hair"]) {
     stroke-width: calc(var(--mc-sw) / 3);
   }
+  /* Above `full`. The ramp used to stop at 1 and eleven inline `calc()`
+     multipliers lived above it, so the scale had no top end and a preset could
+     not retune the heavy marks with the light ones. `heavy` is the emphasis
+     step (a pinned mark, a leader line); `anchor` is the structural one (a
+     beam, a spine). Both are ratios of the same token, so density and
+     `prefers-contrast` still move them together with everything else. */
+  :where(.mc-root [data-mc-w="heavy"]) {
+    stroke-width: calc(var(--mc-sw) * 4 / 3);
+  }
+  :where(.mc-root [data-mc-w="anchor"]) {
+    stroke-width: calc(var(--mc-sw) * 3 / 2);
+  }
 
   /* Ink holds its weight at any render scale.
 
@@ -1007,6 +1019,23 @@
   :where(.mc-trace, .mc-partition) :where(rect) {
     shape-rendering: crispEdges;
     rx: 0.5;
+  }
+
+  /* Square-cornered rects rasterize on the pixel grid.
+
+     133 of the catalog's 154 square rects already spelled this attribute and 21
+     did not, which is the gap behind the docs sentence promising it for
+     "rectilinear marks". Keying on the SHAPE rather than on the chart puts the
+     remaining ones right and lets the 133 stop paying for the attribute in a
+     subpath measured standalone.
+
+     `:not([rx])` is the whole safety argument: `crispEdges` turns anti-aliasing
+     off, so a rounded corner drawn under it goes jagged. A rect that asks for
+     `rx` keeps its smoothing unless its own chart opts in per mark, which five
+     charts do deliberately for dense strips. The sub-unit escape below still has
+     the last word. */
+  :where(.mc-root rect:not([rx])) {
+    shape-rendering: crispEdges;
   }
 
   /* A mark thinner than one viewBox unit gets its anti-aliasing back.

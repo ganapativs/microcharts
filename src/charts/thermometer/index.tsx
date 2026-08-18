@@ -267,7 +267,7 @@ export function Thermometer(props: ThermometerProps): ReactNode {
           x2={geo.targetTick.x2}
           y2={geo.targetTick.y2}
           data-mc-ink="flag"
-          style={{ strokeWidth: 1.25 }}
+          data-mc-w="support"
         />
       ) : null}
       {labelPos ? (

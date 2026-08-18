@@ -181,7 +181,6 @@ export function SparkBar(props: InteractiveSparkBarProps): React.ReactNode {
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        shapeRendering="crispEdges"
       />
     );
   };

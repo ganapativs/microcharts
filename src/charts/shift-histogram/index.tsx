@@ -186,7 +186,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             height={b.up}
             data-mc-ink="neutral"
             data-mc-origin="bottom"
-            shapeRendering="crispEdges"
             fillOpacity={0.55}
           />
         ) : null,
@@ -231,7 +230,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               height={b.down}
               data-mc-ink="accent"
               data-mc-origin="top"
-              shapeRendering="crispEdges"
               style={color ? { fill: color } : undefined}
             />
           )

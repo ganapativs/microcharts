@@ -27,8 +27,10 @@ describe("<TreeRings>", () => {
 
   it("highlight='last' emphasizes the outermost ring (weight, not color-alone)", () => {
     const { container } = draw(<TreeRings data={YEARS} />);
-    const accent = [...container.querySelectorAll("circle")].find((c) =>
-      (c.getAttribute("style") ?? "").includes("1.5"),
+    // Weight comes from the width ramp rather than an inline multiplier, so the
+    // emphasis is `anchor` (3/2 of the token) against the muted rings.
+    const accent = [...container.querySelectorAll("circle")].find(
+      (c) => c.getAttribute("data-mc-w") === "anchor",
     );
     expect(accent).toBeTruthy();
   });

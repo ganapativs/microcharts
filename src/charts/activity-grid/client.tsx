@@ -211,7 +211,6 @@ export function ActivityGrid(props: InteractiveActivityGridProps): React.ReactNo
         rx={m.rx + 0.5}
         fill="none"
         data-mc-active=""
-        strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
       />
     );

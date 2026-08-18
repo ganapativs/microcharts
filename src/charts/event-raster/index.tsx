@@ -153,7 +153,6 @@ export function EventRaster(props: EventRasterProps): ReactNode {
             width={round2(width - gutter)}
             height={lane.laneH}
             data-mc-ink="band"
-            shapeRendering="crispEdges"
           />
         ) : null,
       )}
@@ -184,7 +183,6 @@ export function EventRaster(props: EventRasterProps): ReactNode {
                 y={round2(lane.y + lane.laneH * 0.16)}
                 width={b.width}
                 height={round2(lane.laneH * 0.68)}
-                shapeRendering="crispEdges"
                 data-mc-ink={fillInk}
                 opacity={dim}
                 fillOpacity={b.opacity}

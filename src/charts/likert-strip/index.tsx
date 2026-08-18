@@ -193,7 +193,6 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
                 y={midY - barH / 2}
                 width={s.width}
                 height={barH}
-                shapeRendering="crispEdges"
                 fillOpacity={s.opacity}
                 data-mc-ink={s.side < 0 ? "negative" : s.side > 0 ? "positive" : "neutral"}
               />

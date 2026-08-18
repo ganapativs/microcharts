@@ -206,7 +206,8 @@ export function expandComponents(md: string, resolveChart?: ResolveChart): strin
   });
 
   // <InteractionNote slug="x" /> → the shared interaction sentence for that
-  // chart (nothing for static-only charts and the two contract exceptions).
+  // chart (nothing for the two contract exceptions; the `interactiveImport`
+  // guard below is vestigial, since every shipped chart has one).
   out = out.replace(/<InteractionNote\s+slug=["']([^"']+)["']\s*\/>/g, (_m, slug) => {
     const chart = resolveChart?.(slug);
     return chart ? (interactionNote({ ...chart, slug }) ?? "") : "";

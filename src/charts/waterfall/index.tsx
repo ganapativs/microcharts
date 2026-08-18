@@ -191,7 +191,6 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           y={b.y}
           width={b.w}
           height={b.h}
-          shapeRendering="crispEdges"
           data-mc-ink={b.sign === 0 ? "neutral" : b.sign === goodSign ? "positive" : "negative"}
         />
       ))}
@@ -201,7 +200,6 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           y={geo.totalBar.y}
           width={geo.totalBar.w}
           height={geo.totalBar.h}
-          shapeRendering="crispEdges"
           data-mc-ink="bar"
         />
       ) : null}

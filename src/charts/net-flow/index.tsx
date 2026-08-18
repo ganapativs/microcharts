@@ -202,7 +202,6 @@ export function NetFlow(props: NetFlowProps): ReactNode {
                 height={b.height}
                 data-mc-ink={inRole}
                 fillOpacity={BAR_OPACITY}
-                shapeRendering="crispEdges"
               />
             ) : null,
           )}
@@ -216,7 +215,6 @@ export function NetFlow(props: NetFlowProps): ReactNode {
                 height={b.height}
                 data-mc-ink={outRole}
                 fillOpacity={BAR_OPACITY}
-                shapeRendering="crispEdges"
               />
             ) : null,
           )}

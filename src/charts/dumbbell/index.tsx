@@ -245,10 +245,11 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
                 x2={connector.x1}
                 y2={row.y}
                 data-mc-ink={connectorInk}
-                vectorEffect="non-scaling-stroke"
-                // 1.25 sits in the "1.2–1.8 secondary mark" justified-literal
-                // band — a touch thinner than full data ink.
-                strokeWidth={1.25}
+                // A secondary mark, which is what `support` names. It spelled a
+                // raw 1.25, so it reached neither `--mc-density` nor
+                // `prefers-contrast: more` and stayed hairline for a reader who
+                // asked every other stroke to thicken.
+                data-mc-w="support"
               />
             ) : null}
             {row.x0 !== null && !single ? (

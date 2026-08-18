@@ -175,7 +175,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               width={r.removed.width}
               height={r.height}
               data-mc-ink="negative"
-              shapeRendering="crispEdges"
             />
           ) : null}
           {r.added.width > 0 ? (
@@ -185,7 +184,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               width={r.added.width}
               height={r.height}
               data-mc-ink="positive"
-              shapeRendering="crispEdges"
             />
           ) : null}
           {r.placeholder ? (

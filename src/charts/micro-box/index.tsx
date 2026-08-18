@@ -175,10 +175,8 @@ export function MicroBox(props: MicroBoxProps): ReactNode {
         x2={geo.medianX}
         y2={geo.box.y + geo.box.h}
         data-mc-ink="data"
-        style={{
-          strokeWidth: "calc(var(--mc-sw) * 1.33)",
-          ...(color ? { stroke: color } : null),
-        }}
+        data-mc-w="heavy"
+        style={color ? { stroke: color } : undefined}
       />
       {whiskers === "tukey" && outliers
         ? geo.outliers.map((o, i) => (

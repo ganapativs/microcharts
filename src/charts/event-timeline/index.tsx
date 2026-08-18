@@ -217,7 +217,6 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
             y={s.y}
             width={round2(Math.max(0.5, s.x1 - s.x0))}
             height={s.h}
-            shapeRendering="crispEdges"
             data-mc-ink={KIND_INK[it.kind]}
             fillOpacity={0.7}
           />

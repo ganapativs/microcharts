@@ -314,7 +314,6 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               y={z.y}
               width={z.width}
               height={z.height}
-              shapeRendering="crispEdges"
               fillOpacity={0.85}
               {...TONE_INK[z.tone]}
             />

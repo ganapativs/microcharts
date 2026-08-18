@@ -167,7 +167,6 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
           width={pocBar.width}
           height={pocBar.height}
           data-mc-ink="accent"
-          shapeRendering="crispEdges"
         />
       ) : null}
       {pocText && pocBar ? (

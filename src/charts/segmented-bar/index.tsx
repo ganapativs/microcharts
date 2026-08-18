@@ -172,7 +172,6 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
               y={SEGBAR_INSET}
               width={seg.w}
               height={height - SEGBAR_INSET * 2}
-              shapeRendering="crispEdges"
               data-mc-ink={isOther ? "neutral" : undefined}
               data-mc-cat={isOther ? undefined : (i % CAT_N) + 1}
               style={colors && !isOther ? { fill: colors[i % colors.length] } : undefined}

@@ -287,12 +287,13 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
             x2={t.x}
             y2={round2(geo.track.y + t.half)}
             data-mc-ink={tail ? "flag" : "data"}
-            vectorEffect="non-scaling-stroke"
+            // `heavy` is 2 and `full` is 1.5 at the default theme, so this is the
+            // same ink it always painted — and now the only two literals on a
+            // DATA mark in the catalog are gone. The comment this replaces
+            // defended them on bytes; the two attributes cost fewer than the
+            // inline declaration did.
+            data-mc-w={tail ? "heavy" : "full"}
             style={{
-              // hardcoded (not the token) ONLY because this subpath is pinned at the 3 kB
-              // hard cap and the token-var string costs ~20 B; base 1.5 == the default
-              // mc-stroke-width, so it matches peers at the default theme.
-              strokeWidth: tail ? 2 : 1.5,
               opacity,
               ...(stroke ? { stroke } : null),
             }}

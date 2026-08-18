@@ -253,8 +253,9 @@ particular typeface needs it: `--mc-inline-nudge` for every mark, `--mc-glyph-nu
 
 Scaling an SVG normally thickens or thins its lines. microcharts sets `vector-effect: non-scaling-stroke` on data marks,
 so a line drawn at 200 px and the same line at 800 px keep the **same visual stroke weight**: the geometry scales, the
-ink doesn't. Most rectilinear marks also use `shape-rendering: crispEdges`, so bars and grids stay sharp at any size. A
-mark under one viewBox unit opts back out, because snapping its edges to the pixel grid can erase it.
+ink doesn't. Square-cornered marks also use `shape-rendering: crispEdges`, so bars and grids stay sharp at any size.
+Rounded corners keep their anti-aliasing, and a mark under one viewBox unit opts back out, because snapping its edges to
+the pixel grid can erase it.
 
 Two marks scale their ink on purpose. A MicroDonut wedge and a ProgressRing arc are drawn as a stroke, so the band you
 see is their stroke weight, and it grows with the box like any other geometry.

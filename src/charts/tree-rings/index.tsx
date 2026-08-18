@@ -251,7 +251,8 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
                 // to the inline style, so it changes nothing here and makes the
                 // ring reachable by every role-keyed rule.
                 data-mc-ink="data"
-                style={{ stroke: paint, strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
+                data-mc-w="anchor"
+                style={{ stroke: paint }}
               />
             ) : null,
           ]}

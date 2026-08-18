@@ -278,54 +278,57 @@ describe("charts read the density-scaled stroke token", () => {
   // The test above only catches the BASE TOKEN spelled out. A bare number
   // escapes further: it reaches neither `--mc-density` nor
   // `@media (prefers-contrast: more)`, which raises `--mc-stroke-width` 1.5 → 2
-  // for a reader who asked the OS for heavier contrast. Every mark below stays
-  // hairline for that reader while its neighbours thicken.
+  // for a reader who asked the OS for heavier contrast. Such a mark stays
+  // hairline for that reader while every stroke around it thickens.
   //
-  // The set is FROZEN rather than emptied, because clearing it changes rendered
-  // stroke weights and that is a visual decision, not a test's to make. Adding a
-  // new one fails here; removing one is a deliberate edit to this list.
-  const RAW_STROKE_WIDTH: Record<string, number> = {
-    // Interaction overlays. Not data ink, and `[data-mc-ui]` already governs
-    // their paint, so the weight is chrome rather than an encoded channel.
-    "src/charts/activity-grid/client.tsx": 1,
-    "src/charts/calendar-strip/client.tsx": 1,
-    "src/charts/cohort-triangle/client.tsx": 1,
-    "src/charts/confusion-grid/client.tsx": 1,
-    "src/charts/data-diff/client.tsx": 1,
-    "src/charts/garden-grid/client.tsx": 1,
-    "src/charts/heat-strip/client.tsx": 1,
-    "src/charts/dumbbell/client.tsx": 2,
-    // DATA marks — these are the ones that genuinely lose prefers-contrast.
-    "src/charts/dumbbell/index.tsx": 1,
-    "src/charts/thermometer/index.tsx": 1,
-    // Documented byte trade: the subpath is pinned at its cap and the token
-    // string costs ~20 B (see the comment at the site).
-    "src/charts/percentile-ladder/index.tsx": 1,
-    // Annotation hairlines. `chartSources()` does not reach `src/shared`, so
-    // these three sat outside every stroke guard: the Threshold and Marker
-    // rules carry a comment claiming exemption from `--mc-density`, and the
-    // Callout leader carries none at all.
-    "src/shared/annotations.tsx": 3,
-  };
-
-  it("the set of bare-number stroke widths does not grow", () => {
+  // Sixteen sites used to escape. Seven were inert — a presentation attribute
+  // under an always-present `data-mc-w`, which any CSS declaration outranks —
+  // and the rest are now on the ramp or on the base token. A stroke width may
+  // come from `--mc-sw`, from `--mc-stroke-width` (the density-exempt
+  // reference hairlines), or from geometry. Never from a literal.
+  it("no stroke width is a bare number", () => {
     const annotations = {
       path: "src/shared/annotations.tsx",
       text: readFileSync(resolve(root, "src/shared/annotations.tsx"), "utf8"),
     };
-    const found: Record<string, number> = {};
+    const offenders: string[] = [];
     for (const file of [...chartSources(), annotations]) {
       if (!file.path.endsWith(".tsx")) continue;
-      for (const line of stripComments(file.text).split("\n")) {
-        const m = /strokeWidth\s*[:=]\s*\{?\s*"?([^,;\n}"]+)/.exec(line);
-        if (!m) continue;
-        if (line.includes("var(--mc-sw)")) continue; // token, or a calc on it
-        const value = m[1]?.trim() ?? "";
-        if (/^(geo|rg|Math|[a-z]\w*\.)/.test(value)) continue; // geometry-derived
-        found[file.path] = (found[file.path] ?? 0) + 1;
-      }
+      stripComments(file.text)
+        .split("\n")
+        .forEach((line, i) => {
+          const m = /strokeWidth\s*[:=]\s*\{?\s*"?([^,;\n}"]+)/.exec(line);
+          if (!m) return;
+          if (/var\(--mc-sw\)|var\(--mc-stroke-width\)/.test(line)) return;
+          const value = m[1]?.trim() ?? "";
+          if (/^(geo|rg|Math|[a-z]\w*\.)/.test(value)) return; // geometry-derived
+          offenders.push(`${file.path}:${i + 1} = ${value}`);
+        });
     }
-    expect(found).toEqual(RAW_STROKE_WIDTH);
+    expect(offenders).toEqual([]);
+  });
+
+  // `data-mc-w` is the scale. Seventeen inline `calc(var(--mc-sw) * K)`
+  // multipliers used to sit above and between its steps with nine distinct
+  // values, so a preset could retune the ramp and miss every emphasis mark.
+  // Fifteen moved onto `heavy` (4/3) and `anchor` (3/2), which is where they
+  // clustered. One chart keeps a literal pair, and only because the RATIO is
+  // its encoding: collapsing 1.3/0.7 (1.86) onto heavy/support (2.0) would
+  // change what the reader is being told.
+  it("only a declared exception spells an inline stroke multiplier", () => {
+    const withMultiplier = chartSources()
+      .filter((f) => f.path.endsWith(".tsx"))
+      .filter((f) => /calc\(var\(--mc-sw\)\s*\*/.test(stripComments(f.text)))
+      .map((f) => f.path);
+    expect(withMultiplier).toEqual([
+      // The ×1.3 / ×0.7 pair IS DualWindowMeter's encoding: collapsing it onto
+      // heavy/support would move the ratio from 1.86 to 2.0 and change what the
+      // reader is told.
+      "src/charts/dual-window-meter/index.tsx",
+      // Slope's overlay overloads `data-mc-w` as a pin MARKER, so its width has
+      // to come from somewhere the role rule cannot reach.
+      "src/charts/slope/client.tsx",
+    ]);
   });
 });
 

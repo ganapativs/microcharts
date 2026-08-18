@@ -77,7 +77,7 @@ down.
   few hundred lines of pure functions, and the output is a handful of SVG nodes, typically six or fewer per chart.
 - **Zero runtime dependencies.** `dependencies: {}`, enforced by CI, forever. There is no transitive tree to resolve, to
   audit, or to carry in a lockfile.
-- **Integer geometry, crisp marks.** Coordinates are rounded at generation and most rectilinear marks use
+- **Integer geometry, crisp marks.** Coordinates are rounded at generation and square-cornered marks use
   `shape-rendering: crispEdges`, so the browser does less work rasterizing them.
 - **One stylesheet, one cascade layer.** Theming is CSS custom properties in a low-specificity `@layer`, not inline
   styles recomputed per instance.

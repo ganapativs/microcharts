@@ -134,7 +134,6 @@ export function PictogramRow(props: PictogramRowProps): ReactNode {
               y={round2(u.cy - u.r)}
               width={round2(u.r * 2)}
               height={round2(u.r * 2)}
-              shapeRendering="crispEdges"
               data-mc-ink={fillRole}
               style={fillStyle}
             />

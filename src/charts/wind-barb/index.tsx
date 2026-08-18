@@ -150,7 +150,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
             y2={geo.shaft.y2}
             data-mc-ink="data"
             strokeLinecap="round"
-            style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
+            data-mc-w="heavy"
           />
           {mode === "arrow" && arrowHead ? (
             <path
@@ -158,7 +158,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
               data-mc-ink="data"
               fill="none"
               strokeLinecap="round"
-              style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
+              data-mc-w="heavy"
             />
           ) : (
             <>
@@ -168,7 +168,7 @@ export function WindBarb(props: WindBarbProps): ReactNode {
                   data-mc-ink="data"
                   fill="none"
                   strokeLinecap="round"
-                  style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
+                  data-mc-w="heavy"
                 />
               ) : null}
               {/* One path, not one per pennant: the triangles carry identical

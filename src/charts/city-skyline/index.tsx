@@ -162,15 +162,7 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
       ) : null}
       {geo.buildings.map((b) =>
         b.h <= 0 ? null : (
-          <rect
-            key={`b${b.index}`}
-            x={b.x}
-            y={b.y}
-            width={b.w}
-            height={b.h}
-            shapeRendering="crispEdges"
-            data-mc-ink="bar"
-          />
+          <rect key={`b${b.index}`} x={b.x} y={b.y} width={b.w} height={b.h} data-mc-ink="bar" />
         ),
       )}
       {geo.buildings.map((b) =>

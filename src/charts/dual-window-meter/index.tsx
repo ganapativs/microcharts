@@ -216,7 +216,8 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           token, not width roles (those are for secondary strokes). BOTH traces
           need `non-scaling-stroke` or the ratio only holds at 1:1: the fast
           trace alone scaled with the box, so past ~1.9× it painted THICKER than
-          the slow one and the encoding read backwards. */}
+          the slow one and the encoding read backwards. Their ink roles put both
+          under the stylesheet's pin, so neither spells the attribute. */}
       <path
         d={geo.slowPath}
         data-mc-ink="data"
