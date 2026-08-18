@@ -46,9 +46,12 @@ describe("<DualWindowMeter>", () => {
   // scale-invariant: with only the slow one pinned, the fast trace overtook it
   // past ~1.9× and read as the sustained window.
   it("both traces hold their width ratio at any display scale", () => {
+    // Both widths are `calc(var(--mc-sw) * k)`, so both are token-width ink and
+    // styles.css pins them. What has to hold here is that neither trace loses
+    // its role and drops out of that rule.
     const { container } = draw(<DualWindowMeter data={NOISE} target={75} />);
-    for (const p of container.querySelectorAll("path"))
-      expect(p.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+    const roles = [...container.querySelectorAll("path")].map((p) => p.getAttribute("data-mc-ink"));
+    expect(roles.filter(Boolean).length).toBe(roles.length);
   });
 
   // Hostile CONFIG (not data): a target computed from an empty field arrives

@@ -61,6 +61,8 @@ describe("interactive <TreeRings>", () => {
   it("the halo's stroke is viewBox geometry, so it scales with the disc", async () => {
     // Its width IS the ring's own thickness; `non-scaling-stroke` pinned that to
     // screen pixels, so the halo stopped covering its ring at any zoom but 1:1.
+    // It carries `data-mc-w` for the pin marker, which the library-wide rule now
+    // keys on — so `.mc-ring-halo` is exempted back out in styles.css.
     const screen = await render(<TreeRings data={YEARS} selectedIndex={3} />);
     const halo = screen.container.querySelector('circle[data-mc-w="tick"]')!;
     expect(halo.getAttribute("vector-effect")).toBeNull();

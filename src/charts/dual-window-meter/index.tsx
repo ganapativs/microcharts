@@ -209,7 +209,6 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="tick"
           strokeDasharray="2 1.5"
-          vectorEffect="non-scaling-stroke"
         />
       )}
       {/* the ×1.3 / ×0.7 width pair IS the encoding (slow sustained = thick,
@@ -222,7 +221,6 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.slowPath}
         data-mc-ink="data"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.3)" }}
@@ -231,7 +229,6 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.fastPath}
         data-mc-ink="accent"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-sw) * 0.7)" }}

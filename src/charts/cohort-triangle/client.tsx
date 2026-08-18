@@ -190,7 +190,6 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         data-mc-active=""
         strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

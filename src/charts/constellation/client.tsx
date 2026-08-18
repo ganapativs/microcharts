@@ -259,7 +259,6 @@ export function Constellation(props: InteractiveConstellationProps): React.React
             fill="none"
             data-mc-active=""
             data-mc-w="full"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {activeStar ? (
@@ -270,7 +269,6 @@ export function Constellation(props: InteractiveConstellationProps): React.React
             fill="none"
             data-mc-active=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {rest.children}

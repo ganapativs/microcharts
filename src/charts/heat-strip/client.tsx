@@ -136,7 +136,6 @@ export function HeatStrip(props: InteractiveHeatStripProps): React.ReactNode {
         data-mc-active=""
         strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

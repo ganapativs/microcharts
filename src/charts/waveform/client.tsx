@@ -199,7 +199,6 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
             // in transit would not enclose. Placed by geometry attributes rather
             // than a transform, which is what makes it snap.
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {/* The crosshair tracks a continuum, so unlike the bucket outline above
@@ -214,7 +213,6 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
             data-mc-ink="muted"
             data-mc-ui=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${shownX}px)` }}
           />
         ) : null}

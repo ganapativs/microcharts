@@ -263,7 +263,6 @@ export function PercentileLadder(props: PercentileLadderProps): ReactNode {
         y2={geo.track.y}
         data-mc-ink="muted"
         data-mc-w="support"
-        vectorEffect="non-scaling-stroke"
       />
       {rendered.map((t) => {
         const tail = t.emphasis === k - 1;

@@ -214,7 +214,6 @@ export function GradedBand(props: GradedBandProps): ReactNode {
         x2={geo.median.x}
         y2={geo.bandY + geo.bandH + 0.5}
         data-mc-ink="data"
-        vectorEffect="non-scaling-stroke"
       />
       {geo.dot ? (
         // the observed value is a distinct hollow ring, never confused with the

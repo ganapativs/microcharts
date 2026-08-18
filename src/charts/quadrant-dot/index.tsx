@@ -169,7 +169,6 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="hair"
           strokeOpacity={0.5}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.cross.y !== null ? (
@@ -181,7 +180,6 @@ export function QuadrantDot(props: QuadrantDotProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="hair"
           strokeOpacity={0.5}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {/* Peers at 0.42 — ghost role's 0.18 is for area fills, too faint on dots.

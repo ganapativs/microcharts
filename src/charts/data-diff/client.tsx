@@ -183,7 +183,6 @@ export function DataDiff(props: InteractiveDataDiffProps): React.ReactNode {
         data-mc-active=""
         strokeWidth={0.8}
         data-mc-w={pinned ? "tick" : undefined}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

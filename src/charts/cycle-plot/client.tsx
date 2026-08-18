@@ -263,7 +263,6 @@ export function CyclePlot(props: InteractiveCyclePlotProps): React.ReactNode {
         }
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "hair"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

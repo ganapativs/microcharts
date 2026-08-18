@@ -151,7 +151,6 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
             fill="none"
             data-mc-active=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {/* Crosshair + value dot TRAVEL to the sample they name. `x1`/`x2` have
@@ -169,7 +168,6 @@ export function Horizon(props: InteractiveHorizonProps): React.ReactNode {
               data-mc-ui=""
               data-mc-w="support"
               style={{ transform: `translateX(${crossX}px)` }}
-              vectorEffect="non-scaling-stroke"
             />
             {isFiniteValue(value) ? (
               <circle

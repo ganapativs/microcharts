@@ -194,7 +194,6 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         data-mc-active=""
         strokeWidth={1.2}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

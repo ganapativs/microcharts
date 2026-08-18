@@ -227,15 +227,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
         summary={false}
       >
         {pin ? (
-          <circle
-            cx={pin.x}
-            cy={pin.y}
-            r={2.4}
-            fill="none"
-            data-mc-active=""
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={pin.x} cy={pin.y} r={2.4} fill="none" data-mc-active="" data-mc-w="tick" />
         ) : null}
         {p ? (
           <>
@@ -251,18 +243,9 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
               data-mc-ui=""
               data-mc-w="support"
               strokeDasharray="1.5 2"
-              vectorEffect="non-scaling-stroke"
               style={{ transform: `translateX(${p.x}px)` }}
             />
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={2.4}
-              fill="none"
-              data-mc-active=""
-              data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
-            />
+            <circle cx={p.x} cy={p.y} r={2.4} fill="none" data-mc-active="" data-mc-w="support" />
           </>
         ) : null}
         {rest.children}

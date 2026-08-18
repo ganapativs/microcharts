@@ -200,7 +200,6 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

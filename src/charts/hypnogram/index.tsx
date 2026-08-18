@@ -210,7 +210,6 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
           stroke="var(--mc-neutral)"
           strokeOpacity={0.16}
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {labels
@@ -265,7 +264,6 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
               stroke="var(--mc-neutral)"
               strokeOpacity={0.5}
               data-mc-w="tick"
-              vectorEffect="non-scaling-stroke"
             />
           ) : null}
           <path

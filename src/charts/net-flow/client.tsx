@@ -170,15 +170,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
         summary={false}
       >
         {sp ? (
-          <circle
-            cx={sp.x}
-            cy={sp.netY}
-            r={2.4}
-            fill="none"
-            data-mc-active=""
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={sp.x} cy={sp.netY} r={2.4} fill="none" data-mc-active="" data-mc-w="tick" />
         ) : null}
         {/* NOT tagged `data-mc-ui`: the crosshair's own `x1`/`x2` are read as
             its position by a guard test, so it cannot be zeroed and carried by
@@ -194,7 +186,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               stroke="var(--mc-neutral)"
               data-mc-w="support"
               strokeDasharray="1.5 2"
-              vectorEffect="non-scaling-stroke"
             />
             <circle
               cx={ap.x}
@@ -203,7 +194,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               fill="none"
               stroke="var(--mc-stroke)"
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
             <circle
               cx={ap.x}
@@ -212,7 +202,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               fill="none"
               stroke="var(--mc-stroke)"
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
             <circle
               cx={ap.x}
@@ -221,7 +210,6 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
               fill="none"
               stroke="var(--mc-stroke)"
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
           </>
         ) : null}

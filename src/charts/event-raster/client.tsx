@@ -286,7 +286,6 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${xOf(pinX)}px)` }}
           />
         ) : null}
@@ -300,7 +299,6 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
             data-mc-active=""
             strokeOpacity={0.5}
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {t !== undefined ? (
@@ -312,7 +310,6 @@ export function EventRaster(props: InteractiveEventRasterProps): React.ReactNode
             data-mc-ink="muted"
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${xOf(t)}px)` }}
           />
         ) : null}

@@ -168,7 +168,6 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y2={m.yL}
             stroke={stroke}
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />
         );
         if (mode === "candle") {
@@ -217,7 +216,6 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y2={m.yO}
             stroke={stroke}
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />,
           <line
             key={`c${m.index}`}
@@ -227,7 +225,6 @@ export function Ohlc(props: OhlcProps): ReactNode {
             y2={m.yC}
             stroke={stroke}
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />,
         ];
       })}

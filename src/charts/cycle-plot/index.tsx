@@ -180,7 +180,6 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
           stroke="var(--mc-neutral)"
           strokeOpacity={0.55}
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {spine && geo.spine.d ? (
@@ -190,7 +189,6 @@ export function CyclePlot(props: CyclePlotProps): ReactNode {
           fill="none"
           style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
           strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.slots.map((sl, i) =>

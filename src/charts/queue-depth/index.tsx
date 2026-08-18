@@ -223,7 +223,6 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="hair"
           strokeDasharray="2.5 2.5"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       <path
@@ -231,17 +230,10 @@ export function QueueDepth(props: QueueDepthProps): ReactNode {
         data-mc-ink="accent"
         data-mc-w="support"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         style={color ? { stroke: color } : undefined}
       />
       {geo.breach ? (
-        <path
-          d={geo.breach}
-          data-mc-ink="negative"
-          data-mc-w="full"
-          fill="none"
-          vectorEffect="non-scaling-stroke"
-        />
+        <path d={geo.breach} data-mc-ink="negative" data-mc-w="full" fill="none" />
       ) : null}
       <circle cx={end.x} cy={end.y} r={1.8} data-mc-ink={endInk} style={endStyle} />
       {showCap && geo.capLabelY !== null ? (

@@ -205,7 +205,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
                 strokeOpacity={0.6}
                 strokeDasharray="2 1.5"
                 data-mc-w="hair"
-                vectorEffect="non-scaling-stroke"
               />
             ) : null,
           )
@@ -221,7 +220,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
           style={{ stroke: accent }}
           strokeLinejoin="round"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.breaks.map((b) => (
@@ -234,7 +232,6 @@ export function ChangePoint(props: ChangePointProps): ReactNode {
             data-mc-ink="flag"
             strokeOpacity={0.75}
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
           <path
             d={`M${round2(b.x - 1.6)} 0 L${round2(b.x + 1.6)} 0 L${b.x} 2.2 Z`}

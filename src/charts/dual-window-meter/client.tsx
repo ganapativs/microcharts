@@ -191,7 +191,6 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${selX}px)` }}
           />
         ) : null}
@@ -204,7 +203,6 @@ export function DualWindowMeter(props: InteractiveDualWindowMeterProps): React.R
             data-mc-ink="muted"
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${shownX}px)` }}
           />
         ) : null}

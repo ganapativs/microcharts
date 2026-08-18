@@ -242,7 +242,6 @@ export function ABStrips(props: ABStripsProps): ReactNode {
         strokeOpacity={0.6}
         data-mc-w="tick"
         strokeDasharray="1.6 1.4"
-        vectorEffect="non-scaling-stroke"
       />
       {geo.rows.map((r, i) => {
         const isB = i === 1;

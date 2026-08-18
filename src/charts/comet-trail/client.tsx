@@ -44,7 +44,6 @@ const ring = (m: { cx: number; cy: number; r: number }, pinned: boolean) => (
     fill="none"
     data-mc-active=""
     data-mc-w={pinned ? "tick" : "support"}
-    vectorEffect="non-scaling-stroke"
   />
 );
 

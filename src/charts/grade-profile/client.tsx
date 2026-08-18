@@ -168,7 +168,6 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
           data-mc-active=""
           data-mc-ui=""
           data-mc-w={pinned ? "tick" : "full"}
-          vectorEffect="non-scaling-stroke"
         />
         <circle cx={s.x1} cy={s.y1} r={1.75} data-mc-ink="accent" data-mc-ui="" />
       </>

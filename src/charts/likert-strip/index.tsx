@@ -184,7 +184,6 @@ export function LikertStrip(props: LikertStripProps): ReactNode {
             data-mc-ink="muted"
             data-mc-w="support"
             strokeOpacity={0.6}
-            vectorEffect="non-scaling-stroke"
           />
           {geo.segments.map((s) =>
             s.width > 0 ? (

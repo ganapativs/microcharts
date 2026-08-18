@@ -319,12 +319,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               {...TONE_INK[z.tone]}
             />
           ))}
-          <path
-            d={geo.tickPath}
-            data-mc-ink="muted"
-            data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
-          />
+          <path d={geo.tickPath} data-mc-ink="muted" data-mc-w="hair" />
           {shownLabels.map((t, i) => (
             <text
               key={i}
@@ -368,7 +363,6 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
-              vectorEffect="non-scaling-stroke"
             />
           ) : null}
         </>
@@ -387,7 +381,6 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
           }
           data-mc-ink="muted"
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
           style={{ fill: "none", strokeOpacity: 0.55 }}
         />
       )}

@@ -152,7 +152,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           stroke="var(--mc-neutral)"
           strokeOpacity={0.5}
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.remaining ? (
@@ -163,7 +162,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           y2={geo.done.y + geo.done.height + 0.5}
           stroke="var(--mc-stroke)"
           data-mc-w="tick"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.overflow ? (
@@ -172,7 +170,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           fill="none"
           stroke="var(--mc-neutral)"
           data-mc-w="tick"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {etaText ? (

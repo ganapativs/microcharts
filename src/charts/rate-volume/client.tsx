@@ -201,19 +201,10 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
           data-mc-ui=""
           data-mc-w={w}
           strokeDasharray="1.5 2"
-          vectorEffect="non-scaling-stroke"
           style={{ transform: `translateX(${cx}px)` }}
         />
         {vp ? (
-          <circle
-            cx={vp.x}
-            cy={vp.y}
-            r={2.6}
-            fill="none"
-            data-mc-active=""
-            data-mc-w={w}
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={vp.x} cy={vp.y} r={2.6} fill="none" data-mc-active="" data-mc-w={w} />
         ) : null}
       </>
     );

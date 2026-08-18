@@ -202,7 +202,6 @@ export function EventTimeline(props: InteractiveEventTimelineProps): React.React
       fill="none"
       data-mc-active=""
       data-mc-w={isPinned ? "tick" : "support"}
-      vectorEffect="non-scaling-stroke"
     />
   );
 

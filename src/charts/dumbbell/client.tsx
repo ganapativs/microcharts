@@ -219,7 +219,6 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {row.x1 !== null ? (
@@ -231,7 +230,6 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
             data-mc-active=""
             strokeWidth={1.25}
             data-mc-w={wRole}
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
       </>

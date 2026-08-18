@@ -295,7 +295,6 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
         strokeLinejoin="round"
         strokeLinecap="round"
         data-mc-w={pinned ? "tick" : "full"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

@@ -170,7 +170,6 @@ export function VolumeProfile(props: InteractiveVolumeProfileProps): React.React
         data-mc-active=""
         strokeOpacity={0.6}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

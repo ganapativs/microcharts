@@ -177,7 +177,6 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         data-mc-active=""
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

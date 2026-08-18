@@ -183,7 +183,6 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "full"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

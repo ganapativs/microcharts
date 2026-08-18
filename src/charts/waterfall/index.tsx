@@ -182,7 +182,6 @@ export function Waterfall(props: WaterfallProps): ReactNode {
           data-mc-w="support"
           strokeOpacity={0.4}
           shapeRendering="crispEdges"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.bars.map((b) => (

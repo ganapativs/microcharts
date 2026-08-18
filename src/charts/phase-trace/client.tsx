@@ -172,19 +172,10 @@ export function PhaseTrace(props: InteractivePhaseTraceProps): React.ReactNode {
             fill="none"
             data-mc-active=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {pt ? (
-          <circle
-            cx={pt.x}
-            cy={pt.y}
-            r={2.4}
-            fill="none"
-            data-mc-active=""
-            data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={pt.x} cy={pt.y} r={2.4} fill="none" data-mc-active="" data-mc-w="support" />
         ) : null}
         {rest.children}
       </StaticPhaseTrace>

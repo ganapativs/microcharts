@@ -193,9 +193,7 @@ export function Sparkline(props: SparklineProps): ReactNode {
           style={fillStyle}
         />
       ) : null}
-      {d ? (
-        <path d={d} vectorEffect="non-scaling-stroke" data-mc-ink="data" style={strokeStyle} />
-      ) : null}
+      {d ? <path d={d} data-mc-ink="data" style={strokeStyle} /> : null}
       {showMinMax && geo.min && geo.max && geo.min.index !== geo.max.index ? (
         <>
           {/* Skip an extremum dot that coincides with the endpoint: the accent

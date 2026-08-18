@@ -166,7 +166,6 @@ export function Bullet(props: BulletProps): ReactNode {
           x2={geo.tick.x}
           y2={geo.tick.y1}
           data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
           style={{ strokeWidth: "calc(var(--mc-sw) * 1.33)" }}
         />
       ) : null}

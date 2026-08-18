@@ -152,7 +152,6 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
           style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
         />
       ) : null}
@@ -167,7 +166,6 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

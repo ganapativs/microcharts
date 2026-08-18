@@ -181,7 +181,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           strokeOpacity={0.28}
           strokeDasharray="1 2"
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ))}
       <line
@@ -193,15 +192,8 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
         strokeOpacity={0.6}
         strokeDasharray="2.5 2.5"
         data-mc-w="support"
-        vectorEffect="non-scaling-stroke"
       />
-      <path
-        d={geo.line.d}
-        data-mc-ink="data"
-        fill="none"
-        vectorEffect="non-scaling-stroke"
-        style={{ stroke: lineColor }}
-      />
+      <path d={geo.line.d} data-mc-ink="data" fill="none" style={{ stroke: lineColor }} />
       {geo.exhausted ? (
         // The exhaustion cross is ONE mark, so it is one path: two <line>s
         // repeated every attribute, and the entrance treated the two strokes as
@@ -211,7 +203,6 @@ export function ErrorBudget(props: ErrorBudgetProps): ReactNode {
           fill="none"
           data-mc-ink="flag"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
           style={{ stroke: "var(--mc-negative)" }}
         />
       ) : (

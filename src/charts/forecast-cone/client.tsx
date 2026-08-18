@@ -166,7 +166,6 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };
@@ -223,7 +222,6 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
             data-mc-w="support"
             strokeDasharray="1.5 2"
             style={{ transform: `translateX(${p.x}px)` }}
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {active !== null ? dot(active, false) : null}

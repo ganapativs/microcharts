@@ -190,15 +190,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     const w = pinned ? "tick" : "full";
     // The ring hugs the drawn unit, whatever its shape.
     return shape === "dot" ? (
-      <circle
-        cx={u.cx}
-        cy={u.cy}
-        r={u.r + 1}
-        fill="none"
-        data-mc-active=""
-        data-mc-w={w}
-        vectorEffect="non-scaling-stroke"
-      />
+      <circle cx={u.cx} cy={u.cy} r={u.r + 1} fill="none" data-mc-active="" data-mc-w={w} />
     ) : (
       <rect
         x={u.cx - u.r - 1}
@@ -208,7 +200,6 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
         fill="none"
         data-mc-active=""
         data-mc-w={w}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

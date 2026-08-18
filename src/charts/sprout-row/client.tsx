@@ -176,7 +176,6 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

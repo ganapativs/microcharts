@@ -154,7 +154,6 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         // than a transform, which is what makes it snap — see the scrub-response
         // rule in styles.css.
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

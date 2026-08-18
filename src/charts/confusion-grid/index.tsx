@@ -198,7 +198,6 @@ export function ConfusionGrid(props: ConfusionGridProps): ReactNode {
               stroke="var(--mc-accent)"
               data-mc-w="support"
               data-mc-ring="accent"
-              vectorEffect="non-scaling-stroke"
             />,
           );
         return nodes;

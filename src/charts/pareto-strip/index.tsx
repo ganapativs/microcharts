@@ -194,13 +194,7 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
         );
       })}
       {geo.line.d ? (
-        <path
-          d={geo.line.d}
-          data-mc-ink="muted"
-          data-mc-w="support"
-          fill="none"
-          vectorEffect="non-scaling-stroke"
-        />
+        <path d={geo.line.d} data-mc-ink="muted" data-mc-w="support" fill="none" />
       ) : null}
       {geo.thresholdY !== null ? (
         <line
@@ -212,7 +206,6 @@ export function ParetoStrip(props: ParetoStripProps): ReactNode {
           data-mc-w="hair"
           strokeOpacity={0.55}
           strokeDasharray="2 2"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.crossing !== null && geo.thresholdY !== null ? (

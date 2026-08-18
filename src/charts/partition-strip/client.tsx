@@ -177,7 +177,6 @@ export function PartitionStrip(props: InteractivePartitionStripProps): React.Rea
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

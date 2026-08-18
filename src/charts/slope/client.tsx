@@ -154,7 +154,6 @@ export function Slope(props: InteractiveSlopeProps): React.ReactNode {
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.5)" }}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

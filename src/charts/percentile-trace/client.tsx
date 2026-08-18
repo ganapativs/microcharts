@@ -202,7 +202,6 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
             fill="none"
             data-mc-active=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {/* Crosshair + focus ring TRAVEL to the reading they name. `x1`/`x2`
@@ -222,17 +221,8 @@ export function PercentileTrace(props: InteractivePercentileTraceProps): React.R
               data-mc-w="support"
               strokeDasharray="1.5 2"
               style={{ transform: `translateX(${p.x}px)` }}
-              vectorEffect="non-scaling-stroke"
             />
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={2.4}
-              fill="none"
-              data-mc-active=""
-              data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
-            />
+            <circle cx={p.x} cy={p.y} r={2.4} fill="none" data-mc-active="" data-mc-w="support" />
           </>
         ) : null}
         {rest.children}

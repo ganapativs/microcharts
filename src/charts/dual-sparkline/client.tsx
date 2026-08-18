@@ -187,7 +187,6 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {crossX !== undefined ? (
@@ -203,7 +202,6 @@ export function DualSparkline(props: InteractiveDualSparklineProps): React.React
               data-mc-ink="muted"
               data-mc-ui=""
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
               style={{ transform: `translateX(${crossX}px)` }}
             />
             {geo.primaryPoints[shown!] ? (

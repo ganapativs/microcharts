@@ -187,18 +187,12 @@ export function SpreadBand(props: SpreadBandProps): ReactNode {
               data-mc-ink="muted"
               data-mc-w="support"
               strokeDasharray="4 2"
-              vectorEffect="non-scaling-stroke"
             />
           ) : null}
         </>
       ) : null}
       {geo.subjectD ? (
-        <path
-          d={geo.subjectD}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={color ? { stroke: color } : undefined}
-        />
+        <path d={geo.subjectD} data-mc-ink="data" style={color ? { stroke: color } : undefined} />
       ) : null}
       {/* Keyed by position in the list, not by coordinate: past ~8k points the
           x step falls under the 2-dp rounding grid, so two adjacent crossings

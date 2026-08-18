@@ -162,7 +162,6 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
         strokeOpacity={0.7}
         strokeDasharray="2 1.5"
         data-mc-w="hair"
-        vectorEffect="non-scaling-stroke"
       />
       {/* Split at 50: below muted, above accent. */}
       {[
@@ -196,7 +195,6 @@ export function WinProbWorm(props: WinProbWormProps): ReactNode {
             data-mc-ink="muted"
             strokeOpacity={0.7}
             data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
           />
           <text
             x={swing.x}

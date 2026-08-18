@@ -244,7 +244,6 @@ export function QuantileDots(props: InteractiveQuantileDotsProps): React.ReactNo
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {rest.children}

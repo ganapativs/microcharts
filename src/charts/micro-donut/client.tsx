@@ -168,15 +168,7 @@ export function MicroDonut(props: InteractiveMicroDonutProps): React.ReactNode {
   const mark = (i: number, pinned: boolean) => {
     const w = geo.wedges[i];
     if (!w) return null;
-    return (
-      <path
-        d={w.d}
-        fill="none"
-        data-mc-active=""
-        data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
-      />
-    );
+    return <path d={w.d} fill="none" data-mc-active="" data-mc-w={pinned ? "tick" : "support"} />;
   };
 
   const shown = active ?? selected;

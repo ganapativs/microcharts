@@ -122,12 +122,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
       style={rootStyle}
     >
       {geo.d ? (
-        <path
-          d={geo.d}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={color ? { stroke: color } : undefined}
-        />
+        <path d={geo.d} data-mc-ink="data" style={color ? { stroke: color } : undefined} />
       ) : null}
       {/* Rank-change moments, plus the periods the line cannot reach: a period
           with gaps on both sides is a bare `M` in the step path, and SVG never

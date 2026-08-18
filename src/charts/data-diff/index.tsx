@@ -165,7 +165,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="hair"
         strokeOpacity={0.45}
-        vectorEffect="non-scaling-stroke"
       />
       {geo.rows.map((r) => (
         <g key={r.key}>

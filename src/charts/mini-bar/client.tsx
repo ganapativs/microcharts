@@ -155,15 +155,7 @@ export function MiniBar(props: InteractiveMiniBarProps): React.ReactNode {
       orientation === "vertical"
         ? { x: b.x - 0.5, y: -0.5, width: b.w + 1, height: height + 1 }
         : { x: -0.5, y: b.y - 0.5, width: width + 1, height: b.h + 1 };
-    return (
-      <rect
-        {...ring}
-        fill="none"
-        data-mc-active=""
-        data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
-      />
-    );
+    return <rect {...ring} fill="none" data-mc-active="" data-mc-w={pinned ? "tick" : "support"} />;
   };
 
   const shownBar = shown !== null ? geo.bars[shown] : undefined;

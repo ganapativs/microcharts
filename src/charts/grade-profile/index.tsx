@@ -138,7 +138,7 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
           data-mc-cat={seg.bin === 1 ? 1 : undefined}
         />
       ))}
-      <path d={geo.ridge} data-mc-ink="data" data-mc-w="full" vectorEffect="non-scaling-stroke" />
+      <path d={geo.ridge} data-mc-ink="data" data-mc-w="full" />
       {showLabel ? (
         <>
           <line
@@ -148,7 +148,6 @@ export function GradeProfile(props: GradeProfileProps): ReactNode {
             y2={geo.summitY}
             data-mc-ink="muted"
             data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
           />
           <text
             x={labelX}

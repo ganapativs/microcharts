@@ -172,7 +172,6 @@ export function StarSpoke(props: InteractiveStarSpokeProps): React.ReactNode {
           data-mc-active=""
           strokeLinecap="round"
           data-mc-w={pinned ? "tick" : "support"}
-          vectorEffect="non-scaling-stroke"
         />
         <circle cx={s.tx} cy={s.ty} r={Math.max(1, size * 0.05)} fill="var(--mc-accent)" />
       </>

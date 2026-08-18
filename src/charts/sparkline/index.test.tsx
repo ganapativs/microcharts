@@ -17,7 +17,9 @@ describe("<Sparkline> static structure", () => {
     expect(svg.classList.contains("mc-spark")).toBe(true);
     const path = container.querySelector('path[data-mc-ink="data"]')!;
     expect(path.getAttribute("d")!.startsWith("M")).toBe(true);
-    expect(path.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+    // The role is what makes the line scale-invariant: styles.css pins every
+    // token-width ink, so carrying the role IS carrying the pin.
+    expect(path.getAttribute("data-mc-ink")).toBe("data");
   });
 
   it("default dots='auto' → one accent endpoint dot, no min/max", () => {

@@ -127,7 +127,6 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           data-mc-w="hair"
           fill="none"
           strokeOpacity={0.18}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.trailPath ? (

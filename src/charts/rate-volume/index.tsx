@@ -187,14 +187,7 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
           />
         ) : null,
       )}
-      {geo.line.d ? (
-        <path
-          d={geo.line.d}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={{ stroke: lineColor }}
-        />
-      ) : null}
+      {geo.line.d ? <path d={geo.line.d} data-mc-ink="data" style={{ stroke: lineColor }} /> : null}
       {/* Low-n: hollow rings (shape, not color alone). */}
       {geo.points.map((p, i) =>
         p.low ? (
@@ -209,7 +202,6 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
             data-mc-ink="data"
             style={{ fill: "var(--mc-surface)", stroke: lineColor }}
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null,
       )}

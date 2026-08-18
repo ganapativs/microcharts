@@ -154,7 +154,6 @@ export function MicroBox(props: InteractiveMicroBoxProps): React.ReactNode {
         y2={height - 0.5}
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

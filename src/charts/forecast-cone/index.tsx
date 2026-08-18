@@ -199,7 +199,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           d={geo.history.d}
           data-mc-ink="data"
           fill="none"
-          vectorEffect="non-scaling-stroke"
           style={color ? { stroke: color } : undefined}
         />
       ) : null}
@@ -211,7 +210,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="hair"
         strokeOpacity={0.4}
-        vectorEffect="non-scaling-stroke"
       />
       {geo.now !== null ? (
         <circle cx={geo.boundary.x} cy={geo.boundary.y} r={1.6} data-mc-ink="point" />
@@ -234,7 +232,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
           data-mc-w="hair"
           strokeOpacity={0.6}
           strokeDasharray="1 1.5"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {showLabel ? (
