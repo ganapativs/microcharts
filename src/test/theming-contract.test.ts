@@ -267,15 +267,72 @@ describe("charts read the density-scaled stroke token", () => {
     // `--mc-sw` is `--mc-stroke-width * --mc-density`. Thirty inline
     // declarations across twenty charts reached for the base token and so opted
     // their PRIMARY mark out of `--mc-density` while every stroke around it
-    // scaled. A deliberate exemption reaches for the base token AND says why —
-    // the two annotation hairlines are the only ones, and they carry a comment.
+    // scaled. Nothing reaches for the base token now.
     const offenders: string[] = [];
     for (const file of chartSources()) {
       if (file.text.includes("var(--mc-stroke-width)")) offenders.push(file.path);
     }
     expect(offenders).toEqual([]);
   });
+
+  // The test above only catches the BASE TOKEN spelled out. A bare number
+  // escapes further: it reaches neither `--mc-density` nor
+  // `@media (prefers-contrast: more)`, which raises `--mc-stroke-width` 1.5 → 2
+  // for a reader who asked the OS for heavier contrast. Every mark below stays
+  // hairline for that reader while its neighbours thicken.
+  //
+  // The set is FROZEN rather than emptied, because clearing it changes rendered
+  // stroke weights and that is a visual decision, not a test's to make. Adding a
+  // new one fails here; removing one is a deliberate edit to this list.
+  const RAW_STROKE_WIDTH: Record<string, number> = {
+    // Interaction overlays. Not data ink, and `[data-mc-ui]` already governs
+    // their paint, so the weight is chrome rather than an encoded channel.
+    "src/charts/activity-grid/client.tsx": 1,
+    "src/charts/calendar-strip/client.tsx": 1,
+    "src/charts/cohort-triangle/client.tsx": 1,
+    "src/charts/confusion-grid/client.tsx": 1,
+    "src/charts/data-diff/client.tsx": 1,
+    "src/charts/garden-grid/client.tsx": 1,
+    "src/charts/heat-strip/client.tsx": 1,
+    "src/charts/dumbbell/client.tsx": 2,
+    // DATA marks — these are the ones that genuinely lose prefers-contrast.
+    "src/charts/dumbbell/index.tsx": 1,
+    "src/charts/thermometer/index.tsx": 1,
+    // Documented byte trade: the subpath is pinned at its cap and the token
+    // string costs ~20 B (see the comment at the site).
+    "src/charts/percentile-ladder/index.tsx": 1,
+    // Annotation hairlines. `chartSources()` does not reach `src/shared`, so
+    // these three sat outside every stroke guard: the Threshold and Marker
+    // rules carry a comment claiming exemption from `--mc-density`, and the
+    // Callout leader carries none at all.
+    "src/shared/annotations.tsx": 3,
+  };
+
+  it("the set of bare-number stroke widths does not grow", () => {
+    const annotations = {
+      path: "src/shared/annotations.tsx",
+      text: readFileSync(resolve(root, "src/shared/annotations.tsx"), "utf8"),
+    };
+    const found: Record<string, number> = {};
+    for (const file of [...chartSources(), annotations]) {
+      if (!file.path.endsWith(".tsx")) continue;
+      for (const line of stripComments(file.text).split("\n")) {
+        const m = /strokeWidth\s*[:=]\s*\{?\s*"?([^,;\n}"]+)/.exec(line);
+        if (!m) continue;
+        if (line.includes("var(--mc-sw)")) continue; // token, or a calc on it
+        const value = m[1]?.trim() ?? "";
+        if (/^(geo|rg|Math|[a-z]\w*\.)/.test(value)) continue; // geometry-derived
+        found[file.path] = (found[file.path] ?? 0) + 1;
+      }
+    }
+    expect(found).toEqual(RAW_STROKE_WIDTH);
+  });
 });
+
+/** Drop line and block comments so prose about a pattern never counts as it. */
+function stripComments(text: string): string {
+  return text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
 
 describe("the interaction overlay is a channel, not a hardcode", () => {
   // ~70 client entries drew their focus/selection mark as a literal

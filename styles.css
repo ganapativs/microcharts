@@ -1389,10 +1389,17 @@
   :where(.mc-spark-readout) {
     translate: 0 0;
     scale: 1;
+    /* `--mc-easing`, not a fourth literal. This spelled
+       `cubic-bezier(0.23, 1, 0.32, 1)` — a different published easeOutQuint
+       approximation from the token's `0.22, 1, 0.36, 1`. Sampled at 1000
+       points the two diverge by at most 1.1%, which on this chip's largest
+       animated quantity (a 2px translate) is 0.022px: nominal, not visible.
+       The cost was not the pixels, it was that a host retuning `--mc-easing`
+       retuned every chart transition except this one. */
     transition:
-      opacity 140ms cubic-bezier(0.23, 1, 0.32, 1),
-      translate 140ms cubic-bezier(0.23, 1, 0.32, 1),
-      scale 140ms cubic-bezier(0.23, 1, 0.32, 1);
+      opacity 140ms var(--mc-easing),
+      translate 140ms var(--mc-easing),
+      scale 140ms var(--mc-easing);
     @starting-style {
       opacity: 0;
       translate: 0 2px;
