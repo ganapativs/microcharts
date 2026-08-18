@@ -1,9 +1,9 @@
-// <WindBarb> — which way it's flowing and roughly how hard, in one character
-// Direction is the shaft
-// angle; magnitude is QUANTIZED into WMO barbs (that quantization is the honesty
-// — the per-barb quantum is stated next to every example). No interactive entry:
-// a single glyph has no meaningful pointer/keyboard interaction (the a11y name
-// carries the full reading).
+// <WindBarb> — which way it's flowing and roughly how hard, in one character.
+// Direction is the shaft angle; magnitude is QUANTIZED into WMO barbs (that
+// quantization is the honesty — the per-barb quantum is stated next to every
+// example). Interactivity lives in `./client`: it reports the reading on
+// hover/focus, but there is nothing to rove between, because the shaft is one
+// unit and the accessible name already carries the whole reading.
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";

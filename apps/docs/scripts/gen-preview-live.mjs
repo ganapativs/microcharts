@@ -7,8 +7,8 @@
  *
  * Every entry is a distinct `import("./<slug>.live")` string literal so Turbopack
  * code-splits one chunk per chart (an expression import would collapse them into
- * a single context module). Only slugs with a `<slug>.live.tsx` half appear —
- * the rest simply stay static (`wind-barb` ships no interactive entry at all).
+ * a single context module). Only slugs with a `<slug>.live.tsx` half appear; a
+ * chart without one would stay static in the gallery. Every chart ships one.
  *
  * Slugs are read from the `.live.tsx` files on disk rather than by loading the
  * registry: `registry.ts` now imports the STATIC halves (that is the whole point
