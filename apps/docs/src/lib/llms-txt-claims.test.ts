@@ -51,10 +51,46 @@ describe("llms.txt factual claims resolve against the catalog", () => {
   it("claims no removed prop is still current", () => {
     // `onPointFocus` / `onRunFocus` are named as REMOVED. If either reappeared
     // in the catalog the sentence would be telling agents to avoid a live prop.
-    const props = new Set(STABLE_CHARTS.flatMap((c) => c.sharedInteractive ?? []));
+    const props = new Set(STABLE_CHARTS.flatMap((c) => c.props.map((p) => p.name)));
     for (const gone of ["onPointFocus", "onRunFocus"]) {
       expect(body).toContain(gone);
       expect(props.has(gone), `${gone} is back in the catalog`).toBe(false);
+    }
+  });
+});
+
+describe("the ambient-loop rule stays true", () => {
+  // `/docs/motion` names the nine charts that take no entrance and says why:
+  // each runs a continuous ambient loop, and the loop is the motion. The rule
+  // was unwritten until now, which is how it read as an anomaly that CometTrail
+  // is both loop-driven and a unit picker — those are orthogonal.
+  const AMBIENT = [
+    "breathing-dot",
+    "comet-trail",
+    "dice-pips",
+    "heartbeat-blip",
+    "hourglass",
+    "moon-phase",
+    "orbit-status",
+    "tally-marks",
+    "token-confidence",
+  ];
+
+  it("exactly the documented charts opt out of the entrance", () => {
+    const optedOut = STABLE_CHARTS.filter((c) => c.animates === false)
+      .map((c) => c.slug)
+      .sort();
+    expect(optedOut).toEqual(AMBIENT);
+  });
+
+  it("the motion guide names every one of them", () => {
+    const motion = readFileSync(
+      resolve(import.meta.dirname, "../../content/docs/motion.mdx"),
+      "utf8",
+    );
+    const named = STABLE_CHARTS.filter((c) => AMBIENT.includes(c.slug)).map((c) => c.name);
+    for (const name of named) {
+      expect(motion, `${name} opts out of the entrance but the guide omits it`).toContain(name);
     }
   });
 });

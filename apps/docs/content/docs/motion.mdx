@@ -39,16 +39,21 @@ The entrance follows four rules:
   animate content the reader has seen. Only fresh client mounts play.
 - **Capped.** Staggers spend a fixed window regardless of how many marks share it, and a grid past 80 marks collapses to
   a single wipe instead of spawning one animation per cell.
+- **Not while something already moves.** Nine charts take no entrance: `TallyMarks`, `DicePips`, `MoonPhase`,
+  `Hourglass`, `BreathingDot`, `HeartbeatBlip`, `CometTrail`, `OrbitStatus`, and `TokenConfidence`. Each runs a
+  continuous ambient loop, and the loop is the motion — an entrance would start by fighting it. `CometTrail` is also a
+  unit picker, which is unrelated: you can hover a chart that is already moving.
 
-Duration, easing, and stagger are fixed per archetype and never derive from the data, so a bigger change does not get a
-slower entrance.
+Easing and stagger are fixed per archetype and never derive from the data, so a bigger change does not get a slower
+entrance. Duration is fixed relative to the other archetypes and scales with `--mc-duration`: set the token to `600ms`
+and every entrance takes twice as long, keeping the tuning between them.
 
 To see an entrance before wiring one, open any chart's docs page: the playground has an animate toggle on the charts
 that support it.
 
 ## What it costs
 
-`@microcharts/react/motion` measures **3.2 kB gzip**, paid once per bundle rather than per chart. The flag-handling code
+`@microcharts/react/motion` measures **3.3 kB gzip**, paid once per bundle rather than per chart. The flag-handling code
 inside each chart is a single hook that returns early when the engine is absent.
 
 ## When the data changes
