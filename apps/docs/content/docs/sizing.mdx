@@ -255,6 +255,9 @@ Scaling an SVG normally thickens or thins its lines. microcharts sets `vector-ef
 so a line drawn at 200 px and the same line at 800 px keep the **same visual stroke weight**: the geometry scales, the
 ink doesn't. Rectilinear marks also use `shape-rendering: crispEdges`, so bars and grids stay sharp at any size.
 
+Two marks scale their ink on purpose. A MicroDonut wedge and a ProgressRing arc are drawn as a stroke, so the band you
+see is their stroke weight, and it grows with the box like any other geometry.
+
 Stroke weight is a token: set `--mc-stroke-width` (see [Theming](/docs/theming)) to make it heavier or lighter,
 independent of how big the chart is.
 
