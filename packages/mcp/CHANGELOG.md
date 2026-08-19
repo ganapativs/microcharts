@@ -1,5 +1,18 @@
 # @microcharts/mcp
 
+## 0.1.16
+
+### Patch Changes
+
+- [#132](https://github.com/ganapativs/microcharts/pull/132)
+  [`0389185`](https://github.com/ganapativs/microcharts/commit/03891859521d32a8f1d28872214e378312738bcb) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Re-embeds the catalog and stylesheet after the stroke-token work in
+  `@microcharts/react`.
+
+- Updated dependencies
+  [[`0389185`](https://github.com/ganapativs/microcharts/commit/03891859521d32a8f1d28872214e378312738bcb)]:
+  - @microcharts/react@0.18.1
+
 ## 0.1.15
 
 ### Patch Changes

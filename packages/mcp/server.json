@@ -7,14 +7,14 @@
     "source": "github",
     "subfolder": "packages/mcp"
   },
-  "version": "0.1.15",
+  "version": "0.1.16",
   "websiteUrl": "https://microcharts.dev/docs/mcp",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "@microcharts/mcp",
-      "version": "0.1.15",
+      "version": "0.1.16",
       "transport": {
         "type": "stdio"
       }
