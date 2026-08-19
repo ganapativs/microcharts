@@ -150,7 +150,6 @@ export function Waveform(props: WaveformProps): ReactNode {
           data-mc-ink="muted"
           strokeOpacity={0.3}
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
 

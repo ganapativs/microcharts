@@ -207,7 +207,6 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="support"
         strokeOpacity={0.35}
-        vectorEffect="non-scaling-stroke"
       />
       {geo.spans.map((s) => {
         const it = items[s.i]!;
@@ -218,7 +217,6 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
             y={s.y}
             width={round2(Math.max(0.5, s.x1 - s.x0))}
             height={s.h}
-            shapeRendering="crispEdges"
             data-mc-ink={KIND_INK[it.kind]}
             fillOpacity={0.7}
           />
@@ -266,7 +264,6 @@ export function EventTimeline(props: EventTimelineProps): ReactNode {
           y2={height}
           data-mc-ink="accent"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

@@ -165,6 +165,7 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     if (!rg || rg.rOuter <= rg.rInner) return null;
     return (
       <circle
+        className="mc-ring-halo"
         cx={geo.center.cx}
         cy={geo.center.cy}
         r={(rg.rInner + rg.rOuter) / 2}
@@ -178,7 +179,9 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
         // No `non-scaling-stroke` either, for the same reason: this width is
         // viewBox geometry, so pinning it to screen pixels made the halo stop
         // covering its ring the moment the chart was rendered at anything other
-        // than 1:1. The width roles the sibling dials use are not geometry.
+        // than 1:1. The width roles the sibling dials use are not geometry —
+        // which is why `data-mc-w` above now pins ink library-wide, and why
+        // `.mc-ring-halo` is one of the three marks the stylesheet exempts.
         //
         // The overlay wash is off here, and this is the one chart where that is
         // structural rather than taste: the halo is a CIRCLE whose stroke spans

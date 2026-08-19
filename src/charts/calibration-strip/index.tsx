@@ -121,7 +121,6 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="tick"
         strokeDasharray="2 1.5"
-        vectorEffect="non-scaling-stroke"
       />
 
       {mode === "bars"
@@ -143,7 +142,6 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                   strokeWidth: "var(--mc-sw)",
                   ...(color ? { stroke: color } : null),
                 }}
-                vectorEffect="non-scaling-stroke"
               />
             );
           })
@@ -163,7 +161,6 @@ export function CalibrationStrip(props: CalibrationStripProps): ReactNode {
                 style={{ stroke: color ?? "var(--mc-accent)" }}
                 strokeOpacity={0.5}
                 data-mc-w="support"
-                vectorEffect="non-scaling-stroke"
               />
             ) : (
               <circle

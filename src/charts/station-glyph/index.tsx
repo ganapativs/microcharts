@@ -183,7 +183,6 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
             data-mc-ink="data"
             fill="none"
             strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
           />
           {barb.pennants.map((p, i) => (
             <path key={i} d={p} data-mc-ink="point" />
@@ -196,7 +195,6 @@ export function StationGlyph(props: StationGlyphProps): ReactNode {
         cy={geo.disc.cy}
         r={geo.disc.r}
         data-mc-ink="data"
-        vectorEffect="non-scaling-stroke"
         style={{ fill: "var(--mc-surface)" }}
       />
       {geo.cloudPath ? <path d={geo.cloudPath} data-mc-ink="accent" /> : null}

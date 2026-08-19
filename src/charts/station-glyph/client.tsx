@@ -234,7 +234,6 @@ export function StationGlyph(props: InteractiveStationGlyphProps): React.ReactNo
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

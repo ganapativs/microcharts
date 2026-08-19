@@ -36,6 +36,20 @@ const DUR: Record<EntranceArchetype, number> = {
 // or real x/y positions). The window is the whole sequence's span.
 const TRAIL_WINDOW = 380;
 
+// `--mc-duration` is the package's motion token, and until now it reached only
+// CSS transitions: every duration above is a JS literal, so a host that slowed
+// the token down got slower hovers and identically-fast entrances. The token
+// SCALES these rather than replacing them, because the numbers above are tuned
+// against each other on purpose (`scan` is slow because you watch it fill), and
+// one flat value would erase that. Read once per run, inside the observer
+// callback where a style read is already cheap.
+const durationScale = (el: Element): number => {
+  const v = getComputedStyle(el).getPropertyValue("--mc-duration");
+  const n = Number.parseFloat(v);
+  // 300 is the token's own default, so an untouched theme scales by exactly 1.
+  return n > 0 ? (v.includes("ms") ? n : n * 1e3) / 300 : 1;
+};
+
 // Progress-class reveals (a line drawing, a clip sweeping) are constant-rate
 // motion: a strong ease-out tail makes them sprint then crawl — the "stuck
 // mid-line" feel. They get an even easeOutCubic; pops/rises keep the punchy
@@ -306,9 +320,10 @@ export function runEntrance(
       marks = [];
     }
     const ease = EASE[kind];
-    const dur = DUR[kind];
+    const scale = durationScale(svg);
+    const dur = DUR[kind] * scale;
     const wholeSvgFinal = WHOLE_SVG.has(kind);
-    const storyStart = wholeSvgFinal ? 0 : BEAT;
+    const storyStart = wholeSvgFinal ? 0 : BEAT * scale;
     svg.style.opacity = "";
 
     // Stage / story / voice / link cast
@@ -348,7 +363,7 @@ export function runEntrance(
     const n = marks.length;
     // Sequential choreography: an explicit order (or the trail archetype)
     // spreads the marks across a window along the chart's own geometry.
-    const win = options.window ?? (kind === "trail" ? TRAIL_WINDOW : 300);
+    const win = (options.window ?? (kind === "trail" ? TRAIL_WINDOW : 300)) * scale;
     const norms =
       (options.order && !front) || kind === "trail"
         ? orderNorm(marks, options.order ?? "index")

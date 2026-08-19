@@ -147,7 +147,6 @@ export function DepthWedge(props: DepthWedgeProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="support"
         strokeDasharray="1.5 1.5"
-        vectorEffect="non-scaling-stroke"
       />
       {showSpread ? (
         <text

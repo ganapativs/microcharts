@@ -227,13 +227,7 @@ export function PercentileTrace(props: PercentileTraceProps): ReactNode {
             />
           ))
         : null}
-      <path
-        d={geo.line.d}
-        data-mc-ink="data"
-        fill="none"
-        vectorEffect="non-scaling-stroke"
-        style={{ stroke: lineColor }}
-      />
+      <path d={geo.line.d} data-mc-ink="data" fill="none" style={{ stroke: lineColor }} />
       <circle
         cx={geo.last.x}
         cy={geo.last.y}

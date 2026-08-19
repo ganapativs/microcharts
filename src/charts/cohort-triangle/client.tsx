@@ -188,9 +188,7 @@ export function CohortTriangle(props: InteractiveCohortTriangleProps): React.Rea
         rx={1.5}
         fill="none"
         data-mc-active=""
-        strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

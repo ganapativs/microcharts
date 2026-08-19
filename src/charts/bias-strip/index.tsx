@@ -136,7 +136,6 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="hair"
         strokeDasharray="2 2"
-        vectorEffect="non-scaling-stroke"
       />
       {geo.biasY !== null ? (
         <line
@@ -146,7 +145,6 @@ export function BiasStrip(props: BiasStripProps): ReactNode {
           y2={geo.biasY}
           data-mc-ink="accent"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.dots.map(({ x, y, index, outside }) => (

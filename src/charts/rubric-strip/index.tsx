@@ -206,7 +206,6 @@ export function RubricStrip(props: RubricStripProps): ReactNode {
           data-mc-ink="data"
           data-mc-w="tick"
           strokeDasharray="1.5 1.5"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

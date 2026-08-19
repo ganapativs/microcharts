@@ -180,7 +180,6 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
                 y={p.refRect.y}
                 width={p.refRect.w}
                 height={p.refRect.h}
-                shapeRendering="crispEdges"
                 data-mc-ink="neutral"
                 fillOpacity={0.55}
               />
@@ -191,7 +190,6 @@ export function PairedBars(props: PairedBarsProps): ReactNode {
                 y={p.valueRect.y}
                 width={p.valueRect.w}
                 height={p.valueRect.h}
-                shapeRendering="crispEdges"
                 data-mc-ink={valueInk}
                 data-mc-origin={origin}
                 // `color` repaints only the NEUTRAL bar. With `positive` set,

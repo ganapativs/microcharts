@@ -211,28 +211,10 @@ export function Dumbbell(props: InteractiveDumbbellProps): React.ReactNode {
     return (
       <>
         {row.x0 !== null ? (
-          <circle
-            cx={row.x0}
-            cy={row.y}
-            r={3.25}
-            fill="none"
-            data-mc-active=""
-            strokeWidth={1.25}
-            data-mc-w={wRole}
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={row.x0} cy={row.y} r={3.25} fill="none" data-mc-active="" data-mc-w={wRole} />
         ) : null}
         {row.x1 !== null ? (
-          <circle
-            cx={row.x1}
-            cy={row.y}
-            r={3.25}
-            fill="none"
-            data-mc-active=""
-            strokeWidth={1.25}
-            data-mc-w={wRole}
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={row.x1} cy={row.y} r={3.25} fill="none" data-mc-active="" data-mc-w={wRole} />
         ) : null}
       </>
     );

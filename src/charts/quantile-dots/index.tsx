@@ -177,7 +177,6 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="tick"
           strokeOpacity={0.6}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {/* Past threshold: accent + ring (not color alone). */}
@@ -191,7 +190,6 @@ export function QuantileDots(props: QuantileDotsProps): ReactNode {
             data-mc-ink="flag"
             stroke="var(--mc-stroke)"
             data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
             style={color ? { fill: color } : undefined}
           />
         ) : null,

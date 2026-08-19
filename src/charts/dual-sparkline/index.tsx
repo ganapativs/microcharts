@@ -178,21 +178,10 @@ export function DualSparkline(props: DualSparklineProps): ReactNode {
       ) : null}
       {ann.under}
       {geo.dCompare ? (
-        <path
-          d={geo.dCompare}
-          data-mc-ink="muted"
-          data-mc-w="support"
-          strokeDasharray="4 2"
-          vectorEffect="non-scaling-stroke"
-        />
+        <path d={geo.dCompare} data-mc-ink="muted" data-mc-w="support" strokeDasharray="4 2" />
       ) : null}
       {geo.dPrimary ? (
-        <path
-          d={geo.dPrimary}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={color ? { stroke: color } : undefined}
-        />
+        <path d={geo.dPrimary} data-mc-ink="data" style={color ? { stroke: color } : undefined} />
       ) : null}
       {/* `neutral` (a filled no-valence mark), not `muted` + an inline fill:
           `muted` is fill:none/stroke, so the inline fill was papering over the

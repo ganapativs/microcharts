@@ -79,9 +79,15 @@ describe("<StreakSpark> static structure", () => {
     expect(container.querySelector('path[data-mc-ink="point"]')).toBeNull();
   });
 
-  it("rects use crispEdges", () => {
+  it("bars are square-cornered, so the stylesheet rasterizes them on the grid", () => {
+    // `shape-rendering: crispEdges` moved out of the markup and onto
+    // `rect:not([rx])` in styles.css, which covers every square rect in the
+    // catalog instead of the 133 that remembered the attribute. What this chart
+    // has to keep is the square corner that opts it in.
     const { container } = draw(<StreakSpark data={D} />);
-    expect(container.querySelector("rect")!.getAttribute("shape-rendering")).toBe("crispEdges");
+    const rect = container.querySelector("rect")!;
+    expect(rect.getAttribute("rx")).toBeNull();
+    expect(rect.getAttribute("shape-rendering")).toBeNull();
   });
 
   it("current count label seats at a legible height", () => {

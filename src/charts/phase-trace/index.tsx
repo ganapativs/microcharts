@@ -127,7 +127,6 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           data-mc-w="hair"
           fill="none"
           strokeOpacity={0.18}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.trailPath ? (
@@ -148,7 +147,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           stroke="var(--mc-accent)"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
+          data-mc-w="heavy"
         />
       ) : null}
       {/* A filled neutral dot, so it takes the FILLED neutral role rather than
@@ -164,7 +163,7 @@ export function PhaseTrace(props: PhaseTraceProps): ReactNode {
           fill="none"
           stroke="var(--mc-accent)"
           strokeLinecap="round"
-          style={{ strokeWidth: "calc(var(--mc-sw) * 1.1)" }}
+          data-mc-w="full"
         />
       ) : null}
       {/* "Now": the same flag role the arrowhead carries, so the accent comes

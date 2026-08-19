@@ -158,8 +158,12 @@ export function Threshold(_props: ThresholdProps): ReactNode {
           strokeOpacity={0.7}
           strokeDasharray="2 2"
           vectorEffect="non-scaling-stroke"
-          // reference hairline: fixed 1-unit ink, deliberately exempt from --mc-density
-          style={{ strokeWidth: 1 }}
+          // reference hairline: 1 unit at the default theme. Deliberately exempt
+          // from --mc-density (a reference line should not fatten in a dense
+          // table), so it reaches for the BASE token rather than `--mc-sw` —
+          // which still lets `prefers-contrast: more` raise it with the data ink
+          // instead of leaving it hairline for the reader who asked for weight.
+          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 2 / 3)" }}
         />
         {p.label ? (
           <text
@@ -241,8 +245,12 @@ export function Marker(_props: MarkerProps): ReactNode {
           stroke={p.color ?? "var(--mc-neutral)"}
           strokeOpacity={0.7}
           vectorEffect="non-scaling-stroke"
-          // reference hairline: fixed 1-unit ink, deliberately exempt from --mc-density
-          style={{ strokeWidth: 1 }}
+          // reference hairline: 1 unit at the default theme. Deliberately exempt
+          // from --mc-density (a reference line should not fatten in a dense
+          // table), so it reaches for the BASE token rather than `--mc-sw` —
+          // which still lets `prefers-contrast: more` raise it with the data ink
+          // instead of leaving it hairline for the reader who asked for weight.
+          style={{ strokeWidth: "calc(var(--mc-stroke-width) * 2 / 3)" }}
         />
         {p.label
           ? (() => {
@@ -344,7 +352,9 @@ export function Callout(_props: CalloutProps): ReactNode {
           stroke={p.color ?? "var(--mc-neutral)"}
           strokeOpacity={0.7}
           vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: 0.75 }}
+          // The leader is lighter than a reference hairline and follows the same
+          // rule: base token, so density leaves it alone and contrast does not.
+          style={{ strokeWidth: "calc(var(--mc-stroke-width) / 2)" }}
         />
         <text
           x={tx}

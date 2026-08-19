@@ -185,7 +185,6 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
           width={geo.ellipsis.width}
           height={geo.ellipsis.height}
           data-mc-ink="gap"
-          shapeRendering="crispEdges"
         />
       ) : null}
       {geo.runs.map((run) => {
@@ -199,7 +198,6 @@ export function StreakSpark(props: StreakSparkProps): ReactNode {
             height={run.height}
             data-mc-ink={ink}
             fillOpacity={run.current ? undefined : run.on ? 0.45 : 0.8}
-            shapeRendering="crispEdges"
             style={color && run.current ? { fill: color } : undefined}
           />
         );

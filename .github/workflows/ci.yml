@@ -33,9 +33,13 @@ jobs:
       #         never leak a non-finite number into markup.
       # floor:  every chart stays legible down to half its default size — no
       #         overlapping or spilled labels at ordinary in-product sizes.
+      # ink-scale: a stroke sized from `--mc-sw` holds its weight at any render
+      #         scale. The pin lives in styles.css, so this fails a mark that
+      #         strokes token-width ink without a role the rule can key on.
       - run: pnpm craft
       - run: pnpm robust
       - run: pnpm floor
+      - run: pnpm ink-scale
       - run: pnpm knip
       # EVERY committed generated artifact — size limits, the size-diff baseline,
       # the docs size/bench numbers, the docs registry snapshots, the MCP catalog

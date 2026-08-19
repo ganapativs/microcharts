@@ -127,16 +127,10 @@ export function Seismogram(props: SeismogramProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="tick"
           strokeOpacity={0.4}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.dData !== "" ? (
-        <path
-          d={geo.dData}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={baseStroke ?? undefined}
-        />
+        <path d={geo.dData} data-mc-ink="data" style={baseStroke ?? undefined} />
       ) : null}
       {geo.dPos !== "" ? (
         <path
@@ -171,7 +165,6 @@ export function Seismogram(props: SeismogramProps): ReactNode {
           data-mc-ink="negative"
           data-mc-w="full"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

@@ -88,8 +88,12 @@ export function EtaBar(props: EtaBarProps): ReactNode {
 
   // preliminary geometry to know remaining time for the label
   const pre = etaBarGeometry({ progress, elapsed, rate: rate ?? null, width, height });
+  // `height < 9` used to gate this, which put the label one unit out of reach at
+  // EtaBar's own default box (80x8) — the prop was accepted and silently did
+  // nothing. `labelFont(8, 0.62)` returns the 7-unit floor and the band seats it,
+  // so the shared machinery was ready and only this literal said no.
   const etaText =
-    label === "none" || height < 9
+    label === "none" || fontSize <= 0
       ? undefined
       : label === "percent"
         ? makePercentFormatter(locale)(p)
@@ -152,7 +156,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           stroke="var(--mc-neutral)"
           strokeOpacity={0.5}
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.remaining ? (
@@ -163,7 +166,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           y2={geo.done.y + geo.done.height + 0.5}
           stroke="var(--mc-stroke)"
           data-mc-w="tick"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.overflow ? (
@@ -172,7 +174,6 @@ export function EtaBar(props: EtaBarProps): ReactNode {
           fill="none"
           stroke="var(--mc-neutral)"
           data-mc-w="tick"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {etaText ? (

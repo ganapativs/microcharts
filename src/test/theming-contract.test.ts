@@ -267,15 +267,75 @@ describe("charts read the density-scaled stroke token", () => {
     // `--mc-sw` is `--mc-stroke-width * --mc-density`. Thirty inline
     // declarations across twenty charts reached for the base token and so opted
     // their PRIMARY mark out of `--mc-density` while every stroke around it
-    // scaled. A deliberate exemption reaches for the base token AND says why —
-    // the two annotation hairlines are the only ones, and they carry a comment.
+    // scaled. Nothing reaches for the base token now.
     const offenders: string[] = [];
     for (const file of chartSources()) {
       if (file.text.includes("var(--mc-stroke-width)")) offenders.push(file.path);
     }
     expect(offenders).toEqual([]);
   });
+
+  // The test above only catches the BASE TOKEN spelled out. A bare number
+  // escapes further: it reaches neither `--mc-density` nor
+  // `@media (prefers-contrast: more)`, which raises `--mc-stroke-width` 1.5 → 2
+  // for a reader who asked the OS for heavier contrast. Such a mark stays
+  // hairline for that reader while every stroke around it thickens.
+  //
+  // Sixteen sites used to escape. Seven were inert — a presentation attribute
+  // under an always-present `data-mc-w`, which any CSS declaration outranks —
+  // and the rest are now on the ramp or on the base token. A stroke width may
+  // come from `--mc-sw`, from `--mc-stroke-width` (the density-exempt
+  // reference hairlines), or from geometry. Never from a literal.
+  it("no stroke width is a bare number", () => {
+    const annotations = {
+      path: "src/shared/annotations.tsx",
+      text: readFileSync(resolve(root, "src/shared/annotations.tsx"), "utf8"),
+    };
+    const offenders: string[] = [];
+    for (const file of [...chartSources(), annotations]) {
+      if (!file.path.endsWith(".tsx")) continue;
+      stripComments(file.text)
+        .split("\n")
+        .forEach((line, i) => {
+          const m = /strokeWidth\s*[:=]\s*\{?\s*"?([^,;\n}"]+)/.exec(line);
+          if (!m) return;
+          if (/var\(--mc-sw\)|var\(--mc-stroke-width\)/.test(line)) return;
+          const value = m[1]?.trim() ?? "";
+          if (/^(geo|rg|Math|[a-z]\w*\.)/.test(value)) return; // geometry-derived
+          offenders.push(`${file.path}:${i + 1} = ${value}`);
+        });
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  // `data-mc-w` is the scale. Seventeen inline `calc(var(--mc-sw) * K)`
+  // multipliers used to sit above and between its steps with nine distinct
+  // values, so a preset could retune the ramp and miss every emphasis mark.
+  // Fifteen moved onto `heavy` (4/3) and `anchor` (3/2), which is where they
+  // clustered. One chart keeps a literal pair, and only because the RATIO is
+  // its encoding: collapsing 1.3/0.7 (1.86) onto heavy/support (2.0) would
+  // change what the reader is being told.
+  it("only a declared exception spells an inline stroke multiplier", () => {
+    const withMultiplier = chartSources()
+      .filter((f) => f.path.endsWith(".tsx"))
+      .filter((f) => /calc\(var\(--mc-sw\)\s*\*/.test(stripComments(f.text)))
+      .map((f) => f.path);
+    expect(withMultiplier).toEqual([
+      // The ×1.3 / ×0.7 pair IS DualWindowMeter's encoding: collapsing it onto
+      // heavy/support would move the ratio from 1.86 to 2.0 and change what the
+      // reader is told.
+      "src/charts/dual-window-meter/index.tsx",
+      // Slope's overlay overloads `data-mc-w` as a pin MARKER, so its width has
+      // to come from somewhere the role rule cannot reach.
+      "src/charts/slope/client.tsx",
+    ]);
+  });
 });
+
+/** Drop line and block comments so prose about a pattern never counts as it. */
+function stripComments(text: string): string {
+  return text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/[^\n]*/g, "$1");
+}
 
 describe("the interaction overlay is a channel, not a hardcode", () => {
   // ~70 client entries drew their focus/selection mark as a literal
@@ -401,21 +461,71 @@ describe("animated marks stay inside the viewBox", () => {
 });
 
 describe("primary stroked marks are scale-invariant", () => {
-  it('every stroked [data-mc-ink="data"] mark carries non-scaling-stroke', () => {
-    // The responsiveness model is `viewBox` + `preserveAspectRatio` +
-    // `vector-effect: non-scaling-stroke` — there is no `ResizeObserver` and no
-    // CSS default for the vector-effect, so a mark that omits the attribute
-    // THICKENS with its container. Every interactive entry spreads `FILL`
-    // (`width: 100%`), so those charts thicken with the host, and the same chart
-    // reads at two different weights in a table cell and in a figure.
+  // The responsiveness model is `viewBox` + `preserveAspectRatio` +
+  // `vector-effect: non-scaling-stroke`, and there is no `ResizeObserver`. Every
+  // interactive entry spreads `FILL` (`width: 100%`), so an unpinned stroke
+  // THICKENS with its host and the same chart reads at two weights in a table
+  // cell and in a figure.
+  //
+  // This used to require the ATTRIBUTE on every `data-mc-ink="data"` mark, which
+  // asked 106 charts to remember it — 39 missed at least one, and 14 pinned some
+  // marks and not others, so a single chart held a hairline on its line while its
+  // own baseline thickened. The pin now lives in `styles.css`, keyed on where the
+  // stroke-width comes from, so these assert the RULE rather than 222 copies of
+  // an attribute.
+  it("styles.css pins every token-width ink role", () => {
+    const rule = css.slice(css.indexOf("Ink holds its weight at any render scale"));
+    const decl = rule.slice(
+      0,
+      rule.indexOf("}", rule.indexOf("vector-effect: non-scaling-stroke")),
+    );
+    for (const sel of [
+      "[data-mc-w]",
+      '[data-mc-ink="data"]',
+      '[data-mc-ink="muted"]',
+      '[data-mc-ink="unit-off"]',
+      '[data-mc-ink="gap"]',
+      '[data-mc-ink="accent"]',
+      '[data-mc-ink="positive"]',
+      '[data-mc-ink="negative"]',
+      '[data-mc-ink="ghost"]',
+      '[data-mc-ink="flag"]',
+    ]) {
+      expect(decl, `the pin rule no longer covers ${sel}`).toContain(sel);
+    }
+    expect(decl).toContain("vector-effect: non-scaling-stroke");
+  });
+
+  it("exactly three marks are exempt, because their stroke-width IS the encoding", () => {
+    // Widening this list means a mark grows with its box on purpose. That is a
+    // design decision (the donut's band, the ring halo's span), not a default.
+    const at = css.indexOf("vector-effect: none");
+    expect(at, "the geometry-width exemption rule is gone").toBeGreaterThan(-1);
+    const sel = css.slice(css.lastIndexOf(":where(", at), at);
+    expect(sel).toContain("mc-donut-wedge");
+    expect(sel).toContain("mc-ring-halo");
+    expect(sel).toContain('.mc-ring path[data-mc-ink="accent"]');
+    expect(css.split("vector-effect: none").length - 1).toBe(1);
+  });
+
+  it("no chart re-spells the attribute on a mark the rule already covers", () => {
+    // Drift guard, and a byte guard: every subpath is measured standalone, so a
+    // re-spelled attribute is paid for once per chart that spells it.
+    const COVERED = ["data", "muted", "unit-off", "gap"];
+    const OPEN_ONLY = ["accent", "positive", "negative", "ghost", "flag"];
     const offenders: string[] = [];
     for (const { path, text } of chartSources()) {
       if (!path.endsWith(".tsx")) continue;
-      for (const el of jsxElements(text, /<(path|line|polyline|polygon)\b/g)) {
-        if (!el.source.includes('data-mc-ink="data"')) continue;
-        if (!el.source.includes("non-scaling-stroke")) {
-          offenders.push(`${path}:${el.line} <${el.tag}>`);
-        }
+      for (const el of jsxElements(text, /<(path|line|polyline|polygon|circle|rect|ellipse)\b/g)) {
+        if (!el.source.includes('vectorEffect="non-scaling-stroke"')) continue;
+        if (/data-mc-ink=\{/.test(el.source)) continue; // role decided at runtime
+        const ink = /data-mc-ink="([a-z-]+)"/.exec(el.source)?.[1];
+        const open = ["path", "line", "polyline"].includes(el.tag);
+        const covered =
+          /data-mc-w[=\s]/.test(el.source) ||
+          (ink !== undefined && COVERED.includes(ink)) ||
+          (ink !== undefined && OPEN_ONLY.includes(ink) && open);
+        if (covered) offenders.push(`${path}:${el.line} <${el.tag}>`);
       }
     }
     expect(offenders).toEqual([]);

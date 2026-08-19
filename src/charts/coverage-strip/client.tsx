@@ -160,7 +160,6 @@ export function CoverageStrip(props: InteractiveCoverageStripProps): React.React
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

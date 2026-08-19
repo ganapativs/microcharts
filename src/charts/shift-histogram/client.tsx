@@ -232,7 +232,6 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

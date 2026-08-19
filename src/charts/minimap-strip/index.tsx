@@ -141,7 +141,6 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
             strokeOpacity={0.4}
             data-mc-ink="muted"
             data-mc-w="hair"
-            vectorEffect="non-scaling-stroke"
           />
         </>
       ) : null}
@@ -178,7 +177,6 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
           data-mc-ink="accent"
           data-mc-w="support"
           fill="none"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
 
@@ -195,7 +193,6 @@ export function MinimapStrip(props: MinimapStripProps): ReactNode {
         stroke="var(--mc-accent)"
         strokeDasharray={geo.windowKnown ? undefined : "2 2"}
         data-mc-w="support"
-        vectorEffect="non-scaling-stroke"
       />
       {children}
     </Chart>

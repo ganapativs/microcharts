@@ -165,7 +165,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="hair"
         strokeOpacity={0.45}
-        vectorEffect="non-scaling-stroke"
       />
       {geo.rows.map((r) => (
         <g key={r.key}>
@@ -176,7 +175,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               width={r.removed.width}
               height={r.height}
               data-mc-ink="negative"
-              shapeRendering="crispEdges"
             />
           ) : null}
           {r.added.width > 0 ? (
@@ -186,7 +184,6 @@ export function DataDiff(props: DataDiffProps): ReactNode {
               width={r.added.width}
               height={r.height}
               data-mc-ink="positive"
-              shapeRendering="crispEdges"
             />
           ) : null}
           {r.placeholder ? (

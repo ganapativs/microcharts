@@ -170,7 +170,6 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
             fill="none"
             data-mc-active=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {active !== null && geo.points[active] ? (
@@ -186,7 +185,6 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
               data-mc-ink="muted"
               data-mc-ui=""
               data-mc-w="tick"
-              vectorEffect="non-scaling-stroke"
               style={{ transform: `translateX(${geo.points[active]!.x}px)` }}
             />
             <circle
@@ -196,7 +194,6 @@ export function CalibrationStrip(props: InteractiveCalibrationStripProps): React
               fill="none"
               data-mc-active=""
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
           </>
         ) : null}

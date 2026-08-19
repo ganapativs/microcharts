@@ -145,7 +145,6 @@ export function Bullet(props: BulletProps): ReactNode {
           y={geo.track.y}
           width={r.width}
           height={geo.track.height}
-          shapeRendering="crispEdges"
           data-mc-ink="bar"
           style={{ fillOpacity: 0.12 + (r.step / steps) * 0.26 }}
         />
@@ -155,7 +154,6 @@ export function Bullet(props: BulletProps): ReactNode {
         y={geo.measure.y}
         width={geo.measure.width}
         height={geo.measure.height}
-        shapeRendering="crispEdges"
         data-mc-ink="bar"
         style={color ? { fill: color } : undefined}
       />
@@ -166,8 +164,7 @@ export function Bullet(props: BulletProps): ReactNode {
           x2={geo.tick.x}
           y2={geo.tick.y1}
           data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "calc(var(--mc-sw) * 1.33)" }}
+          data-mc-w="heavy"
         />
       ) : null}
       {labelText !== undefined ? (

@@ -209,7 +209,6 @@ export function StackedArea(props: StackedAreaProps): ReactNode {
                     : `var(${CAT_TOKENS[layer.index % CAT_N]})`
               }
               data-mc-w={mode === "ridge" ? "support" : "tick"}
-              vectorEffect="non-scaling-stroke"
             />
           ) : null}
         </g>

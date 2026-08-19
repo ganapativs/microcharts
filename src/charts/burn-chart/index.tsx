@@ -213,7 +213,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
           data-mc-w="support"
           fill="none"
           strokeDasharray="2.5 2.5"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {/* `muted` resolves to exactly the stroke this line already carried, so
@@ -229,7 +228,6 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
-        vectorEffect="non-scaling-stroke"
       />
       {geo.projection ? (
         <path
@@ -242,13 +240,7 @@ export function BurnChart(props: BurnChartProps): ReactNode {
         />
       ) : null}
       {geo.actual.d ? (
-        <path
-          d={geo.actual.d}
-          data-mc-ink="data"
-          fill="none"
-          vectorEffect="non-scaling-stroke"
-          style={{ stroke: lineColor }}
-        />
+        <path d={geo.actual.d} data-mc-ink="data" fill="none" style={{ stroke: lineColor }} />
       ) : null}
       {/* geo.elapsed, not actual.length: with every entry non-finite the
           geometry plots nothing, and the raw length still painted a today-dot

@@ -174,7 +174,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
         data-mc-ink="muted"
         strokeOpacity={0.4}
         data-mc-w="hair"
-        vectorEffect="non-scaling-stroke"
       />
       {/* Before bins up from center (origin bottom — keep them on the axis). */}
       {geo.bins.map((b, i) =>
@@ -187,7 +186,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
             height={b.up}
             data-mc-ink="neutral"
             data-mc-origin="bottom"
-            shapeRendering="crispEdges"
             fillOpacity={0.55}
           />
         ) : null,
@@ -215,7 +213,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               style={{ stroke: afterFill }}
               data-mc-origin="bottom"
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
           ) : (
             // mirror after-bins hang BELOW the axis → pin the top edge so they
@@ -233,7 +230,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
               height={b.down}
               data-mc-ink="accent"
               data-mc-origin="top"
-              shapeRendering="crispEdges"
               style={color ? { fill: color } : undefined}
             />
           )
@@ -252,7 +248,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           y2={geo.centerY}
           data-mc-ink="data"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.medians.after && !overlay ? (
@@ -263,7 +258,6 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
           y2={round2(geo.centerY + (height / 2 - 2))}
           data-mc-ink="accent"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
           style={color ? { stroke: color } : undefined}
         />
       ) : null}

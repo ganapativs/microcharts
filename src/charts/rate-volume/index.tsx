@@ -176,25 +176,10 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
       {/* Volume bars (ghost ink → forced-colors). */}
       {geo.bars.map((b, i) =>
         b.height > 0 ? (
-          <rect
-            key={i}
-            x={b.x}
-            y={b.y}
-            width={b.width}
-            height={b.height}
-            data-mc-ink="ghost"
-            shapeRendering="crispEdges"
-          />
+          <rect key={i} x={b.x} y={b.y} width={b.width} height={b.height} data-mc-ink="ghost" />
         ) : null,
       )}
-      {geo.line.d ? (
-        <path
-          d={geo.line.d}
-          data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
-          style={{ stroke: lineColor }}
-        />
-      ) : null}
+      {geo.line.d ? <path d={geo.line.d} data-mc-ink="data" style={{ stroke: lineColor }} /> : null}
       {/* Low-n: hollow rings (shape, not color alone). */}
       {geo.points.map((p, i) =>
         p.low ? (
@@ -209,7 +194,6 @@ export function RateVolume(props: RateVolumeProps): ReactNode {
             data-mc-ink="data"
             style={{ fill: "var(--mc-surface)", stroke: lineColor }}
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null,
       )}

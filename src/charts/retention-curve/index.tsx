@@ -193,7 +193,6 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           data-mc-w="support"
           fill="none"
           strokeDasharray="2.5 2"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.plateau ? (
@@ -211,16 +210,9 @@ export function RetentionCurve(props: RetentionCurveProps): ReactNode {
           data-mc-ink="ghost"
           strokeDasharray="1 1.5"
           data-mc-w="hair"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
-      <path
-        d={geo.line.d}
-        data-mc-ink="data"
-        fill="none"
-        vectorEffect="non-scaling-stroke"
-        style={{ stroke: lineColor }}
-      />
+      <path d={geo.line.d} data-mc-ink="data" fill="none" style={{ stroke: lineColor }} />
       {/* The role paints the same `--mc-accent` the inline default did, and it
           keeps the endpoint mapped to Highlight under forced-colors; `color`
           still wins, inline, when the caller sets one. */}

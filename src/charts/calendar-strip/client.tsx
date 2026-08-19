@@ -214,9 +214,7 @@ export function CalendarStrip(props: InteractiveCalendarStripProps): React.React
         rx={m.rx + 0.5}
         fill="none"
         data-mc-active=""
-        strokeWidth={1.5}
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

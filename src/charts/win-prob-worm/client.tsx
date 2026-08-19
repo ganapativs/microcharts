@@ -157,7 +157,6 @@ export function WinProbWorm(props: InteractiveWinProbWormProps): React.ReactNode
         data-mc-ui=""
         data-mc-w={pinned ? "tick" : "support"}
         strokeDasharray="1.5 1.5"
-        vectorEffect="non-scaling-stroke"
         style={{ transform: `translateX(${x}px)` }}
       />
     );

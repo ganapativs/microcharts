@@ -259,7 +259,6 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${selX}px)` }}
           />
         ) : null}
@@ -272,7 +271,6 @@ export function StackedArea(props: InteractiveStackedAreaProps): React.ReactNode
             data-mc-ink="muted"
             data-mc-ui=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${shownX}px)` }}
           />
         ) : null}

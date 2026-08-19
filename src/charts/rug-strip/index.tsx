@@ -125,7 +125,6 @@ export function RugStrip(props: RugStripProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="support"
           strokeOpacity={0.4}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.tiers.map((tier) => (
@@ -133,16 +132,13 @@ export function RugStrip(props: RugStripProps): ReactNode {
           key={tier.opacity}
           d={tier.d}
           data-mc-ink="data"
-          vectorEffect="non-scaling-stroke"
           style={{
             strokeOpacity: tier.opacity,
             ...(color ? { stroke: color } : null),
           }}
         />
       ))}
-      {hl ? (
-        <line {...hl} data-mc-ink="accent" data-mc-w="full" vectorEffect="non-scaling-stroke" />
-      ) : null}
+      {hl ? <line {...hl} data-mc-ink="accent" data-mc-w="full" /> : null}
       {children}
     </Chart>
   );

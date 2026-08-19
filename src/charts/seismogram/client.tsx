@@ -200,7 +200,6 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${slotW * (selected + 0.5)}px)` }}
           />
         ) : null}
@@ -213,7 +212,6 @@ export function Seismogram(props: InteractiveSeismogramProps): React.ReactNode {
             data-mc-ink="muted"
             data-mc-ui=""
             data-mc-w="support"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${slotW * (shown + 0.5)}px)` }}
           />
         ) : null}

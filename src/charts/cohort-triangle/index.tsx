@@ -170,7 +170,6 @@ export function CohortTriangle(props: CohortTriangleProps): ReactNode {
           fill="none"
           stroke="var(--mc-accent)"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

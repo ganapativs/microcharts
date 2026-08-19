@@ -717,6 +717,67 @@
   :where(.mc-root [data-mc-w="hair"]) {
     stroke-width: calc(var(--mc-sw) / 3);
   }
+  /* Above `full`. The ramp used to stop at 1 and eleven inline `calc()`
+     multipliers lived above it, so the scale had no top end and a preset could
+     not retune the heavy marks with the light ones. `heavy` is the emphasis
+     step (a pinned mark, a leader line); `anchor` is the structural one (a
+     beam, a spine). Both are ratios of the same token, so density and
+     `prefers-contrast` still move them together with everything else. */
+  :where(.mc-root [data-mc-w="heavy"]) {
+    stroke-width: calc(var(--mc-sw) * 4 / 3);
+  }
+  :where(.mc-root [data-mc-w="anchor"]) {
+    stroke-width: calc(var(--mc-sw) * 3 / 2);
+  }
+
+  /* Ink holds its weight at any render scale.
+
+     Keyed on where the stroke-width COMES FROM, not on the mark. A stroke sized
+     from `--mc-sw` — every `data-mc-w` step, and the ink roles above that carry
+     a token width — is INK: it encodes nothing by being thicker, so it must not
+     thicken when the box scales. A stroke sized from viewBox GEOMETRY is a mark
+     in its own right (a donut's band, a ring halo's span), and pinning that to
+     screen pixels breaks the channel it carries.
+
+     That split is not new: `tree-rings/client.tsx` already states it in prose
+     for one halo ("this width is viewBox geometry … the width roles the sibling
+     dials use are not geometry"). This is the same rule applied catalog-wide
+     instead of chart by chart, which is what makes it hold for a chart nobody
+     has written yet. Charts spelled the attribute per mark before, and 39 of
+     them missed at least one — 14 pinned some marks and not others, so a single
+     chart could hold a hairline on its line and thicken its own baseline.
+
+     Pinning here rather than in JSX also pays for itself: the attribute costs
+     bytes in every subpath that spells it, and subpaths are measured
+     standalone. Same reasoning as the `[data-mc-ui]` rule further down.
+
+     Roles are listed unscoped by shape on purpose. `vector-effect` is inert on a
+     mark that paints no stroke, so a filled `rect[data-mc-ink="positive"]` is
+     free to match — and listing them flat keeps this rule clear of the
+     element-split shapes `ink-element-split.test.ts` guards, where scoping a
+     PAINT rule that way would wipe DepthWedge's and NetFlow's fills. */
+  :where(
+    .mc-root [data-mc-w],
+    .mc-root [data-mc-ink="data"],
+    .mc-root [data-mc-ink="muted"],
+    .mc-root [data-mc-ink="unit-off"],
+    .mc-root [data-mc-ink="gap"],
+    .mc-root [data-mc-ink="accent"],
+    .mc-root [data-mc-ink="positive"],
+    .mc-root [data-mc-ink="negative"],
+    .mc-root [data-mc-ink="ghost"],
+    .mc-root [data-mc-ink="flag"]
+  ) {
+    vector-effect: non-scaling-stroke;
+  }
+  /* The three marks whose stroke-width IS the encoding. Each sets its width
+     inline from geometry, so the rule above would freeze a band that has to
+     grow with its box: a MicroDonut wedge and a ProgressRing arc ARE their
+     stroke, and the TreeRings halo spans exactly one ring by width. Ordering,
+     not specificity — both selectors are `:where()`, so this stays last. */
+  :where(.mc-donut-wedge, .mc-ring path[data-mc-ink="accent"], .mc-ring-halo) {
+    vector-effect: none;
+  }
   /* interaction overlay — the mark that names the unit under the pointer or the
      keyboard cursor. `data-mc-active` is a marker, not a state: hover vs pin is
      already carried by `data-mc-w`, which ~20 charts tune deliberately in both
@@ -958,6 +1019,23 @@
   :where(.mc-trace, .mc-partition) :where(rect) {
     shape-rendering: crispEdges;
     rx: 0.5;
+  }
+
+  /* Square-cornered rects rasterize on the pixel grid.
+
+     133 of the catalog's 154 square rects already spelled this attribute and 21
+     did not, which is the gap behind the docs sentence promising it for
+     "rectilinear marks". Keying on the SHAPE rather than on the chart puts the
+     remaining ones right and lets the 133 stop paying for the attribute in a
+     subpath measured standalone.
+
+     `:not([rx])` is the whole safety argument: `crispEdges` turns anti-aliasing
+     off, so a rounded corner drawn under it goes jagged. A rect that asks for
+     `rx` keeps its smoothing unless its own chart opts in per mark, which five
+     charts do deliberately for dense strips. The sub-unit escape below still has
+     the last word. */
+  :where(.mc-root rect:not([rx])) {
+    shape-rendering: crispEdges;
   }
 
   /* A mark thinner than one viewBox unit gets its anti-aliasing back.
@@ -1340,10 +1418,17 @@
   :where(.mc-spark-readout) {
     translate: 0 0;
     scale: 1;
+    /* `--mc-easing`, not a fourth literal. This spelled
+       `cubic-bezier(0.23, 1, 0.32, 1)` — a different published easeOutQuint
+       approximation from the token's `0.22, 1, 0.36, 1`. Sampled at 1000
+       points the two diverge by at most 1.1%, which on this chip's largest
+       animated quantity (a 2px translate) is 0.022px: nominal, not visible.
+       The cost was not the pixels, it was that a host retuning `--mc-easing`
+       retuned every chart transition except this one. */
     transition:
-      opacity 140ms cubic-bezier(0.23, 1, 0.32, 1),
-      translate 140ms cubic-bezier(0.23, 1, 0.32, 1),
-      scale 140ms cubic-bezier(0.23, 1, 0.32, 1);
+      opacity 140ms var(--mc-easing),
+      translate 140ms var(--mc-easing),
+      scale 140ms var(--mc-easing);
     @starting-style {
       opacity: 0;
       translate: 0 2px;

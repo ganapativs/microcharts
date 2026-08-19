@@ -179,9 +179,7 @@ export function GardenGrid(props: InteractiveGardenGridProps): React.ReactNode {
         r={geo.rMax + 1}
         fill="none"
         data-mc-active=""
-        strokeWidth={1.25}
-        data-mc-w={pinned ? "tick" : undefined}
-        vectorEffect="non-scaling-stroke"
+        data-mc-w={pinned ? "tick" : "support"}
       />
     );
   };

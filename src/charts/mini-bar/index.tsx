@@ -244,7 +244,6 @@ export function MiniBar(props: MiniBarProps): ReactNode {
             y={b.y}
             width={b.w}
             height={b.h}
-            shapeRendering="crispEdges"
             data-mc-ink={ink}
             data-mc-origin={origin}
             style={!isHl && color ? { fill: color } : undefined}

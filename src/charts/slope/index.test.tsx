@@ -50,7 +50,11 @@ describe("<Slope>", () => {
     const { container } = draw(<Slope data={DATA} highlight="West" />);
     const lines = [...container.querySelectorAll("line")];
     expect(lines[1]!.getAttribute("data-mc-ink")).toBe("accent");
-    expect(lines[1]!.style.strokeWidth).toBe("calc(var(--mc-sw) * 1.5)");
+    // The weight is a ramp step now, not an inline multiplier. `anchor` is 3/2
+    // of the token — the same ink it always painted — and what matters here is
+    // that the highlight is heavier than its peers, not how that is spelled.
+    expect(lines[1]!.getAttribute("data-mc-w")).toBe("anchor");
+    expect(lines[0]!.getAttribute("data-mc-w")).toBe("full");
   });
 
   it("color paints inline (the one declaration that must beat the role's rule)", () => {

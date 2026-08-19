@@ -176,15 +176,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
         summary={false}
       >
         {sp ? (
-          <circle
-            cx={sp.x}
-            cy={sp.y}
-            r={2.4}
-            fill="none"
-            data-mc-active=""
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle cx={sp.x} cy={sp.y} r={2.4} fill="none" data-mc-active="" data-mc-w="tick" />
         ) : null}
         {/* The live pair tracks a continuum, so it TRAVELS to the point it
             names. Both marks ride one transformed group horizontally and the

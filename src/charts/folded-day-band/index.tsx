@@ -152,8 +152,7 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "calc(var(--mc-sw) * 1.25)" }}
+          data-mc-w="heavy"
         />
       ) : null}
       {geo.todayPath ? (
@@ -167,7 +166,6 @@ export function FoldedDayBand(props: FoldedDayBandProps): ReactNode {
           fill="none"
           strokeLinejoin="round"
           strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {children}

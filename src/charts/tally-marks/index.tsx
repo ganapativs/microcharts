@@ -83,7 +83,7 @@ export function TallyMarks(props: TallyMarksProps): ReactNode {
       className={className ? `mc-tally ${className}` : "mc-tally"}
       style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
-      {geo.d ? <path d={geo.d} data-mc-ink="data" vectorEffect="non-scaling-stroke" /> : null}
+      {geo.d ? <path d={geo.d} data-mc-ink="data" /> : null}
       {geo.numeralX !== null ? (
         <text
           x={geo.numeralX}

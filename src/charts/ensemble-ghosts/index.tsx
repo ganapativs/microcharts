@@ -149,7 +149,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
           fill="none"
           data-mc-w="hair"
           strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
         />
       ))}
       {endpoints
@@ -178,7 +177,6 @@ export function EnsembleGhosts(props: EnsembleGhostsProps): ReactNode {
         style={{ stroke: accent, strokeWidth: "var(--mc-sw)" }}
         strokeLinejoin="round"
         strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
       />
       {showLabel ? (
         <text

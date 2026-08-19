@@ -165,7 +165,6 @@ export function SparkBar(props: SparkBarProps): ReactNode {
           y={bar.y}
           width={bar.width}
           height={bar.height}
-          shapeRendering="crispEdges"
           data-mc-ink={barInk(bar, mode, positive)}
           style={color && barInk(bar, mode, positive) === "bar" ? { fill: color } : undefined}
         />

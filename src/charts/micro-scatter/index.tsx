@@ -114,7 +114,6 @@ export function MicroScatter(props: MicroScatterProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="support"
           strokeOpacity={0.45}
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.dots.map((dot) => {

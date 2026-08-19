@@ -158,7 +158,6 @@ export function LikertStrip(props: InteractiveLikertStripProps): React.ReactNode
         fill="none"
         data-mc-active=""
         data-mc-w={pinned ? "tick" : "support"}
-        vectorEffect="non-scaling-stroke"
       />
     );
   };

@@ -164,7 +164,6 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
           data-mc-ui=""
           data-mc-w={pinned ? "tick" : "support"}
           strokeDasharray={pinned ? undefined : "1.5 2"}
-          vectorEffect="non-scaling-stroke"
           style={{ transform: `translateX(${pt.x}px)` }}
         />
         {/* The ring's stroke is state-dependent — an out-of-control point rings
@@ -180,7 +179,6 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
           data-mc-active=""
           style={pt.out ? OUT_INK : undefined}
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       </>
     );

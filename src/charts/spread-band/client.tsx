@@ -200,7 +200,6 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
             data-mc-active=""
             data-mc-ui=""
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
             style={{ transform: `translateX(${pinX}px)` }}
           />
         ) : null}
@@ -214,7 +213,6 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
               data-mc-ink="muted"
               data-mc-ui=""
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
               style={{ transform: `translateX(${crossX}px)` }}
             />
             {geo.subjectPoints[shown!] ? (

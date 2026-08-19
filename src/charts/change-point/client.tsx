@@ -206,7 +206,6 @@ export function ChangePoint(props: InteractiveChangePointProps): React.ReactNode
         // already line[data-mc-w="tick"], so tick can't identify the pin here.
         data-mc-w={pinned ? "support" : "tick"}
         strokeDasharray="1.5 1.5"
-        vectorEffect="non-scaling-stroke"
         style={{ transform: `translateX(${x}px)` }}
       />
     );

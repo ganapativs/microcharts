@@ -154,30 +154,17 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
       style={{ ...style, "--mc-label-px": `${fontSize}px` } as CSSProperties}
     >
       {guides ? (
-        <path
-          d={geo.guidePath}
-          data-mc-ink="muted"
-          data-mc-w="hair"
-          strokeOpacity={0.22}
-          vectorEffect="non-scaling-stroke"
-        />
+        <path d={geo.guidePath} data-mc-ink="muted" data-mc-w="hair" strokeOpacity={0.22} />
       ) : null}
       {cmp ? (
-        <path
-          d={cmp.spokePath}
-          data-mc-ink="ghost"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={{ strokeWidth: "calc(var(--mc-sw) * 1.4)" }}
-        />
+        <path d={cmp.spokePath} data-mc-ink="ghost" strokeLinecap="round" data-mc-w="heavy" />
       ) : null}
       <path
         d={geo.spokePath}
         data-mc-ink="data"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
-        style={{ strokeWidth: "calc(var(--mc-sw) * 1.2)" }}
+        data-mc-w="heavy"
       />
       {dots === "tips" ? (
         // Data ink, not accent. A tip dot encodes exactly what the spoke end

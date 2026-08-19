@@ -201,7 +201,6 @@ export function BenchmarkStrip(props: BenchmarkStripProps): ReactNode {
           y2={geo.bandY + geo.bandH + 0.5}
           data-mc-ink="muted"
           data-mc-w="support"
-          vectorEffect="non-scaling-stroke"
         />
       ) : null}
       {geo.dot.clamped !== 0 ? (

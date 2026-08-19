@@ -99,7 +99,6 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
             y={b.y}
             width={b.w}
             height={b.h}
-            shapeRendering="crispEdges"
             data-mc-ink={marked ? "accent" : "bar"}
             style={
               marked

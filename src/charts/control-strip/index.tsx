@@ -170,7 +170,6 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
           data-mc-w="hair"
           strokeOpacity={0.5}
           strokeDasharray="2 2"
-          vectorEffect="non-scaling-stroke"
         />
       )}
       <line
@@ -181,7 +180,6 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         data-mc-ink="muted"
         data-mc-w="hair"
         strokeOpacity={0.55}
-        vectorEffect="non-scaling-stroke"
       />
 
       <path
@@ -189,21 +187,12 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
         data-mc-ink="data"
         fill="none"
         strokeOpacity={0.4}
-        vectorEffect="non-scaling-stroke"
         style={color ? { stroke: color } : undefined}
       />
       {/* secondary run-rule (WE-2/4) markers — hollow, distinct from the ring */}
       {geo.points.map((p, i) =>
         flagIdx.has(i) ? (
-          <circle
-            key={`f${i}`}
-            cx={p.x}
-            cy={p.y}
-            r={rFlag}
-            data-mc-ink="muted"
-            data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
-          />
+          <circle key={`f${i}`} cx={p.x} cy={p.y} r={rFlag} data-mc-ink="muted" data-mc-w="tick" />
         ) : null,
       )}
       {/* OOC: negative ring stroke (role fills; no ink role for hollow ring). */}
@@ -226,7 +215,6 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
                         stroke="var(--mc-negative)"
                         strokeOpacity={0.5}
                         data-mc-w="tick"
-                        vectorEffect="non-scaling-stroke"
                       />,
                     ]
                   : []),

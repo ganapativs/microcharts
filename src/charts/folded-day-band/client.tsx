@@ -178,7 +178,6 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
             data-mc-ui=""
             data-mc-w="support"
             style={{ transform: `translateX(${pinned.x}px)` }}
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {s ? (
@@ -191,7 +190,6 @@ export function FoldedDayBand(props: InteractiveFoldedDayBandProps): React.React
             data-mc-ui=""
             data-mc-w="tick"
             style={{ transform: `translateX(${s.x}px)` }}
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {rest.children}

@@ -194,7 +194,6 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
             data-mc-active=""
             style={sp.above ? ABOVE_INK : undefined}
             data-mc-w="tick"
-            vectorEffect="non-scaling-stroke"
           />
         ) : null}
         {/* Crosshair + focus ring TRAVEL to the sample they name. `x1`/`x2`
@@ -214,7 +213,6 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
               data-mc-w="support"
               strokeDasharray="1.5 2"
               style={{ transform: `translateX(${ap.x}px)` }}
-              vectorEffect="non-scaling-stroke"
             />
             <circle
               cx={ap.x}
@@ -224,7 +222,6 @@ export function QueueDepth(props: InteractiveQueueDepthProps): React.ReactNode {
               data-mc-active=""
               style={ap.above ? ABOVE_INK : undefined}
               data-mc-w="support"
-              vectorEffect="non-scaling-stroke"
             />
           </>
         ) : null}

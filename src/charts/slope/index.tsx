@@ -209,11 +209,8 @@ export function Slope(props: SlopeProps): ReactNode {
                 x2={line.x1}
                 y2={line.y1}
                 data-mc-ink={ink ?? "muted"}
-                style={{
-                  strokeWidth: isHl ? "calc(var(--mc-sw) * 1.5)" : "var(--mc-sw)",
-                  ...(paint ? { stroke: color } : null),
-                }}
-                vectorEffect="non-scaling-stroke"
+                data-mc-w={isHl ? "anchor" : "full"}
+                style={paint ? { stroke: color } : undefined}
               />
             ) : incomplete && (line.y0 !== null || line.y1 !== null) ? (
               /* dashed stub toward the missing end — announced "incomplete" */

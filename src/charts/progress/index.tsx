@@ -168,7 +168,6 @@ export function Progress(props: ProgressProps): ReactNode {
               y={geo.track.y}
               width={s.w}
               height={geo.track.h}
-              shapeRendering="crispEdges"
               data-mc-ink="band"
             />
           ))}
@@ -180,7 +179,6 @@ export function Progress(props: ProgressProps): ReactNode {
                 y={geo.track.y}
                 width={s.fillW}
                 height={geo.track.h}
-                shapeRendering="crispEdges"
                 data-mc-ink="accent"
                 className="mc-progress-fill"
                 style={fillStyle}
@@ -195,7 +193,6 @@ export function Progress(props: ProgressProps): ReactNode {
             y={geo.track.y}
             width={geo.track.w}
             height={geo.track.h}
-            shapeRendering="crispEdges"
             data-mc-ink="band"
           />
           {geo.fill.w > 0 ? (
@@ -204,7 +201,6 @@ export function Progress(props: ProgressProps): ReactNode {
               y={geo.fill.y}
               width={geo.fill.w}
               height={geo.fill.h}
-              shapeRendering="crispEdges"
               data-mc-ink="accent"
               className="mc-progress-fill"
               style={fillStyle}

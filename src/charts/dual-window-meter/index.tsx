@@ -209,7 +209,6 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           data-mc-ink="muted"
           data-mc-w="tick"
           strokeDasharray="2 1.5"
-          vectorEffect="non-scaling-stroke"
         />
       )}
       {/* the ×1.3 / ×0.7 width pair IS the encoding (slow sustained = thick,
@@ -217,12 +216,12 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
           token, not width roles (those are for secondary strokes). BOTH traces
           need `non-scaling-stroke` or the ratio only holds at 1:1: the fast
           trace alone scaled with the box, so past ~1.9× it painted THICKER than
-          the slow one and the encoding read backwards. */}
+          the slow one and the encoding read backwards. Their ink roles put both
+          under the stylesheet's pin, so neither spells the attribute. */}
       <path
         d={geo.slowPath}
         data-mc-ink="data"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-sw) * 1.3)" }}
@@ -231,7 +230,6 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
         d={geo.fastPath}
         data-mc-ink="accent"
         fill="none"
-        vectorEffect="non-scaling-stroke"
         strokeLinejoin="round"
         strokeLinecap="round"
         style={{ strokeWidth: "calc(var(--mc-sw) * 0.7)" }}

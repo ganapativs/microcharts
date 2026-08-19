@@ -135,7 +135,6 @@ export function DotPlot(props: DotPlotProps): ReactNode {
                 data-mc-ink="muted"
                 data-mc-w="support"
                 strokeOpacity={0.5}
-                vectorEffect="non-scaling-stroke"
               />
             ) : null}
             {x !== null ? (
