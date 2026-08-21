@@ -60,6 +60,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       src: `${HOME}/brand/page.tsx`,
     },
+    {
+      path: "/contact",
+      priority: 0.4,
+      changeFrequency: "yearly" as const,
+      src: `${HOME}/contact/page.tsx`,
+    },
+    {
+      path: "/privacy",
+      priority: 0.4,
+      changeFrequency: "yearly" as const,
+      src: `${HOME}/privacy/page.tsx`,
+    },
   ].map((r) => ({
     url: loc(r.path),
     lastModified: fileLastModified(r.src),

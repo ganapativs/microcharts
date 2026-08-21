@@ -16,6 +16,7 @@ export const metadata: Metadata = docsMeta({
   description:
     "The microcharts mark, lockup, wordmark, colors, and type, with clear-space rules, usage guidance, and downloadable SVG and PNG assets.",
   path: "/brand",
+  markdown: "/brand.md",
 });
 
 export default function BrandPage() {

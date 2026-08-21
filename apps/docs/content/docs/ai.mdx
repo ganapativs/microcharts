@@ -222,9 +222,26 @@ These routes are generated from the same source as the package, so an agent read
 <SurfaceCards />
 
 The `.md` mirrors are static files — `/docs/ai` has a sibling `/docs/ai.md` — so they resolve on any host with no
-runtime, rewrite, or middleware. This site also deploys behind a small Cloudflare Worker that runs on `/docs/*` only:
-send `Accept: text/markdown` and the same doc URL returns the mirror inline, with `Vary: Accept` on both the Markdown
-and the HTML response. Appending `.md` always works; the negotiation is a convenience on top.
+runtime, rewrite, or middleware. Every page has one, including `/`, `/charts` and `/examples`. This site also deploys
+behind a small Cloudflare Worker: send `Accept: text/markdown` to any page URL and it returns that page's mirror inline,
+with `Vary: Accept, Accept-Encoding` on both the Markdown and the HTML response. Appending `.md` always works; the
+negotiation is a convenience on top.
+
+### Errors
+
+A wrong URL is a dead end for a script unless the response says where to go instead. Every 404, 405 and 406 answers in
+the caller's own format:
+
+- `/api/*` and any `.json` path get [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details: `type`, `title`,
+  `status`, `detail` and `instance`, plus a stable `code`, an `error` object, ordered `hints`, and `links` to this
+  site's entry points.
+- Any other scripted client — anything that doesn't name `text/html`, which covers `curl` and most agents — gets a short
+  Markdown note carrying those same links, plus the closest matching real URLs read from the sitemap.
+  [`/404.md`](/404.md) is the static version of it.
+- Browsers keep the designed 404 page.
+
+A 405 carries an `Allow` header, because everything here is read-only. A 406 arrives only when a request accepts neither
+HTML nor Markdown.
 
 `/llms.txt` points at one more surface the cards don't: [`/agent-setup.md`](/agent-setup.md), the paste-and-run setup
 prompt for a coding agent, extracted from the [Quickstart](/docs/quickstart) so the two can't drift. Or skip the URL

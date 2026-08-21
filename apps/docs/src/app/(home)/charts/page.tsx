@@ -7,6 +7,7 @@ export const metadata: Metadata = docsMeta({
   title: "Micro Charts for React — Full Catalog",
   description: chartsIndexDescription(),
   path: "/charts",
+  markdown: "/charts.md",
   keywords: [
     "micro charts",
     "micro charts react",

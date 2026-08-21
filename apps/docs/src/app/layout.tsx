@@ -103,6 +103,10 @@ export const metadata: Metadata = {
     types: {
       "application/atom+xml": [{ url: "/rss.xml", title: `${SITE.name} releases` }],
       "text/plain": [{ url: "/llms.txt", title: `${SITE.name} for LLMs` }],
+      // The home page's Markdown twin, which `/` also serves on
+      // `Accept: text/markdown`. Every other route sets its own alternates
+      // through `docsMeta`, so this advertisement stays on the page it names.
+      "text/markdown": [{ url: "/index.md", title: `${SITE.name} home as Markdown` }],
     },
   },
   robots: {

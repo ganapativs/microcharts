@@ -1,9 +1,9 @@
 {
   // Cloudflare Workers Static Assets deploy for the static-exported docs site.
-  // Cloudflare serves ./out directly from the edge; a thin Worker
-  // (`worker.ts`) runs *only* on `/docs/*` to add `Accept: text/markdown`
-  // content negotiation (https://acceptmarkdown.com). Every other path is
-  // served straight from the edge with no Worker invocation.
+  // Cloudflare serves ./out directly from the edge; the Worker (`worker.ts`)
+  // adds the behaviours a static host cannot express — `Accept: text/markdown`
+  // negotiation (https://acceptmarkdown.com), errors an agent can act on, and a
+  // real 301 for `/gallery`.
   //   pnpm --filter @microcharts/docs cf:deploy
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "microcharts",
@@ -13,10 +13,13 @@
     "directory": "./out",
     // Bind the asset store so the Worker can read mirrors / fall through to pages.
     "binding": "ASSETS",
-    // Run the Worker ahead of asset serving on doc routes only (the bare
-    // `/docs` root plus every nested route).
-    "run_worker_first": ["/docs", "/docs/*"],
-    // Static export emits per-route index.html + a top-level 404.html.
+    // Run the Worker ahead of asset serving on everything a caller can navigate
+    // to or get a 404 from. The two exclusions are the trees where neither
+    // applies and the request volume is highest: content-hashed build output,
+    // and the generated Open Graph images.
+    "run_worker_first": ["/*", "!/_next/*", "!/og/*"],
+    // Static export emits `<route>.html` per route (trailingSlash: false) plus a
+    // top-level 404.html.
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
   },

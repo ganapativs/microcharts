@@ -201,8 +201,21 @@ Independent pnpm workspace. **Fumadocs + Next static export (`output: 'export'`)
 consumes the built library (`@microcharts/react` → `dist/`), so **build the library before building or developing the
 docs** (`pnpm build:site` does both). The site origin is swappable via `NEXT_PUBLIC_SITE_URL`. Every doc example must be
 a real, compiled component (docs-as-tests): `describeSeries` output shown in docs must be the actual generated string.
-The docs also publish machine surfaces — `/llms.txt`, `/llms-full.txt`, and `/catalog.json` — kept in sync with
+The docs also publish machine surfaces — `/llms.txt`, `/llms-full.txt`, `/catalog.json`, `/openapi.json`,
+`/api/charts.json` + `/api/charts/<slug>.json`, and `/.well-known/mcp/server-card.json` — kept in sync with
 `package.json#exports` and gated by tests.
+
+**The agent surface is four rules, and all four are load-bearing.** (1) **Every page route has a Markdown twin**:
+`/docs/*` mirrors come from `scripts/gen-md.ts`, the React routes (`/`, `/charts`, `/examples`, `/brand`, `/contact`,
+`/privacy`) from `lib/page-mirrors.ts` + `lib/trust-pages.ts` via `<route>.md` route handlers. Adding a page route means
+adding its twin, or `Accept: text/markdown` there silently falls back to HTML. (2) **`worker.ts` is the only place that
+touches the network**; every decision it makes is a pure function in `lib/content-negotiation.ts` (negotiation, 406,
+error format) or `lib/agent-errors.ts` (RFC 9457 problem details, the Markdown recovery note, closest-match
+suggestions), unit-tested without a network. (3) **`/openapi.json` is derived from the registry**, so it cannot describe
+a chart the site does not serve — and `agent-surface.test.ts` re-checks every documented path against a real `out/`,
+which means it only runs after `pnpm build` (like `metadata.test.ts`). (4) **Errors answer in the caller's format**:
+problem+json on `/api/*` and `.json`, Markdown for any client that never names `text/html`, the designed HTML page for
+browsers. A 404 always beats a 406 when both apply — "no such page" is the more useful answer.
 
 ## Writing voice (every prose surface: docs, README, site copy, error messages, PR/issue text)
 

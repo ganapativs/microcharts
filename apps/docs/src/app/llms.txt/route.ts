@@ -81,7 +81,18 @@ ${chartLines}
 - MCP server \`@microcharts/mcp\` (\`npx -y @microcharts/mcp\`, stdio): tools \`find_microchart\`, \`get_microchart\`, \`render_microchart\`; resources \`microcharts://catalog\`, \`microcharts://agent-setup\`. Docs: ${mdUrl(["mcp"])}. Prefer calling it over re-reading the catalog when your client can spawn an MCP server.
 - [Chart catalog JSON](${abs("/catalog.json")}): names, import paths, props, data shapes.
 - [Catalog JSON Schema](${abs("/catalog.schema.json")}): the contract the catalog validates against.
+- [OpenAPI description](${abs("/openapi.json")}): every endpoint on this site, with an operation id, typed parameters and a response schema. Load this first if you call the site programmatically.
+- [Chart index JSON](${abs("/api/charts.json")}): one line per chart, each linking to \`${SITE.url}/api/charts/<slug>.json\` — that chart's full prop surface in ~8 kB instead of the catalog's 290 kB.
+- [MCP server card](${abs("/.well-known/mcp/server-card.json")}): the \`server.json\` registry manifest for \`@microcharts/mcp\`, served at the path MCP's draft server-card proposal uses.
 - [Full docs context](${abs("/llms-full.txt")}): complete generated docs text.
+- [Home page as Markdown](${abs("/index.md")}): every page has a twin like this one. Send \`Accept: text/markdown\` to any page URL, or add \`.md\` to it; responses carry \`Vary: Accept, Accept-Encoding\`.
+- [404 recovery note](${abs("/404.md")}): errors are machine-readable — 404, 405 and 406 return RFC 9457 problem details on \`/api/*\` and \`.json\` paths, and a short Markdown note with recovery links everywhere else.
+
+## Project
+
+- [Contact](${abs("/contact.md")}): where to file a bug, propose a chart type, or report a security issue.
+- [Privacy](${abs("/privacy.md")}): what this site collects, stores, and sends on.
+- [Source](${SITE.repo}): MIT licensed. Issues and proposals go here.
 
 ## Does Not Support
 
