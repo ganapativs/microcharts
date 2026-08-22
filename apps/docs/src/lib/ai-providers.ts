@@ -111,6 +111,18 @@ export const MACHINE_SURFACES: MachineSurface[] = [
     href: "/docs/ai.md",
     label: "*.md mirrors",
     note: "clean Markdown",
-    body: "Append .md to any docs page for a Markdown copy an agent reads without parsing HTML — every component expanded to text and code.",
+    body: "Append .md to any page for a Markdown copy an agent reads without parsing HTML — every component expanded to text and code. Sending Accept: text/markdown to the page URL returns the same bytes.",
+  },
+  {
+    href: "/openapi.json",
+    label: "/openapi.json",
+    note: "the endpoints, typed",
+    body: "OpenAPI 3.1 description of every machine-readable route here, with an operation id, typed parameters and a response schema on each one. Point a function-calling agent at it and the surface loads itself.",
+  },
+  {
+    href: "/api/charts.json",
+    label: "/api/charts.json",
+    note: "one chart per fetch",
+    body: "An index of every chart type, each linking to /api/charts/<slug>.json — that chart’s props, imports and caveats in about 8 kB instead of the full catalog’s 290 kB.",
   },
 ];

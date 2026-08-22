@@ -80,8 +80,27 @@ export function organizationJsonLd() {
     logo: abs("/apple-icon"),
     description: SITE.description,
     foundingDate: "2025",
-    sameAs: [SITE.repo, SITE.npm, SITE.authorX, SITE.authorGithub, SITE.authorUrl],
+    sameAs: [SITE.repo, SITE.npm, SITE.npmMcp, SITE.authorX, SITE.authorGithub, SITE.authorUrl],
     founder: author,
+    // Two ways in, both public and both answered by the maintainer. An
+    // open-source project has no switchboard and no postal address; these are
+    // the addresses SECURITY.md and CONTRIBUTING.md already publish.
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "technical support",
+        url: `${SITE.repo}/issues`,
+        email: SITE.email,
+        availableLanguage: "English",
+      },
+      {
+        "@type": "ContactPoint",
+        contactType: "security",
+        url: `${SITE.repo}/security/advisories/new`,
+        email: SITE.email,
+        availableLanguage: "English",
+      },
+    ],
   };
 }
 

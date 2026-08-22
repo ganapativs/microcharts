@@ -10,6 +10,7 @@ export const metadata: Metadata = docsMeta({
   description:
     "Seven production-grade apps built with @microcharts/react from npm — a trading terminal, a print magazine, an eval console — exercising every chart type in the catalog.",
   path: "/examples",
+  markdown: "/examples.md",
   keywords: [
     "microcharts examples",
     "react chart examples",

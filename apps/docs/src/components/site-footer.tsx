@@ -85,6 +85,7 @@ const cols: {
     links: [
       { href: "/llms.txt", label: "llms.txt", external: true },
       { href: "/catalog.json", label: "catalog.json", external: true },
+      { href: "/openapi.json", label: "openapi.json", external: true },
       { href: "/docs/ai", label: "AI-native" },
     ],
   },
@@ -140,15 +141,24 @@ export function SiteFooter() {
                 /brand is permission to use the name and the mark. Same category,
                 same line, in the column whose subject is the identity it
                 documents. */}
-            <div className="mono-label mt-4 flex items-center gap-1.5">
+            <div className="mono-label mt-4 flex flex-wrap items-center gap-1.5">
               <span>Zero deps · MIT ·</span>
-              <Link
-                prefetch={false}
-                href="/brand"
-                className="underline decoration-fd-border underline-offset-[3px] transition-colors hover:text-fd-foreground hover:decoration-fd-muted-foreground"
-              >
-                Brand
-              </Link>
+              {[
+                { href: "/brand", label: "Brand" },
+                { href: "/contact", label: "Contact" },
+                { href: "/privacy", label: "Privacy" },
+              ].map((item, i) => (
+                <span key={item.href} className="flex items-center gap-1.5">
+                  <Link
+                    prefetch={false}
+                    href={item.href}
+                    className="underline decoration-fd-border underline-offset-[3px] transition-colors hover:text-fd-foreground hover:decoration-fd-muted-foreground"
+                  >
+                    {item.label}
+                  </Link>
+                  {i < 2 && <span aria-hidden>·</span>}
+                </span>
+              ))}
             </div>
             {/* The byline belongs to the brand block, not to the bar across the
                 bottom. Down there it was the only thing on the left of a rule the

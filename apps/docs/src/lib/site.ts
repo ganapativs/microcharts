@@ -11,6 +11,10 @@ export const SITE = {
   pkg: "@microcharts/react",
   repo: "https://github.com/ganapativs/microcharts",
   npm: "https://www.npmjs.com/package/@microcharts/react",
+  /** The MCP server package — the other half of what this project publishes. */
+  npmMcp: "https://www.npmjs.com/package/@microcharts/mcp",
+  /** Published project contact, the same address SECURITY.md and package.json carry. */
+  email: "vsg.inbox@gmail.com",
   /** Third-party read on the published package — dependency count and the size
    *  of the root entry, measured by someone other than us. */
   bundlephobia: "https://bundlephobia.com/package/@microcharts/react",
