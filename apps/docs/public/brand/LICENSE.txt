@@ -1,0 +1,23 @@
+microcharts brand assets — terms
+=================================
+
+The microcharts source code is MIT licensed. These brand assets are not
+code, and these terms cover them instead.
+
+You may use the mark, the lockup, and the name to refer to microcharts: a
+"built with microcharts" badge, a talk slide, a blog post, a README, an
+integration listing, a comparison page.
+
+You may not:
+  * modify the artwork — recolor the cells, rotate, stretch, add effects,
+    or redraw it;
+  * use it as your own product's or company's mark, or as part of one;
+  * use it in a way that implies microcharts endorses, sponsors, or
+    certifies what you're shipping.
+
+Reuse the artwork under those terms without asking. Anything outside them:
+ask first — https://x.com/ganapativs
+
+The wordmark outlines are drawn from Open Runde, licensed under the SIL
+Open Font License 1.1 (fonts/OpenRunde-OFL.txt). That license travels with
+any redistribution of the wordmark or lockup files.

@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BRAND_PNGS, BRAND_README, BRAND_SVGS } from "./brand-assets";
+import { BRAND_COLORS, BRAND_LICENSE, BRAND_PNGS, BRAND_README, BRAND_SVGS } from "./brand-assets";
+import { SITE } from "./site";
 
 /** public/brand/ and the kit zip are generated from `brand-assets.ts` by
  *  `pnpm gen:brand-kit`. These guards fail when a file on disk, or the zip a
@@ -10,6 +11,8 @@ import { BRAND_PNGS, BRAND_README, BRAND_SVGS } from "./brand-assets";
 const BRAND = join(process.cwd(), "public/brand");
 const KIT = "microcharts-brand-kit";
 const read = (p: string) => readFileSync(join(BRAND, p));
+/** Exactly what `gen-brand-kit.mjs` writes for colors.json. */
+const COLORS_JSON = `${JSON.stringify(BRAND_COLORS, null, 2)}\n`;
 
 const CRC_TABLE = Int32Array.from({ length: 256 }, (_, n) => {
   let c = n;
@@ -51,6 +54,23 @@ describe("brand assets on disk", () => {
   it("keeps README.txt in sync", () => {
     expect(read("README.txt").toString("utf8")).toBe(BRAND_README);
   });
+
+  // README.txt points at LICENSE.txt, colors.json and fonts/OpenRunde-OFL.txt,
+  // and the brand page links the terms. All three used to exist only inside the
+  // zip, so every one of those references 404'd for anyone reading /brand/.
+  it("keeps LICENSE.txt in sync", () => {
+    expect(read("LICENSE.txt").toString("utf8")).toBe(BRAND_LICENSE);
+  });
+
+  it("keeps colors.json in sync", () => {
+    expect(read("colors.json").toString("utf8")).toBe(COLORS_JSON);
+  });
+
+  it("serves the font license the wordmark outlines carry", () => {
+    expect(read("fonts/OpenRunde-OFL.txt").toString("utf8")).toContain(
+      "SIL OPEN FONT LICENSE Version 1.1",
+    );
+  });
 });
 
 describe("brand assets themselves", () => {
@@ -68,10 +88,26 @@ describe("brand assets themselves", () => {
   it("names every shipped file in the README", () => {
     for (const name of Object.keys(BRAND_SVGS)) expect(BRAND_README).toContain(name);
   });
+
+  // The only address in the terms. It shipped as a handle that appears nowhere
+  // else on the site, inside a zip no test read back.
+  it("sends questions to the handle the rest of the site publishes", () => {
+    expect(BRAND_LICENSE.match(/https:\/\/x\.com\/\S+/g)).toEqual([SITE.authorX]);
+  });
+
+  it("says the artwork is not covered by the code license", () => {
+    expect(BRAND_LICENSE).toContain("These brand assets are not");
+  });
 });
 
 describe("the downloadable kit", () => {
   const entries = zipEntries(read(`${KIT}.zip`));
+
+  it("carries the current text files", () => {
+    expect(entries.get(`${KIT}/README.txt`)).toBe(crc32(Buffer.from(BRAND_README)));
+    expect(entries.get(`${KIT}/LICENSE.txt`)).toBe(crc32(Buffer.from(BRAND_LICENSE)));
+    expect(entries.get(`${KIT}/colors.json`)).toBe(crc32(Buffer.from(COLORS_JSON)));
+  });
 
   it("carries the docs, the license, and the font license", () => {
     expect([...entries.keys()]).toEqual(

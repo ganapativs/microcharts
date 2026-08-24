@@ -18,7 +18,10 @@ const EMBER = { light: "#c2410c", dark: "#f7924e" };
 const TEAL = { light: "#0f766e", dark: "#55c2b3" };
 /** "dark" is dark ink, for light grounds — the naming the files already use. */
 const INK = { dark: "#17110a", light: "#e9e8e3" };
-const PAPER = { light: "#efe9dd", dark: "#0a0b0f" };
+/** The grounds the site paints: `--color-fd-background` in each theme, and
+ *  the two `themeColor` entries. A designer rebuilding the brand from
+ *  colors.json has to land on the same field the product uses. */
+const PAPER = { light: "#e9edf4", dark: "#0a0b0f" };
 
 export const BRAND_COLORS = {
   accent: { cobalt: COBALT, ember: EMBER, teal: TEAL },
@@ -183,9 +186,7 @@ export const BRAND_SVGS: Record<string, string> = {
   "mark-mono-dark.svg": markSvg({ mono: INK.dark }),
   "mark-mono-light.svg": markSvg({ mono: CELL_FILL }),
   "mark-ember.svg": markSvg({ accent: EMBER.light }),
-  // Teal marks the dev build in the tab strip (env-badge.ts), so its title says
-  // so — the file ships in the kit as the cool accent sibling.
-  "mark-teal.svg": markSvg({ accent: TEAL.light, title: "microcharts — dev" }),
+  "mark-teal.svg": markSvg({ accent: TEAL.light }),
   "lockup.svg": lockupSvg({ accent: COBALT.light, type: INK.dark }),
   "lockup-dark.svg": lockupSvg({ accent: COBALT.dark, type: INK.light }),
   "lockup-adaptive.svg": lockupSvg({ adaptive: true }),
@@ -298,7 +299,7 @@ You may not:
     certifies what you're shipping.
 
 Reuse the artwork under those terms without asking. Anything outside them:
-ask first — https://x.com/gunsvs
+ask first — https://x.com/ganapativs
 
 The wordmark outlines are drawn from Open Runde, licensed under the SIL
 Open Font License 1.1 (fonts/OpenRunde-OFL.txt). That license travels with

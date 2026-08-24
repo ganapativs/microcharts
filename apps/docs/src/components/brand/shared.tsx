@@ -199,7 +199,12 @@ export function AssetTile({
         <span className="flex shrink-0 items-center gap-2 tabular-nums">
           <span>{(bytes / 1024).toFixed(1)} kB · svg</span>
           {asset.png ? (
-            <a href={`/brand/png/${asset.png}`} download className="ulink">
+            <a
+              href={`/brand/png/${asset.png}`}
+              download
+              aria-label={`Download ${asset.png}`}
+              className="ulink"
+            >
               png
             </a>
           ) : null}
