@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Download } from "lucide-react";
 import { CopyButton } from "@/components/ui/copy";
 import { CELL_FILL, CELL_R, CELL_SIZE, CELLS, SQUIRCLE_PATH } from "@/lib/brand";
+import { BRAND_COLORS } from "@/lib/brand-assets";
 
 export type Tile = "light" | "dark" | "auto";
 
@@ -116,14 +117,11 @@ export const WORDMARKS: Asset[] = [
   },
 ];
 
-export const ACCENTS: { name: string; light: string; dark: string }[] = [
-  { name: "Cobalt", light: "#2f52d4", dark: "#528dff" },
-  { name: "Ember", light: "#c2410c", dark: "#f7924e" },
-  { name: "Clay", light: "#a14a34", dark: "#e08e73" },
-  { name: "Moss", light: "#4d7c1e", dark: "#a3c46a" },
-  { name: "Teal", light: "#0f766e", dark: "#55c2b3" },
-  { name: "Rose", light: "#be123c", dark: "#fb6f89" },
-];
+/** The picker's six accents, straight from the kit module — the same values a
+ *  visitor downloads in colors.json, so the page cannot drift from the kit. */
+export const ACCENTS: { name: string; light: string; dark: string }[] = Object.entries(
+  BRAND_COLORS.accent,
+).map(([name, a]) => ({ name: name[0].toUpperCase() + name.slice(1), ...a }));
 
 export const SPECS: [string, string][] = [
   ["Container", "Superellipse · n 4.5"],

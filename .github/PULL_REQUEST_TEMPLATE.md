@@ -14,7 +14,7 @@ Closes #
 
 ## Type
 
-- [ ] Fix — behaviour was wrong
+- [ ] Fix — behavior was wrong
 - [ ] Feature — new capability or prop
 - [ ] New chart type
 - [ ] Docs / examples
@@ -52,7 +52,7 @@ Closes #
 - [ ] Interactive entry **composes** the static component; geometry is shared, not re-implemented
 - [ ] One grammar — reused prop names keep their existing meaning across charts
 - [ ] Nothing paints outside the viewBox (containment test covers it)
-- [ ] Accessible name / summary correct; direction and state are never colour-alone
+- [ ] Accessible name / summary correct; direction and state are never color-alone
 - [ ] Any user-visible string goes through `SummaryStrings` — no hardcoded English outside `EN`
 - [ ] Formatting goes through `makeFormatter`; no `new Intl.NumberFormat` in a component
 - [ ] ES2022 floor respected (no `toSorted` / `toReversed` / friends)

@@ -15,19 +15,33 @@ import { WORDMARK_EM, WORDMARK_INK, WORDMARK_PATH } from "./wordmark.ts";
 
 export const COBALT = { light: "#2f52d4", dark: "#528dff" };
 const EMBER = { light: "#c2410c", dark: "#f7924e" };
+const CLAY = { light: "#a14a34", dark: "#e08e73" };
+const MOSS = { light: "#4d7c1e", dark: "#a3c46a" };
 const TEAL = { light: "#0f766e", dark: "#55c2b3" };
-/** "dark" is dark ink, for light grounds — the naming the files already use. */
-const INK = { dark: "#17110a", light: "#e9e8e3" };
+const ROSE = { light: "#be123c", dark: "#fb6f89" };
+/** "dark" is dark ink, for light grounds — the naming the files already use.
+ *  Both values are the site's text inks (`--color-fd-foreground` per theme),
+ *  so the wordmark is set in the ink the product reads in. */
+const INK = { dark: "#12151d", light: "#e9e8e3" };
 /** The grounds the site paints: `--color-fd-background` in each theme, and
  *  the two `themeColor` entries. A designer rebuilding the brand from
  *  colors.json has to land on the same field the product uses. */
 const PAPER = { light: "#e9edf4", dark: "#0a0b0f" };
 
 export const BRAND_COLORS = {
-  accent: { cobalt: COBALT, ember: EMBER, teal: TEAL },
+  /** The site picker's six accents, in its order. Cobalt, ember and teal also
+   *  ship as mark files; the other three recolor chrome only. */
+  accent: { cobalt: COBALT, ember: EMBER, clay: CLAY, moss: MOSS, teal: TEAL, rose: ROSE },
   cell: CELL_FILL,
   ink: { light: INK.dark, dark: INK.light },
   paper: PAPER,
+  /** The valence pair as the brand page shows it — the docs surface's deepened
+   *  cut of the library's own defaults (those live in styles.css). Positive and
+   *  negative keep these hues under every accent and preset. */
+  semantic: {
+    positive: { light: "#077353", dark: "#45a385" },
+    negative: { light: "#ad4713", dark: "#df7856" },
+  },
 };
 
 // ── the mark ───────────────────────────────────────────────────────────────
@@ -267,7 +281,8 @@ Paper (light theme)      ${PAPER.light}
 Ink (dark theme)         ${INK.light}
 Paper (dark theme)       ${PAPER.dark}
 
-Machine-readable in colors.json, accent siblings included.
+Machine-readable in colors.json, with all six accent siblings and
+the semantic positive/negative pair.
 
 Usage
 -----

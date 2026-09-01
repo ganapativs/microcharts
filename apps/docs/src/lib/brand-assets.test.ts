@@ -100,6 +100,45 @@ describe("brand assets themselves", () => {
   });
 });
 
+describe("the palette is the site's", () => {
+  // The kit once documented a paper and an ink the light theme had retired —
+  // colors.json said warm cream while every shipped surface painted cool
+  // blue-grey. These pins hold the kit to the tokens the site actually renders.
+  const css = readFileSync(join(process.cwd(), "src/app/global.css"), "utf8");
+  const all = (token: string) =>
+    [...css.matchAll(new RegExp(`${token}:\\s*(#[0-9a-fA-F]{6})`, "g"))].map((m) => m[1]);
+  /** First definition is the `:root` light value, second the `.dark` override;
+   *  anything after that is a preset scope. */
+  const themed = (token: string) => {
+    const found = all(token);
+    expect(found.length).toBeGreaterThanOrEqual(2);
+    return { light: found[0], dark: found[1] };
+  };
+
+  it("papers the kit on the ground the site paints", () => {
+    expect(BRAND_COLORS.paper).toEqual(themed("--color-fd-background"));
+  });
+
+  it("inks the wordmark in the site's text ink", () => {
+    expect({ light: BRAND_COLORS.ink.light, dark: BRAND_COLORS.ink.dark }).toEqual(
+      themed("--color-fd-foreground"),
+    );
+  });
+
+  it("documents exactly the accents the picker offers", () => {
+    const site = all("--accent");
+    const kit = Object.values(BRAND_COLORS.accent).flatMap((a) => [a.light, a.dark]);
+    expect([...kit].sort()).toEqual([...site].sort());
+    // Cobalt light is the `:root` default the whole site boots with.
+    expect(BRAND_COLORS.accent.cobalt.light).toBe(site[0]);
+  });
+
+  it("carries the valence pair the site renders", () => {
+    expect(BRAND_COLORS.semantic.positive).toEqual(themed("--mc-positive"));
+    expect(BRAND_COLORS.semantic.negative).toEqual(themed("--mc-negative"));
+  });
+});
+
 describe("the downloadable kit", () => {
   const entries = zipEntries(read(`${KIT}.zip`));
 
