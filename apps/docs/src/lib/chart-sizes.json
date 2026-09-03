@@ -136,8 +136,8 @@
     "interactive": 5.88
   },
   "coverage-strip": {
-    "static": 2.61,
-    "interactive": 5
+    "static": 2.62,
+    "interactive": 5.01
   },
   "benchmark-strip": {
     "static": 3.07,

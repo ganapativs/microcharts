@@ -21,7 +21,7 @@ export function coverageSummary(
   strings: CoverageStrings,
 ): string {
   if (geo.expected === 0) return strings.noData;
-  return strings.coverage(geo.measured, geo.expected, pctFmt(geo.coverage), geo.longestGap);
+  return strings.coverage(geo.measured, geo.expected, pctFmt(geo.rawCoverage), geo.longestGap);
 }
 
 export interface CoverageStripProps {
@@ -183,7 +183,7 @@ export function CoverageStrip(props: CoverageStripProps): ReactNode {
           data-mc-ink="label"
           fontSize={FONT}
         >
-          {pctFmt(geo.coverage)}
+          {pctFmt(geo.rawCoverage)}
         </text>
       ) : null}
       {children}

@@ -86,6 +86,25 @@ describe("coverageGeometry", () => {
     expect(geo.expected).toBe(COVERAGE_MAX_SLOTS);
   });
 
+  it("rawCoverage feeds Intl the raw ratio; coverage stays 2-dp (57.5% boundary)", () => {
+    // 23/40 = 0.575 is a true decimal half: `Intl` rounds it up to "58%", but
+    // `round2` (binary `Math.round` on 57.4999…) collapses it to 0.57, so Intl
+    // on the pre-rounded field yields "57%". `rawCoverage` is the fraction the
+    // percent formatter is contracted to receive; `coverage` keeps its 2-dp
+    // contract for other consumers. Sibling k-of-n charts (icon-array,
+    // progress) feed Intl the raw fraction, so `rawCoverage` lets this chart
+    // agree with them.
+    const data = Array.from({ length: 40 }, (_, i) => (i < 23 ? 1 : null));
+    const geo = coverageGeometry({ ...base, data });
+    expect(geo.measured).toBe(23);
+    expect(geo.expected).toBe(40);
+    expect(geo.coverage).toBe(0.57);
+    expect(geo.rawCoverage).toBe(0.575);
+    const pct = new Intl.NumberFormat("en", { style: "percent", maximumFractionDigits: 0 });
+    expect(pct.format(geo.rawCoverage)).toBe("58%");
+    expect(pct.format(geo.coverage)).toBe("57%");
+  });
+
   test.prop([
     fc.array(fc.option(fc.double({ noNaN: true, min: -1e4, max: 1e4 }), { nil: null }), {
       maxLength: 130,
@@ -101,5 +120,7 @@ describe("coverageGeometry", () => {
     }
     expect(geo.coverage).toBeGreaterThanOrEqual(0);
     expect(geo.coverage).toBeLessThanOrEqual(1);
+    expect(geo.rawCoverage).toBeGreaterThanOrEqual(0);
+    expect(geo.rawCoverage).toBeLessThanOrEqual(1);
   });
 });
