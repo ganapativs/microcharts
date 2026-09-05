@@ -40,9 +40,16 @@ describe("controlGeometry", () => {
     expect(geo.violations.every((v) => v.rule === "we1")).toBe(true);
   });
 
-  it("percentile limits use empirical p0.135/p99.865", () => {
-    const geo = controlGeometry({ ...base, data: SAMPLE, limits: "percentile" })!;
-    expect(geo.band.lo).toBeLessThanOrEqual(geo.band.hi);
+  // The retired `limits="percentile"` band was estimated from the sample it then
+  // tested, and the R-7 estimator lands strictly inside the observed range — so
+  // the data's own extremes were flagged by construction. The 3-sigma band is
+  // the only one shipped, and it must sit OUTSIDE the data it was fitted to.
+  it("the band contains the sample that fitted it", () => {
+    const data = [12, 14, 9, 16, 11, 13, 15, 10, 17, 8];
+    const geo = controlGeometry({ ...base, data })!;
+    expect(geo.band.lo).toBeLessThanOrEqual(Math.min(...data));
+    expect(geo.band.hi).toBeGreaterThanOrEqual(Math.max(...data));
+    expect(geo.points.some((p) => p.out)).toBe(false);
   });
 
   it("baseline overrides the computed center", () => {

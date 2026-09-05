@@ -3078,12 +3078,6 @@
         "description": "Sequential measurements."
       },
       {
-        "name": "limits",
-        "type": "\"sigma\" | \"percentile\"",
-        "required": false,
-        "description": "±3σ̂ (default) or empirical p0.135/p99.865 for skewed processes."
-      },
-      {
         "name": "baseline",
         "type": "number",
         "required": false,

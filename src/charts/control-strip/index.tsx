@@ -15,7 +15,6 @@ import {
   CONTROL_STRIP_PAD,
   controlGeometry,
   type ControlGeometry,
-  type ControlLimits,
   type ControlRules,
 } from "./geometry.js";
 
@@ -36,8 +35,6 @@ export function controlSummary(
 export interface ControlStripProps {
   /** Sequential process measurements. */
   data: readonly number[];
-  /** ±3σ̂ (default) or empirical p0.135/p99.865 for skewed processes. */
-  limits?: ControlLimits | undefined;
   /** Known process center from a reference period (else = mean of data). */
   baseline?: number | undefined;
   /** Western Electric secondary run rules (WE-1/2/4 subset). */
@@ -63,7 +60,6 @@ export interface ControlStripProps {
 export function ControlStrip(props: ControlStripProps): ReactNode {
   const {
     data,
-    limits = "sigma",
     baseline,
     rules = "none",
     dots = "out",
@@ -84,7 +80,7 @@ export function ControlStrip(props: ControlStripProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-control-strip ${className}` : "mc-control-strip";
-  const geo = controlGeometry({ width, height, data, limits, baseline, rules, domain });
+  const geo = controlGeometry({ width, height, data, baseline, rules, domain });
 
   if (geo === null) {
     return (
