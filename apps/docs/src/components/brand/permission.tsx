@@ -17,7 +17,11 @@ export function BrandPermission() {
           <a href={SITE.repo} target="_blank" rel="noreferrer noopener" className="ulink">
             MIT
           </a>
-          . Questions?{" "}
+          ; the artwork is not, and{" "}
+          <a href="/brand/LICENSE.txt" className="ulink">
+            LICENSE.txt
+          </a>{" "}
+          carries its terms. Questions?{" "}
           <a href={SITE.authorX} target="_blank" rel="noreferrer noopener" className="ulink">
             {SITE.authorXHandle}
           </a>

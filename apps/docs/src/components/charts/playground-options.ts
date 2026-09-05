@@ -33,7 +33,7 @@ export const FIXTURES: Fixture[] = [
   },
   {
     key: "negative",
-    note: "Values below zero — areas anchor at zero and valence colour follows the sign.",
+    note: "Values below zero — areas anchor at zero and valence color follows the sign.",
     apply: (d) => d.map((v, i) => (i % 2 ? -v : v)),
   },
   {

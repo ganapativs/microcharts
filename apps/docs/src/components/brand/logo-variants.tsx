@@ -9,7 +9,7 @@ export function BrandLogoVariants() {
         </h2>
         <p className="prose u-lede" style={{ maxWidth: "var(--m-prose)" }}>
           Cobalt is the primary one. There is a dark-theme cobalt, an adaptive version for hosts
-          that flip theme, two mono inks for when colour is not available, and two accent siblings.
+          that flip theme, two mono inks for when color is not available, and two accent siblings.
           Every file below is the asset that ships under{" "}
           <code className="font-mono text-[0.86em]" style={{ color: "var(--ink)" }}>
             /brand

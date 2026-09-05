@@ -64,9 +64,9 @@ Pass \`data\` and you get something correct. After that, \`domain\`, \`color\`, 
 ## What ships
 
 - **${CATALOG.total} chart types**, one grammar between them. Sparklines, bars, bullets, heat strips, box plots, donuts, hypnograms, and the rest of the catalog.
-- **Zero runtime dependencies.** React is the only peer. Scales, paths, easing, colour, statistics and summaries are all in-house.
+- **Zero runtime dependencies.** React is the only peer. Scales, paths, easing, color, statistics and summaries are all in-house.
 - **${SIZE_MARKETING}**, gzipped, per chart. The median static chart is ${SIZE.median} kB.
-- **Accessible by default.** Every chart is \`role="img"\` with a natural-language summary generated from the data. Direction and state are never colour alone.
+- **Accessible by default.** Every chart is \`role="img"\` with a natural-language summary generated from the data. Direction and state are never color alone.
 - **Server-component safe.** Default exports are hook-free pure SVG with zero client JavaScript. Interactivity is a separate \`/interactive\` import.
 
 ## Read next
@@ -126,7 +126,7 @@ ${machineSurfaces()}
 export function brandMarkdown(): string {
   return `# Brand (${abs("/brand")})
 
-Logos, wordmarks and colour for writing about microcharts. The full set, including PNG exports, is on the [brand page](${abs("/brand")}) and in [microcharts-brand-kit.zip](${abs("/brand/microcharts-brand-kit.zip")}).
+Logos, wordmarks and color for writing about microcharts. The full set, including PNG exports, is on the [brand page](${abs("/brand")}) and in [microcharts-brand-kit.zip](${abs("/brand/microcharts-brand-kit.zip")}).
 
 ## Assets
 
@@ -136,10 +136,13 @@ Logos, wordmarks and colour for writing about microcharts. The full set, includi
 
 ## Using them
 
-- Keep the mark's proportions and its clear space. Do not recolour it outside the supplied cuts.
+- Use the mark, the lockup and the name to refer to microcharts: a badge, a slide, a post, an integration listing.
+- Keep one cell-width of clear space on every side, and don't render the mark below 16 px.
+- Take one of the supplied cuts. Don't recolor, rotate, stretch, or redraw the artwork.
+- Don't use it as your own product's mark, or in a way that implies microcharts endorses what you ship.
 - The name is lowercase, always: microcharts.
 - The package is \`${SITE.pkg}\`, and the site is ${SITE.url}.
-- Everything here is MIT licensed with the rest of the project. Attribution is welcome, not required.
+- The code is MIT. The artwork is not: the terms above are the summary, and [LICENSE.txt](${abs("/brand/LICENSE.txt")}) is the whole of them.
 
 ${machineSurfaces()}
 `;

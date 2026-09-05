@@ -1,0 +1,47 @@
+{
+  "accent": {
+    "cobalt": {
+      "light": "#2f52d4",
+      "dark": "#528dff"
+    },
+    "ember": {
+      "light": "#c2410c",
+      "dark": "#f7924e"
+    },
+    "clay": {
+      "light": "#a14a34",
+      "dark": "#e08e73"
+    },
+    "moss": {
+      "light": "#4d7c1e",
+      "dark": "#a3c46a"
+    },
+    "teal": {
+      "light": "#0f766e",
+      "dark": "#55c2b3"
+    },
+    "rose": {
+      "light": "#be123c",
+      "dark": "#fb6f89"
+    }
+  },
+  "cell": "#faf7f1",
+  "ink": {
+    "light": "#12151d",
+    "dark": "#e9e8e3"
+  },
+  "paper": {
+    "light": "#e9edf4",
+    "dark": "#0a0b0f"
+  },
+  "semantic": {
+    "positive": {
+      "light": "#077353",
+      "dark": "#45a385"
+    },
+    "negative": {
+      "light": "#ad4713",
+      "dark": "#df7856"
+    }
+  }
+}

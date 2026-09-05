@@ -981,7 +981,7 @@ function PlaygroundView({
                     />
                     <DrawerNote>
                       {FIXTURES.find((f) => f.key === fixture)?.note} This is the live component on
-                      that series — the documented edge-case behaviour, not a mock.
+                      that series — the documented edge-case behavior, not a mock.
                     </DrawerNote>
                   </div>
                 ),

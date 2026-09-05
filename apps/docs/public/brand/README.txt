@@ -46,12 +46,13 @@ Colors
 Cobalt (accent), light   #2f52d4
 Cobalt (accent), dark    #528dff
 Cell fill (near-white)   #faf7f1
-Ink (light theme)        #17110a
-Paper (light theme)      #efe9dd
+Ink (light theme)        #12151d
+Paper (light theme)      #e9edf4
 Ink (dark theme)         #e9e8e3
 Paper (dark theme)       #0a0b0f
 
-Machine-readable in colors.json, accent siblings included.
+Machine-readable in colors.json, with all six accent siblings and
+the semantic positive/negative pair.
 
 Usage
 -----

@@ -1,7 +1,15 @@
 /**
  * Write every brand asset and the downloadable kit.
  *
- *   pnpm gen:brand-kit            (from apps/docs)
+ *   pnpm gen:brand-kit                 (from apps/docs)
+ *   pnpm gen:brand-kit --no-raster     reuse the PNGs already on disk
+ *
+ * The rasters are the only step that needs a browser, and Chromium's
+ * antialiasing differs between builds — regenerating them on a different
+ * Chromium rewrites all twelve files for no visual change. `--no-raster` reads
+ * them back from public/brand/png instead, so a fix to the README, the license
+ * text or a documented color can reissue the kit without touching the artwork.
+ * It refuses if any SVG a raster is drawn from actually moved.
  *
  * The sources live in src/lib/brand-assets.ts — the mark from brand.ts, the
  * name from wordmark.ts (outlined by gen-wordmark-path.py). This script is the
@@ -34,11 +42,44 @@ const DOCS = join(HERE, "..");
 const REPO = join(DOCS, "../..");
 const OUT = join(DOCS, "public/brand");
 const KIT = "microcharts-brand-kit";
+const NO_RASTER = process.argv.includes("--no-raster");
 
 /** Bump when the kit's contents change. Fixed so the zip stays byte-stable. */
 const STAMP = new Date("2026-07-29T00:00:00Z");
 
 // ── rasters ────────────────────────────────────────────────────────────────
+
+/** The SVGs a raster is drawn from, as they were on disk before this run wrote
+ *  over them. `--no-raster` keeps the old PNGs, so it is only sound while those
+ *  sources are byte-identical to what the module now generates. */
+function rasterSourcesBefore() {
+  const before = new Map();
+  for (const { from } of BRAND_PNGS) {
+    if (!before.has(from)) before.set(from, readFileSync(join(OUT, from), "utf8"));
+  }
+  return before;
+}
+
+/** A PNG that no longer matches the SVG it came from would ship a stale mark —
+ *  the failure this module exists to prevent. Runs BEFORE anything is written:
+ *  after the write loop it would compare the sources against themselves, so a
+ *  rejected run would clear its own evidence and an immediate retry would pass. */
+function assertArtworkUnchanged(before) {
+  const stale = [...before].filter(([name, source]) => source !== BRAND_SVGS[name]).map(([n]) => n);
+  if (stale.length) {
+    throw new Error(
+      `--no-raster needs the artwork unchanged, but ${stale.join(", ")} moved. Rerun without it.`,
+    );
+  }
+}
+
+/** Read the rasters back from disk instead of redrawing them. */
+function reuseRasters() {
+  const out = {};
+  for (const { file } of BRAND_PNGS) out[file] = readFileSync(join(OUT, "png", file));
+  console.log(`reused ${BRAND_PNGS.length} png from disk`);
+  return out;
+}
 
 async function rasterize() {
   const browser = await chromium.launch();
@@ -153,19 +194,32 @@ console.log(
 );
 mkdirSync(join(OUT, "png"), { recursive: true });
 
+const before = NO_RASTER ? rasterSourcesBefore() : null;
+if (before) assertArtworkUnchanged(before);
+
 for (const [name, source] of Object.entries(BRAND_SVGS)) writeFileSync(join(OUT, name), source);
 console.log(`wrote ${Object.keys(BRAND_SVGS).length} svg`);
 
-const pngs = await rasterize();
+const pngs = before ? reuseRasters() : await rasterize();
 for (const [name, buf] of Object.entries(pngs)) writeFileSync(join(OUT, "png", name), buf);
 
+// The text files ship beside the artwork as well as inside the zip: the
+// README points at LICENSE.txt and colors.json, the brand page links the terms,
+// and the OFL has to travel with the wordmark outlines wherever they are served
+// — including straight off /brand/, which is how most people take them.
+const COLORS = `${JSON.stringify(BRAND_COLORS, null, 2)}\n`;
+const OFL = readFileSync(join(REPO, "assets/fonts/OpenRunde-OFL.txt"));
+mkdirSync(join(OUT, "fonts"), { recursive: true });
 writeFileSync(join(OUT, "README.txt"), BRAND_README);
+writeFileSync(join(OUT, "LICENSE.txt"), BRAND_LICENSE);
+writeFileSync(join(OUT, "colors.json"), COLORS);
+writeFileSync(join(OUT, "fonts/OpenRunde-OFL.txt"), OFL);
 
 const entries = [
   [`${KIT}/README.txt`, Buffer.from(BRAND_README)],
   [`${KIT}/LICENSE.txt`, Buffer.from(BRAND_LICENSE)],
-  [`${KIT}/colors.json`, Buffer.from(`${JSON.stringify(BRAND_COLORS, null, 2)}\n`)],
-  [`${KIT}/fonts/OpenRunde-OFL.txt`, readFileSync(join(REPO, "assets/fonts/OpenRunde-OFL.txt"))],
+  [`${KIT}/colors.json`, Buffer.from(COLORS)],
+  [`${KIT}/fonts/OpenRunde-OFL.txt`, OFL],
   ...Object.entries(BRAND_SVGS).map(([f, s]) => [`${KIT}/svg/${f}`, Buffer.from(s)]),
   ...Object.entries(pngs).map(([f, b]) => [`${KIT}/png/${f}`, b]),
 ].sort(([a], [b]) => (a < b ? -1 : 1));
