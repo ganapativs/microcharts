@@ -19,7 +19,6 @@ import { sproutRowGeometry, stageGlyphBox } from "./geometry.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
 import {
   SproutRow as StaticSproutRow,
-  sproutShowValue,
   sproutBox,
   sproutLabelsFit,
   sproutLayout,
@@ -98,7 +97,8 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         pad: PAD,
         padX: lay.padX,
         bottomReserve: lay.labelBand,
-        topReserve: sproutShowValue(props.label, fontSize, height) ? fontSize + PAD : 0,
+        fontSize,
+        label: props.label,
       }),
     [data, height, lay, fontSize, props.label],
   );

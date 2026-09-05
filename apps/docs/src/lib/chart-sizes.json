@@ -220,7 +220,7 @@
     "interactive": 3.2
   },
   "fill-word": {
-    "static": 1.83,
+    "static": 1.84,
     "interactive": 3.39
   },
   "fat-digits": {
@@ -240,12 +240,12 @@
     "interactive": 3.86
   },
   "balance-beam": {
-    "static": 2.5,
-    "interactive": 5.1
+    "static": 2.55,
+    "interactive": 5.14
   },
   "sprout-row": {
-    "static": 2.22,
-    "interactive": 4.78
+    "static": 2.26,
+    "interactive": 4.83
   },
   "garden-grid": {
     "static": 2.07,
@@ -285,7 +285,7 @@
   },
   "breathing-dot": {
     "static": 2.09,
-    "interactive": 3.79
+    "interactive": 3.8
   },
   "heartbeat-blip": {
     "static": 2.45,
@@ -304,8 +304,8 @@
     "interactive": 5.54
   },
   "icon-array": {
-    "static": 2.64,
-    "interactive": 5.23
+    "static": 2.66,
+    "interactive": 5.25
   },
   "time-in-range": {
     "static": 2.55,
@@ -336,12 +336,12 @@
     "interactive": 2.28
   },
   "wind-barb": {
-    "static": 2.73,
-    "interactive": 4.3
+    "static": 2.75,
+    "interactive": 4.31
   },
   "star-spoke": {
-    "static": 2.4,
-    "interactive": 4.95
+    "static": 2.42,
+    "interactive": 4.97
   },
   "minimap-strip": {
     "static": 2.91,
