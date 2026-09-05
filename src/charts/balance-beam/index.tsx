@@ -122,13 +122,6 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
   const numerals = (data as readonly (BeamDatum | undefined)[])
     .slice(0, 2)
     .map((d) => (d && Number.isFinite(d.value) ? fmt(d.value) : ""));
-  const showValues =
-    label === "values" && numerals.reduce((w, t) => w + t.length * 0.62 * fontSize, 0) + 2 <= width;
-  // value numerals sit in their own gutter below the apparatus (never over the beam)
-  const labelBand = showValues ? Math.ceil(fontSize * 1.3) : 0;
-  // The numerals' text baseline — also the inline seat's floor when they render.
-  const labelY = height + labelBand - fontSize * 0.32;
-
   const l = data[0] as BeamDatum | undefined;
   const r = data[1] as BeamDatum | undefined;
   const geo = balanceBeamGeometry({
@@ -141,14 +134,32 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
     domain,
     pad: PAD,
   });
-  const accName = resolveSummary(summary, () =>
-    balanceBeamSummary(data, { mode, domain, strings, format, locale }),
-  );
   // keep a centered value numeral inside the box (the beam ends ride the edges)
   const labelX = (cx: number, text: string) => {
     const half = (text.length * 0.62 * fontSize) / 2;
     return Math.min(Math.max(cx, half + 1), width - half - 1);
   };
+  // Two gates, because the box is not the only thing that can crowd them. The
+  // pair must fit the width (`sum + 2`), and it must fit the SEPARATION between
+  // their clamped seats — a tilted beam converges the pan centres by cos(θ), and
+  // the clamp then walks a wide numeral further inward, so a pair whose combined
+  // width fits the box could still be stacked on each other. Half of each
+  // numeral sits either side of its seat, hence `sum / 2 + 2 ≤ dx`.
+  const sum = numerals.reduce((w, t) => w + t.length * 0.62 * fontSize, 0);
+  const dx = Math.abs(
+    labelX(geo.weights[1]?.cx ?? 0, numerals[1] ?? "") -
+      labelX(geo.weights[0]?.cx ?? 0, numerals[0] ?? ""),
+  );
+  const showValues =
+    label === "values" && sum + 2 <= width && (numerals.length < 2 || sum + 4 <= 2 * dx);
+  // value numerals sit in their own gutter below the apparatus (never over the beam)
+  const labelBand = showValues ? Math.ceil(fontSize * 1.3) : 0;
+  // The numerals' text baseline — also the inline seat's floor when they render.
+  const labelY = height + labelBand - fontSize * 0.32;
+
+  const accName = resolveSummary(summary, () =>
+    balanceBeamSummary(data, { mode, domain, strings, format, locale }),
+  );
 
   // The heavier pan is accented — the "which side wins" read is instant, and it
   // only reinforces the tilt (never the sole cue), so direction stays legible

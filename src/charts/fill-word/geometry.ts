@@ -76,7 +76,10 @@ export function fillWordGeometry(opts: {
   const width =
     label && chars > 0
       ? Math.max(1, Math.ceil((numeralX ?? 0) + numeralExtent + pad))
-      : Math.max(1, Math.ceil(textLength + 2 * pad));
+      : // The word renders at its NATURAL width, so the box has to reserve the
+        // wider of the two estimates: 0.62 em/char is a digits figure and ALL-CAPS
+        // prose runs past it, which put SNOWPACK's tail on the text that follows.
+        Math.max(1, Math.ceil(Math.max(textLength, wordExtent) + 2 * pad));
 
   // fill: accent grows from the left → clip the right (1−v) away.
   // drain: accent (remaining) empties from the left as v rises → clip the left v away.

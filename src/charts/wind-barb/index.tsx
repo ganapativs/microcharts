@@ -9,7 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { resolveSummary } from "../../core/summary.js";
-import { labelFont, textGutter } from "../../core/labels.js";
+import { labelFitsBand, labelFont, textGutter } from "../../core/labels.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
 import { DEFAULT_SIZE, isCalm, resolveStep, windBarbGeometry } from "./geometry.js";
@@ -95,7 +95,14 @@ export function WindBarb(props: WindBarbProps): ReactNode {
   // quantum still has a direction and keeps its label; that pairing is the point
   // of labelling a quantized glyph.
   const readable = isFiniteValue(mag) && Number.isFinite(direction);
-  const labelText = (label === "value" || mode === "arrow") && readable ? fmt(mag) : undefined;
+  // `labelSize` raises the floor above the 11-unit cap, so it can ask for text
+  // taller than the box — and a label the box cannot seat DROPS, as the prop's
+  // own contract says (trend-arrow already enforces it this way). The gutter
+  // drops in the same branch, so the glyph reclaims the width.
+  const labelText =
+    (label === "value" || mode === "arrow") && readable && labelFitsBand(size, fontSize)
+      ? fmt(mag)
+      : undefined;
   const gutter = labelText ? textGutter(labelText.length, fontSize, 3) : 0;
   const totalW = size + gutter;
 

@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, textGutterProse } from "../../core/labels.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { resolveSummary } from "../../core/summary.js";
 import { isFiniteValue, round2 } from "../../core/types.js";
@@ -186,7 +186,12 @@ export function StarSpoke(props: StarSpokeProps): ReactNode {
             const dx = Math.cos(s.angle);
             const dy = Math.sin(s.angle);
             const anchor = dx > 0.3 ? "start" : dx < -0.3 ? "end" : "middle";
-            const est = 0.62 * fontSize * label.length;
+            // `label` is CALLER PROSE, so it is measured on the prose bound.
+            // 0.62 em/char is the digits figure, and wide glyphs (THROUGHPUT,
+            // MMMM) ran past it — the drop test and the clamp below both read
+            // this number, so under-estimating kept a label AND seated it over
+            // the viewBox edge.
+            const est = textGutterProse(label.length, fontSize, 0);
             // Seat at the RIM (fixed radius), not the value tip — otherwise a
             // low-value spoke pulls its label into the hub and labels collide.
             const naturalX = s.rx + dx * (fontSize * 0.5);

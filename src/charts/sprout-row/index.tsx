@@ -42,6 +42,19 @@ export interface SproutRowProps {
 }
 
 const PAD = 2;
+
+/** Whether the stage numeral is painted: it sits above the glyph on a text
+ *  baseline and drops once its descender would clear the box floor. Exported so
+ *  the interactive entry reserves the same top band — its focus rings are built
+ *  from the glyph box, and a ring sized against a taller plant than the one
+ *  drawn is not concentric with it. */
+export function sproutShowValue(
+  label: "none" | "value" | undefined,
+  fontSize: number,
+  height: number,
+): boolean {
+  return label === "value" && labelFitsY(PAD + fontSize, fontSize, height, false);
+}
 /** Slot pitch when the caller sets none. */
 const DEFAULT_STEP = 16;
 /** Labels stagger onto two tiers below the soil, so a named row starts taller. */
@@ -158,9 +171,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
   // sprout, with the names spilling out of the box — so they drop, and the band
   // and side gutter drop with them (the plot itself never reflows).
   const showLabels = labels && sproutLabelsFit(data, fontSize, height, props.step);
-  // The stage numeral sits above the glyph on a text baseline; drop it once its
-  // descender would clear the box floor.
-  const showValue = label === "value" && labelFitsY(PAD + fontSize, fontSize, height, false);
+  const showValue = sproutShowValue(label, fontSize, height);
   const { step, padX, labelBand, twoTier } = sproutLayout(data, showLabels, fontSize, props.step);
 
   const geo = sproutRowGeometry({
@@ -170,6 +181,9 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     pad: PAD,
     padX,
     bottomReserve: labelBand,
+    // The numeral sits on a baseline at the top of the box; without a band
+    // carved out for it the plant grew the full height and painted through it.
+    topReserve: showValue ? fontSize + PAD : 0,
   });
   const accName = resolveSummary(summary, () => sproutRowSummary(data, strings));
   const paint = color;
@@ -201,7 +215,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
         s.stage === null ? null : (
           <path
             key={`g${s.x}`}
-            d={stageGlyph(s.stage, s.x, s.baselineY, s.baselineY - PAD)}
+            d={stageGlyph(s.stage, s.x, s.baselineY, geo.gh)}
             data-mc-ink="point"
             style={paint ? { fill: paint } : undefined}
           />

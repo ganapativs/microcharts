@@ -7,6 +7,11 @@ import { round2 } from "../../core/types.js";
 
 export interface SproutRowGeometry {
   slots: { x: number; baselineY: number; stage: number | null }[];
+  /** The glyph's usable height — the room a plant has to grow in, after the
+   *  stage numeral's band is carved off the top. Both entries read it rather
+   *  than re-deriving `baselineY - pad`, which is how the plant grew into the
+   *  numeral's own line and painted over it. */
+  gh: number;
   soil: { x1: number; y1: number; x2: number; y2: number };
   step: number;
   width: number;
@@ -110,13 +115,16 @@ export function sproutRowGeometry(opts: {
   padX?: number;
   /** Space reserved below the soil for category labels. */
   bottomReserve?: number;
+  /** Space reserved above the plants for the stage numeral. */
+  topReserve?: number;
 }): SproutRowGeometry {
-  const { stages, height, step, pad, padX = pad, bottomReserve = 0 } = opts;
+  const { stages, height, step, pad, padX = pad, bottomReserve = 0, topReserve = 0 } = opts;
   const n = stages.length;
   // A box too short to hold the pad put the soil — and every glyph standing on
   // it — above the frame. Nothing may paint outside the viewBox, so the soil
   // rides the top edge instead and the plants have no room left to grow.
   const baselineY = round2(Math.max(0, height - pad - 1 - bottomReserve));
+  const gh = round2(Math.max(0, baselineY - pad - topReserve));
   const slots = stages.map((s, i) => ({
     x: round2(padX + step / 2 + i * step),
     baselineY,
@@ -125,6 +133,7 @@ export function sproutRowGeometry(opts: {
   const width = Math.max(1, Math.ceil(n * step + 2 * padX));
   return {
     slots,
+    gh,
     soil: { x1: padX, y1: baselineY, x2: round2(width - padX), y2: baselineY },
     step,
     width,
