@@ -30,13 +30,17 @@ allowBuilds:
   sharp: true
   workerd: true
 
-# tsdown@0.22.4 still declares its `typescript` peer as ^5||^6, but builds and
-# emits d.ts fine under TypeScript 7 (dts is generated via oxc, not tsc). Allow
-# TS 7 to satisfy that peer so install stays warning-free; drop once tsdown
-# widens its declared range.
+# @fast-check/vitest@0.4.1 still declares its `vitest` peer as ^4.1.0, but the
+# only vitest API it reaches for — `test` and `TestRunner.getSuiteHooks` — is
+# unchanged in 5.0.0, and all 177 property tests across 118 files pass on it.
+# Allow vitest 5 to satisfy that peer so install stays warning-free; drop once
+# @fast-check/vitest widens its declared range.
+#
+# (The `tsdown>typescript` rule that lived here is gone: tsdown 0.23 declares
+# `^5.0.0 || ^6.0.0 || ^7.0.0` and needs no help.)
 peerDependencyRules:
   allowedVersions:
-    "tsdown>typescript": "7"
+    "@fast-check/vitest>vitest": "5"
 
 # One Playwright runtime, and only one. This repo pins `playwright` and
 # `@playwright/test` together with the CI container image (see ci.yml), but

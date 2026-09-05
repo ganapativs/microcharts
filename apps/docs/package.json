@@ -27,7 +27,7 @@
   "dependencies": {
     "@microcharts/react": "workspace:*",
     "@stackblitz/sdk": "^1.11.1",
-    "cnfast": "^0.1.0",
+    "cnfast": "^0.2.0",
     "fumadocs-core": "16.15.7",
     "fumadocs-mdx": "15.4.0",
     "fumadocs-ui": "16.15.7",
@@ -48,7 +48,7 @@
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11",
+    "vitest": "^5.0.0",
     "wrangler": "^4.129.0"
   }
 }
