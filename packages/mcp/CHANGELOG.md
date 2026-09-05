@@ -1,5 +1,25 @@
 # @microcharts/mcp
 
+## 0.1.17
+
+### Patch Changes
+
+- [#157](https://github.com/ganapativs/microcharts/pull/157)
+  [`3b29ce9`](https://github.com/ganapativs/microcharts/commit/3b29ce9b55482d348a12c8d12679e5f8accc69d3) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Embedded catalog regenerated: `<ControlStrip>` no longer lists a
+  `limits` prop.
+
+- Updated dependencies
+  [[`b0325ac`](https://github.com/ganapativs/microcharts/commit/b0325aca3106c54ef3c74f5ba8b77c3a91360059),
+  [`5591e2f`](https://github.com/ganapativs/microcharts/commit/5591e2fa8e879ba454bcbb24d9fc3f5ff276ca9b),
+  [`3b29ce9`](https://github.com/ganapativs/microcharts/commit/3b29ce9b55482d348a12c8d12679e5f8accc69d3),
+  [`f7f1540`](https://github.com/ganapativs/microcharts/commit/f7f1540c55ec10b98de3957a73b86e8d9a58c5ee),
+  [`e406804`](https://github.com/ganapativs/microcharts/commit/e406804964ce8d6c72efa190085fc8604eb1a977),
+  [`c2647cb`](https://github.com/ganapativs/microcharts/commit/c2647cb9600a8e1042a34c79e024157926a4571b),
+  [`10ebc5c`](https://github.com/ganapativs/microcharts/commit/10ebc5cdd6abd9f7943c0e08e136780c2c483bf5),
+  [`6531194`](https://github.com/ganapativs/microcharts/commit/653119456ff5ba10014d53a06f9bb5ab44cb0ec4)]:
+  - @microcharts/react@0.19.0
+
 ## 0.1.16
 
 ### Patch Changes

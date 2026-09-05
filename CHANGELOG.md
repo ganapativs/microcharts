@@ -1,5 +1,116 @@
 # @microcharts/react
 
+## 0.19.0
+
+### Minor Changes
+
+- [#157](https://github.com/ganapativs/microcharts/pull/157)
+  [`3b29ce9`](https://github.com/ganapativs/microcharts/commit/3b29ce9b55482d348a12c8d12679e5f8accc69d3) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - **Breaking:** `<ControlStrip>` no longer accepts `limits`. The band is
+  always ±3σ̂ estimated from the moving range, which is what `limits="sigma"` (the default) already did.
+
+  `limits="percentile"` cut the band from the empirical p0.135/p99.865 of the same sample it then tested, and the R-7
+  estimator lands strictly inside the observed range — so the series minimum and maximum satisfied the out-of-control
+  test by construction, on any data whose extremes are not tied. On `[12, 14, 9, 16, 11, 13, 15, 10, 17, 8]` the band
+  came out `[8.01, 16.99]` and flagged both `17` and `8`; the ±3σ̂ default flags neither. The same `out` array drives the
+  ringed dots, the crosshair classification, the readout chip and the accessible summary, so every surface reported
+  excursions that were not there.
+
+  Correct percentile limits need a Phase I reference window the chart's data contract does not carry. Rather than ship a
+  band with near-zero specificity, the option is removed; drop the prop, and the chart renders as it did on the default.
+  A reference-window API can land later.
+
+### Patch Changes
+
+- [#154](https://github.com/ganapativs/microcharts/pull/154)
+  [`b0325ac`](https://github.com/ganapativs/microcharts/commit/b0325aca3106c54ef3c74f5ba8b77c3a91360059) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Eight charts announced something they did not paint. `PartitionStrip`
+  described the whole tree while the strip caps at 24 segments, so a wide bundle breakdown named a group count — and a
+  "largest" — that was never drawn. `Constellation` announced a largest event on jittered data, where the geometry
+  deliberately rings none. `ConfusionGrid` formatted the raw accuracy in the gutter and the 2-dp-rounded one in the
+  summary, so a matrix landing on a `.xx5` boundary painted 58% and said 57%. `BurnChart` painted a red `+7 d` schedule
+  verdict for a chart with no plan recorded. `ForecastCone` counted raw array lengths for the horizon, inflating it by
+  every non-finite entry the chart dropped. `Waterfall` showed `0` for a flat step in the chip and `+0` in the live
+  region and in the `formatted` a consumer lifts into its own KPI card. `GradeProfile` announced `∞%` and handed
+  `Infinity` to `onActive` for a pitch over a subnormal run. `Hourglass` read a value dropout as a threshold crossing
+  and announced the same sentence a real drain to 0% does.
+
+  Adds `constellationPlain` to `SummaryStrings` — the sentence for sparse events with no ranking channel.
+
+- [#150](https://github.com/ganapativs/microcharts/pull/150)
+  [`5591e2f`](https://github.com/ganapativs/microcharts/commit/5591e2fa8e879ba454bcbb24d9fc3f5ff276ca9b) Thanks
+  [@detail-app](https://github.com/apps/detail-app)! - `CoverageStrip` now rounds the coverage percent the same way its
+  k-of-n siblings do. The summary aria-label and the `label="percent"` gutter text fed `Intl` a `round2`-pre-rounded
+  fraction, so a true half like 57.5% (`23/40`) collapsed to `0.57` via IEEE-754 `Math.round` before `Intl` saw it,
+  announcing and painting "57%" where `Progress` announces "58%" for the same ratio. The formatter now receives the raw
+  `measured / expected` fraction and lets `Intl` do the rounding, matching `progress`.
+
+- [#153](https://github.com/ganapativs/microcharts/pull/153)
+  [`f7f1540`](https://github.com/ganapativs/microcharts/commit/f7f1540c55ec10b98de3957a73b86e8d9a58c5ee) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Interactive entries now resolve the same box as the static twin they
+  compose. Four entries laid their overlay or pointer map against a box the static never used: `Sparkline` skipped the
+  `chartSide` clamp, so a `width={NaN}` off a collapsed container ringed a coordinate that was not on the line;
+  `NetFlow` withheld `labelSize` from the label rule, and `ErrorBudget` skipped the seat test that drops the label
+  gutter, so both mapped the pointer over a width wider than the one they rendered and the crosshair ran ahead of the
+  cursor; `Waveform` dropped `locale` from the sample-count formatter, so the accessible name announced the tally in the
+  runtime's locale rather than the caller's.
+
+- [#155](https://github.com/ganapativs/microcharts/pull/155)
+  [`e406804`](https://github.com/ganapativs/microcharts/commit/e406804964ce8d6c72efa190085fc8604eb1a977) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Eight charts painted a label outside the box that reserved room for
+  it, or on top of another mark. `.mc-root` is `overflow: visible`, so each of these lands in the page rather than
+  clipping.
+
+  `FillWord` sized its viewBox from the 0.62 em/char digits estimate while the word renders at its natural width —
+  `SNOWPACK` ran 4 units onto the sentence beside it, and the caps-aware extent the chart already computes now sets the
+  box. `StarSpoke` measured caller-supplied metric names on the same digits rate instead of the published prose bound.
+  `IconArray` reserved five characters for its percent label, which is `"100%"` — a `format` asking for fractional
+  digits ran past the edge; the reserve is now measured off the caller's own formatter. `WindBarb` painted a label
+  taller than its box when `labelSize` raised the floor above it, where the prop's contract (and its sibling
+  `TrendArrow`) says the label drops. `Dumbbell` bounded the from-value against the viewBox origin rather than the
+  row-name gutter, so a `from` on the domain minimum overprinted the row name. `SproutRow` grew its plants through the
+  stage numeral's own line. `BalanceBeam` gated its numerals on the box width alone, so a tilted beam stacked them on
+  each other. `BreathingDot` cut its reserved gutter for a four-character `"100%"`, so in locales that write `"100 %"`
+  the line resized when the feed dropped out.
+
+- [#156](https://github.com/ganapativs/microcharts/pull/156)
+  [`c2647cb`](https://github.com/ganapativs/microcharts/commit/c2647cb9600a8e1042a34c79e024157926a4571b) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Fixes five picking and scale bugs. `IconArray`'s keyboard step applied
+  its idle rule ("a first arrow from nothing focuses unit 0") ahead of the key filter, so the first `Tab` or letter
+  after an idle reset activated unit 0, fired `onActive`, and swallowed the keystroke. `TimeInRange`'s hit test matched
+  each zone's painted extent and ignored the separator the geometry lays between them, so a pointer sweep hit a dead
+  band at every boundary and the hover outline, chip and live region dropped and re-lit; the geometry now reports the
+  separator it actually laid and the hit box swallows it. `Horizon`'s `foldedY` wrapped past the top fold into a band
+  that is never drawn, teleporting the interactive dot the height of the strip for a value one epsilon over the ceiling.
+  `niceDomain` dropped the zero anchor for an all-zero series, so a zero-anchored `Sparkline` fill drew its baseline
+  across the midline instead of the floor. `CalendarStrip`'s `color` prop skipped zero-valued days, which kept the
+  default accent beside recoloured neighbours.
+
+- [#159](https://github.com/ganapativs/microcharts/pull/159)
+  [`10ebc5c`](https://github.com/ganapativs/microcharts/commit/10ebc5cdd6abd9f7943c0e08e136780c2c483bf5) Thanks
+  [@ganapativs](https://github.com/ganapativs)! - Replaces the announce-on-change and pulse-on-change effects with two
+  shared hooks, `useAnnounceOnChange` and `usePulseOnChange`. Fourteen interactive charts each kept their own `useRef` +
+  `useEffect` that called `setState` synchronously, which costs a second render — and a committed intermediate frame —
+  on every value change. Both hooks derive the state during render instead, so React re-runs the component before
+  committing and the intermediate frame never happens. Announcement semantics are unchanged: still silent on mount,
+  still quiet while `live` is false, still keyed on the same value per chart.
+
+  `usePrefersReducedMotion` now reads `matchMedia` through `useSyncExternalStore`. It used to seed `false` and correct
+  itself in a mount effect, so a reader who asked for reduced motion got one committed frame of the animated state
+  first.
+
+- [#151](https://github.com/ganapativs/microcharts/pull/151)
+  [`6531194`](https://github.com/ganapativs/microcharts/commit/653119456ff5ba10014d53a06f9bb5ab44cb0ec4) Thanks
+  [@detail-app](https://github.com/apps/detail-app)! - `<TimeInRange orientation="vertical">` no longer paints its
+  in-zone percent outside the SVG when the strip is thinner than the label.
+
+  The fit gate measures the label's horizontal glyph extent, and the `<text>` is unrotated in both orientations — so
+  that extent always runs along the SVG X axis. In vertical mode the gate compared it against `z.height` (the
+  along-strip length) instead of `z.width` (the cross-strip thickness), so a thin vertical strip still painted a label
+  wider than itself and it escaped the viewBox on both X edges. The gate now bounds the glyph extent against `z.width`
+  regardless of orientation; a label the strip can no longer seat drops rather than spilling, the same degradation the
+  horizontal mode already had.
+
 ## 0.18.1
 
 ### Patch Changes
