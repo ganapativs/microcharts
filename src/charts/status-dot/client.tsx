@@ -3,10 +3,10 @@
 // a polite region ("Deploys: warning."). No pointer math — a single 8-px state
 // mark has nothing to reveal on hover that the summary doesn't already say
 // (documented skip).
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef } from "react";
 import { named, useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { resolveStatus, StatusDot as StaticStatusDot, type StatusDotProps } from "./index.js";
 
@@ -60,13 +60,7 @@ export function StatusDot(props: InteractiveStatusDotProps): React.ReactNode {
   // Announce only real changes, not the initial mount (an aria-live region's
   // first content is read anyway by some SRs; keep the channel quiet until the
   // state actually moves).
-  const [announced, setAnnounced] = useState("");
-  const prev = useRef(state.label);
-  useEffect(() => {
-    if (prev.current === state.label) return;
-    prev.current = state.label;
-    if (live) setAnnounced(generated);
-  }, [state.label, generated, live]);
+  const announced = useAnnounceOnChange(state.label, generated, live);
 
   // One state mark, one selectable unit (index 0). A status encodes no number,
   // so `value` is null and the state's name rides in `label`. One builder, so

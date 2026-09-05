@@ -37,6 +37,9 @@ describe("useFluidWidth ref", () => {
     let seen: HTMLDivElement | null = null;
     function Probe(): React.ReactNode {
       const { ref } = useFluidWidth();
+      // Reading the ref during render is the ASSERTION — the test below pins
+      // that it is null until commit. Both rules fire on the probe, not on a bug.
+      // oxlint-disable-next-line react/globals, react/refs
       seen = ref.current;
       return <div ref={ref} data-testid="box" />;
     }

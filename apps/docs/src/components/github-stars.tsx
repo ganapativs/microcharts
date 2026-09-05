@@ -37,6 +37,9 @@ function useGithubStars(repo: string): number | null {
       if (raw) {
         const cached = JSON.parse(raw) as { n: number; t: number };
         if (Date.now() - cached.t < TTL_MS) {
+          // localStorage is an external system and is not readable during SSR, so
+          // this cannot move into a lazy initializer without a hydration mismatch.
+          // oxlint-disable-next-line react/set-state-in-effect
           setStars(cached.n);
           return;
         }

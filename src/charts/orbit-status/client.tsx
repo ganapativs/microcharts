@@ -8,7 +8,7 @@
 // live region announces threshold crossings only. ONE unit (the dependency
 // itself) → the lean scalar contract: `onSelect` for drill-down, no picker
 // kernel, no roving, no selection state to rove between.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { usePrefersReducedMotion, useInViewport } from "../../shared/motion.js";
 import { useEntrance } from "../../shared/motion-gate.js";
 import { makeFormatter } from "../../core/format.js";
@@ -17,7 +17,7 @@ import { isFiniteValue } from "../../core/types.js";
 import { CHIP, named, fillFor, useScalarActive, wrap } from "../../shared/interactive.js";
 import type { MicroDatum } from "../../shared/interactive.js";
 import { EN_ORBIT_STATUS, type OrbitStatusStrings } from "../../core/strings-orbit-status.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { orbitStatusGeometry } from "./geometry.js";
 import {
   OrbitStatus as StaticOrbitStatus,
@@ -90,9 +90,6 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     [latency, rate, size, latencyDomain, rateDomain, threshold],
   );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
-  const [announced, setAnnounced] = useState("");
-  const prevAlerted = useRef<boolean | null>(null);
-  const mounted = useRef(false);
 
   const accName =
     summary === false
@@ -152,19 +149,13 @@ export function OrbitStatus(props: InteractiveOrbitStatusProps): React.ReactNode
     return () => anim.cancel();
   }, [reduced, inView, geo.unknown, geo.orbit.rateStep, geo.center.cx, geo.center.cy, wrapRef]);
 
-  // Announce threshold crossings only (never per frame); quiet on mount.
-  useEffect(() => {
-    const alerted = geo.satellite.alerted;
-    if (!mounted.current) {
-      mounted.current = true;
-      prevAlerted.current = alerted;
-      return;
-    }
-    if (prevAlerted.current === alerted) return;
-    prevAlerted.current = alerted;
-    if (alerted) setAnnounced(strings.orbitAlert(fmt(Math.max(0, latency))));
-    else setAnnounced(orbitStatusSummary(latency, rate, { threshold, strings, format, locale }));
-  }, [geo.satellite.alerted, latency, rate, threshold, strings, fmt, format, locale]);
+  // Announce threshold crossings only (never per frame); quiet on mount, which
+  // is what keying the announcement on `alerted` gives — the hook starts having
+  // already seen the mount value.
+  const crossingText = geo.satellite.alerted
+    ? strings.orbitAlert(fmt(Math.max(0, latency)))
+    : orbitStatusSummary(latency, rate, { threshold, strings, format, locale });
+  const announced = useAnnounceOnChange(geo.satellite.alerted, crossingText, true);
 
   return (
     <span

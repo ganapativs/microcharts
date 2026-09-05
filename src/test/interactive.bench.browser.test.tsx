@@ -104,6 +104,8 @@ describe.skipIf(!RUN)("interactive bench", () => {
       let bump: (n: number) => void = () => {};
       function Harness(): React.ReactNode {
         const [n, setN] = useState(0);
+        // The harness hands its setter out so the bench can drive re-renders.
+        // oxlint-disable-next-line react/globals
         bump = setN;
         return (
           <div data-n={n}>

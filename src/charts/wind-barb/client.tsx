@@ -3,10 +3,10 @@
 // reports the reading, and a live value change re-announces it through a
 // polite region. No sub-part navigation — the shaft is a single unit, and the
 // accessible name already carries the full reading.
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_WIND_BARB, octant, type WindBarbStrings } from "../../core/strings-wind-barb.js";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
@@ -72,14 +72,7 @@ export function WindBarb(props: InteractiveWindBarbProps): React.ReactNode {
   // painted glyph when this sits inline in prose (see seat-hoist).
   useSeatHoist(wrap);
   useEntrance(wrap, "pop", animate);
-  const prev = useRef(text);
-  const [announced, setAnnounced] = useState("");
-
-  useEffect(() => {
-    if (prev.current === text) return;
-    prev.current = text;
-    if (live) setAnnounced(text);
-  }, [text, live]);
+  const announced = useAnnounceOnChange(text, text, live);
 
   // The caller's `summary` owns the wrapper's name: `false` is the decorative
   // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a

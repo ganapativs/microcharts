@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { CopyButton } from "@/components/ui/copy";
 
 export type PropRow = {
@@ -57,8 +57,13 @@ function resizePair(
 
 export function PropTableView({ rows }: { rows: PropRow[] }) {
   const [widths, setWidths] = useState<[number, number, number] | null>(null);
+  // Latest-value mirror for the drag handlers. Written on commit: assigning it
+  // during render is a render side effect, and React may not have kept the
+  // render it happened in.
   const widthsRef = useRef(widths);
-  widthsRef.current = widths;
+  useEffect(() => {
+    widthsRef.current = widths;
+  }, [widths]);
   const drag = useRef<{
     col: 0 | 1;
     startX: number;

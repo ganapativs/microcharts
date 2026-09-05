@@ -3,9 +3,10 @@
 // point at. `live` mode announces direction changes through a polite region and
 // gives the glyph a one-shot pulse (CSS, reduced-motion-gated). Keyboard:
 // wrapper is focusable, nothing more.
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef } from "react";
 import { named, useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { usePulseOnChange } from "../../shared/motion.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { TrendArrow as StaticTrendArrow, trendArrowModel, type TrendArrowProps } from "./index.js";
@@ -49,19 +50,9 @@ export function TrendArrow(props: InteractiveTrendArrowProps): React.ReactNode {
     ...rest
   } = props;
   const model = trendArrowModel({ ...rest, strings });
-  const [pulse, setPulse] = useState(false);
-  const prev = useRef(model.direction);
+  const pulse = usePulseOnChange(model.direction, live);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
-
-  useEffect(() => {
-    if (prev.current === model.direction) return;
-    prev.current = model.direction;
-    if (!live) return;
-    setPulse(true);
-    const t = setTimeout(() => setPulse(false), 450);
-    return () => clearTimeout(t);
-  }, [model.direction, live]);
 
   const accName =
     summary === false ? undefined : typeof summary === "string" ? summary : model.summary;

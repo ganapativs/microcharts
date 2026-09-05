@@ -62,10 +62,14 @@ export function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // The mobile sheet never survives a navigation or an Escape.
-  useEffect(() => {
+  // The mobile sheet never survives a navigation or an Escape. Derived from the
+  // path rather than synced to it: an effect would paint one frame of the open
+  // sheet on the new route before closing it.
+  const [route, setRoute] = useState(pathname);
+  if (route !== pathname) {
+    setRoute(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {

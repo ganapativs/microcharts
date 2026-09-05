@@ -4,7 +4,7 @@
 // Fill-width transition is CSS, reduced-motion-gated. No pointer math (single
 // mark) — hover/focus is a reveal of the reading, for the `label="none"` bar
 // that prints nothing.
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import {
   CHIP,
   named,
@@ -14,7 +14,7 @@ import {
   type MicroDatum,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_SCALAR, type ScalarStrings } from "../../core/strings-scalar.js";
 import { Progress as StaticProgress, progressModel, type ProgressProps } from "./index.js";
 
@@ -67,13 +67,8 @@ export function Progress(props: InteractiveProgressProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "sweep", animate);
 
-  const [announced, setAnnounced] = useState("");
-  const prev = useRef(wholePct);
-  useEffect(() => {
-    if (prev.current === wholePct) return; // sub-percent movement stays quiet
-    prev.current = wholePct;
-    if (live) setAnnounced(model.summary);
-  }, [wholePct, model.summary, live]);
+  // Keyed on whole percent: sub-percent movement stays quiet.
+  const announced = useAnnounceOnChange(wholePct, model.summary, live);
 
   const accName =
     summary === false ? undefined : typeof summary === "string" ? summary : model.summary;

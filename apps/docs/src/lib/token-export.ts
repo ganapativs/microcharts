@@ -299,7 +299,7 @@ export type ExportOptions = {
   /** CSS selector the block targets (CSS format only). */
   scope: string;
   format: Format;
-  /** Append a `/* role *​/` comment after each declaration. */
+  /** Append a CSS block comment naming each declaration's role. */
   annotate: boolean;
 };
 

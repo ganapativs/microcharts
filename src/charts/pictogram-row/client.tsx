@@ -9,7 +9,7 @@
 // can describe a partly-filled unit honestly. With no unit active the live
 // region falls back to (1)'s value-change text. The same reading is painted
 // as a chip over the unit (`readout={false}` suppresses only the chip).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
   CHIP,
@@ -20,7 +20,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_PICTOGRAM, type PictogramStrings } from "../../core/strings-pictogram.js";
 import { chartSide } from "../../core/types.js";
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH, pictogramGeometry } from "./geometry.js";
@@ -152,13 +152,7 @@ export function PictogramRow(props: InteractivePictogramRowProps): React.ReactNo
     defaultSelectedIndex,
   });
 
-  const [announced, setAnnounced] = useState("");
-  const prev = useRef(value);
-  useEffect(() => {
-    if (prev.current === value) return;
-    prev.current = value;
-    if (live) setAnnounced(text);
-  }, [value, text, live]);
+  const announced = useAnnounceOnChange(value, text, live);
 
   // The caller's `summary` owns the wrapper's name: `false` is the decorative
   // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a

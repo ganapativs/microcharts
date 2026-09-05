@@ -68,6 +68,8 @@ function Harness<T>({
   render: (data: T) => React.ReactNode;
 }): React.ReactNode {
   const [data, setData] = useState(initial);
+  // The harness hands its setter out so the test can push new data in.
+  // oxlint-disable-next-line react/globals
   push = setData as unknown as (next: never) => void;
   return renderChart(data);
 }

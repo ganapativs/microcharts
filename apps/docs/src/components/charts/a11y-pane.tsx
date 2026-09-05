@@ -49,9 +49,16 @@ function useA11yProbe(
     return () => mo.disconnect();
   }, [ref, key]);
 
+  // Reset the probe when it is pointed at a different chart. Derived from `key`
+  // rather than synced to it, so the pane never paints one frame of the previous
+  // chart's log against the new target.
+  const [probed, setProbed] = useState(key);
+  if (probed !== key) {
+    setProbed(key);
+    setLog([]);
+  }
   useEffect(() => {
     rawRef.current = null;
-    setLog([]);
   }, [key]);
 
   return { snapshot, log };

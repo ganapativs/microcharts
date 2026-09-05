@@ -20,15 +20,16 @@ import { MCP_CLIENT_GROUPS, type McpClient, type McpSetup } from "@/lib/mcp-clie
 function Note({ text }: { text: string }) {
   // Offsets, not list positions, key the parts — the same stable, data-derived
   // key the lexers use.
-  let at = 0;
-  const parts = text
-    .split(/(`[^`]+`|\*\*[^*]+\*\*)/g)
-    .filter(Boolean)
-    .map((s) => {
-      const part = { s, at };
-      at += s.length;
-      return part;
-    });
+  const parts: { s: string; at: number }[] = [];
+  for (
+    let at = 0, chunks = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).filter(Boolean), i = 0;
+    i < chunks.length;
+    i++
+  ) {
+    const s = chunks[i]!;
+    parts.push({ s, at });
+    at += s.length;
+  }
   return (
     <p className="mcp-note">
       {parts.map(({ s, at: key }) =>

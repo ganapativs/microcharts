@@ -16,19 +16,20 @@ const PIE_SIZE = 14;
 function FailingPie() {
   const r = PIE_SIZE / 2;
   const total = SHARES.reduce((a, b) => a + b, 0);
-  let angle = -Math.PI / 2;
-  const wedges = SHARES.map((share, i) => {
+  const wedges: { key: string; d: string; fill: string }[] = [];
+  for (let i = 0, angle = -Math.PI / 2; i < SHARES.length; i++) {
+    const share = SHARES[i]!;
     const next = angle + (share / total) * Math.PI * 2;
     const p0 = [r + r * Math.cos(angle), r + r * Math.sin(angle)];
     const p1 = [r + r * Math.cos(next), r + r * Math.sin(next)];
     const large = next - angle > Math.PI ? 1 : 0;
-    angle = next;
-    return {
+    wedges.push({
       key: `${share}-${i}`,
       d: `M${r} ${r} L${p0[0]!.toFixed(2)} ${p0[1]!.toFixed(2)} A${r} ${r} 0 ${large} 1 ${p1[0]!.toFixed(2)} ${p1[1]!.toFixed(2)} Z`,
       fill: `var(--mc-cat-${(i % 6) + 1})`,
-    };
-  });
+    });
+    angle = next;
+  }
 
   return (
     <svg

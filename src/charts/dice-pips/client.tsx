@@ -2,10 +2,10 @@
 // Interactive <DicePips>. Announces the new face through a polite
 // region on change; the pip set cross-fades (opacity, reduced-motion → instant).
 // No sub-part navigation — the pips are one value.
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_DICE, type DiceStrings } from "../../core/strings-dice.js";
 import {
   named,
@@ -62,12 +62,11 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   useSeatHoist(wrap);
   useEntrance(wrap, "pop", animate);
   const prev = useRef(value);
-  const [announced, setAnnounced] = useState("");
+  const announced = useAnnounceOnChange(value, text, live);
 
   useEffect(() => {
     if (prev.current === value) return;
     prev.current = value;
-    if (live) setAnnounced(text);
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     // A new face is a roll landing — pips pop into place (scale + a tiny
     // per-pip stagger), not a flat dissolve.

@@ -64,9 +64,14 @@ export function HeartbeatBlip(props: InteractiveHeartbeatBlipProps): React.React
   const prevLen = useRef(events.length);
   const mounted = useRef(false);
 
-  useEffect(() => {
+  // New events anchor the clock at "now". Derived from `baseNow` rather than
+  // synced to it in an effect, so the trace never commits one frame against the
+  // stale anchor before the reset lands.
+  const [anchor, setAnchor] = useState(baseNow);
+  if (anchor !== baseNow) {
+    setAnchor(baseNow);
     setLiveNow(baseNow);
-  }, [baseNow]);
+  }
 
   // Advance the clock so the trace sweeps left (only when motion is allowed).
   useEffect(() => {

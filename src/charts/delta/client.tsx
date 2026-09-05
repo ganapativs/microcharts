@@ -3,9 +3,10 @@
 // `live` mode: when the value changes it re-announces the new figure through a
 // polite region (for updating KPI cards) and gives a one-shot pulse. Motion is
 // gated on reduced-motion in CSS; the announcement always fires.
-import { memo, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { memo, useRef, useState, useSyncExternalStore } from "react";
 import { useScalarActive, type MicroDatum } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
+import { usePulseOnChange } from "../../shared/motion.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { Delta as StaticDelta, deltaModel, type DeltaProps } from "./index.js";
 
@@ -50,8 +51,7 @@ export function Delta({
   onSelect,
   ...props
 }: InteractiveDeltaProps): React.ReactNode {
-  const [pulse, setPulse] = useState(false);
-  const prev = useRef(props.value);
+  const pulse = usePulseOnChange(props.value, live);
   const { summary, shown, display } = deltaModel(props);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
@@ -62,17 +62,10 @@ export function Delta({
   // like the glyph: opt-in, fresh client mount only (never over hydrated HTML),
   // and `prefers-reduced-motion` strips the keyframe (motion layer).
   const hydrating = useSyncExternalStore(subscribeNever, clientSnap, serverSnap);
-  const ssr = useRef(hydrating);
-  const enter = animate && !ssr.current;
-
-  useEffect(() => {
-    if (prev.current === props.value) return;
-    prev.current = props.value;
-    if (!live) return;
-    setPulse(true);
-    const t = setTimeout(() => setPulse(false), 450);
-    return () => clearTimeout(t);
-  }, [props.value, live]);
+  // Captured once, never written — `useState`'s initializer IS that, and a ref
+  // read during render is not (React may not see the read).
+  const [ssr] = useState(hydrating);
+  const enter = animate && !ssr;
 
   // One value, one selectable unit (index 0) — no roving. The decorative form
   // (`summary={false}` AND no `title` — a title is still a name) stays inert:

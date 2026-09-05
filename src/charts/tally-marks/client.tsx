@@ -3,10 +3,10 @@
 // polite region on change; newly added marks draw in via a one-shot
 // stroke-dashoffset sweep (≤200 ms, reduced-motion → instant). No pointer or
 // keyboard model beyond wrapper focus — a count has no sub-parts to navigate.
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useSeatHoist } from "../../shared/seat-hoist.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import {
   named,
   fillFor,
@@ -68,13 +68,12 @@ export function TallyMarks(props: InteractiveTallyMarksProps): React.ReactNode {
   // added subpath (static dash prefix = the old marks) instead of re-drawing
   // the whole tally on every increment.
   const prevLen = useRef<number | null>(null);
-  const [announced, setAnnounced] = useState("");
+  const announced = useAnnounceOnChange(value, text, live);
 
   useEffect(() => {
     if (prev.current === value) return;
     const grew = value > prev.current;
     prev.current = value;
-    if (live) setAnnounced(text);
     const path = wrap.current?.querySelector<SVGPathElement>('path[data-mc-ink="data"]');
     const len = path ? path.getTotalLength() : 0;
     const from = prevLen.current;

@@ -80,13 +80,13 @@ export function TapeGauge(props: InteractiveTapeGaugeProps): React.ReactNode {
   // this entry memoises and the SVG the static paints cannot drift apart.
   const width = chartSide(widthProp, DEFAULT_WIDTH);
   const height = chartSide(heightProp, DEFAULT_HEIGHT);
-  const { span, tiers } = resolveTapeScale({
-    value,
-    span: spanProp,
-    zones,
-    rate,
-    rateTiers: tiersProp,
-  });
+  // Memoised so the geometry below can be too: the compiler treats a value
+  // destructured from a freshly-built object as mutable and drops the memo that
+  // depends on it, which takes the whole component out of optimization.
+  const { span, tiers } = useMemo(
+    () => resolveTapeScale({ value, span: spanProp, zones, rate, rateTiers: tiersProp }),
+    [value, spanProp, zones, rate, tiersProp],
+  );
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
   // The tape walks ticks and zones; in `live` use this component re-renders on
   // every reading, so keep it off the render path when only the throttled

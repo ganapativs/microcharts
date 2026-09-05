@@ -9,7 +9,7 @@
   },
   "delta": {
     "static": 1.24,
-    "interactive": 2.37
+    "interactive": 2.4
   },
   "bullet": {
     "static": 2.33,
@@ -21,7 +21,7 @@
   },
   "trend-arrow": {
     "static": 2.05,
-    "interactive": 3.18
+    "interactive": 3.2
   },
   "status-dot": {
     "static": 1.78,
@@ -45,7 +45,7 @@
   },
   "pictogram-row": {
     "static": 2.21,
-    "interactive": 4.85
+    "interactive": 4.86
   },
   "seismogram": {
     "static": 2.7,
@@ -53,7 +53,7 @@
   },
   "heat-strip": {
     "static": 2.64,
-    "interactive": 5
+    "interactive": 5.01
   },
   "dot-plot": {
     "static": 2.66,
@@ -65,7 +65,7 @@
   },
   "paired-bars": {
     "static": 2.95,
-    "interactive": 5.46
+    "interactive": 5.47
   },
   "slope": {
     "static": 4.09,
@@ -89,7 +89,7 @@
   },
   "progress-ring": {
     "static": 2.76,
-    "interactive": 4.37
+    "interactive": 4.38
   },
   "micro-donut": {
     "static": 3,
@@ -117,7 +117,7 @@
   },
   "stacked-area": {
     "static": 3.46,
-    "interactive": 6.37
+    "interactive": 6.36
   },
   "ohlc": {
     "static": 2.92,
@@ -209,15 +209,15 @@
   },
   "ensemble-ghosts": {
     "static": 3.28,
-    "interactive": 6.5
+    "interactive": 6.49
   },
   "tally-marks": {
     "static": 1.67,
-    "interactive": 3.22
+    "interactive": 3.25
   },
   "dice-pips": {
     "static": 1.71,
-    "interactive": 3.2
+    "interactive": 3.24
   },
   "fill-word": {
     "static": 1.84,
@@ -241,7 +241,7 @@
   },
   "balance-beam": {
     "static": 2.55,
-    "interactive": 5.14
+    "interactive": 5.15
   },
   "sprout-row": {
     "static": 2.26,
@@ -249,7 +249,7 @@
   },
   "garden-grid": {
     "static": 2.07,
-    "interactive": 4.67
+    "interactive": 4.66
   },
   "bubble-row": {
     "static": 2.31,
@@ -285,19 +285,19 @@
   },
   "breathing-dot": {
     "static": 2.09,
-    "interactive": 3.8
+    "interactive": 3.81
   },
   "heartbeat-blip": {
     "static": 2.45,
-    "interactive": 4.1
+    "interactive": 4.13
   },
   "comet-trail": {
     "static": 2.47,
-    "interactive": 5.15
+    "interactive": 5.16
   },
   "orbit-status": {
     "static": 2.49,
-    "interactive": 4.52
+    "interactive": 4.51
   },
   "rate-volume": {
     "static": 2.89,
@@ -325,7 +325,7 @@
   },
   "event-raster": {
     "static": 2.8,
-    "interactive": 5.92
+    "interactive": 5.93
   },
   "rubric-strip": {
     "static": 2.88,
@@ -337,7 +337,7 @@
   },
   "wind-barb": {
     "static": 2.75,
-    "interactive": 4.31
+    "interactive": 4.32
   },
   "star-spoke": {
     "static": 2.45,
@@ -385,7 +385,7 @@
   },
   "tape-gauge": {
     "static": 3.41,
-    "interactive": 5.02
+    "interactive": 5.04
   },
   "station-glyph": {
     "static": 3.47,
