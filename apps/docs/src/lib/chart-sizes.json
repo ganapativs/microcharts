@@ -161,7 +161,7 @@
   },
   "burn-chart": {
     "static": 3.49,
-    "interactive": 6.14
+    "interactive": 6.15
   },
   "error-budget": {
     "static": 2.98,
@@ -184,7 +184,7 @@
     "interactive": 5.94
   },
   "shift-histogram": {
-    "static": 3.25,
+    "static": 3.24,
     "interactive": 5.95
   },
   "pareto-strip": {
@@ -209,7 +209,7 @@
   },
   "ensemble-ghosts": {
     "static": 3.28,
-    "interactive": 6.49
+    "interactive": 6.5
   },
   "tally-marks": {
     "static": 1.67,
@@ -340,8 +340,8 @@
     "interactive": 4.31
   },
   "star-spoke": {
-    "static": 2.42,
-    "interactive": 4.97
+    "static": 2.45,
+    "interactive": 5
   },
   "minimap-strip": {
     "static": 2.91,
@@ -364,7 +364,7 @@
     "interactive": 5.26
   },
   "confusion-grid": {
-    "static": 2.85,
+    "static": 2.86,
     "interactive": 5.48
   },
   "folded-day-band": {
@@ -393,7 +393,7 @@
   },
   "cohort-triangle": {
     "static": 2.69,
-    "interactive": 5.37
+    "interactive": 5.36
   },
   "streak-spark": {
     "static": 2.8,
