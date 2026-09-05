@@ -60,16 +60,21 @@ function rasterSourcesBefore() {
   return before;
 }
 
-/** Read the rasters back from disk instead of redrawing them. A PNG that no
- *  longer matches the SVG it came from would ship a stale mark — the failure
- *  this module exists to prevent — so a moved source is a hard stop. */
-function reuseRasters(before) {
+/** A PNG that no longer matches the SVG it came from would ship a stale mark —
+ *  the failure this module exists to prevent. Runs BEFORE anything is written:
+ *  after the write loop it would compare the sources against themselves, so a
+ *  rejected run would clear its own evidence and an immediate retry would pass. */
+function assertArtworkUnchanged(before) {
   const stale = [...before].filter(([name, source]) => source !== BRAND_SVGS[name]).map(([n]) => n);
   if (stale.length) {
     throw new Error(
       `--no-raster needs the artwork unchanged, but ${stale.join(", ")} moved. Rerun without it.`,
     );
   }
+}
+
+/** Read the rasters back from disk instead of redrawing them. */
+function reuseRasters() {
   const out = {};
   for (const { file } of BRAND_PNGS) out[file] = readFileSync(join(OUT, "png", file));
   console.log(`reused ${BRAND_PNGS.length} png from disk`);
@@ -190,10 +195,12 @@ console.log(
 mkdirSync(join(OUT, "png"), { recursive: true });
 
 const before = NO_RASTER ? rasterSourcesBefore() : null;
+if (before) assertArtworkUnchanged(before);
+
 for (const [name, source] of Object.entries(BRAND_SVGS)) writeFileSync(join(OUT, name), source);
 console.log(`wrote ${Object.keys(BRAND_SVGS).length} svg`);
 
-const pngs = before ? reuseRasters(before) : await rasterize();
+const pngs = before ? reuseRasters() : await rasterize();
 for (const [name, buf] of Object.entries(pngs)) writeFileSync(join(OUT, "png", name), buf);
 
 // The text files ship beside the artwork as well as inside the zip: the

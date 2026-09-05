@@ -111,9 +111,10 @@
      the site accent so the picker retunes charts too. Charts stay MATTE.
      Same recipe as Theming → “Class-based dark” / frosted surfaces. */
   /* positive/negative/neutral are deepened past the library defaults so every
-     data ink clears 4.5:1 over the COMPOSITED light glass (≈#f7f3ea) and the
-     bare field (#e9edf4) — the frost never earns contrast (a11y fallback drops
-     it), so the ink must. Verified: pos 5.29/4.99, neg 5.14/4.85, ntr 5.13/4.84. */
+     data ink clears 4.5:1 on the bare field (#e9edf4). The field is the binding
+     case: the frost composites lighter than it (card white at 46%, then a 10%
+     sheen), and the a11y fallback drops the frost entirely, so the ink must
+     carry the contrast. Verified on the field: pos 4.99, neg 4.85, ntr 4.84. */
   --mc-stroke: #181c25;
   --mc-positive: #077353;
   --mc-negative: #ad4713;

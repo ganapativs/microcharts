@@ -100,6 +100,22 @@ describe("brand assets themselves", () => {
   });
 });
 
+describe("the kit generator", () => {
+  const gen = readFileSync(join(process.cwd(), "scripts/gen-brand-kit.mjs"), "utf8");
+
+  // --no-raster keeps the PNGs already on disk, which is only sound while the
+  // SVGs they were drawn from still match the module. The check has to happen
+  // BEFORE the write loop: after it, the run compares the sources against
+  // themselves, so a rejected run clears its own evidence and the retry passes.
+  it("checks the artwork before overwriting it", () => {
+    const guard = gen.indexOf("assertArtworkUnchanged(before)");
+    const write = gen.indexOf("writeFileSync(join(OUT, name), source)");
+    expect(guard, "assertArtworkUnchanged(before) is called").toBeGreaterThan(-1);
+    expect(write, "the SVG write loop is present").toBeGreaterThan(-1);
+    expect(guard).toBeLessThan(write);
+  });
+});
+
 describe("the palette is the site's", () => {
   // The kit once documented a paper and an ink the light theme had retired —
   // colors.json said warm cream while every shipped surface painted cool
