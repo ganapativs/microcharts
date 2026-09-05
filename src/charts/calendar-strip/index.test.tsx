@@ -20,6 +20,16 @@ afterEach(() => {
 });
 
 describe("<CalendarStrip>", () => {
+  // A zero day and a value day share the `cell` ink role, so both take the
+  // override. Only `value` got it, and the zero day fell back to the
+  // stylesheet's accent beside recoloured neighbours.
+  it("recolours zero days along with the rest", () => {
+    const { container } = draw(<CalendarStrip data={DATA} end={END} color="#B14E2E" />);
+    const inked = [...container.querySelectorAll('rect[data-mc-ink="cell"]')];
+    expect(inked.length).toBeGreaterThan(0);
+    for (const r of inked) expect((r as SVGElement).style.fill).toBe("rgb(177, 78, 46)");
+  });
+
   it("renders real calendar cells with the composed summary", () => {
     const { container } = draw(<CalendarStrip data={DATA} end={END} />);
     const svg = container.querySelector("svg")!;

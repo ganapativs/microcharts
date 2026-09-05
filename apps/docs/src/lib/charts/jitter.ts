@@ -118,7 +118,19 @@ function scale(n: number, f: number, env: Envelope | null): number {
   if (n === 0 || !Number.isFinite(n)) return n;
   const next = env ? env.mid + (n - env.mid) * f : n * f;
   const held = env ? Math.min(env.hi, Math.max(env.lo, next)) : next;
-  return Number.isInteger(n) ? Math.round(held) || (n > 0 ? 1 : -1) : Number(held.toFixed(4));
+  return Number.isInteger(n) ? holdInt(held, env) || (n > 0 ? 1 : -1) : Number(held.toFixed(4));
+}
+
+/**
+ * Round an integer field back to the INTEGER sub-range of its envelope. Rounding
+ * after the clamp is what let a value out: OHLC's floor is 136.4 and bar 0's
+ * `low` is the integer 137, so on the seeds that clamp it to the floor,
+ * `Math.round` returned 136 — below the series minimum that defined the
+ * envelope, and the chart auto-fits its domain to exactly that minimum.
+ */
+function holdInt(held: number, env: Envelope | null): number {
+  const r = Math.round(held);
+  return env ? Math.min(Math.floor(env.hi), Math.max(Math.ceil(env.lo), r)) : r;
 }
 
 function walk(
@@ -235,6 +247,6 @@ export function shuffleSeries(base: readonly (number | null)[], seed: number): (
     // series' own min/max on the next line, which is the same guarantee by a
     // different route — it is where the rule was first written.
     const moved = Math.min(hi, Math.max(lo, scale(v, factor(next), null)));
-    return Number.isInteger(v) ? Math.round(moved) : Number(moved.toFixed(4));
+    return Number.isInteger(v) ? holdInt(moved, { lo, hi, mid: 0 }) : Number(moved.toFixed(4));
   });
 }

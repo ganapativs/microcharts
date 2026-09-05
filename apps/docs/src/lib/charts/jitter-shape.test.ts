@@ -242,4 +242,22 @@ describe("jitter's own contract", () => {
       expect(after.width / before.width).toBeLessThanOrEqual(1.0001);
     }
   });
+
+  // Integers were rounded AFTER the clamp, so one clamped onto a fractional
+  // envelope edge rounded back out of it. OHLC is the shape that hits it: its
+  // floor is 136.4 and bar 0's `low` is the integer 137, and the chart auto-fits
+  // its domain to exactly that minimum.
+  it("holds an integer field inside a fractional envelope, on every seed", () => {
+    const sessions = [
+      { open: 137.2, high: 141.6, low: 137, close: 140.1 },
+      { open: 140.1, high: 142.4, low: 136.4, close: 138.8 },
+      { open: 138.8, high: 143.2, low: 138.1, close: 142.6 },
+    ];
+    const before = span(numbers(sessions));
+    for (let seed = 1; seed <= 200; seed++) {
+      const after = span(numbers(jitter(sessions, seed)));
+      expect(after.lo, `seed ${seed} escaped below the floor`).toBeGreaterThanOrEqual(before.lo);
+      expect(after.hi, `seed ${seed} escaped above the ceiling`).toBeLessThanOrEqual(before.hi);
+    }
+  });
 });

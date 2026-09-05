@@ -191,7 +191,10 @@ export function CalendarStrip(props: CalendarStripProps): ReactNode {
             // a real zero must read as present-but-lowest, not vanish into
             // the 0.06 empty-track look (keeps "empty ≠ zero" legible)
             fillOpacity={c.state === "zero" ? 0.14 : stepOpacity(c.step ?? 0, geo.steps)}
-            style={color && c.state === "value" ? { fill: color } : undefined}
+            // Only `value` and `zero` reach this rect, and both carry the `cell` ink
+            // role — so both take the override. A zero day left without one fell
+            // back to the stylesheet's `--mc-accent` beside recoloured neighbours.
+            style={color ? { fill: color } : undefined}
           />
         );
       })}

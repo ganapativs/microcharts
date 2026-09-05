@@ -66,5 +66,12 @@ describe("niceDomain", () => {
     expect(lo).toBeLessThan(5);
     expect(hi).toBeGreaterThan(5);
   });
+  // The flat-pad branch ran before the zero anchor could apply, and for an
+  // all-zero series it centred 0 instead of flooring it — a zero-anchored
+  // sparkline fill drew its baseline across the midline.
+  it("keeps zero on the floor for an all-zero series", () => {
+    expect(niceDomain([0, 0, 0], true)).toEqual([0, 1]);
+    expect(niceDomain([0, 0, 0])).toEqual([-1, 1]);
+  });
   it("empty falls back to [0,1]", () => expect(niceDomain([])).toEqual([0, 1]));
 });

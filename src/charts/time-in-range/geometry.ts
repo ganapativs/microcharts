@@ -70,14 +70,20 @@ export function timeInRangeGeometry(opts: {
   height: number;
   orientation: Orientation;
   gap?: number | undefined;
-}): { zones: TirZone[] } {
+}): {
+  zones: TirZone[];
+  /** The separator actually laid between adjacent zones — clamped down on a
+   *  short strip, so a hit test has to read it rather than assume the `gap`
+   *  option, or a pointer in the gap is attributed to the wrong zone. */
+  g: number;
+} {
   const { data, width, height, orientation, gap = 0.5 } = opts;
   const horizontal = orientation !== "vertical";
   const inset = 1;
 
   const { keys, values } = presentZones(data);
   const norm = normalizeShares(values);
-  if (!norm) return { zones: [] };
+  if (!norm) return { zones: [], g: 0 };
 
   const along = (horizontal ? width : height) - inset * 2;
   // A box narrower than its own inset leaves nothing to draw on, and a rect with
@@ -117,7 +123,7 @@ export function timeInRangeGeometry(opts: {
     }
     pos += len + g;
   });
-  return { zones };
+  return { zones, g };
 }
 
 /** Integer percents that sum to exactly 100 (largest remainder) — label and

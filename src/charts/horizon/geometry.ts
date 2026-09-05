@@ -121,7 +121,13 @@ export function horizonGeometry(opts: {
   const foldedY = (v: number): number => {
     if (!isFiniteValue(v)) return midY;
     const dev = Math.abs(v - baseline);
-    const frac = (dev % foldSize) / foldSize || (dev > 0 ? 1 : 0);
+    // Saturate at the top fold, exactly where the band generator's
+    // `Math.min(dev, hi)` does — the modulo wrapped past it into a fold that is
+    // never drawn (the loop is bounded by `folds`), so a value one epsilon over
+    // the ceiling teleported the dot from the strip top to the strip bottom
+    // while the band under it stayed saturated.
+    const ceil = folds * foldSize;
+    const frac = dev >= ceil ? 1 : (dev % foldSize) / foldSize || (dev > 0 ? 1 : 0);
     if (mode === "mirror") return round2(stripBot - frac * (stripBot - stripTop));
     return v - baseline >= 0
       ? round2(midY - frac * (midY - stripTop))
