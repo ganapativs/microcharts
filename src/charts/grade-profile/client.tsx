@@ -118,19 +118,31 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   // `datum.formatted`. It used to be hand-composed a second time for the
   // callback, which both drifted from the chip and pinned English ("gained")
   // into a consumer's KPI card while the chip itself stayed translated.
+  // A pitch over a subnormal run overflows to Infinity, which `Intl` renders as
+  // "∞%" rather than throwing. The summary path already gates it; the readout,
+  // the announcement and the callback payload are the same claim, so they gate
+  // it too — the bin (and the ink it paints) still reads the raw grade.
   const sentence = useCallback(
     (i: number): string | undefined => {
       const s = geo.segments[i];
-      return s ? strings.gradeProfileAt(fmt(s.dEnd), pct(s.grade), fmt(s.cumGain)) : undefined;
+      if (!s) return undefined;
+      return strings.gradeProfileAt(
+        fmt(s.dEnd),
+        pct(Number.isFinite(s.grade) ? s.grade : 0),
+        fmt(s.cumGain),
+      );
     },
     [geo, strings, fmt, pct],
   );
   const datum = useCallback(
-    (i: number) => ({
-      index: i,
-      value: geo.segments[i]?.grade ?? null,
-      formatted: chipText(sentence(i)),
-    }),
+    (i: number) => {
+      const g = geo.segments[i]?.grade;
+      return {
+        index: i,
+        value: g != null && Number.isFinite(g) ? g : null,
+        formatted: chipText(sentence(i)),
+      };
+    },
     [geo, sentence],
   );
 

@@ -139,6 +139,10 @@ export interface SummaryStrings {
   honeycombCell: (index: number, total: number, filled: boolean) => string;
   /** S1 sparse events, e.g. "4 events between Jan and Jun; largest at Mar." */
   constellation: (n: number, first: string, last: string, largest: string) => string;
+  /** Sparse events with no ranking channel, e.g. "5 events between 0 and 9."
+   *  (constellation). Neither magnitude nor value is encoded, so the chart rings
+   *  no largest star and the sentence names none. */
+  constellationPlain: (n: number, first: string, last: string) => string;
   /** Single sparse event, e.g. "1 event at Mar." (constellation). */
   constellationOne: (label: string) => string;
   /** Hovered/focused constellation event, e.g. "Mar: 82, magnitude 5." */

@@ -10,6 +10,19 @@ const PLAN = [40, 36, 32, 28, 24, 20, 16, 12, 8, 4, 0];
 const ACTUAL = [40, 38, 36, 34, 32, 30];
 
 describe("<BurnChart>", () => {
+  // With no plan there is no deadline to be late against. The geometry stood a
+  // synthetic one on today to keep the projection drawable, and the gutter
+  // painted that as "+7 d" in negative ink beside a summary that says no plan
+  // is recorded.
+  it("paints no schedule verdict when no plan is recorded", () => {
+    const { container } = draw(
+      <BurnChart data={{ plan: [], actual: [40, 35, 31, 27, 24, 21] }} label="gap" />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe("6 days in: 21 points remain.");
+    expect(svg.querySelector("text")).toBeNull();
+  });
+
   it("summary states progress vs plan and the projected landing — the real string", () => {
     const { container } = draw(<BurnChart data={{ plan: PLAN, actual: ACTUAL }} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

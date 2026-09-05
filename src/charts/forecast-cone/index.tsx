@@ -103,8 +103,6 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
 
   const fmt = makeFormatter(format, locale);
   const cls = className ? `mc-forecast-cone ${className}` : "mc-forecast-cone";
-  const at = data.length + forecast.mid.length;
-
   // Paths ignore the label gutter — one geometry pass, then widen the box.
   const geo = forecastConeGeometry({ width, height, data, forecast, target, domain });
 
@@ -126,6 +124,10 @@ export function ForecastCone(props: ForecastConeProps): ReactNode {
     );
   }
 
+  // The filtered period axis the geometry numbers points on — raw lengths
+  // counted the non-finite entries the chart dropped and announced a horizon
+  // past the last point a reader can reach.
+  const at = geo.points.length;
   const FONT = label === "landing" ? labelFont(height, 0.55, labelSize) : 0;
   const showLabel = FONT > 0 && labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? fmt(geo.landing.value) : "";

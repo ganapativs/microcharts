@@ -75,3 +75,16 @@ describe("interactive <Hourglass>", () => {
     expect(seen.length).toBe(2);
   });
 });
+
+// Every relational test against NaN is false, so the XOR crossing test read a
+// value dropout as a crossing and announced the same sentence a real drain to
+// 0% does — indistinguishable to a screen-reader user.
+describe("interactive <Hourglass> on a value dropout", () => {
+  it("does not announce a threshold crossing for a non-finite value", async () => {
+    const screen = await render(<Hourglass value={0.4} />);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await screen.rerender(<Hourglass value={Number.NaN} />);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(live.textContent).toBe("");
+  });
+});

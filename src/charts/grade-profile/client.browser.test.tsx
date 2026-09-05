@@ -128,3 +128,37 @@ describe("interactive <GradeProfile>", () => {
     expect(screen.container.querySelector('line[data-mc-w="tick"]')).not.toBeNull();
   });
 });
+
+// A pitch over a subnormal run overflows to Infinity, and Intl renders that as
+// "∞%" rather than throwing — it reached the chip, the live region and the
+// onActive payload while the summary path had gated it all along.
+describe("interactive <GradeProfile> on an unrepresentable pitch", () => {
+  const WALL = [
+    { d: 0, elev: 0 },
+    { d: Number.MIN_VALUE, elev: 1 },
+    { d: 100, elev: 0 },
+    { d: 200, elev: 10 },
+  ];
+
+  it("never announces or emits a non-finite grade", async () => {
+    const seen: { value?: number | null }[] = [];
+    const screen = await render(
+      <GradeProfile
+        data={WALL}
+        width={200}
+        height={40}
+        onActive={(d) => {
+          if (d) seen.push(d as { value?: number | null });
+        }}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-grade-live") as HTMLElement;
+    wrap.focus();
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect.poll(() => live.textContent).not.toBe("");
+    expect(live.textContent).not.toContain("∞");
+    expect(screen.container.querySelector(".mc-spark-readout")?.textContent).not.toContain("∞");
+    expect(seen.at(-1)?.value).toBeNull();
+  });
+});

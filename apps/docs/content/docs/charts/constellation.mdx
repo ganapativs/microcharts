@@ -115,10 +115,11 @@ mentions vertical position. The x position is never jittered, so simultaneous ev
 
 ## Accessibility
 
-The accessible name states the count, the span, and the largest event: **"4 events between 0 and 8; largest at 8."** The
-interactive entry lets you arrow through the events chronologically, each announced with its time, value, and magnitude
-through a polite live region; a hover readout shows the same. Dot area is a low-precision channel, so magnitude is
-always carried by a number as well, never by size alone.
+The accessible name states the count and the span, and names the largest event when the data ranks one. On jittered data
+it reads **"4 events between 0 and 8."** — no event carries a value or a magnitude, so the chart rings no largest star
+and the name claims none. The interactive entry lets you arrow through the events chronologically, each announced with
+its time, value, and magnitude through a polite live region; a hover readout shows the same. Dot area is a low-precision
+channel, so magnitude is always carried by a number as well, never by size alone.
 
 <InteractionNote slug="constellation" />
 

@@ -16,6 +16,19 @@ const EVENTS = [
 ] as const;
 
 describe("<Constellation>", () => {
+  // Jittered layout: no `y`, no magnitude. The geometry leaves `largestIndex`
+  // at -1 and draws no halo and no numeral, so the accessible name must not
+  // announce a "largest" the reader is then sent to look for.
+  it("names no largest when neither magnitude nor value is encoded", () => {
+    const { container } = draw(
+      <Constellation data={[{ x: 0 }, { x: 3 }, { x: 5 }, { x: 7 }, { x: 9 }]} label="max" />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.getAttribute("aria-label")).toBe("5 events between 0 and 9.");
+    expect(svg.querySelector('[data-mc-ink="accent"]')).toBeNull();
+    expect(svg.querySelector("text")).toBeNull();
+  });
+
   it("summary names the count, span, and largest event", () => {
     const { container } = draw(<Constellation data={EVENTS} xFormat={monthFmt} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
