@@ -1,7 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { CoverageStrip } from "./index.js";
+import { CoverageStrip, coverageSummary } from "./index.js";
+import { coverageGeometry } from "./geometry.js";
+import { makePercentFormatter } from "../../core/format.js";
+import { EN_COVERAGE } from "../../core/strings-coverage.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 
@@ -13,6 +16,38 @@ describe("<CoverageStrip>", () => {
     const { container } = draw(<CoverageStrip data={data} expected={8} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
       "4 of 8 slots measured (50%); longest gap 2 slots.",
+    );
+  });
+
+  // 23/40 = 0.575 is a true decimal half. `Intl` (decimal) rounds it up to "58%";
+  // `round2` (binary `Math.round` on 57.4999…) collapses it to 0.57 first, so
+  // feeding Intl the pre-rounded field yielded "57%" — disagreeing by 1 with
+  // the `23 of 40` it sits beside, and with `icon-array`/`progress`, which feed
+  // Intl the raw fraction. All three inputs are within COVERAGE_MAX_SLOTS = 120.
+  it.each([
+    [23, 40],
+    [46, 80],
+    [69, 120],
+  ])("summary rounds %i/%i (57.5%%) up to 58%% — Intl on raw, not round2", (measured, expected) => {
+    const data = Array.from({ length: expected }, (_, i) => (i < measured ? 1 : null));
+    const { container } = draw(<CoverageStrip data={data} />);
+    expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
+      `${measured} of ${expected} slots measured (58%); longest gap ${expected - measured} slots.`,
+    );
+  });
+
+  it("coverageSummary feeds Intl the raw ratio (shared with client.tsx)", () => {
+    // client.tsx shares this function, so pinning it covers the interactive
+    // path without a browser: 23/40 → "58%" (was "57%" pre-fix).
+    const geo = coverageGeometry({
+      width: 80,
+      height: 10,
+      shape: "square",
+      data: Array.from({ length: 40 }, (_, i) => (i < 23 ? 1 : null)),
+    });
+    const pctFmt = makePercentFormatter("en");
+    expect(coverageSummary(geo, pctFmt, EN_COVERAGE)).toBe(
+      "23 of 40 slots measured (58%); longest gap 17 slots.",
     );
   });
 
@@ -34,6 +69,12 @@ describe("<CoverageStrip>", () => {
     const wLabeled = labeled.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2];
     expect(Number(wLabeled)).toBeGreaterThan(Number(wPlain));
     expect(labeled.querySelector("text")!.textContent).toBe("75%");
+  });
+
+  it("label='percent' rounds 57.5% up to 58% in the gutter (raw ratio to Intl)", () => {
+    const data = Array.from({ length: 40 }, (_, i) => (i < 23 ? 1 : null));
+    const { container } = draw(<CoverageStrip data={data} label="percent" />);
+    expect(container.querySelector("text")!.textContent).toBe("58%");
   });
 
   it("1 node per cell (node budget)", () => {

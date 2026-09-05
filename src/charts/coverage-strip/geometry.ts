@@ -25,6 +25,12 @@ export interface CoverageStripGeometry {
   cells: CoverageCell[];
   /** measured / expected, 0–1, 2-dp. */
   coverage: number;
+  /** measured / expected, 0–1, RAW. Feed THIS to the percent formatter —
+   *  `makePercentFormatter` is contracted to take the raw fraction and let
+   *  `Intl` (decimal) round, so a pre-`round2` here collapses a true half
+   *  (0.575 → 0.57 via IEEE-754 `Math.round`) before `Intl` sees it, yielding
+   *  "57%" where `icon-array`/`progress` announce "58%" for the same ratio. */
+  rawCoverage: number;
   measured: number;
   /** Whole slot count the cells were laid out and the summary counted against.
    *  Callers must read THIS, never the raw `expected` opt — see `resolveCount`. */
@@ -90,6 +96,7 @@ export function coverageGeometry(opts: {
     return {
       cells: [],
       coverage: 0,
+      rawCoverage: 0,
       measured: 0,
       expected: 0,
       steps,
@@ -147,6 +154,7 @@ export function coverageGeometry(opts: {
   return {
     cells,
     coverage: round2(measured / expected),
+    rawCoverage: measured / expected,
     measured,
     expected,
     steps,
