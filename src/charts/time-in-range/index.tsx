@@ -134,7 +134,6 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
   const pctFmt = tirPercent(locale);
   const fontSize = labelFont(Math.min(width, height), 0.55, labelSize);
   const accName = resolveSummary(summary, () => timeInRangeSummary(data, strings, pctFmt));
-  const horizontal = orientation !== "vertical";
 
   return (
     <Chart
@@ -155,14 +154,16 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
         const paint = ZONE_INK[z.key];
         const showLabel =
           label === "all" || (label === "in" && z.key === "in") ? pct[z.key] : undefined;
-        const span = horizontal ? z.width : z.height;
+        const span = z.width;
         const text = showLabel !== undefined ? pctFmt(showLabel) : undefined;
         // The percent lives INSIDE its zone rect, so it has to clear the rect on
-        // BOTH axes: `span` along the strip, and — the part a short strip broke —
-        // a full line of text across it. `labelFont` floors at 7 viewBox units,
-        // so a 6-unit-tall strip can seat nothing and every percent DROPS; the
-        // zones themselves are the encoding and still read. Pure arithmetic:
-        // the static path may never measure text.
+        // BOTH axes: `span` on the X axis the unrotated glyph extent runs along
+        // (the strip's X width, regardless of orientation), and — the part a
+        // short strip broke — a full line of text across it via `labelFitsY`.
+        // `labelFont` floors at 7 viewBox units, so a 6-unit-tall strip can seat
+        // nothing and every percent DROPS; the zones themselves are the encoding
+        // and still read. Pure arithmetic: the static path may never measure
+        // text.
         const cy = round2(z.y + z.height / 2);
         const fits =
           text !== undefined &&

@@ -142,4 +142,36 @@ describe("TimeInRange degradation", () => {
     expect(small.querySelector("text")).toBeNull();
     expect(small.querySelectorAll("rect").length).toBe(3);
   });
+
+  it("a vertical strip thinner than the label DROPS it; a vertical strip that fits seats it inside the viewBox", () => {
+    // The <text> is unrotated in BOTH orientations, so the in-zone percent's
+    // glyph extent always runs along the SVG X axis — the strip's X width,
+    // which is the cross-strip thickness in vertical. The fit gate has to
+    // bound that extent against z.width; bounding it against z.height (the
+    // along-strip length) let the label escape the viewBox on both X edges
+    // on a thin vertical strip.
+    const data = { below: 9, in: 72, above: 19 };
+
+    // Repro: viewBox "0 0 12 80", strip thickness 10, "72%" glyph extent ~15.02
+    // at fontSize 7 — wider than the strip, so the label DROPS, the zones stay.
+    const thin = draw(
+      <TimeInRange data={data} orientation="vertical" width={12} height={80} />,
+    ).container;
+    expect(thin.querySelector("text")).toBeNull();
+    expect(thin.querySelectorAll("rect").length).toBe(3);
+
+    // Docs call-site geometry (cross-strip thickness 24): "72%" glyph extent
+    // ~22.46 at fontSize 11 — seats, and stays inside the viewBox on X.
+    const wide = draw(
+      <TimeInRange data={data} orientation="vertical" width={26} height={110} />,
+    ).container;
+    const text = wide.querySelector("text")!;
+    expect(text.textContent).toBe("72%");
+    const viewBoxW = Number(wide.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[2]);
+    const x = Number(text.getAttribute("x"));
+    const fs = Number(text.getAttribute("font-size"));
+    const half = (text.textContent!.length * fs * 0.62 + 2) / 2;
+    expect(x - half).toBeGreaterThanOrEqual(0);
+    expect(x + half).toBeLessThanOrEqual(viewBoxW);
+  });
 });
