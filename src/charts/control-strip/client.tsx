@@ -38,7 +38,6 @@ export interface InteractiveControlStripProps extends ControlStripProps, PickerP
 export function ControlStrip(props: InteractiveControlStripProps): React.ReactNode {
   const {
     data,
-    limits = "sigma",
     baseline,
     rules = "none",
     width = 80,
@@ -63,8 +62,8 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
   useEntrance(hostRef, "draw", animate);
 
   const geo = useMemo(
-    () => controlGeometry({ width, height, data, limits, baseline, rules, domain: props.domain }),
-    [width, height, data, limits, baseline, rules, props.domain],
+    () => controlGeometry({ width, height, data, baseline, rules, domain: props.domain }),
+    [width, height, data, baseline, rules, props.domain],
   );
   // Plotted points are the finite subset (geometry filters non-finite); the
   // navigable index runs over these, so values line up with geo.points 1:1.
@@ -195,7 +194,6 @@ export function ControlStrip(props: InteractiveControlStripProps): React.ReactNo
         {...rest}
         style={fillFor(style)}
         data={data}
-        limits={limits}
         baseline={baseline}
         rules={rules}
         width={width}

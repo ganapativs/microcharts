@@ -6,7 +6,6 @@
 // marked (ringed, negative) — an in-control process should look boring.
 // Coords 2-dp, integer viewBox.
 import { linePath } from "../../core/path.js";
-import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
 import { isFiniteValue, round2, type XY } from "../../core/types.js";
 
@@ -15,7 +14,6 @@ import { isFiniteValue, round2, type XY } from "../../core/types.js";
  *  plotted chart does, instead of a literal that silently desyncs. */
 export const CONTROL_STRIP_PAD = 2;
 
-export type ControlLimits = "sigma" | "percentile";
 export type ControlRules = "none" | "we";
 
 interface ControlViolation {
@@ -52,7 +50,6 @@ export function controlGeometry(opts: {
   width: number;
   height: number;
   data: readonly number[];
-  limits?: ControlLimits | undefined;
   baseline?: number | undefined;
   rules?: ControlRules | undefined;
   domain?: readonly [number, number] | undefined;
@@ -86,16 +83,8 @@ export function controlGeometry(opts: {
   const sigmaHat = mrBar / 1.128;
   const degenerate = sigmaHat === 0;
 
-  let lo: number;
-  let hi: number;
-  if (opts.limits === "percentile" && n >= 2) {
-    const [q1, q2] = quantiles(data, [0.00135, 0.99865])! as [number, number];
-    lo = q1;
-    hi = q2;
-  } else {
-    lo = center - 3 * sigmaHat;
-    hi = center + 3 * sigmaHat;
-  }
+  const lo = center - 3 * sigmaHat;
+  const hi = center + 3 * sigmaHat;
   const sigma2 = sigmaHat; // 2σ band edge distance uses 2·σ̂ below
 
   // y-domain fits the data + the limits so nothing clips

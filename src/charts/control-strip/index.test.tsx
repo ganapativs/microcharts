@@ -76,7 +76,6 @@ describe("<ControlStrip>", () => {
     ["domain NaN", { domain: [Number.NaN, 10] as [number, number] }],
     ["domain Infinity", { domain: [0, Number.POSITIVE_INFINITY] as [number, number] }],
     ["domain flat", { domain: [5, 5] as [number, number] }],
-    ["percentile limits", { limits: "percentile" as const }],
   ])("%s: nothing non-finite reaches the name or an attribute", (_name, extra) => {
     const { container } = draw(<ControlStrip data={SAMPLE} dots="all" {...extra} />);
     const svg = container.querySelector("svg")!;

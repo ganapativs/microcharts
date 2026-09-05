@@ -48,7 +48,11 @@ assume a stationary process.
 
 `rules="we"` adds the implemented Western Electric subset, enumerated so none of them fires silently: WE-1 (a point
 beyond 3σ), WE-2 (two of three beyond 2σ), and WE-4 (eight on one side). `dots="all"` draws every point rather than only
-the excursions, and `limits="percentile"` swaps the ±3σ̂ band for stated quantiles, for skewed processes.
+the excursions.
+
+The band is always ±3σ̂ estimated from the moving range. There is no percentile alternative: an empirical band cut from
+the same sample it then tests lands inside that sample's own range, so it flags the series minimum and maximum on every
+run. Limits for a skewed process need a reference period the chart does not currently accept.
 
 <LiveDemo
   label="Western Electric rules + all dots"

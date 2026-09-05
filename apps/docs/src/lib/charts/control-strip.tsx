@@ -38,12 +38,6 @@ export const entry: ChartEntry = {
       description: "Sequential measurements.",
     },
     {
-      name: "limits",
-      type: '"sigma" | "percentile"',
-      required: false,
-      description: "±3σ̂ (default) or empirical p0.135/p99.865 for skewed processes.",
-    },
-    {
       name: "baseline",
       type: "number",
       required: false,
@@ -80,20 +74,12 @@ export function Preview() {
 }
 export const playground: PlaygroundSpec = {
   knobs: [
-    {
-      kind: "segmented",
-      key: "limits",
-      label: "limits",
-      options: ["sigma", "percentile"],
-      init: "sigma",
-    },
     { kind: "toggle", key: "rules", label: "WE rules", init: false },
     { kind: "toggle", key: "dots", label: "all dots", init: false },
   ],
   render: (s) => (
     <ControlStrip
       data={DEMO}
-      limits={s.limits as "sigma" | "percentile"}
       rules={s.rules ? "we" : "none"}
       dots={s.dots ? "all" : "out"}
       summary={false}
@@ -102,14 +88,7 @@ export const playground: PlaygroundSpec = {
     />
   ),
   code: (s) =>
-    [
-      "<ControlStrip",
-      "  data={weights}",
-      s.limits !== "sigma" && `  limits="${s.limits}"`,
-      s.rules && '  rules="we"',
-      s.dots && '  dots="all"',
-      "/>",
-    ]
+    ["<ControlStrip", "  data={weights}", s.rules && '  rules="we"', s.dots && '  dots="all"', "/>"]
       .filter(Boolean)
       .join("\n"),
   interactiveHint:
@@ -130,9 +109,21 @@ export const recipes: Recipe[] = [
 ];
 
 const CTX_ROWS = [
-  { name: "Line 1", meta: "in spec", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
-  { name: "Line 2", meta: "in spec", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
-  { name: "Line 3", meta: "1 excursion", data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0] },
+  {
+    name: "Line 1",
+    meta: "in spec",
+    data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0],
+  },
+  {
+    name: "Line 2",
+    meta: "in spec",
+    data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0],
+  },
+  {
+    name: "Line 3",
+    meta: "1 excursion",
+    data: [0.82, 0.85, 0.87, 0.9, 0.92, 0.95, 0.97, 1.0],
+  },
 ];
 
 export const contexts: ChartContexts = {
