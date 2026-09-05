@@ -168,6 +168,7 @@ export function StreamDemo() {
 
   // Reduced motion: skip animation, show the finished reply (per active stream).
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect
     if (reduced) setCount(total);
   }, [reduced, total]);
 
@@ -197,10 +198,12 @@ export function StreamDemo() {
   useEffect(() => {
     if (isLive) return;
     if (reduced) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setCount(total);
       return;
     }
     if (!startedRef.current) return;
+    // oxlint-disable-next-line react/set-state-in-effect
     setCount(0);
     setRunning(true);
   }, [activeId, isLive, reduced, total]);
@@ -209,6 +212,7 @@ export function StreamDemo() {
   useEffect(() => {
     if (!running || isLive) return;
     if (count >= total) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setRunning(false);
       return;
     }

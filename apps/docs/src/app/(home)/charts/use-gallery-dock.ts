@@ -40,12 +40,12 @@ export function useGalleryDock(
     router.push(key === "all" ? "/charts" : `/charts/${key}`);
   };
 
-  // Read the URL + localStorage ONCE, not once per state initializer.
-  const init = useRef<ReturnType<typeof initialState>>(undefined as never);
-  init.current ??= initialState();
-  const [q, setQ] = useState(init.current.q);
-  const [density, setDensity] = useState<GalleryDensity>(init.current.density);
-  const [sort, setSort] = useState<GallerySort>(init.current.sort);
+  // Read the URL + localStorage ONCE, not once per state initializer — a lazy
+  // initializer runs exactly once, which is what the read-once ref was for.
+  const [init] = useState(initialState);
+  const [q, setQ] = useState(init.q);
+  const [density, setDensity] = useState<GalleryDensity>(init.density);
+  const [sort, setSort] = useState<GallerySort>(init.sort);
   const [shown, setShown] = useState<number | null>(null);
   const [atTop, setAtTop] = useState(true);
   const [dockHidden, setDockHidden] = useState(false);
@@ -60,6 +60,9 @@ export function useGalleryDock(
   const remeasure = useRef<() => void>(() => {});
 
   useEffect(() => {
+    // A hydration latch: "are we past the server render" is not knowable during
+    // one, so it cannot be derived.
+    // oxlint-disable-next-line react/set-state-in-effect
     setMounted(true);
     const html = document.documentElement;
     html.dataset.g2Mounted = "true";
@@ -211,6 +214,9 @@ export function useGalleryDock(
       const label = collections.find((c) => c.key === col)?.label;
       emptyQ.textContent = trimmed ? `“${trimmed}”` : label ? `${label} charts` : "that";
     }
+    // Counted off the live DOM after the filter ran — an external measurement,
+    // which is what an effect is for; there is nothing to derive it from.
+    // oxlint-disable-next-line react/set-state-in-effect
     setShown(count);
     // Filtering changes the document height, so the overflow test has to be
     // re-measured here — this is the one place it can actually have changed

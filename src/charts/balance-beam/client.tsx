@@ -4,7 +4,7 @@
 // selects it (onSelect); the beam eases to a new tilt on data change (CSS
 // geometry transition, reduced-motion-gated) and announces when the heavier
 // side flips.
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import { labelFont } from "../../core/labels.js";
@@ -17,7 +17,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { balanceBeamGeometry, DEFAULT_MAX_TILT } from "./geometry.js";
 import { EN_BEAM, type BeamStrings } from "../../core/strings-beam.js";
 import { BalanceBeam as StaticBeam, balanceBeamSummary, type BalanceBeamProps } from "./index.js";
@@ -65,7 +65,6 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
   // Data-driven announcement: fires only when the heavier side flips (a prop
   // change), independent of keyboard/pointer focus — see `panSpoken` below for
   // the roving announcement, which takes priority whenever a pan is shown.
-  const [changed, setChanged] = useState("");
   const hostRef = useRef<HTMLSpanElement>(null);
   // Only the weights (dots) settle — the beam and fulcrum arrive via the base
   // whole-svg fade, since a scaling line/path would read oddly at this scale.
@@ -90,12 +89,7 @@ export function BalanceBeam(props: InteractiveBalanceBeamProps): React.ReactNode
     [data, width, height, maxTilt, mode, domain],
   );
 
-  const prevHeavier = useRef(geo.heavier);
-  useEffect(() => {
-    if (geo.heavier === prevHeavier.current) return;
-    prevHeavier.current = geo.heavier;
-    if (live) setChanged(text);
-  }, [geo, text, live]);
+  const changed = useAnnounceOnChange(geo.heavier, text, live);
 
   // The caller's `summary` owns the wrapper's name: `false` is the decorative
   // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a

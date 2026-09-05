@@ -906,6 +906,7 @@ function PlaygroundView({
     <Shell
       morphKey={mountKey}
       resetKey={dataKey}
+      // oxlint-disable-next-line react/refs
       morphed={painted.current}
       mode={spec.renderInteractive ? mode : undefined}
       onMode={

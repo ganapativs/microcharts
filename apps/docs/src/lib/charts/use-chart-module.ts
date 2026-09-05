@@ -38,7 +38,10 @@ export function useChartModule(slug: string | undefined): ChartModule | undefine
   );
 
   useEffect(() => {
+    // Loading a chart module is a dynamic import — an external system, and the
+    // resolved module is what this hook exists to hand back.
     if (!slug) {
+      // oxlint-disable-next-line react/set-state-in-effect
       setMod(undefined);
       return;
     }

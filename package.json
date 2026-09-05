@@ -1215,7 +1215,7 @@
     "knip": "^6.32.2",
     "lefthook": "^2.1.10",
     "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
+    "oxlint": "^1.81.0",
     "playwright": "1.62.1",
     "prettier": "^3.9.6",
     "publint": "^0.3.23",

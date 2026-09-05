@@ -3,7 +3,7 @@
 // polite region on change; the weight eases via CSS on variable fonts (snaps
 // otherwise). with no layout shift (tabular-nums). Wrapper focus only —
 // numeral is one value.
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useRef } from "react";
 import {
   named,
   fillFor,
@@ -12,7 +12,7 @@ import {
   type MicroDatum,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_FAT, type FatStrings } from "../../core/strings-fat.js";
 import { FatDigits as StaticFatDigits, fatDigitsSummary, type FatDigitsProps } from "./index.js";
 
@@ -61,14 +61,7 @@ export function FatDigits(props: InteractiveFatDigitsProps): React.ReactNode {
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "pop", animate);
   const text = fatDigitsSummary(value, { encode, tiers, domain, strings, format, locale });
-  const prev = useRef(value);
-  const [announced, setAnnounced] = useState("");
-
-  useEffect(() => {
-    if (prev.current === value) return;
-    prev.current = value;
-    if (live) setAnnounced(text);
-  }, [value, text, live]);
+  const announced = useAnnounceOnChange(value, text, live);
 
   // The caller's `summary` owns the wrapper's name: `false` is the decorative
   // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a

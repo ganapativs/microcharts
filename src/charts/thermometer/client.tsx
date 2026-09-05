@@ -3,7 +3,7 @@
 // the fill glides to its new level (CSS, reduced-motion-gated); announces through
 // a polite region on change, and calls out a target crossing. No pointer math
 // a single value; hover is a reveal, not a lookup.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
@@ -15,7 +15,7 @@ import {
   type MicroDatum,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_THERMOMETER, type ThermometerStrings } from "../../core/strings-thermometer.js";
 import {
   Thermometer as StaticThermometer,
@@ -78,18 +78,12 @@ export function Thermometer(props: InteractiveThermometerProps): React.ReactNode
     ...rest
   } = props;
   const text = thermometerSummary(value, { domain, target, strings, format, locale });
-  const [announced, setAnnounced] = useState("");
-  const prev = useRef(value);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, orientation === "horizontal" ? "sweep" : "rise", animate, {
     selector: FILL_SELECTOR,
   });
 
-  useEffect(() => {
-    if (prev.current === value) return;
-    prev.current = value;
-    if (live) setAnnounced(text);
-  }, [value, text, live]);
+  const announced = useAnnounceOnChange(value, text, live);
 
   // The caller's `summary` owns the wrapper's name: `false` is the decorative
   // opt-out (`named()` renders `aria-hidden` and drops the tab stop with it), a

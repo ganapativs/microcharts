@@ -119,6 +119,10 @@ export function AppearanceMenu() {
   }
 
   useEffect(() => {
+    // The boot script writes these onto <html> before React runs (see the
+    // pre-hydration latch), so they can only be read after mount — reading them
+    // during render would mismatch the server HTML.
+    // oxlint-disable-next-line react/set-state-in-effect
     setMounted(true);
     setAccentState(document.documentElement.dataset.accent ?? "cobalt");
     setPresetState(document.documentElement.dataset.mcPreset ?? "modern");
@@ -150,7 +154,11 @@ export function AppearanceMenu() {
   }
 
   function setPreset(id: string) {
+    // The <html> dataset IS the theme channel (styles.css reads it, and the boot
+    // script writes it pre-hydration). Writing it from a handler is the point.
+    // oxlint-disable-next-line react/immutability
     if (id === "modern") delete document.documentElement.dataset.mcPreset;
+    // oxlint-disable-next-line react/immutability
     else document.documentElement.dataset.mcPreset = id;
     try {
       localStorage.setItem("mc-preset", id);

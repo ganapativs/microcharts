@@ -3,7 +3,7 @@
 // "value of total" readout. useActivePicker adds per-cell picking on top: one
 // wrapper listener + nearest-hex lookup, offset-row keyboard roving, click /
 // Enter / Space selects a cell (onSelect).
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { makeFormatter } from "../../core/format.js";
 import {
   CHIP,
@@ -14,7 +14,7 @@ import {
   type PickerProps,
 } from "../../shared/interactive.js";
 import { useEntrance } from "../../shared/motion-gate.js";
-import { LiveRegion } from "../../shared/live-region.js";
+import { LiveRegion, useAnnounceOnChange } from "../../shared/live-region.js";
 import { EN_HONEYCOMB, type HoneycombStrings } from "../../core/strings-honeycomb.js";
 import { hexPath, honeycombGeometry, resolveTotal, resolveValue } from "./geometry.js";
 import { Honeycomb as StaticHoneycomb, honeycombSummary, type HoneycombProps } from "./index.js";
@@ -62,8 +62,6 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   const generated = honeycombSummary(value, { total, unit, strings, format, locale });
   const accName = summary === false ? undefined : typeof summary === "string" ? summary : generated;
   const [hover, setHover] = useState(false);
-  const [announced, setAnnounced] = useState("");
-  const prev = useRef(value);
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "grow", animate);
 
@@ -82,11 +80,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   }, [geo]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
-  useEffect(() => {
-    if (prev.current === value) return;
-    prev.current = value;
-    if (live) setAnnounced(generated);
-  }, [value, generated, live]);
+  const announced = useAnnounceOnChange(value, generated, live);
 
   // Pointer (viewBox space) → cell index: nearest hex center within one
   // circumradius (hexes tile, so the nearest center is the containing cell).

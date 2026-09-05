@@ -60,7 +60,10 @@ export function ProgressRing(props: InteractiveProgressRingProps): React.ReactNo
     style,
     ...rest
   } = props;
-  const { value, max = 1, sweep = false, format, locale } = rest;
+  const { value, max = 1, sweep = false } = rest;
+  // Straight off `props`: `rest` is spread onward, so the compiler treats
+  // anything destructured from it as mutable and drops the memo below.
+  const { format, locale } = props;
   const hostRef = useRef<HTMLSpanElement>(null);
   // `trace`: the arc is drawn along its own stroke, clockwise from 12 o'clock.
   // A ring is not x-monotone, so the shared left→right front would open it from
