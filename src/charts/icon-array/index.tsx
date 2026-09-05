@@ -87,7 +87,8 @@ export function IconArray(props: IconArrayProps): ReactNode {
   } = props;
 
   const total = resolveTotal(rawTotal);
-  const plan = iconArrayLabelPlan({ label, total, width, height, labelSize });
+  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
+  const plan = iconArrayLabelPlan({ label, total, width, height, labelSize, pct: pctFmt });
   const { font: FONT, gutterCh, show: showLabel } = plan;
   const geo = iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT });
 
@@ -100,7 +101,6 @@ export function IconArray(props: IconArrayProps): ReactNode {
     devWarn("<IconArray> total=100 needs ≥ 40×40 — unit size falls below the crispness floor.");
   }
 
-  const pctFmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 });
   const accName = resolveSummary(summary, () => iconArraySummary(geo, pctFmt, strings));
 
   // no custom color: the fill role token IS the ink role (bound in

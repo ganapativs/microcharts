@@ -220,7 +220,12 @@ export function Dumbbell(props: DumbbellProps): ReactNode {
           leftX !== null &&
           rightX !== null &&
           rightX - leftX >= Math.max(est(leftVal), est(rightVal)) &&
-          leftX - 4 - est(leftVal) >= 0 &&
+          // `geo.labelX` is where the row name ENDS (it is anchored there), and
+          // that — not the viewBox origin — is the left boundary. A `from` on
+          // the domain minimum clamps to the plot edge, and the from-value was
+          // kept and seated one unit from the name it then overprinted. It is 0
+          // when the names have dropped, which is the old bound.
+          leftX - 4 - est(leftVal) >= geo.labelX &&
           rightX + 4 + est(rightVal) <= width;
         return (
           <g key={row.index}>

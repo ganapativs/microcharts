@@ -78,6 +78,10 @@ export interface IconArrayLabelPlan {
  * `2 × digits + 5` is both sides of the ratio, the four characters of `" in "`,
  * and one character of slack — which reproduces the calibrated 9 for the 10-
  * and 20-unit grids exactly, so only the case that overflowed moves.
+ *
+ * The percent reserve is measured the same way, off `pct` — the caller's own
+ * formatter, at its widest value. A flat 5 was calibrated for `"100%"` and the
+ * `format` prop can ask for `"100.00%"`, which ran past the right edge.
  */
 export function iconArrayLabelPlan(opts: {
   label: "ratio" | "percent" | "none";
@@ -86,12 +90,19 @@ export function iconArrayLabelPlan(opts: {
   height: number;
   /** Minimum label size in viewBox units (the chart's `labelSize` prop). */
   labelSize?: number | undefined;
+  /** The entry's own percent formatter — measured at 100% for the reserve. */
+  pct?: ((fraction: number) => string) | undefined;
 }): IconArrayLabelPlan {
   const { label, total, width, height } = opts;
   // label a touch smaller than the strips so the countable grid stays the hero
   // (~0.5·height, clamped 7–10) — see coverage-strip
   const font = labelFont(height, 0.5, opts.labelSize);
-  const wantCh = label === "ratio" ? 2 * `${total}`.length + 5 : label === "percent" ? 5 : 0;
+  const wantCh =
+    label === "ratio"
+      ? 2 * `${total}`.length + 5
+      : label === "percent"
+        ? (opts.pct?.(1) ?? "100%").length + 1
+        : 0;
   if (wantCh === 0) return { font, gutterCh: 0, show: false };
   // The label lives in a gutter carved OUT of the width. On a narrow box that
   // gutter can swallow the grid whole — the units collapse to nothing and the

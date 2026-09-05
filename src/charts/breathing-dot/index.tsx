@@ -96,8 +96,8 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
   const accName = resolveSummary(summary, () =>
     breathingDotSummary(value, { thresholds, strings, format, locale }),
   );
-  const pctText =
-    label === "value" && !geo.unknown ? makeUnitFormatter(format, locale, PCT)(geo.level) : null;
+  const pct = makeUnitFormatter(format, locale, PCT);
+  const pctText = label === "value" && !geo.unknown ? pct(geo.level) : null;
   const labelY = geo.size / 2 + fontSize * 0.34;
   // `labelFont` floors at 7, so under a box of ~8 units the numeral's em-box no
   // longer fits the glyph box vertically — and `.mc-root` is `overflow: visible`,
@@ -112,8 +112,12 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
   // resize the line it sits on. `Math.ceil` because that floor is fractional: at
   // the default size it put `width="39.400000000000006"` on the root, against
   // the integer-viewBox rule (`textGutter` already snaps to integers).
+  // The reserve is the WIDEST numeral this locale and `format` can produce, so
+  // it does not move with the value — including to nothing when the feed drops
+  // out. The old floor was cut for a 4-character "100%"; fr-FR writes "100 %"
+  // and every other state was one character narrower than the saturated one.
   const labelBand = labelFits
-    ? Math.ceil(Math.max(fontSize * 2.6, pctText ? textGutter(pctText.length, fontSize, 1) : 0))
+    ? Math.ceil(Math.max(fontSize * 2.6, textGutter(pct(1).length, fontSize, 1)))
     : 0;
 
   return (

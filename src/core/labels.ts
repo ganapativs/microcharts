@@ -151,6 +151,33 @@ export function textGutterProse(chars: number, fontSize: number, pad: number): n
 }
 
 /**
+ * Rendered width of caller prose, for SEATING text — never for reserving a
+ * gutter.
+ *
+ * `textGutterProse`'s 0.95 is the all-`W` bound, and over-reserving a *gutter*
+ * is cheap: the box grows and the mark keeps its place. Over-estimating a
+ * *clamp* is not, because a clamp MOVES the mark. Seating `Power` on an 80-unit
+ * star at the 0.95 bound walked it 13 units inward, off its rim and onto the
+ * spokes — contained, and unreadable.
+ *
+ * So this holds a margin over the measured advances in the table above rather
+ * than over the pathological one, splitting on the same ≥70%-caps test
+ * `fill-word` uses to seat its numeral. Mixed case keeps `textGutter`'s 0.62 —
+ * comfortably over the 0.50–0.54 measured, and the same number the craft audit
+ * models text with, so a chart can never clamp TIGHTER than the gate checking
+ * it. Capitals measure 0.635 and get 0.72.
+ *
+ * A string of nothing but `W`/`M` is wider than this: that is what the drop test
+ * is for, and a caller who passes one gets no label rather than one in the
+ * margin.
+ */
+export function proseExtent(text: string, fontSize: number): number {
+  let caps = 0;
+  for (const c of text) if (c >= "A" && c <= "Z") caps++;
+  return text.length * fontSize * (text.length > 0 && caps / text.length >= 0.7 ? 0.72 : 0.62);
+}
+
+/**
  * Inverse of `textGutterProse`: how many characters of caller-supplied prose fit
  * in `room` viewBox units at `fontSize`, after `pad` breathing room. The one
  * place a chart may turn available width into a character budget — never invert

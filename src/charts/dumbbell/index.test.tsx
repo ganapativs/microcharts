@@ -8,6 +8,24 @@ import { mappedEdgeSuite } from "../../test/edge-cases.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
 describe("<Dumbbell>", () => {
+  // The left guard bounded the from-value against the viewBox origin, not
+  // against the row-name gutter. A `from` on the domain minimum clamps to the
+  // plot edge, and the value was then seated one unit from the name it
+  // overprinted — both anchored `end`, on the same y.
+  it("drops the from-value rather than overprinting the row name", () => {
+    const { container } = draw(
+      <Dumbbell
+        data={[{ label: "Berlin", from: 0, to: 30 }]}
+        domain={[0, 50]}
+        width={120}
+        label="value"
+      />,
+    );
+    const texts = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(texts).toContain("Berlin");
+    expect(texts).not.toContain("0");
+  });
+
   it("single row: connector + hollow from-dot + filled to-dot summary", () => {
     const { container } = draw(<Dumbbell data={[{ from: 62000, to: 84000 }]} />);
     expect(container.querySelector("line")).not.toBeNull();

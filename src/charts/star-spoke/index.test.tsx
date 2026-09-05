@@ -21,6 +21,31 @@ const PROFILE = [
 afterEach(() => vi.restoreAllMocks());
 
 describe("<StarSpoke>", () => {
+  // A rim label is SEATED at its spoke and only nudged inward far enough to stay
+  // in the box, so the estimate that sizes the nudge has to be a realistic
+  // advance. Sized off the pathological all-`W` bound instead, `Power` moved
+  // from 57.1 to 41.5 on an 80-unit box whose centre is 40 — inside the
+  // viewBox, and sitting on the spokes. Containment cannot catch that; the
+  // seat coordinates can, so they are pinned — and these are `main`'s, because
+  // mixed-case text keeps the 0.62 rate it always had. Only capitals widen.
+  it("seats side labels clear of the star, not merely inside the viewBox", () => {
+    const data = [
+      { label: "Speed", value: 0.8 },
+      { label: "Power", value: 0.5 },
+      { label: "Range", value: 0.3 },
+      { label: "Cost", value: 0.6 },
+      { label: "Ease", value: 0.4 },
+    ];
+    const { container } = draw(<StarSpoke data={data} size={80} />);
+    const seats = Object.fromEntries(
+      [...container.querySelectorAll("text")].map((t) => [
+        t.textContent,
+        Number(t.getAttribute("x")),
+      ]),
+    );
+    expect(seats).toEqual({ Speed: 40, Power: 54.7, Range: 54.7, Cost: 24.48, Ease: 20.34 });
+  });
+
   it("renders a value spoke path + a guide path summary", () => {
     const { container } = draw(<StarSpoke data={PROFILE} />);
     expect(container.querySelector('path[data-mc-ink="data"]')).not.toBeNull();

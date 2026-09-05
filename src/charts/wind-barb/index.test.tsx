@@ -13,6 +13,20 @@ const fmt = makeFormatter(undefined, undefined);
 afterEach(() => vi.restoreAllMocks());
 
 describe("<WindBarb>", () => {
+  // `labelSize` raises the floor above the 11-unit cap, so it can ask for a
+  // label taller than the box. The prop's contract is that such a label DROPS
+  // rather than shrinking back under the floor; it used to paint at the
+  // oversize font and spill out of the glyph into the page.
+  it("drops an oversize label instead of painting it outside the box", () => {
+    const { container } = draw(
+      <WindBarb magnitude={32} direction={90} size={16} labelSize={20} label="value" />,
+    );
+    const svg = container.querySelector("svg")!;
+    expect(svg.querySelector("text")).toBeNull();
+    // …and the gutter drops with it, so the glyph reclaims the width.
+    expect(svg.getAttribute("viewBox")).toBe("0 0 16 16");
+  });
+
   it("renders a shaft summary names compass + degrees", () => {
     const { container } = draw(<WindBarb direction={225} magnitude={32} />);
     expect(container.querySelector('line[data-mc-ink="data"]')).not.toBeNull();

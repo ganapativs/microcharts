@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { EN_SPROUT, type SproutStrings } from "../../core/strings-sprout.js";
-import { labelFont, labelFitsY, textGutterProse } from "../../core/labels.js";
+import { labelFont, textGutterProse } from "../../core/labels.js";
 import { sproutRowGeometry, stageGlyph } from "./geometry.js";
 import { resolveSummary } from "../../core/summary.js";
 import { maxOf } from "../../core/scale.js";
@@ -158,9 +158,6 @@ export function SproutRow(props: SproutRowProps): ReactNode {
   // sprout, with the names spilling out of the box — so they drop, and the band
   // and side gutter drop with them (the plot itself never reflows).
   const showLabels = labels && sproutLabelsFit(data, fontSize, height, props.step);
-  // The stage numeral sits above the glyph on a text baseline; drop it once its
-  // descender would clear the box floor.
-  const showValue = label === "value" && labelFitsY(PAD + fontSize, fontSize, height, false);
   const { step, padX, labelBand, twoTier } = sproutLayout(data, showLabels, fontSize, props.step);
 
   const geo = sproutRowGeometry({
@@ -170,7 +167,10 @@ export function SproutRow(props: SproutRowProps): ReactNode {
     pad: PAD,
     padX,
     bottomReserve: labelBand,
+    fontSize,
+    label,
   });
+  const showValue = geo.numeral;
   const accName = resolveSummary(summary, () => sproutRowSummary(data, strings));
   const paint = color;
 
@@ -201,7 +201,7 @@ export function SproutRow(props: SproutRowProps): ReactNode {
         s.stage === null ? null : (
           <path
             key={`g${s.x}`}
-            d={stageGlyph(s.stage, s.x, s.baselineY, s.baselineY - PAD)}
+            d={stageGlyph(s.stage, s.x, s.baselineY, geo.gh)}
             data-mc-ink="point"
             style={paint ? { fill: paint } : undefined}
           />

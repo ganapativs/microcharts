@@ -72,20 +72,21 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
   });
 
   const total = resolveTotal(rawTotal);
+  const pctFmt = useMemo(
+    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
+    [format, locale],
+  );
   const { font: FONT, gutterCh } = iconArrayLabelPlan({
     label,
     total,
     width,
     height,
     labelSize: props.labelSize,
+    pct: pctFmt,
   });
   const geo = useMemo(
     () => iconArrayGeometry({ width, height, value, total, shape, gutterCh, fontSize: FONT }),
     [width, height, value, total, shape, gutterCh, FONT],
-  );
-  const pctFmt = useMemo(
-    () => makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 0 }),
-    [format, locale],
   );
 
   // Navigable units are the icons; datum.index is the unit index (0…n-1 in

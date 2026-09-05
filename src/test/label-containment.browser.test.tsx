@@ -35,6 +35,7 @@ import { DotPlot } from "../charts/dot-plot/index.js";
 import { DualSparkline } from "../charts/dual-sparkline/index.js";
 import { Dumbbell } from "../charts/dumbbell/index.js";
 import { EventTimeline } from "../charts/event-timeline/index.js";
+import { FillWord } from "../charts/fill-word/index.js";
 import { Funnel } from "../charts/funnel/index.js";
 import { GradeProfile } from "../charts/grade-profile/index.js";
 import { HeatCell } from "../charts/heat-cell/index.js";
@@ -48,6 +49,7 @@ import { SparkBar } from "../charts/sparkbar/index.js";
 import { Sparkline } from "../charts/sparkline/index.js";
 import { SpreadBand } from "../charts/spread-band/index.js";
 import { StackedArea } from "../charts/stacked-area/index.js";
+import { StarSpoke } from "../charts/star-spoke/index.js";
 import { StreakSpark } from "../charts/streak-spark/index.js";
 import { TapeGauge } from "../charts/tape-gauge/index.js";
 import { TrendArrow } from "../charts/trend-arrow/index.js";
@@ -275,6 +277,36 @@ const CASES: Record<string, () => ReactElement> = {
       ]}
       label="delta"
       title="Waterfall"
+    />
+  ),
+
+  // The word IS the mark, and it renders at its natural width — an ALL-CAPS task
+  // label measures well past the 0.62 em/char digits estimate the box was cut
+  // from, and `.mc-root` is `overflow: visible`, so it landed on the sentence.
+  "fill-word": () => <FillWord word="SNOWPACK" value={0.5} title="Snowpack" />,
+  "fill-word (labelled)": () => <FillWord word="QUOTA" value={0.41} label="value" title="Quota" />,
+  // Caller prose on the rim, measured at the prose rate rather than the digits
+  // one: THROUGHPUT ran 4 units past the box on both the left and right spokes.
+  "star-spoke": () => (
+    <StarSpoke
+      data={[
+        { label: "THROUGHPUT", value: 0.8 },
+        { label: "LATENCY", value: 0.5 },
+        { label: "ERRORS", value: 0.3 },
+        { label: "COST", value: 0.6 },
+      ]}
+      title="Profile"
+    />
+  ),
+  // The percent gutter was cut for a 4-character "100%"; `format` can ask for
+  // fractional digits, and the label then ran past the right edge.
+  "icon-array (fractional percent)": () => (
+    <IconArray
+      value={1}
+      total={20}
+      label="percent"
+      format={{ minimumFractionDigits: 2 }}
+      title="Icons"
     />
   ),
 

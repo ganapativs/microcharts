@@ -37,7 +37,9 @@ export interface InteractiveSproutRowProps extends SproutRowProps, PickerProps {
   animate?: boolean;
 }
 
-/** Mirrors the static entry's `PAD` — the glyph's usable height is `baselineY - PAD`. */
+/** Mirrors the static entry's `PAD`. The glyph's usable height comes from the
+ *  geometry (`slot.gh`), which is the only place that knows whether the stage
+ *  numeral took a band off the top. */
 const PAD = 2;
 /** Breathing room between the painted glyph and the focus ring. */
 const RING_PAD = 1.5;
@@ -95,8 +97,10 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
         pad: PAD,
         padX: lay.padX,
         bottomReserve: lay.labelBand,
+        fontSize,
+        label: props.label,
       }),
-    [data, height, lay],
+    [data, height, lay, fontSize, props.label],
   );
 
   // One slot per datum, so the unit index IS the DATA index.
@@ -161,7 +165,7 @@ export function SproutRow(props: InteractiveSproutRowProps): React.ReactNode {
     const slot = geo.slots[i];
     if (!slot) return null;
     // A missing item paints no glyph; ring the seed-sized spot on the soil.
-    const b = stageGlyphBox(slot.stage ?? 0, slot.x, slot.baselineY, slot.baselineY - PAD);
+    const b = stageGlyphBox(slot.stage ?? 0, slot.x, slot.baselineY, geo.gh);
     // No scrub `data-mc-ui` here: `<ellipse>` is not in the shared rule's
     // selector, and carrying it on a transformed `<g>` puts the ring's own
     // coordinates at the origin — `getBBox()` reports a box in the element's

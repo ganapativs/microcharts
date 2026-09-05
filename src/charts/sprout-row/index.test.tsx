@@ -15,6 +15,26 @@ const ACCT = [
 ] as const;
 
 describe("<SproutRow>", () => {
+  // The numeral is pinned to a baseline near the top of the box and the glyph
+  // grew the full usable height into the same band, so at stage >= 2 the digit
+  // painted across the plant. Geometry now carves a top reserve.
+  it("keeps the stage numeral clear of the glyph it names", () => {
+    const { container } = draw(
+      <SproutRow data={[{ label: "Basil", value: 3 }]} label="value" height={46} />,
+    );
+    const numeralY = Number(container.querySelector("text")!.getAttribute("y"));
+    // Every y the glyph path draws; its smallest is the top of the plant. M/L/Q
+    // carry x,y pairs, so the odd positions are the ys — the `a` arcs are anchored
+    // by an M that is already counted.
+    const d = container.querySelector("path")!.getAttribute("d")!;
+    const ys: number[] = [];
+    for (const [, , nums] of d.matchAll(/([MLQ])([^A-Za-z]*)/g)) {
+      const n = nums!.trim().split(/[ ,]+/).filter(Boolean).map(Number);
+      for (let i = 1; i < n.length; i += 2) ys.push(n[i]!);
+    }
+    expect(Math.min(...ys)).toBeGreaterThan(numeralY);
+  });
+
   it("summary counts blooms and seeds", () => {
     const { container } = draw(<SproutRow data={ACCT} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

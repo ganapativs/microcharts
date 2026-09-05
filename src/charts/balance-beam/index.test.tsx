@@ -197,6 +197,34 @@ describe("BalanceBeam containment under hostile config", () => {
 // seat is DROPPED — never painted outside the viewBox, never stacked on a
 // neighbour — the reserved gutter goes with it, and the mark still renders.
 describe("BalanceBeam degradation", () => {
+  // The gate read the box width only. A tilted beam converges its pan centres,
+  // and the clamp then walks a wide numeral further inward, so a pair whose
+  // combined width fits the box was still stacked on itself.
+  it("drops tilt-converged numerals rather than colliding", () => {
+    const { container } = draw(
+      <BalanceBeam
+        data={[
+          { label: "A", value: 9999 },
+          { label: "B", value: 0 },
+        ]}
+        label="values"
+        width={48}
+        height={50}
+        maxTilt={80}
+      />,
+    );
+    const texts = [...container.querySelectorAll("text")];
+    if (texts.length === 2) {
+      const box = (t: Element) => {
+        const half = ((t.textContent ?? "").length * 0.62 * 11) / 2;
+        const x = Number(t.getAttribute("x"));
+        return [x - half, x + half] as const;
+      };
+      const [a, b] = [box(texts[0]!), box(texts[1]!)];
+      expect(Math.min(a[1], b[1]) - Math.max(a[0], b[0])).toBeLessThanOrEqual(0);
+    }
+  });
+
   it("both numerals drop rather than colliding, the beam still draws", () => {
     const big = draw(
       <BalanceBeam data={IN_OUT} label="values" width={120} height={44} />,

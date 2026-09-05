@@ -7,6 +7,19 @@ import { expectNoA11yViolations } from "../../test/a11y.js";
 const draw = (ui: React.ReactNode) => render(<StrictMode>{ui}</StrictMode>);
 
 describe("<BreathingDot>", () => {
+  // The reserved gutter is what keeps the line from reflowing as the value
+  // moves — including to nothing when the feed drops out. Its floor was cut for
+  // a 4-character "100%", and fr-FR writes "100 %".
+  it("holds one width across the value range and a dropout, in a NBSP locale", () => {
+    const widths = [1, 0.5, null].map((v) => {
+      const { container, unmount } = draw(<BreathingDot value={v} label="value" locale="fr-FR" />);
+      const w = container.querySelector("svg")!.getAttribute("width");
+      unmount();
+      return w;
+    });
+    expect(new Set(widths).size).toBe(1);
+  });
+
   it("summary states the percent and the band word", () => {
     const { container } = draw(<BreathingDot value={0.42} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe("Load 42% — calm.");

@@ -109,11 +109,13 @@ export function FillWord(props: FillWordProps): ReactNode {
     fillWordSummary(value, word, mode, strings, locale),
   );
   // The word renders at its NATURAL width — no textLength/lengthAdjust, which
-  // distort the glyphs (the 0.62 estimate never matches a proportional font, so
-  // pinning the extent stretches or squeezes the letters). The estimate still
-  // drives the viewBox width + numeral gutter (a safe over-estimate for real task
-  // labels); the accent clip is a percentage of the text's OWN box, so the fill
-  // fraction stays exact regardless of the true rendered width.
+  // distort the glyphs (an em/char estimate never matches a proportional font,
+  // so pinning the extent stretches or squeezes the letters). The estimate still
+  // drives the viewBox width + numeral gutter, and it is the CAPS-AWARE one:
+  // 0.62 em/char is calibrated for digits, and ALL-CAPS task labels run past it,
+  // which painted SNOWPACK's tail over the text beside it. The accent clip is a
+  // percentage of the text's OWN box, so the fill fraction stays exact
+  // regardless of the true rendered width.
   const textProps = {
     x: geo.x,
     y: geo.y,
