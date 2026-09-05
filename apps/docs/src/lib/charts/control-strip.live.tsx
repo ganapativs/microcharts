@@ -20,7 +20,6 @@ export const playground: PlaygroundSpec = {
   renderInteractive: (s, _data, ui) => (
     <ControlStripInteractive
       data={DEMO}
-      limits={s.limits as "sigma" | "percentile"}
       rules={s.rules ? "we" : "none"}
       dots={s.dots ? "all" : "out"}
       summary={false}
@@ -33,7 +32,6 @@ export const playground: PlaygroundSpec = {
     [
       "<ControlStrip",
       "  data={weights}",
-      s.limits !== "sigma" && `  limits="${s.limits}"`,
       s.rules && '  rules="we"',
       s.dots && '  dots="all"',
       ui.animate && " animate",

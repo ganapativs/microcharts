@@ -1438,7 +1438,7 @@ export const DOCS_CODE: Record<string, ChartDocsCode> = {
   },
   "control-strip": {
     playground:
-      'import { ControlStrip } from "@microcharts/react/control-strip/interactive";\n\n<ControlStrip\n  data={weights}\n  limits="undefined"\n/>',
+      'import { ControlStrip } from "@microcharts/react/control-strip/interactive";\n\n<ControlStrip\n  data={weights}\n/>',
     recipes: [
       {
         label: "Western Electric run rules",
