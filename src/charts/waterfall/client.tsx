@@ -19,6 +19,24 @@ import { LiveRegion } from "../../shared/live-region.js";
 import { waterfallGeometry } from "./geometry.js";
 import { Waterfall as StaticWaterfall, waterfallSummary, type WaterfallProps } from "./index.js";
 
+/**
+ * One sign rule for the three places a step's delta is rendered — the chip, the
+ * announcement, and the `formatted` a consumer lifts into its own KPI card.
+ * `withPlus` withholds the plus for a zero step, matching the static entry,
+ * which prints no signed label for one at all; the chip alone used to know that
+ * and a flat step read "0" on screen and "+0" everywhere else.
+ */
+const signedDelta = (
+  value: number | null | undefined,
+  fmt: (n: number) => string,
+  noData: string,
+): string =>
+  isFiniteValue(value)
+    ? value < 0
+      ? `−${unsigned(fmt(Math.abs(value)))}`
+      : withPlus(value, (v) => fmt(Math.abs(v)))
+    : noData;
+
 export interface InteractiveWaterfallProps extends WaterfallProps, PickerProps {
   strings?: FlowStrings;
   /**
@@ -104,11 +122,9 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
         index: i,
         value: isFiniteValue(d.value) ? d.value : null,
         label: d.label,
-        formatted: `${d.label}: ${
-          isFiniteValue(d.value)
-            ? `${d.value < 0 ? "−" : "+"}${unsigned(fmt(Math.abs(d.value)))}`
-            : strings.noData
-        } → ${fmt(geo.levels[i] ?? open)}`,
+        formatted: `${d.label}: ${signedDelta(d.value, fmt, strings.noData)} → ${fmt(
+          geo.levels[i] ?? open,
+        )}`,
       };
     },
     [data, endLevel, fmt, geo, strings, open],
@@ -166,9 +182,7 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     : step
       ? strings.waterfallStep(
           step.label,
-          isFiniteValue(step.value)
-            ? `${step.value < 0 ? "−" : "+"}${unsigned(fmt(Math.abs(step.value)))}`
-            : strings.noData,
+          signedDelta(step.value, fmt, strings.noData),
           fmt(geo.levels[shown!] ?? open),
         )
       : "";
@@ -204,13 +218,9 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
           {isTotal
             ? fmt(endLevel)
             : step
-              ? `${step.label}: ${
-                  isFiniteValue(step.value)
-                    ? step.value < 0
-                      ? `−${unsigned(fmt(Math.abs(step.value)))}`
-                      : withPlus(step.value, (v) => fmt(Math.abs(v)))
-                    : strings.noData
-                } → ${fmt(geo.levels[shown] ?? open)}`
+              ? `${step.label}: ${signedDelta(step.value, fmt, strings.noData)} → ${fmt(
+                  geo.levels[shown] ?? open,
+                )}`
               : fmt(geo.levels[shown] ?? open)}
         </span>
       ) : null}

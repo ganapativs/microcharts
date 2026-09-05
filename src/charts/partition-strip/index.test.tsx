@@ -37,6 +37,24 @@ describe("<PartitionStrip>", () => {
     );
   });
 
+  // The strip caps at 24 segments. The summary walked the whole tree, so a
+  // bundle breakdown wider than that announced a group count and a "largest"
+  // the strip never drew.
+  it("describes only the segments the 24-segment cap left painted", () => {
+    const wide = Array.from({ length: 30 }, (_, i) => ({
+      label: `m${i}`,
+      // ascending, so the largest node of all is one the cap drops
+      value: i + 1,
+    }));
+    const { container } = draw(<PartitionStrip data={wide} width={200} height={24} />);
+    const painted = [...container.querySelectorAll("rect")];
+    expect(painted.length).toBe(24);
+    const summary = partitionStripSummary(wide, EN_PARTITION);
+    expect(summary).toContain("24 groups");
+    expect(summary).toContain("largest m23");
+    expect(summary).not.toContain("m29");
+  });
+
   it("single-level data → flat summary", () => {
     expect(
       partitionStripSummary(

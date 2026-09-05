@@ -104,8 +104,13 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
         ),
       );
     }
-    // announce only when a documented threshold was crossed
-    const crossed = THRESHOLDS.some((t) => before < t !== value < t);
+    // announce only when a documented threshold was crossed. Every relational
+    // test against NaN is false, so an unguarded XOR reads a dropout as a
+    // crossing and speaks the same sentence a real drain to 0% does.
+    const crossed =
+      Number.isFinite(before) &&
+      Number.isFinite(value) &&
+      THRESHOLDS.some((t) => before < t !== value < t);
     if (live && crossed) setAnnounced(generated);
   }, [value, generated, live]);
 

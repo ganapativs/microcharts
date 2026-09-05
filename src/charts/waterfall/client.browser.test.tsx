@@ -59,3 +59,38 @@ describe("interactive <Waterfall>", () => {
     expect(screen.container.querySelector('rect[data-mc-w="tick"]')).not.toBeNull();
   });
 });
+
+// The chip suppressed the plus on a zero delta and the live region and the
+// `formatted` handed to onActive/onSelect did not, so a flat step read "0" on
+// screen and "+0" in the two channels a consumer mirrors it through.
+describe("interactive <Waterfall> on a zero step", () => {
+  const FLAT = [
+    { label: "Product", value: 300 },
+    { label: "Flat", value: 0 },
+    { label: "Refunds", value: -140 },
+  ];
+
+  it("chip, live region and datum.formatted agree on an unsigned 0", async () => {
+    const seen: { formatted?: string }[] = [];
+    const screen = await render(
+      <Waterfall
+        data={FLAT}
+        open={1200}
+        title="P&L"
+        onActive={(d) => {
+          if (d) seen.push(d as { formatted?: string });
+        }}
+      />,
+    );
+    const wrap = screen.container.querySelector(".mc-waterfall-live") as HTMLElement;
+    wrap.focus();
+    key(wrap, "ArrowRight");
+    key(wrap, "ArrowRight");
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await expect
+      .poll(() => screen.container.querySelector(".mc-spark-readout")?.textContent)
+      .toBe("Flat: 0 → 1,500");
+    expect(live.textContent).toBe("Flat: 0, running 1,500.");
+    expect(seen.at(-1)?.formatted).toBe("Flat: 0 → 1,500");
+  });
+});

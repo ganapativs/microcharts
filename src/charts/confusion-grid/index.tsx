@@ -62,7 +62,10 @@ export function confusionSummary(
   const k = Math.max(2, Math.min(4, labels.length));
   if (labels.length < 2 || counts.length === 0) return strings.noData;
   const geo = confusionGridGeometry({ size: 48, k, counts, normalize: "row", gutterCh: 6 });
-  const acc = pct(geo.accuracy);
+  // The RAW fraction, the one the painted label formats. `geo.accuracy` is
+  // round2'd to hold the geometry's 2-dp contract, and rounding twice moved the
+  // announced percent off the painted one at a .xx5 boundary (58% vs 57%).
+  const acc = pct(confGeoAccuracy(counts, k));
   const emptyRows = geo.rowTotals
     .map((t, i) => (t === 0 ? labels[i]! : null))
     .filter((x): x is string => x != null);

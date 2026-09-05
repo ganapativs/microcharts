@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { ForecastCone } from "./index.js";
-import type { ForecastInput } from "./geometry.js";
+import { forecastConeGeometry, type ForecastInput } from "./geometry.js";
 import { expectNoA11yViolations } from "../../test/a11y.js";
 import { seriesEdgeSuite } from "../../test/edge-cases.js";
 import { expectHostsAnnotations } from "../../test/annotation-host.js";
@@ -30,6 +30,24 @@ const FC: ForecastInput = {
 };
 
 describe("<ForecastCone>", () => {
+  // The geometry numbers periods over the finite-only axis; the summary counted
+  // raw array lengths, so every dropped entry inflated the announced horizon
+  // past the last point a reader can reach.
+  it("announces the horizon on the axis the geometry numbers", () => {
+    const data = [3, Number.NaN, 5, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, 7];
+    const forecast: ForecastInput = {
+      mid: [40, 42],
+      p80: [
+        [37, 43],
+        [35, 47],
+      ],
+    };
+    const { container } = draw(<ForecastCone data={data} forecast={forecast} />);
+    const label = container.querySelector("svg")!.getAttribute("aria-label")!;
+    const geo = forecastConeGeometry({ width: 80, height: 20, data, forecast })!;
+    expect(label).toContain(`week ${geo.points.length}`);
+  });
+
   it("summary states median, horizon interval, and today — the real string", () => {
     const { container } = draw(<ForecastCone data={HIST} forecast={FC} />);
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(

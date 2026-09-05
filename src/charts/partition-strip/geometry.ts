@@ -33,7 +33,10 @@ export interface PartitionSegment {
   group: number;
 }
 
-const SEGMENT_CAP = 24;
+/** The strip paints at most this many segments (parents + children, in layout
+ *  order). Exported because the accessible name has to stop at the same place —
+ *  it used to describe the whole tree and name a "largest" that was dropped. */
+export const SEGMENT_CAP = 24;
 
 /**
  * The box `<Chart>` will actually paint: it clamps a non-finite or non-positive

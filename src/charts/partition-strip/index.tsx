@@ -12,6 +12,7 @@ import {
   PARTITION_INSET,
   partitionBox,
   partitionStripGeometry,
+  SEGMENT_CAP,
   parentValue,
   type PartitionNode,
 } from "./geometry.js";
@@ -62,15 +63,25 @@ export function partitionStripSummary(
 ): string {
   const parents = data.filter((p) => parentValue(p) > 0);
   if (parents.length === 0) return strings.noData;
+  // Shares are of the WHOLE — the strip tiles every parent's width against it —
+  // but the sentence stops where the strip does: `seg` walks the same
+  // `SEGMENT_CAP` budget the layout spends, in the same order.
   const total = parents.reduce((s, p) => s + parentValue(p), 0);
+  let seg = 0;
+  let groups = 0;
   let parts = 0;
   let bestChild: { label: string; parent: string; share: number } | null = null;
   let bestParent = { label: parents[0]!.label, share: parentValue(parents[0]!) / total };
   for (const p of parents) {
+    if (seg >= SEGMENT_CAP) break;
+    seg++;
+    groups++;
     const pv = parentValue(p);
     if (pv / total > bestParent.share) bestParent = { label: p.label, share: pv / total };
     const kids = (p.children ?? []).filter((c) => Number.isFinite(c.value) && c.value > 0);
     for (const c of kids) {
+      if (seg >= SEGMENT_CAP) break;
+      seg++;
       parts++;
       const share = c.value / total;
       if (!bestChild || share > bestChild.share)
@@ -79,14 +90,14 @@ export function partitionStripSummary(
   }
   if (bestChild) {
     return strings.partition(
-      parents.length,
+      groups,
       parts,
       bestChild.parent,
       bestChild.label,
       pctOf(bestChild.share),
     );
   }
-  return strings.partitionFlat(parents.length, bestParent.label, pctOf(bestParent.share));
+  return strings.partitionFlat(groups, bestParent.label, pctOf(bestParent.share));
 }
 
 export function PartitionStrip(props: PartitionStripProps): ReactNode {

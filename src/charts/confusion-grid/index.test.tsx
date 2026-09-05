@@ -82,6 +82,23 @@ describe("<ConfusionGrid>", () => {
     expect([...container.querySelectorAll("text")].some((t) => t.textContent === "87%")).toBe(true);
   });
 
+  // The gutter formatted the raw fraction and the summary formatted the
+  // round2'd one, so at a .xx5 percent boundary the chart painted 58% and
+  // announced 57%.
+  it("paints and announces the same accuracy at a rounding boundary", () => {
+    const half = {
+      labels: ["cat", "dog"],
+      counts: [
+        [23, 12],
+        [5, 0],
+      ],
+    }; // 23/40 = 0.575
+    const { container } = draw(<ConfusionGrid data={half} label="accuracy" />);
+    const svg = container.querySelector("svg")!;
+    const painted = [...svg.querySelectorAll("text")].find((t) => t.textContent?.endsWith("%"))!;
+    expect(svg.getAttribute("aria-label")).toContain(painted.textContent!);
+  });
+
   it("is axe-clean", async () => {
     const { container } = draw(<ConfusionGrid data={CATDOG} title="Classifier" />);
     await expectNoA11yViolations(container);

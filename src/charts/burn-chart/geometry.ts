@@ -147,9 +147,14 @@ export function burnGeometry(opts: {
     };
   }
 
-  const landing = finishes
-    ? { delta, value: round2(nowActual + slope * (deadline - today)) }
-    : null;
+  // `delta` is measured against the DEADLINE, and with no plan there is none —
+  // the fallbacks above stand a synthetic one on today so the projection stays
+  // drawable. Emitting a landing there painted "+7 d" in negative ink for a
+  // chart whose own summary says no plan is recorded.
+  const landing =
+    finishes && plan.length > 0
+      ? { delta, value: round2(nowActual + slope * (deadline - today)) }
+      : null;
 
   const points: BurnPoint[] = [];
   const spanInt = Math.round(spanEnd);

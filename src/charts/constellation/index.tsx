@@ -96,6 +96,12 @@ export function constellationSummary(
   }
 
   if (ev.length === 1) return strings.constellationOne(xFmt(first.x));
+  // Neither channel is encoded: the geometry leaves `largestIndex` at -1 and
+  // draws no halo and no numeral, so the sentence names no largest either. The
+  // `largest = last` initialiser above used to announce one anyway — a ranking
+  // the reader is sent to look for and the chart refuses to draw.
+  if (!mags.length && !vals.length)
+    return strings.constellationPlain(ev.length, xFmt(first.x), xFmt(last.x));
   return strings.constellation(ev.length, xFmt(first.x), xFmt(last.x), xFmt(largest.x));
 }
 

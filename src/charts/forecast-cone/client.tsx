@@ -91,7 +91,9 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
     });
   }, [width, height, data, forecast, target, props.domain, props.label, props.labelSize, fmt]);
 
-  const at = data.length + forecast.mid.length;
+  // The filtered period axis (see the static entry) — raw lengths counted
+  // entries the geometry dropped.
+  const at = geo?.points.length ?? 0;
   const accName =
     summary === false
       ? undefined
