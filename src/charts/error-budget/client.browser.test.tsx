@@ -111,3 +111,30 @@ describe("interactive <ErrorBudget>", () => {
     expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });
+
+// The static drops the "remaining" label — and its gutter with it — in a box too
+// short to seat the text. The client reserved the gutter on `label` alone, so it
+// mapped the pointer over a box wider than the one it rendered and every reading
+// landed early.
+describe("interactive <ErrorBudget> in a box too short for the label", () => {
+  it("maps the pointer over the width the static actually rendered", async () => {
+    const screen = await render(<ErrorBudget data={OBSERVED} width={90} height={6} />);
+    const wrap = screen.container.querySelector(".mc-error-budget-live") as HTMLElement;
+    const svg = wrap.querySelector("svg")!;
+    expect(svg.getAttribute("viewBox")).toBe("0 0 90 6");
+    const r = svg.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width * 0.6,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    // The crosshair pair rides one transformed group (x1/x2 cannot transition).
+    const g = svg.querySelector("g[data-mc-ui]") as SVGGElement;
+    const x = Number(/translateX\(([-\d.]+)px\)/.exec(g.style.transform)![1]);
+    const step = 90 / (OBSERVED.length - 1);
+    expect(Math.abs(x - 90 * 0.6)).toBeLessThanOrEqual(step / 2);
+  });
+});

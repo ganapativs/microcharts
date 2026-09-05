@@ -14,7 +14,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { describeSeries, EN_SERIES, type SeriesStrings } from "../../core/summary.js";
-import { isFiniteValue } from "../../core/types.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
 import { lastLabelMetrics, minmaxFont, sparkGeometry } from "./geometry.js";
 import { lastFinite } from "../../core/stats.js";
 import { Sparkline as StaticSparkline, type SparklineProps } from "./index.js";
@@ -45,8 +45,8 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const {
     data,
     domain,
-    width = 80,
-    height = 20,
+    width: widthProp = 80,
+    height: heightProp = 20,
     fill = false,
     band,
     label = "none",
@@ -65,6 +65,12 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+
+  // The same resolved box the composed static lays its marks against — the
+  // overlay and the hit test are sized in viewBox units off this, so a raw
+  // `width={NaN}` would point the crosshair at a box the line never used.
+  const width = chartSide(widthProp, 80);
+  const height = chartSide(heightProp, 20);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);

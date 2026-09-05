@@ -74,7 +74,9 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
     // `netFlowLabel` is the static's own drop rule — asking it (rather than
     // re-deriving from `label`) is what keeps the reserved gutter and the
     // painted viewBox the same width in a box too short to seat the text.
-    const lab = base ? netFlowLabel(base, height, props.label ?? "last", fmt) : null;
+    const lab = base
+      ? netFlowLabel(base, height, props.label ?? "last", fmt, props.labelSize)
+      : null;
     return netFlowGeometry({
       width,
       height,
@@ -84,7 +86,7 @@ export function NetFlow(props: InteractiveNetFlowProps): React.ReactNode {
       gutterCh: lab ? lab.text.length : 0,
       fontSize: lab ? lab.font : 0,
     });
-  }, [width, height, data, mode, props.domain, props.label, fmt]);
+  }, [width, height, data, mode, props.domain, props.label, props.labelSize, fmt]);
 
   const total = data.length;
   const navigable = geo !== null && !geo.degenerate;
