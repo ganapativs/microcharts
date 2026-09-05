@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_ERROR_BUDGET, type ErrorBudgetStrings } from "../../core/strings-error-budget.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { errorBudgetGeometry } from "./geometry.js";
 import {
   ErrorBudget as StaticErrorBudget,
@@ -71,7 +71,13 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
   // readout run at a short scale and the crosshair drifts from the cursor.
   const geo = useMemo(() => {
     const base = errorBudgetGeometry({ width, height, data, window, rates });
-    const showLabel = (props.label ?? "remaining") === "remaining" && base != null;
+    // The static drops label AND gutter together in a box too short to seat the
+    // text, so the same seat test has to gate the gutter here.
+    const font = labelFont(height, 0.55, props.labelSize);
+    const showLabel =
+      (props.label ?? "remaining") === "remaining" &&
+      base != null &&
+      labelFitsY(height / 2, font, height);
     const gutterCh = showLabel ? fmt(base!.remaining.value).length : 0;
     return errorBudgetGeometry({
       width,
@@ -80,7 +86,7 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
       window,
       rates,
       gutterCh,
-      fontSize: labelFont(height, 0.55, props.labelSize),
+      fontSize: font,
     });
   }, [width, height, data, window, rates, props.label, props.labelSize, fmt]);
 

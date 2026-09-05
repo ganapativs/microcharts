@@ -137,3 +137,37 @@ describe("interactive <NetFlow>", () => {
     expect(wrap.querySelector('circle[data-mc-w="tick"]')).not.toBeNull();
   });
 });
+
+// …and the same when `labelSize` raises the floor. The client asked
+// `netFlowLabel` for the drop rule but withheld the caller's floor, so it sized
+// its pointer map at the default font while the static rendered at the raised
+// one — the crosshair ran ahead of the cursor by the gutter difference.
+describe("interactive <NetFlow> at a raised label floor", () => {
+  const LONG: NetFlowPeriod[] = Array.from({ length: 12 }, (_, i) => ({
+    in: 4 + (i % 3),
+    out: 3 + ((i + 1) % 3),
+  }));
+
+  it("maps the pointer over the width the static actually rendered", async () => {
+    const screen = await render(<NetFlow data={LONG} width={90} height={24} labelSize={22} />);
+    const wrap = screen.container.querySelector(".mc-net-flow-live") as HTMLElement;
+    const svg = wrap.querySelector("svg")!;
+    const vbWidth = Number(svg.getAttribute("viewBox")!.split(" ")[2]);
+    const r = svg.getBoundingClientRect();
+    wrap.dispatchEvent(
+      new PointerEvent("pointermove", {
+        bubbles: true,
+        clientX: r.left + r.width * 0.6,
+        clientY: r.top + r.height / 2,
+      }),
+    );
+    await expect.poll(() => wrap.querySelector(".mc-spark-readout")).not.toBeNull();
+    const line = [...svg.querySelectorAll("line")].find(
+      (l) => l.getAttribute("x1") === l.getAttribute("x2"),
+    )!;
+    // Nearest-x picking, so the crosshair lands within half a period of the
+    // cursor; a map sized off the wrong font lands whole periods away.
+    const step = 90 / (LONG.length - 1);
+    expect(Math.abs(Number(line.getAttribute("x1")) - vbWidth * 0.6)).toBeLessThanOrEqual(step / 2);
+  });
+});

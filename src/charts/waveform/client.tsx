@@ -91,6 +91,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
   // Position through the clip — a percentage of its own, so it takes the locale
   // but never the amplitude `format` (which carries the signal's units).
   const posFmt = useMemo(() => makePercentFormatter(locale), [locale]);
+  const cntFmt = useMemo(() => makeFormatter(undefined, locale), [locale]);
 
   // The painted x of a bucket — bars and the envelope sit on different pitches,
   // so every x-aware surface here reads it from geometry rather than assuming.
@@ -150,7 +151,7 @@ export function Waveform(props: InteractiveWaveformProps): React.ReactNode {
       ? undefined
       : typeof summary === "string"
         ? summary
-        : waveformSummary(data, strings, fmt, posFmt);
+        : waveformSummary(data, strings, fmt, posFmt, cntFmt);
   const label = [title, accName].filter(Boolean).join(". ") || undefined;
 
   const shown = active ?? selected;
