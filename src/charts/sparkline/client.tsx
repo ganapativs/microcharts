@@ -45,8 +45,8 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   const {
     data,
     domain,
-    width: widthProp = 80,
-    height: heightProp = 20,
+    width: widthProp,
+    height: heightProp,
     fill = false,
     band,
     label = "none",
@@ -69,8 +69,10 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
   // The same resolved box the composed static lays its marks against — the
   // overlay and the hit test are sized in viewBox units off this, so a raw
   // `width={NaN}` would point the crosshair at a box the line never used.
-  const width = chartSide(widthProp, 80);
-  const height = chartSide(heightProp, 20);
+  // `chartSide` already falls back on a non-finite side, so `undefined` needs
+  // no separate default.
+  const width = chartSide(widthProp as number, 80);
+  const height = chartSide(heightProp as number, 20);
 
   const hostRef = useRef<HTMLSpanElement>(null);
   useEntrance(hostRef, "draw", animate);
