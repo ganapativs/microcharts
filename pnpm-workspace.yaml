@@ -37,3 +37,15 @@ allowBuilds:
 peerDependencyRules:
   allowedVersions:
     "tsdown>typescript": "7"
+
+# One Playwright runtime, and only one. This repo pins `playwright` and
+# `@playwright/test` together with the CI container image (see ci.yml), but
+# `@vitest/browser-playwright` declares its peer as `playwright: "*"`, which
+# happily resolves a SECOND copy. Two runtimes in the tree and Playwright
+# collects nothing at all — "did not expect test() to be called here", 0 of 104
+# specs, on a message that names neither version.
+#
+# This lived in `package.json#pnpm.overrides` until pnpm 11.25, which stopped
+# reading that field (silently — an ignored override does not fail an install).
+overrides:
+  playwright: "1.63.0"
