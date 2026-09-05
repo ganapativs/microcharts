@@ -98,6 +98,11 @@ export function niceDomain(values: readonly Value[], zero = false): [number, num
   if (min === max) {
     // pad a flat series so it has a non-degenerate band to sit in
     const pad = min === 0 ? 1 : Math.abs(min) * 0.5;
+    // …but an all-zero series still owes `zero` its anchor. The block above is a
+    // no-op there (0 is already both ends), and a symmetric pad then put 0 at
+    // the MIDDLE of the domain — the one flat input where the zero anchor was
+    // dropped, so the baseline drew across the midline instead of the floor.
+    if (zero && min === 0) return [0, pad];
     return [min - pad, max + pad];
   }
   return [min, max];

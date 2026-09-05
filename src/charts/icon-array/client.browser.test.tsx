@@ -135,3 +135,27 @@ describe("interactive <IconArray>", () => {
       .toBe("1/20 plein");
   });
 });
+
+// The idle rule ("a first arrow from nothing focuses unit 0") sat ahead of the
+// key filter, so it caught every key. The first Tab or letter after an idle
+// reset activated unit 0, fired onActive, and preventDefault swallowed the
+// keystroke.
+describe("interactive <IconArray> while idle", () => {
+  it("ignores a non-roving key instead of activating unit 0", async () => {
+    const seen: unknown[] = [];
+    const screen = await render(
+      <IconArray value={0.15} total={20} onActive={(d) => seen.push(d)} />,
+    );
+    const wrap = screen.container.querySelector(".mc-icon-array-live") as HTMLElement;
+    wrap.focus();
+    const ev = new KeyboardEvent("keydown", { key: "a", bubbles: true, cancelable: true });
+    wrap.dispatchEvent(ev);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(seen).toEqual([]);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(screen.container.querySelector("rect[data-mc-active]")).toBeNull();
+    // …and the roving keys still work.
+    wrap.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    await expect.poll(() => (seen.at(-1) as { index?: number } | null)?.index).toBe(0);
+  });
+});

@@ -115,3 +115,16 @@ describe("horizonGeometry", () => {
     }
   });
 });
+
+// The band generator clamps `dev` at the top fold and the loop draws no fold
+// above it; `foldedY` wrapped past that ceiling into a band that does not
+// exist, so a value one epsilon over it teleported the dot the full height of
+// the strip while the band under it stayed saturated.
+describe("foldedY saturates where the bands do", () => {
+  it("holds the saturated edge for values past the top fold", () => {
+    const geo = horizonGeometry({ ...base, values: [0, 1, 2], domain: [0, 4] });
+    const atCeiling = geo.foldedY(4);
+    expect(geo.foldedY(4.001)).toBe(atCeiling);
+    expect(geo.foldedY(400)).toBe(atCeiling);
+  });
+});

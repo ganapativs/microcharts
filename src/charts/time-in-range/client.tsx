@@ -102,9 +102,14 @@ export function TimeInRange(props: InteractiveTimeInRangeProps): React.ReactNode
   // Pointer (viewBox space) → zone index by the zone's own extent.
   const locate = useCallback(
     (x: number, y: number) => {
+      // Each zone's hit box swallows the separator that follows it. Matching the
+      // painted extent alone left a dead band at every boundary: a sweep across
+      // it resolved to no zone, and the hover outline, the chip and the live
+      // region all dropped and re-lit. `geo.g`, not the 0.5 default — the
+      // separator is clamped down on a short strip.
       const i = horizontal
-        ? geo.zones.findIndex((z) => x >= z.x && x <= z.x + z.width)
-        : geo.zones.findIndex((z) => y >= z.y && y <= z.y + z.height);
+        ? geo.zones.findIndex((z) => x >= z.x && x <= z.x + z.width + geo.g)
+        : geo.zones.findIndex((z) => y >= z.y && y <= z.y + z.height + geo.g);
       return i >= 0 ? i : null;
     },
     [geo, horizontal],

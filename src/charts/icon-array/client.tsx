@@ -117,18 +117,23 @@ export function IconArray(props: InteractiveIconArrayProps): React.ReactNode {
       if ((n as number) === 0) return null;
       if (key === "Home") return 0;
       if (key === "End") return n - 1;
-      if (cur < 0) return 0;
-      const row = Math.floor(cur / cols);
-      const col = cur % cols;
+      // The idle rule applies to ROVING keys only. Ahead of the switch it caught
+      // every key, so the first `Tab` (or any letter) after an idle reset was
+      // read as "activate unit 0" — preventDefault swallowed the keystroke and
+      // onActive fired a datum nobody asked for. `null` means "not ours".
+      const first = cur < 0;
+      const c = first ? 0 : cur;
+      const row = Math.floor(c / cols);
+      const col = c % cols;
       switch (key) {
         case "ArrowRight":
-          return col < cols - 1 ? cur + 1 : cur;
+          return first ? 0 : col < cols - 1 ? c + 1 : c;
         case "ArrowLeft":
-          return col > 0 ? cur - 1 : cur;
+          return first ? 0 : col > 0 ? c - 1 : c;
         case "ArrowDown":
-          return row < rows - 1 ? Math.min(n - 1, cur + cols) : cur;
+          return first ? 0 : row < rows - 1 ? Math.min(n - 1, c + cols) : c;
         case "ArrowUp":
-          return row > 0 ? cur - cols : cur;
+          return first ? 0 : row > 0 ? c - cols : c;
       }
       return null;
     },
