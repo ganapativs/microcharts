@@ -239,14 +239,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      # No `allow-ghsas` here, and nothing should be added: the one exemption
+      # this job carried (GHSA-frvp-7c67-39w9, path traversal in
+      # @hono/node-server's Windows `serve-static`) is gone with the advisory.
+      # @modelcontextprotocol/sdk widened its range to `^1.19.9 || ^2.0.5`, so
+      # the tree now resolves @hono/node-server 2.1.1 — past both patched
+      # versions the advisory names (1.19.15 and 2.0.5).
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
-        with:
-          # GHSA-frvp-7c67-39w9 — path traversal in @hono/node-server's Windows
-          # `serve-static`. It reaches us only as a transitive dependency of
-          # @modelcontextprotocol/sdk, which pulls Hono for its Streamable-HTTP
-          # transport; @microcharts/mcp imports StdioServerTransport only, so no
-          # code path here can reach it. Unfixable downstream: the SDK pins
-          # `^1.19.9` and the patch landed in Hono 2.0.5 (a major).
-          # REMOVE this entry once the SDK widens to Hono 2 — it is not a
-          # standing exemption, and nothing else should be added beside it.
-          allow-ghsas: GHSA-frvp-7c67-39w9
