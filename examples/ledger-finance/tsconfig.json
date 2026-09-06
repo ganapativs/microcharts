@@ -11,7 +11,8 @@
     "jsx": "react-jsx",
     "strict": true,
     "moduleDetection": "force",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": ["vite/client"]
   },
   "include": ["src"]
 }
