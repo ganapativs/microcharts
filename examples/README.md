@@ -59,8 +59,8 @@ npm run dev                                        # fixed port — see table
 
 Or launch any of them from the editor via the `ex-*` entries in `.claude/launch.json`.
 
-To point the suite at a newer release or RC, bump `@microcharts/react` in each app's `package.json` (e.g. `"0.18.2"` or
-`"0.13.0-rc.1"`) and re-run `npm install`.
+To point the suite at a newer release or RC, bump `@microcharts/react` in each app's `package.json` to the target
+version and re-run `npm install`.
 
 ## Deploy (Cloudflare Pages — one URL per app)
 
