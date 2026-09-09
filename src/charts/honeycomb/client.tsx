@@ -80,7 +80,7 @@ export function Honeycomb(props: InteractiveHoneycombProps): React.ReactNode {
   }, [geo]);
   const fmt = useMemo(() => makeFormatter(format, locale), [format, locale]);
 
-  const announced = useAnnounceOnChange(value, generated, live);
+  const announced = useAnnounceOnChange(resolveValue(value), generated, live);
 
   // Pointer (viewBox space) → cell index: nearest hex center within one
   // circumradius (hexes tile, so the nearest center is the containing cell).
