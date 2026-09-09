@@ -110,6 +110,23 @@ const nonFinite = (html: string): string[] =>
     .map((m) => m[1]!)
     .filter((v) => /NaN|Infinity/.test(v));
 
+// A real plant glyph rises above the soil (its topmost y is smaller than the
+// soil y); a degenerate `gh=0` path sits entirely on the soil line — every
+// y == soil. Confirms the chart's plant encoding renders rather than
+// collapsing to text-only digits and category names.
+const plantsAboveSoil = (container: HTMLElement): boolean => {
+  const soil = Number(container.querySelector("line")!.getAttribute("y1"));
+  const paths = [...container.querySelectorAll('path[data-mc-ink="point"]')];
+  if (paths.length === 0) return false;
+  for (const path of paths) {
+    const ys = [...path.getAttribute("d")!.matchAll(/[ML](-?\d+\.?\d*) (-?\d+\.?\d*)/g)].map((m) =>
+      Number(m[2]),
+    );
+    if (ys.length === 0 || Math.min(...ys) >= soil) return false;
+  }
+  return true;
+};
+
 describe("hostile config never reaches the markup", () => {
   // `height`, `step` and `fontSize` are host-computed as often as typed —
   // `Number("")` on a cleared input, a container measured mid-collapse. Each of
@@ -165,11 +182,45 @@ describe("degrades instead of spilling", () => {
     { label: "Initech", value: 2 },
   ];
 
-  it("shows names and the stage numeral at the default size", () => {
+  it("renders plant glyphs at the default labeled height with label=value", () => {
+    // At the default labeled height (40) with 2+ items and label="value", the
+    // numeral's band would consume all the plants' growing room — yielding
+    // degenerate zero-height paths on the soil — so the gate drops the numeral
+    // and the plant encoding, the chart's primary mark, still renders. The
+    // category names sit on their own band and keep their room.
     const { container } = render(<SproutRow data={NAMED} labels label="value" />);
     const text = [...container.querySelectorAll("text")].map((t) => t.textContent);
+    expect(text).toContain("Acme"); // names fit on an independent band
+    expect(text).not.toContain("3"); // numeral drops to give the plants their room
+    expect(plantsAboveSoil(container), "every glyph rises above the soil").toBe(true);
+  });
+
+  it("keeps the stage numeral once both it and the plants fit", () => {
+    // At 44 units the numeral's band and the plants' growing room both fit, so
+    // the gate keeps the numeral AND the plants render with real height.
+    const { container } = render(<SproutRow data={NAMED} labels label="value" height={44} />);
+    const text = [...container.querySelectorAll("text")].map((t) => t.textContent);
     expect(text).toContain("Acme");
-    expect(text).toContain("3");
+    expect(text).toContain("3"); // numeral painted, plants still rise
+    expect(plantsAboveSoil(container), "every glyph rises above the soil").toBe(true);
+  });
+
+  it("drops the numeral wherever its band would zero out the plants", () => {
+    // 2+ items + label="value": the two-tier label band raises the soil, so
+    // heights 39–42 leave no room for both the numeral and the plants. The
+    // numeral drops (the plants are the primary encoding) and the plants
+    // render; from 43 up both coexist.
+    for (const low of [39, 40, 41, 42]) {
+      const { container } = render(<SproutRow data={NAMED} labels label="value" height={low} />);
+      expect(
+        [...container.querySelectorAll("text")].map((t) => t.textContent),
+        `height=${low} drops the numeral`,
+      ).not.toContain("3");
+      expect(plantsAboveSoil(container), `height=${low} plants rise`).toBe(true);
+    }
+    const tall = render(<SproutRow data={NAMED} labels label="value" height={43} />).container;
+    expect([...tall.querySelectorAll("text")].map((t) => t.textContent)).toContain("3");
+    expect(plantsAboveSoil(tall), "height=43 plants rise").toBe(true);
   });
 
   it("drops the names — and their band — when the glyph would have no room", () => {
