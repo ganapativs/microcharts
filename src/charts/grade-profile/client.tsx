@@ -121,14 +121,18 @@ export function GradeProfile(props: InteractiveGradeProfileProps): React.ReactNo
   // A pitch over a subnormal run overflows to Infinity, which `Intl` renders as
   // "∞%" rather than throwing. The summary path already gates it; the readout,
   // the announcement and the callback payload are the same claim, so they gate
-  // it too — the bin (and the ink it paints) still reads the raw grade.
+  // it too. The grade slot substitutes `gradeProfileUnrepresentable`, not a
+  // fabricated 0: `pct(0)` renders the same "0%" string a real flat pitch does,
+  // and the bin/ink that would disambiguate them is a visual channel the
+  // `<LiveRegion>` (the only surface a screen-reader user gets) does not
+  // announce. `dEnd` and `cumGain` are real and read as-painted.
   const sentence = useCallback(
     (i: number): string | undefined => {
       const s = geo.segments[i];
       if (!s) return undefined;
       return strings.gradeProfileAt(
         fmt(s.dEnd),
-        pct(Number.isFinite(s.grade) ? s.grade : 0),
+        Number.isFinite(s.grade) ? pct(s.grade) : strings.gradeProfileUnrepresentable,
         fmt(s.cumGain),
       );
     },

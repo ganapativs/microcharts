@@ -98,6 +98,7 @@ describe("interactive <GradeProfile>", () => {
       gradeProfile: (d, g, p, a) => `${d}, ${g} ; max ${p} à ${a}.`,
       gradeProfileFlat: (d) => `${d}, plat.`,
       gradeProfileAt: (at, grade, gain) => `${at} : ${grade}, ${gain} de dénivelé.`,
+      gradeProfileUnrepresentable: "non représentable",
       gradeMax: (g) => `${g} max`,
     };
     const seen: { formatted?: string | undefined }[] = [];
@@ -141,14 +142,14 @@ describe("interactive <GradeProfile> on an unrepresentable pitch", () => {
   ];
 
   it("never announces or emits a non-finite grade", async () => {
-    const seen: { value?: number | null }[] = [];
+    const seen: { value?: number | null; formatted?: string }[] = [];
     const screen = await render(
       <GradeProfile
         data={WALL}
         width={200}
         height={40}
         onActive={(d) => {
-          if (d) seen.push(d as { value?: number | null });
+          if (d) seen.push(d as { value?: number | null; formatted?: string });
         }}
       />,
     );
@@ -160,5 +161,11 @@ describe("interactive <GradeProfile> on an unrepresentable pitch", () => {
     expect(live.textContent).not.toContain("∞");
     expect(screen.container.querySelector(".mc-spark-readout")?.textContent).not.toContain("∞");
     expect(seen.at(-1)?.value).toBeNull();
+    // `value: null` ("no representable grade") must not be paired, in the same
+    // payload, with a `formatted` string that renders a fabricated finite grade
+    // (digit + optional space + %). A real flat pitch reports `value: 0`, not
+    // null, so this guard never fires on a legitimate 0% pitch; a fabricated
+    // "0%" beside a non-null gain was exactly the screen-reader contradiction.
+    expect(seen.at(-1)?.formatted).not.toMatch(/\d\s*%/);
   });
 });

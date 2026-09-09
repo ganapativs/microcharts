@@ -5,7 +5,12 @@ import type { SummaryStrings } from "./summary.js";
 
 export type GradeProfileStrings = Pick<
   SummaryStrings,
-  "noData" | "gradeProfile" | "gradeProfileFlat" | "gradeProfileAt" | "gradeMax"
+  | "noData"
+  | "gradeProfile"
+  | "gradeProfileFlat"
+  | "gradeProfileAt"
+  | "gradeProfileUnrepresentable"
+  | "gradeMax"
 >;
 
 export const EN_GRADE_PROFILE: GradeProfileStrings = {
@@ -14,5 +19,6 @@ export const EN_GRADE_PROFILE: GradeProfileStrings = {
     `${distance}, ${gain} gain; steepest ${grade} at ${at}.`,
   gradeProfileFlat: (distance) => `${distance}, no real climb.`,
   gradeProfileAt: (at, grade, gain) => `${at}: ${grade}, ${gain} gained.`,
+  gradeProfileUnrepresentable: "unrepresentable",
   gradeMax: (grade) => `${grade} max`,
 };
