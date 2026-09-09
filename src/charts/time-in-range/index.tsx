@@ -3,7 +3,7 @@
 // by position first, color second — a clinically proven grammar (AGP lineage).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont, labelFitsY } from "../../core/labels.js";
+import { labelFitsBand, labelFont, labelFitsY } from "../../core/labels.js";
 import { makePercentFormatter } from "../../core/format.js";
 import { chartSide, round2 } from "../../core/types.js";
 
@@ -159,16 +159,21 @@ export function TimeInRange(props: TimeInRangeProps): ReactNode {
         // The percent lives INSIDE its zone rect, so it has to clear the rect on
         // BOTH axes: `span` on the X axis the unrotated glyph extent runs along
         // (the strip's X width, regardless of orientation), and — the part a
-        // short strip broke — a full line of text across it via `labelFitsY`.
-        // `labelFont` floors at 7 viewBox units, so a 6-unit-tall strip can seat
-        // nothing and every percent DROPS; the zones themselves are the encoding
-        // and still read. Pure arithmetic: the static path may never measure
-        // text.
+        // short strip broke — a full line of text across the along-strip axis:
+        // whole-box `labelFitsY` in horizontal, per-zone `labelFitsBand` in
+        // vertical (a band shorter than the font DROPS its label the way
+        // horizontal's `span` does, so two adjacent short mid-box zones never
+        // stack their percents on each other). `labelFont` floors at 7 viewBox
+        // units, so a 6-unit-tall strip can seat nothing and every percent
+        // DROPS; the zones themselves are the encoding and still read. Pure
+        // arithmetic: the static path may never measure text.
         const cy = round2(z.y + z.height / 2);
         const fits =
           text !== undefined &&
           span >= Math.max(14, text.length * fontSize * 0.62 + 2) &&
-          labelFitsY(cy, fontSize, height);
+          (orientation !== "vertical"
+            ? labelFitsY(cy, fontSize, height)
+            : labelFitsBand(z.height, fontSize));
         // flat siblings (no per-zone <g>) — the zone list is this chart's SSR
         // hot path; ink comes from an exact role (positive/negative/cat), never
         // "band" (that role would exempt the rect from the craft text-collision
