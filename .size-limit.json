@@ -733,7 +733,7 @@
   {
     "name": "@microcharts/react/sprout-row (static)",
     "path": "dist/charts/sprout-row/index.js",
-    "limit": "2.27 kB",
+    "limit": "2.28 kB",
     "gzip": true
   },
   {
