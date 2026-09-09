@@ -238,3 +238,55 @@ describe("BalanceBeam degradation", () => {
     expect(small.querySelector("line")).not.toBeNull();
   });
 });
+
+// One-drawn-numeral symmetry (e406804 regression). The separation clause's
+// bypass must count numerals that actually render (non-empty — the renderer's
+// `geo.known[i]` test), not the array length. The 2-tuple `[real, non-finite]`
+// spelling (length 2, one drawn) is the same logical input as the short-array
+// `[real]` spelling under the component's own runtime tolerance, so both must
+// render the lone numeral identically.
+describe("BalanceBeam one-drawn-numeral symmetry", () => {
+  const textsOf = (c: HTMLElement) =>
+    [...c.querySelectorAll("text")].map((t) => t.textContent ?? "");
+  const marks = (c: HTMLElement) => c.querySelectorAll("rect, circle").length;
+  const common = { label: "values", width: 48, height: 20, locale: "en-US" } as const;
+
+  it("renders the lone numeral for a 2-tuple with a non-finite pan (NaN/±Infinity)", () => {
+    for (const bad of [NaN, Infinity, -Infinity]) {
+      const { container } = draw(
+        <BalanceBeam
+          data={[
+            { label: "A", value: 1234567 },
+            { label: "B", value: bad },
+          ]}
+          {...common}
+        />,
+      );
+      expect(textsOf(container), `value: ${bad}`).toEqual(["1,234,567"]);
+      expect(marks(container)).toBe(1); // the known weight mark still draws
+    }
+  });
+
+  it("the 2-tuple-non-finite spelling matches the short-array spelling across the wide-numeral corner", () => {
+    for (const width of [48, 60, 80, 120]) {
+      const single = draw(
+        <BalanceBeam
+          data={[{ label: "A", value: 1234567 }] as unknown as any}
+          {...common}
+          width={width}
+        />,
+      ).container;
+      const paired = draw(
+        <BalanceBeam
+          data={[
+            { label: "A", value: 1234567 },
+            { label: "B", value: NaN },
+          ]}
+          {...common}
+          width={width}
+        />,
+      ).container;
+      expect(textsOf(paired), `W=${width}`).toEqual(textsOf(single));
+    }
+  });
+});
