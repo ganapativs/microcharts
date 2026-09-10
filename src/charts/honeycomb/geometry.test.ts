@@ -89,6 +89,14 @@ describe("honeycombGeometry — hex occupancy", () => {
       expect(resolveCell(0)).toBe(0);
     });
 
+    it("resolveValue collapses -0 to +0 (the live-region key's contract)", () => {
+      expect(resolveValue(-0)).toBe(0);
+      expect(resolveValue(-0)).not.toBe(-0);
+      expect(resolveValue(0)).toBe(0);
+      expect(resolveValue(Number.NaN)).toBe(resolveValue(-0));
+      expect(Object.is(resolveValue(0), resolveValue(-0))).toBe(true);
+    });
+
     it.each([
       ["total", { total: Number.NaN }],
       ["total ∞", { total: Number.POSITIVE_INFINITY }],
