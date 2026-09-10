@@ -38,16 +38,16 @@ better behavior — not neon glow, glass, dashboard chrome, or decorative comple
    target, "Delta-class" ≤ 1.5 kB), interactive ≤ static + 3.25 kB, ≤ ~6 SVG nodes typical, 0 client JS for static
    charts in RSC. **(4) Catalog ceiling:** static 4.35 kB / interactive **7 kB**. The interactive wall is hard — no
    subpath crosses it, and no sign-off raises it, because "~2–7 kB interactive" is quoted in the README, the docs and
-   the package description. `sparkline` defines the top of both scales (4256 / 6973 measured) and its interactive budget
-   is pinned **at** the wall: 7000 B, 27 B of headroom. Growing that entry fails the gate on purpose — buy room by
+   the package description. `sparkline` defines the top of both scales (4256 / 6983 measured) and its interactive budget
+   is pinned **at** the wall: 7000 B, 17 B of headroom. Growing that entry fails the gate on purpose — buy room by
    shrinking it, never by raising the number.
 
    The old `interactive ≤ static + 1 kB` rule is **retired**, and `static ≤ 3 kB` is an admission bar rather than a
    catalog ceiling — the decision, its measurements, and the byte review behind it are recorded as `$ceilings` in
    `size-budgets.json`. In short: size-limit bundles each subpath standalone, so every interactive entry is charged the
-   whole shared picker kernel (measured deltas 1.01–3.12 kB, median 2.45 kB across 106 pairs), and 32 shipped statics
-   run 3.02–4.25 kB because each carries a named feature — annotations host, direct-label gutter math, derived
-   statistics, a second series, a second orientation. 74 chart statics stay under 3 kB and a new chart still must.
+   whole shared picker kernel (measured deltas 1.01–3.12 kB, median 2.45 kB across 106 pairs), and 33 shipped statics
+   run 3.02–4.26 kB because each carries a named feature — annotations host, direct-label gutter math, derived
+   statistics, a second series, a second orientation. 73 chart statics stay under 3 kB and a new chart still must.
 
    The **shared kernel is tracked, not gated**: nothing in `dist/` is the kernel (it is a set of hash-named chunks, and
    no chart imports all of them), so `size-snapshot.json` carries a declared `kernels` reading — `kernel:static` ~2.4
