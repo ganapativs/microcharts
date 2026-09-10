@@ -109,9 +109,8 @@ export function ohlcGeometry(opts: {
   // A gutter wider than half the box, or a box too short for a line of text,
   // DROPS the label and its gutter together — otherwise `x1` went negative and
   // every candle was laid out past the left edge.
-  const want = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
-  const labelFits = want > 0 && want <= width / 2 && labelFitsY(height / 2, fontSize, height);
-  const gutter = labelFits ? want : 0;
+  const gutter = gutterCh > 0 ? textGutter(gutterCh, fontSize, 5) : 0;
+  const labelFits = gutter > 0 && gutter <= width / 2 && labelFitsY(height / 2, fontSize, height);
   const invalid: number[] = [];
   // Carry each surviving period's SOURCE index: dropping a corrupt period
   // shifts every later one, and a mark that only knew its own position would
@@ -126,7 +125,7 @@ export function ohlcGeometry(opts: {
 
   // +5 gap so the last-close value reads as separate from the final candle
   const x0 = 1;
-  const x1 = width - 1 - gutter;
+  const x1 = width - 1 - (labelFits ? gutter : 0);
 
   const lo = minOf(valid.map((e) => e.p.low));
   const hi = maxOf(valid.map((e) => e.p.high));

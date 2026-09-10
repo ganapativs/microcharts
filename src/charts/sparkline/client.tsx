@@ -110,15 +110,14 @@ export function Sparkline(props: InteractiveSparklineProps): React.ReactNode {
 
   const locate = useCallback(
     (x: number) => {
-      if (stops.length === 0) return null;
-      let best = stops[0]!;
+      // nearest painted stop; none painted (empty, or every stop past a
+      // downsampled `points`) is null, not stop 0
+      let best: number | null = null;
       let bestDist = Infinity;
       for (const i of stops) {
         const p = geo.points[i];
-        if (!p) continue;
-        const d = Math.abs(p[0] - x);
-        if (d < bestDist) {
-          bestDist = d;
+        if (p && Math.abs(p[0] - x) < bestDist) {
+          bestDist = Math.abs(p[0] - x);
           best = i;
         }
       }

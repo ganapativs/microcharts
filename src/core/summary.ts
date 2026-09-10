@@ -1063,7 +1063,7 @@ export function describeSeries(values: readonly Value[], opts: DescribeOptions =
     parts.push(t.noChange);
   } else {
     const dir = s.trend > 0 ? "up" : "down";
-    if (s.first === 0 || !Number.isFinite(s.deltaRatio)) {
+    if (!s.first || !isFinite(s.deltaRatio)) {
       parts.push(t.trendAbs(dir, fmt(Math.abs(s.delta))));
     } else {
       // Percent as a plain integer, but routed through the locale formatter so

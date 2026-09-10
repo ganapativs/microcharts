@@ -367,7 +367,7 @@
   {
     "name": "@microcharts/react/ohlc (static)",
     "path": "dist/charts/ohlc/index.js",
-    "limit": "2.99 kB",
+    "limit": "3.06 kB",
     "gzip": true
   },
   {

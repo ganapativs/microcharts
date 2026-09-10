@@ -90,13 +90,14 @@ export function lastLabelMetrics(
   height: number,
   min = 5,
 ): { fontSize: number; gutter: number } | undefined {
-  if (text === undefined) return undefined;
+  // An empty string has nothing to seat either (no 6-unit gutter for nothing).
+  if (!text) return undefined;
   const ideal = Math.max(min, 6, Math.min(Math.round(height * 0.5), 11));
   const budget = Math.floor(width * 0.45);
   const needs = (size: number): number => Math.ceil(text.length * size * 0.62) + 6;
 
   let fontSize = ideal;
-  if (needs(fontSize) > budget && text.length > 0) {
+  if (needs(fontSize) > budget) {
     // Largest size whose gutter fits the budget, floored at `min` so the figure
     // never sets under the size an app asked for, and capped at `ideal` so a
     // roomy chart never grows its label.
