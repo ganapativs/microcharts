@@ -400,8 +400,8 @@
     "interactive": 5.19
   },
   "grade-profile": {
-    "static": 2.6,
-    "interactive": 5.1
+    "static": 2.62,
+    "interactive": 5.12
   },
   "win-prob-worm": {
     "static": 3.78,
