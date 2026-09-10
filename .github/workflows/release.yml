@@ -39,12 +39,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Create release PR or publish
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        # v2 renamed every input (`version` → `version-script`, `publish` →
+        # `publish-script`) and reads the token from the `github-token` input,
+        # not the `GITHUB_TOKEN` env — a SHA-only bump keeps the old names,
+        # which v2 silently ignores, and the release stops publishing.
         with:
-          version: pnpm run version
-          publish: pnpm run release
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm run version
+          publish-script: pnpm run release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
 
       # When @microcharts/mcp was just published to npm, register the pointer in
@@ -55,8 +59,8 @@ jobs:
       # One-time setup required: verify the `io.github.ganapativs` namespace on
       # registry.modelcontextprotocol.io. Skipped automatically when only the
       # library published (or on a version-PR run).
-      # NOTE the two output names. changesets/action v1.9.0 (the pinned SHA above)
-      # emits `publishedPackages`; a later version renamed it to
+      # NOTE the two output names. changesets/action v1 emitted
+      # `publishedPackages`; v2 (the pinned SHA above) renamed it to
       # `published-packages`. Reading only one would make this step silently stop
       # firing on an action bump — a skipped step looks identical to "the library
       # released on its own", so it would go unnoticed. Check both.

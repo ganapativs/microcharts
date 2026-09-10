@@ -104,3 +104,40 @@ describe("<IconArray>", () => {
 });
 
 valueEdgeSuite("IconArray", (value) => <IconArray value={value} title="Edge" />);
+
+// Regression: the percent gutter was measured at `pct(1)`, which is the WIDEST
+// percent ("100%") but the NARROWEST decimal ("1"), so `format={{ style:
+// "decimal" }}` under-reserved and "0.15" ran 6.25 units past a 110-unit box.
+describe("<IconArray> percent reserve under a replaced style", () => {
+  it("a non-percent format keeps its widest label inside the viewBox", () => {
+    for (const [w, h] of [
+      [110, 26],
+      [140, 28],
+      [100, 60],
+    ] as const) {
+      for (const format of [{ style: "decimal" }, { style: "unit", unit: "kilometer" }] as const) {
+        const { container } = draw(
+          <IconArray
+            value={0.15}
+            total={20}
+            label="percent"
+            format={format}
+            width={w}
+            height={h}
+          />,
+        );
+        const text = container.querySelector("text");
+        if (!text) continue; // dropping is allowed; spilling is not
+        const fs = Number(text.getAttribute("font-size"));
+        const end = Number(text.getAttribute("x")) + text.textContent!.length * 0.62 * fs;
+        expect(end, `${w}x${h} ${format.style} "${text.textContent}"`).toBeLessThanOrEqual(w);
+      }
+    }
+  });
+  it("the percent-style reserve is unchanged (100% is still the widest)", () => {
+    const a = draw(
+      <IconArray value={0.15} total={20} label="percent" width={110} height={26} />,
+    ).container;
+    expect(a.querySelector("text")!.textContent).toBe("15%");
+  });
+});
