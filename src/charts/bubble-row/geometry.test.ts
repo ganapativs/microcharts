@@ -96,5 +96,8 @@ describe("bubbleLayout — the scalars both entries share", () => {
     expect(bubbleLayout({ height: 8, label: "value" })).toMatchObject({ band: 0, charW: 0 });
     expect(bubbleLayout({ height: 30, label: "none" })).toMatchObject({ band: 0, charW: 0 });
     expect(bubbleLayout({ height: 12, label: "value" }).band).toBe(9);
+    // 9–11 units: the numeral fits the box but the 2-unit bubble floor would
+    // paint over its ascent, so the band drops with it.
+    expect(bubbleLayout({ height: 10, label: "value" }).band).toBe(0);
   });
 });

@@ -17,21 +17,22 @@ the other 105. Sizes are gzip, measured by `pnpm size` and gated, so a chart tha
 
 <SizeDistribution />
 
-The `/interactive` subpath lands between **2.27 kB and 7 kB** gzip, with a **median of 5.3 kB**. That buys hover, roving
-keyboard focus, select-to-pin (and light dismiss), touch scrub, and live announcements. Its static twin is pure SVG with
-zero client JavaScript, and lands between **1.08 kB and 4.25 kB**, with a **median of 2.78 kB**. A page pays for
-interactivity only where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the
+The `/interactive` subpath lands between **2.27 kB and 6.98 kB** gzip, with a **median of 5.31 kB**. That buys hover,
+roving keyboard focus, select-to-pin (and light dismiss), touch scrub, and live announcements. Its static twin is pure
+SVG with zero client JavaScript, and lands between **1.08 kB and 4.26 kB**, with a **median of 2.78 kB**. A page pays
+for interactivity only where it uses it. About 0.5 kB of the interactive delta is the shared picker kernel, which the
 per-subpath gate measures standalone in every entry; a page using several interactive charts bundles it once.
 
 <SizeTable />
 
-Thirty-two charts sit above the 3 kB static reference line, none of them by more than 1.25 kB. Sparkline, the most
+Thirty-three charts sit above the 3 kB static reference line, none of them by more than 1.26 kB. Sparkline, the most
 configurable primitive in the set, is the largest. Most of the rest are value-series charts that host annotations
 (ChangePoint, WinProbWorm, ForecastCone, DualSparkline, BurnChart, SpreadBand, RetentionCurve, ControlStrip, QueueDepth,
 SparkBar, EnsembleGhosts, NetFlow, Slope), plus Station Glyph, PercentileLadder, PercentileTrace, ShiftHistogram,
 StackedArea, ABStrips, PolarClock, Constellation, Dumbbell, CyclePlot, Waterfall, TapeGauge, MiniBar, BenchmarkStrip,
-EventTimeline, VolumeProfile, GradedBand and LikertStrip; the last two crossed the line when their percent labels moved
-onto a real `Intl` formatter. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
+EventTimeline, VolumeProfile, GradedBand, LikertStrip and MicroDonut. GradedBand and LikertStrip crossed the line when
+their percent labels moved onto a real `Intl` formatter; MicroDonut crossed it when its total label gained a fit gate
+against the hole it sits in. The annotation hosts carry a small shared walker that resolves `Threshold`, `Marker`, and
 the rest against the chart's scale, and you pay for it only on those charts.
 
 Every number on this page is measured in this repo. For a reading nobody here produced, open the package on

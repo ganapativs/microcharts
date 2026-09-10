@@ -144,14 +144,18 @@ export function BalanceBeam(props: BalanceBeamProps): ReactNode {
   // their clamped seats — a tilted beam converges the pan centres by cos(θ), and
   // the clamp then walks a wide numeral further inward, so a pair whose combined
   // width fits the box could still be stacked on each other. Half of each
-  // numeral sits either side of its seat, hence `sum / 2 + 2 ≤ dx`.
+  // numeral sits either side of its seat, hence `sum / 2 + 2 ≤ dx`. The separation
+  // clause is gated on the count of numerals that actually render (non-empty,
+  // the same `geo.known[i]` test the renderer uses) — not the array length: a
+  // one-non-finite-pan spelling `[{A, real}, {B, non-finite}]` has length 2 but
+  // draws one, and is not a collision partner for itself.
   const sum = numerals.reduce((w, t) => w + t.length * 0.62 * fontSize, 0);
   const dx = Math.abs(
     labelX(geo.weights[1]?.cx ?? 0, numerals[1] ?? "") -
       labelX(geo.weights[0]?.cx ?? 0, numerals[0] ?? ""),
   );
-  const showValues =
-    label === "values" && sum + 2 <= width && (numerals.length < 2 || sum + 4 <= 2 * dx);
+  const drawn = numerals.filter((t) => t.length > 0).length;
+  const showValues = label === "values" && sum + 2 <= width && (drawn < 2 || sum + 4 <= 2 * dx);
   // value numerals sit in their own gutter below the apparatus (never over the beam)
   const labelBand = showValues ? Math.ceil(fontSize * 1.3) : 0;
   // The numerals' text baseline — also the inline seat's floor when they render.

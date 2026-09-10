@@ -70,7 +70,12 @@ export function bubbleLayout(opts: {
   // Alphabetic baseline, so `mid: false`. A numeral the box can no longer seat
   // is DROPPED, never shrunk or painted past the edge — the library's
   // degradation rule (core/labels.ts).
-  const show = opts.label !== "none" && labelFitsY(labelY, fontSize, height, false);
+  // The bubble band floors at 2 units below `PAD`; a numeral whose ascent
+  // rises above that floor is painted over by the largest disc, so it drops.
+  const show =
+    opts.label !== "none" &&
+    labelFitsY(labelY, fontSize, height, false) &&
+    labelY - fontSize * 0.78 >= PAD + 2;
   return {
     height,
     gap,

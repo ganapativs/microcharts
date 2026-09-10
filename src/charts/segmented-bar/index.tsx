@@ -6,7 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
 import { makeFormatter, makePercentFormatter, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { EN_COMPOSITION, type CompositionStrings } from "../../core/strings-composition.js";
 import { chartSide, isFiniteValue, round2 } from "../../core/types.js";
 import {
@@ -116,6 +116,9 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
     );
   }
   const fontSize = label === "none" ? 0 : labelFont(height, 0.6, labelSize);
+  // `labelFont` floors at 7 and `labelSize` raises it; a box shorter than the
+  // font cannot seat the in-segment label, so it DROPS (never spills).
+  const labelSeats = labelFitsBand(height, fontSize);
   const geo = segmentedBarGeometry({
     width,
     height,
@@ -176,7 +179,7 @@ export function SegmentedBar(props: SegmentedBarProps): ReactNode {
               data-mc-cat={isOther ? undefined : (i % CAT_N) + 1}
               style={colors && !isOther ? { fill: colors[i % colors.length] } : undefined}
             />
-            {text !== undefined && seg.labelFits(text.length) ? (
+            {text !== undefined && labelSeats && seg.labelFits(text.length) ? (
               <text
                 x={round2(seg.x + seg.w / 2)}
                 y={height / 2}

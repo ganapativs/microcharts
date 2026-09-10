@@ -90,10 +90,10 @@ export function EtaBar(props: InteractiveEtaBarProps): React.ReactNode {
       : etaFormat
         ? etaFormat(etaGeo.remainingTime)
         : fmt(etaGeo.remainingTime);
-  // Mirrors the static's own gutter rule (`label`/`height < 9`/no ETA to print).
+  // Mirrors the static's own gutter rule (`label`/no ETA to print).
   // Left uncoerced on purpose: this subpath sits exactly on its size budget, and
   // a `!!` costs 2 B gzipped. Only ever read as a condition.
-  const gutterPaints = labelMode !== "none" && height >= 9 && (labelMode === "percent" || etaOnly);
+  const gutterPaints = labelMode !== "none" && (labelMode === "percent" || etaOnly);
   const chip =
     summary === false
       ? undefined

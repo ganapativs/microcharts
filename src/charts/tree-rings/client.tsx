@@ -15,6 +15,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { treeRingsGeometry, treeRingsSize, TREE_PAD } from "./geometry.js";
+import { isFiniteValue } from "../../core/types.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import {
   TreeRings as StaticTreeRings,
@@ -116,18 +117,26 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
     [data.length],
   );
 
+  // A period the geometry floored to a zero ring (non-finite or negative) has
+  // no number to report.
+  const known = useCallback((i: number) => isFiniteValue(data[i]) && data[i]! >= 0, [data]);
   // Rings are 1:1 with data; index = ring/period index, value = its number.
   const datum = useCallback(
     (i: number) => {
       const rg = geo.rings[i];
       return {
         index: i,
-        value: rg?.value ?? null,
+        // The geometry floors an unmeasured period to a zero-thickness ring so
+        // the disc keeps its order; the readout must not print that 0 as a
+        // measurement (the summary skips it too).
+        value: rg && known(rg.index) ? rg.value : null,
         label: periodLabel(i),
-        formatted: rg ? strings.treeRingAt(periodLabel(rg.index), fmt(rg.value)) : undefined,
+        formatted: rg
+          ? strings.treeRingAt(periodLabel(rg.index), known(rg.index) ? fmt(rg.value) : "—")
+          : undefined,
       };
     },
-    [geo, periodLabel, fmt, strings],
+    [geo, periodLabel, fmt, strings, known],
   );
 
   // `label="last"` widens the static's viewBox by a right gutter; the pointer
@@ -202,7 +211,10 @@ export function TreeRings(props: InteractiveTreeRingsProps): React.ReactNode {
   const shown = active ?? selected;
   const shownRing = shown !== null ? geo.rings[shown] : undefined;
   const announced = shownRing
-    ? strings.treeRingAt(periodLabel(shownRing.index), fmt(shownRing.value))
+    ? strings.treeRingAt(
+        periodLabel(shownRing.index),
+        known(shownRing.index) ? fmt(shownRing.value) : "—",
+      )
     : "";
 
   return (

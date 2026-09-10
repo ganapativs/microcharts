@@ -85,7 +85,12 @@ export function MicroDonut(props: MicroDonutProps): ReactNode {
   const fontSize = label === "total" ? labelFont(size, 0.28, labelSize) : 0;
   const totalText =
     label === "total" && Number.isFinite(total) ? makeFormatter(format, locale)(total) : undefined;
-  const showLabel = !decorative && totalText !== undefined && labelFitsY(size / 2, fontSize, size);
+  // …and the hole (2·rInner) has to hold the numeral, or it paints across the ring.
+  const showLabel =
+    !decorative &&
+    totalText !== undefined &&
+    labelFitsY(size / 2, fontSize, size) &&
+    totalText.length * fontSize * 0.62 <= size - 1 - 2 * geo.weight;
   // Shares take `locale` but never the value `format` (which carries the
   // units) — the same split SegmentedBar and PartitionStrip make. Without it a
   // de-DE static donut announced an en-US "62%" while its own interactive entry

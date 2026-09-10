@@ -19,7 +19,7 @@ import { resolveSummary } from "../../core/summary.js";
  *  both the sign and its spacing in en-US, so `locale` never reached it.
  *  `withPlus` adds the leading `+` only when the formatter emitted no sign. */
 export const changePointDelta = (frac: number, pct: (fraction: number) => string): string =>
-  withPlus(frac, pct);
+  isFiniteValue(frac) ? withPlus(frac, pct) : "—";
 
 export function changePointSummary(
   geo: ChangePointGeometry,
@@ -31,16 +31,18 @@ export function changePointSummary(
   if (geo.breaks.length === 0) return strings.changePointNone(geo.n);
   // headline = the largest-magnitude break
   let lead = geo.breaks[0]!;
-  for (const b of geo.breaks) if (Math.abs(b.delta) > Math.abs(lead.delta)) lead = b;
+  for (const b of geo.breaks)
+    if (!isFiniteValue(lead.delta) || Math.abs(b.delta) > Math.abs(lead.delta)) lead = b;
   const isLast = lead.index === geo.breaks[geo.breaks.length - 1]!.index;
   // A regime mean is NaN when every point in it is a gap (reachable with
   // explicit `breaks`), and `fmt(NaN)` announces the literal string "NaN" —
   // the catalog's placeholder for an unmeasurable slot is an em dash.
   const num = (v: number): string => (isFiniteValue(v) ? fmt(v) : "—");
   return strings.changePoint(
-    lead.delta >= 0 ? "up" : "down",
-    // unsigned — the direction word already carries the sign
-    pct(Math.abs(lead.delta)),
+    lead.after < lead.before ? "down" : "up",
+    // unsigned — the direction word already carries the sign; a ratio with no
+    // basis (zero / all-gap regime) reads as the catalog's em-dash placeholder
+    isFiniteValue(lead.delta) ? pct(Math.abs(lead.delta)) : "—",
     lead.index,
     num(lead.before),
     num(lead.after),

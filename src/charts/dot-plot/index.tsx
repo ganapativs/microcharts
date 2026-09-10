@@ -92,7 +92,7 @@ export function DotPlot(props: DotPlotProps): ReactNode {
   // name to identify the row (`rowLabelChars` returns 0 for that). Without the
   // second, a narrow plate rendered every label as a bare "…".
   const showCategories = geo.pitch >= fontSize * 1.25 && maxLabelChars > 0;
-  const showValues = label === "value" && geo.pitch >= 8;
+  const showValues = label === "value" && geo.pitch >= Math.max(8, fontSize);
 
   // Pin the label size in viewBox units. `styles.css` sets `font-size` on
   // `.mc-root text`, and a CSS declaration outranks the SVG presentation

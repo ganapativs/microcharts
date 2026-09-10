@@ -16,6 +16,17 @@ describe("interactive <DicePips>", () => {
     expect(live.textContent).toBe("5 out of 6.");
   });
 
+  it("a value move that rounds to the same face stays silent", async () => {
+    // 2 → 2.4 both read "2 out of 6." — the sentence did not change, so the
+    // live region does not re-speak it (the key moved, the text did not).
+    const screen = await render(<DicePips value={2} />);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    await screen.rerender(<DicePips value={2.4} />);
+    expect(live.textContent).toBe("");
+    await screen.rerender(<DicePips value={5} />);
+    expect(live.textContent).toBe("5 out of 6.");
+  });
+
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<DicePips value={4} title="Severity" />);
     const wrap = screen.container.querySelector(".mc-dice-live")!;

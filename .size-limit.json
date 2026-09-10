@@ -367,7 +367,7 @@
   {
     "name": "@microcharts/react/ohlc (static)",
     "path": "dist/charts/ohlc/index.js",
-    "limit": "2.99 kB",
+    "limit": "3.06 kB",
     "gzip": true
   },
   {
@@ -733,7 +733,7 @@
   {
     "name": "@microcharts/react/sprout-row (static)",
     "path": "dist/charts/sprout-row/index.js",
-    "limit": "2.27 kB",
+    "limit": "2.28 kB",
     "gzip": true
   },
   {

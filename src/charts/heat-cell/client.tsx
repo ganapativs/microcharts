@@ -74,7 +74,7 @@ export function HeatCell(props: InteractiveHeatCellProps): React.ReactNode {
   // template — a chip is rendered text, so English in it is untranslatable.
   // Suppressed when `label="value"` already prints the number on the cell.
   const chip =
-    geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, geo.steps) : fmt(value);
+    geo.step !== null ? strings.levelChip(fmt(value), geo.step + 1, geo.steps) : strings.noData;
 
   // The static DROPS the numeral when it is wider than the cell, so
   // `label="value"` alone was the wrong suppression test: a wide value painted

@@ -103,7 +103,7 @@ export function DicePips(props: InteractiveDicePipsProps): React.ReactNode {
   // `onActive` and `onSelect` can never report a different face.
   const datum = (): MicroDatum => ({
     index: 0,
-    value: Number.isFinite(value) ? Math.round(value) : null,
+    value: Number.isFinite(value) && Math.round(value) >= 0 ? Math.round(value) : null,
   });
   const { bind } = useScalarActive(datum, onActive, onSelect);
 

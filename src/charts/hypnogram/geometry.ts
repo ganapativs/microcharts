@@ -2,7 +2,7 @@
 // step strip that REFUSES interpolation: state is a fact, not a sample of a
 // continuum, so runs are right-angle (H/V) only — never a diagonal. Consecutive
 // same-state entries merge; the last state holds to domain[1]. 2-dp.
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { labelFitsBand, labelFont, textGutterProse } from "../../core/labels.js";
 
 export interface HypnoEntry {
@@ -144,7 +144,11 @@ export function hypnogramGeometry(opts: {
   y0: number;
   y1: number;
 } {
-  const { data, states, domain, width, height, style, gutter = 0 } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { data, states, domain, style, gutter = 0 } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const spans = hypnoSpans(data, domain);
   const n0 = Math.max(1, states.length);
   const rowY0 = Array.from({ length: n0 }, (_v, r) =>

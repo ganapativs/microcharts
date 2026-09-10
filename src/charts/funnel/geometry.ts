@@ -32,7 +32,8 @@ function side(n: number, fallback: number): number {
 function labelFontFor(height: number, label: FunnelLabel, min: number | undefined): number {
   if (label === "none") return 0;
   const f = labelFont(height, 0.35, min);
-  return labelFitsY(f * 0.9, f, height, false) ? f : 0;
+  // …and the gutter it reserves (f + 1) must leave the columns at least a unit.
+  return labelFitsY(f * 0.9, f, height, false) && height - (f + 1) >= 1 ? f : 0;
 }
 
 interface FunnelStage {

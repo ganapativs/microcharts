@@ -180,7 +180,9 @@ export function CitySkyline(props: CitySkylineProps): ReactNode {
           // the row keeps its slot; printing that 0 would state a measurement
           // nobody made, so the numeral is omitted instead (empty ≠ zero).
           geo.buildings.map((b) =>
-            isFiniteValue(data[b.index]?.value) ? (
+            isFiniteValue(data[b.index]?.value) &&
+            data[b.index]!.value >= 0 &&
+            fmt(b.value).length * 0.62 * fontSize <= bw + gap - 1 ? (
               <text
                 key={`v${b.index}`}
                 x={b.x + b.w / 2}

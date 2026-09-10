@@ -919,6 +919,13 @@ export interface SummaryStrings {
   gradeProfileFlat: (distance: string) => string;
   /** GradeProfile pitch announce, e.g. "km 18: 9.5%, 620 m gained." */
   gradeProfileAt: (at: string, grade: string, gain: string) => string;
+  /** GradeProfile grade-slot token for a pitch whose `rise/run` overflows
+   *  (sub-normal run → `Infinity`): substitutes for the `${grade}` slot in
+   *  `gradeProfileAt`, e.g. "0: unrepresentable, 1 gained." Sentence-internal,
+   *  so it carries no terminal punctuation — `pct(0)` renders the same "0%"
+   *  string a real flat pitch does, which the live region (no bin/ink to defer
+   *  to) cannot disambiguate, so the slot names the unknown instead. */
+  gradeProfileUnrepresentable: string;
   /** GradeProfile summit callout, e.g. "12% max". */
   gradeMax: (grade: string) => string;
   /** WinProbWorm summary, e.g. "Per the supplied model, home leads at 98%; 3 lead changes, biggest swing +17 at point 8." */
@@ -1056,7 +1063,7 @@ export function describeSeries(values: readonly Value[], opts: DescribeOptions =
     parts.push(t.noChange);
   } else {
     const dir = s.trend > 0 ? "up" : "down";
-    if (s.first === 0) {
+    if (!s.first || !isFinite(s.deltaRatio)) {
       parts.push(t.trendAbs(dir, fmt(Math.abs(s.delta))));
     } else {
       // Percent as a plain integer, but routed through the locale formatter so

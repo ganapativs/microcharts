@@ -110,7 +110,10 @@ export function Honeycomb(props: HoneycombProps): ReactNode {
             )
           : undefined;
   }
-  const showLabel = labelText !== undefined && labelFitsY(geo.height / 2, fontSize, geo.height);
+  const showLabel =
+    labelText !== undefined &&
+    labelFitsY(geo.height / 2, fontSize, geo.height) &&
+    labelText.length * fontSize * 0.62 <= geo.width;
   const accName = resolveSummary(summary, () =>
     honeycombSummary(filled, { total: cap, unit, strings, format, locale }),
   );

@@ -4,7 +4,7 @@
 // threshold-crossing bar, click / Enter / Space selects (onSelect). The live
 // region states each bar's share + cumulative.
 import { useCallback, useMemo, useRef } from "react";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { EN_PARETO, type ParetoStrings } from "../../core/strings-pareto.js";
 import {
   CHIP,
@@ -96,7 +96,14 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
   // crosshair drifts from the cursor.
   const geo = useMemo(() => {
     const base = paretoGeometry({ width, height, data, threshold, maxItems });
-    const showLabel = (props.label ?? "count") === "count" && base != null && base.crossing != null;
+    const FONT = labelFont(height, 0.55, props.labelSize);
+    // Same gate as the static: a box too short for the label drops its gutter
+    // there, and a gutter reserved only here would scale the pointer map.
+    const showLabel =
+      (props.label ?? "count") === "count" &&
+      base != null &&
+      base.crossing != null &&
+      labelFitsY(height / 2, FONT, height);
     // Measure the string `strings` will actually paint — a translated caption is
     // a different length, and the gutter is reserved from this count.
     const gutterCh = showLabel
@@ -109,7 +116,7 @@ export function ParetoStrip(props: InteractiveParetoStripProps): React.ReactNode
       threshold,
       maxItems,
       gutterCh,
-      fontSize: labelFont(height, 0.55, props.labelSize),
+      fontSize: FONT,
     });
   }, [width, height, data, threshold, maxItems, props.label, props.labelSize, pct, strings]);
 

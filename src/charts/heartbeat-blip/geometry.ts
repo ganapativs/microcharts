@@ -3,7 +3,7 @@
 // spike path and the flat baseline IS the down signal (shape, not color). The
 // clock is passed in (`now`) — this file never calls Date.now (SSR must be
 // deterministic; a mismatch is a hydration bug). All coords 2-dp.
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { maxOf } from "../../core/scale.js";
 
 /** Documented default window (ms) — also the fallback for an unusable one. */
@@ -76,7 +76,11 @@ export function heartbeatGeometry(opts: {
   height: number;
   pad: number;
 }): HeartbeatGeometry {
-  const { events, now, width, height, pad } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { events, now, pad } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const win = resolveWindow(opts.window);
   // A reserved label gutter wider than the box used to make this negative, which
   // mirrored every spike out of the viewBox instead of collapsing the plot.

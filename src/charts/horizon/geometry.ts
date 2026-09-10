@@ -5,7 +5,7 @@
 // author-declared, never auto-switched. 2-dp.
 import { linePath } from "../../core/path.js";
 import { extent } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 
 type XY = readonly [number, number];
 
@@ -58,7 +58,11 @@ export function horizonGeometry(opts: {
   mode: "mirror" | "offset";
   domain?: readonly [number, number] | undefined;
 }): HorizonGeometry {
-  const { width, height, values, mode } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { values, mode } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const folds = resolveFolds(opts.folds);
   const baseline = Number.isFinite(opts.baseline) ? opts.baseline : 0;
   const n = values.length;

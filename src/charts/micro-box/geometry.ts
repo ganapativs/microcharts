@@ -4,7 +4,7 @@
 // from fewer than 5 observations — degenerate honesty handled by the caller.
 import { fiveNumber, type FiveNumber } from "../../core/quantile.js";
 import { clamp, maxOf, minOf, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 
 type StatX = Record<"min" | "q1" | "median" | "q3" | "max", number>;
 
@@ -51,7 +51,10 @@ export function microBoxDots(opts: {
   five: FiveNumber;
   domain?: readonly [number, number] | undefined;
 }): MicroBoxDots {
-  const { raw, width, five } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { raw, five } = opts;
+  const width = chartSide(opts.width);
   const x = axis(opts.domain, [five.min, five.max], width);
   return { dots: raw.map(x), statX: statsX(x, five) };
 }

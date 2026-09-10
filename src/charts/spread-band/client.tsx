@@ -97,7 +97,7 @@ export function SpreadBand(props: InteractiveSpreadBandProps): React.ReactNode {
       const d = data[i];
       const a = d?.a;
       const b = d?.b;
-      const g = isFiniteValue(a) && isFiniteValue(b) ? a - b : null;
+      const g = isFiniteValue(a) && isFiniteValue(b) && isFiniteValue(a - b) ? a - b : null;
       // Mirror the readout chip exactly ("—", "level", or "organic +11").
       const [la, lb] = seriesPair(seriesLabels);
       return {

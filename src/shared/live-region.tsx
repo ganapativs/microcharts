@@ -49,10 +49,16 @@ export function LiveRegion({ children }: { children?: ReactNode }): React.ReactN
  * the channel should stay quiet until the data actually moves. A change while
  * `live` is false is swallowed but still consumes the key, so re-enabling
  * `live` does not replay a stale announcement — and the previous text is kept
- * rather than cleared, which is what the effect version did.
+ * rather than cleared, which is what the effect version did. A key change whose
+ * `text` is byte-identical to the last one is swallowed too: the region only
+ * ever re-speaks a sentence that actually changed.
  */
 export function useAnnounceOnChange(key: unknown, text: string, live: boolean): string {
-  const [seen, setSeen] = useState<{ key: unknown; text: string }>({ key, text: "" });
-  if (!Object.is(seen.key, key)) setSeen({ key, text: live ? text : seen.text });
-  return seen.text;
+  const [seen, setSeen] = useState({ key, text, out: "" });
+  // A key move that leaves the sentence unchanged (0 → -0, 3.4 → 3.2 under a
+  // rounding chart, a re-resolved NaN) says nothing new, so it is swallowed —
+  // announcing an identical sentence again is the redundant utterance.
+  if (!Object.is(seen.key, key))
+    setSeen({ key, text, out: live && text !== seen.text ? text : seen.out });
+  return seen.out;
 }

@@ -177,7 +177,9 @@ export function Thermometer(props: ThermometerProps): ReactNode {
             Math.max(geo.fillEdge, textGutter(valueText.length, fontSize, 0) / 2),
             width - textGutter(valueText.length, fontSize, 0) / 2,
           ),
-          y: boxH + fontSize * 0.9,
+          // 0.75: with `dominant-baseline: central` the em-box runs ±fs/2, so
+          // 0.9 put its bottom 0.15 fs past the 1.25 fs band reserved for it
+          y: boxH + fontSize * 0.75,
           anchor: "middle" as const,
         }
     : null;

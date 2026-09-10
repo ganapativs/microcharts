@@ -5,7 +5,7 @@
 // Space selects (onSelect).// crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import {
   CHIP,
   named,
@@ -77,7 +77,13 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       target,
       domain: props.domain,
     });
-    const showLabel = (props.label ?? "landing") === "landing" && base != null;
+    const FONT = labelFont(height, 0.55, props.labelSize);
+    // Same gate as the static: a box too short for the label drops its gutter
+    // there, and a gutter reserved only here would scale the pointer map.
+    const showLabel =
+      (props.label ?? "landing") === "landing" &&
+      base != null &&
+      labelFitsY(height / 2, FONT, height);
     const gutterCh = showLabel ? fmt(base!.landing.value).length : 0;
     return forecastConeGeometry({
       width,
@@ -87,7 +93,7 @@ export function ForecastCone(props: InteractiveForecastConeProps): React.ReactNo
       target,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height, 0.55, props.labelSize),
+      fontSize: FONT,
     });
   }, [width, height, data, forecast, target, props.domain, props.label, props.labelSize, fmt]);
 

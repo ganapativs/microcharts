@@ -6,7 +6,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, withPlus, type Format } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { round2 } from "../../core/types.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import {
@@ -108,7 +108,11 @@ export function ShiftHistogram(props: ShiftHistogramProps): ReactNode {
     mode,
     domain,
   });
-  const showLabel = label === "shift" && probe != null && probe.shift !== null;
+  const showLabel =
+    label === "shift" &&
+    probe != null &&
+    probe.shift !== null &&
+    labelFitsY(height / 2, FONT, height);
   const labelText = showLabel ? shiftDelta(probe!, fmt) : "";
   const gutterCh = showLabel ? labelText.length : 0;
 

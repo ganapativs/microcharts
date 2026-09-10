@@ -61,7 +61,10 @@ export function hourglassSummary(
   strings: HourglassStrings = EN_HOURGLASS,
   locale?: string | string[] | undefined,
 ): string {
-  const e = Math.round((Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0) * 100);
+  // No sand to count: the interactive readout already says "—" here, and a
+  // fabricated "0% elapsed" reads as a real start.
+  if (!Number.isFinite(value)) return strings.noData;
+  const e = Math.round(Math.min(1, Math.max(0, value)) * 100);
   return strings.hourglass(hourglassPct(e, locale), hourglassPct(100 - e, locale));
 }
 
@@ -104,6 +107,8 @@ export function Hourglass(props: HourglassProps): ReactNode {
   // size it crosses both viewBox edges. Drop it (the labels.ts degradation rule)
   // and hand the gutter back with it; the summary still states the percent.
   const showLabel = label !== "none" && labelFitsY(height / 2, fontSize, height);
+  // the gutter stays reserved for an unknown value (no width jitter); the numeral drops
+  const showNumeral = showLabel && Number.isFinite(value);
   // 0.72 em/char (not 0.62): the % glyph is wide and under-reserves at 0.62.
   // Measured off the FORMATTED string, so a locale that adds a NBSP before the
   // sign widens the gutter with it instead of spilling the numeral onto the page.
@@ -167,7 +172,7 @@ export function Hourglass(props: HourglassProps): ReactNode {
           style={{ stroke: color ?? "var(--mc-moon)", strokeLinecap: "round" }}
         />
       ) : null}
-      {showLabel ? (
+      {showNumeral ? (
         <text
           x={boxW + 2}
           y={height / 2}

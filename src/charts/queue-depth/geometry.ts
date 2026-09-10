@@ -160,7 +160,7 @@ export function queueDepthGeometry(opts: {
     // steady state) in full negative ink under a "within capacity" summary, and
     // turned a line that merely touched the hairline into a zero-length span.
     const above = capacity !== null && v > capacity;
-    points.push({ index: i, x, y, value: round2(v), above });
+    points.push({ index: i, x, y, value: v, above });
     if (capacity !== null) {
       if (prev) {
         const pa = prev.v > capacity;

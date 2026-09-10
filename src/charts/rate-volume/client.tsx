@@ -5,7 +5,7 @@
 // never announced without its volume.// crosshair + rate ring + pin are overlay children re-using geometry.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { EN_RATE_VOLUME, type RateVolumeStrings } from "../../core/strings-rate-volume.js";
 import {
   CHIP,
@@ -79,7 +79,13 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
       domain: props.domain,
       volumeDomain: props.volumeDomain,
     });
-    const showLabel = (props.label ?? "last") === "last" && base?.last != null;
+    const FONT = labelFont(height, 0.62, props.labelSize);
+    // Same gate as the static: a box too short for the label drops its gutter
+    // there, and a gutter reserved only here would scale the pointer map.
+    const showLabel =
+      (props.label ?? "last") === "last" &&
+      base?.last != null &&
+      labelFitsY(height / 2, FONT, height);
     const gutterCh = showLabel ? fmt(base!.last!.rate).length : 0;
     return rateVolumeGeometry({
       width,
@@ -90,7 +96,7 @@ export function RateVolume(props: InteractiveRateVolumeProps): React.ReactNode {
       domain: props.domain,
       volumeDomain: props.volumeDomain,
       gutterCh,
-      fontSize: labelFont(height, 0.62, props.labelSize),
+      fontSize: FONT,
     });
   }, [
     width,

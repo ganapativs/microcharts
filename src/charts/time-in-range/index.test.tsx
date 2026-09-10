@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { fc, test } from "@fast-check/vitest";
 import { StrictMode } from "react";
 import { render } from "@testing-library/react";
 import { TimeInRange, timeInRangeSummary } from "./index.js";
@@ -174,4 +175,87 @@ describe("TimeInRange degradation", () => {
     expect(x - half).toBeGreaterThanOrEqual(0);
     expect(x + half).toBeLessThanOrEqual(viewBoxW);
   });
+
+  it("vertical label='all' DROPS adjacent short mid-box zones rather than stacking them", () => {
+    // Repro: a U-shaped profile — 64% in the severe bands, 6% near range — leaves
+    // two ADJACENT mid-box zones (`in` and `below`) that are each 2.28 viewBox
+    // units tall, centred at cy=51.78 and cy=54.56 — 2.78 units apart, far under
+    // the 11-unit font. The vertical along-strip gate was `labelFitsY` against
+    // the FULL viewBox, which both centres clear; both `3%` labels painted on
+    // top of each other at x=15. The per-zone `labelFitsBand` gate now drops
+    // short mid-box zones the way the horizontal `span` gate already did.
+    const data = { severeBelow: 30, below: 3, in: 3, above: 30, severeAbove: 34 };
+    const { container } = draw(
+      <TimeInRange data={data} orientation="vertical" label="all" width={30} height={80} />,
+    );
+    // All five present zones still render their rects — the strip is the
+    // encoding, and the label drop never touches it.
+    expect(container.querySelectorAll("rect").length).toBe(5);
+    // Only the three large zones keep their labels; the two adjacent 3% zones
+    // (each 2.28 < fontSize 11) DROP, instead of stacking into one garbled glyph.
+    const labels = [...container.querySelectorAll("text")].map((t) => t.textContent ?? "").sort();
+    expect(labels).toEqual(["30%", "30%", "34%"]);
+  });
+
+  it("vertical label='all' — a band that fits still seats its label inside the viewBox", () => {
+    // No-regression guard against the per-zone vertical gate over-dropping: in
+    // a 110-tall vertical strip the large zones keep their labels, and each
+    // kept label's em-box sits inside its own zone band — hence inside the
+    // viewBox on Y — even when the zone lives at a strip edge. (Pre-fix this
+    // also painted 72% + 15% + 7% — the new gate additionally drops the 7%
+    // `below` band whose 7.42 < fontSize 11, and keeps the two that fit.)
+    const { container } = draw(
+      <TimeInRange
+        data={{ severeBelow: 2, below: 7, in: 72, above: 15, severeAbove: 4 }}
+        orientation="vertical"
+        label="all"
+        width={26}
+        height={110}
+      />,
+    );
+    const texts = [...container.querySelectorAll("text")];
+    expect(texts.map((t) => t.textContent ?? "").sort()).toEqual(["15%", "72%"]);
+    const fs = Number(texts[0]!.getAttribute("font-size"));
+    const H = Number(container.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[3]);
+    for (const t of texts) {
+      const y = Number(t.getAttribute("y"));
+      expect(y - fs / 2).toBeGreaterThanOrEqual(0);
+      expect(y + fs / 2).toBeLessThanOrEqual(H);
+    }
+  });
+});
+
+// Vertical along-strip label stacking: a kept label is centred inside its own
+// zone band, and adjacent zone bands share only the separator `g`, so the bands
+// a vertical `label="all"` chart keeps can never paint two percent labels whose
+// em-boxes overlap on the Y axis. This is the contract that closed the bug.
+test.prop([
+  fc.record({
+    severeBelow: fc.double({ min: 0, max: 1e3, noNaN: true }),
+    below: fc.double({ min: 0, max: 1e3, noNaN: true }),
+    in: fc.double({ min: 0, max: 1e3, noNaN: true }),
+    above: fc.double({ min: 0, max: 1e3, noNaN: true }),
+    severeAbove: fc.double({ min: 0, max: 1e3, noNaN: true }),
+  }),
+])("vertical label='all' never paints two labels whose Y em-boxes overlap", (data) => {
+  const { container } = draw(
+    <TimeInRange data={data} orientation="vertical" label="all" width={30} height={80} />,
+  );
+  const texts = [...container.querySelectorAll("text")];
+  const fs = Number(texts[0]?.getAttribute("font-size") ?? 11);
+  for (let i = 0; i < texts.length; i++) {
+    const yi = Number(texts[i]!.getAttribute("y"));
+    for (let j = i + 1; j < texts.length; j++) {
+      const yj = Number(texts[j]!.getAttribute("y"));
+      const overlap = Math.min(yi + fs / 2, yj + fs / 2) - Math.max(yi - fs / 2, yj - fs / 2);
+      expect(overlap, `labels at y=${yi},${yj} (fs=${fs}) overlap`).toBeLessThanOrEqual(0);
+    }
+  }
+  // Out-of-box corollary: every kept label sits inside the viewBox on Y.
+  const H = Number(container.querySelector("svg")!.getAttribute("viewBox")!.split(" ")[3]);
+  for (const t of texts) {
+    const y = Number(t.getAttribute("y"));
+    expect(y - fs / 2).toBeGreaterThanOrEqual(-0.01);
+    expect(y + fs / 2).toBeLessThanOrEqual(H + 0.01);
+  }
 });

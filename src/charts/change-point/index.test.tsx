@@ -55,7 +55,7 @@ describe("<ChangePoint>", () => {
       <ChangePoint data={[...Array(10).fill(NaN), ...Array(10).fill(5)]} breaks={[10]} />,
     );
     expect(container.querySelector("svg")!.getAttribute("aria-label")).toBe(
-      "Level shifted up 0% around point 10 (mean — → 5); stable since.",
+      "Level shifted up — around point 10 (mean — → 5); stable since.",
     );
   });
 

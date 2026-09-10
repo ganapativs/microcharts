@@ -45,11 +45,11 @@ describe("docs-facts derivations", () => {
     expect(SIZE.max).toBeLessThanOrEqual(4.5);
   });
 
-  // performance.mdx prose names these explicitly ("Thirty-two charts sit above the
+  // performance.mdx prose names these explicitly ("Thirty-three charts sit above the
   // 3 kB reference line … Sparkline is the largest"). If the measured sizes shift,
   // the prose is stale — fail here so it gets revisited.
   it("matches the performance.mdx claim about the 3 kB line", () => {
-    expect(SIZE.over3).toHaveLength(32);
+    expect(SIZE.over3).toHaveLength(33);
     // over3 is largest-first — Sparkline leads.
     expect(SIZE.over3[0]?.slug).toBe("sparkline");
     // The prose quotes how far the largest sits over the line; docs-claims.test.ts
@@ -72,6 +72,7 @@ describe("docs-facts derivations", () => {
       "forecast-cone",
       "graded-band",
       "likert-strip",
+      "micro-donut",
       "mini-bar",
       "net-flow",
       "percentile-ladder",

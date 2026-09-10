@@ -133,8 +133,15 @@ export function sproutRowGeometry(opts: {
   // The numeral sits on a baseline at the top of the box, and drops once its
   // descender would clear the floor. Its band is carved out of the plants'
   // growing room; without that the glyph grew the full height and painted
-  // through the digit it is named by.
-  const numeral = opts.label === "value" && labelFitsY(pad + fontSize, fontSize, height, false);
+  // through the digit it is named by. The gate also checks the residual
+  // growing height after the carve: a band that consumes all the room the
+  // plants have (`baselineY` raised by `bottomReserve`) leaves a zero-height
+  // glyph — a degenerate path on the soil — so it drops the numeral instead,
+  // keeping the plant encoding the chart exists to draw.
+  const numeral =
+    opts.label === "value" &&
+    labelFitsY(pad + fontSize, fontSize, height, false) &&
+    round2(baselineY - pad - (fontSize + pad)) > 0;
   const gh = round2(Math.max(0, baselineY - pad - (numeral ? fontSize + pad : 0)));
   const slots = stages.map((s, i) => ({
     x: round2(padX + step / 2 + i * step),

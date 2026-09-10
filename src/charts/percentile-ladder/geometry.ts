@@ -25,7 +25,8 @@ export interface PercentileLadderGeometry {
   /** The sample's median — what "× the median" measures against, in both entries. Unrounded. */
   median: number;
   /** last tick value / the median, 2-dp; 0 when the median is 0. */
-  ratio: number;
+  /** Tail ÷ median; `null` when the median is 0 (no basis for a multiple). */
+  ratio: number | null;
   /** Log scale actually applied (falls back to linear on any value ≤ 0). */
   log: boolean;
   /** Placement of the in-chart `log` tag (left gutter), or null. */
@@ -130,7 +131,7 @@ export function percentileLadderGeometry(opts: {
   // round2 multiplies by 100 first, so a finite-but-huge quotient (denormal
   // inputs → e.g. 1.8e306) overflows to Infinity — guard the ROUNDED result
   const rounded = round2(quotient);
-  const ratio = Number.isFinite(rounded) ? rounded : 0;
+  const ratio = median !== 0 && Number.isFinite(rounded) ? rounded : null;
 
   return {
     track: { x0: round2(x0), x1: round2(width - pad), y },

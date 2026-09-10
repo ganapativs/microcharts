@@ -26,7 +26,9 @@ export function ladderSummary(
   const list = geo.ticks.map((t) => strings.ladderTick(String(t.p), fmt(t.value))).join(", ");
   const lastP = geo.ticks[geo.ticks.length - 1]!.p;
   const tailShare = tailFmt((100 - lastP) / 100);
-  const ratio = `${ratioFmt(geo.ratio)}×`;
+  // A zero median has no multiple to state: the em dash is the catalog's
+  // placeholder, never a fabricated "0×".
+  const ratio = geo.ratio === null ? "—" : `${ratioFmt(geo.ratio)}×`;
   return strings.ladder(list, tailShare, ratio);
 }
 

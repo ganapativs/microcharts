@@ -26,7 +26,8 @@ import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { usePrefersReducedMotion } from "../../shared/motion.js";
 import { EN_ENSEMBLE, type EnsembleStrings } from "../../core/strings-ensemble.js";
-import { ensembleGeometry } from "./geometry.js";
+import { ensembleEndLabel, ensembleGeometry } from "./geometry.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import {
   EnsembleGhosts as StaticEnsembleGhosts,
   ensembleSummary,
@@ -229,9 +230,19 @@ export function EnsembleGhosts(props: InteractiveEnsembleGhostsProps): React.Rea
     [endOf, fmt],
   );
 
+  // The static widens its viewBox by the `label="end"` gutter; the pointer
+  // basis follows it (same gate + same measure), or every x is read in a
+  // squeezed space and `locate` compares strands at the wrong column.
+  const totalWidth = useMemo(() => {
+    const font = (rest.label ?? "end") === "end" ? labelFont(height, 0.55, rest.labelSize) : 0;
+    return geo !== null && font > 0 && labelFitsY(height / 2, font, height)
+      ? ensembleEndLabel(width, height, geo.landing.y, fmt(geo.landing.value), font).totalWidth
+      : width;
+  }, [geo, width, height, fmt, rest.label, rest.labelSize]);
+
   const { active, selected, bind } = useActivePicker({
     count: paths.length,
-    width,
+    width: totalWidth,
     height,
     locate,
     datum,

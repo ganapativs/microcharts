@@ -148,7 +148,10 @@ export function GradedBand(props: GradedBandProps): ReactNode {
   const outer = geo.bands[0];
   const bandColor = color ?? "var(--mc-accent)";
   // pin the label size to viewBox units (see coverage-strip)
-  const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
+  // Only a painted label pins its size: a NaN `height` made this "NaNpx".
+  const rootStyle = showLabel
+    ? ({ ...style, "--mc-label-px": `${FONT}px` } as CSSProperties)
+    : style;
 
   return (
     <Chart

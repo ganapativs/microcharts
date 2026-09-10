@@ -12,6 +12,30 @@ describe("interactive <Honeycomb>", () => {
     expect(live.textContent).toBe("34 of 40 seats filled.");
   });
 
+  it("+0 → -0 is a no-op for the live region (no redundant announce)", async () => {
+    const screen = await render(<Honeycomb value={0} total={10} unit="seats" />);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("");
+    await screen.rerender(<Honeycomb value={-0} total={10} unit="seats" />);
+    expect(live.textContent).toBe("");
+    await screen.rerender(<Honeycomb value={0} total={10} unit="seats" />);
+    expect(live.textContent).toBe("");
+  });
+
+  it("value={NaN} is silent on mount (the symmetric NaN fix stays intact)", async () => {
+    await render(<Honeycomb value={Number.NaN} total={10} unit="seats" />);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("");
+  });
+
+  it("a real count change from 0 still announces (the resolved key is not a suppressor)", async () => {
+    const screen = await render(<Honeycomb value={0} total={10} unit="seats" />);
+    const live = document.querySelector('[aria-live="polite"]')!;
+    expect(live.textContent).toBe("");
+    await screen.rerender(<Honeycomb value={5} total={10} unit="seats" />);
+    expect(live.textContent).toBe("5 of 10 seats filled.");
+  });
+
   it("wrapper owns naming; static chart is decorative", async () => {
     const screen = await render(<Honeycomb value={34} total={40} unit="seats" title="Occupancy" />);
     const wrap = screen.container.querySelector(".mc-honeycomb-live")!;

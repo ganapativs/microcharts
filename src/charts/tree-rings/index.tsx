@@ -9,7 +9,7 @@ import { Chart } from "../../shared/Chart.js";
 import { EN_TREE, type TreeStrings } from "../../core/strings-tree.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { resolveSummary } from "../../core/summary.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { isFiniteValue } from "../../core/types.js";
 import {
   ringAnnulus,
@@ -78,8 +78,10 @@ export function treeRingsWidth(opts: {
 }): number {
   const box = treeRingsSize(opts.size);
   const last = opts.data[opts.data.length - 1];
-  if (opts.label !== "last" || !isFiniteValue(last)) return box;
   const font = treeRingsFont(box, opts.fontSize, opts.labelSize);
+  // A raised `labelSize`/`fontSize` the disc cannot seat DROPS the label and
+  // its gutter (the prop's own promise), instead of painting past the box.
+  if (opts.label !== "last" || !isFiniteValue(last) || !labelFitsBand(box, font)) return box;
   return box + Math.ceil(`${opts.fmt(last)}`.length * 0.62 * font + 5);
 }
 
@@ -152,8 +154,8 @@ export function TreeRings(props: TreeRingsProps): ReactNode {
   const last = data[data.length - 1];
   // the last-value label sits in a gutter to the RIGHT of the disc (over the
   // concentric rings it would collide), so it needs a wider viewBox
-  const showLabel = label === "last" && isFiniteValue(last);
   const gutter = treeRingsWidth({ data, size: box, label, fontSize, fmt }) - box;
+  const showLabel = gutter > 0;
 
   // SSR hot path, one pass for both variants: the muted rings all share their
   // paint, so they merge into O(1) nodes instead of N. `stroke` (the default)
