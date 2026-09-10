@@ -86,7 +86,7 @@ export function Hourglass(props: InteractiveHourglassProps): React.ReactNode {
 
   useEffect(() => {
     const before = prev.current;
-    if (before === value) return;
+    if (Object.is(before, value)) return;
     prev.current = value;
     if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       // Sand FALLS: the top level settles down as it drains, the bottom pile

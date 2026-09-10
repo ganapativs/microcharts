@@ -101,8 +101,8 @@ export function retentionGeometry(opts: {
       period: i,
       x: x(i),
       y: y(v),
-      value: round2(v),
-      bench: b === null ? null : round2(b),
+      value: v,
+      bench: b,
       benchY: b === null ? null : y(b),
     });
   });
@@ -113,7 +113,7 @@ export function retentionGeometry(opts: {
   const last = {
     x: x(lastIdx),
     y: y(values[lastIdx]!),
-    value: round2(values[lastIdx]!),
+    value: values[lastIdx]!,
   };
 
   // plateau: mean |Δ| over the last k = max(3, ⌈n/3⌉) measured periods < 0.005.
@@ -141,7 +141,7 @@ export function retentionGeometry(opts: {
       if (meanDelta < 0.005) {
         const level = windowVals.reduce((s, v) => s + v, 0) / windowVals.length;
         const from = finitePeriods[finite.length - k]!;
-        plateau = { y: y(level), value: round2(level), from, fromX: x(from) };
+        plateau = { y: y(level), value: level, from, fromX: x(from) };
       }
     }
   }

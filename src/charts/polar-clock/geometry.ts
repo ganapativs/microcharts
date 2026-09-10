@@ -202,8 +202,8 @@ export function polarClockGeometry(opts: {
   // Accent the `now` segment (both modes): its sector re-drawn.
   let accentPath: string | null = null;
   const nowIdx = opts.now;
-  if (typeof nowIdx === "number" && nowIdx >= 0 && nowIdx < n) {
-    const s = segments[nowIdx]!;
+  if (Number.isInteger(nowIdx) && (nowIdx as number) >= 0 && (nowIdx as number) < n) {
+    const s = segments[nowIdx as number]!;
     if (!s.isNull) {
       const rO = mode === "opacity" ? rMax : s.rOuter;
       if (rO > r0 + 0.01) accentPath = annulusSector(cx, cy, rO, r0, s.a0, s.a1);

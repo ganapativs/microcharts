@@ -5,7 +5,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
 import { devWarn } from "../../core/dev.js";
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { EN_HYPNOGRAM, type HypnogramStrings } from "../../core/strings-hypnogram.js";
 import {
   firstAppearance,
@@ -205,7 +205,9 @@ export function Hypnogram(props: HypnogramProps): ReactNode {
           individually. */}
       {rowY.length > 0 ? (
         <path
-          d={rowY.map((y) => `M${round2(gutter + 1)} ${y}H${width - 1}`).join("")}
+          // `chartSide`: the geometry laid out against the resolved width, and a
+          // NaN prop put "HNaN" in the row rules under a valid frame
+          d={rowY.map((y) => `M${round2(gutter + 1)} ${y}H${chartSide(width) - 1}`).join("")}
           fill="none"
           stroke="var(--mc-neutral)"
           strokeOpacity={0.16}

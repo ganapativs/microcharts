@@ -16,7 +16,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { EN_TRACE_FOLD } from "../../core/strings-trace-fold.js";
-import { chartSide } from "../../core/types.js";
+import { chartSide, isFiniteValue } from "../../core/types.js";
 import { DEFAULT_WIDTH, traceFoldGeometry, traceFoldHeight } from "./geometry.js";
 import { TraceFold as StaticTraceFold, traceFoldSummary, type TraceFoldProps } from "./index.js";
 
@@ -157,14 +157,16 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
       const s = geo.rects[i];
       return {
         index: i,
-        value: s?.duration ?? null,
+        // The geometry floors a non-finite duration to 0 for the rect; the
+        // readout says "—", not a zero nobody measured.
+        value: s && isFiniteValue(data[i]?.duration) ? s.duration : null,
         label: s?.label,
         formatted: s
-          ? `${s.label} ${fmt(s.duration)}${s.critical ? strings.traceCritical : ""}`
+          ? `${s.label} ${isFiniteValue(data[i]?.duration) ? fmt(s.duration) : "—"}${s.critical ? strings.traceCritical : ""}`
           : undefined,
       };
     },
-    [geo, fmt, strings],
+    [geo, fmt, strings, data],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -211,7 +213,7 @@ export function TraceFold(props: InteractiveTraceFoldProps): React.ReactNode {
   const announced = span
     ? strings.traceFoldAt(
         span.label,
-        fmt(span.duration),
+        isFiniteValue(data[shown!]?.duration) ? fmt(span.duration) : "—",
         pctFmt(span.share),
         span.depth,
         span.critical ? strings.traceCritical : "",

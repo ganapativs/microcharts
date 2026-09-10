@@ -4,7 +4,7 @@
 // (scattered fills are harder to count — medical-risk literature); the rest are
 // hollow, shape-distinct. No partial-unit fills ever (a 37% unit is a lie in a
 // counting chart). Coords 2-dp.
-import { round2 } from "../../core/types.js";
+import { chartSide, round2 } from "../../core/types.js";
 import { cellMetrics, type CellShape } from "../../shared/cell.js";
 import { labelFitsY, labelFont, textGutter } from "../../core/labels.js";
 
@@ -93,7 +93,9 @@ export function iconArrayLabelPlan(opts: {
   /** The entry's own percent formatter — measured over every k/n for the reserve. */
   pct?: ((fraction: number) => string) | undefined;
 }): IconArrayLabelPlan {
-  const { label, total, width, height } = opts;
+  const { label, total } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   // label a touch smaller than the strips so the countable grid stays the hero
   // (~0.5·height, clamped 7–10) — see coverage-strip
   const font = labelFont(height, 0.5, opts.labelSize);
@@ -130,7 +132,11 @@ export function iconArrayGeometry(opts: {
   gutterCh?: number;
   fontSize?: number;
 }): IconArrayGeometry {
-  const { width, height, value, shape } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { value, shape } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const n = resolveTotal(opts.total);
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;

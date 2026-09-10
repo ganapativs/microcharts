@@ -22,7 +22,7 @@ function trendClause(values: readonly Value[], strings: SeriesStrings): string {
   if (!s || s.count < 2) return strings.noData;
   if (s.min === s.max || s.trend === 0) return strings.noChange;
   const dir = s.trend > 0 ? "up" : "down";
-  return s.first === 0
+  return s.first === 0 || !Number.isFinite(s.deltaRatio)
     ? strings.trendAbs(dir, String(Math.round(Math.abs(s.delta) * 100) / 100))
     : strings.trendPct(dir, String(Math.round(Math.abs(s.deltaRatio) * 100)));
 }

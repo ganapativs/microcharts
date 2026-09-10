@@ -176,7 +176,11 @@ export function VolumeProfile(props: VolumeProfileProps): ReactNode {
               ? Math.min(width - 0.5, pocBar.x + pocBar.width + 1)
               : Math.max(0.5, pocBar.x - 1)
           }
-          y={round2(pocBar.y + pocBar.height / 2)}
+          // clamped by half the font: a 2.5-unit edge row centres a 7-unit
+          // label past the box otherwise
+          y={round2(
+            Math.min(Math.max(pocBar.y + pocBar.height / 2, fontSize / 2), height - fontSize / 2),
+          )}
           dominantBaseline="central"
           textAnchor={anchorLeft ? "start" : "end"}
           fontSize={fontSize}

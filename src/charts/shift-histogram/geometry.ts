@@ -153,10 +153,12 @@ export function shiftHistogramGeometry(opts: {
     y1: round2(height - pad),
     bins,
     medians: {
-      before: bMed === null ? null : { x: medX(bMed), value: round2(bMed) },
-      after: aMed === null ? null : { x: medX(aMed), value: round2(aMed) },
+      // Values stay raw: only coordinates are 2-dp rounded, or a formatter
+      // asking for a third decimal reads a number the data never held.
+      before: bMed === null ? null : { x: medX(bMed), value: bMed },
+      after: aMed === null ? null : { x: medX(aMed), value: aMed },
     },
-    shift: bMed === null || aMed === null ? null : round2(aMed - bMed),
+    shift: bMed === null || aMed === null ? null : aMed - bMed,
     nBefore: before.length,
     nAfter: after.length,
     labelX: round2(width + 3),

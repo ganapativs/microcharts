@@ -63,7 +63,9 @@ function levelOf(value: number, min: number, max: number, levels: number): numbe
   if (value <= 0) return 0;
   if (max <= 0 || max === min) return levels - 1;
   const frac = (value - Math.max(0, min)) / (max - Math.max(0, min));
-  return Math.min(levels - 1, 1 + Math.floor(frac * (levels - 1 - 1e-9)));
+  // `frac` goes negative for a positive value under `domain[0]`; a level
+  // below 1 became a negative fill-opacity, and the cell painted nothing.
+  return Math.min(levels - 1, Math.max(1, 1 + Math.floor(frac * (levels - 1 - 1e-9))));
 }
 
 export function activityGridGeometry(

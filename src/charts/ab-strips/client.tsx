@@ -217,7 +217,8 @@ export function ABStrips(props: InteractiveABStripsProps): React.ReactNode {
             seriesLabels[shownRow]!,
             fmt(at.edge.value),
             fmt(Math.abs(geo.deltaMedian)),
-            geo.deltaMedian < 0 ? "below" : "above",
+            // `deltaMedian` is B − A; the sentence is about the SHOWN row
+            (shownRow === 0 ? -geo.deltaMedian : geo.deltaMedian) < 0 ? "below" : "above",
             seriesLabels[shownRow === 0 ? 1 : 0]!,
           )
         : strings.abEdge(seriesLabels[shownRow]!, at.edge.p, fmt(at.edge.value))

@@ -114,7 +114,9 @@ export function traceFoldGeometry(opts: {
   longest: { label: string; duration: number; critical: boolean } | null;
 } {
   const { data, width, height, rowGap } = opts;
-  const spans = data.slice(0, 40);
+  // A non-finite depth has no row; it joins depth 0 here so both entries agree
+  // (the live region read "depth NaN" off the raw span).
+  const spans = data.slice(0, 40).map((s) => (Number.isFinite(s.depth) ? s : { ...s, depth: 0 }));
   if (spans.length === 0) return { rects: [], total: 0, criticalCount: 0, longest: null };
 
   const pad = 1;
@@ -143,7 +145,10 @@ export function traceFoldGeometry(opts: {
   const rowCount = Math.max(1, depths.length);
   const plotW = width - pad * 2;
   const rowH = (height - pad * 2) / rowCount;
-  const xOf = (t: number): number => round2(pad + ((t - minStart) / total) * plotW);
+  // Clamped: a collapsed `total` (starts spanning past 1e308) must not send a
+  // rect to x="Infinity"; every span still lands inside the box.
+  const xOf = (t: number): number =>
+    round2(pad + Math.min(1, Math.max(0, (t - minStart) / total)) * plotW);
 
   const flags = criticalPath(spans);
   // "longest" excludes the top depth level — a root span trivially spans the

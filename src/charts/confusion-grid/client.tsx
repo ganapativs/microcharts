@@ -152,7 +152,7 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
         value: c?.share ?? null,
         label: c ? `${labels[c.row] ?? ""}→${labels[c.col] ?? ""}` : undefined,
         formatted: c
-          ? `${labels[c.row]}→${labels[c.col]} ${pctFmt(rt > 0 ? c.count / rt : 0)} (${countFmt(c.count)})`
+          ? `${labels[c.row]}→${labels[c.col]} ${rt > 0 ? pctFmt(c.count / rt) : "—"} (${countFmt(c.count)})`
           : undefined,
       };
     },
@@ -200,7 +200,9 @@ export function ConfusionGrid(props: InteractiveConfusionGridProps): React.React
   const shown = active ?? selected;
   const cell = shown !== null ? geo.cells[shown] : undefined;
   const rowTotal = cell ? (geo.rowTotals[cell.row] ?? 0) : 0;
-  const pct = pctFmt(cell && rowTotal > 0 ? cell.count / rowTotal : 0);
+  // An all-zero row has no share: "—", never a "0%" a populated row could
+  // also say (the static paints the cell hollow and names it empty).
+  const pct = cell && rowTotal > 0 ? pctFmt(cell.count / rowTotal) : "—";
   // The tally, not just its row share. `counts` IS the data the caller passed,
   // and a row-normalized percentage cannot be inverted back to it without the
   // row total — so "12%" alone dropped the only number the user actually gave

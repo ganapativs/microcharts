@@ -102,7 +102,9 @@ export function lastLabelMetrics(
     // roomy chart never grows its label.
     fontSize = Math.max(min, Math.min(ideal, Math.floor((budget - 6) / (text.length * 0.62))));
   }
-  return labelFitsY(height / 2, fontSize, height)
+  // Dropped, not shrunk past `min`: a gutter over half the box would push the
+  // plot (and the line in it) past the left edge.
+  return labelFitsY(height / 2, fontSize, height) && needs(fontSize) <= width / 2
     ? { fontSize, gutter: needs(fontSize) }
     : undefined;
 }

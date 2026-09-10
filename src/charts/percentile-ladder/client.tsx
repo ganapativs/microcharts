@@ -126,6 +126,11 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   // here (nearest tick to p50) made the chip and the static summary quote two
   // different multiples of "the median" for the same ladder.
   const medianValue = geo?.median ?? 0;
+  // Same rule as `ladderSummary`: no median, no multiple ("—", never "0×").
+  const multiple = useCallback(
+    (v: number) => (medianValue === 0 ? "—" : `${ratioFmt(round2(v / medianValue))}×`),
+    [medianValue, ratioFmt],
+  );
 
   const datum = useCallback(
     (i: number) => {
@@ -134,12 +139,10 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
         index: i,
         value: t?.value ?? null,
         label: t ? `p${t.p}` : undefined,
-        formatted: t
-          ? `p${t.p} ${fmt(t.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(t.value / medianValue))}×)`
-          : undefined,
+        formatted: t ? `p${t.p} ${fmt(t.value)} (${multiple(t.value)})` : undefined,
       };
     },
-    [geo, fmt, ratioFmt, medianValue],
+    [geo, fmt, multiple],
   );
 
   const { active, selected, bind } = useActivePicker({
@@ -184,11 +187,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
   const shown = active ?? selected;
   const tick = shown !== null && geo ? geo.ticks[shown] : undefined;
   const announced = tick
-    ? strings.ladderProbe(
-        String(tick.p),
-        fmt(tick.value),
-        `${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×`,
-      )
+    ? strings.ladderProbe(String(tick.p), fmt(tick.value), multiple(tick.value))
     : "";
 
   return (
@@ -218,7 +217,7 @@ export function PercentileLadder(props: InteractivePercentileLadderProps): React
       </StaticPercentileLadder>
       {readout && tick ? (
         <span className="mc-ladder-readout mc-spark-readout" {...CHIP}>
-          {`p${tick.p} ${fmt(tick.value)} (${ratioFmt(medianValue === 0 ? 0 : round2(tick.value / medianValue))}×)`}
+          {`p${tick.p} ${fmt(tick.value)} (${multiple(tick.value)})`}
         </span>
       ) : null}
       <LiveRegion>{announced}</LiveRegion>

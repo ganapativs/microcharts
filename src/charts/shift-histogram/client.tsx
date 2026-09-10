@@ -6,7 +6,7 @@
 // the crosshair + readout chip are overlay children.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter, makePercentFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsY, labelFont } from "../../core/labels.js";
 import { EN_SHIFT, type ShiftStrings } from "../../core/strings-shift.js";
 import {
   CHIP,
@@ -102,7 +102,14 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
       mode,
       domain: props.domain,
     });
-    const showLabel = (props.label ?? "shift") === "shift" && base != null && base.shift !== null;
+    const FONT = labelFont(height, 0.42, props.labelSize);
+    // Same gate as the static: a box too short for the label drops its gutter
+    // there, and a gutter reserved only here would scale the pointer map.
+    const showLabel =
+      (props.label ?? "shift") === "shift" &&
+      base != null &&
+      base.shift !== null &&
+      labelFitsY(height / 2, FONT, height);
     const gutterCh = showLabel ? shiftDelta(base!, fmt).length : 0;
     return shiftHistogramGeometry({
       width,
@@ -113,7 +120,7 @@ export function ShiftHistogram(props: InteractiveShiftHistogramProps): React.Rea
       mode,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height, 0.42, props.labelSize),
+      fontSize: FONT,
     });
   }, [
     width,

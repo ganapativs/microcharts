@@ -4,7 +4,7 @@
 // fontSize × 1.1 drop their labels (count × height, no measurement), and the
 // category name gets a character budget that scales with the width. 2-dp.
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
-import { round2 } from "../../core/types.js";
+import { isFiniteValue, round2 } from "../../core/types.js";
 import {
   ROW_LABEL_WIDTH_SHARE,
   labelFont,
@@ -80,10 +80,11 @@ export function slopeFitFrame(opts: {
   // The bottom of the ramp is `labelSize` when the caller raised it: the walk
   // stops there and `frameFor` DROPS the labels rather than setting them under
   // the floor an app asked for.
+  const drawn = drawnRows(data);
   const floor = Math.max(SLOPE_FONT, opts.labelSize ?? 0);
   let fontSize = floor;
   for (let f = Math.max(floor, slopeLabelFont(height, width)); f > floor; f--) {
-    if (labelsFitAt({ width, height, rows: data.length, chars, fontSize: f })) {
+    if (labelsFitAt({ width, height, rows: drawn, chars, fontSize: f })) {
       fontSize = f;
       break;
     }
@@ -182,6 +183,11 @@ function slopeLabelChars(
 }
 
 /** One candidate frame: gutters at this type size, with the reclaim rule. */
+// Density counts the rows that paint: a row with no finite endpoint draws
+// nothing, so it must not drop the labels of the rows that do.
+const drawnRows = (rows: readonly { from: number; to: number }[]): number =>
+  rows.filter((r) => isFiniteValue(r.from) || isFiniteValue(r.to)).length;
+
 function frameFor(opts: {
   width: number;
   height: number;
@@ -330,7 +336,7 @@ export function slopeGeometry(opts: {
     // (or 10 units) reads as a label pile, not a chart
     labelsFit:
       colX1 - colX0 >= Math.max(10, width * 0.35) &&
-      (pairs.length === 0 ? true : height / pairs.length >= fontSize * 1.1),
+      (drawnRows(pairs) === 0 ? true : height / drawnRows(pairs) >= fontSize * 1.1),
     colX0,
     colX1,
     domain,

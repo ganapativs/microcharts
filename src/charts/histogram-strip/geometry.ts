@@ -2,7 +2,7 @@
 // VALUE whose bin gets accent — it marks the bin, never re-bins around the
 // value. 2-dp.
 import { uniformBins } from "../../core/bin.js";
-import { round2, type Value } from "../../core/types.js";
+import { chartSide, round2, type Value } from "../../core/types.js";
 
 interface HistogramBar {
   x: number;
@@ -35,7 +35,11 @@ export function histogramGeometry(opts: {
   gap?: number | undefined;
   markValue?: number | undefined;
 }): HistogramGeometry {
-  const { width, height, values, gap = 0.5, markValue } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const { values, gap = 0.5, markValue } = opts;
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   // explicit bin counts collapse to the observation count (no empty-comb)
   let finiteCount = 0;
   for (const v of values) if (typeof v === "number" && Number.isFinite(v)) finiteCount++;

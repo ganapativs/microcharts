@@ -61,7 +61,7 @@ export function labelMetrics(
   width: number,
   height: number,
   min = 5,
-): { fontSize: number; gutter: number } {
+): { fontSize: number; gutter: number } | undefined {
   const ideal = Math.max(min, 6, Math.min(Math.round(height * 0.5), 11));
   const budget = Math.floor(width * 0.45);
   const needs = (size: number): number => textGutter(text.length, size, 6);
@@ -73,7 +73,9 @@ export function labelMetrics(
     // gutter is `needs(fontSize)` either way, so the figure keeps its room.
     fontSize = Math.max(min, Math.min(ideal, fitted));
   }
-  return { fontSize, gutter: needs(fontSize) };
+  // Dropped, not shrunk past `min`: a gutter over half the box leaves the bars
+  // no room and the label paints past the right edge.
+  return needs(fontSize) <= width / 2 ? { fontSize, gutter: needs(fontSize) } : undefined;
 }
 
 /** One placed bar. `sign` drives valence color; `gap` bars (null data) are dropped. */

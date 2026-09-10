@@ -79,7 +79,7 @@ export function controlGeometry(opts: {
   // σ̂ from the mean moving range (Shewhart individuals): MR̄ / 1.128
   let mrSum = 0;
   for (let i = 1; i < n; i++) mrSum += Math.abs(data[i]! - data[i - 1]!);
-  const mrBar = n > 1 ? mrSum / (n - 1) : 0;
+  const mrBar = n > 1 && Number.isFinite(mrSum) ? mrSum / (n - 1) : 0;
   const sigmaHat = mrBar / 1.128;
   const degenerate = sigmaHat === 0;
 

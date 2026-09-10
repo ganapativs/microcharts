@@ -50,7 +50,7 @@ export interface InteractiveWaterfallProps extends WaterfallProps, PickerProps {
 export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
   const {
     data,
-    open = 0,
+    open: rawOpen = 0,
     totalBar = true,
     domain,
     width = 70,
@@ -70,6 +70,8 @@ export function Waterfall(props: InteractiveWaterfallProps): React.ReactNode {
     defaultSelectedIndex,
     ...rest
   } = props;
+  // Same rule as the static: a non-finite `open` starts the walk at 0.
+  const open = isFiniteValue(rawOpen) ? rawOpen : 0;
 
   const hostRef = useRef<HTMLSpanElement>(null);
   // Waterfall bars float between running totals rather than sharing a zero

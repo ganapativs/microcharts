@@ -39,7 +39,13 @@ export function deltaModel(props: DeltaProps): DeltaModel {
   // (or underflows) keeps the arrow it earned.
   const sign: -1 | 0 | 1 = !finite ? 0 : delta > 0 ? 1 : delta < 0 ? -1 : 0;
 
-  const fmt = makeUnitFormatter(format, locale, { style: "percent", maximumFractionDigits: 1 });
+  // A zero base has no percent change: the absolute delta is shown, so the
+  // default formatter is decimal there (percent would print "+1,200%").
+  const fmt = makeUnitFormatter(
+    format,
+    locale,
+    from === 0 ? { maximumFractionDigits: 1 } : { style: "percent", maximumFractionDigits: 1 },
+  );
 
   // Non-finite input (NaN/±Infinity) renders the flat/em-dash form rather than
   // "NaN%" — documented degenerate behavior.

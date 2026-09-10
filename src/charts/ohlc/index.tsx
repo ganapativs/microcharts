@@ -228,7 +228,7 @@ export function Ohlc(props: OhlcProps): ReactNode {
           />,
         ];
       })}
-      {label === "last" && lastMark && lastClose !== undefined ? (
+      {geo.labelFits && lastMark && lastClose !== undefined ? (
         <text
           x={width - 1}
           y={Math.min(Math.max(lastMark.yC, fontSize * 0.55), height - fontSize * 0.55)}

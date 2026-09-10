@@ -3,6 +3,7 @@
 // density-smoothed. Contract: RAW observations in — pre-aggregated counts are
 // not supported (docs steer to SparkBar).
 import type { CSSProperties, ReactNode } from "react";
+import { chartSide } from "../../core/types.js";
 import { Chart } from "../../shared/Chart.js";
 import { makeFormatter, type Format } from "../../core/format.js";
 import { EN_DIST, type DistStrings } from "../../core/strings-dist.js";
@@ -79,7 +80,8 @@ export function HistogramStrip(props: HistogramStripProps): ReactNode {
       // Counts are zero-anchored and every bin's bottom edge is `height`; the
       // half-unit inset geometry reserves is at the TOP (headroom for the modal
       // bin), so the floor is the box bottom and the bins sit on the baseline.
-      seat={{ mode: "floor", bottom: height }}
+      // resolved like the viewBox: a NaN `height` put `--mc-seat: NaN` on the root
+      seat={{ mode: "floor", bottom: chartSide(height) }}
       className={className ? `mc-histogram ${className}` : "mc-histogram"}
       style={style}
     >

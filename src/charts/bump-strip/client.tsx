@@ -17,7 +17,7 @@ import {
 import { useEntrance } from "../../shared/motion-gate.js";
 import { LiveRegion } from "../../shared/live-region.js";
 import { isFiniteValue } from "../../core/types.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { bumpGeometry } from "./geometry.js";
 import { BumpStrip as StaticBumpStrip, bumpSummary, type BumpStripProps } from "./index.js";
 
@@ -59,11 +59,11 @@ export function BumpStrip(props: InteractiveBumpStripProps): React.ReactNode {
   // Widest rank label, in chars. A full scan of the series, so it is memoised:
   // the interactive entry re-renders on every unit crossed during a scrub.
   const maxLabelChars = useMemo(() => {
-    if (label === "none") return 0;
+    if (label === "none" || !labelFitsBand(height, fontSize)) return 0;
     let max = 1;
     for (const r of data) if (isFiniteValue(r)) max = Math.max(max, Math.round(r));
     return 1 + String(max).length;
-  }, [data, label]);
+  }, [data, label, height, fontSize]);
   const geo = useMemo(
     () =>
       bumpGeometry({

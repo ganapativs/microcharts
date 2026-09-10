@@ -117,7 +117,15 @@ export function BreathingDot(props: BreathingDotProps): ReactNode {
   // out. The old floor was cut for a 4-character "100%"; fr-FR writes "100 %"
   // and every other state was one character narrower than the saturated one.
   const labelBand = labelFits
-    ? Math.ceil(Math.max(fontSize * 2.6, textGutter(pct(1).length, fontSize, 1)))
+    ? Math.ceil(
+        Math.max(
+          fontSize * 2.6,
+          // "100%" is the widest DEFAULT numeral; a caller `format` with
+          // fraction digits renders "12.34%" wider than "100%", so the
+          // painted numeral itself is the floor too.
+          textGutter(Math.max(pct(1).length, pctText?.length ?? 0), fontSize, 1),
+        ),
+      )
     : 0;
 
   return (

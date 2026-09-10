@@ -273,6 +273,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
     for (let k = 0; k < n; k++) {
       if (vertical) {
         const y = geo.pointer.labelY + (up ? -(clearV + k * 3) : clearV + k * 3);
+        if (y - 1.6 < 0 || y + 1.6 > height) break;
         chevrons.push(
           up
             ? `M${geo.pointer.labelX - 2} ${round2(y + 1)}l2 -1.6l2 1.6`
@@ -281,6 +282,7 @@ export function TapeGauge(props: TapeGaugeProps): ReactNode {
       } else {
         const clearH = est(valueText.length || 1, readoutFont) / 2 + 3;
         const x = geo.pointer.labelX + (up ? clearH + k * 3 : -clearH - k * 3);
+        if (x - 1.6 < 0 || x + 1.6 > width) break;
         chevrons.push(
           up
             ? `M${round2(x - 1)} ${geo.pointer.labelY - 2}l1.6 2l-1.6 2`

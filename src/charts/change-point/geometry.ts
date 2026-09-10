@@ -191,7 +191,12 @@ export function changePointGeometry(opts: {
   const breaks = bpts.map((index, k) => {
     const before = segMean(bounds[k]!, index);
     const after = segMean(index, bounds[k + 2]!);
-    const delta = before !== 0 && Number.isFinite(before) ? (after - before) / Math.abs(before) : 0;
+    // A ratio with no basis (a zero or all-gap regime on either side) is NaN,
+    // never a fabricated 0: "shifted 0%" is what a real flat break says.
+    const delta =
+      before !== 0 && Number.isFinite(before) && Number.isFinite(after)
+        ? (after - before) / Math.abs(before)
+        : NaN;
     return {
       index,
       x: round2(sx(index)),

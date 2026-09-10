@@ -112,7 +112,7 @@ export function CitySkyline(props: InteractiveCitySkylineProps): React.ReactNode
       const b = geo.buildings[i];
       return {
         index: i,
-        value: d?.value ?? null,
+        value: isFiniteValue(d?.value) ? d.value : null,
         label: d?.label,
         formatted:
           d && b

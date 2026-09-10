@@ -146,6 +146,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
   const accName = resolveSummary(summary, () => dataDiffSummary(geo, fmt, strings));
   const rootStyle = { ...style, "--mc-label-px": `${FONT}px` } as CSSProperties;
 
+  const totalsText = showTotals ? `+${fmt(geo.totals.added)} / −${fmt(geo.totals.removed)}` : "";
   return (
     <Chart
       width={geo.totalWidth}
@@ -227,7 +228,9 @@ export function DataDiff(props: DataDiffProps): ReactNode {
           ) : null}
         </g>
       ))}
-      {showTotals ? (
+      {/* The band is earned on height; the text also has to fit the width,
+          or a wide total runs out of the left edge. It drops, the band stays. */}
+      {showTotals && totalsText.length * 0.62 * FONT + 2 <= geo.totalWidth ? (
         <text
           x={round2(geo.totalWidth - 1)}
           y={round2(height - footerH / 2)}
@@ -236,7 +239,7 @@ export function DataDiff(props: DataDiffProps): ReactNode {
           data-mc-ink="label"
           fontSize={FONT}
         >
-          {`+${fmt(geo.totals.added)} / −${fmt(geo.totals.removed)}`}
+          {totalsText}
         </text>
       ) : null}
       {children}

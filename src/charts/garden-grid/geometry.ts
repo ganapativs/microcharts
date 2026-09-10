@@ -54,7 +54,7 @@ function stepOf(value: number, min: number, max: number, steps: number): number 
   const lo = Math.max(0, min);
   if (max <= 0 || max === lo) return steps;
   const frac = (value - lo) / (max - lo);
-  return Math.min(steps, 1 + Math.floor(frac * (steps - 1e-9)));
+  return Math.min(steps, Math.max(1, 1 + Math.floor(frac * (steps - 1e-9))));
 }
 
 export function gardenGridGeometry(opts: {

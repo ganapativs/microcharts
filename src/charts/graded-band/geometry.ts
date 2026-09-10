@@ -6,7 +6,7 @@
 // the nesting. Coords 2-dp.
 import { quantiles } from "../../core/quantile.js";
 import { clamp, extent, scaleLinear } from "../../core/scale.js";
-import { isFiniteValue, round2, type Value } from "../../core/types.js";
+import { chartSide, isFiniteValue, round2, type Value } from "../../core/types.js";
 import { textGutter } from "../../core/labels.js";
 
 interface GradedBandLevel {
@@ -48,7 +48,10 @@ export function gradedBandGeometry(opts: {
   gutterCh?: number;
   fontSize?: number;
 }): GradedBandGeometry | null {
-  const { width, height } = opts;
+  // `<Chart>` clamps a NaN side to its 1×1 fallback; laying out against the
+  // raw prop put NaN into every coordinate under that valid frame.
+  const width = chartSide(opts.width);
+  const height = chartSide(opts.height);
   const pad = 3;
   const gutterCh = opts.gutterCh ?? 0;
   const fontSize = opts.fontSize ?? 0;

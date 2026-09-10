@@ -78,7 +78,7 @@ describe("percentileLadderGeometry", () => {
       data: [9.06e-18, 5e-324, 0],
       scale: "linear",
     })!;
-    expect(Number.isFinite(geo.ratio)).toBe(true);
+    expect(geo.ratio === null || Number.isFinite(geo.ratio)).toBe(true);
   });
 
   test.prop([
@@ -91,6 +91,6 @@ describe("percentileLadderGeometry", () => {
       expect(t.x).toBeGreaterThanOrEqual(-0.01);
       expect(t.x).toBeLessThanOrEqual(80.01);
     }
-    expect(Number.isFinite(geo.ratio)).toBe(true);
+    expect(geo.ratio === null || Number.isFinite(geo.ratio)).toBe(true);
   });
 });

@@ -40,7 +40,6 @@ export interface InteractiveErrorBudgetProps extends ErrorBudgetProps, PickerPro
 export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode {
   const {
     data,
-    window,
     rates,
     unit = "day",
     height = 20,
@@ -69,6 +68,8 @@ export function ErrorBudget(props: InteractiveErrorBudgetProps): React.ReactNode
   // viewBox. The composed static reserves a right gutter for the "remaining"
   // label (widening the viewBox past `width`); without it the pointer map and
   // readout run at a short scale and the crosshair drifts from the cursor.
+  // One fallback, shared with the static: a non-finite `window` reads as unset.
+  const window = Number.isFinite(props.window) ? props.window : undefined;
   const geo = useMemo(() => {
     const base = errorBudgetGeometry({ width, height, data, window, rates });
     // The static drops label AND gutter together in a box too short to seat the

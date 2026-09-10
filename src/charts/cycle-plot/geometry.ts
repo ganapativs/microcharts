@@ -52,7 +52,8 @@ export const CYCLE_MAX_PERIOD = 366;
  *  Exported so the no-data branch can seat the same frame a populated one uses. */
 export const CYCLE_PAD = 2;
 
-const meanOf = (a: readonly number[]): number => a.reduce((s, v) => s + v, 0) / a.length;
+// streaming mean: a plain sum overflows past 1e308 and put cy="Infinity" on a slot
+const meanOf = (a: readonly number[]): number => a.reduce((m, v, i) => m + (v - m) / (i + 1), 0);
 
 function medianOf(a: readonly number[]): number {
   const s = [...a].sort((x, y) => x - y);

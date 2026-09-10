@@ -19,7 +19,8 @@ export interface SpreadDatum {
 export function lastGap(data: readonly SpreadDatum[]): number | null {
   for (let i = data.length - 1; i >= 0; i--) {
     const d = data[i];
-    if (d && isFiniteValue(d.a) && isFiniteValue(d.b)) return d.a - d.b;
+    if (d && isFiniteValue(d.a) && isFiniteValue(d.b))
+      return isFiniteValue(d.a - d.b) ? d.a - d.b : null;
   }
   return null;
 }

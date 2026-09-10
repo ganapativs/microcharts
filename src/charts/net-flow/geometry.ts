@@ -148,15 +148,17 @@ export function netFlowGeometry(opts: {
   ]);
   const netPts: XY[] = nets.map((v, i) => [round2(lineX(i)), up(v)]);
 
+  // Columns clamp to the half-height like the paths do, or a `domain` under
+  // the data sends a bar past the box.
   const inBars: FlowBar[] = ins.map((v, i) => {
-    const h = round2(scale(v));
+    const h = round2(Math.min(scale(v), half));
     return { x: round2(barCenter(i) - barW / 2), y: round2(zeroY - h), width: barW, height: h };
   });
   const outBars: FlowBar[] = outs.map((v, i) => ({
     x: round2(barCenter(i) - barW / 2),
     y: zeroY,
     width: barW,
-    height: round2(scale(v)),
+    height: round2(Math.min(scale(v), half)),
   }));
 
   const down = (v: number) => round2(clamp(zeroY + scale(v), padY, height - padY));

@@ -6,7 +6,7 @@
 // lower is always better in rank space (documented).
 import type { CSSProperties, ReactNode } from "react";
 import { Chart } from "../../shared/Chart.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFitsBand, labelFont } from "../../core/labels.js";
 import { devWarn } from "../../core/dev.js";
 import { EN_FLOW, type FlowStrings } from "../../core/strings-flow.js";
 import { isFiniteValue, type Value } from "../../core/types.js";
@@ -87,8 +87,13 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
     Math.min(Math.max(y, fontSize * 0.5), height - fontSize * 0.5);
   // maxOf, not `Math.max(...arr)`: a spread over a caller's series throws past
   // ~125k arguments. (The interactive entry already loops for the same reason.)
-  const maxLabelChars =
-    label === "none" ? 0 : 1 + String(maxOf(data.filter(isFiniteValue).map(Math.round), 1)).length;
+  // A box shorter than the font cannot seat a rank label: `labelY`'s clamp
+  // inverts and the glyph paints past the top edge, so the label DROPS and
+  // its gutter with it (labels.ts degradation rule).
+  const showLabel = label !== "none" && labelFitsBand(height, fontSize);
+  const maxLabelChars = showLabel
+    ? 1 + String(maxOf(data.filter(isFiniteValue).map(Math.round), 1)).length
+    : 0;
   const geo = bumpGeometry({
     width,
     height,
@@ -134,7 +139,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
             <circle key={i} cx={c.x} cy={c.y} r={1.5} data-mc-ink="accent" />
           ))
         : null}
-      {label !== "none" && geo.lastLabel ? (
+      {showLabel && geo.lastLabel ? (
         <text
           x={geo.lastLabel.x}
           y={labelY(geo.lastLabel.y)}
@@ -146,7 +151,7 @@ export function BumpStrip(props: BumpStripProps): ReactNode {
           {`#${geo.lastLabel.rank}`}
         </text>
       ) : null}
-      {label === "ends" && geo.firstLabel ? (
+      {showLabel && label === "ends" && geo.firstLabel ? (
         <text
           x={geo.firstLabel.x}
           y={labelY(geo.firstLabel.y)}

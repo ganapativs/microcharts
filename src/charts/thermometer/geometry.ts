@@ -60,7 +60,9 @@ export function thermometerGeometry(opts: {
   const alongLo = vertical ? height - pad - bulbR : pad + bulbR; // domain[0], bulb centre
   const alongHi = vertical ? pad : width - pad; // domain[1]
   const scale = scaleLinear(domain, [alongLo, alongHi]);
-  const clamped = clamp(value, domain[0], domain[1]);
+  // ±Infinity would clamp to a domain edge and paint a full/empty tube under
+  // a "No data." name; NaN already draws no fill, so it joins it.
+  const clamped = Number.isFinite(value) ? clamp(value, domain[0], domain[1]) : NaN;
   const edge = round2(scale(clamped));
   const overflow = value < domain[0] || value > domain[1];
 

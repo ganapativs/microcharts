@@ -5,7 +5,7 @@
 // tap-to-pin, and the onActive/onSelect contract.
 import { useCallback, useMemo, useRef } from "react";
 import { makeFormatter } from "../../core/format.js";
-import { labelFont } from "../../core/labels.js";
+import { labelFont, labelFitsY } from "../../core/labels.js";
 import {
   CHIP,
   named,
@@ -80,7 +80,14 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       projection,
       domain: props.domain,
     });
-    const showLabel = (props.label ?? "gap") === "gap" && base?.landing != null;
+    const FONT = labelFont(height, 0.55, props.labelSize);
+    // Same three-way gate as the static (`labelFitsY` included): a box too
+    // short to seat the label drops its gutter there, and a gutter reserved
+    // only here would scale the pointer map past the rendered viewBox.
+    const showLabel =
+      (props.label ?? "gap") === "gap" &&
+      base?.landing != null &&
+      labelFitsY(height / 2, FONT, height);
     // `[...unit][0]` matches the static's gutter arithmetic exactly — charAt
     // would split a surrogate pair into two units of width and drift the
     // pointer map from the rendered viewBox.
@@ -96,7 +103,7 @@ export function BurnChart(props: InteractiveBurnChartProps): React.ReactNode {
       projection,
       domain: props.domain,
       gutterCh,
-      fontSize: labelFont(height, 0.55, props.labelSize),
+      fontSize: FONT,
     });
   }, [
     width,

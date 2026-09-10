@@ -153,7 +153,9 @@ export function DualWindowMeter(props: DualWindowMeterProps): ReactNode {
   // sustained reading fits — it DROPS rather than spilling past the box. The
   // two traces against the target line are the encoding and survive alone.
   const showLabels = label === "last" && labelFitsY(height / 2, fontSize, height);
-  const showFast = showLabels && bothFit;
+  // With no slow reading there is nothing to crush against: the fast one alone
+  // needs one line, not two.
+  const showFast = showLabels && (bothFit || geo.slowLast == null);
   // the readout is `dominant-baseline: central`, so its box straddles y by half
   // a font EACH WAY — an asymmetric 0.6/0.4 clamp let the descender side hang
   // out of the box once the label filled the height.
