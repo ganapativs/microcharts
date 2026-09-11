@@ -1,5 +1,74 @@
 # @microcharts/react
 
+## 0.19.1
+
+### Patch Changes
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`702aba9`](https://github.com/ganapativs/microcharts/commit/702aba9a109f9f2fb96fe4d3adba8d44b6712542) Thanks [@ganapativs](https://github.com/ganapativs)! - A catalog-wide sweep for four defect classes, each already found once in a sibling chart:
+  
+  - **Labels gated against the wrong bound.** BumpStrip, SegmentedBar, ShiftHistogram, TreeRings, Honeycomb, MicroDonut,
+    CitySkyline, DataDiff, DotPlot, VolumeProfile, Thermometer (horizontal), TapeGauge (rate chevrons), Ohlc, Sparkline
+    and SparkBar (`label="last"`), BreathingDot, Funnel and BubbleRow now drop a label the box cannot seat instead of
+    painting it past the viewBox, stacking it on a neighbour, or collapsing the mark under it. NetFlow columns honour the
+    `domain` clamp like the paths.
+  - **Gates that counted inputs, not painted marks.** Slope's label density counts rows with a finite endpoint;
+    DualWindowMeter paints the fast reading alone when the slow window is unfilled.
+  - **No fabricated numbers.** ChangePoint reads `—` (never `0%`/`NaN%`) for a shift with no basis; PercentileLadder
+    states no multiple over a zero median; Delta with `from={0}` shows the absolute change; Sparkline/DualSparkline
+    summaries state the absolute change when the ratio overflows; ConfusionGrid, HeatCell, TreeRings, TraceFold,
+    CitySkyline, DicePips, Waterfall, ErrorBudget, Hourglass and Thermometer (`±Infinity`) no longer announce, chip or
+    report a value the paint does not show. RetentionCurve, QueueDepth and ShiftHistogram format the value the data holds,
+    not a 2-dp rounding of it. ActivityGrid and GardenGrid paint a positive value under `domain[0]` at level 1. PolarClock
+    accepts a fractional `now`. A NaN `width`/`height` no longer leaks into the markup of GradedBand, HeartbeatBlip,
+    HistogramStrip, Horizon, Hypnogram, IconArray or MicroBox.
+  - **Interactive basis matches the static.** BurnChart, ParetoStrip, RateVolume, ForecastCone, ShiftHistogram, EtaBar and
+    EnsembleGhosts reserve (or drop) the label gutter exactly as their static twin does, so the pointer map is never
+    scaled past the rendered viewBox. ABStrips announces the shown row's own side of the median gap.
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`b177f9c`](https://github.com/ganapativs/microcharts/commit/b177f9cc64365d13310dbf3bf11daa40085182cf) Thanks [@ganapativs](https://github.com/ganapativs)! - BalanceBeam: the lone value label no longer disappears when the other pan holds a non-finite value (NaN, ±Infinity, or
+  null). The two equivalent spellings of one known value — `[{label, value}]` and `[{label, value}, {label, NaN}]` — now
+  render the same numeral at every width, restoring the pre-`e406804` symmetry. The both-finite tilt-convergence
+  separation gate is unchanged.
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`c438f76`](https://github.com/ganapativs/microcharts/commit/c438f76a7459fb51d068ca2f66c315bae53a7105) Thanks [@ganapativs](https://github.com/ganapativs)! - `GradeProfile` readout fabricated a `0%` grade for a pitch whose `rise/run` overflows to `Infinity` (sub-normal run),
+  announcing `"0%, N gained."` — the exact string a real flat pitch renders, beside a non-zero climb. Screen-reader users,
+  who get only the live region (no painted bin/ink to disambiguate), had no signal the grade was the documented
+  placeholder rather than a genuine flat. The grade slot now substitutes a sentence-internal `gradeProfileUnrepresentable`
+  token ("unrepresentable"), keeping `dEnd` and `cumGain` announced as-painted. Adds `gradeProfileUnrepresentable` to
+  `SummaryStrings` (sentence-internal, no terminal punctuation so it never collides with the `gradeProfileAt` template's
+  commas).
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`e97d97c`](https://github.com/ganapativs/microcharts/commit/e97d97cd6f782090d5b872e4c2a618c1fbb4deac) Thanks [@ganapativs](https://github.com/ganapativs)! - Interactive `<Honeycomb>` announced a redundant `aria-live` count when its `value` flipped between `0` and `-0` — a
+  transition whose painted comb and summary string are identical ("0 of N seats filled."). The announce now keys on the
+  same `resolveValue` the comb, chip, and summary already use, so the live region stays quiet until the count the reader
+  perceives actually moves. The `value={NaN}` mount-silence from the shared `useAnnounceOnChange` hook is preserved.
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`4adf346`](https://github.com/ganapativs/microcharts/commit/4adf346b5826cb1fd9227aa8062350842671b773) Thanks [@ganapativs](https://github.com/ganapativs)! - `<IconArray label="percent">` reserves its label gutter from the widest string the caller's `format` can produce over
+  the grid's own values (k/n), not from `pct(1)`. "100%" is the widest percent, but a `format` that replaces the style
+  (`{ style: "decimal" }`, `{ style: "unit" }`) renders its narrowest form at 1 ("1", "1 km") and "0.05 km" at k=1, so the
+  reserve under-measured and the label painted past the viewBox at narrow widths.
+  
+  Interactive charts no longer re-announce a live-region sentence that did not change. `useAnnounceOnChange` keyed on the
+  raw value, so a move that leaves the spoken text identical (`0 → -0`, `3.4 → 3.2` under a rounding chart) spoke the same
+  sentence again. The region now speaks only when the sentence itself changes.
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`759bf32`](https://github.com/ganapativs/microcharts/commit/759bf32b4fb38eab391f895d04ee9409751c0121) Thanks [@ganapativs](https://github.com/ganapativs)! - `SproutRow` with two or more named items at the default labeled height and `label="value"` rendered zero-height plant
+  glyphs — the chart's primary growth-stage encoding was absent in its default configuration. The stage numeral's band is
+  now dropped when carving it would leave no room for plants, so the plants render at heights 39–42 (including the default
+  40); the numeral stays on from 43 up where both it and the plants fit.
+
+- [#173](https://github.com/ganapativs/microcharts/pull/173) [`cd629e1`](https://github.com/ganapativs/microcharts/commit/cd629e16af497c28ca12a5967aee3861e0db8a96) Thanks [@ganapativs](https://github.com/ganapativs)! - `<TimeInRange orientation="vertical" label="all">` no longer stacks adjacent small zones' percent labels on top of each
+  other.
+  
+  In vertical mode the along-strip (Y) fit gate was `labelFitsY(cy, fontSize, height)`, which bounds the label's em-box
+  against the full viewBox `height`. Two adjacent short zones whose centres sit mid-box both clear that gate, so both
+  labels paint with their centres only `(h1 + h2) / 2 + g` apart — far less than the font size — and stack on each other.
+  The chart now gates the vertical along-strip axis with `labelFitsBand(z.height, fontSize)` instead, the per-zone band
+  check the library already uses elsewhere: a band shorter than the font DROPS its label, so two adjacent short mid-box
+  zones no longer print on top of each other — the same degradation horizontal already gets from the cross-strip `span`
+  gate along its own X axis. Cross-strip X containment is unchanged; a band that fits still seats its label inside the
+  viewBox as a corollary.
+
 ## 0.19.0
 
 ### Minor Changes
