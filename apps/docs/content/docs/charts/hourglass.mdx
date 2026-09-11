@@ -68,13 +68,13 @@ chart that doesn't imply a clock.
   <Hourglass value={1.4} title="Overrun" height={36} />
 </LiveDemo>
 
-<LiveDemo label="NaN — treated as 0 elapsed (documented)" code={`<Hourglass value={Number.NaN} title="Invalid" />`}>
+<LiveDemo label="NaN — reads 'No data.', numeral dropped" code={`<Hourglass value={Number.NaN} title="Invalid" />`}>
   <Hourglass value={Number.NaN} title="Invalid" height={36} />
 </LiveDemo>
 
-Out-of-range values clamp to 0–1 in the drawing and in the accessible name, and `NaN` renders as 0 elapsed. Both ends
-drop the neck stream, so a not-started or finished glyph never reads as a running timer. In the static entry the stream
-is a state mark and is never animated.
+Out-of-range values clamp to 0–1 in the drawing and in the accessible name, and `NaN` draws as 0 elapsed but reads **"No
+data."** — the numeral drops, never a fabricated "0% elapsed". Both ends drop the neck stream, so a not-started or
+finished glyph never reads as a running timer. In the static entry the stream is a state mark and is never animated.
 
 ## Four homes
 
