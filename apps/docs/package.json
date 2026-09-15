@@ -28,7 +28,7 @@
     "@microcharts/react": "workspace:*",
     "@stackblitz/sdk": "^1.11.1",
     "cnfast": "^0.2.0",
-    "fumadocs-core": "16.15.7",
+    "fumadocs-core": "16.15.11",
     "fumadocs-mdx": "15.4.0",
     "fumadocs-ui": "16.15.7",
     "lucide-react": "^1.41.0",
