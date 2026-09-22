@@ -1,7 +1,7 @@
 # microcharts examples — visual test suite
 
-Seven **independent** real-world apps that each install `@microcharts/react` **from npm** (`0.19.0`) and integrate it
-via the [quickstart agent prompt](https://microcharts.dev/docs/quickstart). They are a **manual** visual harness: before
+Seven **independent** real-world apps that each install `@microcharts/react` **from npm** and integrate it via the
+[quickstart agent prompt](https://microcharts.dev/docs/quickstart). They are a **manual** visual harness: before
 shipping a major change, bump the dependency to the target version (or RC), reinstall, launch all seven, and eyeball
 that rendering, theming, interactivity, and the RSC/static path still behave — then take it live.
 
@@ -31,7 +31,7 @@ Together they cover: **all 106 chart types**, static vs interactive entries, all
 `selectedIndex`), **`readout={false}` + `datum.formatted`**, **`SparkGroup`**, **`defineTheme` + `MicroProvider`**, and
 responsive reflow (tested at 375 / 768 / 1280). Each app is a multi-section product with light+dark support.
 
-## Feature matrix (0.19.0 coverage)
+## Feature matrix
 
 | Surface                         | pulse                        | ledger | vitals  | shipyard | dispatch             | atlas     | cortex |
 | ------------------------------- | ---------------------------- | ------ | ------- | -------- | -------------------- | --------- | ------ |
@@ -53,7 +53,7 @@ responsive reflow (tested at 375 / 768 / 1280). Each app is a multi-section prod
 
 ```bash
 cd examples/<app>
-npm install                                        # resolves @microcharts/react@0.19.0 from npm
+npm install                                        # resolves @microcharts/react from npm
 npm run dev                                        # fixed port — see table
 ```
 
