@@ -1,6 +1,6 @@
 /**
  * Shared grammar — documented once for `catalog.json`, PropTable footer, and
- * `prop-parity.test.ts` (`SHARED_PROP_NAMES` / `SHARED_INTERACTIVE_NAMES`).
+ * `prop-parity.test.ts`.
  * Descriptions mirror quickstart#the-shared-grammar — keep in sync.
  */
 import type { ChartProp } from "./types";
@@ -197,22 +197,3 @@ export const SHARED_PROPS: ChartProp[] = [
   ...I18N_PROPS,
   ...SHARED_INTERACTIVE_PROPS,
 ];
-
-/**
- * Static shared names per-chart tables may omit. `size`, `fontSize`, `gap`, `cell`
- * left this set — not universal and not one meaning across charts; each chart
- * documents its own row (`prop-parity` enforces).
- */
-export const SHARED_PROP_NAMES: ReadonlySet<string> = new Set([
-  ...GRAMMAR_PROPS.map((p) => p.name),
-  ...LAYOUT_PROPS.map((p) => p.name),
-  ...I18N_PROPS.map((p) => p.name),
-  // structural / react
-  "children",
-  "ref",
-  "key",
-]);
-
-export const SHARED_INTERACTIVE_NAMES: ReadonlySet<string> = new Set(
-  SHARED_INTERACTIVE_PROPS.map((p) => p.name),
-);
