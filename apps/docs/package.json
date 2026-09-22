@@ -28,9 +28,9 @@
     "@microcharts/react": "workspace:*",
     "@stackblitz/sdk": "^1.11.1",
     "cnfast": "^0.2.0",
-    "fumadocs-core": "16.15.12",
+    "fumadocs-core": "16.15.13",
     "fumadocs-mdx": "15.4.3",
-    "fumadocs-ui": "16.15.12",
+    "fumadocs-ui": "16.15.13",
     "lucide-react": "^1.47.0",
     "next": "^16.3.5",
     "next-themes": "^0.4.6",
@@ -49,6 +49,6 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1",
-    "wrangler": "^4.136.1"
+    "wrangler": "^4.136.2"
   }
 }
