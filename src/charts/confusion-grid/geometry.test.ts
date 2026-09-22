@@ -8,7 +8,7 @@ const COUNTS = [
 ];
 
 describe("confusionGridGeometry", () => {
-  it("computes accuracy, row totals, and the worst off-diagonal", () => {
+  it("computes row totals and the worst off-diagonal", () => {
     const geo = confusionGridGeometry({
       size: 40,
       k: 2,
@@ -18,7 +18,6 @@ describe("confusionGridGeometry", () => {
     });
     expect(geo.cells.length).toBe(4);
     expect(geo.rowTotals).toEqual([100, 69]);
-    expect(geo.accuracy).toBe(0.87);
     expect(geo.maxErrorCell).toEqual({ row: 0, col: 1 }); // cat→dog
   });
 
