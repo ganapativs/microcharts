@@ -2,12 +2,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { STABLE_CHARTS } from "./charts/registry";
-import {
-  SHARED_PROP_NAMES,
-  SHARED_INTERACTIVE_NAMES,
-  SHARED_INTERACTIVE_PROPS,
-  SHARED_PROPS,
-} from "./charts/shared-props";
+import { SHARED_INTERACTIVE_PROPS, SHARED_PROPS } from "./charts/shared-props";
 
 // Each chart's prop table (hand-authored in lib/charts/<slug>.tsx) must document
 // every chart-SPECIFIC prop the component actually accepts — on BOTH the static
@@ -18,10 +13,16 @@ import {
 // that lived entirely outside the static-only guard.
 //
 // Shared props are documented once — the static grammar in quickstart#the-shared-
-// grammar + the PropTable footer (SHARED_PROP_NAMES), and the shared interactive
-// props animate/live (SHARED_INTERACTIVE_NAMES). Per-chart tables omit both.
-const SHARED = SHARED_PROP_NAMES;
-const SHARED_INTERACTIVE = new Set([...SHARED_PROP_NAMES, ...SHARED_INTERACTIVE_NAMES]);
+// grammar + the PropTable footer, and the shared interactive props animate/live.
+// Per-chart tables omit both.
+const SHARED = new Set([
+  ...SHARED_PROPS.filter((p) => !p.interactive).map((p) => p.name),
+  // structural / react
+  "children",
+  "ref",
+  "key",
+]);
+const SHARED_INTERACTIVE = new Set([...SHARED_PROPS.map((p) => p.name), "children", "ref", "key"]);
 
 // Escape hatch for props that are public but intentionally undocumented. Keep it
 // empty; add "<slug>:<prop>" entries only with a written reason.
@@ -65,29 +66,6 @@ function clientProps(slug: string): string[] {
     .flatMap(([, props]) => props);
   return [...own, ...mixed];
 }
-
-// Everything a per-chart table is excused from must be documented SOMEWHERE —
-// the shared grammar / layout / i18n lists render into quickstart, the PropTable
-// footer and catalog.json's `sharedProps`. The only legitimate extras are the
-// structural React props, which are not part of the chart API at all.
-//
-// `size`, `fontSize`, `gap` and `cell` used to sit here undocumented: excused
-// from every per-chart table AND absent from every shared list, so 31 charts had
-// public knobs that appeared nowhere. Re-adding an undocumented name here is
-// that same hole, so this test closes it.
-describe("the shared-prop escape hatch documents what it excuses", () => {
-  it("excuses only documented shared props plus the structural React props", () => {
-    const documented = new Set(SHARED_PROPS.map((p) => p.name));
-    const structural = new Set(["children", "ref", "key"]);
-    const undocumented = [...SHARED_PROP_NAMES].filter(
-      (n) => !documented.has(n) && !structural.has(n),
-    );
-    expect(
-      undocumented,
-      `SHARED_PROP_NAMES hides props no shared list documents: ${undocumented.join(", ")}`,
-    ).toEqual([]);
-  });
-});
 
 describe("chart prop tables cover the component's public props", () => {
   for (const chart of STABLE_CHARTS) {

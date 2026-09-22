@@ -136,8 +136,8 @@
     "interactive": 5.88
   },
   "coverage-strip": {
-    "static": 2.62,
-    "interactive": 5.01
+    "static": 2.61,
+    "interactive": 5
   },
   "benchmark-strip": {
     "static": 3.07,
@@ -364,8 +364,8 @@
     "interactive": 5.26
   },
   "confusion-grid": {
-    "static": 2.86,
-    "interactive": 5.49
+    "static": 2.83,
+    "interactive": 5.45
   },
   "folded-day-band": {
     "static": 2.58,

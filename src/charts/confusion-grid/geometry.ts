@@ -26,7 +26,6 @@ export function confusionGridGeometry(opts: {
 }): {
   cells: ConfusionCell[];
   rowTotals: number[];
-  accuracy: number;
   maxErrorCell: { row: number; col: number } | null;
   /** Matrix block, top and bottom edges — below the reserved axis-label gutter. */
   y0: number;
@@ -45,8 +44,6 @@ export function confusionGridGeometry(opts: {
   let globalMax = 0;
   for (const row of counts) for (const v of row) if (clean(v) > globalMax) globalMax = clean(v);
 
-  let trace = 0;
-  let total = 0;
   let maxError = -1;
   let maxErrorCell: { row: number; col: number } | null = null;
 
@@ -55,8 +52,6 @@ export function confusionGridGeometry(opts: {
   for (let r = 0; r < k; r++) {
     for (let c = 0; c < k; c++) {
       const count = clean(counts[r]?.[c] ?? 0);
-      total += count;
-      if (r === c) trace += count;
       if (r !== c && count > maxError) {
         maxError = count;
         maxErrorCell = { row: r, col: c };
@@ -81,7 +76,6 @@ export function confusionGridGeometry(opts: {
   return {
     cells,
     rowTotals,
-    accuracy: total > 0 ? round2(trace / total) : 0,
     maxErrorCell: maxError > 0 ? maxErrorCell : null,
     y0: round2(inset),
     y1: round2(inset + k * cellW),
